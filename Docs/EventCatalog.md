@@ -1,9 +1,9 @@
 # ECLIPSE Event Catalog
 *Governance: GDD 14.2 — every event-bus tag is documented here in the same commit that adds it. GDD 12.2 rule 2 — subsystems communicate only via these events (or explicit public interfaces).*
 
-**Status legend:** `specified` = named in a Phase 1 spec, no code yet · `implemented` = native tag + emitter exist.
+**Status legend:** `specified` = named in a Phase 1 spec, no code yet · `declared` = native tag exists in `Source/Eclipse/Core/EclipseGameplayTags.cpp` (SPEC-P1-01 bus infrastructure), emitter pending · `implemented` = native tag + emitter exist.
 
-All tags below are **specified** (Phase 0 output; implementation lands in Phase 1).
+All tags below are **declared** (SPEC-P1-01: the bus and all native tags landed together; payload structs live in `Core/EclipseEventPayloads.h`). Rows move to `implemented` in the commit that adds their emitter (specs P1-02…08).
 
 | Tag | Payload (struct) | Emitted by | Consumed by | Spec |
 |---|---|---|---|---|

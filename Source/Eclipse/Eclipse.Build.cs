@@ -6,6 +6,11 @@ public class Eclipse : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		// GDD 12.2 fixes the layout to subsystem folders directly under the module
+		// (no Public/Private split); expose the module root so includes are written
+		// as "Core/..." etc. from anywhere in (or dependent on) this module.
+		PublicIncludePaths.Add(ModuleDirectory);
+
 		// Dependency set mirrors the Phase 1 architecture decisions (GDD 12.1):
 		// GAS for all abilities/attributes, EnhancedInput for context stacks,
 		// AIModule/NavigationSystem for squad AI, GameplayTags for the event bus.
