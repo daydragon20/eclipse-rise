@@ -29,4 +29,8 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierDied, "Event.Roster.SoldierDied", "A soldier died permanently; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierWounded, "Event.Roster.SoldierWounded", "A soldier was wounded and is out N days; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Memorial_EntryAdded, "Event.Memorial.EntryAdded", "A memorial record was written; the wall never resets (SPEC-P1-07, Pillar 3).")
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Resource_Credits, "Resource.Credits", "Money — the grey world (GDD 6.2). Phase 1 wallet resource.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Resource_Materials, "Resource.Materials", "Industrial matter for construction/manufacturing (GDD 6.2). Phase 1 wallet resource.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Resource_Intel, "Resource.Intel", "Secrets; decays weekly to force spending (GDD 6.2). Phase 1 wallet resource.")
 }

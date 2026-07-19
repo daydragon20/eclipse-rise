@@ -44,4 +44,10 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierDied)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierWounded)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Memorial_EntryAdded)
+
+	// Resource identities — Phase 1 subset of GDD 6.2 (C/M/I). Not events; the
+	// wallet and all economy data key off these. Amounts stay in DataAssets.
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Resource_Credits)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Resource_Materials)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Resource_Intel)
 }

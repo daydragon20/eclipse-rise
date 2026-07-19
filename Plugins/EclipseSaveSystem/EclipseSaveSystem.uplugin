@@ -1,0 +1,20 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "Eclipse Save System",
+	"Description": "Versioned save/load with per-subsystem serialization contracts and a migration registry (GDD 12.3; SPEC-P1-02 save v0).",
+	"Category": "Eclipse",
+	"CreatedBy": "ECLIPSE team",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "EclipseSaveSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

@@ -19,11 +19,17 @@ void UEclipseEventBusSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 #if !UE_BUILD_SHIPPING
-	DumpCommand = IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("Eclipse.Events.Dump"),
-		TEXT("Log the most recent event-bus broadcasts with payload type and age."),
-		FConsoleCommandDelegate::CreateUObject(this, &UEclipseEventBusSubsystem::DumpRecentEvents),
-		ECVF_Default);
+	// Guarded: with several GameInstances alive (PIE clients, test fixtures) only
+	// the first registers; the command binds to that instance's bus, which is
+	// acceptable for a diagnostic.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.Events.Dump")) == nullptr)
+	{
+		DumpCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.Events.Dump"),
+			TEXT("Log the most recent event-bus broadcasts with payload type and age."),
+			FConsoleCommandDelegate::CreateUObject(this, &UEclipseEventBusSubsystem::DumpRecentEvents),
+			ECVF_Default);
+	}
 #endif
 }
 

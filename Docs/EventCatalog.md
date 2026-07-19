@@ -3,28 +3,28 @@
 
 **Status legend:** `specified` = named in a Phase 1 spec, no code yet · `declared` = native tag exists in `Source/Eclipse/Core/EclipseGameplayTags.cpp` (SPEC-P1-01 bus infrastructure), emitter pending · `implemented` = native tag + emitter exist.
 
-All tags below are **declared** (SPEC-P1-01: the bus and all native tags landed together; payload structs live in `Core/EclipseEventPayloads.h`). Rows move to `implemented` in the commit that adds their emitter (specs P1-02…08).
+Payload structs live in `Core/EclipseEventPayloads.h`. Rows move to `implemented` in the commit that adds their emitter (specs P1-02…08).
 
-| Tag | Payload (struct) | Emitted by | Consumed by | Spec |
-|---|---|---|---|---|
-| `Event.Campaign.DayAdvanced` | `FEclipseCampaignEventPayload` (new day index) | CampaignSubsystem (commit) | Economy (tick) | P1-02 |
-| `Event.Economy.ResourcesChanged` | `FEclipseEconomyEventPayload` (type, delta, new balance, reason) | CampaignSubsystem (commit) | Mini-map UI, Base UI | P1-02/03 |
-| `Event.Economy.ProductionQueued` | `FEclipseEconomyEventPayload` (item id, eta) | CampaignSubsystem (commit) | Base UI | P1-03 |
-| `Event.Economy.ProductionCompleted` | `FEclipseEconomyEventPayload` (item id, loadout tag) | Economy tick → commit | Base UI, Preparation | P1-03 |
-| `Event.Strategy.RegionControlChanged` | `FEclipseStrategyEventPayload` (region id, old/new owner) | CampaignSubsystem (commit) | Mini-map UI | P1-02/04 |
-| `Event.Strategy.MissionSelected` | `FEclipseStrategyEventPayload` (region id, template id) | Mini-map screen | Preparation flow | P1-04 |
-| `Event.Prep.MissionLaunchRequested` | `FEclipsePrepEventPayload` (mission id, squad ids, loadout, insertion, intel level) | Preparation flow | Mission runtime | P1-08 |
-| `Event.Mission.Started` | `FEclipseMissionEventPayload` (mission id) | Mission runtime | Squad (spawn), UI | P1-05 |
-| `Event.Mission.ObjectiveCompleted` | `FEclipseMissionEventPayload` (mission id, objective id) | Objective components | Mission StateTree, UI | P1-05 |
-| `Event.Mission.Completed` | `FEclipseMissionEventPayload` (mission id, results) | Mission runtime (debrief) | Economy, Roster, Base UI | P1-05 |
-| `Event.Mission.Failed` | `FEclipseMissionEventPayload` (mission id, results) | Mission runtime (debrief) | Economy, Roster, Base UI | P1-05 |
-| `Event.Squad.OrderIssued` | `FEclipseSquadEventPayload` (soldier id, order, target) | Order input layer | Squad AI, debug UI | P1-06 |
-| `Event.Squad.OrderAcknowledged` | `FEclipseSquadEventPayload` (soldier id, order, bark line) | Squad AI | Debug UI, (later) VO | P1-06 |
-| `Event.Squad.OrderRefused` | `FEclipseSquadEventPayload` (soldier id, order, reason) | Squad AI | Debug UI, scenario tests | P1-06 |
-| `Event.Squad.SoldierDowned` | `FEclipseSquadEventPayload` (soldier id, cause) | Character/health | Mission runtime (debrief resolution) | P1-06/07 |
-| `Event.Roster.SoldierAdded` | `FEclipseRosterEventPayload` (soldier record) | CampaignSubsystem (commit) | Barracks UI | P1-07 |
-| `Event.Roster.SoldierDied` | `FEclipseRosterEventPayload` (soldier id, cause, day) | CampaignSubsystem (commit) | Barracks UI, Memorial | P1-07 |
-| `Event.Roster.SoldierWounded` | `FEclipseRosterEventPayload` (soldier id, days out) | CampaignSubsystem (commit) | Barracks UI | P1-07 |
-| `Event.Memorial.EntryAdded` | `FEclipseRosterEventPayload` (memorial entry) | CampaignSubsystem (commit) | Memorial UI | P1-07 |
+| Tag | Payload (struct) | Emitted by | Consumed by | Spec | Status |
+|---|---|---|---|---|---|
+| `Event.Campaign.DayAdvanced` | `FEclipseCampaignEventPayload` (new day index) | CampaignSubsystem (commit) | Economy (tick) | P1-02 | implemented |
+| `Event.Economy.ResourcesChanged` | `FEclipseEconomyEventPayload` (type, delta, new balance, reason) | CampaignSubsystem (commit) | Mini-map UI, Base UI | P1-02/03 | implemented |
+| `Event.Economy.ProductionQueued` | `FEclipseEconomyEventPayload` (item id, eta) | CampaignSubsystem (commit) | Base UI | P1-03 | implemented |
+| `Event.Economy.ProductionCompleted` | `FEclipseEconomyEventPayload` (item id, loadout tag) | Economy tick → commit | Base UI, Preparation | P1-03 | declared |
+| `Event.Strategy.RegionControlChanged` | `FEclipseStrategyEventPayload` (region id, old/new owner) | CampaignSubsystem (commit) | Mini-map UI | P1-02/04 | implemented |
+| `Event.Strategy.MissionSelected` | `FEclipseStrategyEventPayload` (region id, template id) | Mini-map screen | Preparation flow | P1-04 | declared |
+| `Event.Prep.MissionLaunchRequested` | `FEclipsePrepEventPayload` (mission id, squad ids, loadout, insertion, intel level) | Preparation flow | Mission runtime | P1-08 | declared |
+| `Event.Mission.Started` | `FEclipseMissionEventPayload` (mission id) | Mission runtime | Squad (spawn), UI | P1-05 | declared |
+| `Event.Mission.ObjectiveCompleted` | `FEclipseMissionEventPayload` (mission id, objective id) | Objective components | Mission StateTree, UI | P1-05 | declared |
+| `Event.Mission.Completed` | `FEclipseMissionEventPayload` (mission id, results) | Mission runtime (debrief) | Economy, Roster, Base UI | P1-05 | declared |
+| `Event.Mission.Failed` | `FEclipseMissionEventPayload` (mission id, results) | Mission runtime (debrief) | Economy, Roster, Base UI | P1-05 | declared |
+| `Event.Squad.OrderIssued` | `FEclipseSquadEventPayload` (soldier id, order, target) | Order input layer | Squad AI, debug UI | P1-06 | declared |
+| `Event.Squad.OrderAcknowledged` | `FEclipseSquadEventPayload` (soldier id, order, bark line) | Squad AI | Debug UI, (later) VO | P1-06 | declared |
+| `Event.Squad.OrderRefused` | `FEclipseSquadEventPayload` (soldier id, order, reason) | Squad AI | Debug UI, scenario tests | P1-06 | declared |
+| `Event.Squad.SoldierDowned` | `FEclipseSquadEventPayload` (soldier id, cause) | Character/health | Mission runtime (debrief resolution) | P1-06/07 | declared |
+| `Event.Roster.SoldierAdded` | `FEclipseRosterEventPayload` (soldier record) | CampaignSubsystem (commit) | Barracks UI | P1-07 | implemented |
+| `Event.Roster.SoldierDied` | `FEclipseRosterEventPayload` (soldier id, cause, day) | CampaignSubsystem (commit) | Barracks UI, Memorial | P1-07 | implemented |
+| `Event.Roster.SoldierWounded` | `FEclipseRosterEventPayload` (soldier id, days out) | CampaignSubsystem (commit) | Barracks UI | P1-07 | declared |
+| `Event.Memorial.EntryAdded` | `FEclipseRosterEventPayload` (memorial entry) | CampaignSubsystem (commit) | Memorial UI | P1-07 | implemented |
 
 **Rules for adding a tag:** name follows `Event.<System>.<PastTenseFact>`; facts, not commands (the bus reports what happened; the transaction API is how you make things happen — GDD 14.3.3). State-changing facts are emitted only by the CampaignState commit, never directly by gameplay code.

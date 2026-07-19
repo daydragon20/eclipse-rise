@@ -29,13 +29,16 @@ public class Eclipse : ModuleRules
 			"StateTreeModule",
 			"UMG",
 			"CommonUI",
-			"CommonInput"
+			"CommonInput",
+			"EclipseSaveSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"Json",
+			"JsonUtilities"
 		});
 	}
 }
