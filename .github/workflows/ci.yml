@@ -1,0 +1,52 @@
+# ECLIPSE CI — build + data validation + save-migration tests from day one (GDD 13.2 Phase 0).
+# Requires a self-hosted Windows runner with UE 5.7 installed at $env:UE_ROOT
+# (GitHub-hosted runners cannot build UE projects). Provisioning is an open Phase 0 item.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-editor:
+    runs-on: [self-hosted, windows, ue5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build EclipseEditor
+        shell: pwsh
+        run: |
+          & "$env:UE_ROOT\Engine\Build\BatchFiles\Build.bat" EclipseEditor Win64 Development `
+            -Project="$env:GITHUB_WORKSPACE\Eclipse.uproject" -WaitMutex -FromMsBuild
+
+  data-validation:
+    needs: build-editor
+    runs-on: [self-hosted, windows, ue5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ValidateData commandlet (GDD 12.2 rule 3)
+        shell: pwsh
+        run: |
+          & "$env:UE_ROOT\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+            "$env:GITHUB_WORKSPACE\Eclipse.uproject" -run=EclipseValidateData -unattended -nopause -nosplash
+      - name: Event catalog coverage (GDD 14.2)
+        shell: pwsh
+        run: python Tools/check_event_catalog.py
+
+  automation-tests:
+    needs: build-editor
+    runs-on: [self-hosted, windows, ue5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit + save round-trip + squad scenario suite (GDD 14.4)
+        shell: pwsh
+        run: |
+          & "$env:UE_ROOT\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+            "$env:GITHUB_WORKSPACE\Eclipse.uproject" `
+            -ExecCmds="Automation RunTests Eclipse; quit" -unattended -nopause -nosplash -nullrhi `
+            -log -ReportOutputPath="$env:GITHUB_WORKSPACE\Saved\Automation"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automation-report
+          path: Saved/Automation
