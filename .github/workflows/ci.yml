@@ -1,5 +1,5 @@
 # ECLIPSE CI — build + data validation + save-migration tests from day one (GDD 13.2 Phase 0).
-# Requires a self-hosted Windows runner with UE 5.7 installed at $env:UE_ROOT
+# Requires a self-hosted Windows runner with UE 5.8 installed at $env:UE_ROOT
 # (GitHub-hosted runners cannot build UE projects). Provisioning is an open Phase 0 item.
 name: ci
 

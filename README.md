@@ -5,9 +5,9 @@
 
 Pre-production (Phase 0, GDD 13.2). This is a compile-ready project skeleton: modules, config, CI contract, event catalog. **No gameplay features exist yet** — Phase 1 implementation starts only after the Phase 0 gate, per the ACTIVE_MILESTONE rule in `../13_roadmap.md`.
 
-## First-time setup (Windows workstation with UE 5.7)
+## First-time setup (Windows workstation with UE 5.8)
 
-1. Install UE 5.7 + Visual Studio 2022 (C++ game dev workload).
+1. Install UE 5.8 + Visual Studio 2022 (C++ game dev workload).
 2. Right-click `Eclipse.uproject` → Generate Visual Studio project files.
 3. Build `EclipseEditor` (Development Editor | Win64), open the project.
 4. CI: provision a self-hosted runner with `UE_ROOT` set (see `.github/workflows/ci.yml`).
