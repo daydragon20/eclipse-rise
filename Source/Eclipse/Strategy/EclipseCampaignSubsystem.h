@@ -30,6 +30,14 @@ public:
 
 	const FEclipseCampaignState& GetState() const { return State; }
 
+	/**
+	 * Setup asset of the running campaign (region/economy definitions). Null
+	 * before StartNewCampaign or after a bare load — consumers must degrade
+	 * gracefully (GDD 14.3.5). PLACEHOLDER(GDD 12.3): a loaded save re-resolves
+	 * its setup via project settings once campaign-slot metadata exists.
+	 */
+	const UEclipseCampaignSetupAsset* GetActiveSetup() const { return ActiveSetup; }
+
 	/** The only writer. Emits one event per applied mutation after the whole transaction lands. */
 	bool CommitTransaction(const FEclipseCampaignTransaction& Transaction, FString& OutError);
 
@@ -52,5 +60,9 @@ private:
 	void UnregisterConsoleCommands();
 
 	FEclipseCampaignState State;
+
+	UPROPERTY()
+	TObjectPtr<const UEclipseCampaignSetupAsset> ActiveSetup;
+
 	TArray<IConsoleObject*> ConsoleCommands;
 };

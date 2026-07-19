@@ -126,9 +126,9 @@ struct FEclipseCampaignState
 {
 	GENERATED_BODY()
 
-	/** Bumped on breaking layout change; the save system routes migrations off it. */
+	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Campaign")
-	int32 SchemaVersion = 1;
+	int32 SchemaVersion = 2;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 Day = 0;
@@ -149,6 +149,10 @@ struct FEclipseCampaignState
 	/** 0 or 1 entries in Phase 1; slot count becomes data when facilities land (GDD 5.3). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TArray<FEclipseProductionOrder> ProductionQueue;
+
+	/** Loadout options earned by completed production (SPEC-P1-03: the choice must matter next mission). Append-only, insertion-ordered. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TArray<FGameplayTag> UnlockedLoadoutTags;
 
 	int32 GetBalance(const FGameplayTag& ResourceType) const
 	{

@@ -5,6 +5,7 @@
 #include "GameplayTagContainer.h"
 #include "EclipseCampaignSetupAsset.generated.h"
 
+class UEclipseEconomyDataAsset;
 class UEclipseRegionGraphAsset;
 
 /**
@@ -38,4 +39,8 @@ public:
 	/** The district's region definitions (SPEC-P1-04 asset). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipseRegionGraphAsset> RegionGraph;
+
+	/** Economy tunables for this campaign (SPEC-P1-03). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipseEconomyDataAsset> EconomyData;
 };

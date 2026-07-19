@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "GameplayTagContainer.h"
 #include "Strategy/EclipseCampaignTypes.h"
 #include "EclipseRegionGraphAsset.generated.h"
 
@@ -30,6 +31,10 @@ struct FEclipseRegionDefinition
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Strategy", meta = (ClampMin = 0))
 	int32 StartingGarrison = 0;
+
+	/** Per-day yield by Resource.* tag at 100% control (SPEC-P1-03; GDD 6.3.2 factors apply per owner). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Strategy")
+	TMap<FGameplayTag, int32> BaseYieldPerDay;
 };
 
 UCLASS(BlueprintType)

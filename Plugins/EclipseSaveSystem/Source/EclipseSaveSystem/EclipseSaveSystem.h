@@ -12,8 +12,9 @@ namespace EclipseSave
 	/**
 	 * Bump on any breaking change to the container or a provider payload —
 	 * and add a migration + test in the same commit (GDD 14.3.6).
+	 * v2: Campaign block gained UnlockedLoadoutTags (SPEC-P1-03).
 	 */
-	inline constexpr int32 CurrentSchemaVersion = 1;
+	inline constexpr int32 CurrentSchemaVersion = 2;
 
 	inline const FString AutosaveSlotName = TEXT("Autosave");
 	inline const FString ManualSlotName = TEXT("Manual");

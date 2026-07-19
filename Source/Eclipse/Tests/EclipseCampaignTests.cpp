@@ -321,9 +321,11 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
-	// Rewrite the header's schema version to 0: the registered no-op v0->v1
-	// migration must run exactly once and the load must still succeed
-	// (SPEC-P1-02: migration scaffold proven by CI, not by hope).
+	// Rewrite the header's schema version to 0: the whole chain (0->1 no-op,
+	// 1->2 loadout-unlock append) must run and the load must still succeed
+	// (SPEC-P1-02: migration scaffold proven by CI, not by hope). The 1->2
+	// tail-append is harmless on this v2-shaped block: readers stop at the
+	// original trailing count and ignore appended bytes.
 	TArray<uint8> FileBytes;
 	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
 	const int32 VersionOffset = sizeof(uint32);
@@ -332,7 +334,7 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("Load of v0 file succeeds via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly one migration step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("Both migration steps ran (0->1, 1->2)"), Target.Save->GetLastLoadMigrationStepCount(), 2);
 	TestEqual(TEXT("Migrated state matches source"),
 		Target.Campaign->GetState().ComputeStateHash(),
 		Source.Campaign->GetState().ComputeStateHash());

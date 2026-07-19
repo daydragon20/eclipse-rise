@@ -25,6 +25,7 @@ enum class EEclipseCampaignMutationType : uint8
 	KillSoldier,
 	AddMemorialEntry,
 	QueueProduction,
+	CompleteProduction,
 	AdvanceDay
 };
 
@@ -74,12 +75,16 @@ struct FEclipseCampaignMutation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FEclipseMemorialEntry MemorialEntry;
 
-	/** QueueProduction */
+	/** QueueProduction / CompleteProduction */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FName ProductionItemId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	int32 EtaDays = 0;
+
+	/** CompleteProduction: loadout option the finished item unlocks (SPEC-P1-03). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	FGameplayTag LoadoutTag;
 };
 
 USTRUCT(BlueprintType)

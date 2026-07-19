@@ -50,6 +50,11 @@ uint32 FEclipseCampaignState::ComputeStateHash() const
 		Hash = HashCombine(Hash, GetTypeHash(Order.CompletesOnDay));
 	}
 
+	for (const FGameplayTag& LoadoutTag : UnlockedLoadoutTags)
+	{
+		Hash = HashCombine(Hash, GetTypeHash(LoadoutTag.GetTagName()));
+	}
+
 	return Hash;
 }
 
@@ -156,6 +161,17 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 		}
 		return true;
 	}
+	case EEclipseCampaignMutationType::CompleteProduction:
+	{
+		const FEclipseProductionOrder* Order = State.ProductionQueue.FindByPredicate(
+			[&Mutation](const FEclipseProductionOrder& Candidate) { return Candidate.ItemId == Mutation.ProductionItemId; });
+		if (Order == nullptr)
+		{
+			OutError = FString::Printf(TEXT("CompleteProduction: '%s' is not in the queue"), *Mutation.ProductionItemId.ToString());
+			return false;
+		}
+		return true;
+	}
 	case EEclipseCampaignMutationType::AdvanceDay:
 		return true;
 	default:
@@ -213,6 +229,17 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 		Order.CompletesOnDay = State.Day + Mutation.EtaDays;
 		State.ProductionQueue.Add(Order);
 		Applied.ProductionCompletesOnDay = Order.CompletesOnDay;
+		break;
+	}
+	case EEclipseCampaignMutationType::CompleteProduction:
+	{
+		const int32 Removed = State.ProductionQueue.RemoveAll(
+			[&Mutation](const FEclipseProductionOrder& Candidate) { return Candidate.ItemId == Mutation.ProductionItemId; });
+		check(Removed > 0);
+		if (Mutation.LoadoutTag.IsValid())
+		{
+			State.UnlockedLoadoutTags.AddUnique(Mutation.LoadoutTag);
+		}
 		break;
 	}
 	case EEclipseCampaignMutationType::AdvanceDay:

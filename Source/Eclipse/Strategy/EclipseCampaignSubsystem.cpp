@@ -108,6 +108,29 @@ namespace
 			Ar << Order.ItemId;
 			Ar << Order.CompletesOnDay;
 		}
+
+		// Schema v2 (SPEC-P1-03): unlocked loadout tags, appended at block end so
+		// the v1->v2 migration is a pure tail-append of an empty count.
+		int32 UnlockCount = State.UnlockedLoadoutTags.Num();
+		Ar << UnlockCount;
+		if (Ar.IsLoading())
+		{
+			State.UnlockedLoadoutTags.Reset();
+			for (int32 Index = 0; Index < UnlockCount; ++Index)
+			{
+				FName TagName;
+				Ar << TagName;
+				State.UnlockedLoadoutTags.Add(FGameplayTag::RequestGameplayTag(TagName, /*ErrorIfNotFound*/ false));
+			}
+		}
+		else
+		{
+			for (const FGameplayTag& LoadoutTag : State.UnlockedLoadoutTags)
+			{
+				FName TagName = LoadoutTag.GetTagName();
+				Ar << TagName;
+			}
+		}
 	}
 }
 
@@ -126,6 +149,23 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		// end-to-end in CI before the first real schema break needs it.
 		SaveSubsystem->RegisterMigration(0, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
 			[](TMap<FName, TArray<uint8>>&) { return true; }));
+
+		// v1 -> v2 (SPEC-P1-03): the Campaign block gained a trailing
+		// UnlockedLoadoutTags array. Rewrite the leading state SchemaVersion int
+		// and append an empty array count — old campaigns simply own no unlocks.
+		SaveSubsystem->RegisterMigration(1, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
+			[](TMap<FName, TArray<uint8>>& Blocks)
+			{
+				TArray<uint8>* CampaignBlock = Blocks.Find(TEXT("Campaign"));
+				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
+				{
+					return false;
+				}
+				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 2;
+				const int32 EmptyCount = 0;
+				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
+				return true;
+			}));
 	}
 
 	RegisterConsoleCommands();
@@ -149,6 +189,7 @@ void UEclipseCampaignSubsystem::Deinitialize()
 void UEclipseCampaignSubsystem::StartNewCampaign(const UEclipseCampaignSetupAsset* Setup)
 {
 	State = FEclipseCampaignState();
+	ActiveSetup = Setup;
 
 	if (Setup == nullptr)
 	{
@@ -277,6 +318,15 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			Payload.EtaDays = Record.ProductionCompletesOnDay - Record.DayAfter;
 			Payload.Reason = Mutation.Reason;
 			Bus->Broadcast(EclipseTags::Event_Economy_ProductionQueued, FInstancedStruct::Make(Payload));
+			break;
+		}
+		case EEclipseCampaignMutationType::CompleteProduction:
+		{
+			FEclipseEconomyEventPayload Payload;
+			Payload.ItemId = Mutation.ProductionItemId;
+			Payload.LoadoutTag = Mutation.LoadoutTag;
+			Payload.Reason = Mutation.Reason;
+			Bus->Broadcast(EclipseTags::Event_Economy_ProductionCompleted, FInstancedStruct::Make(Payload));
 			break;
 		}
 		case EEclipseCampaignMutationType::AdvanceDay:
