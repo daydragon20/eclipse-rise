@@ -6,6 +6,7 @@
 #include "EclipseCampaignSetupAsset.generated.h"
 
 class UEclipseEconomyDataAsset;
+class UEclipsePrepTuningAsset;
 class UEclipseRegionGraphAsset;
 class UEclipseRosterTuningAsset;
 
@@ -48,4 +49,8 @@ public:
 	/** Roster tunables + name/trait pools (SPEC-P1-07). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipseRosterTuningAsset> RosterTuning;
+
+	/** Preparation tunables + loadout options (SPEC-P1-08). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipsePrepTuningAsset> PrepTuning;
 };

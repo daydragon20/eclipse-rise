@@ -13,7 +13,7 @@ Payload structs live in `Core/EclipseEventPayloads.h`. Rows move to `implemented
 | `Event.Economy.ProductionCompleted` | `FEclipseEconomyEventPayload` (item id, loadout tag) | Economy tick → commit | Base UI, Preparation | P1-03 | declared |
 | `Event.Strategy.RegionControlChanged` | `FEclipseStrategyEventPayload` (region id, old/new owner) | CampaignSubsystem (commit) | Mini-map UI | P1-02/04 | implemented |
 | `Event.Strategy.MissionSelected` | `FEclipseStrategyEventPayload` (region id, template id) | StrategySubsystem (map screen pick) | Preparation flow | P1-04 | implemented |
-| `Event.Prep.MissionLaunchRequested` | `FEclipsePrepEventPayload` (mission id, squad ids, loadout, insertion, intel level) | Preparation flow | Mission runtime | P1-08 | declared |
+| `Event.Prep.MissionLaunchRequested` | `FEclipsePrepEventPayload` (mission id, squad ids, loadout, insertion, intel level) | PrepSubsystem (validated launch) | Mission runtime | P1-08 | implemented |
 | `Event.Mission.Started` | `FEclipseMissionEventPayload` (mission id) | MissionSubsystem | Squad (spawn), UI | P1-05 | implemented |
 | `Event.Mission.ObjectiveCompleted` | `FEclipseMissionEventPayload` (mission id, objective id) | MissionSubsystem (objective components report in) | Mission phases, UI | P1-05 | implemented |
 | `Event.Mission.Completed` | `FEclipseMissionEventPayload` (mission id, results) | MissionSubsystem (debrief) | Economy, Roster, Base UI | P1-05 | implemented |

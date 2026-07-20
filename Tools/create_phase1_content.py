@@ -169,7 +169,27 @@ setup.set_editor_property("region_graph", graph)
 setup.set_editor_property("economy_data", economy)
 setup.set_editor_property("roster_tuning", roster_tuning)
 
-for asset in (graph, offers, items, economy, name_pools, traits, roster_tuning, setup):
+# --- Preparation data (SPEC-P1-08): loadout options + tuning.
+loadouts = get_or_create("DT_LoadoutOptions", unreal.DataTable,
+                         make_table_factory(unreal.EclipseLoadoutOptionRow.static_struct()))
+loadouts_json = json.dumps([
+    {"Name": "Loadout_Scavenged", "DisplayName": "Scavenged arms",
+     "LoadoutTag": {"TagName": "Loadout.Scavenged"}, "RequiredUnlockTag": {"TagName": "None"}},
+    {"Name": "Loadout_Rifle", "DisplayName": "Rifle platform",
+     "LoadoutTag": {"TagName": "Loadout.Rifle"}, "RequiredUnlockTag": {"TagName": "Loadout.Rifle"}},
+    {"Name": "Loadout_MediumArmor", "DisplayName": "Medium armor",
+     "LoadoutTag": {"TagName": "Loadout.MediumArmor"}, "RequiredUnlockTag": {"TagName": "Loadout.MediumArmor"}},
+])
+if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(loadouts, loadouts_json):
+    raise RuntimeError("DT_LoadoutOptions JSON fill failed")
+
+prep_tuning = get_or_create("DA_PrepTuning", unreal.EclipsePrepTuningAsset)
+prep_tuning.set_editor_property("intel_reveal_cost", 5)
+prep_tuning.set_editor_property("squad_size", 2)
+prep_tuning.set_editor_property("loadout_options", loadouts)
+setup.set_editor_property("prep_tuning", prep_tuning)
+
+for asset in (graph, offers, items, economy, name_pools, traits, roster_tuning, loadouts, prep_tuning, setup):
     editor_asset.save_loaded_asset(asset)
 
-unreal.log("Phase 1 content bootstrap complete: 8 assets in /Game/Data.")
+unreal.log("Phase 1 content bootstrap complete: 10 assets in /Game/Data.")
