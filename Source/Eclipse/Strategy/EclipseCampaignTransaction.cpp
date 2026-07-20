@@ -172,6 +172,26 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 		}
 		return true;
 	}
+	case EEclipseCampaignMutationType::WoundSoldier:
+	{
+		const FEclipseSoldierRecord* Soldier = State.FindSoldier(Mutation.SoldierId);
+		if (Soldier == nullptr)
+		{
+			OutError = FString::Printf(TEXT("WoundSoldier: unknown soldier %s"), *Mutation.SoldierId.ToString());
+			return false;
+		}
+		if (Soldier->Status == EEclipseSoldierStatus::Dead)
+		{
+			OutError = FString::Printf(TEXT("WoundSoldier: %s is dead"), *Soldier->Name);
+			return false;
+		}
+		if (Mutation.EtaDays <= 0)
+		{
+			OutError = TEXT("WoundSoldier: recovery days must be positive");
+			return false;
+		}
+		return true;
+	}
 	case EEclipseCampaignMutationType::AdvanceDay:
 		return true;
 	default:
@@ -240,6 +260,15 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 		{
 			State.UnlockedLoadoutTags.AddUnique(Mutation.LoadoutTag);
 		}
+		break;
+	}
+	case EEclipseCampaignMutationType::WoundSoldier:
+	{
+		FEclipseSoldierRecord* Soldier = State.Roster.FindByPredicate(
+			[&Mutation](const FEclipseSoldierRecord& S) { return S.SoldierId == Mutation.SoldierId; });
+		check(Soldier != nullptr);
+		Soldier->Status = EEclipseSoldierStatus::Wounded;
+		Soldier->WoundedUntilDay = State.Day + Mutation.EtaDays;
 		break;
 	}
 	case EEclipseCampaignMutationType::AdvanceDay:

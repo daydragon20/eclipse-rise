@@ -26,6 +26,7 @@ enum class EEclipseCampaignMutationType : uint8
 	AddMemorialEntry,
 	QueueProduction,
 	CompleteProduction,
+	WoundSoldier,
 	AdvanceDay
 };
 

@@ -8,6 +8,8 @@
 #include "Engine/GameInstance.h"
 #include "HAL/IConsoleManager.h"
 #include "JsonObjectConverter.h"
+#include "Squad/EclipseRosterLogic.h"
+#include "Squad/EclipseRosterTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "StructUtils/InstancedStruct.h"
@@ -217,16 +219,33 @@ void UEclipseCampaignSubsystem::StartNewCampaign(const UEclipseCampaignSetupAsse
 		UE_LOG(LogEclipse, Warning, TEXT("StartNewCampaign: setup asset has no region graph — campaign starts with zero regions."));
 	}
 
-	// PLACEHOLDER(GDD 4.2.1): numbered recruits until SPEC-P1-07's name/trait
-	// tables land; ids are deterministic per slot for test reproducibility.
+	// SPEC-P1-07: soldiers are generated people, not numbers. Pools resolve from
+	// data; empty/missing pools degrade to numbered recruits inside the core.
+	EclipseRosterLogic::FEclipseNameGenerationParams NameParams;
+	const FName OriginId = TEXT("Kessara");
+	if (const UEclipseRosterTuningAsset* RosterTuning = Setup->RosterTuning.LoadSynchronous())
+	{
+		if (const UDataTable* NamePools = RosterTuning->NamePools.LoadSynchronous())
+		{
+			if (const FEclipseNamePoolRow* Pool = NamePools->FindRow<FEclipseNamePoolRow>(OriginId, TEXT("StartNewCampaign"), /*bWarnIfMissing*/ false))
+			{
+				NameParams.FirstNames = Pool->FirstNames;
+				NameParams.LastNames = Pool->LastNames;
+			}
+		}
+		if (const UDataTable* TraitStubs = RosterTuning->TraitStubs.LoadSynchronous())
+		{
+			NameParams.TraitIds = TraitStubs->GetRowNames();
+		}
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("StartNewCampaign: no roster tuning asset — recruits get fallback names (GDD 14.3.5)."));
+	}
+
 	for (int32 Index = 0; Index < Setup->StartingRosterSize; ++Index)
 	{
-		FEclipseSoldierRecord Soldier;
-		Soldier.SoldierId = FGuid(0x45434C53, 0x0BADCAFE, 0x00000000, Index + 1);
-		Soldier.Name = FString::Printf(TEXT("Recruit %02d"), Index + 1);
-		Soldier.OriginId = TEXT("Kessara");
-		Soldier.Status = EEclipseSoldierStatus::Available;
-		State.Roster.Add(Soldier);
+		State.Roster.Add(EclipseRosterLogic::GenerateSoldier(OriginId, NameParams, Index + 1));
 	}
 
 	UE_LOG(LogEclipse, Display, TEXT("New campaign: day %d, %d regions, %d soldiers."), State.Day, State.Regions.Num(), State.Roster.Num());
@@ -309,6 +328,16 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			Payload.Cause = Mutation.MemorialEntry.Cause;
 			Payload.Day = Mutation.MemorialEntry.Day;
 			Bus->Broadcast(EclipseTags::Event_Memorial_EntryAdded, FInstancedStruct::Make(Payload));
+			break;
+		}
+		case EEclipseCampaignMutationType::WoundSoldier:
+		{
+			FEclipseRosterEventPayload Payload;
+			Payload.SoldierId = Mutation.SoldierId;
+			Payload.Cause = Mutation.Cause;
+			Payload.Day = Record.DayAfter;
+			Payload.DaysOut = Mutation.EtaDays;
+			Bus->Broadcast(EclipseTags::Event_Roster_SoldierWounded, FInstancedStruct::Make(Payload));
 			break;
 		}
 		case EEclipseCampaignMutationType::QueueProduction:
@@ -428,6 +457,41 @@ void UEclipseCampaignSubsystem::RegisterConsoleCommands()
 			if (!CommitTransaction(Transaction, Error))
 			{
 				UE_LOG(LogEclipse, Error, TEXT("GrantResource failed: %s"), *Error);
+			}
+		}),
+		ECVF_Default));
+
+	ConsoleCommands.Add(Console.RegisterConsoleCommand(
+		TEXT("Eclipse.Roster.Kill"),
+		TEXT("Usage: Eclipse.Roster.Kill <RosterIndex> — debug permadeath incl. memorial (SPEC-P1-07 save/pipeline testing)."),
+		FConsoleCommandWithArgsDelegate::CreateWeakLambda(this, [this](const TArray<FString>& Args)
+		{
+			const int32 Index = Args.Num() == 1 ? FCString::Atoi(*Args[0]) : INDEX_NONE;
+			if (!State.Roster.IsValidIndex(Index))
+			{
+				UE_LOG(LogEclipse, Error, TEXT("Usage: Eclipse.Roster.Kill <RosterIndex 0..%d>"), State.Roster.Num() - 1);
+				return;
+			}
+			const FEclipseSoldierRecord& Soldier = State.Roster[Index];
+
+			FEclipseCampaignTransaction Transaction;
+			Transaction.Source = TEXT("DebugConsole");
+			FEclipseCampaignMutation& Kill = Transaction.Mutations.AddDefaulted_GetRef();
+			Kill.Type = EEclipseCampaignMutationType::KillSoldier;
+			Kill.SoldierId = Soldier.SoldierId;
+			Kill.Cause = TEXT("DebugConsole");
+			FEclipseCampaignMutation& Memorial = Transaction.Mutations.AddDefaulted_GetRef();
+			Memorial.Type = EEclipseCampaignMutationType::AddMemorialEntry;
+			Memorial.MemorialEntry.SoldierId = Soldier.SoldierId;
+			Memorial.MemorialEntry.Name = Soldier.Name;
+			Memorial.MemorialEntry.MissionsServed = Soldier.MissionsServed;
+			Memorial.MemorialEntry.Cause = TEXT("DebugConsole");
+			Memorial.MemorialEntry.Day = State.Day;
+
+			FString Error;
+			if (!CommitTransaction(Transaction, Error))
+			{
+				UE_LOG(LogEclipse, Error, TEXT("Roster.Kill failed: %s"), *Error);
 			}
 		}),
 		ECVF_Default));

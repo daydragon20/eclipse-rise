@@ -7,6 +7,7 @@
 
 class UEclipseEconomyDataAsset;
 class UEclipseRegionGraphAsset;
+class UEclipseRosterTuningAsset;
 
 /**
  * Campaign starting conditions (SPEC-P1-02 data schema). Every starting number
@@ -43,4 +44,8 @@ public:
 	/** Economy tunables for this campaign (SPEC-P1-03). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipseEconomyDataAsset> EconomyData;
+
+	/** Roster tunables + name/trait pools (SPEC-P1-07). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipseRosterTuningAsset> RosterTuning;
 };
