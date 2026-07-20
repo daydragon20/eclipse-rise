@@ -16,7 +16,9 @@ public class EclipseEditor : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			"UnrealEd"
+			"UnrealEd",
+			"AssetRegistry",
+			"GameplayTags"
 		});
 	}
 }
