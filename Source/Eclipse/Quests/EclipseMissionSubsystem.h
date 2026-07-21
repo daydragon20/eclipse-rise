@@ -40,6 +40,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
 	bool CompleteObjective(FName ObjectiveId, FString& OutError);
 
+	/** Site-driven completion (objective triggers report the site; the active spec maps site -> objective). */
+	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
+	void CompleteObjectiveByTarget(FName TargetId);
+
+	/** Roster ids deployed on the active mission (game-mode spawn wiring). */
+	const TArray<FGuid>& GetDeployedSoldierIds() const { return DeployedSoldierIds; }
+
+	/** Active objective list (HUD/debug display; empty outside a run). */
+	const TArray<FEclipseObjectiveDef>& GetActiveObjectives() const { return ActiveObjectives; }
+
 	/** A squadmate went down in the field (SPEC-P1-06 wiring; resolution happens at debrief). */
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
 	void NotifySoldierDowned(const FGuid& SoldierId, FName Cause);

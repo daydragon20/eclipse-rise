@@ -189,7 +189,121 @@ prep_tuning.set_editor_property("squad_size", 2)
 prep_tuning.set_editor_property("loadout_options", loadouts)
 setup.set_editor_property("prep_tuning", prep_tuning)
 
-for asset in (graph, offers, items, economy, name_pools, traits, roster_tuning, loadouts, prep_tuning, setup):
+# --- Squad data (SPEC-P1-06): bark pools + tuning.
+order_defs = get_or_create("DT_SquadOrderDefs", unreal.DataTable,
+                           make_table_factory(unreal.EclipseSquadOrderDefRow.static_struct()))
+order_defs_json = json.dumps([
+    {"Name": "MoveTo",
+     "AcknowledgeLines": ["On it.", "Moving.", "Copy - relocating."],
+     "RefusalLines": ["No route, boss.", "Can't get there from here.", "That path's blocked."]},
+    {"Name": "FocusTarget",
+     "AcknowledgeLines": ["Target marked.", "On your mark.", "Engaging."],
+     "RefusalLines": ["Can't see the target.", "No shot from here.", "Target's gone."]},
+    {"Name": "Hold",
+     "AcknowledgeLines": ["Holding.", "Anchored.", "Not moving."],
+     "RefusalLines": ["Can't hold here."]},
+    {"Name": "Regroup",
+     "AcknowledgeLines": ["Falling back to you.", "Coming in.", "Regrouping."],
+     "RefusalLines": ["No way back to you.", "Route's cut."]},
+])
+if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(order_defs, order_defs_json):
+    raise RuntimeError("DT_SquadOrderDefs JSON fill failed")
+
+squad_tuning = get_or_create("DA_SquadTuning", unreal.EclipseSquadTuningAsset)
+squad_tuning.set_editor_property("follow_distance", 400.0)
+squad_tuning.set_editor_property("cover_search_radius", 800.0)
+squad_tuning.set_editor_property("response_timeout_seconds", 1.0)
+squad_tuning.set_editor_property("order_defs", order_defs)
+setup.set_editor_property("squad_tuning", squad_tuning)
+
+# --- Combat data (SPEC-P1-05): archetypes + weapons + character tuning.
+# Numbers follow the locked feel targets (player TTK ~0.6 s well-aimed: 60 HP /
+# 22 dmg / 0.15 s interval; enemy vs exposed player ~2.5 s: 100 HP / 10 dmg /
+# 0.8 s x 3 enemies in practice).
+archetypes = get_or_create("DT_EnemyArchetypes", unreal.DataTable,
+                           make_table_factory(unreal.EclipseEnemyArchetypeRow.static_struct()))
+archetypes_json = json.dumps([
+    {"Name": "Enforcer", "Health": 60, "Damage": 10, "PerceptionRadius": 2500, "FireInterval": 0.8},
+    {"Name": "Trooper", "Health": 80, "Damage": 12, "PerceptionRadius": 3000, "FireInterval": 0.7},
+])
+if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(archetypes, archetypes_json):
+    raise RuntimeError("DT_EnemyArchetypes JSON fill failed")
+
+weapons = get_or_create("DT_Weapons", unreal.DataTable,
+                        make_table_factory(unreal.EclipseWeaponRow.static_struct()))
+weapons_json = json.dumps([
+    {"Name": "AR_Foundry", "Damage": 22, "RangeCm": 5000, "FireInterval": 0.15, "HeadshotMultiplier": 2.5},
+    {"Name": "Sidearm_Scrap", "Damage": 16, "RangeCm": 2500, "FireInterval": 0.25, "HeadshotMultiplier": 2.5},
+])
+if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(weapons, weapons_json):
+    raise RuntimeError("DT_Weapons JSON fill failed")
+
+char_tuning = get_or_create("DA_CharacterTuning", unreal.EclipseCharacterTuningAsset)
+char_tuning.set_editor_property("walk_speed", 180.0)
+char_tuning.set_editor_property("run_speed", 420.0)
+char_tuning.set_editor_property("sprint_speed", 650.0)
+char_tuning.set_editor_property("crouch_speed", 150.0)
+char_tuning.set_editor_property("camera_fov", 90.0)
+char_tuning.set_editor_property("max_health", 100.0)
+
+# --- Mission templates (SPEC-P1-05) under /Game/Data/Missions/<TemplateId>.
+def make_objective(obj_id, obj_type, description, optional=False, target=""):
+    objective = unreal.EclipseObjectiveDef()
+    objective.set_editor_property("objective_id", unreal.Name(obj_id))
+    objective.set_editor_property("type", obj_type)
+    objective.set_editor_property("description", unreal.Text(description))
+    objective.set_editor_property("optional", optional)
+    objective.set_editor_property("target_id", unreal.Name(target))
+    return objective
+
+
+def make_spawn(archetype, count, site):
+    spawn = unreal.EclipseEnemySpawnSet()
+    spawn.set_editor_property("archetype_id", unreal.Name(archetype))
+    spawn.set_editor_property("count", count)
+    spawn.set_editor_property("spawn_site_id", unreal.Name(site))
+    return spawn
+
+
+MISSIONS_PATH = "/Game/Data/Missions"
+OT = unreal.EclipseObjectiveType
+
+
+def make_mission(template_id, name, objectives, spawns):
+    path = f"{MISSIONS_PATH}/{template_id}"
+    if editor_asset.does_asset_exist(path):
+        mission = editor_asset.load_asset(path)
+    else:
+        mission = asset_tools.create_asset(template_id, MISSIONS_PATH, unreal.EclipseMissionAsset, None)
+    mission.set_editor_property("template_id", unreal.Name(template_id))
+    mission.set_editor_property("display_name", unreal.Text(name))
+    mission.set_editor_property("objectives", objectives)
+    mission.set_editor_property("insertion_point_ids",
+                                [unreal.Name("Entry_Main"), unreal.Name("Entry_Sewer"), unreal.Name("Entry_Roof")])
+    mission.set_editor_property("enemy_spawns", spawns)
+    mission.set_editor_property("progress_region_on_success", True)
+    return mission
+
+
+mission_assault = make_mission("MT_Assault", "Checkpoint Assault", [
+    make_objective("Obj_Primary", OT.DESTROY_TARGET, "Break the checkpoint's control post", target="Site_ControlPost"),
+    make_objective("Obj_NoAlarms", OT.REACH_LOCATION, "Optional: cut the alarm relay first", optional=True, target="Site_AlarmRelay"),
+    make_objective("Obj_Exfil", OT.EXTRACT_SQUAD, "Extract the squad", target="Site_Extraction"),
+], [make_spawn("Enforcer", 4, "Spawn_Checkpoint"), make_spawn("Trooper", 2, "Spawn_Reserve")])
+
+mission_sabotage = make_mission("MT_Sabotage", "Foundry Line Sabotage", [
+    make_objective("Obj_Primary", OT.DESTROY_TARGET, "Wreck the shipment crane", target="Site_Crane"),
+    make_objective("Obj_Exfil", OT.EXTRACT_SQUAD, "Extract the squad", target="Site_Extraction"),
+], [make_spawn("Enforcer", 4, "Spawn_Yard")])
+
+mission_rescue = make_mission("MT_Rescue", "Holding Pen Rescue", [
+    make_objective("Obj_Primary", OT.COLLECT_ITEM, "Open the holding pens", target="Site_Pens"),
+    make_objective("Obj_Exfil", OT.EXTRACT_SQUAD, "Get everyone out", target="Site_Extraction"),
+], [make_spawn("Enforcer", 3, "Spawn_Pens"), make_spawn("Trooper", 2, "Spawn_Patrol")])
+
+for asset in (graph, offers, items, economy, name_pools, traits, roster_tuning, loadouts,
+              prep_tuning, order_defs, squad_tuning, archetypes, weapons, char_tuning,
+              mission_assault, mission_sabotage, mission_rescue, setup):
     editor_asset.save_loaded_asset(asset)
 
-unreal.log("Phase 1 content bootstrap complete: 10 assets in /Game/Data.")
+unreal.log("Phase 1 content bootstrap complete: 18 assets in /Game/Data.")

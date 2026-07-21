@@ -178,6 +178,19 @@ bool UEclipseMissionSubsystem::CompleteObjective(FName ObjectiveId, FString& Out
 	return true;
 }
 
+void UEclipseMissionSubsystem::CompleteObjectiveByTarget(FName TargetId)
+{
+	const FEclipseObjectiveDef* Objective = ActiveObjectives.FindByPredicate(
+		[TargetId](const FEclipseObjectiveDef& O) { return O.TargetId == TargetId; });
+	if (Objective == nullptr || CompletedObjectiveIds.Contains(Objective->ObjectiveId))
+	{
+		return; // unbound site or repeat entry — not an error, sites outlive missions
+	}
+
+	FString Error;
+	CompleteObjective(Objective->ObjectiveId, Error);
+}
+
 void UEclipseMissionSubsystem::NotifySoldierDowned(const FGuid& SoldierId, FName Cause)
 {
 	if (Phase == EEclipseMissionPhase::None || Phase == EEclipseMissionPhase::Finished)

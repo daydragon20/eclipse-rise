@@ -9,6 +9,7 @@ class UEclipseEconomyDataAsset;
 class UEclipsePrepTuningAsset;
 class UEclipseRegionGraphAsset;
 class UEclipseRosterTuningAsset;
+class UEclipseSquadTuningAsset;
 
 /**
  * Campaign starting conditions (SPEC-P1-02 data schema). Every starting number
@@ -53,4 +54,8 @@ public:
 	/** Preparation tunables + loadout options (SPEC-P1-08). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipsePrepTuningAsset> PrepTuning;
+
+	/** Squad tunables + order bark pools (SPEC-P1-06). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipseSquadTuningAsset> SquadTuning;
 };
