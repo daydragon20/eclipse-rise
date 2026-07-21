@@ -1,28 +1,22 @@
-# Unreal Engine generated
-Binaries/
-DerivedDataCache/
-Intermediate/
-Saved/
-Build/
-
-# IDE
-.vs/
-.vscode/
-.idea/
-*.sln
-*.slnx
-.vsconfig
-*.suo
-*.opensdf
-*.sdf
-*.VC.db
-*.VC.opendb
-*.code-workspace
+# Repository root ignore. The UE project keeps its own Eclipse/.gitignore;
+# these entries are belt-and-suspenders so build artifacts never leak in
+# from the repo root after the bible+code consolidation.
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Local config
-Config/UserEngine.ini
-Config/UserGame.ini
+# Unreal Engine generated (also ignored by Eclipse/.gitignore)
+Eclipse/Binaries/
+Eclipse/DerivedDataCache/
+Eclipse/Intermediate/
+Eclipse/Saved/
+Eclipse/Build/
+
+# IDE
+Eclipse/.vs/
+.vscode/
+.idea/
+Eclipse/*.sln
+Eclipse/*.slnx
+Eclipse/.vsconfig

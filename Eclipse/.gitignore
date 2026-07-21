@@ -1,0 +1,28 @@
+# Unreal Engine generated
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.sln
+*.slnx
+.vsconfig
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config
+Config/UserEngine.ini
+Config/UserGame.ini
