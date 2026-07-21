@@ -4,7 +4,7 @@
 This file explains how to navigate the project documentation.
 The project contains several large documents. The AI must read and use them in the correct order before generating code, assets, systems, or design changes.
 
-**File mapping note:** the documentation is split into 16 numbered files for maintainability. The logical "Bibles" referenced below map onto them as follows:
+**File mapping note:** the documentation is split into 18 numbered files for maintainability. The logical "Bibles" referenced below map onto them as follows:
 
 | Logical document | Physical files |
 |---|---|
@@ -13,6 +13,8 @@ The project contains several large documents. The AI must read and use them in t
 | **DEVELOPMENT_ROADMAP** | `13_roadmap.md` (Part 13, incl. ACTIVE_MILESTONE) |
 | **MASTER_DEVELOPMENT_PROMPT** | `14_ai_dev_instructions.md` (Part 14) |
 | **VISUAL_QUALITY_CHARTER** | `15_visual_quality_charter.md` (Part 15, art & rendering direction) |
+| **AUDIO_SYSTEM** | `16_audio_system.md` (Part 16, audio + ElevenLabs pipeline) |
+| **CINEMATIC_ANIMATION_SYSTEM** | `17_cinematic_animation_system.md` (Part 17, animation & cinematics) |
 | **Master index & canon glossary** | `00_INDEX.md` |
 
 ---
@@ -74,6 +76,9 @@ Before writing any code, read in this exact order. Do not skip steps.
 | Testing requirements | `14_ai_dev_instructions.md` → 14.4 |
 | Visual quality / art & rendering | `15_visual_quality_charter.md` |
 | Hardware reality (dev vs. target) | `15_visual_quality_charter.md` → 15.2 |
+| Audio / voice / music / ElevenLabs | `16_audio_system.md` |
+| Audio credit budget & always-on music | `16_audio_system.md` → 16.7, 16.13 |
+| Animation & cinematics | `17_cinematic_animation_system.md` |
 | Current task | `13_roadmap.md` → ACTIVE_MILESTONE |
 
 ---

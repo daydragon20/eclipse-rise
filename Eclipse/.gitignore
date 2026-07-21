@@ -26,3 +26,8 @@ Thumbs.db
 # Local config
 Config/UserEngine.ini
 Config/UserGame.ini
+
+# Secrets — API keys never enter git (ElevenLabs etc.). Read from env or this file.
+Config/UserSecrets.ini
+*.secret
+.env

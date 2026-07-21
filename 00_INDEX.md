@@ -27,6 +27,8 @@
 | 13 | [Roadmap](13_roadmap.md) | 6 phases over ~4.5 years, gates, pre-committed cut lines, team shape |
 | 14 | [AI Dev Instructions](14_ai_dev_instructions.md) | Priorities, coding standards, architecture constitution, testing bar, 7 AI skills |
 | 15 | [Visual Quality Charter](15_visual_quality_charter.md) | AAA art & rendering target, hardware reality, per-phase fidelity plan, optimization discipline |
+| 16 | [Audio System](16_audio_system.md) | Audio architecture, ElevenLabs pipeline (TTS/music/SFX), always-on adaptive music, credit budget |
+| 17 | [Cinematic & Animation System](17_cinematic_animation_system.md) | MetaHuman animation, motion matching, facial performance, dynamic camera, runtime cinematics |
 
 ## Canon Glossary (names — single source of truth)
 
