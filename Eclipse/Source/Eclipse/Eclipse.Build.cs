@@ -38,7 +38,8 @@ public class Eclipse : ModuleRules
 			"Slate",
 			"SlateCore",
 			"Json",
-			"JsonUtilities"
+			"JsonUtilities",
+			"HTTP" // ElevenLabs voice pipeline (GDD 16.12); dev/editor-time generation
 		});
 	}
 }
