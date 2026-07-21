@@ -30,7 +30,12 @@ public:
 	 */
 	EclipseSquadOrderLogic::FEclipseOrderDecision ExecuteOrder(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor);
 
-	/** Self-preservation tiers 1-2 stub (GDD 9.5 priority stack): stop and report when the body goes down. */
+	/**
+	 * Stand-down on down: stop and clear focus when the body goes down — the
+	 * SPEC-P1-07 death transition, not self-preservation.
+	 * PLACEHOLDER(SPEC-P1-06): conscious self-preservation tiers 1-2 (GDD 9.5
+	 * priority stack) still pending — belongs in the BT/EQS content pass.
+	 */
 	void HandlePawnDowned();
 
 	EEclipseSquadOrder GetCurrentOrder() const { return CurrentOrder; }

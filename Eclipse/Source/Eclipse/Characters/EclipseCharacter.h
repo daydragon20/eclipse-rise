@@ -48,6 +48,13 @@ public:
 	FGuid GetSoldierId() const { return SoldierId; }
 	void SetSoldierId(const FGuid& InSoldierId) { SoldierId = InSoldierId; }
 
+	/**
+	 * Phase 1 friend/foe — one source of truth (enemy AI, squad cover scorer,
+	 * objective triggers): the player and roster squadmates are "player side"
+	 * (player-controlled or carrying a soldier id); everything else is hostile.
+	 */
+	bool IsPlayerSide() const { return SoldierId.IsValid() || IsPlayerControlled(); }
+
 	/** Fired once when health reaches zero; mission/squad wiring listens (SPEC-P1-06/07 pipeline). */
 	FEclipseCharacterDownedDelegate OnDowned;
 

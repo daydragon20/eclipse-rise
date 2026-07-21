@@ -44,9 +44,8 @@ AEclipseCharacter* AEclipseEnemyController::FindNearestVisibleHostile() const
 	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
 	{
 		AEclipseCharacter* Candidate = *It;
-		// Hostiles = the player's side: roster soldiers carry ids; the player
-		// pawn is the locally controlled character (id-less but player-possessed).
-		const bool bPlayerSide = Candidate->GetSoldierId().IsValid() || Candidate->IsPlayerControlled();
+		// Hostiles = the player's side (shared friend/foe rule on AEclipseCharacter).
+		const bool bPlayerSide = Candidate->IsPlayerSide();
 		if (Candidate == Body || Candidate->IsDowned() || !bPlayerSide)
 		{
 			continue;

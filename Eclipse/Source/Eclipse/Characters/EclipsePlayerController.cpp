@@ -146,15 +146,30 @@ bool AEclipsePlayerController::GetAimPoint(FVector& OutLocation, AActor*& OutAct
 	FRotator ViewRotation;
 	GetPlayerViewPoint(ViewLocation, ViewRotation);
 
-	FHitResult Hit;
+	constexpr float AimReachCm = 10000.0f;
+	const FVector TraceEnd = ViewLocation + ViewRotation.Vector() * AimReachCm;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseAim), false, GetPawn());
-	if (GetWorld()->LineTraceSingleByChannel(Hit, ViewLocation, ViewLocation + ViewRotation.Vector() * 10000.0f, ECC_Visibility, Params))
+
+	// Geometry (Visibility) fixes the move-to point — walls and floor, which pawn
+	// capsules deliberately don't block.
+	FHitResult GeoHit;
+	const bool bHitGeo = GetWorld()->LineTraceSingleByChannel(GeoHit, ViewLocation, TraceEnd, ECC_Visibility, Params);
+	OutLocation = bHitGeo ? GeoHit.ImpactPoint : TraceEnd;
+
+	// Actor acquisition MUST use a channel pawn capsules block (Pawn) — the same
+	// channel the weapon fires on. Tracing actors on Visibility passes straight
+	// through every character, so Focus-target could never lock a live enemy.
+	FHitResult PawnHit;
+	OutActor = nullptr;
+	if (GetWorld()->LineTraceSingleByChannel(PawnHit, ViewLocation, TraceEnd, ECC_Pawn, Params))
 	{
-		OutLocation = Hit.ImpactPoint;
-		OutActor = Hit.GetActor();
-		return true;
+		OutActor = PawnHit.GetActor();
+		if (!bHitGeo || PawnHit.Distance < GeoHit.Distance)
+		{
+			OutLocation = PawnHit.ImpactPoint; // a body in front of the wall is the aim point
+		}
 	}
-	return false;
+	return OutActor != nullptr || bHitGeo;
 }
 
 void AEclipsePlayerController::IssueSquadOrder(EEclipseSquadOrder Order)

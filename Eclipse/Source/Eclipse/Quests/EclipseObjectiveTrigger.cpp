@@ -21,7 +21,7 @@ void AEclipseObjectiveTrigger::HandleOverlap(UPrimitiveComponent*, AActor* Other
 	// Only the player's side advances objectives; enemies wandering through a
 	// site must not complete the mission for us.
 	const AEclipseCharacter* Character = Cast<AEclipseCharacter>(OtherActor);
-	if (Character == nullptr || Character->IsDowned() || !(Character->GetSoldierId().IsValid() || Character->IsPlayerControlled()))
+	if (Character == nullptr || Character->IsDowned() || !Character->IsPlayerSide())
 	{
 		return;
 	}

@@ -152,8 +152,8 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 void UEclipseSquadSubsystem::IssueOrderToAll(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor)
 {
 	// Copy: entries never mutate mid-issue today, but order handlers may re-enter.
-	const TArray<FSquadmateEntry> Entries = Squadmates;
-	for (const FSquadmateEntry& Entry : Entries)
+	const TArray<FSquadmateEntry> EntrySnapshot = Squadmates;
+	for (const FSquadmateEntry& Entry : EntrySnapshot)
 	{
 		IssueOrder(Entry.SoldierId, Order, TargetLocation, TargetActor);
 	}

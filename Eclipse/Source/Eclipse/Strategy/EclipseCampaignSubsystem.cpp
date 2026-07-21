@@ -156,9 +156,9 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		// UnlockedLoadoutTags array. Rewrite the leading state SchemaVersion int
 		// and append an empty array count — old campaigns simply own no unlocks.
 		SaveSubsystem->RegisterMigration(1, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
-			[](TMap<FName, TArray<uint8>>& Blocks)
+			[](TMap<FName, TArray<uint8>>& SaveBlocks)
 			{
-				TArray<uint8>* CampaignBlock = Blocks.Find(TEXT("Campaign"));
+				TArray<uint8>* CampaignBlock = SaveBlocks.Find(TEXT("Campaign"));
 				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
 				{
 					return false;

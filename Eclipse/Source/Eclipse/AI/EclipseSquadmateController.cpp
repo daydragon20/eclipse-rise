@@ -4,6 +4,7 @@
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Eclipse.h"
 #include "EngineUtils.h"
+#include "Navigation/PathFollowingComponent.h" // EPathFollowingRequestResult (AIController.h only forward-declares it)
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
 
@@ -27,8 +28,10 @@ EclipseSquadOrderLogic::FEclipseOrderWorldFacts AEclipseSquadmateController::Gat
 
 	if (Order == EEclipseSquadOrder::FocusTarget)
 	{
+		// A valid focus target is a live hostile — never a friendly or the player
+		// (focusing our own side must refuse, not open fire on them).
 		const AEclipseCharacter* Target = Cast<AEclipseCharacter>(TargetActor);
-		Facts.bTargetValid = Target != nullptr && !Target->IsDowned();
+		Facts.bTargetValid = Target != nullptr && !Target->IsDowned() && !Target->IsPlayerSide();
 		Facts.bTargetVisible = Facts.bTargetValid && LineOfSightTo(Target);
 	}
 
@@ -48,11 +51,25 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 	switch (Order)
 	{
 	case EEclipseSquadOrder::MoveTo:
-		MoveToLocation(SelectCoverPointNear(TargetLocation), /*AcceptanceRadius*/ 50.0f);
-		break;
 	case EEclipseSquadOrder::Regroup:
-		MoveToLocation(TargetLocation, /*AcceptanceRadius*/ 150.0f);
+	{
+		// GatherFacts validated a path to the ordered point, but MoveTo actually
+		// drives to a cover point near it. If that pick is unreachable, downgrade
+		// the accept to a reasoned NoRoute refusal so an accepted order never
+		// stalls silently (GDD 8.4 never-silent contract — the pure decision
+		// table cannot see the chosen destination).
+		const FVector Destination = Order == EEclipseSquadOrder::MoveTo ? SelectCoverPointNear(TargetLocation) : TargetLocation;
+		const float AcceptanceRadius = Order == EEclipseSquadOrder::MoveTo ? 50.0f : 150.0f;
+		if (MoveToLocation(Destination, AcceptanceRadius) == EPathFollowingRequestResult::Failed)
+		{
+			StopMovement();
+			CurrentOrder = EEclipseSquadOrder::Hold;
+			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;
+			Refusal.Reason = EEclipseOrderRefusalReason::NoRoute;
+			return Refusal;
+		}
 		break;
+	}
 	case EEclipseSquadOrder::Hold:
 		StopMovement();
 		break;
