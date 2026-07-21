@@ -13,12 +13,17 @@ This is **not** a web app and does **not** deploy to Vercel — it is a native U
 
 ---
 
-## 2. Where everything lives (the two folders)
+## 2. Where everything lives (one repo)
 
-| What | Path | Under git? |
-|---|---|---|
-| **Design bible** (docs 00–15, `phase0/` specs, this file) | `C:\Dev\ECLIPSE_GDD\` | **No** — loose text files (design authority, deliberately a sibling of the code) |
-| **The UE game (code + content + history)** | `C:\Dev\ECLIPSE_GDD\Eclipse\` | **Yes** — git repo, 14 commits, local only (no remote yet) |
+As of the consolidation commit, the **design bible and the UE game are in ONE git repo** rooted at `C:\Dev\ECLIPSE_GDD\`, so a single `git clone` gets everything (docs + code + full history).
+
+| What | Path (relative to repo root) |
+|---|---|
+| **Design bible** (docs 00–15, `phase0/` specs, this file, SETUP.md) | repo root |
+| **The UE game** (code + content) | `Eclipse/` |
+| **Save & push safety net** | `push-all.bat` / `push-all.ps1` |
+
+Repo is local-only until pushed (see §7). Save-and-push any time with **`push-all.bat`** (double-click) — commits everything and pushes so the other machine can `git pull`.
 
 **Progress is readable in two places:**
 1. `git log` inside `Eclipse\` — each commit is one spec landed (the real build record).
@@ -93,17 +98,18 @@ CI definition (needs a self-hosted Windows+UE5 runner): `Eclipse\.github\workflo
 
 ## 7. How another (stronger) computer takes over
 
-The clean mechanism is **git**. Right now the code repo has **no remote**, so it lives only on this laptop. To hand off:
+The clean mechanism is **git**. The bible + code are already **one repo** (§2), local-only until pushed.
 
-**Recommended — one private GitHub repo, then clone on the strong PC:**
-1. Finish/confirm `gh auth login` on this machine (was previously blocked on GitHub's e-mail verification step).
-2. Push the code: create a **private** repo and `git push -u origin main` from `Eclipse\`.
-3. Make sure the **design bible travels too** (it's outside the code repo). Two clean choices — pick one (ask Claude to do it):
-   - **(a)** consolidate the bible + code into one repo so a single `git clone` gets everything, or
-   - **(b)** keep the bible as its own repo / synced to the Rocadelo server, and clone both.
-4. On the strong PC: install UE 5.8 + VS2022, `git clone`, generate project files, build (§6), read this file + `ACTIVE_MILESTONE`, continue at §5.
+**One-time setup — private GitHub repo:**
+1. `gh auth login --hostname github.com --git-protocol https --web` → authorize in the browser (kimi can drive it).
+2. From the repo root: `gh repo create eclipse-rise --private --source . --remote origin --push` (creates the private repo AND pushes everything in one go).
 
-**Alternatives if you don't want GitHub yet:** a `git bundle` of `Eclipse\` (one file, carries full history) + a zip of the bible, transferred by USB/drive/server; or push to the existing Rocadelo server the project already came from.
+**From then on — keep it synced (this is the auto-push command):**
+- Double-click **`push-all.bat`** (or run `push-all.ps1`). It commits all current work and `git push`es. Use it before switching machines or whenever Claude nears a session limit.
+
+**On the strong PC:** install the toolchain (`SETUP.md`), `git clone https://github.com/<owner>/eclipse-rise.git C:\Dev\ECLIPSE_GDD`, build (§6), read this file + `ACTIVE_MILESTONE`, continue at §5.
+
+**Alternatives if you don't want GitHub yet:** `git bundle create eclipse.bundle --all` (one file, full history) transferred by USB/drive/server; or push to the existing Rocadelo server the project already came from.
 
 **What the strong PC's Claude should be told:** *"Read `C:\...\ECLIPSE_GDD\HANDOFF.md`, then continue Phase 1 at §5. Stay inside the ACTIVE_MILESTONE. Fidelity work starts at Phase 2 per `15_visual_quality_charter.md`."*
 
