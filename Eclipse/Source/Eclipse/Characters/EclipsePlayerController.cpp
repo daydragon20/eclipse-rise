@@ -1,14 +1,24 @@
 #include "Characters/EclipsePlayerController.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Characters/EclipseCharacter.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "Core/EclipseGameplayTags.h"
+#include "Eclipse.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Engine/GameInstance.h"
+#include "EngineUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerStart.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "InputModifiers.h"
 #include "Squad/EclipseSquadSubsystem.h"
+#include "Strategy/EclipseCampaignSetupAsset.h"
+#include "Strategy/EclipseCampaignSubsystem.h"
+#include "UI/EclipseBaseHubWidget.h"
+#include "UI/EclipseMissionHudWidget.h"
 
 void AEclipsePlayerController::BeginPlay()
 {
@@ -17,6 +27,116 @@ void AEclipsePlayerController::BeginPlay()
 	if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		InputSubsystem->AddMappingContext(MappingContext, /*Priority*/ 0);
+	}
+
+	EnsureCampaignStarted();
+
+	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+	{
+		MissionEventsHandle = Bus->Subscribe(
+			FGameplayTag::RequestGameplayTag(TEXT("Event.Mission")),
+			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipsePlayerController::OnMissionEvent));
+	}
+
+	// The loop starts at the menu base (SPEC-P1-08); launching drops into the mission.
+	EnterBaseMode();
+}
+
+void AEclipsePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+	{
+		Bus->Unsubscribe(MissionEventsHandle);
+	}
+	Super::EndPlay(EndPlayReason);
+}
+
+void AEclipsePlayerController::EnsureCampaignStarted()
+{
+	UEclipseCampaignSubsystem* Campaign = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>() : nullptr;
+	if (Campaign == nullptr || Campaign->GetActiveSetup() != nullptr)
+	{
+		return; // already running (or no subsystem) — never wipe an active campaign
+	}
+
+	const UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Boot: DA_CampaignSetup not found — starting an empty campaign (GDD 14.3.5)."));
+	}
+	Campaign->StartNewCampaign(Setup);
+}
+
+void AEclipsePlayerController::EnterBaseMode()
+{
+	if (BaseHub == nullptr)
+	{
+		BaseHub = CreateWidget<UEclipseBaseHubWidget>(this, UEclipseBaseHubWidget::StaticClass());
+	}
+	if (MissionHud != nullptr)
+	{
+		MissionHud->RemoveFromParent();
+	}
+	if (BaseHub != nullptr && !BaseHub->IsInViewport())
+	{
+		BaseHub->AddToViewport(10);
+	}
+
+	bShowMouseCursor = true;
+	FInputModeUIOnly Mode;
+	Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	SetInputMode(Mode);
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		ControlledPawn->DisableInput(this); // parked while the tester plans at the base
+	}
+}
+
+void AEclipsePlayerController::EnterMissionMode()
+{
+	if (BaseHub != nullptr)
+	{
+		BaseHub->RemoveFromParent();
+	}
+	if (MissionHud == nullptr)
+	{
+		MissionHud = CreateWidget<UEclipseMissionHudWidget>(this, UEclipseMissionHudWidget::StaticClass());
+	}
+	if (MissionHud != nullptr && !MissionHud->IsInViewport())
+	{
+		MissionHud->AddToViewport(5);
+	}
+
+	bShowMouseCursor = false;
+	FInputModeGameOnly Mode;
+	SetInputMode(Mode);
+
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		ControlledPawn->EnableInput(this);
+
+		// Insert at the main entry (SPEC-P1-05: preparation picks an entry; Phase 1
+		// uses Entry_Main until the insertion-choice UI lands).
+		for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
+		{
+			if (It->ActorHasTag(TEXT("Entry_Main")))
+			{
+				ControlledPawn->SetActorLocation(It->GetActorLocation() + FVector(0, 0, 100.0f));
+				break;
+			}
+		}
+	}
+}
+
+void AEclipsePlayerController::OnMissionEvent(FGameplayTag EventTag, const FInstancedStruct& /*Payload*/)
+{
+	if (EventTag == EclipseTags::Event_Mission_Started)
+	{
+		EnterMissionMode();
+	}
+	else if (EventTag == EclipseTags::Event_Mission_Completed || EventTag == EclipseTags::Event_Mission_Failed)
+	{
+		EnterBaseMode();
 	}
 }
 

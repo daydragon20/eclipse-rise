@@ -105,11 +105,13 @@ void UEclipseMissionSubsystem::ResolveMissionSpec(FName TemplateId, TArray<FEcli
 	Primary.ObjectiveId = TEXT("Obj_Primary");
 	Primary.Type = EEclipseObjectiveType::ReachLocation;
 	Primary.Description = FText::FromString(TEXT("Reach the objective site"));
+	Primary.TargetId = TEXT("Site_ControlPost"); // graybox site the trigger reports (SPEC-P1-05)
 
 	FEclipseObjectiveDef& Exfil = OutObjectives.AddDefaulted_GetRef();
 	Exfil.ObjectiveId = TEXT("Obj_Exfil");
 	Exfil.Type = EEclipseObjectiveType::ExtractSquad;
 	Exfil.Description = FText::FromString(TEXT("Extract the squad"));
+	Exfil.TargetId = TEXT("Site_Extraction"); // reaching this ends the run
 
 	bOutProgressRegion = true;
 }
@@ -187,8 +189,20 @@ void UEclipseMissionSubsystem::CompleteObjectiveByTarget(FName TargetId)
 		return; // unbound site or repeat entry — not an error, sites outlive missions
 	}
 
+	const bool bWasExtraction = Objective->Type == EEclipseObjectiveType::ExtractSquad;
 	FString Error;
 	CompleteObjective(Objective->ObjectiveId, Error);
+
+	if (bWasExtraction)
+	{
+		// Reaching extraction ends the run (SPEC-P1-05 loop): success if the
+		// mandatory set is now complete, else fail-forward (GDD 11.4 — never a wall).
+		const bool bSuccess = EclipseMissionLogic::AreMandatoryObjectivesComplete(ActiveObjectives, CompletedObjectiveIds);
+		if (!ResolveDebrief(bSuccess, Error))
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Extraction debrief rejected: %s"), *Error);
+		}
+	}
 }
 
 void UEclipseMissionSubsystem::NotifySoldierDowned(const FGuid& SoldierId, FName Cause)

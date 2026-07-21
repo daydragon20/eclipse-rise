@@ -111,6 +111,20 @@ void UEclipseSquadSubsystem::UnregisterAll()
 	Squadmates.Reset();
 }
 
+TArray<FString> UEclipseSquadSubsystem::GetOrderStateLines() const
+{
+	TArray<FString> Lines;
+	for (const FSquadmateEntry& Entry : Squadmates)
+	{
+		const AEclipseSquadmateController* Controller = Entry.Controller.Get();
+		const FString Order = Controller != nullptr
+			? UEnum::GetValueAsString(Controller->GetCurrentOrder()).RightChop(FString(TEXT("EEclipseSquadOrder::")).Len())
+			: TEXT("(lost)");
+		Lines.Add(FString::Printf(TEXT("%s  ->  %s"), *Entry.SoldierId.ToString().Left(8), *Order));
+	}
+	return Lines;
+}
+
 bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor)
 {
 	FSquadmateEntry* Entry = Squadmates.FindByPredicate(

@@ -6,6 +6,7 @@
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "Core/EclipseGameplayTags.h"
 #include "Core/EclipseGrayboxBuilder.h"
 #include "Eclipse.h"
 #include "Engine/GameInstance.h"
@@ -36,7 +37,78 @@ void AEclipseGameMode::InitGame(const FString& MapName, const FString& Options, 
 void AEclipseGameMode::StartPlay()
 {
 	Super::StartPlay();
-	SpawnMissionActors();
+
+	// The mission lifecycle drives ground actors (SPEC-P1-05): spawn when a run
+	// starts, tear down at debrief — so a launch after boot works, not only a
+	// mission that happened to be active at StartPlay.
+	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+	{
+		MissionEventsHandle = Bus->Subscribe(
+			FGameplayTag::RequestGameplayTag(TEXT("Event.Mission")),
+			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnMissionLifecycle));
+	}
+
+	// A mission already running at boot (e.g. after a load) still populates.
+	if (const UEclipseMissionSubsystem* Mission = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseMissionSubsystem>() : nullptr)
+	{
+		if (Mission->GetPhase() == EEclipseMissionPhase::Objectives)
+		{
+			SpawnMissionActors();
+		}
+	}
+}
+
+void AEclipseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+	{
+		Bus->Unsubscribe(MissionEventsHandle);
+	}
+	Super::EndPlay(EndPlayReason);
+}
+
+void AEclipseGameMode::OnMissionLifecycle(FGameplayTag EventTag, const FInstancedStruct& /*Payload*/)
+{
+	if (EventTag == EclipseTags::Event_Mission_Started)
+	{
+		SpawnMissionActors();
+	}
+	else if (EventTag == EclipseTags::Event_Mission_Completed || EventTag == EclipseTags::Event_Mission_Failed)
+	{
+		DespawnMissionActors();
+	}
+}
+
+void AEclipseGameMode::DespawnMissionActors()
+{
+	if (UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr)
+	{
+		Squad->UnregisterAll();
+	}
+	for (AActor* Actor : SpawnedMissionActors)
+	{
+		if (Actor != nullptr)
+		{
+			Actor->Destroy();
+		}
+	}
+	SpawnedMissionActors.Reset();
+}
+
+void AEclipseGameMode::HandlePlayerDowned(AEclipseCharacter* /*Player*/, FName /*Cause*/)
+{
+	UEclipseMissionSubsystem* Mission = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseMissionSubsystem>() : nullptr;
+	if (Mission == nullptr)
+	{
+		return;
+	}
+	const EEclipseMissionPhase P = Mission->GetPhase();
+	if (P == EEclipseMissionPhase::Objectives || P == EEclipseMissionPhase::Extraction)
+	{
+		// Player down ends the run as a failure — fail-forward commits at debrief (GDD 11.4).
+		FString Error;
+		Mission->ResolveDebrief(false, Error);
+	}
 }
 
 FVector AEclipseGameMode::FindSiteLocation(FName SiteId, const FVector& Fallback) const
@@ -76,16 +148,29 @@ void AEclipseGameMode::SpawnMissionActors()
 	UEclipseSquadSubsystem* Squad = GetWorld()->GetSubsystem<UEclipseSquadSubsystem>();
 	const UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
 
+	const EEclipseMissionPhase Phase = Mission != nullptr ? Mission->GetPhase() : EEclipseMissionPhase::None;
 	if (Mission == nullptr || Squad == nullptr || Campaign == nullptr
-		|| Mission->GetPhase() != EEclipseMissionPhase::Objectives)
+		|| (Phase != EEclipseMissionPhase::Insertion && Phase != EEclipseMissionPhase::Objectives))
 	{
 		// No active mission = free-roam graybox (feel-target tuning sessions).
 		return;
 	}
 
-	const FVector PlayerLocation = GetWorld()->GetFirstPlayerController() != nullptr && GetWorld()->GetFirstPlayerController()->GetPawn() != nullptr
-		? GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation()
-		: FVector::ZeroVector;
+	// Balanced with DespawnMissionActors; a re-entry rebuilds cleanly.
+	if (!SpawnedMissionActors.IsEmpty())
+	{
+		DespawnMissionActors();
+	}
+
+	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController() != nullptr ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr;
+	const FVector PlayerLocation = PlayerPawn != nullptr ? PlayerPawn->GetActorLocation() : FVector::ZeroVector;
+
+	// Player body down ends the run (bind once; RemoveAll guards re-entry dupes).
+	if (AEclipseCharacter* PlayerBody = Cast<AEclipseCharacter>(PlayerPawn))
+	{
+		PlayerBody->OnDowned.RemoveAll(this);
+		PlayerBody->OnDowned.AddUObject(this, &AEclipseGameMode::HandlePlayerDowned);
+	}
 
 	// Squad of 2 (SPEC-P1-06): the picked roster soldiers, spawned beside the
 	// player, registered so orders and the downed pipeline reach them.
@@ -104,7 +189,9 @@ void AEclipseGameMode::SpawnMissionActors()
 		{
 			Controller->Possess(Body);
 			Squad->RegisterSquadmate(Controller, SoldierId);
+			SpawnedMissionActors.Add(Controller);
 		}
+		SpawnedMissionActors.Add(Body);
 	}
 
 	// PLACEHOLDER(SPEC-P1-05): enemy placement reads the mission asset's spawn
@@ -123,8 +210,10 @@ void AEclipseGameMode::SpawnMissionActors()
 		if (Controller != nullptr)
 		{
 			Controller->Possess(Enemy);
+			SpawnedMissionActors.Add(Controller);
 			++EnemyIndex;
 		}
+		SpawnedMissionActors.Add(Enemy);
 	}
 
 	UE_LOG(LogEclipse, Display, TEXT("GameMode: mission actors spawned (%d squadmates, %d enemies)."),

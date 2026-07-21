@@ -1,12 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/EclipseEventBusSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "Squad/EclipseSquadTypes.h"
 #include "EclipsePlayerController.generated.h"
 
 class UInputAction;
 class UInputMappingContext;
+class UEclipseBaseHubWidget;
+class UEclipseMissionHudWidget;
 
 /**
  * Player input (SPEC-P1-05/06): Enhanced Input only (GDD 12.1). Move/look/
@@ -23,6 +26,7 @@ class ECLIPSE_API AEclipsePlayerController : public APlayerController
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupInputComponent() override;
 
 private:
@@ -32,6 +36,26 @@ private:
 	void HandleSprint(const struct FInputActionValue& Value);
 	void HandleCrouch();
 	void IssueSquadOrder(EEclipseSquadOrder Order);
+
+	/** Boot a fresh campaign from data if none is running (SPEC-P1-08 live loop). */
+	void EnsureCampaignStarted();
+
+	/** Menu base presentation: show the hub, UI input, pawn parked. */
+	void EnterBaseMode();
+
+	/** Ground presentation: hub hidden, game input, mission HUD, inserted at the entry. */
+	void EnterMissionMode();
+
+	/** Mission lifecycle drives the base<->mission presentation swap. */
+	void OnMissionEvent(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	UPROPERTY()
+	TObjectPtr<UEclipseBaseHubWidget> BaseHub;
+
+	UPROPERTY()
+	TObjectPtr<UEclipseMissionHudWidget> MissionHud;
+
+	FEclipseEventSubscriptionHandle MissionEventsHandle;
 
 	/** Aim point = camera-forward hitscan against world geometry (order target + fire direction). */
 	bool GetAimPoint(FVector& OutLocation, AActor*& OutActor) const;

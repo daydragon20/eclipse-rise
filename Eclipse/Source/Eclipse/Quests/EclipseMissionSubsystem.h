@@ -50,6 +50,9 @@ public:
 	/** Active objective list (HUD/debug display; empty outside a run). */
 	const TArray<FEclipseObjectiveDef>& GetActiveObjectives() const { return ActiveObjectives; }
 
+	/** Completed objective ids (HUD tick marks). */
+	const TArray<FName>& GetCompletedObjectiveIds() const { return CompletedObjectiveIds; }
+
 	/** A squadmate went down in the field (SPEC-P1-06 wiring; resolution happens at debrief). */
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
 	void NotifySoldierDowned(const FGuid& SoldierId, FName Cause);

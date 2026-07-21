@@ -37,6 +37,9 @@ public:
 
 	int32 GetSquadmateCount() const { return Squadmates.Num(); }
 
+	/** Per-squadmate "id: order" lines for the mission HUD (SPEC-P1-06 order-state widget). */
+	TArray<FString> GetOrderStateLines() const;
+
 private:
 	struct FSquadmateEntry
 	{
