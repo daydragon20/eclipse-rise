@@ -49,25 +49,20 @@ This dev box is a **2017 laptop: NVIDIA GTX 1050 (4 GB), i7-7700HQ, 32 GB RAM**.
 
 **Systems in place (headless-proven):** event bus · campaign state + transaction API + save v0 · deterministic economy ledger · 6-node strategy mini-map · mission runtime + debrief consequences · squad of 2 with ordered actions and *reasoned refusals* (never-silent) · roster + permadeath + memorial stub · menu base hub + preparation flow · playable graybox layer (character/GAS health, hitscan combat, enemy AI, code-built district).
 
-The full loop is **proven headless** (test `Eclipse.Base.Prep.FullCircleSmoke`: advance day → select → intel spend → launch → win → consequences → second loop) and via `Eclipse.Prep.AutoLaunch`.
+The full loop is **proven headless** (test `Eclipse.Base.Prep.FullCircleSmoke`: advance day → select → intel spend → launch → win → consequences → second loop) and is now **wired live** — playable in PIE with no console commands (menu base → launch → graybox mission with squad orders → extraction → debrief → base).
 
 ---
 
-## 5. What's next (the remaining Phase-1 gap)
+## 5. What's next
 
-The state machine is complete; what's missing is the **live presentation/flow glue** so a human tester can play the loop in PIE without console commands (this is the Phase-1 Definition of Done in `SPEC-P1-00`). Tracked as tasks 7a–7e:
+The **live playable loop is done** (commit `[Loop] Wire the live playable loop`): boot → menu base → launch → graybox mission with squad orders → extraction/lose → debrief → base, no console commands. The remaining Phase-1 step is the **gate question** — a human plays it and answers *"do testers voluntarily play a second loop?"* (13.2). That's the owner's call, not an automated check.
 
-1. **7a** — spawn mission actors on `Event.Mission.Started` (not `StartPlay`), despawn on Completed/Failed.
-2. **7b** — flow coordinator: show base hub + mini-map + prep on boot (UI input mode); on Mission.Started switch to game input + possess the player; return to base on debrief.
-3. **7c** — mission HUD: on-screen objective list + per-squadmate order-state (debug-grade).
-4. **7d** — extraction trigger → `ResolveDebrief(true)`; lose condition → `ResolveDebrief(false)` (fail-forward).
-5. **7e** — initialize a fresh campaign from `DA_CampaignSetup` on live boot.
+**Open (small, non-blocking) polish:**
+- Move-order **stance stub** (ready/aggressive) — an in-scope SPEC-P1-06 bullet, still missing (no gate impact).
+- Wire the hardcoded **squad tuning constants** (cover ring radius/samples, acceptance radii) into `DA_SquadTuning` (`14.2` compliance).
+- **Audio** (Part 16, forward infra): runtime mp3→USoundWave playback, auto-assign to Dialogue DataAssets (WITH_EDITOR import), an editor bulk-gen UI, and the Music/SFX endpoints. Set `ELEVENLABS_API_KEY` (env) to generate; **rotate the key** that was shared in plaintext.
 
-Then: end-to-end PIE verification + the gate question ("do testers voluntarily play a second loop?").
-
-**Non-blocking carryover** (explicitly allowed to lag, per roadmap): CI self-hosted runner provisioning, 10 concept-art pieces, 5 feel-reference clips. **Fidelity/art work does not start until Phase 2** (graybox rule).
-
-**Also open (small):** wire the hardcoded squad tuning constants into `DA_SquadTuning` (task 10, `14.2` compliance).
+**Non-blocking carryover** (roadmap-allowed to lag): CI self-hosted runner, 10 concept-art pieces, 5 feel-reference clips. **Fidelity/art starts at Phase 2** (graybox rule); Parts 15–17 are the target for that.
 
 ---
 
