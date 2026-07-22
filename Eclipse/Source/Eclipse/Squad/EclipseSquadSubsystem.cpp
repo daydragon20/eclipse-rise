@@ -78,11 +78,14 @@ void UEclipseSquadSubsystem::RegisterSquadmate(AEclipseSquadmateController* Cont
 	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(Controller->GetPawn()))
 	{
 		Body->SetSoldierId(SoldierId);
-		Body->OnDowned.AddWeakLambda(this, [this, Controller](AEclipseCharacter* Downed, FName Cause)
+		// Weak controller capture: the body can outlive its controller during
+		// teardown, and a raw pointer would dangle (GC never nulls captures).
+		TWeakObjectPtr<AEclipseSquadmateController> WeakController(Controller);
+		Body->OnDowned.AddWeakLambda(this, [this, WeakController](AEclipseCharacter* Downed, FName Cause)
 		{
-			if (Controller != nullptr)
+			if (AEclipseSquadmateController* AliveController = WeakController.Get())
 			{
-				Controller->HandlePawnDowned();
+				AliveController->HandlePawnDowned();
 			}
 
 			UGameInstance* GameInstance = GetWorld() != nullptr ? GetWorld()->GetGameInstance() : nullptr;

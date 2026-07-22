@@ -127,9 +127,11 @@ FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& Ordered
 	for (TActorIterator<AEclipseCharacter> It(World); It; ++It)
 	{
 		const AEclipseCharacter* Candidate = *It;
-		if (Candidate == Body || Candidate->IsDowned() || Candidate->GetSoldierId().IsValid())
+		if (Candidate == Body || Candidate->IsDowned() || Candidate->IsPlayerSide())
 		{
-			continue; // roster soldiers are friendlies; enemies carry no soldier id
+			continue; // one friend/foe source of truth: the player counts as friendly
+			          // even without a soldier id (GDD 9.3; the id-only check made the
+			          // squad take cover *from the player*)
 		}
 		const float Distance = FVector::DistSquared(Candidate->GetActorLocation(), OrderedLocation);
 		if (Distance < NearestDistance)
