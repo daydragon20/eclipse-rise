@@ -158,14 +158,31 @@ Or set a machine/user env var instead:
 ```
 
 ### Step 4 — The Max plan + Fable (the important one)
-The Max/Fable plan lives on the **Anthropic account**, not on the server — it just happens to be logged in there today. To use it on the strong PC:
+The Max/Fable plan lives on the **Anthropic account**, not on the server — it just happens to be logged in there today. The account is **`rocadelobv@gmail.com`** (Rocadelo BV). Two ways to get it onto the strong PC:
+
+**Option 1 — normal login (needs the account password):**
 ```powershell
 claude            # first run opens login
-/login            # choose "Log in with Claude subscription", use the Max account: rocadelobv@gmail.com
-/model            # pick Fable 5
-/effort           # set to max
+/login            # "Log in with Claude subscription", account rocadelobv@gmail.com
+/model            # Fable 5
+/effort           # max
 ```
-Once logged in with that account, Fable is available on the strong PC exactly like on the server. (See §4 for the Fable-credit caveat and the exact server flags.)
+
+**Option 2 — copy the session (NO password needed).** Claude Code stores its login as a plain file on both Linux and Windows, and there is no keyring on the server, so the session is transferable:
+- Server file: `/home/edwin/.claude/.credentials.json` (perms 600 — it's a secret; treat it like one).
+- Strong-PC target: `C:\Users\<you>\.claude\.credentials.json`.
+```powershell
+# On the strong PC, after installing Claude Code (so ~/.claude exists) and CLOSING it:
+scp edwin@100.103.118.98:/home/edwin/.claude/.credentials.json "$env:USERPROFILE\.claude\.credentials.json"
+# (needs the rocadelo_key in ~/.ssh and Tailscale up; or copy the file by USB)
+claude            # launches already logged in as rocadelobv@gmail.com
+/model            # Fable 5
+```
+If Claude still shows logged-out after the copy, the token needs its account context — fall through to Option 3.
+
+**Option 3 — the durable fix (recover the password).** `rocadelobv@gmail.com` is the Rocadelo BV company inbox. Whoever controls that Gmail can do a password reset at claude.ai → then Option 1 works forever, on any machine. This is the one to arrange so you're never locked out again.
+
+> **Security:** `.credentials.json` holds OAuth tokens. Never commit it, never paste it in chat, never put it in the repo. It is not covered by `git` here (it lives in your home dir, not the project).
 
 ### Step 5 — Build + verify green
 ```powershell
