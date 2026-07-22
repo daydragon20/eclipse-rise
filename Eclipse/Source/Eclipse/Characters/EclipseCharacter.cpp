@@ -52,6 +52,12 @@ void AEclipseCharacter::InitializeHealth(float MaxHealth)
 	bDowned = false;
 }
 
+void AEclipseCharacter::ReviveForMission()
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	InitializeHealth(HealthAttributes->GetMaxHealth());
+}
+
 void AEclipseCharacter::ApplyDamage(float Amount, AEclipseCharacter* DamageInstigator, FName Cause)
 {
 	if (Amount <= 0.0f || bDowned)

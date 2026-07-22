@@ -5,6 +5,8 @@
 #include "GameplayTagContainer.h"
 #include "EclipseCampaignSetupAsset.generated.h"
 
+class UDataTable;
+class UEclipseCharacterTuningAsset;
 class UEclipseEconomyDataAsset;
 class UEclipsePrepTuningAsset;
 class UEclipseRegionGraphAsset;
@@ -58,4 +60,16 @@ public:
 	/** Squad tunables + order bark pools (SPEC-P1-06). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipseSquadTuningAsset> SquadTuning;
+
+	/** Movement/health feel targets applied to every spawned body (SPEC-P1-05; locked graybox feel). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipseCharacterTuningAsset> CharacterTuning;
+
+	/** Rows: FEclipseWeaponRow — the player-side weapon platforms (SPEC-P1-05). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> Weapons;
+
+	/** Rows: FEclipseEnemyArchetypeRow — enemy stats resolved at mission spawn (SPEC-P1-05). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> EnemyArchetypes;
 };

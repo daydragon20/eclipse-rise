@@ -60,6 +60,14 @@ struct FEclipseEnemyArchetypeRow : public FTableRowBase
 	/** Seconds between shots. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Enemy", meta = (ClampMin = 0.05))
 	float FireInterval = 0.8f;
+
+	/** Pursuit stop distance (cm) — how close this archetype closes before holding to shoot. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Enemy", meta = (ClampMin = 0))
+	float EngageRange = 600.0f;
+
+	/** Weaponless fallback strike range (cm) — a data mistake degrades to weak melee, never invincible (GDD 14.3.5). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Enemy", meta = (ClampMin = 0))
+	float MeleeRange = 200.0f;
 };
 
 /** One weapon platform (DT_Weapons row; Phase 1: one AR, one sidearm per feel targets). */

@@ -9,12 +9,49 @@
 #include "Core/EclipseGameplayTags.h"
 #include "Core/EclipseGrayboxBuilder.h"
 #include "Eclipse.h"
+#include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
 #include "Engine/TargetPoint.h"
 #include "EngineUtils.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Squad/EclipseSquadSubsystem.h"
+#include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
+
+namespace
+{
+	/** The body's hitscan weapon, created on demand (the engine-spawned player pawn has none). */
+	UEclipseHitscanWeaponComponent& EnsureWeapon(AEclipseCharacter& Body)
+	{
+		UEclipseHitscanWeaponComponent* Weapon = Body.FindComponentByClass<UEclipseHitscanWeaponComponent>();
+		if (Weapon == nullptr)
+		{
+			Weapon = NewObject<UEclipseHitscanWeaponComponent>(&Body);
+			Body.AddOwnedComponent(Weapon);
+			Weapon->RegisterComponent();
+		}
+		return *Weapon;
+	}
+
+	/**
+	 * First row of a typed table. PLACEHOLDER(SPEC-P1-05/08): loadout choice maps
+	 * to a specific row when the content pass lands; Phase 1 carries one platform
+	 * and one archetype, so "first" is the whole catalog.
+	 */
+	template <typename TRow>
+	const TRow* FirstRowOf(const UDataTable* Table)
+	{
+		if (Table == nullptr || Table->GetRowStruct() != TRow::StaticStruct())
+		{
+			return nullptr;
+		}
+		for (const TPair<FName, uint8*>& Row : Table->GetRowMap())
+		{
+			return reinterpret_cast<const TRow*>(Row.Value);
+		}
+		return nullptr;
+	}
+}
 
 AEclipseGameMode::AEclipseGameMode()
 {
@@ -136,10 +173,11 @@ AEclipseCharacter* AEclipseGameMode::SpawnBodyNear(const FVector& Location, cons
 #if WITH_EDITOR
 		Body->SetActorLabel(Label);
 #endif
-		Body->AddOwnedComponent(NewObject<UEclipseHitscanWeaponComponent>(Body));
+		EnsureWeapon(*Body);
 	}
 	return Body;
 }
+
 
 void AEclipseGameMode::SpawnMissionActors()
 {
@@ -165,15 +203,37 @@ void AEclipseGameMode::SpawnMissionActors()
 	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController() != nullptr ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr;
 	const FVector PlayerLocation = PlayerPawn != nullptr ? PlayerPawn->GetActorLocation() : FVector::ZeroVector;
 
-	// Player body down ends the run (bind once; RemoveAll guards re-entry dupes).
+	// Ground data resolved from the campaign setup (GDD 14.2: the numbers live in
+	// DA_CharacterTuning / DT_Weapons / DT_EnemyArchetypes, not in code defaults).
+	const UEclipseCampaignSetupAsset* Setup = Campaign->GetActiveSetup();
+	const UEclipseCharacterTuningAsset* CharacterTuning = Setup != nullptr ? Setup->CharacterTuning.LoadSynchronous() : nullptr;
+	const FEclipseWeaponRow* PlayerWeaponRow = Setup != nullptr ? FirstRowOf<FEclipseWeaponRow>(Setup->Weapons.LoadSynchronous()) : nullptr;
+	const FEclipseEnemyArchetypeRow* ArchetypeRow = Setup != nullptr ? FirstRowOf<FEclipseEnemyArchetypeRow>(Setup->EnemyArchetypes.LoadSynchronous()) : nullptr;
+	if (CharacterTuning == nullptr || PlayerWeaponRow == nullptr || ArchetypeRow == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("GameMode: ground data incomplete (tuning %s, weapons %s, archetypes %s) — struct defaults stand in (GDD 14.3.5)."),
+			CharacterTuning != nullptr ? TEXT("ok") : TEXT("missing"),
+			PlayerWeaponRow != nullptr ? TEXT("ok") : TEXT("missing"),
+			ArchetypeRow != nullptr ? TEXT("ok") : TEXT("missing"));
+	}
+	const FEclipseWeaponRow DefaultWeaponRow;
+
+	// The player pawn persists across runs: re-arm, re-tune and revive it so a
+	// lost mission never launches the next one with a downed, unarmed body.
 	if (AEclipseCharacter* PlayerBody = Cast<AEclipseCharacter>(PlayerPawn))
 	{
+		PlayerBody->ApplyTuning(CharacterTuning);
+		PlayerBody->ReviveForMission();
+		EnsureWeapon(*PlayerBody).ApplyWeaponRow(PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
+
+		// Player body down ends the run (bind once; RemoveAll guards re-entry dupes).
 		PlayerBody->OnDowned.RemoveAll(this);
 		PlayerBody->OnDowned.AddUObject(this, &AEclipseGameMode::HandlePlayerDowned);
 	}
 
 	// Squad of 2 (SPEC-P1-06): the picked roster soldiers, spawned beside the
-	// player, registered so orders and the downed pipeline reach them.
+	// player, registered so orders and the downed pipeline reach them. They carry
+	// the player-side platform (GDD 8.3 fairness: same guns, same rules).
 	for (const FGuid& SoldierId : Mission->GetDeployedSoldierIds())
 	{
 		const FEclipseSoldierRecord* Record = Campaign->GetState().FindSoldier(SoldierId);
@@ -183,6 +243,8 @@ void AEclipseGameMode::SpawnMissionActors()
 		{
 			continue;
 		}
+		Body->ApplyTuning(CharacterTuning);
+		EnsureWeapon(*Body).ApplyWeaponRow(PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
 
 		AEclipseSquadmateController* Controller = GetWorld()->SpawnActor<AEclipseSquadmateController>();
 		if (Controller != nullptr)
@@ -199,6 +261,18 @@ void AEclipseGameMode::SpawnMissionActors()
 	// makes squad orders meaningful today (4-8 dummies per spec).
 	int32 EnemyIndex = 0;
 	const FVector PrimarySite = FindSiteLocation(TEXT("Site_ControlPost"), PlayerLocation + FVector(3000.0f, 0.0f, 0.0f));
+
+	// Enemy ballistics derive from the archetype row (GDD 8.3 fairness: same
+	// hitscan seam, data-tuned): damage/cadence from the row, reach = sight.
+	FEclipseWeaponRow EnemyWeaponRow;
+	if (ArchetypeRow != nullptr)
+	{
+		EnemyWeaponRow.Damage = ArchetypeRow->Damage;
+		EnemyWeaponRow.FireInterval = ArchetypeRow->FireInterval;
+		EnemyWeaponRow.RangeCm = ArchetypeRow->PerceptionRadius;
+		EnemyWeaponRow.HeadshotMultiplier = 1.0f; // graybox capsules have no head bone; no lottery shots
+	}
+
 	for (int32 Index = 0; Index < 4; ++Index)
 	{
 		AEclipseCharacter* Enemy = SpawnBodyNear(PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f), FString::Printf(TEXT("Enforcer_%d"), Index));
@@ -206,9 +280,14 @@ void AEclipseGameMode::SpawnMissionActors()
 		{
 			continue;
 		}
+		EnsureWeapon(*Enemy).ApplyWeaponRow(EnemyWeaponRow);
 		AEclipseEnemyController* Controller = GetWorld()->SpawnActor<AEclipseEnemyController>();
 		if (Controller != nullptr)
 		{
+			if (ArchetypeRow != nullptr)
+			{
+				Controller->ApplyArchetype(*ArchetypeRow);
+			}
 			Controller->Possess(Enemy);
 			SpawnedMissionActors.Add(Controller);
 			++EnemyIndex;

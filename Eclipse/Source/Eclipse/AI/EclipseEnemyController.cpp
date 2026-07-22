@@ -78,7 +78,7 @@ void AEclipseEnemyController::SenseAndAct()
 	}
 
 	SetFocus(Target);
-	MoveToActor(Target, /*AcceptanceRadius*/ 600.0f);
+	MoveToActor(Target, Archetype.EngageRange);
 
 	if (UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>())
 	{
@@ -89,7 +89,7 @@ void AEclipseEnemyController::SenseAndAct()
 	{
 		// Archetype damage without a weapon component: melee-range fallback so a
 		// data mistake degrades to weak enemies, not invincible ones (GDD 14.3.5).
-		if (FVector::DistSquared(Target->GetActorLocation(), Body->GetActorLocation()) < FMath::Square(200.0f))
+		if (FVector::DistSquared(Target->GetActorLocation(), Body->GetActorLocation()) < FMath::Square(Archetype.MeleeRange))
 		{
 			Target->ApplyDamage(Archetype.Damage, Body, TEXT("EnemyMelee"));
 		}

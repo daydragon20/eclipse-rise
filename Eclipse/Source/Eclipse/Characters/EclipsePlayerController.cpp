@@ -2,6 +2,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Characters/EclipseCharacter.h"
+#include "Characters/EclipseCharacterTypes.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
@@ -248,8 +249,17 @@ void AEclipsePlayerController::HandleSprint(const FInputActionValue& Value)
 	{
 		return;
 	}
+
+	// Speeds from DA_CharacterTuning (GDD 14.2); the fallbacks mirror the locked
+	// feel targets so a missing asset degrades to the same numbers (GDD 14.3.5).
+	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
+	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;
+	const UEclipseCharacterTuningAsset* Tuning = Setup != nullptr ? Setup->CharacterTuning.LoadSynchronous() : nullptr;
+
 	const bool bSprinting = Value.Get<bool>();
-	Body->GetCharacterMovement()->MaxWalkSpeed = bSprinting ? 650.0f : 420.0f;
+	Body->GetCharacterMovement()->MaxWalkSpeed = bSprinting
+		? (Tuning != nullptr ? Tuning->SprintSpeed : 650.0f)
+		: (Tuning != nullptr ? Tuning->RunSpeed : 420.0f);
 }
 
 void AEclipsePlayerController::HandleCrouch()

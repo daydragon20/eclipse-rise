@@ -36,6 +36,13 @@ public:
 	void InitializeHealth(float MaxHealth);
 
 	/**
+	 * Reset a persistent body for a fresh run: full health, standing, mobile.
+	 * The player pawn survives between missions, so a lost run would otherwise
+	 * leave it downed with movement disabled forever (the mission spawn calls this).
+	 */
+	void ReviveForMission();
+
+	/**
 	 * Hitscan damage entry point (SPEC-P1-05 minimal combat): routes through the
 	 * GAS meta attribute so future mitigation composes.
 	 */
