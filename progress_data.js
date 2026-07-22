@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-22 21:50",
+  bijgewerkt: "2026-07-22 22:10",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
@@ -46,7 +46,7 @@ window.PROGRESS_DATA = {
         { naam: "Cel/toon-materiaal (banden + hatching, M_EclipseToon)", pct: 100, notitie: "Live geverifieerd; hatching leest nu als penseelstroken (25% duty, periode 120)." },
         { naam: "Ink-outline post-materiaal", pct: 85, notitie: "PP_EclipseInk LIVE bewezen: Sobel→Laplaciaan-fix (scherende vloer vloeide vol inkt); silhouet- + naadlijnen schoon." },
         { naam: "Belichting / mood", pct: 85, notitie: "SM6-pad live: volumetric smog + zon-schaduwen + skylight + film grain (15.5-revisie); lit-toon-migratie (echte Lumen-GI) is de volgende milestone." },
-        { naam: "Kleurenpalet & blok-dressing", pct: 50, notitie: "Lit/shade-paren met hue-shift per bloktype + Kessara-skyline-ring (code-built: hulks, schoorstenen, kraanportalen, natrium-raamstroken)." },
+        { naam: "Kleurenpalet & blok-dressing", pct: 60, notitie: "Palet + skyline-ring + EERSTE ECHTE TEXTURES (CC0 Poly Haven, world-aligned door de toon-pijplijn; gain genormaliseerd op gemeten lineair gemiddelde)." },
         { naam: "Gebouwen (echte kits)", pct: 10 },
         { naam: "Straten / props / decals", pct: 5 },
         { naam: "Bomen / vegetatie", pct: 0, notitie: "Eerste vegetatie Phase 3 (Sylvaris)." },
@@ -90,9 +90,16 @@ window.PROGRESS_DATA = {
     { file: "progress_media/shot_03.jpg", caption: "Cover-veld (review-camera 3)" },
     { file: "progress_media/shot_04.jpg", caption: "Overzicht district (review-camera 4)" }
   ],
-  screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6, Scalability 3) — derde ronde vandaag: inktlijnen + hatch-tuning + Kessara-skyline (code-built) + SM6-smog/grain; camera 4 kadreert nu het hele district.",
+  screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-22 (nacht, sterke PC — asset-pass gestart)", punten: [
+      "EERSTE ECHTE TEXTURES in de game (taak C, owner-akkoord): 4×2K CC0-diffuse van Poly Haven (asfalt, betonblok, golfplaat, metaalplaat) — gedownload via API, geïmporteerd via nieuw script Tools/import_polyhaven_textures.py, herkomst in Content/Art/Textures/SOURCES.md.",
+      "M_EclipseToon uitgebreid met world-aligned albedo-pad (dominante-as-projectie, default volledig neutraal); builder koppelt per palet-entry texture + schaal.",
+      "Exposure-les geleerd en gefixt: textures her-meterden de auto-exposure (schemer werd dag) — per texture het lineaire gemiddelde gemeten en gain = 1/gemiddelde gezet (klem op 2.5 tegen hotspot-krassen); de gebankte dusk-grade is terug.",
+      "Fab-route gedocumenteerd: wacht op éénmalige Epic-login van de eigenaar (Launcher nooit gestart op deze pc); CC0-spoor loopt ondertussen autonoom door.",
+      "Groene bar: build ✓, 31/31 ✓, validatie 0 ✓, catalog 19/19 ✓."
+    ]},
     { datum: "Sessie 2026-07-22 (avond, sterke PC — vervolg)", punten: [
       "Shot-rig gefixt: pawn in flying-mode tijdens de rig — overview-camera 4 kadreert nu het hele district (viel eerst 2 s naar de grond vóór elke capture).",
       "Hatch-tuning: 25% duty + periode 120 — schaduw-arcering leest als penseelstroken, niet meer als golfplaat.",
