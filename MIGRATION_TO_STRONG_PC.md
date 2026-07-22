@@ -42,7 +42,7 @@ De map **`C:\Dev\ECLIPSE_SECRETS`** van de laptop wordt met USB/beveiligde kopie
 | Bestand/map | Wat | Hoe gebruikt |
 |---|---|---|
 | `fable-config\` | **De volledige Claude-config van het Max/Fable-account** (`rocadelobv@gmail.com`), inclusief login en projectgeheugen | Niets kopiëren: `start_fable.bat` wijst `CLAUDE_CONFIG_DIR` hierheen. **Een eventueel eigen Claude-account op de PC blijft hier volledig los van.** |
-| `start_fable.bat` | **De startknop**: zet `CLAUDE_CONFIG_DIR`, gaat naar de repo-map en start `claude --model fable --effort max --dangerously-skip-permissions` | Dubbelklikken = Fable draait met het juiste account en zonder permission-prompts |
+| `start_fable.bat` | **De startknop**: zet `CLAUDE_CONFIG_DIR`, gaat naar de repo-map en start `claude --model fable --effort max --dangerously-skip-permissions`. Canonieke kopie ligt in de repo (root) — kopieer die naar `C:\Dev\ECLIPSE_SECRETS\`. Zie ook `FABLE_START_RUNBOOK.md`. | Dubbelklikken = Fable draait met het juiste account en zonder permission-prompts |
 | `UserSecrets.ini` | **ElevenLabs API-key** (werkend geverifieerd 2026-07-22; scope: alleen TTS) | Kopiëren naar `C:\Dev\ECLIPSE_GDD\Eclipse\Config\UserSecrets.ini` (gitignored) — Claude begeleidt dit in de bootstrap |
 | `claude-credentials.json` | Losse kopie van de Max-login | **Fallback** als de config-dir-route ooit hapert: naar `C:\Users\<jij>\.claude\.credentials.json` |
 | `MIGRATION_TO_STRONG_PC.md` | Kopie van dit draaiboek | Openen in Kladblok om de §7-prompt te kunnen plakken vóórdat de repo gecloned is |
