@@ -12,6 +12,7 @@
 #include "Engine/SkyLight.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
+#include "Engine/Texture.h"
 #include "Engine/TargetPoint.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -90,18 +91,28 @@ namespace
 	 * with authored kits. Shade tones are hue-shifted cool, never just darker —
 	 * that hue shift is what makes flat cel shading read as painted, not dimmed.
 	 */
-	struct FPaletteDef { const TCHAR* Prefix; FLinearColor Lit; FLinearColor Shade; };
+	// TexPath (optional): CC0 world-aligned albedo multiplied into the cel bands
+	// (Content/Art/Textures/SOURCES.md — owner-authorized asset pass). Null =
+	// flat cel, bit-identical to the pre-texture look.
+	// TexGain normalizes each texture's average luminance back to ~1.0 so the
+	// district's histogram — and with it the banked dusk auto-exposure — is
+	// unchanged by texturing (first textured round: the darker floor re-metered
+	// the whole scene into daylight). TexMix < 1 blends toward the flat cel
+	// color where a texture's value range fights the palette.
+	struct FPaletteDef { const TCHAR* Prefix; FLinearColor Lit; FLinearColor Shade; const TCHAR* TexPath; float TexScale; float TexGain; float TexMix; };
 	const FPaletteDef Palette[] = {
-		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f) },  // asphalt — dark but never crushed
-		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f) },  // perimeter concrete, cold
-		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f) },  // Dominion post: oxide red, shade to maroon-purple
-		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f) },  // warehouse: worker teal, shade to deep sea
-		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f) },  // hazard orange, reads as cover
-		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f) }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
-		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f) },  // sodium-orange window strips — bright enough to survive 15 km of smog
-		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f) }, // industrial plain under the skyline, darker than the district floor
+		// TexGain = 1/measured-linear-average (System.Drawing sample pass,
+		// 2026-07-22): asphalt .059, concrete .049, metal .031, corrugated .095.
+		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f), TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 700.0f, 16.8f, 0.5f },  // asphalt — dark but never crushed
+		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
+		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.35f },  // Dominion post: oxide red, shade to maroon-purple
+		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_corrugated_iron_02_diff.T_corrugated_iron_02_diff"), 300.0f, 10.5f, 0.45f },  // warehouse: worker teal, shade to deep sea
+		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f), nullptr, 0.0f, 1.0f, 0.0f },  // hazard orange, reads as cover
+		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f), nullptr, 0.0f, 1.0f, 0.0f }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
+		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f), nullptr, 0.0f, 1.0f, 0.0f },  // sodium-orange window strips — bright enough to survive 15 km of smog
+		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f), nullptr, 0.0f, 1.0f, 0.0f }, // industrial plain under the skyline, darker than the district floor
 	};
-	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f) };
+	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f), nullptr, 0.0f, 1.0f, 0.0f };
 
 	const FPaletteDef& PaletteForLabel(const TCHAR* Label)
 	{
@@ -192,6 +203,22 @@ void BuildDistrict(UWorld& World)
 				// The material's L = -LightDir, so pass the travel direction of the sun.
 				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
 				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				// CC0 albedo pass: opt in per entry; a missing asset degrades to
+				// the flat cel look, never a crash (GDD 14.3.5).
+				if (Entry.TexPath != nullptr)
+				{
+					if (UTexture* Albedo = LoadObject<UTexture>(nullptr, Entry.TexPath))
+					{
+						Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Albedo);
+						Mid->SetScalarParameterValue(TEXT("TexWorldScale"), Entry.TexScale);
+						Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Entry.TexGain);
+						Mid->SetScalarParameterValue(TEXT("AlbedoMix"), Entry.TexMix);
+					}
+					else
+					{
+						UE_LOG(LogEclipse, Warning, TEXT("Graybox: albedo %s missing — flat cel fallback (run Tools/import_polyhaven_textures.py)."), Entry.TexPath);
+					}
+				}
 			}
 			else
 			{

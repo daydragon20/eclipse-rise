@@ -28,6 +28,19 @@ float midStep = step(BandLo, ndl);
 float3 midColor = lerp(ShadeColor.rgb, LitColor.rgb, 0.5);
 float3 col = lerp(ShadeColor.rgb, midColor, midStep);
 col = lerp(col, LitColor.rgb, litStep);
+// Surface character from a world-aligned albedo (CC0 texture pass, 15.5): the
+// dominant-axis projection keeps tiling uniform across the wildly non-uniform
+// cube scales (a 200:1 slab and a 1:1 crate read the same grain). AlbedoMix
+// defaults to 0 so untextured instances are bit-identical to the flat cel.
+float3 an = abs(N);
+float2 tuv = (an.z > 0.6) ? WorldPos.xy : ((an.x >= an.y) ? WorldPos.yz : WorldPos.xz);
+float3 albedo = Texture2DSample(AlbedoTex, AlbedoTexSampler, tuv / max(TexWorldScale, 1.0)).rgb;
+// AlbedoGain is measured per texture as 1/average-linear-luminance (builder),
+// so the mean multiplier is exactly 1.0 and texturing cannot re-meter the
+// scene's auto-exposure. The clamp kills specular-scratch outliers that a
+// 10-30x normalization would otherwise blow into hotspots.
+float3 varTex = min(albedo * AlbedoGain, 2.5);
+col *= lerp(float3(1.0, 1.0, 1.0), varTex, saturate(AlbedoMix));
 // Hatching reads as pen strokes, not corrugation: wide spacing with a thin
 // dark stroke (25% duty). At 50% duty and a 42-unit period the shade band
 // looked like corrugated sheet metal (first strong-PC round, camera 2).
@@ -80,6 +93,16 @@ band_hi = scalar_param("BandHi", 0.55, -900, 220)
 band_lo = scalar_param("BandLo", 0.10, -900, 300)
 hatch_scale = scalar_param("HatchScale", 120.0, -900, 380)
 hatch_strength = scalar_param("HatchStrength", 0.22, -900, 460)
+# Albedo path (CC0 texture pass): white texture + mix 0 = the untextured cel
+# look, exactly. The builder opts palette entries in per texture.
+albedo_tex = mel.create_material_expression(mat, unreal.MaterialExpressionTextureObjectParameter, -900, 700)
+albedo_tex.set_editor_property("parameter_name", "AlbedoTex")
+white_tex = unreal.load_asset("/Engine/EngineResources/WhiteSquareTexture")
+if white_tex:
+    albedo_tex.set_editor_property("texture", white_tex)
+tex_world_scale = scalar_param("TexWorldScale", 400.0, -900, 800)
+albedo_mix = scalar_param("AlbedoMix", 0.0, -900, 880)
+albedo_gain = scalar_param("AlbedoGain", 1.8, -900, 960)
 # Authored color -> final pixel needs the emissive to live in the same physical
 # range as the SkyAtmosphere; the builder pins exposure at EV100=12 and sets this
 # to 1.2 * 2^12 so a LitColor of (0.5, ...) lands on screen as exactly that value.
@@ -92,7 +115,7 @@ toon.set_editor_property("output_type", unreal.CustomMaterialOutputType.CMOT_FLO
 toon.set_editor_property("description", "EclipseToonBands")
 
 inputs = []
-for input_name in ("NormalWS", "LitColor", "ShadeColor", "LightDir", "BandHi", "BandLo", "HatchScale", "HatchStrength", "EmissiveScale", "WorldPos"):
+for input_name in ("NormalWS", "LitColor", "ShadeColor", "LightDir", "BandHi", "BandLo", "HatchScale", "HatchStrength", "EmissiveScale", "WorldPos", "AlbedoTex", "TexWorldScale", "AlbedoMix", "AlbedoGain"):
     custom_input = unreal.CustomInput()
     custom_input.set_editor_property("input_name", input_name)
     inputs.append(custom_input)
@@ -108,6 +131,10 @@ mel.connect_material_expressions(hatch_scale, "", toon, "HatchScale")
 mel.connect_material_expressions(hatch_strength, "", toon, "HatchStrength")
 mel.connect_material_expressions(emissive_scale, "", toon, "EmissiveScale")
 mel.connect_material_expressions(world_pos, "", toon, "WorldPos")
+mel.connect_material_expressions(albedo_tex, "", toon, "AlbedoTex")
+mel.connect_material_expressions(tex_world_scale, "", toon, "TexWorldScale")
+mel.connect_material_expressions(albedo_mix, "", toon, "AlbedoMix")
+mel.connect_material_expressions(albedo_gain, "", toon, "AlbedoGain")
 
 mel.connect_material_property(toon, "", unreal.MaterialProperty.MP_EMISSIVE_COLOR)
 
