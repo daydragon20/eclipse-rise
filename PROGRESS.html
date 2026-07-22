@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECLIPSE — Voortgang</title>
+<style>
+  /* ============ tokens (donker thema) ============ */
+  :root{
+    color-scheme: dark;
+    --plane:        #0d0d0d;   /* pagina-achtergrond */
+    --surface:      #1a1a19;   /* kaart-oppervlak */
+    --surface-2:    #222220;   /* chip / lichte lift */
+    --ink:          #ffffff;   /* primaire tekst */
+    --ink-2:        #c3c2b7;   /* secundaire tekst */
+    --ink-3:        #898781;   /* gedempte tekst */
+    --hairline:     rgba(255,255,255,0.10);
+    --grid:         #2c2c2a;
+
+    /* statuskleuren (vast, gevalideerd op donker oppervlak) */
+    --groen:  #0ca30c;
+    --geel:   #fab219;
+    --oranje: #ec835a;
+    --rood:   #d03b3b;
+    --groen-track:  rgba(12,163,12,0.16);
+    --geel-track:   rgba(250,178,25,0.16);
+    --oranje-track: rgba(236,131,90,0.16);
+    --rood-track:   rgba(208,59,59,0.16);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ background:var(--plane); }
+  body{
+    background:var(--plane);
+    color:var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size:14px; line-height:1.5;
+    max-width:1080px; margin:0 auto;
+    padding:36px 22px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ============ kop ============ */
+  header h1{ font-size:26px; font-weight:650; letter-spacing:-0.01em; }
+  .meta{ color:var(--ink-2); font-size:13px; margin-top:4px; }
+
+  /* ============ kaarten & sectiekoppen ============ */
+  section.kaart{
+    background:var(--surface);
+    border:1px solid var(--hairline);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-top:16px;
+  }
+  .kaart h2{ font-size:16px; font-weight:650; }
+  .kaart .scope{ color:var(--ink-3); font-size:12.5px; font-weight:400; margin-left:6px; }
+  .kaart > .intro{ color:var(--ink-2); font-size:13px; margin-top:2px; }
+
+  /* ============ meter-rijen ============ */
+  .rijen{ margin-top:14px; display:flex; flex-direction:column; gap:11px; }
+  .rij{
+    display:grid;
+    grid-template-columns:minmax(210px,330px) 1fr 52px;
+    gap:4px 14px;
+    align-items:center;
+  }
+  .naam{ font-size:13.5px; color:var(--ink); }
+  .pct{
+    font-size:13px; font-weight:600; color:var(--ink);
+    font-variant-numeric: tabular-nums;
+    text-align:right;
+  }
+  .balk{
+    height:10px; width:100%;
+    border-radius:0 4px 4px 0;             /* data-eind afgerond, basislijn recht */
+    background:var(--track-kleur, var(--grid));
+    overflow:hidden;
+  }
+  .vul{
+    height:100%;
+    border-radius:0 4px 4px 0;
+    background:var(--vul-kleur, var(--ink-3));
+  }
+  .notitie{
+    grid-column:1 / -1;
+    color:var(--ink-3); font-size:12.5px; line-height:1.45;
+    margin-top:-2px;
+  }
+  .rij.totaal .naam{ font-weight:650; }
+  .rij.totaal .balk{ height:14px; }
+  .scheiding{ border:0; border-top:1px solid var(--hairline); margin:14px 0 3px; }
+
+  /* statusklassen: de vulling draagt de status; de lege track is een lichte stap van dezelfde tint */
+  .s-groen  { --vul-kleur:var(--groen);  --track-kleur:var(--groen-track); }
+  .s-geel   { --vul-kleur:var(--geel);   --track-kleur:var(--geel-track); }
+  .s-oranje { --vul-kleur:var(--oranje); --track-kleur:var(--oranje-track); }
+  .s-rood   { --vul-kleur:var(--rood);   --track-kleur:var(--rood-track); }
+
+  /* ============ hero (hele game) ============ */
+  .hero{
+    background:var(--surface);
+    border:1px solid var(--hairline);
+    border-radius:10px;
+    padding:22px;
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:6px 24px;
+    align-items:center;
+  }
+  .hero-figuur{
+    font-size:56px; font-weight:650; line-height:1;
+    letter-spacing:-0.02em;
+    grid-row:1 / span 2;
+  }
+  .hero-label{ font-size:14px; font-weight:650; }
+  .hero-label .scope{ color:var(--ink-3); font-weight:400; font-size:12.5px; margin-left:6px; }
+  .hero-balk{ align-self:start; }
+  .hero .balk{ height:16px; }
+
+  /* ============ kleursleutel ============ */
+  .sleutel{
+    display:flex; flex-wrap:wrap; gap:6px 18px;
+    margin-top:10px;
+    color:var(--ink-2); font-size:12.5px;
+  }
+  .zw{
+    display:inline-block; width:10px; height:10px;
+    border-radius:2px; margin-right:6px; vertical-align:baseline;
+    position:relative; top:0.5px;
+  }
+  .z-groen{ background:var(--groen); } .z-geel{ background:var(--geel); }
+  .z-oranje{ background:var(--oranje); } .z-rood{ background:var(--rood); }
+
+  /* ============ hoe werkt dit live ============ */
+  .stappen{ margin:12px 0 2px 18px; color:var(--ink-2); font-size:13.5px; }
+  .stappen li{ margin-top:6px; }
+  .stappen li::marker{ color:var(--ink-3); }
+  code{
+    background:var(--surface-2);
+    border:1px solid var(--hairline);
+    border-radius:4px;
+    padding:1px 6px;
+    font-size:12.5px;
+    font-family:ui-monospace, Consolas, "Cascadia Mono", monospace;
+    color:var(--ink);
+  }
+
+  /* ============ kwaliteitsbalk (chips) ============ */
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .chip{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--surface-2);
+    border:1px solid var(--hairline);
+    border-radius:999px;
+    padding:6px 14px 6px 11px;
+    font-size:13px; color:var(--ink);
+  }
+  .chip .glyph{ font-weight:700; font-size:13px; }
+  .chip-ok .glyph{ color:var(--groen); }
+  .chip-open .glyph{ color:var(--geel); }
+  .chip-open{ border-color:rgba(250,178,25,0.35); }
+
+  /* ============ screenshots ============ */
+  .galerij{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:16px; margin-top:14px;
+  }
+  .galerij figure{ margin:0; }
+  .galerij img{
+    display:block; width:100%; max-width:100%; height:auto;
+    border-radius:6px;
+    border:1px solid var(--hairline);
+    background:var(--grid);
+  }
+  .galerij figcaption{
+    color:var(--ink-2); font-size:12.5px; margin-top:6px;
+  }
+  .hardware{
+    display:inline-block;
+    margin-top:12px;
+    color:var(--ink-2); font-size:12.5px;
+    background:var(--surface-2);
+    border:1px solid var(--hairline);
+    border-radius:6px;
+    padding:6px 10px;
+  }
+  .eerlijk{ color:var(--ink-3); font-size:12.5px; margin-top:8px; }
+
+  /* ============ changelog ============ */
+  .changelog{ margin:12px 0 2px 18px; color:var(--ink-2); font-size:13.5px; }
+  .changelog li{ margin-top:6px; }
+  .changelog li::marker{ color:var(--ink-3); }
+
+  footer{
+    margin-top:22px;
+    color:var(--ink-3); font-size:12px;
+    text-align:center;
+  }
+
+  /* ============ smal scherm ============ */
+  @media (max-width:640px){
+    .rij{ grid-template-columns:1fr 52px; }
+    .rij .naam{ grid-row:1; grid-column:1; }
+    .rij .pct{ grid-row:1; grid-column:2; }
+    .rij .balk{ grid-row:2; grid-column:1 / -1; }
+    .rij .notitie{ grid-column:1 / -1; }
+    .hero{ grid-template-columns:1fr; }
+    .hero-figuur{ grid-row:auto; }
+    .galerij{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ECLIPSE: Rise of the Resistance — Voortgang</h1>
+  <p class="meta">Laatst bijgewerkt: 2026-07-22 (Fable 5-sessie) · Game Design Bible docs 00–17</p>
+</header>
+
+<!-- ============ totaal ============ -->
+<div class="hero">
+  <div class="hero-figuur">8%</div>
+  <div class="hero-label">Hele game <span class="scope">gewogen indicatie over alle fases</span></div>
+  <div class="hero-balk s-rood">
+    <div class="balk" aria-hidden="true"><div class="vul" style="width:8%"></div></div>
+  </div>
+</div>
+
+<div class="sleutel" aria-label="Kleursleutel">
+  <span><i class="zw z-groen"></i>groen &#8805; 90%</span>
+  <span><i class="zw z-geel"></i>geel 40–89%</span>
+  <span><i class="zw z-oranje"></i>oranje 10–39%</span>
+  <span><i class="zw z-rood"></i>rood &lt; 10%</span>
+</div>
+
+<!-- ============ hoe werkt dit live ============ -->
+<section class="kaart">
+  <h2>Hoe werkt dit live?</h2>
+  <ol class="stappen">
+    <li>Elke dev-sessie werkt dit bestand (en de screenshots in <code>progress_media/</code>) bij en pusht het mee met de repo.</li>
+    <li>Jij doet <code>git pull</code> en ververst dit tabblad (<code>F5</code>) — dat is alles.</li>
+    <li>Dit bestand reist mee met de repo: geen server, geen build, geen externe resources.</li>
+  </ol>
+</section>
+
+<!-- ============ 1 roadmap ============ -->
+<section class="kaart">
+  <h2>1 · Roadmap <span class="scope">Part 13 — fases</span></h2>
+  <div class="rijen">
+    <div class="rij s-groen">
+      <span class="naam">Fase 0 — Pre-productie</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:90%"></div></div>
+      <span class="pct">90%</span>
+      <p class="notitie">Open: CI-runner · concept-art-stukken 0/10 · feel-referentieclips 0/5.</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Fase 1 — Prototype “The Loop”</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:95%"></div></div>
+      <span class="pct">95%</span>
+      <p class="notitie">Alle 8 specs + live speelbare loop af. Open: gate-vraag “spelen testers vrijwillig een 2e loop?” — beslissing van de eigenaar. Audio-polish is forward-infra.</p>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Fase 2 — Vertical Slice “Thirteen Bullets”</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:2%"></div></div>
+      <span class="pct">2%</span>
+      <p class="notitie">Alleen art-richting gelockt + outline-materiaal.</p>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Fase 3 — Early Build</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Fase 4 — Alpha</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Fase 5 — Beta</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Fase 6 — Release</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 systemen ============ -->
+<section class="kaart">
+  <h2>2 · Systemen <span class="scope">C++ — t.o.v. Phase-1-scope</span></h2>
+  <div class="rijen">
+    <div class="rij s-groen">
+      <span class="naam">Event bus (12.2)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Campaign state + transacties + save v0 (SPEC-P1-02)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Economie-ledger (P1-03)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Strategie-minimap (P1-04)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Mission runtime + debrief (P1-05)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Squad orders (P1-06)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:95%"></div></div>
+      <span class="pct">95%</span>
+      <p class="notitie">Stance-stub: gedrag volgt.</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Roster / permadeath / memorial (P1-07)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Base / preparation (P1-08)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Characters / GAS health</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:90%"></div></div>
+      <span class="pct">90%</span>
+      <p class="notitie">Damage via GameplayEffects volgt.</p>
+    </div>
+    <div class="rij s-geel">
+      <span class="naam">Combat hitscan</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:85%"></div></div>
+      <span class="pct">85%</span>
+      <p class="notitie">Feel-pass in Phase 2.</p>
+    </div>
+    <div class="rij s-geel">
+      <span class="naam">Vijand-AI</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:70%"></div></div>
+      <span class="pct">70%</span>
+      <p class="notitie">Perception-stub; patrouilles en archetype-variatie later.</p>
+    </div>
+    <div class="rij s-geel">
+      <span class="naam">Debug-UI hub / HUD</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:80%"></div></div>
+      <span class="pct">80%</span>
+      <p class="notitie">Bewust debug-grade.</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Save-plugin</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 graphics ============ -->
+<section class="kaart">
+  <h2>3 · Graphics <span class="scope">Part 15 — t.o.v. Phase-2 vertical-slice-doel; start pas echt op de RTX-PC</span></h2>
+  <div class="rijen">
+    <div class="rij totaal s-oranje">
+      <span class="naam">Totaal</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:12%"></div></div>
+      <span class="pct">12%</span>
+    </div>
+  </div>
+  <hr class="scheiding">
+  <div class="rijen">
+    <div class="rij s-groen">
+      <span class="naam">Art-richting gelockt (Borderlands-stilering)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-geel">
+      <span class="naam">Ink-outline post-materiaal</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:80%"></div></div>
+      <span class="pct">80%</span>
+    </div>
+    <div class="rij s-geel">
+      <span class="naam">Belichting / mood dev-box (SM5)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:70%"></div></div>
+      <span class="pct">70%</span>
+      <p class="notitie">Milestone gebankt: schemer-twee-tonen + outlines; SM5-limieten gedocumenteerd, herkalibratie op RTX.</p>
+    </div>
+    <div class="rij s-oranje">
+      <span class="naam">Kleurenpalet &amp; blok-dressing</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:25%"></div></div>
+      <span class="pct">25%</span>
+    </div>
+    <div class="rij s-oranje">
+      <span class="naam">Gebouwen (echte kits)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:10%"></div></div>
+      <span class="pct">10%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Straten / props / decals</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:5%"></div></div>
+      <span class="pct">5%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Bomen / vegetatie</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+      <p class="notitie">Eerste vegetatie pas in Phase 3 (planeet Sylvaris).</p>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Characters / MetaHumans</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+      <p class="notitie">Phase 2 → 3.</p>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Weer &amp; dag/nacht</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">VFX</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Nanite / Lumen / VSM op target-hardware</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+      <p class="notitie">Wacht op de RTX-PC; deze laptop kan het niet — SM5-fallback.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 audio ============ -->
+<section class="kaart">
+  <h2>4 · Audio <span class="scope">Part 16</span></h2>
+  <div class="rijen">
+    <div class="rij totaal s-geel">
+      <span class="naam">Totaal</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:60%"></div></div>
+      <span class="pct">60%</span>
+    </div>
+  </div>
+  <hr class="scheiding">
+  <div class="rijen">
+    <div class="rij s-groen">
+      <span class="naam">ElevenLabs TTS-client (HTTPS, key-hygiëne, PCM/WAV)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Cache + manifest (nooit 2× dezelfde regel)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+      <p class="notitie">Verhuisd naar Content/Audio/Generated — cache reist mee met de repo (16.12).</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Runtime-playback in game</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:85%"></div></div>
+      <span class="pct">85%</span>
+      <p class="notitie">PlayLine (asset → cache-wav → genereren) af; eerste run tegen de live API nog te doen.</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Auto-assign naar Dialogue DataAssets</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:90%"></div></div>
+      <span class="pct">90%</span>
+      <p class="notitie">Bulk-commandlet importeert .wav als USoundWave en koppelt + saved het DataAsset.</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Editor-bulk-tool</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:90%"></div></div>
+      <span class="pct">90%</span>
+      <p class="notitie">-run=EclipseGenerateVoices; zonder API-key een nette cache-only run.</p>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Music-endpoint</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">SFX-endpoint</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Adaptieve always-on muziek (16.7)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Credit-budgetplan (16.13)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+      <p class="notitie">Gedocumenteerd.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 content & verhaal ============ -->
+<section class="kaart">
+  <h2>5 · Content &amp; verhaal <span class="scope">Parts 2, 3, 11</span></h2>
+  <div class="rijen">
+    <div class="rij s-groen">
+      <span class="naam">Missie-templates Phase 1 (3 stuks)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Dialogen geschreven</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">VO gegenereerd</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:0%"></div></div>
+      <span class="pct">0%</span>
+    </div>
+    <div class="rij s-rood">
+      <span class="naam">Planeten uitgewerkt in game</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:5%"></div></div>
+      <span class="pct">5%</span>
+      <p class="notitie">1 graybox-district van Kessara.</p>
+    </div>
+    <div class="rij s-groen">
+      <span class="naam">Lore-canon (bible)</span>
+      <div class="balk" aria-hidden="true"><div class="vul" style="width:100%"></div></div>
+      <span class="pct">100%</span>
+      <p class="notitie">Docs 00–17 staan.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 kwaliteitsbalk ============ -->
+<section class="kaart">
+  <h2>6 · Kwaliteitsbalk <span class="scope">per sessie</span></h2>
+  <div class="chips">
+    <span class="chip chip-ok"><span class="glyph">&#10003;</span> Build: groen</span>
+    <span class="chip chip-ok"><span class="glyph">&#10003;</span> Tests: 30/30 groen</span>
+    <span class="chip chip-ok"><span class="glyph">&#10003;</span> Datavalidatie: 0 fouten</span>
+    <span class="chip chip-ok"><span class="glyph">&#10003;</span> Event-catalog: 19/19 sync</span>
+    <span class="chip chip-open"><span class="glyph">!</span> PIE-playtest door eigenaar: OPEN (gate-vraag)</span>
+  </div>
+</section>
+
+<!-- ============ screenshots ============ -->
+<section class="kaart">
+  <h2>Screenshots <span class="scope">review-camera's, district-graybox Kessara</span></h2>
+  <div class="galerij">
+    <figure>
+      <img src="progress_media/shot_01.jpg" width="640" height="360" alt="Editor-screenshot: controlepost-compound in het graybox-district, gestileerde blokken">
+      <figcaption>Controlepost-compound (review-camera 1)</figcaption>
+    </figure>
+    <figure>
+      <img src="progress_media/shot_02.jpg" width="640" height="360" alt="Editor-screenshot: warehouse-straat in het graybox-district, gestileerde blokken">
+      <figcaption>Warehouse-straat (review-camera 2)</figcaption>
+    </figure>
+    <figure>
+      <img src="progress_media/shot_03.jpg" width="640" height="360" alt="Editor-screenshot: cover-veld met dekkingsblokken in het graybox-district">
+      <figcaption>Cover-veld (review-camera 3)</figcaption>
+    </figure>
+    <figure>
+      <img src="progress_media/shot_04.jpg" width="640" height="360" alt="Editor-screenshot: overzicht van het hele district vanaf hoogte">
+      <figcaption>Overzicht district (review-camera 4)</figcaption>
+    </figure>
+  </div>
+  <span class="hardware">Dev-laptop (GTX 1050, SM5) — gestileerde dressing-pass in ontwikkeling; echte fidelity-pass volgt op de RTX-PC</span>
+  <p class="eerlijk">Let op: de belichtings-debug loopt nog — beelden kunnen ruw of fout ogen. Dit dashboard toont bewust de eerlijke stand.</p>
+</section>
+
+<!-- ============ changelog ============ -->
+<section class="kaart">
+  <h2>Sessie 2026-07-22 <span class="scope">changelog</span></h2>
+  <ul class="changelog">
+    <li>Onafhankelijke her-review van de Opus-code afgerond.</li>
+    <li>4 defect-fixes gecommit: missions-served-teller · cover-scorer vriend/vijand · data-wiring speler/wapens/vijanden + speler-revive · UI-foutmeldingen.</li>
+    <li>Ink-outline post-materiaal geauthord.</li>
+    <li>District-dressing + screenshot-rig gebouwd.</li>
+    <li>28/28 tests groen.</li>
+    <li>Audio-pipeline afgerond conform owner-mandaat (phase0/OWNER_MANDATE.md): PCM→WAV-opslag, runtime-PlayLine, auto-assign + bulk-commandlet, cache naar Content/, 2 nieuwe headless tests (30/30 groen).</li>
+    <li>Graphics dev-box-milestone gebankt: gestileerde schemer-twee-tonen + ink-outlines (SM5-limieten forensisch gedocumenteerd); volle stack (Lumen/Nanite/VSM) wacht op de RTX-PC.</li>
+  </ul>
+</section>
+
+<footer>
+  PROGRESS.html · statisch bestand in de repo, geen externe resources · screenshots: progress_media/shot_01.jpg t/m shot_04.jpg
+</footer>
+
+</body>
+</html>

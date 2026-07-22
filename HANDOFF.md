@@ -1,5 +1,7 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-21.*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-22 (Fable 5 re-review session).*
+
+> **Live progress dashboard:** open [`PROGRESS.html`](PROGRESS.html) in a browser — per-system/per-subtask percentages with screenshots, updated every dev session. Owner instructions for the audio pipeline + studio working method are recorded verbatim in [`phase0/OWNER_MANDATE.md`](phase0/OWNER_MANDATE.md).
 
 > **Read order for whoever picks this up:** this file → `DOCUMENTATION_README.md` → `00_INDEX.md` → `13_roadmap.md` (ACTIVE_MILESTONE) → `14_ai_dev_instructions.md`. Then the phase specs in `phase0/specs/`.
 
@@ -38,14 +40,14 @@ This dev box is a **2017 laptop: NVIDIA GTX 1050 (4 GB), i7-7700HQ, 32 GB RAM**.
 
 ---
 
-## 4. Current status (2026-07-21)
+## 4. Current status (2026-07-22)
 
-**Phase 1 — all 8 feature specs have landed and the tree is green.**
+**Phase 1 — all 8 feature specs landed, independently re-reviewed (Fable 5), and the tree is green.**
 
 - Build: `EclipseEditor Win64 Development` **Succeeded** (UE 5.8).
-- Automation tests: **28/28 pass** (`Automation RunTests Eclipse`, headless `-nullrhi`).
+- Automation tests: **30/30 pass** (`Automation RunTests Eclipse`, headless `-nullrhi`; incl. 2 new audio tests).
 - Data validation: **clean** (`EclipseValidateData` commandlet, 0 errors).
-- Event catalog: **19/19 in sync** (`Tools/check_event_catalog.py`).
+- Event catalog: **19/19 in sync** (`Eclipse/Tools/check_event_catalog.py`).
 
 **Systems in place (headless-proven):** event bus · campaign state + transaction API + save v0 · deterministic economy ledger · 6-node strategy mini-map · mission runtime + debrief consequences · squad of 2 with ordered actions and *reasoned refusals* (never-silent) · roster + permadeath + memorial stub · menu base hub + preparation flow · playable graybox layer (character/GAS health, hitscan combat, enemy AI, code-built district).
 
@@ -57,10 +59,19 @@ The full loop is **proven headless** (test `Eclipse.Base.Prep.FullCircleSmoke`: 
 
 The **live playable loop is done** (commit `[Loop] Wire the live playable loop`): boot → menu base → launch → graybox mission with squad orders → extraction/lose → debrief → base, no console commands. The remaining Phase-1 step is the **gate question** — a human plays it and answers *"do testers voluntarily play a second loop?"* (13.2). That's the owner's call, not an automated check.
 
+**Done since 2026-07-21 (Fable 5 independent re-review, all green + pushed):**
+- Stance stub + `DA_SquadTuning` wiring landed (previous session's last commit).
+- Re-review fixes: `MarkMissionServed` mutation (roster service count was never incremented); squad cover scorer treated the id-less player as a threat + downed-callback lifetime hardened; ground-data wiring (DA_CharacterTuning/DT_Weapons/DT_EnemyArchetypes were dead data, the player pawn had **no weapon** and stayed **downed after a lost run** — all fixed, player revives per launch); prep/launch rejections now visible in the hub.
+- First stylized dressing pass on the code-built district (owner-authorized ahead of Phase 2): palette MIDs, SkyAtmosphere, haze, punch grading, authored ink-outline post material (`/Game/Art/PP_EclipseOutline`), and a `-EclipseShot` screenshot review rig (15.9). Dev-box (SM5) lighting calibration in progress — see PROGRESS.html for honest status; the full stack (Lumen/Nanite/VSM) remains RTX-PC work.
+
+**Done later on 2026-07-22 (owner-mandate session, all green + pushed):**
+- **Audio pipeline per OWNER_MANDATE** (16.12): TTS now requests raw PCM and stores **WAV** in `Content/Audio/Generated/` (cache travels with the repo); runtime `PlayLine` (asset → cached wav → generate); `FEclipseDialogueLine.GeneratedAudio` + per-character `Lines`; bulk commandlet `-run=EclipseGenerateVoices` (AssetRegistry scan → generate → import USoundWave → auto-assign + save); 2 new headless tests. First live-API run still pending (no key on this box).
+- **Live progress dashboard** `PROGRESS.html` + `progress_media/` (per-subtask %, screenshots) — update it every session.
+
 **Open (small, non-blocking) polish:**
-- Move-order **stance stub** (ready/aggressive) — an in-scope SPEC-P1-06 bullet, still missing (no gate impact).
-- Wire the hardcoded **squad tuning constants** (cover ring radius/samples, acceptance radii) into `DA_SquadTuning` (`14.2` compliance).
-- **Audio** (Part 16, forward infra): runtime mp3→USoundWave playback, auto-assign to Dialogue DataAssets (WITH_EDITOR import), an editor bulk-gen UI, and the Music/SFX endpoints. Set `ELEVENLABS_API_KEY` (env) to generate; **rotate the key** that was shared in plaintext.
+- Run `-run=EclipseGenerateVoices` once with `ELEVENLABS_API_KEY` set to verify the PCM endpoint live; **rotate the key** that was shared in plaintext.
+- Music/SFX endpoints + adaptive always-on music (16.7) — Phase 2 forward infra.
+- Graphics: the SM5 dev-box milestone is banked (dusk two-tone + ink outlines); the real fidelity pass (Lumen/Nanite/VSM, Part 15 full stack) runs on the RTX PC.
 
 **Non-blocking carryover** (roadmap-allowed to lag): CI self-hosted runner, 10 concept-art pieces, 5 feel-reference clips. **Fidelity/art starts at Phase 2** (graybox rule); Parts 15–17 are the target for that.
 
@@ -117,3 +128,19 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 - Save contract: `12_technical_design.md` §12.3.
 - Performance budgets: `12_technical_design.md` §12.4.
 - Visual target + hardware reality: `15_visual_quality_charter.md`.
+
+---
+
+## LAATSTE STAND (2026-07-22, ~14:45 CET)
+
+**Waar gestopt:** einde van de Fable 5-sessie (her-review + mandaat-implementatie). Werkboom schoon, alles gecommit en gepusht; **build groen, 30/30 tests groen, validatie 0 fouten, catalog 19/19**.
+
+**Deze sessie aangeraakt (samengevat):**
+- *Fixes uit her-review (4 commits, eerder gepusht):* `EclipseCampaignTransaction.h/.cpp`, `EclipseMissionLogic.cpp`, `EclipseMissionTests.cpp` (MarkMissionServed); `EclipseSquadmateController.cpp`, `EclipseSquadSubsystem.cpp` (cover-scorer/weak-ptr); `EclipseCharacter(.h/.cpp)`, `EclipseCharacterTypes.h`, `EclipsePlayerController.cpp`, `EclipseEnemyController.cpp`, `EclipseGameMode.cpp`, `EclipseCampaignSetupAsset.h`, `DA_CampaignSetup.uasset` (data-wiring + speler-wapen + revive); `EclipseBaseHubWidget(.h/.cpp)` (foutmeldingen).
+- *Graphics (deze push):* `EclipseGrayboxBuilder.cpp` (palet-MID's, atmosfeer, key+fill, fog, post + outline-blendable, host-map-purge), `EclipseGameMode(.h/.cpp)` (`-EclipseShot` review-rig), `Content/Art/PP_EclipseOutline.uasset`.
+- *Audio (deze push):* `EclipseElevenLabsClient(.h/.cpp)` (PCM), nieuw `EclipseWavUtil`, `EclipseVoiceCache`, `EclipseGenerateVoicesCommandlet` (EclipseEditor), `EclipseDialogueTypes.h`, `EclipseCharacterVoiceData.h`, `EclipseDialogueVoiceSubsystem(.h/.cpp)` (PlayLine), `EclipseEditor.Build.cs`, nieuw `EclipseAudioTests.cpp`.
+- *Docs/dashboard (deze push):* `HANDOFF.md`, `PROGRESS.html` + `progress_media/`, `phase0/OWNER_MANDATE.md`.
+
+**Bekende SM5-devbox-limiet (gedocumenteerd in code):** directionele lichten verlichten op het D3D12-SM5-fallbackpad van de GTX 1050 geen horizontale vlakken betrouwbaar; de gestileerde twee-tonen-look is de bewuste dev-box-milestone. Geen actie nodig op deze laptop.
+
+**Eerstvolgende stap:** (1) eigenaar speelt de loop in PIE en beantwoordt de gate-vraag "spelen testers vrijwillig een 2e loop?" (13.2); (2) op een machine mét `ELEVENLABS_API_KEY`: `-run=EclipseGenerateVoices` één keer draaien (live-API-verificatie) en de key roteren; (3) op de RTX-PC: Part 15-fidelity-pass (Lumen/Nanite/VSM) — startprompt staat in `MIGRATION_TO_STRONG_PC.md` §6.
