@@ -30,15 +30,18 @@ public:
 	void UnregisterAll();
 
 	/** Issue to one squadmate by roster id; returns false only for unknown ids (unknown = caller bug, not refusal). */
-	bool IssueOrder(const FGuid& SoldierId, EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor);
+	bool IssueOrder(const FGuid& SoldierId, EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor, EEclipseSquadStance Stance = EEclipseSquadStance::Ready);
 
 	/** Issue to everyone (the Phase 1 hotkey path). */
-	void IssueOrderToAll(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor);
+	void IssueOrderToAll(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor, EEclipseSquadStance Stance = EEclipseSquadStance::Ready);
 
 	int32 GetSquadmateCount() const { return Squadmates.Num(); }
 
 	/** Per-squadmate "id: order" lines for the mission HUD (SPEC-P1-06 order-state widget). */
 	TArray<FString> GetOrderStateLines() const;
+
+	/** Active squad tuning asset (cover/acceptance/timeout data); null degrades to code defaults (GDD 14.3.5). */
+	const UEclipseSquadTuningAsset* ResolveTuning() const;
 
 private:
 	struct FSquadmateEntry
@@ -48,7 +51,6 @@ private:
 	};
 
 	void BroadcastOrderEvent(const FGameplayTag& Tag, const FGuid& SoldierId, EEclipseSquadOrder Order, const FString& BarkLine, EEclipseOrderRefusalReason Reason);
-	const UEclipseSquadTuningAsset* ResolveTuning() const;
 
 	TArray<FSquadmateEntry> Squadmates;
 	IConsoleObject* DumpCommand = nullptr;

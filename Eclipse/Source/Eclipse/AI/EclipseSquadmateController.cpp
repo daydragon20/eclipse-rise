@@ -7,6 +7,8 @@
 #include "Navigation/PathFollowingComponent.h" // EPathFollowingRequestResult (AIController.h only forward-declares it)
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "Squad/EclipseSquadSubsystem.h"
+#include "Squad/EclipseSquadTypes.h"
 
 EclipseSquadOrderLogic::FEclipseOrderWorldFacts AEclipseSquadmateController::GatherFacts(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor) const
 {
@@ -38,7 +40,13 @@ EclipseSquadOrderLogic::FEclipseOrderWorldFacts AEclipseSquadmateController::Gat
 	return Facts;
 }
 
-EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::ExecuteOrder(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor)
+const UEclipseSquadTuningAsset* AEclipseSquadmateController::ResolveTuning() const
+{
+	const UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+	return Squad != nullptr ? Squad->ResolveTuning() : nullptr;
+}
+
+EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::ExecuteOrder(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor, EEclipseSquadStance Stance)
 {
 	const EclipseSquadOrderLogic::FEclipseOrderDecision Decision =
 		EclipseSquadOrderLogic::DecideOrder(Order, GatherFacts(Order, TargetLocation, TargetActor));
@@ -48,6 +56,7 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 	}
 
 	CurrentOrder = Order;
+	CurrentStance = Stance; // stored for the feel pass; no behavior split in Phase 1
 	switch (Order)
 	{
 	case EEclipseSquadOrder::MoveTo:
@@ -58,8 +67,11 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 		// the accept to a reasoned NoRoute refusal so an accepted order never
 		// stalls silently (GDD 8.4 never-silent contract — the pure decision
 		// table cannot see the chosen destination).
+		const UEclipseSquadTuningAsset* Tuning = ResolveTuning();
 		const FVector Destination = Order == EEclipseSquadOrder::MoveTo ? SelectCoverPointNear(TargetLocation) : TargetLocation;
-		const float AcceptanceRadius = Order == EEclipseSquadOrder::MoveTo ? 50.0f : 150.0f;
+		const float AcceptanceRadius = Order == EEclipseSquadOrder::MoveTo
+			? (Tuning != nullptr ? Tuning->MoveAcceptanceRadius : 50.0f)
+			: (Tuning != nullptr ? Tuning->RegroupAcceptanceRadius : 150.0f);
 		if (MoveToLocation(Destination, AcceptanceRadius) == EPathFollowingRequestResult::Failed)
 		{
 			StopMovement();
@@ -133,9 +145,11 @@ FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& Ordered
 
 	// Ring samples around the ordered point; a sample "is cover" when geometry
 	// blocks the enemy's line to it. Ties go to the sample closest to the order —
-	// obeying the letter of the order beats optimizing the spirit.
-	constexpr int32 SampleCount = 8;
-	constexpr float RingRadius = 200.0f;
+	// obeying the letter of the order beats optimizing the spirit. Radius + sample
+	// count are data (SPEC-P1-06 Data); missing tuning degrades to code defaults.
+	const UEclipseSquadTuningAsset* Tuning = ResolveTuning();
+	const int32 SampleCount = Tuning != nullptr ? FMath::Max(3, Tuning->CoverRingSamples) : 8;
+	const float RingRadius = Tuning != nullptr ? Tuning->CoverRingRadius : 200.0f;
 	FVector BestPoint = OrderedLocation;
 	float BestScore = -1.0f;
 	for (int32 Index = 0; Index < SampleCount; ++Index)

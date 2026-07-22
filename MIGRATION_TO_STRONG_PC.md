@@ -275,16 +275,25 @@ PHASE B — Verify the playable loop.
   - The gate question (roadmap 13.2) — "do testers voluntarily play a second loop?" —
     is the owner's call; surface it, don't self-declare it passed.
 
-PHASE C — Graphics / fidelity (this is why you're on the strong PC; follow Part 15).
-  - Stay inside the ACTIVE_MILESTONE for GAMEPLAY, but begin the Phase-2 visual
-    foundation the strong hardware unlocks: enable/verify Lumen (hardware RT where
-    available), Nanite on suitable geometry, Virtual Shadow Maps, TSR, volumetric
-    fog, physically-based exposure and a filmic post chain — all behind UE
-    scalability so min-spec still runs. Replace the graybox cubes of the first
-    district with Megascan/Nanite materials and intentional lighting per the art
-    direction (15.5), keeping the 12.4 performance budgets. Profile on this GPU and
-    report stat unit / GPU numbers.
-  - Do NOT let graphics work regress the Phase-1 loop or the green test bar.
+PHASE C — Graphics (this is why you're on the strong PC; follow Part 15 exactly).
+  - ART DIRECTION IS LOCKED: stylized, Borderlands-leaning (15.5) — bold shapes,
+    strong silhouettes, ink/edge outlines, punchy readable colour, hand-authored
+    surface character. NOT photoreal. Drive it with the full UE stack (Nanite,
+    Lumen/HWRT where available, Virtual Shadow Maps, TSR, volumetric fog, a stylized
+    cel/toon post chain + outline materials), all behind UE scalability so min-spec
+    still runs.
+  - WORK LIKE A FULL AAA GRAPHICS STUDIO, not a code generator. Make the best the
+    engine + this GPU can give, then keep pushing. REVIEW SCREENSHOTS EVERY PASS:
+    capture fixed cameras, study them, find the weakest element, fix it (lighting →
+    materials → textures → meshes → effects → detail), repeat. EVERY DETAIL OF EVERY
+    ENVIRONMENT MATTERS — no filler geometry, no bare untouched surfaces, no
+    "good enough" corners; grime, decals, propaganda, wear, edge highlights, props,
+    atmosphere. Replace the graybox cubes of the first district with a real stylized
+    dressing pass. Ask each scene "does this look like a modern AAA Borderlands-tier
+    game?" and if not, iterate.
+  - Stay inside the ACTIVE_MILESTONE for GAMEPLAY; keep the 12.4 performance budgets;
+    profile (stat unit / GPU visualizer) and report numbers. Do NOT let graphics
+    work regress the Phase-1 loop or the green test bar.
 
 Work in small, reviewed, committed steps. After each meaningful change: build, test,
 commit, push. Keep the design bible authoritative — if something conflicts, the Game

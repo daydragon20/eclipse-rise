@@ -91,7 +91,13 @@ Highest-quality source that the pipeline and licence allow. Priority order:
 
 ## 15.5 Art Direction (the anti-generic clause)
 
-Realistic materials, detailed surfaces, natural colour, real-world scale, filmic light — **but specific to ECLIPSE, never stock.** The failure mode we reject: a technically-correct scene that looks like a marketplace demo. Each environment must feel authored by a team with a point of view:
+## CHOSEN DIRECTION — stylized, Borderlands-leaning (locked)
+
+ECLIPSE's look is **stylized, not photoreal — the Borderlands family of style is the north star**: bold shapes, strong silhouettes, hand-authored surface character, ink/edge outlines, punchy readable colour, and a graphic-novel confidence. This is a deliberate choice and it is the smart one for this team size (pillar 5, ACHIEVABLE AMBITION): a stylized target reads better at command distance, ages well, forgives imperfection, and is *far* cheaper to produce at quality than photoreal — while UE 5.8's full tech stack (Nanite, Lumen, VSM, TSR, volumetrics) still drives it, now serving a stylized look instead of a photoreal one (cel/toon post + outline materials + physically-plausible-but-stylized lighting).
+
+**Work like a full AAA graphics studio, not a code generator** (the standing mandate): every meaningful surface gets deliberate attention. Aim for the best the engine and hardware can give, then keep pushing — **review screenshots every pass**, find the weakest element, and fix it (lighting → materials → textures → meshes → effects → detail). **Every detail of every environment matters**: no filler geometry, no bare untouched surfaces, no "good enough" corners. Grime, decals, propaganda, wear, edge highlights, small props, atmosphere — the world must feel *authored*, occupied, and specific. Ask each scene *"does this look like a modern AAA game in this style?"* and if not, iterate (see §15.8/§15.9).
+
+Beyond the stylization, the anti-generic rules still hold — **specific to ECLIPSE, never stock.** The failure mode we reject: a technically-correct scene that looks like a marketplace demo. Each environment must feel authored by a team with a point of view:
 
 - **Hierarchy & silhouette** — the eye is led; hero elements read at command distance.
 - **Occupation & story** — checkpoints, Dominion propaganda, Veil surveillance, worker districts, damage history. The world is *ruled*, and that shows.
@@ -152,8 +158,8 @@ This loop is a Phase-2-onward ritual. In Phase 1 the equivalent loop targets *fe
 
 Regular, evidence-based checks (Web/Playwright-style rigour, applied to a game):
 
-- **Play it** — does it feel and look like a modern AAA third-person action game at command distance and in a firefight?
-- **Screenshot review** at fixed cameras and target breakpoints (1080p/1440p/4K on target hardware).
+- **Play it** — does it feel and look like a modern AAA stylized (Borderlands-tier) third-person action game at command distance and in a firefight?
+- **Screenshot review every pass** — capture fixed cameras at target breakpoints (1080p/1440p/4K on target hardware), study them, and treat every prop, surface, and corner as something that must earn its place. No bare or untouched geometry ships.
 - **Lighting analysis** — exposure sanity, no blown/crushed zones, GI leaks, shadow acne/peter-panning.
 - **Performance capture** — `stat unit`, GPU visualizer, Insights traces against 12.4 budgets.
 - **Fix visual bugs** before they compound.

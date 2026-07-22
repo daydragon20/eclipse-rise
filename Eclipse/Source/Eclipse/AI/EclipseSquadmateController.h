@@ -28,7 +28,7 @@ public:
 	 * the caller turns it into an Acknowledged/Refused event; silence cannot
 	 * happen by construction (GDD 8.4).
 	 */
-	EclipseSquadOrderLogic::FEclipseOrderDecision ExecuteOrder(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor);
+	EclipseSquadOrderLogic::FEclipseOrderDecision ExecuteOrder(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor, EEclipseSquadStance Stance = EEclipseSquadStance::Ready);
 
 	/**
 	 * Stand-down on down: stop and clear focus when the body goes down — the
@@ -51,5 +51,11 @@ private:
 	 */
 	FVector SelectCoverPointNear(const FVector& OrderedLocation) const;
 
+	/** Active squad tuning (cover/acceptance data) via the squad subsystem; null -> code defaults. */
+	const class UEclipseSquadTuningAsset* ResolveTuning() const;
+
 	EEclipseSquadOrder CurrentOrder = EEclipseSquadOrder::Hold;
+
+	/** Last move stance (SPEC-P1-06 stub; no behavior split yet — PLACEHOLDER in the enum). */
+	EEclipseSquadStance CurrentStance = EEclipseSquadStance::Ready;
 };

@@ -307,5 +307,11 @@ void AEclipsePlayerController::IssueSquadOrder(EEclipseSquadOrder Order)
 	const FVector Target = Order == EEclipseSquadOrder::Regroup && GetPawn() != nullptr
 		? GetPawn()->GetActorLocation()
 		: AimLocation;
-	Squad->IssueOrderToAll(Order, Target, AimActor);
+
+	// Stance stub (SPEC-P1-06): hold Left Alt while ordering for Aggressive, else
+	// Ready. PLACEHOLDER(GDD 8.4): stance drives posture/ROE in the feel pass.
+	const EEclipseSquadStance Stance = IsInputKeyDown(EKeys::LeftAlt)
+		? EEclipseSquadStance::Aggressive
+		: EEclipseSquadStance::Ready;
+	Squad->IssueOrderToAll(Order, Target, AimActor, Stance);
 }

@@ -32,6 +32,18 @@ enum class EEclipseOrderRefusalReason : uint8
 	Downed
 };
 
+/**
+ * Move-order posture (SPEC-P1-06 stub: "Move to position (with stance stub:
+ * ready/aggressive)"). PLACEHOLDER(GDD 8.4): drives posture/ROE and the cover-vs-
+ * advance bias in the feel pass; Phase 1 stores it but splits no behavior yet.
+ */
+UENUM(BlueprintType)
+enum class EEclipseSquadStance : uint8
+{
+	Ready,
+	Aggressive
+};
+
 /** One order's line pools (DT_SquadOrderDefs row; row name = order id). */
 USTRUCT(BlueprintType)
 struct FEclipseSquadOrderDefRow : public FTableRowBase
@@ -57,6 +69,22 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
 	float CoverSearchRadius = 800.0f;
+
+	/** Ring radius sampled around an ordered point when picking cover (SPEC-P1-06 Data). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
+	float CoverRingRadius = 200.0f;
+
+	/** How many ring samples the cover scorer tests. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 3))
+	int32 CoverRingSamples = 8;
+
+	/** Move-to acceptance radius (how close to the cover point counts as arrived). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 1))
+	float MoveAcceptanceRadius = 50.0f;
+
+	/** Regroup acceptance radius (looser — gather near, not on, the leader). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 1))
+	float RegroupAcceptanceRadius = 150.0f;
 
 	/** Feel bar: order -> visible answer within 1 s (graybox feel targets §4). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0.1))

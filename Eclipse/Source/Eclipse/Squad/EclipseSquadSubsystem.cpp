@@ -125,7 +125,7 @@ TArray<FString> UEclipseSquadSubsystem::GetOrderStateLines() const
 	return Lines;
 }
 
-bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor)
+bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor, EEclipseSquadStance Stance)
 {
 	FSquadmateEntry* Entry = Squadmates.FindByPredicate(
 		[&SoldierId](const FSquadmateEntry& Candidate) { return Candidate.SoldierId == SoldierId; });
@@ -138,7 +138,7 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 
 	BroadcastOrderEvent(EclipseTags::Event_Squad_OrderIssued, SoldierId, Order, FString(), EEclipseOrderRefusalReason::None);
 
-	const EclipseSquadOrderLogic::FEclipseOrderDecision Decision = Controller->ExecuteOrder(Order, TargetLocation, TargetActor);
+	const EclipseSquadOrderLogic::FEclipseOrderDecision Decision = Controller->ExecuteOrder(Order, TargetLocation, TargetActor, Stance);
 
 	// Bark pools from data; the order id doubles as the row key.
 	const UEclipseSquadTuningAsset* Tuning = ResolveTuning();
@@ -163,13 +163,13 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 	return true;
 }
 
-void UEclipseSquadSubsystem::IssueOrderToAll(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor)
+void UEclipseSquadSubsystem::IssueOrderToAll(EEclipseSquadOrder Order, const FVector& TargetLocation, AActor* TargetActor, EEclipseSquadStance Stance)
 {
 	// Copy: entries never mutate mid-issue today, but order handlers may re-enter.
 	const TArray<FSquadmateEntry> EntrySnapshot = Squadmates;
 	for (const FSquadmateEntry& Entry : EntrySnapshot)
 	{
-		IssueOrder(Entry.SoldierId, Order, TargetLocation, TargetActor);
+		IssueOrder(Entry.SoldierId, Order, TargetLocation, TargetActor, Stance);
 	}
 }
 
