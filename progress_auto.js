@@ -1,13 +1,23 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-22 16:37",
+    "generatedAt":  "2026-07-22 17:17",
     "tests":  {
                   "ok":  31,
                   "failed":  0,
                   "total":  31,
-                  "reportAge":  "1 min geleden"
+                  "reportAge":  "41 min geleden"
               },
     "commits":  [
+                    {
+                        "hash":  "59de309",
+                        "date":  "22-07 16:44",
+                        "msg":  "[Repo] Rewrite the strong-PC migration playbook as a day-one bootstrap (GDD 14.1)"
+                    },
+                    {
+                        "hash":  "8618f48",
+                        "date":  "22-07 16:44",
+                        "msg":  "[Characters] Play with an Xbox pad alongside mouse/keyboard (owner request, GDD 8.1 stub)"
+                    },
                     {
                         "hash":  "4f41114",
                         "date":  "22-07 15:19",
@@ -37,34 +47,24 @@ window.PROGRESS_AUTO = {
                         "hash":  "d68667f",
                         "date":  "22-07 14:38",
                         "msg":  "[Repo] Record owner mandate; add live progress dashboard; update handoff (GDD 14.1, Part 15/16)"
-                    },
-                    {
-                        "hash":  "6b3c055",
-                        "date":  "22-07 14:38",
-                        "msg":  "[Audio] Land the WAV voice pipeline - runtime playback, auto-assign, bulk commandlet (GDD 16.12)"
-                    },
-                    {
-                        "hash":  "5159589",
-                        "date":  "22-07 14:38",
-                        "msg":  "[Core] Dress the code-built district and add the screenshot review rig (Part 15.5/15.8/15.9)"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (19 min geleden)"
+                            "caption":  "Laatste run - beeld 1 (59 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (19 min geleden)"
+                            "caption":  "Laatste run - beeld 2 (59 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (19 min geleden)"
+                            "caption":  "Laatste run - beeld 3 (59 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (19 min geleden)"
+                            "caption":  "Laatste run - beeld 4 (59 min geleden)"
                         }
                     ]
 };
