@@ -27,7 +27,8 @@ enum class EEclipseCampaignMutationType : uint8
 	QueueProduction,
 	CompleteProduction,
 	WoundSoldier,
-	AdvanceDay
+	AdvanceDay,
+	MarkMissionServed
 };
 
 /**
@@ -65,7 +66,7 @@ struct FEclipseCampaignMutation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FEclipseSoldierRecord SoldierRecord;
 
-	/** KillSoldier */
+	/** KillSoldier / WoundSoldier / MarkMissionServed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FGuid SoldierId;
 

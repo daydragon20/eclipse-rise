@@ -194,6 +194,24 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 	}
 	case EEclipseCampaignMutationType::AdvanceDay:
 		return true;
+	case EEclipseCampaignMutationType::MarkMissionServed:
+	{
+		const FEclipseSoldierRecord* Soldier = State.FindSoldier(Mutation.SoldierId);
+		if (Soldier == nullptr)
+		{
+			OutError = FString::Printf(TEXT("MarkMissionServed: unknown soldier %s"), *Mutation.SoldierId.ToString());
+			return false;
+		}
+		if (Soldier->Status == EEclipseSoldierStatus::Dead)
+		{
+			// Order service marks before KillSoldier in the same transaction: the
+			// fatal mission still counts on the roster row (Pillar 3), and the
+			// memorial snapshot (Record + 1) then matches the row exactly.
+			OutError = FString::Printf(TEXT("MarkMissionServed: %s is already dead"), *Soldier->Name);
+			return false;
+		}
+		return true;
+	}
 	default:
 		OutError = TEXT("Unknown mutation type");
 		return false;
@@ -274,6 +292,14 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 	case EEclipseCampaignMutationType::AdvanceDay:
 	{
 		State.Day += 1;
+		break;
+	}
+	case EEclipseCampaignMutationType::MarkMissionServed:
+	{
+		FEclipseSoldierRecord* Soldier = State.Roster.FindByPredicate(
+			[&Mutation](const FEclipseSoldierRecord& S) { return S.SoldierId == Mutation.SoldierId; });
+		check(Soldier != nullptr);
+		Soldier->MissionsServed += 1;
 		break;
 	}
 	default:

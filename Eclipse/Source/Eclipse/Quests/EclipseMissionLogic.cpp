@@ -42,6 +42,22 @@ FEclipseCampaignTransaction ComposeConsequences(
 	FEclipseCampaignTransaction Transaction;
 	Transaction.Source = TEXT("MissionDebrief");
 
+	// Every deployed soldier served this mission, win or lose (SPEC-P1-07 roster
+	// field; Pillar 3: the count is the person's history). Marks precede the
+	// casualty mutations so a soldier who dies today still records the fatal
+	// mission on their roster row — matching the memorial's Record + 1 snapshot.
+	for (const FGuid& DeployedId : Outcome.DeployedSoldierIds)
+	{
+		const FEclipseSoldierRecord* Deployed = State.FindSoldier(DeployedId);
+		if (Deployed == nullptr || Deployed->Status == EEclipseSoldierStatus::Dead)
+		{
+			continue; // unknown/dead ids must not reject the whole debrief (GDD 14.3.5)
+		}
+		FEclipseCampaignMutation& Served = Transaction.Mutations.AddDefaulted_GetRef();
+		Served.Type = EEclipseCampaignMutationType::MarkMissionServed;
+		Served.SoldierId = DeployedId;
+	}
+
 	auto AddReward = [&Transaction](const FGameplayTag& Tag, int32 Amount, FName Reason)
 	{
 		if (Tag.IsValid() && Amount > 0)

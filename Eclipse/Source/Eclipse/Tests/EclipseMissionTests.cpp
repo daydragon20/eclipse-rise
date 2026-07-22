@@ -77,6 +77,10 @@ bool FEclipseMissionConsequenceCompositionTest::RunTest(const FString& Parameter
 	Soldier.SoldierId = FGuid(9, 9, 9, 1);
 	Soldier.Name = TEXT("Vara Chen");
 	Soldier.MissionsServed = 4;
+	FEclipseSoldierRecord& Survivor = State.Roster.AddDefaulted_GetRef();
+	Survivor.SoldierId = FGuid(9, 9, 9, 2);
+	Survivor.Name = TEXT("Oram Bex");
+	Survivor.MissionsServed = 2;
 
 	FEclipseMissionRewards Rewards;
 	Rewards.Credits = 60;
@@ -85,6 +89,7 @@ bool FEclipseMissionConsequenceCompositionTest::RunTest(const FString& Parameter
 	FEclipseMissionOutcome Outcome;
 	Outcome.RegionId = TEXT("Region_Target");
 	Outcome.bSuccess = true;
+	Outcome.DeployedSoldierIds = { Soldier.SoldierId, Survivor.SoldierId };
 
 	FEclipseResolvedCasualty Casualty;
 	Casualty.SoldierId = Soldier.SoldierId;
@@ -105,6 +110,8 @@ bool FEclipseMissionConsequenceCompositionTest::RunTest(const FString& Parameter
 	TestTrue(TEXT("Casualty is dead"), State.FindSoldier(Soldier.SoldierId)->Status == EEclipseSoldierStatus::Dead);
 	TestEqual(TEXT("Memorial written in the same transaction"), State.Memorial.Num(), 1);
 	TestEqual(TEXT("Memorial counts the fatal mission"), State.Memorial[0].MissionsServed, 5);
+	TestEqual(TEXT("Fallen soldier's roster row counts the fatal mission"), State.FindSoldier(Soldier.SoldierId)->MissionsServed, 5);
+	TestEqual(TEXT("Survivor's missions-served incremented (SPEC-P1-07)"), State.FindSoldier(Survivor.SoldierId)->MissionsServed, 3);
 
 	// Lose (fail-forward): half intel salvage, no flip. Fresh Dominion-held
 	// region (the win branch above mutated the shared state's region).
@@ -212,6 +219,8 @@ bool FEclipseMissionFullLoopTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Downed soldier resolved and recorded"),
 		Campaign->GetState().FindSoldier(Squad[0])->Status == EEclipseSoldierStatus::Dead);
 	TestEqual(TEXT("Memorial entry present"), Campaign->GetState().Memorial.Num(), 1);
+	TestEqual(TEXT("Fallen soldier served the fatal mission"), Campaign->GetState().FindSoldier(Squad[0])->MissionsServed, 1);
+	TestEqual(TEXT("Survivor served the mission too"), Campaign->GetState().FindSoldier(Squad[1])->MissionsServed, 1);
 	TestEqual(TEXT("Mission.Completed broadcast once"), CompletedEvents, 1);
 	TestTrue(TEXT("Runtime finished"), Mission->GetPhase() == EEclipseMissionPhase::Finished);
 
