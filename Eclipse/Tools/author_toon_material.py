@@ -28,7 +28,10 @@ float midStep = step(BandLo, ndl);
 float3 midColor = lerp(ShadeColor.rgb, LitColor.rgb, 0.5);
 float3 col = lerp(ShadeColor.rgb, midColor, midStep);
 col = lerp(col, LitColor.rgb, litStep);
-float stripe = step(0.5, frac((WorldPos.x + WorldPos.y) / max(HatchScale, 1.0)));
+// Hatching reads as pen strokes, not corrugation: wide spacing with a thin
+// dark stroke (25% duty). At 50% duty and a 42-unit period the shade band
+// looked like corrugated sheet metal (first strong-PC round, camera 2).
+float stripe = step(0.75, frac((WorldPos.x + WorldPos.y) / max(HatchScale, 1.0)));
 col *= 1.0 - (stripe * (1.0 - midStep) * saturate(HatchStrength));
 return col * EmissiveScale;
 """
@@ -75,8 +78,8 @@ light_dir = vec_param("LightDir", (-0.44, -0.62, -0.66, 0.0), -900, 20)
 # never be the brightest surface), sun-facing facades go lit, away faces shade+hatch.
 band_hi = scalar_param("BandHi", 0.55, -900, 220)
 band_lo = scalar_param("BandLo", 0.10, -900, 300)
-hatch_scale = scalar_param("HatchScale", 42.0, -900, 380)
-hatch_strength = scalar_param("HatchStrength", 0.30, -900, 460)
+hatch_scale = scalar_param("HatchScale", 120.0, -900, 380)
+hatch_strength = scalar_param("HatchStrength", 0.22, -900, 460)
 # Authored color -> final pixel needs the emissive to live in the same physical
 # range as the SkyAtmosphere; the builder pins exposure at EV100=12 and sets this
 # to 1.2 * 2^12 so a LitColor of (0.5, ...) lands on screen as exactly that value.

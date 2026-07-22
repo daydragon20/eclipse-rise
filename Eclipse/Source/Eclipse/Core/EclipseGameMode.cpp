@@ -12,6 +12,8 @@
 #include "Engine/DataTable.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/TargetPoint.h"
 #include "EngineUtils.h"
 #include "Misc/CommandLine.h"
@@ -155,6 +157,15 @@ void AEclipseGameMode::AdvanceShotRig()
 	{
 		Pawn->SetActorLocation(Shots[ShotIndex].Location);
 		Controller->SetControlRotation(Shots[ShotIndex].Rotation);
+		// The overview camera sits 15 m up; a walking character falls the whole
+		// 2 s stabilization window and the capture frames bare floor instead of
+		// the district (first strong-PC round, camera 4). Flying + zeroed
+		// velocity pins the pawn to the review position for every shot.
+		if (ACharacter* Character = Cast<ACharacter>(Pawn))
+		{
+			Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+			Character->GetCharacterMovement()->StopMovementImmediately();
+		}
 	}
 	else
 	{

@@ -97,6 +97,9 @@ namespace
 		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f) },  // Dominion post: oxide red, shade to maroon-purple
 		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f) },  // warehouse: worker teal, shade to deep sea
 		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f) },  // hazard orange, reads as cover
+		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f) }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
+		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f) },  // sodium-orange window strips — bright enough to survive 15 km of smog
+		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f) }, // industrial plain under the skyline, darker than the district floor
 	};
 	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f) };
 
@@ -216,9 +219,14 @@ void BuildDistrict(UWorld& World)
 			// high scalability. Graybox blocks light via CSM only; the authored
 			// district gets proper per-kit distance fields in the art pass.
 			Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
-			if (FCString::Stricmp(Label, TEXT("Floor")) == 0)
+			if (FCString::Stricmp(Label, TEXT("Floor")) == 0 ||
+				FCString::Strnicmp(Label, TEXT("Skyline"), 7) == 0 ||
+				FCString::Strnicmp(Label, TEXT("Glow"), 4) == 0 ||
+				FCString::Strnicmp(Label, TEXT("Outland"), 7) == 0)
 			{
-				Actor->GetStaticMeshComponent()->SetCastShadow(false); // nothing is ever under the ground slab
+				// Ground slabs have nothing under them; skyline dressing sits
+				// kilometers out — VSM pages for backdrop shadows are pure waste.
+				Actor->GetStaticMeshComponent()->SetCastShadow(false);
 			}
 		}
 	};
@@ -234,6 +242,71 @@ void BuildDistrict(UWorld& World)
 		const bool bRotated = (CoverIndex++ % 2) == 0;
 		SpawnBlock(TEXT("Cover"), FVector(Cover.X, Cover.Y, 60.0f),
 			FVector(bRotated ? 3.0f : 1.0f, bRotated ? 1.0f : 3.0f, 1.2f));
+	}
+
+	// PLACEHOLDER(15.5/03.3): Kessara skyline massing OUTSIDE the playable
+	// perimeter — "silhouetted crane forests" in the amber smog. Pure backdrop:
+	// no nav, no cover, no mission space touched; the art pass replaces it with
+	// authored kits. Deterministic seed so every machine builds the same city
+	// (reproducible-from-code graybox, SPEC-P1-05).
+	{
+		FRandomStream SkylineRng(503); // 503 AE — the present year (00_INDEX)
+
+		// Industrial plain under the backdrop, one slab: without it the massing
+		// floats over sky beyond the district floor's ±10 km edge.
+		SpawnBlock(TEXT("Outland"), FVector(0, 0, -80.0f), FVector(620.0f, 620.0f, 1.0f));
+
+		// Mega-blocks: factory hulks ringing the district at 13–26 km.
+		for (int32 Index = 0; Index < 56; ++Index)
+		{
+			const float Angle = SkylineRng.FRandRange(0.0f, 2.0f * UE_PI);
+			const float Radius = SkylineRng.FRandRange(13000.0f, 26000.0f);
+			const float Height = SkylineRng.FRandRange(9.0f, 34.0f);
+			SpawnBlock(TEXT("Skyline"),
+				FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, Height * 50.0f - 80.0f),
+				FVector(SkylineRng.FRandRange(9.0f, 26.0f), SkylineRng.FRandRange(9.0f, 26.0f), Height));
+
+			// Sodium window strips on roughly a third of the hulks: worker light
+			// against the graphite (03.3's sodium-orange vs. Dominion white-gold).
+			if (SkylineRng.FRand() < 0.35f)
+			{
+				// 1600 units inward clears the widest hulk half-extent (26*50), so
+				// strips sit proud of the facade instead of embedded in it.
+				const float StripHeight = SkylineRng.FRandRange(150.0f, Height * 50.0f);
+				SpawnBlock(TEXT("Glow"),
+					FVector(FMath::Cos(Angle) * (Radius - 1600.0f), FMath::Sin(Angle) * (Radius - 1600.0f), StripHeight),
+					FVector(0.4f, SkylineRng.FRandRange(3.0f, 7.0f), 0.45f));
+			}
+		}
+
+		// Chimney stacks: the forge-world's vertical punctuation.
+		for (int32 Index = 0; Index < 18; ++Index)
+		{
+			const float Angle = SkylineRng.FRandRange(0.0f, 2.0f * UE_PI);
+			const float Radius = SkylineRng.FRandRange(12000.0f, 22000.0f);
+			const float Height = SkylineRng.FRandRange(26.0f, 44.0f);
+			SpawnBlock(TEXT("Skyline"),
+				FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, Height * 50.0f - 80.0f),
+				FVector(SkylineRng.FRandRange(1.2f, 2.0f), SkylineRng.FRandRange(1.2f, 2.0f), Height));
+		}
+
+		// Crane gantries: two legs + a long beam, alternating axis — the layered
+		// silhouette Kessara's identity hangs on. Axis-aligned is right for a
+		// forge world's orthogonal yards.
+		for (int32 Index = 0; Index < 12; ++Index)
+		{
+			const float Angle = SkylineRng.FRandRange(0.0f, 2.0f * UE_PI);
+			const float Radius = SkylineRng.FRandRange(11500.0f, 17000.0f);
+			const FVector Base(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.0f);
+			const bool bAlongX = (Index % 2) == 0;
+			const float LegHeight = SkylineRng.FRandRange(18.0f, 28.0f);
+			const float Span = SkylineRng.FRandRange(1600.0f, 2600.0f);
+			const FVector LegOffset = bAlongX ? FVector(Span * 0.5f, 0, 0) : FVector(0, Span * 0.5f, 0);
+			SpawnBlock(TEXT("Skyline"), Base + LegOffset + FVector(0, 0, LegHeight * 50.0f - 80.0f), FVector(1.4f, 1.4f, LegHeight));
+			SpawnBlock(TEXT("Skyline"), Base - LegOffset + FVector(0, 0, LegHeight * 50.0f - 80.0f), FVector(1.4f, 1.4f, LegHeight));
+			SpawnBlock(TEXT("Skyline"), Base + FVector(0, 0, LegHeight * 100.0f - 140.0f),
+				bAlongX ? FVector(Span / 100.0f + 6.0f, 1.6f, 1.6f) : FVector(1.6f, Span / 100.0f + 6.0f, 1.6f));
+		}
 	}
 
 	for (const FPointDef& Site : Sites)
@@ -280,6 +353,12 @@ void BuildDistrict(UWorld& World)
 		}
 	}
 
+	// The SM6 target (strong PC, GTX 1080 Ti+) runs the full-fidelity extras the
+	// SM5 laptop fallback cannot: volumetric smog, shadowed sun shafts, a real
+	// captured skylight (15.2C + the 15.5 fidelity revision). The district's
+	// unlit toon read is identical on both tiers by construction.
+	const bool bFullFidelity = World.GetFeatureLevel() >= ERHIFeatureLevel::SM6;
+
 	// Low industrial sun; drives the SkyAtmosphere so the horizon carries the mood.
 	// Mid-afternoon sun: warm but high enough that shade sides stay readable —
 	// the stylized look wants soft, lifted shadows, not noir silhouettes.
@@ -301,16 +380,33 @@ void BuildDistrict(UWorld& World)
 			SunComponent->SetLightColor(FLinearColor(1.0f, 0.87f, 0.70f));
 			SunComponent->SetAtmosphereSunLight(true);
 			SunComponent->SetVolumetricScatteringIntensity(2.0f);
-			// PLACEHOLDER(15.3, strong PC): this box's SM5 CSM path blankets the
-			// 200x-scaled ground slab in shadow no matter the caster set (passes
-			// 5-16 forensics). Key light ships shadowless here — the flat two-tone
-			// + ink outline IS the stylized look; VSM shadows return on SM6 target.
-			SunComponent->SetCastShadows(false);
+			// SM5 laptop: the CSM path blankets the 200x-scaled ground slab in
+			// shadow no matter the caster set (passes 5-16 forensics) — sun ships
+			// shadowless there. SM6: VSM shadows return; the unlit district cannot
+			// darken (emissive ignores shadowing), but the volumetric smog CAN —
+			// buildings now cut real light shafts through the haze (15.5 revision).
+			SunComponent->SetCastShadows(bFullFidelity);
 			UE_LOG(LogEclipse, Display, TEXT("Graybox: sun direction %s (movable)."), *SunComponent->GetDirection().ToString());
 		}
 	}
 
 	World.SpawnActor<ASkyAtmosphere>(FVector::ZeroVector, FRotator::ZeroRotator, Params);
+
+	// SM6 only: the real captured skylight the fill light stands in for on SM5
+	// (the laptop's realtime capture fed horizontal glare + a black zenith,
+	// passes 3-14). Lights pawns/props; the unlit district ignores it.
+	if (bFullFidelity)
+	{
+		if (ASkyLight* Sky = World.SpawnActor<ASkyLight>(FVector(0, 0, 400), FRotator::ZeroRotator, Params))
+		{
+			if (USkyLightComponent* SkyComponent = Sky->GetLightComponent())
+			{
+				SkyComponent->SetMobility(EComponentMobility::Movable);
+				SkyComponent->SetRealTimeCaptureEnabled(true);
+				SkyComponent->SetIntensity(1.0f);
+			}
+		}
+	}
 
 	// Fill light instead of a captured skylight: on this box's SM5 fallback the
 	// realtime sky capture feeds horizontal glare and a black zenith (floors go
@@ -340,10 +436,12 @@ void BuildDistrict(UWorld& World)
 			FogComponent->SetFogDensity(0.006f);
 			FogComponent->SetFogHeightFalloff(0.2f);
 			FogComponent->SetFogInscatteringColor(FLinearColor(0.42f, 0.32f, 0.24f));
-			// PLACEHOLDER(15.3, strong PC): volumetric fog receives no sun on this
-			// box's SM5 fallback and extinguishes the whole ground plane to black —
-			// plain exponential haze until target hardware (SM6) takes over.
-			FogComponent->SetVolumetricFog(false);
+			// SM5 laptop: volumetric fog receives no sun on the fallback path and
+			// extinguishes the whole ground plane to black — plain exponential
+			// haze there. SM6: real volumetric smog, so the shadowed sun draws
+			// shafts through the crane-and-compound silhouettes (Kessara identity
+			// 03.3: amber smog; 15.5 revision: more atmosphere within the style).
+			FogComponent->SetVolumetricFog(bFullFidelity);
 		}
 	}
 
@@ -367,7 +465,12 @@ void BuildDistrict(UWorld& World)
 		Settings.bOverride_LocalExposureShadowContrastScale = true;
 		Settings.LocalExposureShadowContrastScale = 1.0f;
 		Settings.bOverride_BloomIntensity = true;
-		Settings.BloomIntensity = 0.35f;
+		Settings.BloomIntensity = 0.45f; // 15.5 revision: punchier bloom within the graphic-novel look
+		// Subtle film grain per the 15.5 fidelity revision — texture, not noise;
+		// SSAO is deliberately absent: it is a no-op on the unlit emissive
+		// district and returns with the lit-toon migration.
+		Settings.bOverride_FilmGrainIntensity = true;
+		Settings.FilmGrainIntensity = 0.07f;
 		Settings.bOverride_ColorSaturation = true;
 		Settings.ColorSaturation = FVector4(1.22f, 1.22f, 1.22f, 1.0f);
 		Settings.bOverride_ColorContrast = true;
