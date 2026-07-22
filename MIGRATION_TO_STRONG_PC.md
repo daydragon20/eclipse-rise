@@ -5,7 +5,7 @@
 
 ## 0. Hoe dit document werkt
 
-1. **Voor de eigenaar:** installeer op de nieuwe PC alleen Claude Code (§2, stap 1 — dat is de enige handmatige stap), open het in een lege map, en plak de prompt uit §7. Alles daarna doet Claude, met jouw akkoord per stap.
+1. **Voor de eigenaar:** op de nieuwe PC installeer je alleen Node.js + Claude Code (§2, stap 1), kopieer je `ECLIPSE_SECRETS` van de USB naar `C:\Dev\`, en **dubbelklik je `C:\Dev\ECLIPSE_SECRETS\start_fable.bat`** — dan draait Fable meteen met het juiste (Max-)account, los van een eventueel eigen Claude-account op die PC. Plak dan de prompt uit §7. Alles daarna doet Claude, met jouw akkoord per installatie/download.
 2. **Voor Claude op de nieuwe PC:** dit document is jouw opdracht. Volg het **consent-protocol** (§1) zonder uitzondering. De secties §3–§6 zijn je inhoudelijke kader: wat er al af is, het asset-beleid van de eigenaar, en de eerlijke werkverdeling laptop ↔ RTX-PC.
 
 ---
@@ -36,15 +36,24 @@ De eigenaar hoeft vooraf alleen **stap 1** zelf te doen; Claude regelt de rest n
 
 **Geen andere installaties zonder vraag.** VS Code is optioneel (de eigenaar kijkt mee via de Claude Code-terminal of de VS-IDE); als de eigenaar het wil: winget `Microsoft.VisualStudioCode` + de Claude-extensie.
 
-### Secrets (NOOIT via git of chat)
-De map **`C:\Dev\ECLIPSE_SECRETS`** van de laptop wordt met USB/beveiligde kopie meegenomen naar de nieuwe PC (zelfde pad). Inhoud en bestemming:
+### Secrets + de Fable-start (NOOIT via git of chat)
+De map **`C:\Dev\ECLIPSE_SECRETS`** van de laptop wordt met USB/beveiligde kopie meegenomen naar de nieuwe PC (zelfde pad: `C:\Dev\ECLIPSE_SECRETS`). Inhoud en rol:
 
-| Bestand | Wat | Gaat naar |
+| Bestand/map | Wat | Hoe gebruikt |
 |---|---|---|
-| `claude-credentials.json` | **Max/Fable-login** (account `rocadelobv@gmail.com`) | `C:\Users\<jij>\.claude\.credentials.json` (Claude Code eerst één keer starten + sluiten zodat de map bestaat) |
-| `UserSecrets.ini` | **ElevenLabs API-key** (werkend geverifieerd 2026-07-22; scope: alleen TTS) | `C:\Dev\ECLIPSE_GDD\Eclipse\Config\UserSecrets.ini` (gitignored) |
+| `fable-config\` | **De volledige Claude-config van het Max/Fable-account** (`rocadelobv@gmail.com`), inclusief login en projectgeheugen | Niets kopiëren: `start_fable.bat` wijst `CLAUDE_CONFIG_DIR` hierheen. **Een eventueel eigen Claude-account op de PC blijft hier volledig los van.** |
+| `start_fable.bat` | **De startknop**: zet `CLAUDE_CONFIG_DIR`, gaat naar de repo-map en start `claude --model fable --effort max --dangerously-skip-permissions` | Dubbelklikken = Fable draait met het juiste account en zonder permission-prompts |
+| `UserSecrets.ini` | **ElevenLabs API-key** (werkend geverifieerd 2026-07-22; scope: alleen TTS) | Kopiëren naar `C:\Dev\ECLIPSE_GDD\Eclipse\Config\UserSecrets.ini` (gitignored) — Claude begeleidt dit in de bootstrap |
+| `claude-credentials.json` | Losse kopie van de Max-login | **Fallback** als de config-dir-route ooit hapert: naar `C:\Users\<jij>\.claude\.credentials.json` |
+| `MIGRATION_TO_STRONG_PC.md` | Kopie van dit draaiboek | Openen in Kladblok om de §7-prompt te kunnen plakken vóórdat de repo gecloned is |
 
-Na het kopiëren van de login: `claude` starten → hij is ingelogd als `rocadelobv@gmail.com` → `/model` → **Fable 5** → `/effort` → **max**. Werkt de gekopieerde sessie niet, dan is de duurzame route: toegang tot de `rocadelobv@gmail.com`-inbox → wachtwoord-reset op claude.ai → normale `/login`.
+**Het startcommando (wat `start_fable.bat` doet):**
+```powershell
+$env:CLAUDE_CONFIG_DIR = "C:\Dev\ECLIPSE_SECRETS\fable-config"
+cd C:\Dev\ECLIPSE_GDD   # of C:\ zolang de repo nog niet gecloned is
+claude --model fable --effort max --dangerously-skip-permissions
+```
+`--dangerously-skip-permissions` betekent: Claude wordt niet per tool-actie om toestemming gevraagd. **Daarom is het consent-protocol van §1 des te bindender** — de rem zit in het gedrag (eerst uitleggen, dan akkoord), niet in de tooling. Duurzame fallback voor de login: toegang tot de `rocadelobv@gmail.com`-inbox → wachtwoord-reset op claude.ai → normale `/login`.
 
 ---
 
@@ -97,10 +106,13 @@ Na het kopiëren van de login: `claude` starten → hij is ingelogd als `rocadel
 > Voorwaarde: Claude Code is geïnstalleerd (§2 stap 1) en gestart in een willekeurige map. Kopieer ALLES in het blok hieronder.
 
 ```text
-Je bent de ECLIPSE-ontwikkelaar (doel: Fable 5, Max-plan) op de nieuwe sterke Windows-PC.
-Deze machine is nieuw en leeg; jouw taak is hem volledig in te richten en daarna het
-ontwikkelwerk te starten. Het draaiboek staat in het bestand MIGRATION_TO_STRONG_PC.md
-van de repo https://github.com/daydragon20/eclipse-rise (branch main).
+Je bent de ECLIPSE-ontwikkelaar (Fable 5, Max-plan) op de nieuwe sterke Windows-PC. Je
+bent gestart via C:\Dev\ECLIPSE_SECRETS\start_fable.bat (CLAUDE_CONFIG_DIR wijst naar de
+vault, permission-modus is bypass — het consent-protocol hieronder is daarom BINDEND
+gedrag, niet optioneel). Jouw taak: deze machine volledig inrichten en daarna het
+ontwikkelwerk starten. Het draaiboek staat in MIGRATION_TO_STRONG_PC.md — nu al leesbaar
+in C:\Dev\ECLIPSE_SECRETS\, na het clonen ook in de repo
+https://github.com/daydragon20/eclipse-rise (branch main).
 
 STRIKTE REGEL (consent-protocol): vóór ELKE download, installatie, account-koppeling of
 actie die een Windows-beveiligingsprompt kan geven, zeg je eerst in 1-2 zinnen WAT het is,
@@ -117,11 +129,10 @@ DOE DIT, IN VOLGORDE (vraag per stap akkoord waar het protocol dat eist):
      (Claude Code draait al — daarin praat je nu met mij.)
   3. Clone de repo: git clone https://github.com/daydragon20/eclipse-rise.git C:\Dev\ECLIPSE_GDD
      (github-login via gh auth login --web als dat nodig is — leg uit, vraag akkoord).
-  4. Secrets: ik heb de map C:\Dev\ECLIPSE_SECRETS van de laptop meegenomen. Begeleid me:
-     (a) claude-credentials.json → %USERPROFILE%\.claude\.credentials.json zodat Claude Code
-         op het Max-abonnement (rocadelobv@gmail.com) draait; daarna /model Fable 5, /effort max;
-     (b) UserSecrets.ini → C:\Dev\ECLIPSE_GDD\Eclipse\Config\UserSecrets.ini (ElevenLabs-key,
-         gitignored — nooit in git of chat).
+  4. Secrets: C:\Dev\ECLIPSE_SECRETS staat al op deze pc (USB) en jij draait al op het
+     Max-account via de vault-config — controleer dat met /model (Fable 5) en meld het.
+     Kopieer alleen nog UserSecrets.ini → C:\Dev\ECLIPSE_GDD\Eclipse\Config\UserSecrets.ini
+     (ElevenLabs-key, gitignored — nooit in git of chat).
   5. Zet UE_ROOT (C:\Program Files\Epic Games\UE_5.8), genereer Visual Studio-projectfiles
      voor C:\Dev\ECLIPSE_GDD\Eclipse\Eclipse.uproject en bouw:
        & "$env:UE_ROOT\Engine\Build\BatchFiles\Build.bat" EclipseEditor Win64 Development
@@ -133,8 +144,9 @@ DOE DIT, IN VOLGORDE (vraag per stap akkoord waar het protocol dat eist):
      -EclipseShot-screenshotronde; toon mij de shots:
        Eclipse\Tools\author_toon_material.py  en  Eclipse\Tools\author_outline_material.py
   8. Open Visual Studio met de solution (C:\Dev\ECLIPSE_GDD\Eclipse\Eclipse.sln) zodat ik
-     de gamefiles voor me heb, en bevestig de eindstaat: VS open · Claude Code op Fable 5/max ·
-     repo gebouwd en groen · screenshots gezien.
+     de gamefiles voor me heb. Vraagt VS om een Microsoft-account-login (Community-licentie),
+     leg dat uit en laat mij inloggen. Bevestig de eindstaat: VS open met de solution ·
+     Claude Code op Fable 5/max (vault-config) · repo gebouwd en groen · screenshots gezien.
   9. Lees daarna ZELF, zonder overslaan: HANDOFF.md (incl. "LAATSTE STAND") →
      MIGRATION_TO_STRONG_PC.md §3-§6 (status, werkverdeling, ASSET-BELEID, werkwijze) →
      phase0/OWNER_MANDATE.md → DOCUMENTATION_README.md → 00_INDEX.md → 13_roadmap.md
