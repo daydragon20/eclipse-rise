@@ -35,12 +35,14 @@ col = lerp(col, LitColor.rgb, litStep);
 float3 an = abs(N);
 float2 tuv = (an.z > 0.6) ? WorldPos.xy : ((an.x >= an.y) ? WorldPos.yz : WorldPos.xz);
 float3 albedo = Texture2DSample(AlbedoTex, AlbedoTexSampler, tuv / max(TexWorldScale, 1.0)).rgb;
-// AlbedoGain is measured per texture as 1/average-linear-luminance (builder),
-// so the mean multiplier is exactly 1.0 and texturing cannot re-meter the
-// scene's auto-exposure. The clamp kills specular-scratch outliers that a
-// 10-30x normalization would otherwise blow into hotspots.
-float3 varTex = min(albedo * AlbedoGain, 2.5);
-col *= lerp(float3(1.0, 1.0, 1.0), varTex, saturate(AlbedoMix));
+// Luminance-only variation: the palette keeps exclusive hue authority (15.5
+// palette discipline — a rusty texture must never re-tint a Dominion facade),
+// the texture contributes value/grain only. AlbedoGain is measured per
+// texture as 1/average-linear-luminance (builder) so the mean multiplier is
+// 1.0 and texturing cannot re-meter the scene's auto-exposure; the clamp
+// kills specular-scratch outliers a 10-30x normalization would blow out.
+float varL = min(dot(albedo, float3(0.2126, 0.7152, 0.0722)) * AlbedoGain, 2.5);
+col *= lerp(1.0, varL, saturate(AlbedoMix));
 // Hatching reads as pen strokes, not corrugation: wide spacing with a thin
 // dark stroke (25% duty). At 50% duty and a 42-unit period the shade band
 // looked like corrugated sheet metal (first strong-PC round, camera 2).

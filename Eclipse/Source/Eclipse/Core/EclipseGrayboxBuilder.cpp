@@ -105,12 +105,14 @@ namespace
 		// 2026-07-22): asphalt .059, concrete .049, metal .031, corrugated .095.
 		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f), TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 700.0f, 16.8f, 0.5f },  // asphalt — dark but never crushed
 		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
-		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.35f },  // Dominion post: oxide red, shade to maroon-purple
+		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },  // Dominion post: oxide red, shade to maroon-purple (variation is luminance-only, hue stays palette)
 		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_corrugated_iron_02_diff.T_corrugated_iron_02_diff"), 300.0f, 10.5f, 0.45f },  // warehouse: worker teal, shade to deep sea
 		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f), nullptr, 0.0f, 1.0f, 0.0f },  // hazard orange, reads as cover
 		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f), nullptr, 0.0f, 1.0f, 0.0f }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
 		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f), nullptr, 0.0f, 1.0f, 0.0f },  // sodium-orange window strips — bright enough to survive 15 km of smog
 		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f), nullptr, 0.0f, 1.0f, 0.0f }, // industrial plain under the skyline, darker than the district floor
+		{ TEXT("DecoLine"), FLinearColor(0.700f, 0.660f, 0.520f), FLinearColor(0.300f, 0.280f, 0.240f), nullptr, 0.0f, 1.0f, 0.0f }, // worn lane paint on the plaza asphalt
+		{ TEXT("DecoStain"), FLinearColor(0.070f, 0.062f, 0.075f), FLinearColor(0.028f, 0.026f, 0.038f), nullptr, 0.0f, 1.0f, 0.0f }, // oil/rust staining, darker than the floor mid tone
 	};
 	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f), nullptr, 0.0f, 1.0f, 0.0f };
 
@@ -249,11 +251,19 @@ void BuildDistrict(UWorld& World)
 			if (FCString::Stricmp(Label, TEXT("Floor")) == 0 ||
 				FCString::Strnicmp(Label, TEXT("Skyline"), 7) == 0 ||
 				FCString::Strnicmp(Label, TEXT("Glow"), 4) == 0 ||
-				FCString::Strnicmp(Label, TEXT("Outland"), 7) == 0)
+				FCString::Strnicmp(Label, TEXT("Outland"), 7) == 0 ||
+				FCString::Strnicmp(Label, TEXT("Deco"), 4) == 0)
 			{
 				// Ground slabs have nothing under them; skyline dressing sits
 				// kilometers out — VSM pages for backdrop shadows are pure waste.
 				Actor->GetStaticMeshComponent()->SetCastShadow(false);
+			}
+			if (FCString::Strnicmp(Label, TEXT("Deco"), 4) == 0 ||
+				FCString::Strnicmp(Label, TEXT("Glow"), 4) == 0)
+			{
+				// Dressing never collides: lane paint, stains, and light strips
+				// must not perturb nav, cover queries, or hitscan (SPEC-P1-05).
+				Actor->SetActorEnableCollision(false);
 			}
 		}
 	};
@@ -315,6 +325,40 @@ void BuildDistrict(UWorld& World)
 			SpawnBlock(TEXT("Skyline"),
 				FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, Height * 50.0f - 80.0f),
 				FVector(SkylineRng.FRandRange(1.2f, 2.0f), SkylineRng.FRandRange(1.2f, 2.0f), Height));
+		}
+
+		// Street dressing + checkpoint light strips INSIDE the district: a
+		// readable occupation story on the empty plaza (15.5 "occupation &
+		// story"), all no-collision deco — nav/cover/missions untouched.
+		{
+			// East-west artery: Entry_Main to the control-post compound.
+			SpawnBlock(TEXT("DecoLine"), FVector(0, 460, 3), FVector(190.0f, 0.16f, 0.06f));
+			SpawnBlock(TEXT("DecoLine"), FVector(0, -460, 3), FVector(190.0f, 0.16f, 0.06f));
+			for (int32 Index = 0; Index < 24; ++Index)
+			{
+				SpawnBlock(TEXT("DecoLine"), FVector(-9200.0f + Index * 800.0f, 0, 3), FVector(1.6f, 0.14f, 0.06f));
+			}
+			// North-south cross street toward the warehouse yard.
+			SpawnBlock(TEXT("DecoLine"), FVector(-4460, 0, 3), FVector(0.16f, 190.0f, 0.06f));
+			SpawnBlock(TEXT("DecoLine"), FVector(-3540, 0, 3), FVector(0.16f, 190.0f, 0.06f));
+			// Oil and rust staining, biased toward the driven crossing.
+			FRandomStream DecoRng(77);
+			for (int32 Index = 0; Index < 14; ++Index)
+			{
+				SpawnBlock(TEXT("DecoStain"),
+					FVector(DecoRng.FRandRange(-8000.0f, 8000.0f), DecoRng.FRandRange(-7000.0f, 7000.0f), 2.0f),
+					FVector(DecoRng.FRandRange(2.0f, 6.5f), DecoRng.FRandRange(2.0f, 6.5f), 0.04f));
+			}
+			// Sodium checkpoint strips on the inner wall faces (03.3: sodium
+			// checkpoints vs. Dominion white-gold) — three per wall.
+			for (int32 Index = -1; Index <= 1; ++Index)
+			{
+				const float Along = Index * 6000.0f;
+				SpawnBlock(TEXT("Glow"), FVector(Along, 9935, 360), FVector(3.0f, 0.12f, 0.35f));
+				SpawnBlock(TEXT("Glow"), FVector(Along, -9935, 360), FVector(3.0f, 0.12f, 0.35f));
+				SpawnBlock(TEXT("Glow"), FVector(9935, Along, 360), FVector(0.12f, 3.0f, 0.35f));
+				SpawnBlock(TEXT("Glow"), FVector(-9935, Along, 360), FVector(0.12f, 3.0f, 0.35f));
+			}
 		}
 
 		// Crane gantries: two legs + a long beam, alternating axis — the layered
