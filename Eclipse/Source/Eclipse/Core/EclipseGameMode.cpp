@@ -10,9 +10,13 @@
 #include "Core/EclipseGrayboxBuilder.h"
 #include "Eclipse.h"
 #include "Engine/DataTable.h"
+#include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 #include "Engine/TargetPoint.h"
 #include "EngineUtils.h"
+#include "Misc/CommandLine.h"
+#include "Scalability.h"
+#include "TimerManager.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Squad/EclipseSquadSubsystem.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
@@ -93,7 +97,74 @@ void AEclipseGameMode::StartPlay()
 			SpawnMissionActors();
 		}
 	}
+
+#if !UE_BUILD_SHIPPING
+	SetupShotRig();
+#endif
 }
+
+#if !UE_BUILD_SHIPPING
+void AEclipseGameMode::SetupShotRig()
+{
+	if (!FParse::Param(FCommandLine::Get(), TEXT("EclipseShot")))
+	{
+		return;
+	}
+
+	// Review stills judge the art, not this laptop's autodetected settings —
+	// force full scalability so the skylight capture/volumetrics actually run.
+	Scalability::FQualityLevels Quality;
+	Quality.SetFromSingleQualityLevel(3);
+	Scalability::SetQualityLevels(Quality);
+
+	// First fire waits for exposure/streaming to settle; then a 2 s cadence
+	// alternates teleport and capture so every shot gets a stabilized frame.
+	GetWorldTimerManager().SetTimer(ShotRigTimer, this, &AEclipseGameMode::AdvanceShotRig, 2.0f, /*bLoop*/ true, /*FirstDelay*/ 8.0f);
+	UE_LOG(LogEclipse, Display, TEXT("ShotRig: armed (Part 15.9 fixed review cameras)."));
+}
+
+void AEclipseGameMode::AdvanceShotRig()
+{
+	// Fixed review cameras (15.9): both compounds, cover field, high overview.
+	// Index 0 repeats the first camera as a sacrificial warm-up — the first
+	// capture of a session carries streaming/history artifacts; discard it.
+	struct FShotDef { FVector Location; FRotator Rotation; };
+	static const FShotDef Shots[] = {
+		{ FVector(2600.0f, -2000.0f, 260.0f), FRotator(-4.0f, 0.0f, 0.0f) },
+		{ FVector(2600.0f, -2000.0f, 260.0f), FRotator(-4.0f, 0.0f, 0.0f) },
+		{ FVector(-1800.0f, 3000.0f, 260.0f), FRotator(-4.0f, 180.0f, 0.0f) },
+		{ FVector(700.0f, -5200.0f, 220.0f), FRotator(-6.0f, 115.0f, 0.0f) },
+		{ FVector(-8200.0f, -8200.0f, 1500.0f), FRotator(-24.0f, 45.0f, 0.0f) },
+	};
+
+	APlayerController* Controller = GetWorld()->GetFirstPlayerController();
+	APawn* Pawn = Controller != nullptr ? Controller->GetPawn() : nullptr;
+	if (Pawn == nullptr)
+	{
+		return;
+	}
+
+	const int32 ShotIndex = ShotRigStep / 2;
+	if (ShotIndex >= static_cast<int32>(UE_ARRAY_COUNT(Shots)))
+	{
+		Controller->ConsoleCommand(TEXT("quit"));
+		return;
+	}
+
+	if ((ShotRigStep % 2) == 0)
+	{
+		Pawn->SetActorLocation(Shots[ShotIndex].Location);
+		Controller->SetControlRotation(Shots[ShotIndex].Rotation);
+	}
+	else
+	{
+		// ConsoleCommand routes through the local player -> game viewport exec
+		// chain; a bare GEngine->Exec never reaches the screenshot handler.
+		Controller->ConsoleCommand(TEXT("HighResShot 1920x1080"));
+	}
+	++ShotRigStep;
+}
+#endif
 
 void AEclipseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {

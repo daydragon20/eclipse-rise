@@ -36,6 +36,18 @@ private:
 	/** Player body down = mission failure (fail-forward at debrief, GDD 11.4). */
 	void HandlePlayerDowned(AEclipseCharacter* Player, FName Cause);
 
+#if !UE_BUILD_SHIPPING
+	/**
+	 * Screenshot review rig (Part 15.8/15.9): with -EclipseShot on the command
+	 * line, cycle fixed vantage cameras, HighResShot each, then quit — the
+	 * "review screenshots every pass" ritual, automatable headless.
+	 */
+	void SetupShotRig();
+	void AdvanceShotRig();
+	FTimerHandle ShotRigTimer;
+	int32 ShotRigStep = 0;
+#endif
+
 	/** Actors spawned for the active mission (squad + enemies), destroyed at teardown. */
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> SpawnedMissionActors;
