@@ -84,30 +84,53 @@ namespace
 
 	/**
 	 * PLACEHOLDER(Part 15.5): early stylized dressing, owner-authorized ahead of
-	 * the Phase 2 art pass. Bold flat block colors (Borderlands-leaning: punchy,
-	 * readable at command distance) applied as dynamic instances of the engine
-	 * shape material; the real district replaces all of it with authored kits.
+	 * the Phase 2 art pass. Bold cel-banded block colors (Borderlands-leaning:
+	 * punchy, readable at command distance) as dynamic instances of the authored
+	 * toon master (/Game/Art/M_EclipseToon); the real district replaces all of it
+	 * with authored kits. Shade tones are hue-shifted cool, never just darker —
+	 * that hue shift is what makes flat cel shading read as painted, not dimmed.
 	 */
-	struct FPaletteDef { const TCHAR* Prefix; FLinearColor Color; };
+	struct FPaletteDef { const TCHAR* Prefix; FLinearColor Lit; FLinearColor Shade; };
 	const FPaletteDef Palette[] = {
-		{ TEXT("Floor"),  FLinearColor(0.120f, 0.110f, 0.120f) },  // asphalt — dark but never crushed
-		{ TEXT("Wall_"),  FLinearColor(0.180f, 0.195f, 0.225f) },  // perimeter concrete, cold
-		{ TEXT("BldgA"),  FLinearColor(0.420f, 0.130f, 0.075f) },  // Dominion post: oxide red
-		{ TEXT("BldgB"),  FLinearColor(0.050f, 0.230f, 0.240f) },  // warehouse: worker teal
-		{ TEXT("Cover"),  FLinearColor(0.760f, 0.310f, 0.045f) },  // hazard orange, reads as cover
+		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f) },  // asphalt — dark but never crushed
+		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f) },  // perimeter concrete, cold
+		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f) },  // Dominion post: oxide red, shade to maroon-purple
+		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f) },  // warehouse: worker teal, shade to deep sea
+		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f) },  // hazard orange, reads as cover
 	};
+	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f) };
 
-	FLinearColor ColorForLabel(const TCHAR* Label)
+	const FPaletteDef& PaletteForLabel(const TCHAR* Label)
 	{
 		for (const FPaletteDef& Entry : Palette)
 		{
 			if (FCString::Strnicmp(Label, Entry.Prefix, FCString::Strlen(Entry.Prefix)) == 0)
 			{
-				return Entry.Color;
+				return Entry;
 			}
 		}
-		return FLinearColor(0.35f, 0.35f, 0.38f);
+		return DefaultPalette;
 	}
+
+	/**
+	 * One sun definition shared by the light actor AND the toon material's LightDir
+	 * parameter — if these ever diverge, material banding and pawn lighting tell
+	 * two different stories about where the sun is.
+	 */
+	// Low dusk sun: vertical faces split hard into lit/shade (the cel read), the
+	// floor stays in the mid band (BandLo < sin 25 deg < BandHi in M_EclipseToon).
+	const FRotator SunRotation(-25.0f, 55.0f, 0.0f);
+
+	/**
+	 * Cel luminance calibration for the dev box: the unlit toon emissive is scaled
+	 * so the district occupies the same luminance range a lit surface had under
+	 * the banked pass-19 sun (legacy intensity 8 + fill 2.5) — auto-exposure then
+	 * lands on the same proven dusk grade, and the palette survives as ratios.
+	 * Pinning exposure + physical lux was tried (passes 20-22 forensics) and
+	 * fought three unit systems at once on SM5; the RTX pass redoes this in real
+	 * physical units with Lumen.
+	 */
+	const float ToonEmissiveScale = 10.0f;
 }
 
 namespace EclipseGraybox
@@ -137,25 +160,45 @@ void BuildDistrict(UWorld& World)
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	// One dynamic instance per palette color (not per block) keeps the dressing cheap.
+	// One dynamic instance per palette entry (not per block) keeps the dressing cheap.
+	// Toon master first (cel bands computed in-material — deterministic on the SM5
+	// fallback where scene lights never reach horizontals); engine shape material
+	// as the flat-color fallback when the authored asset is absent (GDD 14.3.5).
+	UMaterialInterface* ToonMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon"));
 	UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
-	TMap<uint32, UMaterialInstanceDynamic*> MidByColor;
-	auto MidForColor = [BaseMaterial, &MidByColor, &World](const FLinearColor& Color) -> UMaterialInstanceDynamic*
+	if (ToonMaterial == nullptr)
 	{
-		if (BaseMaterial == nullptr)
+		UE_LOG(LogEclipse, Warning, TEXT("Graybox: M_EclipseToon missing — falling back to flat engine-material dressing (GDD 14.3.5)."));
+	}
+	TMap<uint32, UMaterialInstanceDynamic*> MidByColor;
+	auto MidForPalette = [ToonMaterial, BaseMaterial, &MidByColor, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
+	{
+		UMaterialInterface* Master = ToonMaterial != nullptr ? ToonMaterial : BaseMaterial;
+		if (Master == nullptr)
 		{
-			return nullptr; // engine material missing = plain blocks, never a crash (GDD 14.3.5)
+			return nullptr; // both materials missing = plain blocks, never a crash (GDD 14.3.5)
 		}
-		UMaterialInstanceDynamic*& Mid = MidByColor.FindOrAdd(GetTypeHash(Color.ToFColor(true)));
+		UMaterialInstanceDynamic*& Mid = MidByColor.FindOrAdd(GetTypeHash(Entry.Lit.ToFColor(true)));
 		if (Mid == nullptr)
 		{
-			Mid = UMaterialInstanceDynamic::Create(BaseMaterial, &World);
-			Mid->SetVectorParameterValue(TEXT("Color"), Color);
+			Mid = UMaterialInstanceDynamic::Create(Master, &World);
+			if (ToonMaterial != nullptr)
+			{
+				Mid->SetVectorParameterValue(TEXT("LitColor"), Entry.Lit);
+				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Entry.Shade);
+				// The material's L = -LightDir, so pass the travel direction of the sun.
+				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			}
+			else
+			{
+				Mid->SetVectorParameterValue(TEXT("Color"), Entry.Lit);
+			}
 		}
 		return Mid;
 	};
 
-	auto SpawnBlock = [&World, CubeMesh, &Params, &MidForColor](const TCHAR* Label, const FVector& Location, const FVector& Scale)
+	auto SpawnBlock = [&World, CubeMesh, &Params, &MidForPalette](const TCHAR* Label, const FVector& Location, const FVector& Scale)
 	{
 		AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator::ZeroRotator, Params);
 		if (Actor != nullptr)
@@ -164,7 +207,7 @@ void BuildDistrict(UWorld& World)
 			Actor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
 			Actor->SetActorScale3D(Scale);
 			Actor->Tags.Add(Label);
-			if (UMaterialInstanceDynamic* Mid = MidForColor(ColorForLabel(Label)))
+			if (UMaterialInstanceDynamic* Mid = MidForPalette(PaletteForLabel(Label)))
 			{
 				Actor->GetStaticMeshComponent()->SetMaterial(0, Mid);
 			}
@@ -240,21 +283,23 @@ void BuildDistrict(UWorld& World)
 	// Low industrial sun; drives the SkyAtmosphere so the horizon carries the mood.
 	// Mid-afternoon sun: warm but high enough that shade sides stay readable —
 	// the stylized look wants soft, lifted shadows, not noir silhouettes.
-	if (ADirectionalLight* Sun = World.SpawnActor<ADirectionalLight>(FVector(0, 0, 5000), FRotator(-42.0f, 55.0f, 0), Params))
+	if (ADirectionalLight* Sun = World.SpawnActor<ADirectionalLight>(FVector(0, 0, 5000), SunRotation, Params))
 	{
 		if (UDirectionalLightComponent* SunComponent = Cast<UDirectionalLightComponent>(Sun->GetLightComponent()))
 		{
 			// ADirectionalLight ships static-mobility; a runtime spawn keeps the
 			// default horizontal direction unless made movable and re-rotated —
 			// which lit facades and left every floor black (pass-8 forensics).
+			// SunRotation is shared with the toon material's LightDir (see above).
 			SunComponent->SetMobility(EComponentMobility::Movable);
-			Sun->SetActorRotation(FRotator(-42.0f, 55.0f, 0));
+			Sun->SetActorRotation(SunRotation);
+			// Legacy intensity 8 pairs with the toon emissive x10 range under auto
+			// exposure. Atmosphere re-linked: the old decouple protected LIT ground
+			// from transmittance loss (pass-15) — the district is unlit now, so the
+			// sun may power a real dusk sky and only lights pawns.
 			SunComponent->SetIntensity(8.0f);
 			SunComponent->SetLightColor(FLinearColor(1.0f, 0.87f, 0.70f));
-			// Not the atmosphere's sun: with legacy-unit intensities the atmosphere
-			// transmittance eats the ground contribution (pass-15 forensics) — the
-			// sky keeps its own gradient, the district keeps predictable light.
-			SunComponent->SetAtmosphereSunLight(false);
+			SunComponent->SetAtmosphereSunLight(true);
 			SunComponent->SetVolumetricScatteringIntensity(2.0f);
 			// PLACEHOLDER(15.3, strong PC): this box's SM5 CSM path blankets the
 			// 200x-scaled ground slab in shadow no matter the caster set (passes
@@ -278,7 +323,7 @@ void BuildDistrict(UWorld& World)
 		{
 			FillComponent->SetMobility(EComponentMobility::Movable);
 			Fill->SetActorRotation(FRotator(-35.0f, 235.0f, 0));
-			FillComponent->SetIntensity(2.5f);
+			FillComponent->SetIntensity(2.5f); // pawn fill in the banked pass-19 units; the unlit district ignores it
 			FillComponent->SetLightColor(FLinearColor(0.55f, 0.65f, 0.85f));
 			FillComponent->SetCastShadows(false);
 			FillComponent->SetAtmosphereSunLight(false);
@@ -308,9 +353,19 @@ void BuildDistrict(UWorld& World)
 	{
 		Post->bUnbound = true;
 		FPostProcessSettings& Settings = Post->Settings;
-		// Physical sun + atmosphere: default histogram auto-exposure handles the
-		// range correctly — clamping it in legacy units blew the frame to white
-		// the moment the light became physical (pass-11 forensics).
+		// Default histogram auto-exposure (the banked pass-19 regime — pinned
+		// EV100 + physical lux fought three unit systems at once on this SM5 box,
+		// passes 20-22 forensics). Local exposure stays neutralized so it cannot
+		// re-contrast the flat cel bands.
+		// Pull the histogram key down: without it the mostly-bright emissive
+		// district washes to pastel (pass-27 forensics) — the dusk look wants
+		// saturated mids, not chalk.
+		Settings.bOverride_AutoExposureBias = true;
+		Settings.AutoExposureBias = -1.0f;
+		Settings.bOverride_LocalExposureHighlightContrastScale = true;
+		Settings.LocalExposureHighlightContrastScale = 1.0f;
+		Settings.bOverride_LocalExposureShadowContrastScale = true;
+		Settings.LocalExposureShadowContrastScale = 1.0f;
 		Settings.bOverride_BloomIntensity = true;
 		Settings.BloomIntensity = 0.35f;
 		Settings.bOverride_ColorSaturation = true;
@@ -320,13 +375,18 @@ void BuildDistrict(UWorld& World)
 		Settings.bOverride_VignetteIntensity = true;
 		Settings.VignetteIntensity = 0.35f;
 
-		if (UMaterialInterface* Outline = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/PP_EclipseOutline.PP_EclipseOutline")))
+		// Ink lines: PP_EclipseInk is the Tools/author_outline_material.py build —
+		// a verified scene passthrough (zero edges = untouched frame). The old
+		// PP_EclipseOutline asset replaced the whole frame with its tint and masked
+		// every material change from pass 20-26; it stays on disk unused. Until the
+		// script has authored PP_EclipseInk, the district renders without lines.
+		if (UMaterialInterface* Outline = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/PP_EclipseInk.PP_EclipseInk")))
 		{
 			Settings.WeightedBlendables.Array.Add(FWeightedBlendable(1.0f, Outline));
 		}
 		else
 		{
-			UE_LOG(LogEclipse, Warning, TEXT("Graybox: PP_EclipseOutline missing — district renders without ink lines (GDD 14.3.5)."));
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: PP_EclipseInk not authored yet — district renders without ink lines (GDD 14.3.5; run Tools/author_outline_material.py)."));
 		}
 	}
 

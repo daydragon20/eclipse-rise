@@ -183,12 +183,34 @@ void AEclipsePlayerController::SetupInputComponent()
 	MapKey(SprintAction, EKeys::LeftShift);
 	MapKey(CrouchAction, EKeys::LeftControl);
 
+	// Gamepad (owner request 2026-07-22): the same actions, Xbox-layout keys, so
+	// pad and mouse/keyboard coexist in one context — no mode switch, last device
+	// wins (EnhancedInput default). Left2D matches HandleMove's axes directly
+	// (X = right, Y = forward), so no swizzle is needed on the stick.
+	MapKey(MoveAction, EKeys::Gamepad_Left2D);
+	{
+		// Stick look adds per-frame rate, not mouse deltas — scale it up or a
+		// full deflection turns ~3x slower than a normal mouse swipe.
+		// PLACEHOLDER(GDD 8.1): per-frame rate is framerate-bound; the combat
+		// feel pass gives look its own sensitivity curve + deltatime scaling.
+		FEnhancedActionKeyMapping& StickLook = MappingContext->MapKey(LookAction, EKeys::Gamepad_Right2D);
+		UInputModifierScalar* LookRate = NewObject<UInputModifierScalar>(this);
+		LookRate->Scalar = FVector(2.0, 1.5, 1.0);
+		StickLook.Modifiers.Add(LookRate);
+	}
+	MapKey(FireAction, EKeys::Gamepad_RightTrigger);
+	MapKey(SprintAction, EKeys::Gamepad_LeftThumbstick);
+	MapKey(CrouchAction, EKeys::Gamepad_FaceButton_Right);
+
 	const FKey OrderKeys[] = { EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four };
+	// D-pad mirrors the 1-4 order keys in reading order: up, right, down, left.
+	const FKey OrderPadKeys[] = { EKeys::Gamepad_DPad_Up, EKeys::Gamepad_DPad_Right, EKeys::Gamepad_DPad_Down, EKeys::Gamepad_DPad_Left };
 	OrderActions.SetNum(4);
 	for (int32 Index = 0; Index < 4; ++Index)
 	{
 		OrderActions[Index] = MakeAction(EInputActionValueType::Boolean);
 		MapKey(OrderActions[Index], OrderKeys[Index]);
+		MapKey(OrderActions[Index], OrderPadKeys[Index]);
 	}
 
 	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
@@ -320,7 +342,7 @@ void AEclipsePlayerController::IssueSquadOrder(EEclipseSquadOrder Order)
 
 	// Stance stub (SPEC-P1-06): hold Left Alt while ordering for Aggressive, else
 	// Ready. PLACEHOLDER(GDD 8.4): stance drives posture/ROE in the feel pass.
-	const EEclipseSquadStance Stance = IsInputKeyDown(EKeys::LeftAlt)
+	const EEclipseSquadStance Stance = (IsInputKeyDown(EKeys::LeftAlt) || IsInputKeyDown(EKeys::Gamepad_LeftShoulder))
 		? EEclipseSquadStance::Aggressive
 		: EEclipseSquadStance::Ready;
 	Squad->IssueOrderToAll(Order, Target, AimActor, Stance);
