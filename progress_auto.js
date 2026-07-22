@@ -1,13 +1,18 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-22 15:17",
+    "generatedAt":  "2026-07-22 16:37",
     "tests":  {
                   "ok":  31,
                   "failed":  0,
                   "total":  31,
-                  "reportAge":  "11 min geleden"
+                  "reportAge":  "1 min geleden"
               },
     "commits":  [
+                    {
+                        "hash":  "4f41114",
+                        "date":  "22-07 15:19",
+                        "msg":  "[Repo] Record the live voice-run milestone in handoff + dashboard (GDD 14.1, 16.12)"
+                    },
                     {
                         "hash":  "2a67a09",
                         "date":  "22-07 15:15",
@@ -42,29 +47,24 @@ window.PROGRESS_AUTO = {
                         "hash":  "5159589",
                         "date":  "22-07 14:38",
                         "msg":  "[Core] Dress the code-built district and add the screenshot review rig (Part 15.5/15.8/15.9)"
-                    },
-                    {
-                        "hash":  "67dd728",
-                        "date":  "22-07 12:14",
-                        "msg":  "[UI] Surface rejected prep actions in the hub (SPEC-P1-08)"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (1 uur geleden)"
+                            "caption":  "Laatste run - beeld 1 (19 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (1 uur geleden)"
+                            "caption":  "Laatste run - beeld 2 (19 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (1 uur geleden)"
+                            "caption":  "Laatste run - beeld 3 (19 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (1 uur geleden)"
+                            "caption":  "Laatste run - beeld 4 (19 min geleden)"
                         }
                     ]
 };

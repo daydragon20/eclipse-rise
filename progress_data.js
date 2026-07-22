@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-22 15:16",
+  bijgewerkt: "2026-07-22 17:00",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
@@ -43,9 +43,10 @@ window.PROGRESS_DATA = {
       totaal: 14,
       items: [
         { naam: "Art-richting gelockt (Borderlands-stilering)", pct: 100 },
-        { naam: "Ink-outline post-materiaal", pct: 80 },
-        { naam: "Belichting / mood dev-box (SM5)", pct: 70, notitie: "Milestone gebankt: schemer-twee-tonen; herkalibratie op RTX." },
-        { naam: "Kleurenpalet & blok-dressing", pct: 25 },
+        { naam: "Cel/toon-materiaal (banden + hatching, M_EclipseToon)", pct: 85, notitie: "Werkend bewezen; band-defaults + shotronde nog te draaien." },
+        { naam: "Ink-outline post-materiaal", pct: 40, notitie: "Oude versie overschilderde het hele beeld (pass 20-26!); herbouwd als PP_EclipseInk-script, nog te draaien." },
+        { naam: "Belichting / mood dev-box (SM5)", pct: 75, notitie: "Unlit-toon omzeilt de SM5-lichtbugs structureel; kalibratie-verificatie open." },
+        { naam: "Kleurenpalet & blok-dressing", pct: 35, notitie: "Lit/shade-paren met hue-shift per bloktype." },
         { naam: "Gebouwen (echte kits)", pct: 10 },
         { naam: "Straten / props / decals", pct: 5 },
         { naam: "Bomen / vegetatie", pct: 0, notitie: "Eerste vegetatie Phase 3 (Sylvaris)." },
@@ -92,6 +93,12 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Dev-laptop (GTX 1050, SM5) — gestileerde dressing-pass; echte fidelity-pass volgt op de RTX-PC.",
 
   changelog: [
+    { datum: "Sessie 2026-07-22 (namiddag)", punten: [
+      "GRAPHICS-DOORBRAAK: de 'paarse waas' van 7 passes bleek het oude outline-postmateriaal dat het hele beeld overschilderde; toon-materiaal M_EclipseToon (cel-banden + hatching, Unlit) bewezen werkend, inktlijnen herbouwd als PP_EclipseInk-script (nog te draaien + shotronde).",
+      "Xbox-controller + muis samen speelbaar: stick-lopen/kijken, RT vuren, D-pad squad-orders, LB stance — feel-pass volgt in Phase 2.",
+      "MIGRATION_TO_STRONG_PC.md herschreven als dag-één-draaiboek: consent-protocol (eerst uitleggen, dan akkoord, -NoUba), asset-beleid (algemeen downloaden / hero handgebouwd op gelijk niveau), bootstrap-prompt voor de nieuwe PC (§7).",
+      "Groene bar herbevestigd na alle wijzigingen: build ✓, 31/31 ✓."
+    ]},
     { datum: "Sessie 2026-07-22 (middag)", punten: [
       "Groene bar onafhankelijk herbevestigd: build ✓, 31/31 tests ✓, validatie 0 fouten ✓, catalog 19/19 ✓.",
       "Dialogue-seed gebouwd (16.12): Content/Audio/DialogueSeed.json → voice-assets via de commandlet (create-only), pure parser + 31e headless test.",
