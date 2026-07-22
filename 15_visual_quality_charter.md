@@ -30,12 +30,12 @@ The identity we are dressing (from 01/03): a single-player third-person Action-S
 
 ## 15.2 Hardware Reality — target vs. dev box (Optimization Specialist's opening note)
 
-A charter that ignores the machine is a wish list. Two different machines matter:
+A charter that ignores the machine is a wish list. Three different machines matter:
 
 **A) Fidelity target — the shipping min/rec spec (what the visuals are authored FOR).**
 A "powerful gaming PC," RTX-class. Hardware Lumen + hardware ray tracing available, Nanite throughout, Virtual Shadow Maps, 8+ GB VRAM for 4K texture streaming. All fidelity decisions in this charter are validated against this class of machine and scaled *down* via UE scalability for weaker specs — never the reverse.
 
-**B) Current development box — measured 2026-07-21 (what we build ON right now).**
+**B) Laptop dev box — measured 2026-07-21 (graybox / systems / CI machine).**
 
 | Component | Reality | Consequence |
 |---|---|---|
@@ -43,6 +43,14 @@ A "powerful gaming PC," RTX-class. Hardware Lumen + hardware ray tracing availab
 | CPU | Intel i7-7700HQ, 4c/8t @ 2.8 GHz (2017 mobile) | Fine for graybox logic + tests. Editor cook/light builds are slow; keep them off the hot loop. |
 | RAM | 32 GB | Comfortable for the editor + UBT. |
 | Display | 3840×2160 | Author at native, but profile at 1080p — the 1050 will not drive 4K fidelity. |
+
+**C) Strong dev PC — measured 2026-07-22 (the machine fidelity work now runs on).**
+
+| Component | Reality | Consequence |
+|---|---|---|
+| GPU | **NVIDIA GTX 1080 Ti, 11 GB VRAM** (Pascal) | Full DX12/SM6: **Nanite, VSM, TSR, and software Lumen all available and performant.** **No RT cores** → hardware ray tracing / HW-Lumen *not available here*; the stylized fidelity pass is authored on the tuned software-Lumen path (see the 15.5 fidelity revision). 11 GB comfortably streams 4K textures. |
+
+Final HWRT/HW-Lumen validation still requires an RTX-class card per (A); everything else in this charter is now authorable on (C).
 
 **What this means, stated plainly:** this laptop is a perfectly good **graybox / systems / CI dev box** — exactly what Phase 1 needs, and it runs the ugly prototype fine. It is **not** the fidelity target and cannot represent shipping visuals. When Phase 2 fidelity work starts, high-fidelity scenes must be validated on target-class hardware (a stronger workstation, or the server/other machine), with this box running the editor at reduced dev-preview scalability. **We will not pretend a GTX 1050 renders RTX visuals.** Honesty here protects the schedule.
 
@@ -94,6 +102,16 @@ Highest-quality source that the pipeline and licence allow. Priority order:
 ## CHOSEN DIRECTION — stylized, Borderlands-leaning (locked)
 
 ECLIPSE's look is **stylized, not photoreal — the Borderlands family of style is the north star**: bold shapes, strong silhouettes, hand-authored surface character, ink/edge outlines, punchy readable colour, and a graphic-novel confidence. This is a deliberate choice and it is the smart one for this team size (pillar 5, ACHIEVABLE AMBITION): a stylized target reads better at command distance, ages well, forgives imperfection, and is *far* cheaper to produce at quality than photoreal — while UE 5.8's full tech stack (Nanite, Lumen, VSM, TSR, volumetrics) still drives it, now serving a stylized look instead of a photoreal one (cel/toon post + outline materials + physically-plausible-but-stylized lighting).
+
+**Fidelity revision (owner instruction, 2026-07-22) — sharper, still stylized.** The Borderlands-leaning direction stays locked, but the fidelity bar *within* it is raised:
+
+- **Higher polygon density via Nanite** — dense modular kits, hero props, debris. Silhouettes carry this style, so geometry gets real detail; low-poly "toon = cheap" is explicitly rejected.
+- **More GI detail via software Lumen** — software Lumen is the tuned-*up* guaranteed floor (Lumen scene detail / final-gather quality raised), because the current strong dev PC has no RT cores (15.2C). Hardware RT remains an *additive* path for RTX-class machines only.
+- **Richer post-processing** — SSAO layered where it adds over Lumen, punchy bloom, and **subtle film grain** as part of the graphic-novel look.
+- **More particles & atmospherics** — sparks, smoke, embers, drifting ash; density within the 12.4 budgets.
+- **Better anti-aliasing** — TSR at high quality; edge stability matters doubly with ink outlines.
+
+All of it stays inside the **cel-shaded palette, the light-band toon shading, and the ink outlines** — fidelity serves the style, it never dilutes it.
 
 **Work like a full AAA graphics studio, not a code generator** (the standing mandate): every meaningful surface gets deliberate attention. Aim for the best the engine and hardware can give, then keep pushing — **review screenshots every pass**, find the weakest element, and fix it (lighting → materials → textures → meshes → effects → detail). **Every detail of every environment matters**: no filler geometry, no bare untouched surfaces, no "good enough" corners. Grime, decals, propaganda, wear, edge highlights, small props, atmosphere — the world must feel *authored*, occupied, and specific. Ask each scene *"does this look like a modern AAA game in this style?"* and if not, iterate (see §15.8/§15.9).
 
