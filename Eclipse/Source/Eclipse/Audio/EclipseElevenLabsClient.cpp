@@ -55,7 +55,9 @@ namespace EclipseElevenLabs
 			return;
 		}
 
-		const FString Url = FString::Printf(TEXT("https://api.elevenlabs.io/v1/text-to-speech/%s"), *VoiceId);
+		// output_format=pcm_<rate>: raw PCM16 instead of mp3, so callers only ever
+		// need the EclipseWavUtil wrap — no audio decoder in the pipeline (16.12).
+		const FString Url = FString::Printf(TEXT("https://api.elevenlabs.io/v1/text-to-speech/%s?output_format=pcm_%d"), *VoiceId, TtsPcmSampleRate);
 		const FString Body = BuildRequestBody(ModelId.IsEmpty() ? TEXT("eleven_multilingual_v2") : ModelId, Text, Settings);
 
 		const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -63,11 +65,12 @@ namespace EclipseElevenLabs
 		Request->SetVerb(TEXT("POST"));
 		Request->SetHeader(TEXT("xi-api-key"), ApiKey);
 		Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-		Request->SetHeader(TEXT("Accept"), TEXT("audio/mpeg"));
+		Request->SetHeader(TEXT("Accept"), TEXT("audio/pcm"));
 		Request->SetContentAsString(Body);
 		Request->OnProcessRequestComplete().BindLambda(
 			[OnComplete](FHttpRequestPtr /*Req*/, FHttpResponsePtr Response, bool bConnectedOk)
 			{
+				// Success payload is raw PCM16 (see header constants), not a container format.
 				if (!bConnectedOk || !Response.IsValid())
 				{
 					OnComplete.ExecuteIfBound(false, TArray<uint8>(), TEXT("Request failed or no response"));

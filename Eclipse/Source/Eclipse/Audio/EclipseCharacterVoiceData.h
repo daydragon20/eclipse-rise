@@ -39,6 +39,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Audio")
 	TMap<EEclipseVoiceEmotion, FEclipseVoiceSettings> EmotionSettings;
 
+	/**
+	 * This character's dialogue lines — the Phase 1 dialogue database is
+	 * per-character (16.3/16.5), so the voice identity and its lines live on one
+	 * asset and the bulk generator + runtime playback share a single source of
+	 * truth instead of a parallel table that could drift.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Audio")
+	TArray<FEclipseDialogueLine> Lines;
+
 	/** Settings for a given emotion (override if present, else base). */
 	FEclipseVoiceSettings ResolveSettings(EEclipseVoiceEmotion Emotion) const
 	{

@@ -18,7 +18,9 @@ public class EclipseEditor : ModuleRules
 		{
 			"UnrealEd",
 			"AssetRegistry",
-			"GameplayTags"
+			"GameplayTags",
+			"AssetTools", // wav -> USoundWave import tasks (EclipseGenerateVoices commandlet)
+			"HTTP"        // manual HttpManager pump — commandlets have no game loop to tick it (16.12)
 		});
 	}
 }
