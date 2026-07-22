@@ -4,6 +4,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "Audio/EclipseCharacterVoiceData.h"
+#include "Audio/EclipseDialogueSeed.h"
 #include "Audio/EclipseDialogueVoiceSubsystem.h"
 #include "Audio/EclipseElevenLabsClient.h"
 #include "Audio/EclipseVoiceCache.h"
@@ -117,6 +118,78 @@ namespace
 		SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
 		return UPackage::SavePackage(Package, &Voice, *PackageFileName, SaveArgs);
 	}
+
+	/** Where seeded voice identity assets are created — /Game/Audio, not .../Generated: identity data is authored input, Generated holds pipeline output only (16.14 layout). */
+	const TCHAR* GVoiceIdentityAssetPath = TEXT("/Game/Audio");
+
+	/**
+	 * Materialise seed entries into UEclipseCharacterVoiceData assets. Create-only
+	 * by contract: an existing asset is the live, designer-owned copy (it may carry
+	 * GeneratedAudio assignments and tuned settings), so the seed never touches it —
+	 * re-running the commandlet is always safe.
+	 */
+	int32 SeedVoiceAssets(const FString& SeedFilePath)
+	{
+		FString JsonText;
+		if (!FFileHelper::LoadFileToString(JsonText, *SeedFilePath))
+		{
+			// No seed file is a valid state (assets may be authored directly in-editor).
+			return 0;
+		}
+
+		TArray<FEclipseVoiceSeedEntry> Entries;
+		TArray<FString> Problems;
+		const bool bParsed = EclipseDialogueSeed::Parse(JsonText, Entries, Problems);
+		for (const FString& Problem : Problems)
+		{
+			UE_LOG(LogEclipseEditor, Warning, TEXT("GenerateVoices: seed: %s"), *Problem);
+		}
+		if (!bParsed)
+		{
+			return 0;
+		}
+
+		int32 NumCreated = 0;
+		for (const FEclipseVoiceSeedEntry& Entry : Entries)
+		{
+			const FString PackageName = FString::Printf(TEXT("%s/%s"), GVoiceIdentityAssetPath, *ObjectTools::SanitizeObjectName(Entry.AssetName));
+			if (FPackageName::DoesPackageExist(PackageName))
+			{
+				continue; // live asset wins — the seed only bootstraps
+			}
+
+			UPackage* Package = CreatePackage(*PackageName);
+			UEclipseCharacterVoiceData* Voice = NewObject<UEclipseCharacterVoiceData>(Package, FName(*ObjectTools::SanitizeObjectName(Entry.AssetName)), RF_Public | RF_Standalone);
+			Voice->CharacterId = Entry.CharacterId;
+			Voice->DisplayName = Entry.DisplayName;
+			Voice->ElevenLabsVoiceId = Entry.ElevenLabsVoiceId;
+			if (!Entry.ModelId.IsEmpty())
+			{
+				Voice->ModelId = Entry.ModelId;
+			}
+			for (const FEclipseVoiceSeedLine& SeedLine : Entry.Lines)
+			{
+				FEclipseDialogueLine Line;
+				Line.LineId = SeedLine.LineId;
+				Line.CharacterId = Entry.CharacterId;
+				Line.Text = SeedLine.Text;
+				Line.Emotion = SeedLine.Emotion;
+				Voice->Lines.Add(MoveTemp(Line));
+			}
+
+			FAssetRegistryModule::AssetCreated(Voice);
+			if (SaveVoiceAsset(*Voice))
+			{
+				++NumCreated;
+				UE_LOG(LogEclipseEditor, Display, TEXT("GenerateVoices: seeded %s (%d lines)."), *PackageName, Voice->Lines.Num());
+			}
+			else
+			{
+				UE_LOG(LogEclipseEditor, Warning, TEXT("GenerateVoices: could not save seeded asset %s"), *PackageName);
+			}
+		}
+		return NumCreated;
+	}
 }
 
 int32 UEclipseGenerateVoicesCommandlet::Main(const FString& Params)
@@ -138,6 +211,20 @@ int32 UEclipseGenerateVoicesCommandlet::Main(const FString& Params)
 	{
 		// Plain log + cache-only mode, not an error — CI without secrets stays green.
 		UE_LOG(LogEclipseEditor, Display, TEXT("GenerateVoices: no ELEVENLABS_API_KEY / UserSecrets.ini key — cache-only mode (import + assign existing wavs, no generation)."));
+	}
+
+	// Step 0 — bootstrap the dialogue database from the seed file (16.12): a fresh
+	// clone gets voice assets without a human clicking through the editor. -Seed=
+	// overrides the canonical location.
+	FString SeedPath = FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Audio/DialogueSeed.json"));
+	if (const FString* SeedOverride = ParamValues.Find(TEXT("Seed")))
+	{
+		SeedPath = *SeedOverride;
+	}
+	const int32 NumSeeded = SeedVoiceAssets(SeedPath);
+	if (NumSeeded > 0)
+	{
+		UE_LOG(LogEclipseEditor, Display, TEXT("GenerateVoices: seeded %d new voice asset(s) from %s."), NumSeeded, *SeedPath);
 	}
 
 	FEclipseVoiceCache Cache(FEclipseVoiceCache::DefaultDirectory());

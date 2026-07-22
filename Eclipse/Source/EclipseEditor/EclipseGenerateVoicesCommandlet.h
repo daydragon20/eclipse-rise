@@ -6,14 +6,17 @@
 
 /**
  * Bulk voice generation + import (GDD 16.12, the "UEclipseVoiceGenerator" role):
- * scans every UEclipseCharacterVoiceData asset via the AssetRegistry and, per
- * dialogue line: (1) fills the repo cache (Content/Audio/Generated, WAV) through
- * ElevenLabs when the content-hash key is a miss, (2) imports the cached wav as
- * a USoundWave under /Game/Audio/Generated, (3) assigns it to the line's
- * GeneratedAudio and saves the DataAsset — so runtime playback needs no loose
- * files and no key.
+ * first materialises any new entries from the dialogue-database seed
+ * (Content/Audio/DialogueSeed.json — create-only, an existing asset is never
+ * touched), then scans every UEclipseCharacterVoiceData asset via the
+ * AssetRegistry and, per dialogue line: (1) fills the repo cache
+ * (Content/Audio/Generated, WAV) through ElevenLabs when the content-hash key is
+ * a miss, (2) imports the cached wav as a USoundWave under /Game/Audio/Generated,
+ * (3) assigns it to the line's GeneratedAudio and saves the DataAsset — so
+ * runtime playback needs no loose files and no key.
  *
- * Run: UnrealEditor-Cmd <project> -run=EclipseGenerateVoices [-Timeout=<seconds>]
+ * Run: UnrealEditor-Cmd <project> -run=EclipseGenerateVoices
+ *      [-Timeout=<seconds>] [-Seed=<path to seed json>]
  *
  * No API key => cached import/assign still runs, generation is skipped with a
  * plain log — never an error, so CI machines without secrets stay green

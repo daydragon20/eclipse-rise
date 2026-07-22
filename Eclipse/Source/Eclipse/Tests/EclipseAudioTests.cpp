@@ -5,6 +5,7 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "Audio/EclipseDialogueSeed.h"
 #include "Audio/EclipseDialogueVoiceSubsystem.h"
 #include "Audio/EclipseWavUtil.h"
 #include "Misc/AutomationTest.h"
@@ -113,6 +114,72 @@ bool FEclipseAudioCacheKeyDeterminismTest::RunTest(const FString& Parameters)
 		UEclipseDialogueVoiceSubsystem::MakeCacheKey(TEXT("voice_mara"), ModelId, EEclipseVoiceEmotion::Confident, Text));
 	TestNotEqual(TEXT("Different model changes the key"), KeyA,
 		UEclipseDialogueVoiceSubsystem::MakeCacheKey(VoiceId, TEXT("eleven_turbo_v2"), EEclipseVoiceEmotion::Confident, Text));
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseAudioSeedParseRulesTest,
+	"Eclipse.Audio.Seed.ParseRules",
+	EclipseAudioTest::TestFlags)
+
+bool FEclipseAudioSeedParseRulesTest::RunTest(const FString& Parameters)
+{
+	// Happy path — fields land, emotion string maps to the enum.
+	{
+		const FString Json = TEXT(R"({"voices":[{"assetName":"DA_Voice_Test","characterId":"Test.Voice","displayName":"Test Voice","elevenLabsVoiceId":"voice123","modelId":"eleven_turbo_v2","lines":[{"lineId":"L1","emotion":"Urgent","text":"Go go go!"},{"lineId":"L2","text":"Copy."}]}]})");
+		TArray<FEclipseVoiceSeedEntry> Entries;
+		TArray<FString> Problems;
+		TestTrue(TEXT("Valid seed parses"), EclipseDialogueSeed::Parse(Json, Entries, Problems));
+		TestEqual(TEXT("No problems on a clean seed"), Problems.Num(), 0);
+		TestEqual(TEXT("One entry parsed"), Entries.Num(), 1);
+		if (Entries.Num() == 1)
+		{
+			TestEqual(TEXT("AssetName lands"), Entries[0].AssetName, FString(TEXT("DA_Voice_Test")));
+			TestEqual(TEXT("CharacterId lands"), Entries[0].CharacterId, FName(TEXT("Test.Voice")));
+			TestEqual(TEXT("VoiceId lands"), Entries[0].ElevenLabsVoiceId, FString(TEXT("voice123")));
+			TestEqual(TEXT("ModelId lands"), Entries[0].ModelId, FString(TEXT("eleven_turbo_v2")));
+			TestEqual(TEXT("Both lines land"), Entries[0].Lines.Num(), 2);
+			if (Entries[0].Lines.Num() == 2)
+			{
+				TestEqual(TEXT("Emotion string maps to enum"), Entries[0].Lines[0].Emotion, EEclipseVoiceEmotion::Urgent);
+				TestEqual(TEXT("Missing emotion defaults to Neutral"), Entries[0].Lines[1].Emotion, EEclipseVoiceEmotion::Neutral);
+			}
+		}
+	}
+
+	// Recoverable problems are reported, never silently dropped (14.3.5): unknown
+	// emotion defaults to Neutral, rows missing identity fields are skipped,
+	// duplicate line ids are skipped (they would collide as asset names).
+	{
+		const FString Json = TEXT(R"({"voices":[
+			{"assetName":"DA_A","characterId":"A","elevenLabsVoiceId":"v1","lines":[
+				{"lineId":"L1","emotion":"Heroic","text":"Charge!"},
+				{"lineId":"L1","text":"Duplicate id"},
+				{"lineId":"","text":"No id"}]},
+			{"assetName":"","characterId":"B","elevenLabsVoiceId":"v2"},
+			{"assetName":"DA_A","characterId":"C","elevenLabsVoiceId":"v3"}]})");
+		TArray<FEclipseVoiceSeedEntry> Entries;
+		TArray<FString> Problems;
+		TestTrue(TEXT("Seed with recoverable problems still parses"), EclipseDialogueSeed::Parse(Json, Entries, Problems));
+		TestEqual(TEXT("Only the addressable entry survives"), Entries.Num(), 1);
+		if (Entries.Num() == 1)
+		{
+			TestEqual(TEXT("Only the first 'L1' line survives"), Entries[0].Lines.Num(), 1);
+			TestEqual(TEXT("Unknown emotion falls back to Neutral"), Entries[0].Lines[0].Emotion, EEclipseVoiceEmotion::Neutral);
+		}
+		// 5 = unknown emotion + duplicate lineId + empty lineId + empty assetName + duplicate assetName.
+		TestEqual(TEXT("Every dropped/defaulted row is reported"), Problems.Num(), 5);
+	}
+
+	// Structurally unusable input returns false — the commandlet must know the
+	// difference between "nothing to seed" and "seed file is broken".
+	{
+		TArray<FEclipseVoiceSeedEntry> Entries;
+		TArray<FString> Problems;
+		TestFalse(TEXT("Garbage is rejected"), EclipseDialogueSeed::Parse(TEXT("not json at all"), Entries, Problems));
+		TestFalse(TEXT("JSON without a voices array is rejected"), EclipseDialogueSeed::Parse(TEXT("{\"foo\":1}"), Entries, Problems));
+		TestTrue(TEXT("Rejection reasons are reported"), Problems.Num() > 0);
+	}
 
 	return true;
 }
