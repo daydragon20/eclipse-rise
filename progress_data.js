@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-22 15:15",
+  bijgewerkt: "2026-07-22 15:16",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
@@ -57,13 +57,13 @@ window.PROGRESS_DATA = {
     },
     {
       titel: "4 · Audio", scope: "Part 16",
-      totaal: 60,
+      totaal: 65,
       items: [
-        { naam: "ElevenLabs TTS-client (HTTPS, key-hygiëne, PCM/WAV)", pct: 100 },
-        { naam: "Cache + manifest (nooit 2× dezelfde regel)", pct: 100, notitie: "Cache reist mee in Content/Audio/Generated (16.12)." },
-        { naam: "Runtime-playback in game", pct: 85, notitie: "PlayLine af; eerste live-API-run nog te doen." },
-        { naam: "Auto-assign naar Dialogue DataAssets", pct: 90 },
-        { naam: "Editor-bulk-tool (-run=EclipseGenerateVoices)", pct: 90, notitie: "Zonder key: nette cache-only run." },
+        { naam: "ElevenLabs TTS-client (HTTPS, key-hygiëne, PCM/WAV)", pct: 100, notitie: "Live geverifieerd 22-07: 8/8 regels gegenereerd." },
+        { naam: "Cache + manifest (nooit 2× dezelfde regel)", pct: 100, notitie: "Cache reist mee in Content/Audio/Generated; herhaalrun = 8 hits, 0 API-calls (live bewezen)." },
+        { naam: "Runtime-playback in game", pct: 95, notitie: "PlayLine af, assets staan er; eerste hoorbare check in PIE nog te doen." },
+        { naam: "Auto-assign naar Dialogue DataAssets", pct: 100, notitie: "8/8 GeneratedAudio-refs gezet en opgeslagen." },
+        { naam: "Editor-bulk-tool (-run=EclipseGenerateVoices)", pct: 100, notitie: "Incl. dialogue-seed (JSON → voice-assets, create-only)." },
         { naam: "Music-endpoint", pct: 0 },
         { naam: "SFX-endpoint", pct: 0 },
         { naam: "Adaptieve always-on muziek (16.7)", pct: 0 },
@@ -74,8 +74,8 @@ window.PROGRESS_DATA = {
       titel: "5 · Content & verhaal", scope: "Parts 2, 3, 11",
       items: [
         { naam: "Missie-templates Phase 1 (3 stuks)", pct: 100 },
-        { naam: "Dialogen geschreven", pct: 0 },
-        { naam: "VO gegenereerd", pct: 0 },
+        { naam: "Dialogen geschreven", pct: 2, notitie: "8 squad-barks in DialogueSeed.json (Phase-1 debugbarks)." },
+        { naam: "VO gegenereerd", pct: 2, notitie: "8 regels live gegenereerd + gecachet (2 stemmen)." },
         { naam: "Planeten uitgewerkt in game", pct: 5, notitie: "1 graybox-district van Kessara." },
         { naam: "Lore-canon (bible)", pct: 100, notitie: "Docs 00–17 staan." }
       ]
@@ -92,6 +92,13 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Dev-laptop (GTX 1050, SM5) — gestileerde dressing-pass; echte fidelity-pass volgt op de RTX-PC.",
 
   changelog: [
+    { datum: "Sessie 2026-07-22 (middag)", punten: [
+      "Groene bar onafhankelijk herbevestigd: build ✓, 31/31 tests ✓, validatie 0 fouten ✓, catalog 19/19 ✓.",
+      "Dialogue-seed gebouwd (16.12): Content/Audio/DialogueSeed.json → voice-assets via de commandlet (create-only), pure parser + 31e headless test.",
+      "EERSTE LIVE ELEVENLABS-RUN GESLAAGD: 8/8 barks gegenereerd (PCM→WAV), geïmporteerd als USoundWave en auto-toegewezen; herhaalrun = 8 cache-hits, 0 API-calls.",
+      "Voice-cache gecommit — geen enkele machine betaalt deze regels opnieuw.",
+      "Let op: key werkt voor TTS maar /v1/voices geeft 401 (scope-beperkt); rotatiestatus bevestigen is aan de eigenaar."
+    ]},
     { datum: "Sessie 2026-07-22", punten: [
       "Onafhankelijke her-review van alle Phase-1-code afgerond.",
       "4 defect-fixes gecommit: missions-served-teller, cover-scorer vriend/vijand, data-wiring speler/wapens/vijanden + speler-revive, UI-foutmeldingen.",

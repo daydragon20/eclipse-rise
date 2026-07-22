@@ -45,9 +45,10 @@ This dev box is a **2017 laptop: NVIDIA GTX 1050 (4 GB), i7-7700HQ, 32 GB RAM**.
 **Phase 1 — all 8 feature specs landed, independently re-reviewed (Fable 5), and the tree is green.**
 
 - Build: `EclipseEditor Win64 Development` **Succeeded** (UE 5.8).
-- Automation tests: **30/30 pass** (`Automation RunTests Eclipse`, headless `-nullrhi`; incl. 2 new audio tests).
+- Automation tests: **31/31 pass** (`Automation RunTests Eclipse`, headless `-nullrhi`; incl. 3 audio tests).
 - Data validation: **clean** (`EclipseValidateData` commandlet, 0 errors).
 - Event catalog: **19/19 in sync** (`Eclipse/Tools/check_event_catalog.py`).
+- Voice pipeline: **live-verified** against the ElevenLabs PCM endpoint (8/8 lines generated + imported + assigned; re-run = 8 cache hits, 0 API calls).
 
 **Systems in place (headless-proven):** event bus · campaign state + transaction API + save v0 · deterministic economy ledger · 6-node strategy mini-map · mission runtime + debrief consequences · squad of 2 with ordered actions and *reasoned refusals* (never-silent) · roster + permadeath + memorial stub · menu base hub + preparation flow · playable graybox layer (character/GAS health, hitscan combat, enemy AI, code-built district).
 
@@ -68,8 +69,14 @@ The **live playable loop is done** (commit `[Loop] Wire the live playable loop`)
 - **Audio pipeline per OWNER_MANDATE** (16.12): TTS now requests raw PCM and stores **WAV** in `Content/Audio/Generated/` (cache travels with the repo); runtime `PlayLine` (asset → cached wav → generate); `FEclipseDialogueLine.GeneratedAudio` + per-character `Lines`; bulk commandlet `-run=EclipseGenerateVoices` (AssetRegistry scan → generate → import USoundWave → auto-assign + save); 2 new headless tests. First live-API run still pending (no key on this box).
 - **Live progress dashboard** `PROGRESS.html` + `progress_media/` (per-subtask %, screenshots) — update it every session.
 
+**Done still later on 2026-07-22 (green-bar re-verify + first live voice run, all pushed):**
+- Green bar independently re-verified (build ✓, tests ✓, validation ✓, catalog ✓).
+- **Dialogue-database seed** (16.12): `Content/Audio/DialogueSeed.json` → the commandlet materialises `UEclipseCharacterVoiceData` assets under `/Game/Audio` (create-only, never overwrites); pure parser `EclipseDialogueSeed` + headless rules test (test #31).
+- **First live ElevenLabs run succeeded** using the vault key (`ECLIPSE_SECRETS\UserSecrets.ini`, copied to `Eclipse/Config/` — gitignored): 8/8 squad barks generated (PCM→WAV), imported as `USoundWave`, auto-assigned, saved; the re-run proved 8 cached / 0 generated. Cache + assets committed.
+- **Key scope note:** the vault key works for TTS but `/v1/voices` returns **401** — it appears scope-restricted to text-to-speech. Whether this is the already-rotated key is for the owner to confirm; if the plaintext-shared key is still active, rotate it in the ElevenLabs dashboard and update the vault + `Eclipse/Config/UserSecrets.ini`.
+
 **Open (small, non-blocking) polish:**
-- Run `-run=EclipseGenerateVoices` once with `ELEVENLABS_API_KEY` set to verify the PCM endpoint live; **rotate the key** that was shared in plaintext.
+- First audible PIE check of `PlayLine` (assets exist; nobody has *heard* them in-game yet).
 - Music/SFX endpoints + adaptive always-on music (16.7) — Phase 2 forward infra.
 - Graphics: the SM5 dev-box milestone is banked (dusk two-tone + ink outlines); the real fidelity pass (Lumen/Nanite/VSM, Part 15 full stack) runs on the RTX PC.
 
@@ -131,16 +138,18 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
-## LAATSTE STAND (2026-07-22, ~14:45 CET)
+## LAATSTE STAND (2026-07-22, ~15:20 CET)
 
-**Waar gestopt:** einde van de Fable 5-sessie (her-review + mandaat-implementatie). Werkboom schoon, alles gecommit en gepusht; **build groen, 30/30 tests groen, validatie 0 fouten, catalog 19/19**.
+**Waar gestopt:** einde van de tweede Fable 5-sessie van vandaag (groene-bar-herverificatie + eerste live voice-run). Werkboom schoon, alles gecommit en gepusht; **build groen, 31/31 tests groen, validatie 0 fouten, catalog 19/19, voice-pipeline live geverifieerd**.
 
 **Deze sessie aangeraakt (samengevat):**
-- *Fixes uit her-review (4 commits, eerder gepusht):* `EclipseCampaignTransaction.h/.cpp`, `EclipseMissionLogic.cpp`, `EclipseMissionTests.cpp` (MarkMissionServed); `EclipseSquadmateController.cpp`, `EclipseSquadSubsystem.cpp` (cover-scorer/weak-ptr); `EclipseCharacter(.h/.cpp)`, `EclipseCharacterTypes.h`, `EclipsePlayerController.cpp`, `EclipseEnemyController.cpp`, `EclipseGameMode.cpp`, `EclipseCampaignSetupAsset.h`, `DA_CampaignSetup.uasset` (data-wiring + speler-wapen + revive); `EclipseBaseHubWidget(.h/.cpp)` (foutmeldingen).
-- *Graphics (deze push):* `EclipseGrayboxBuilder.cpp` (palet-MID's, atmosfeer, key+fill, fog, post + outline-blendable, host-map-purge), `EclipseGameMode(.h/.cpp)` (`-EclipseShot` review-rig), `Content/Art/PP_EclipseOutline.uasset`.
-- *Audio (deze push):* `EclipseElevenLabsClient(.h/.cpp)` (PCM), nieuw `EclipseWavUtil`, `EclipseVoiceCache`, `EclipseGenerateVoicesCommandlet` (EclipseEditor), `EclipseDialogueTypes.h`, `EclipseCharacterVoiceData.h`, `EclipseDialogueVoiceSubsystem(.h/.cpp)` (PlayLine), `EclipseEditor.Build.cs`, nieuw `EclipseAudioTests.cpp`.
-- *Docs/dashboard (deze push):* `HANDOFF.md`, `PROGRESS.html` + `progress_media/`, `phase0/OWNER_MANDATE.md`.
+- *Groene bar herbevestigd* (stap A van de sessieopdracht): build ✓, 30/30 → daarna 31/31 tests ✓, `EclipseValidateData` 0 fouten ✓, catalog 19/19 ✓.
+- *Dialogue-seed (16.12):* nieuw `EclipseDialogueSeed(.h/.cpp)` (pure parser, runtime-module), `EclipseGenerateVoicesCommandlet(.h/.cpp)` (stap 0: seed → voice-assets, create-only), nieuw `Eclipse/Content/Audio/DialogueSeed.json` (2 squad-stemmen, 8 barks), 31e test in `EclipseAudioTests.cpp` (commit `9e33eec`).
+- *Eerste live ElevenLabs-run GESLAAGD* met de vault-key (`C:\Dev\ECLIPSE_SECRETS\UserSecrets.ini` → gekopieerd naar `Eclipse/Config/UserSecrets.ini`, gitignored): 8/8 regels gegenereerd (PCM→WAV), geïmporteerd als `USoundWave` in `/Game/Audio/Generated`, `GeneratedAudio` toegewezen + opgeslagen; herhaalrun = **8 cached, 0 generated, 0 API-calls** (never-twice live bewezen). Cache + assets gecommit (commit `2a67a09`).
+- *Dashboard:* `progress_data.js` bijgewerkt (PROGRESS.html is een vaste viewer — nooit bewerken; `progress_auto.js` is van de watcher).
+
+**Key-status (belangrijk voor de eigenaar):** de key uit de vault werkt voor **TTS**, maar `/v1/voices` geeft **401** — de key lijkt scope-beperkt tot text-to-speech. Onbekend of dit al de geroteerde key is; als de ooit in plaintext gedeelde key nog actief is: roteren in het ElevenLabs-dashboard en vault + `Eclipse/Config/UserSecrets.ini` bijwerken.
 
 **Bekende SM5-devbox-limiet (gedocumenteerd in code):** directionele lichten verlichten op het D3D12-SM5-fallbackpad van de GTX 1050 geen horizontale vlakken betrouwbaar; de gestileerde twee-tonen-look is de bewuste dev-box-milestone. Geen actie nodig op deze laptop.
 
-**Eerstvolgende stap:** (1) eigenaar speelt de loop in PIE en beantwoordt de gate-vraag "spelen testers vrijwillig een 2e loop?" (13.2); (2) op een machine mét `ELEVENLABS_API_KEY`: `-run=EclipseGenerateVoices` één keer draaien (live-API-verificatie) en de key roteren; (3) op de RTX-PC: Part 15-fidelity-pass (Lumen/Nanite/VSM) — startprompt staat in `MIGRATION_TO_STRONG_PC.md` §6.
+**Eerstvolgende stap:** (1) eigenaar speelt de loop in PIE en beantwoordt de gate-vraag "spelen testers vrijwillig een 2e loop?" (13.2) — en hoort daarbij meteen de eerste squad-barks (PlayLine-check); (2) key-rotatiestatus bevestigen (zie hierboven); (3) op de RTX-PC: Part 15-fidelity-pass (Lumen/Nanite/VSM) — startprompt staat in `MIGRATION_TO_STRONG_PC.md` §6; (4) Phase-2 forward-infra wanneer gewenst: Music/SFX-endpoints + adaptieve muziek-datamodel (16.7).

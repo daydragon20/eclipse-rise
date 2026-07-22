@@ -1,13 +1,33 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-22 14:47",
+    "generatedAt":  "2026-07-22 15:17",
     "tests":  {
-                  "ok":  30,
+                  "ok":  31,
                   "failed":  0,
-                  "total":  30,
-                  "reportAge":  "4 min geleden"
+                  "total":  31,
+                  "reportAge":  "11 min geleden"
               },
     "commits":  [
+                    {
+                        "hash":  "2a67a09",
+                        "date":  "22-07 15:15",
+                        "msg":  "[Audio] Commit the first live-generated voice cache (GDD 16.12, 16.15 rule 7)"
+                    },
+                    {
+                        "hash":  "9e33eec",
+                        "date":  "22-07 15:14",
+                        "msg":  "[Audio] Seed the dialogue database from JSON in the bulk commandlet (GDD 16.12)"
+                    },
+                    {
+                        "hash":  "6643a5e",
+                        "date":  "22-07 14:49",
+                        "msg":  "[Repo] Point handoff at the self-updating dashboard flow (progress_data.js)"
+                    },
+                    {
+                        "hash":  "2bf49b1",
+                        "date":  "22-07 14:48",
+                        "msg":  "[Repo] Make the progress dashboard self-updating (data files + watcher)"
+                    },
                     {
                         "hash":  "d68667f",
                         "date":  "22-07 14:38",
@@ -27,44 +47,24 @@ window.PROGRESS_AUTO = {
                         "hash":  "67dd728",
                         "date":  "22-07 12:14",
                         "msg":  "[UI] Surface rejected prep actions in the hub (SPEC-P1-08)"
-                    },
-                    {
-                        "hash":  "f7a62d6",
-                        "date":  "22-07 12:14",
-                        "msg":  "[Characters] Wire ground tuning/weapon/archetype data + revive player each launch (GDD 14.2, SPEC-P1-05)"
-                    },
-                    {
-                        "hash":  "738ac0d",
-                        "date":  "22-07 12:14",
-                        "msg":  "[Squad] Fix cover scorer siding against the player; weak-ptr the downed callback (GDD 9.3, SPEC-P1-06)"
-                    },
-                    {
-                        "hash":  "eafd809",
-                        "date":  "22-07 12:14",
-                        "msg":  "[Strategy] Add MarkMissionServed mutation; debrief credits every deployed soldier (GDD 4.2, Pillar 3, SPEC-P1-07)"
-                    },
-                    {
-                        "hash":  "6542a30",
-                        "date":  "22-07 11:05",
-                        "msg":  "[Squad] Data-drive cover/acceptance tunables + add move stance stub (14.2, SPEC-P1-06); lock Borderlands art direction"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (39 min geleden)"
+                            "caption":  "Laatste run - beeld 1 (1 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (39 min geleden)"
+                            "caption":  "Laatste run - beeld 2 (1 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (39 min geleden)"
+                            "caption":  "Laatste run - beeld 3 (1 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (39 min geleden)"
+                            "caption":  "Laatste run - beeld 4 (1 uur geleden)"
                         }
                     ]
 };
