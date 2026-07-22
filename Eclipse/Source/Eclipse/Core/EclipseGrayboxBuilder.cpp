@@ -76,7 +76,7 @@ namespace
 		{ TEXT("Site_Extraction"), -8500, -8500 },
 	};
 
-	constexpr FPointDef Entries[] = {
+	constexpr FPointDef EntryPoints[] = {
 		{ TEXT("Entry_Main"), -9000, 0 },
 		{ TEXT("Entry_Sewer"), 0, -9000 },
 		{ TEXT("Entry_Roof"), 8500, 8500 },
@@ -252,7 +252,7 @@ void BuildDistrict(UWorld& World)
 		}
 	}
 
-	for (const FPointDef& Entry : Entries)
+	for (const FPointDef& Entry : EntryPoints)
 	{
 		if (APlayerStart* Start = World.SpawnActor<APlayerStart>(FVector(Entry.X, Entry.Y, 200.0f), FRotator::ZeroRotator, Params))
 		{
@@ -392,7 +392,7 @@ void BuildDistrict(UWorld& World)
 
 	UE_LOG(LogEclipse, Display, TEXT("Graybox: district built (%d blocks, %d cover, %d sites, %d entries)."),
 		static_cast<int32>(UE_ARRAY_COUNT(Blocks)), static_cast<int32>(UE_ARRAY_COUNT(CoverPoints)),
-		static_cast<int32>(UE_ARRAY_COUNT(Sites)), static_cast<int32>(UE_ARRAY_COUNT(Entries)));
+		static_cast<int32>(UE_ARRAY_COUNT(Sites)), static_cast<int32>(UE_ARRAY_COUNT(EntryPoints)));
 }
 
 } // namespace EclipseGraybox
