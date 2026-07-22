@@ -101,9 +101,11 @@ claude --model fable --effort max --dangerously-skip-permissions
 
 ---
 
-## 7. DE BOOTSTRAP-PROMPT — dit plakt de eigenaar in Claude Code op de nieuwe PC
+## 7. DE BOOTSTRAP-PROMPT — fallback-route
 
-> Voorwaarde: Claude Code is geïnstalleerd (§2 stap 1) en gestart in een willekeurige map. Kopieer ALLES in het blok hieronder.
+> **Primaire route (aanrader):** op de USB-stick staat **`FIRST_PROMPT.md`** (ook in `ECLIPSE_SECRETS`). Daarin: **PROMPT A** voor de eigen (Pro-)Claude van de eigenaar, die als *installateur* alles opzet — installaties met akkoord, repo clonen met de meegeleverde GitHub-token (`github-token.txt`, geen login nodig), bouwen, Visual Studio + PROGRESS.html openen en het Fable-venster starten via `start_fable.bat` — en **PROMPT B** die daarna in het Fable-venster gaat. De eigenaar hoeft alleen: USB erin, eigen Claude openen, PROMPT A plakken, accepteren, wachten.
+>
+> Het blok hieronder is de **fallback** voor wie direct in een vers Fable-venster wil bootstrappen zonder de installateur-route. Kopieer dan ALLES in het blok.
 
 ```text
 Je bent de ECLIPSE-ontwikkelaar (Fable 5, Max-plan) op de nieuwe sterke Windows-PC. Je
