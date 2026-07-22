@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-22 21:35",
+  bijgewerkt: "2026-07-22 21:50",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
@@ -43,10 +43,10 @@ window.PROGRESS_DATA = {
       totaal: 14,
       items: [
         { naam: "Art-richting gelockt (Borderlands-stilering)", pct: 100, notitie: "Owner-revisie 22-07: scherpere fidelity bínnen de stijl (15.5)." },
-        { naam: "Cel/toon-materiaal (banden + hatching, M_EclipseToon)", pct: 95, notitie: "Geauthord + live geverifieerd op de sterke PC; hatch-schaal leest nog als golfplaat — tunen." },
+        { naam: "Cel/toon-materiaal (banden + hatching, M_EclipseToon)", pct: 100, notitie: "Live geverifieerd; hatching leest nu als penseelstroken (25% duty, periode 120)." },
         { naam: "Ink-outline post-materiaal", pct: 85, notitie: "PP_EclipseInk LIVE bewezen: Sobel→Laplaciaan-fix (scherende vloer vloeide vol inkt); silhouet- + naadlijnen schoon." },
-        { naam: "Belichting / mood", pct: 80, notitie: "SM5-kalibratie gebankt; eerste SM6-shotronde (sterke PC) rendert de schemer-mood correct." },
-        { naam: "Kleurenpalet & blok-dressing", pct: 35, notitie: "Lit/shade-paren met hue-shift per bloktype." },
+        { naam: "Belichting / mood", pct: 85, notitie: "SM6-pad live: volumetric smog + zon-schaduwen + skylight + film grain (15.5-revisie); lit-toon-migratie (echte Lumen-GI) is de volgende milestone." },
+        { naam: "Kleurenpalet & blok-dressing", pct: 50, notitie: "Lit/shade-paren met hue-shift per bloktype + Kessara-skyline-ring (code-built: hulks, schoorstenen, kraanportalen, natrium-raamstroken)." },
         { naam: "Gebouwen (echte kits)", pct: 10 },
         { naam: "Straten / props / decals", pct: 5 },
         { naam: "Bomen / vegetatie", pct: 0, notitie: "Eerste vegetatie Phase 3 (Sylvaris)." },
@@ -90,9 +90,16 @@ window.PROGRESS_DATA = {
     { file: "progress_media/shot_03.jpg", caption: "Cover-veld (review-camera 3)" },
     { file: "progress_media/shot_04.jpg", caption: "Overzicht district (review-camera 4)" }
   ],
-  screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6, Scalability 3) — eerste ronde mét werkende PP_EclipseInk-inktlijnen; camera 4 kadreert laag (pawn zakt vóór capture — rig-punt).",
+  screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6, Scalability 3) — derde ronde vandaag: inktlijnen + hatch-tuning + Kessara-skyline (code-built) + SM6-smog/grain; camera 4 kadreert nu het hele district.",
 
   changelog: [
+    { datum: "Sessie 2026-07-22 (avond, sterke PC — vervolg)", punten: [
+      "Shot-rig gefixt: pawn in flying-mode tijdens de rig — overview-camera 4 kadreert nu het hele district (viel eerst 2 s naar de grond vóór elke capture).",
+      "Hatch-tuning: 25% duty + periode 120 — schaduw-arcering leest als penseelstroken, niet meer als golfplaat.",
+      "SM6-fidelitypad in de builder (feature-level-gated, laptop onaangetast): volumetric smog + zon-schaduwen (lichtschachten), realtime skylight, film grain 0.07 + bloom 0.45 per de 15.5-revisie.",
+      "KESSARA-SKYLINE (03.3, code-built placeholder): deterministische ring (seed 503) buiten de perimeter — 56 fabriekshulks, 18 schoorstenen, 12 kraanportalen, natrium-raamstroken; het district staat nu in een stad. Buiten nav/missies, tests onaangetast.",
+      "Groene bar na alles opnieuw: build ✓, 31/31 ✓, validatie 0 ✓, catalog 19/19 ✓."
+    ]},
     { datum: "Sessie 2026-07-22 (avond, sterke PC)", punten: [
       "Eerste sessie op de sterke PC: groene bar onafhankelijk herbevestigd (build ✓, 31/31 tests ✓, validatie 0 fouten ✓, catalog 19/19 ✓).",
       "Machine gemeten: GTX 1080 Ti 11 GB — SM6 met Nanite/VSM/TSR/software-Lumen, géén RT-cores (HWRT-validatie blijft RTX-werk); charter 15.2 bijgewerkt.",
