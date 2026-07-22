@@ -80,5 +80,8 @@ private:
 	TArray<FString> DebriefLines;
 	bool bCollectingDebrief = false;
 
+	/** Last rejected action's reason, shown in the prep panel — a refused button must say why (SPEC-P1-08 DoD). */
+	FString LastActionNote;
+
 	FEclipseEventSubscriptionHandle EventsHandle;
 };

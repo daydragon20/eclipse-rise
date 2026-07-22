@@ -307,6 +307,12 @@ void UEclipseBaseHubWidget::RefreshPrepPanel()
 		AddTextRow(*WidgetTree, *PrepPanel, Line);
 	}
 
+	if (!LastActionNote.IsEmpty())
+	{
+		AddTextRow(*WidgetTree, *PrepPanel, FString::Printf(TEXT("!! %s"), *LastActionNote))
+			->SetColorAndOpacity(FSlateColor(FLinearColor(0.95f, 0.35f, 0.25f)));
+	}
+
 	AddTextRow(*WidgetTree, *PrepPanel, TEXT("--- PREPARATION (select a strike on the map first) ---"));
 	AddTextRow(*WidgetTree, *PrepPanel, Prep->WasIntelRevealed()
 		? TEXT("Briefing: enemy positions revealed.")
@@ -353,7 +359,13 @@ void UEclipseBaseHubWidget::HandleProduce(FName ItemId)
 	if (Economy != nullptr && !Economy->TryQueueProduction(ItemId, Error))
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Workshop: %s"), *Error);
+		LastActionNote = Error;
 	}
+	else
+	{
+		LastActionNote.Reset();
+	}
+	RefreshAll();
 }
 
 void UEclipseBaseHubWidget::HandleToggleSquadPick(const FGuid& SoldierId)
@@ -372,7 +384,13 @@ void UEclipseBaseHubWidget::HandleIntelReveal()
 	if (Prep != nullptr && !Prep->SpendIntelForReveal(Error))
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Prep: %s"), *Error);
+		LastActionNote = Error;
 	}
+	else
+	{
+		LastActionNote.Reset();
+	}
+	RefreshAll();
 }
 
 void UEclipseBaseHubWidget::HandleLaunch(FGameplayTag LoadoutTag)
@@ -382,7 +400,10 @@ void UEclipseBaseHubWidget::HandleLaunch(FGameplayTag LoadoutTag)
 	if (Prep != nullptr && !Prep->LaunchMission(PickedSquad, LoadoutTag, TEXT("Entry_Default"), Error))
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Launch rejected: %s"), *Error);
+		LastActionNote = Error;
+		RefreshAll();
 		return;
 	}
+	LastActionNote.Reset();
 	PickedSquad.Reset();
 }
