@@ -27,7 +27,13 @@ float dL = SceneTextureLookup(uv + float2(-px.x, 0), 1, false).r;
 float dR = SceneTextureLookup(uv + float2(px.x, 0), 1, false).r;
 float dU = SceneTextureLookup(uv + float2(0, -px.y), 1, false).r;
 float dD = SceneTextureLookup(uv + float2(0, px.y), 1, false).r;
-float grad = abs(dL - dR) + abs(dU - dD);
+// Second-derivative (Laplacian) edge test: a first-derivative Sobel floods any
+// plane seen at a grazing angle -- the far floor's per-pixel depth delta dwarfs
+// every workable threshold (first strong-PC round, 2026-07-22, shots 1-4: the
+// whole midground painted solid ink). The Laplacian is ~zero on plane
+// interiors at any view angle and spikes at true silhouettes and creases
+// (wall-floor junctions), which is exactly the ink contract.
+float grad = abs(dL + dR - 2.0 * dC) + abs(dU + dD - 2.0 * dC);
 // Depth-proportional threshold: distant geometry needs a bigger delta to count
 // as a silhouette, or the whole horizon becomes one smear of line.
 float edge = saturate((grad - DepthThreshold * (1.0 + dC * DistanceFade)) * Hardness);
