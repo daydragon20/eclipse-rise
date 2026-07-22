@@ -1,5 +1,5 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-22 (Fable 5 re-review session).*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-22 (first strong-PC session).*
 
 > **Live progress dashboard:** open [`PROGRESS.html`](PROGRESS.html) in a browser and leave it open — it reloads itself every 60 s. Facts (commits, tests, newest screenshots) refresh automatically every 10 min via `start_progress_watcher.bat` (→ `Tools/update_progress.ps1`). Dev sessions update the judgment percentages by editing **`progress_data.js`** at milestones — never edit PROGRESS.html itself, and never hand-edit `progress_auto.js`. Owner instructions for the audio pipeline + studio working method are recorded verbatim in [`phase0/OWNER_MANDATE.md`](phase0/OWNER_MANDATE.md).
 
@@ -138,7 +138,25 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
-## LAATSTE STAND (2026-07-22, ~17:00 CET)
+## LAATSTE STAND (2026-07-22, ~21:40 CET — EERSTE SESSIE OP DE STERKE PC)
+
+**Waar gestopt:** eerste Fable 5-sessie op de sterke PC (na de installateur-bootstrap). Werkboom schoon, alles gecommit en gepusht; **groene bar hier onafhankelijk herbevestigd: build ✓ (-NoUba), 31/31 tests ✓, validatie 0 fouten ✓, catalog 19/19 ✓.**
+
+**Deze sessie (samengevat):**
+- *Machine gemeten:* **GTX 1080 Ti, 11 GB VRAM** — volle SM6/DX12 (Nanite, VSM, TSR, software-Lumen), maar **géén RT-cores**: hardware ray tracing kan hier niet. Charter 15.2 heeft nu een aparte rij (C) voor deze machine; HWRT-validatie blijft RTX-klasse-werk.
+- *Owner-revisie §15 verwerkt (bindend):* Borderlands-leunend blijft gelockt, **fidelity erbínnen omhoog** — Nanite-polygoondichtheid, opgeschroefde software-Lumen-GI, rijkere post (SSAO/bloom/film grain), meer particles, TSR hoog. Vastgelegd in 15.5 ("Fidelity revision").
+- *Graphics-kalibratie (taak A) — inktlijnen LIVE:* beide materiaal-scripts gedraaid (`M_EclipseToon` banden 0.55/0.10; `PP_EclipseInk`). Eerste live-ronde onthulde een klassiek depth-Sobel-artefact: **de scherende vloer vloeide vol inkt** (heel middenveld zwart). Fix: edge-detectie omgebouwd naar **Laplaciaan (2e afgeleide)** in `author_outline_material.py` — vlak-interieurs schoon onder elke kijkhoek, silhouetten + gevel-vloer-naden krijgen wél lijn. Tweede shotronde geverifieerd: vloer loopt door tot de horizon, lijnen schoon, schemerpalet staat. Galerij (`progress_media/shot_01..04.jpg`) ververst.
+- *Kleine carry-over:* rename `Entries`→`EntryPoints` van de installateur gecommit (gedragsneutraal, groen geverifieerd).
+
+**Bekende volgende zwakste punten (15.8-lijst voor de volgende pass):** (1) hatch-strepen op de schaduwband lezen als golfplaat i.p.v. arcering — HatchScale/Strength tunen; (2) review-camera 4 kadreert te laag: de pawn zakt tijdens de 2 s vóór capture van Z=1500 naar de grond — shot-rig een spectator-achtige camera geven; (3) daarna de echte fidelity-pass per de herziene 15.5 (taak B): software-Lumen-GI aan voor de district-scène, SSAO/film grain in de post-stack, particles.
+
+**Owner-afspraken die blijven gelden (elke sessie):** geen installaties/downloads/acceptatie-prompts zonder expliciet akkoord vooraf (eerst uitleggen waarvoor); bouwen met `-NoUba`; PROGRESS.html nooit bewerken (data in `progress_data.js`; `progress_auto.js` is van de watcher). `gh` is hier NIET geïnstalleerd — push werkt via de vault-token in Windows Credential Manager (username gepind in repo-config).
+
+**Eerstvolgende stap:** (1) hatch-tuning + shot-rig-fix, nieuwe shotronde ter review; (2) eigenaar speelt de loop in PIE — gate-vraag 13.2 — met squad-barks en Xbox-controller; (3) taak B: fidelity-pass per herziene 15.5 op deze machine; (4) taak C (art-pass, Fab/Quixel) — **wacht op per-download akkoord**, Epic Launcher/Fab-toegang is hier bovendien nog niet opgezet; (5) taak D: Music/SFX-endpoints + adaptieve muziek (16.7).
+
+---
+
+## VORIGE STAND (2026-07-22, ~17:00 CET — laptop)
 
 **Waar gestopt:** einde van de derde Fable 5-sessie van vandaag (voice live + graphics-doorbraak + controller + migratiedraaiboek). Werkboom schoon, alles gecommit en gepusht; **build groen, 31/31 tests groen, validatie 0 fouten, catalog 19/19**.
 

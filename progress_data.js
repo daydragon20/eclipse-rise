@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-22 17:00",
+  bijgewerkt: "2026-07-22 21:35",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
@@ -39,13 +39,13 @@ window.PROGRESS_DATA = {
       ]
     },
     {
-      titel: "3 · Graphics", scope: "Part 15 — echt werk start op de RTX-PC",
+      titel: "3 · Graphics", scope: "Part 15 — fidelity-pass loopt op de sterke PC (1080 Ti, software-Lumen-pad)",
       totaal: 14,
       items: [
-        { naam: "Art-richting gelockt (Borderlands-stilering)", pct: 100 },
-        { naam: "Cel/toon-materiaal (banden + hatching, M_EclipseToon)", pct: 85, notitie: "Werkend bewezen; band-defaults + shotronde nog te draaien." },
-        { naam: "Ink-outline post-materiaal", pct: 40, notitie: "Oude versie overschilderde het hele beeld (pass 20-26!); herbouwd als PP_EclipseInk-script, nog te draaien." },
-        { naam: "Belichting / mood dev-box (SM5)", pct: 75, notitie: "Unlit-toon omzeilt de SM5-lichtbugs structureel; kalibratie-verificatie open." },
+        { naam: "Art-richting gelockt (Borderlands-stilering)", pct: 100, notitie: "Owner-revisie 22-07: scherpere fidelity bínnen de stijl (15.5)." },
+        { naam: "Cel/toon-materiaal (banden + hatching, M_EclipseToon)", pct: 95, notitie: "Geauthord + live geverifieerd op de sterke PC; hatch-schaal leest nog als golfplaat — tunen." },
+        { naam: "Ink-outline post-materiaal", pct: 85, notitie: "PP_EclipseInk LIVE bewezen: Sobel→Laplaciaan-fix (scherende vloer vloeide vol inkt); silhouet- + naadlijnen schoon." },
+        { naam: "Belichting / mood", pct: 80, notitie: "SM5-kalibratie gebankt; eerste SM6-shotronde (sterke PC) rendert de schemer-mood correct." },
         { naam: "Kleurenpalet & blok-dressing", pct: 35, notitie: "Lit/shade-paren met hue-shift per bloktype." },
         { naam: "Gebouwen (echte kits)", pct: 10 },
         { naam: "Straten / props / decals", pct: 5 },
@@ -53,7 +53,7 @@ window.PROGRESS_DATA = {
         { naam: "Characters / MetaHumans", pct: 0, notitie: "Phase 2→3." },
         { naam: "Weer & dag/nacht", pct: 0 },
         { naam: "VFX", pct: 0 },
-        { naam: "Nanite / Lumen / VSM op target-hardware", pct: 0, notitie: "Wacht op RTX-PC (deze laptop: SM5-fallback)." }
+        { naam: "Nanite / Lumen / VSM op target-hardware", pct: 5, notitie: "Sterke PC gemeten: GTX 1080 Ti (11 GB, SM6) — Nanite/VSM/software-Lumen kunnen, géén RT-cores; HWRT-validatie later op RTX-klasse." }
       ]
     },
     {
@@ -90,9 +90,16 @@ window.PROGRESS_DATA = {
     { file: "progress_media/shot_03.jpg", caption: "Cover-veld (review-camera 3)" },
     { file: "progress_media/shot_04.jpg", caption: "Overzicht district (review-camera 4)" }
   ],
-  screenshotNoot: "Dev-laptop (GTX 1050, SM5) — gestileerde dressing-pass; echte fidelity-pass volgt op de RTX-PC.",
+  screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6, Scalability 3) — eerste ronde mét werkende PP_EclipseInk-inktlijnen; camera 4 kadreert laag (pawn zakt vóór capture — rig-punt).",
 
   changelog: [
+    { datum: "Sessie 2026-07-22 (avond, sterke PC)", punten: [
+      "Eerste sessie op de sterke PC: groene bar onafhankelijk herbevestigd (build ✓, 31/31 tests ✓, validatie 0 fouten ✓, catalog 19/19 ✓).",
+      "Machine gemeten: GTX 1080 Ti 11 GB — SM6 met Nanite/VSM/TSR/software-Lumen, géén RT-cores (HWRT-validatie blijft RTX-werk); charter 15.2 bijgewerkt.",
+      "Owner-revisie 15.5 vastgelegd: Borderlands-leunend blijft gelockt, fidelity erbinnen omhoog (Nanite-dichtheid, software-Lumen-GI, SSAO/bloom/film grain, particles, TSR).",
+      "Beide materiaal-scripts gedraaid; INKTLIJNEN LIVE: eerste-orde depth-Sobel overspoelde de scherende vloer met inkt (heel middenveld zwart) — herbouwd op Laplaciaan (2e afgeleide), silhouet- én naadlijnen schoon, vloer loopt weer door tot de horizon.",
+      "Galerij ververst met de geverifieerde sterke-PC-shotronde (review-camera's 1-4)."
+    ]},
     { datum: "Sessie 2026-07-22 (namiddag)", punten: [
       "GRAPHICS-DOORBRAAK: de 'paarse waas' van 7 passes bleek het oude outline-postmateriaal dat het hele beeld overschilderde; toon-materiaal M_EclipseToon (cel-banden + hatching, Unlit) bewezen werkend, inktlijnen herbouwd als PP_EclipseInk-script (nog te draaien + shotronde).",
       "Xbox-controller + muis samen speelbaar: stick-lopen/kijken, RT vuren, D-pad squad-orders, LB stance — feel-pass volgt in Phase 2.",
