@@ -5,10 +5,11 @@
 window.PROGRESS_DATA = {
   bijgewerkt: "2026-07-23 09:30",
   hero: { label: "Hele game", pct: 8 },
-  playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
+  playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
+    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "Planner-agent schrijft het volledige risk-first-uitvoeringsplan (phase0/EXECUTION_PLAN.md); element-builder draait de graphics-pass (warning-signs, patrol-figuren, poort-portaal); reviewers vóór elke commit; wakeup elke 60 s." },
     { taak: "Fab-packs binnenhalen", status: "klaar", pct: 100, detail: "11 packs binnen: 8× SciFi (RAISOR-familie), Paragon Belica + Twinblast + Minions (~50 skeletal meshes, ~950 animaties). MetaHuman-items faalden (EOS-login in de editor-Fab-tab nodig — stap 3-punt)." },
     { taak: "Character-pipeline (stap 2)", status: "klaar", pct: 100, detail: "GELAND + QC: 9 bodies via DT_BodyDefs, 5 Dominion-archetypes, toon-restyle per slot (eigen texture als luminantie-detail, factie-kleur uit palet: Dominion-goud, rebel-teal, Veil-violet, Shock-rood) — zelfde exposure-laag als de wereld, mét inktlijnen." },
     { taak: "Zelf bouwen (Borderlands-kwaliteit)", status: "klaar", pct: 100, detail: "LIVE: 5 zelfgemaakte straatprops + facade-ensemble (deur/ramen/pilaren/dakrand/schoorsteen) + lantaarns met glow + propagandaborden + kleur-kalibratie + 5 autowrakken — alles groen geverifieerd. Geparkeerd voor scale-audit: kabelbundels (~100× te groot) + vakwerk-portaal." },
@@ -24,8 +25,8 @@ window.PROGRESS_DATA = {
       titel: "1 · Roadmap", scope: "Part 13",
       items: [
         { naam: "Fase 0 — Pre-productie", pct: 90, notitie: "Open: CI-runner, concept-art 0/10, feel-clips 0/5." },
-        { naam: "Fase 1 — Prototype \"The Loop\"", pct: 95, notitie: "Alle 8 specs + live loop af. Open: gate-vraag (eigenaar)." },
-        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 2, notitie: "Art-richting gelockt + outline-materiaal." },
+        { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, notitie: "Alle 8 specs + live loop af; carryover: 13.2-playtest (eigenaar)." },
+        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 8, notitie: "ACTIEF (owner-instructie 23-07): SPEC-P2-00 staat; body-pipeline + archetypes + named-slots + fidelity-basis geland; P2-01 (squad van 4 + classes) is de volgende systeemtaak." },
         { naam: "Fase 3 — Early Build", pct: 0 },
         { naam: "Fase 4 — Alpha", pct: 0 },
         { naam: "Fase 5 — Beta", pct: 0 },

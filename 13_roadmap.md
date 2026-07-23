@@ -6,9 +6,9 @@
 
 ## ACTIVE_MILESTONE
 
-> **Current milestone: PHASE 1 — PROTOTYPE, "The Loop".**
-> Scope: strictly per `phase0/specs/SPEC-P1-00`…`08` — one graybox district, 6-node strategy mini-map, menu-only base; event bus → campaign state/save → economy → mini-map → mission runtime → squad of 2 → roster/permadeath → menu base (build order per SPEC-P1-00).
-> Gate passed 2026-07-19 (build verified on UE 5.8; owner sign-off). Phase 0 carryover, non-blocking: CI runner provisioning, 10 concept pieces, 5 feel-reference clips (`phase0/README.md`).
+> **Current milestone: PHASE 2 — VERTICAL SLICE, "Thirteen Bullets".**
+> Scope: per `phase0/specs/SPEC-P2-00` (build order SPEC-P2-01…09) — Act 1's opening ~3 hours at target quality: squad of 4 with 3 classes, Command Mode final feel, Hollow Point walkable base, authored M1.1–M1.4, one liberation instance, save v1, UI v1, fidelity district per the 15.5 revision, audio infra (16.7).
+> Entered 2026-07-23 on **explicit owner instruction** (autonomy-loop directive; DOCUMENTATION_README hierarchy rule 4 satisfied) with Phase 1 fully green (build ✓, 31/31 tests ✓, live loop playable). **Phase-1 carryover, standing owner action: the 13.2 gate playtest** ("do testers voluntarily play a second loop?") — the answer remains the owner's call and is recorded when played; it does not block Phase-2 work under the owner instruction. Phase 0 carryover unchanged: CI runner, 10 concept pieces, 5 feel-reference clips.
 > Do not implement features beyond this milestone unless explicitly instructed (see DOCUMENTATION_README.md, Document Hierarchy rule 4).
 > *Update this block — and nothing else in this file — when a milestone gate is passed.*
 
