@@ -9,8 +9,8 @@ window.PROGRESS_DATA = {
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
-    { taak: "Fab-packs binnenhalen", status: "bezig", pct: 40, detail: "Eigenaar klikt 'Add to Project': SciFiSoldier03 (168 MB — meshes + 6 materiaal-varianten Type_A–F + demo-anims), SciFiSoldier02 en SciFiGirl zijn binnen; wacht op de rest + het 'ze staan erin'-sein." },
-    { taak: "Character-pipeline (stap 2)", status: "gepland", pct: 5, detail: "C++/data op DT_NamePools + DA_CharacterTuning + DT_EnemyArchetypes: BaseCharacter-opzet, squad-identiteit (naam/traits/rang/permadeath), Dominion-archetypes op de RAISOR-meshes (Type_A–F = archetype-onderscheid), anim-retargeting. Start op het sein van de eigenaar." },
+    { taak: "Fab-packs binnenhalen", status: "klaar", pct: 100, detail: "11 packs binnen: 8× SciFi (RAISOR-familie), Paragon Belica + Twinblast + Minions (~50 skeletal meshes, ~950 animaties). MetaHuman-items faalden (EOS-login in de editor-Fab-tab nodig — stap 3-punt)." },
+    { taak: "Character-pipeline (stap 2)", status: "bezig", pct: 20, detail: "Verkenning klaar: alle 8 SciFi-packs delen de UE4-Mannequin-skeletfamilie → géén retargeting nodig voor v1. Nu: DT_BodyDefs + archetype-koppeling (Enforcer/Trooper/Shock/Veil/Radiant Guard) + ApplyBodyDef in AEclipseCharacter. Compile-moment vereist gesloten editor." },
     { taak: "MetaHuman-recepten (stap 3)", status: "gepland", pct: 0, detail: "Per named character (Kaya, Brick, Vale, Dex, Petra, Kaine) code/data-slots + exact Creator-recept voor de eigenaar." },
     { taak: "Graphics-iteraties (15.8-loop)", status: "bezig", pct: 100, detail: "6 iteraties gebankt vandaag: inktlijnen-fix, skyline, textures, straat-dressing, decals, eerste bewoners — loopt door met patrol-figuren + particles." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build + 31/31 tests + validatie 0 + catalog 19/19 vóór elke commit/push." },
