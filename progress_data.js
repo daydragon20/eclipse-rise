@@ -9,8 +9,8 @@ window.PROGRESS_DATA = {
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
-    { taak: "Fab-library uitlezen", status: "wachten", pct: 60, detail: "Launcher-cache (listings_v1.db) bestaat maar is leeg — eigenaar opent één keer Launcher → Unreal Engine → Library → Fab Library, dan lees ik de ~1000 assets zelf uit." },
-    { taak: "Character-pipeline (stap 2)", status: "gepland", pct: 0, detail: "C++/data op DT_NamePools + DA_CharacterTuning + DT_EnemyArchetypes: BaseCharacter-opzet, squad-identiteit (naam/traits/rang/permadeath), Dominion-archetypes, anim-retargeting. Start na Fab-packs (placeholders waar nodig)." },
+    { taak: "Fab-packs binnenhalen", status: "bezig", pct: 40, detail: "Eigenaar klikt 'Add to Project': SciFiSoldier03 (168 MB — meshes + 6 materiaal-varianten Type_A–F + demo-anims), SciFiSoldier02 en SciFiGirl zijn binnen; wacht op de rest + het 'ze staan erin'-sein." },
+    { taak: "Character-pipeline (stap 2)", status: "gepland", pct: 5, detail: "C++/data op DT_NamePools + DA_CharacterTuning + DT_EnemyArchetypes: BaseCharacter-opzet, squad-identiteit (naam/traits/rang/permadeath), Dominion-archetypes op de RAISOR-meshes (Type_A–F = archetype-onderscheid), anim-retargeting. Start op het sein van de eigenaar." },
     { taak: "MetaHuman-recepten (stap 3)", status: "gepland", pct: 0, detail: "Per named character (Kaya, Brick, Vale, Dex, Petra, Kaine) code/data-slots + exact Creator-recept voor de eigenaar." },
     { taak: "Graphics-iteraties (15.8-loop)", status: "bezig", pct: 100, detail: "6 iteraties gebankt vandaag: inktlijnen-fix, skyline, textures, straat-dressing, decals, eerste bewoners — loopt door met patrol-figuren + particles." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build + 31/31 tests + validatie 0 + catalog 19/19 vóór elke commit/push." },
