@@ -471,6 +471,61 @@ void BuildDistrict(UWorld& World)
 		}
 	}
 
+	// PLACEHOLDER(15.8): warning-sign placards — FD_WarningSigns_V1 (Fab free
+	// pack, machine-local) restyled through the toon pipeline like the car
+	// wrecks: the sign's own albedo as AlbedoTex (UVMode 1) over amber/red cel
+	// tints. The pack ships decal cutouts over green-screen photo backing
+	// (headless audit 2026-07-23), so these ride the background-cleaned
+	// placards from Tools/prepare_warning_signs.py (import via
+	// Tools/import_warning_signs.py); gains are the measured 1/linear-mean per
+	// placard — the car-block 3.2 assumes a full-frame albedo, these are
+	// bright marks on a dark plate (poster-decal recipe). No collision;
+	// missing textures = skipped (GDD 14.3.5).
+	{
+		struct FSignDef { const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; FVector Location; FVector Scale; };
+		const FLinearColor SignRedLit(0.300f, 0.060f, 0.050f), SignRedShade(0.110f, 0.030f, 0.035f);      // checkpoint red (stencil family)
+		const FLinearColor SignAmberLit(0.300f, 0.200f, 0.030f), SignAmberShade(0.120f, 0.080f, 0.020f);  // hazard amber (pad family)
+		const FSignDef Signs[] = {
+			// STOP hung under the gate portal's west beam, facing the Entry_Main approach.
+			{ TEXT("/Game/Art/Decals/T_sign_stop_diff.T_sign_stop_diff"), 8.9f, SignRedLit, SignRedShade, FVector(-8850, 0, 320), FVector(0.04f, 1.0f, 1.0f) },
+			// Radiation placard on the crossing lamp pole (artery x cross-street).
+			{ TEXT("/Game/Art/Decals/T_sign_radiation_diff.T_sign_radiation_diff"), 10.7f, SignAmberLit, SignAmberShade, FVector(-4650, -675, 230), FVector(0.9f, 0.04f, 0.9f) },
+			// TOXIC on the west wall inner face — the Dominion answer to the rebel stencil across the Entry_Main gap.
+			{ TEXT("/Game/Art/Decals/T_sign_toxic_diff.T_sign_toxic_diff"), 6.5f, SignAmberLit, SignAmberShade, FVector(-9944, -350, 260), FVector(0.04f, 1.4f, 1.4f) },
+		};
+
+		for (const FSignDef& Sign : Signs)
+		{
+			UTexture* Tex = LoadObject<UTexture>(nullptr, Sign.TexPath);
+			if (Tex == nullptr || ToonMaterial == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: sign %s missing — skipped (run Tools/import_warning_signs.py chain)."), Sign.TexPath);
+				continue;
+			}
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), Sign.Lit);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Sign.Shade);
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+			Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Sign.TexGain);
+			Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Tex);
+			Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.9f);
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Sign.Location, FRotator::ZeroRotator, Params);
+			if (Actor != nullptr)
+			{
+				Actor->SetMobility(EComponentMobility::Movable);
+				Actor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
+				Actor->SetActorScale3D(Sign.Scale);
+				Actor->GetStaticMeshComponent()->SetMaterial(0, Mid);
+				Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+				Actor->GetStaticMeshComponent()->SetCastShadow(false);
+				Actor->SetActorEnableCollision(false);
+				Actor->Tags.Add(TEXT("Deco_Sign"));
+			}
+		}
+	}
+
 	// PLACEHOLDER(15.7/09): first inhabitants — Quaternius CC0 animated
 	// characters (SOURCES.md) as looping-Idle dressing figures, toon-restyled
 	// flat cel (palette hue, no albedo). Visual tier only: no collision, no AI,
@@ -485,6 +540,12 @@ void BuildDistrict(UWorld& World)
 			{ TEXT("/Game/Art/Characters/BlueSoldier_Female/BlueSoldier_Female.BlueSoldier_Female"), TEXT("/Game/Art/Characters/BlueSoldier_Female/BlueSoldier_FemaleCharacterArmature_Idle.BlueSoldier_FemaleCharacterArmature_Idle"), EnforcerLit, EnforcerShade, FVector(-450, 630, 0), 250.0f },
 			{ TEXT("/Game/Art/Characters/Casual_Bald/Casual_Bald.Casual_Bald"), TEXT("/Game/Art/Characters/Casual_Bald/Casual_BaldCharacterArmature_Idle.Casual_BaldCharacterArmature_Idle"), CivilianLit, CivilianShade, FVector(-4250, 3250, 0), 30.0f },
 			{ TEXT("/Game/Art/Characters/Casual2_Male/Casual2_Male.Casual2_Male"), TEXT("/Game/Art/Characters/Casual2_Male/Casual2_MaleCharacterArmature_Idle.Casual2_MaleCharacterArmature_Idle"), CivilianLit, CivilianShade, FVector(2050, 850, 0), 300.0f },
+			// 15.8 patrol pass: two enforcers looping the Walk cycle along the
+			// EW artery (same visual tier — no AI, no nav; the real patrol
+			// brain is Part 9). One paces the gate portal, one the crossing,
+			// so the stride reads in the new review frames.
+			{ TEXT("/Game/Art/Characters/BlueSoldier_Male/BlueSoldier_Male.BlueSoldier_Male"), TEXT("/Game/Art/Characters/BlueSoldier_Male/BlueSoldier_MaleCharacterArmature_Walk.BlueSoldier_MaleCharacterArmature_Walk"), EnforcerLit, EnforcerShade, FVector(-8700, -100, 0), 0.0f },
+			{ TEXT("/Game/Art/Characters/BlueSoldier_Female/BlueSoldier_Female.BlueSoldier_Female"), TEXT("/Game/Art/Characters/BlueSoldier_Female/BlueSoldier_FemaleCharacterArmature_Walk.BlueSoldier_FemaleCharacterArmature_Walk"), EnforcerLit, EnforcerShade, FVector(-4100, -350, 0), 180.0f },
 		};
 
 		for (const FFigureDef& Figure : Figures)
@@ -635,13 +696,14 @@ void BuildDistrict(UWorld& World)
 			}
 		}
 
-		auto SpawnGen = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float Yaw)
+		auto SpawnGen = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float Yaw, const FVector& Scale = FVector(1.0f))
 		{
 			if (Mesh == nullptr) { return; }
 			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, Yaw, 0.0f), Params);
 			if (Actor == nullptr) { return; }
 			Actor->SetMobility(EComponentMobility::Movable);
 			Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+			Actor->SetActorScale3D(Scale);
 			Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
 			Actor->SetActorEnableCollision(false);
 			Actor->Tags.Add(TEXT("Deco_Gen"));
@@ -716,11 +778,27 @@ void BuildDistrict(UWorld& World)
 			SpawnGen(KChimney, MasonryMid, RowBase + FVector(600.0f, 220.0f, 0), 0.0f);
 			SpawnGen(Vent, MetalMid, RowBase + FVector(1000.0f, 60.0f, 350.0f), 250.0f);
 		}
-		// PARKED (QC round 2026-07-23): CableArc imports ~100x oversized and the
-		// GantryBeam floats without legs — both return in a proper portal
-		// assembly pass (scale audit + support pillars) instead of guess-fixes.
-		(void)Cable;
-		(void)KGantry;
+		// Scale audit (headless bounds pass, 2026-07-23): SM_Prop_CableArc
+		// measures 422x30x79 with its sag at z 236..315 — the parked "~100x
+		// oversized" QC eyeball was stale; the import is a sane 4.2 m catenary
+		// hung at pole height. Strung at natural scale between a lamp pair
+		// flanking the crossing; the pair's second lamp spawns here so the
+		// 420-unit spacing matches the measured span.
+		SpawnGen(Lamp, MetalMid, FVector(-4230, -700, 0), 90.0f);
+		SpawnGen(LampGlow, GenGlowMid, FVector(-4230, -700, 0), 90.0f);
+		SpawnGen(Cable, MetalMid, FVector(-4440, -700, 0), 0.0f);
+
+		// Gate portal at the Entry_Main approach (measured kit: CornerPillar
+		// 80x80x370, GantryBeam 50x600x50): two frames across the artery —
+		// corner pillars as legs OUTSIDE the y=+-460 lane lines, beams scaled
+		// 1.8 along their span so they bridge the 1080-unit gap flush with the
+		// pillar outer faces. Metal tint; same no-collision dressing tier.
+		for (const float GateX : { -8850.0f, -8550.0f })
+		{
+			SpawnGen(KPillar, MetalMid, FVector(GateX, -500.0f, 0), 0.0f);
+			SpawnGen(KPillar, MetalMid, FVector(GateX, 500.0f, 0), 0.0f);
+			SpawnGen(KGantry, MetalMid, FVector(GateX, 0, 370.0f), 0.0f, FVector(1.0f, 1.8f, 1.0f));
+		}
 	}
 
 	// PLACEHOLDER(15.5/03.3): Kessara skyline massing OUTSIDE the playable

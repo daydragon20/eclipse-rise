@@ -161,6 +161,14 @@ void AEclipseGameMode::AdvanceShotRig()
 		{ FVector(-1800.0f, 3000.0f, 260.0f), FRotator(-4.0f, 180.0f, 0.0f) },
 		{ FVector(700.0f, -5200.0f, 220.0f), FRotator(-6.0f, 115.0f, 0.0f) },
 		{ FVector(-8200.0f, -8200.0f, 1500.0f), FRotator(-24.0f, 45.0f, 0.0f) },
+		// 15.8 frames: the gate portal + STOP/TOXIC signs looking back west
+		// toward Entry_Main, and the crossing's cable-arc lamp pair +
+		// radiation placard — the new dressing must be judged close-up, not
+		// as overview specks. Crossing cam sits south of the artery so the
+		// pole placard is face-on and the propaganda board's back stays out
+		// of the sightline (first 15.8 round blocked the patrol figure).
+		{ FVector(-8200.0f, -250.0f, 300.0f), FRotator(-4.0f, 185.0f, 0.0f) },
+		{ FVector(-4700.0f, -1500.0f, 280.0f), FRotator(-4.0f, 75.0f, 0.0f) },
 	};
 
 	APlayerController* Controller = GetWorld()->GetFirstPlayerController();
