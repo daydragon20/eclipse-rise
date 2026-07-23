@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-23 15:32",
+  bijgewerkt: "2026-07-23 19:10",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -74,11 +74,10 @@ window.PROGRESS_DATA = {
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
-    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "3 element-builders parallel: (1) westgevel-B doorvoeren (owner-keuze), (2) P2-01 squad van 4 + classes, (3) audio-ronde 16.7 (ElevenLabs); planner houdt de backlog risk-first (phase0/EXECUTION_PLAN.md). Reviews vóór elke commit; wakeup 60 s; voltooide taken verhuizen naar de changelog." },
-    { taak: "Westgevel-B doorvoeren (owner-keuze)", status: "bezig", pct: 60, detail: "Owner koos B in het A/B-paneel — B wordt district-breed doorgevoerd: BandHi terug naar 0.55 + per-gevel warmte-compensatie op élke westgevel (masters al her-authored en wees-vrij, C++-rollout geschreven). Wacht alleen op het sluiten van de owner-editor (Live Coding blokkeert de build); bouwt daarna automatisch → shots → reviews → commit → nieuw cam-1-shot in het A/B-paneel." },
+    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "Editor is vrij: P2-01-tests draaien; daarna staan klaar: pack-slim-ronde (Minions+SciFi10), MetaHuman-curatie (SentinelC/Atira/Locodrome) en de audio-import — na elkaar (één commandlet tegelijk). Reviews vóór elke commit; wakeup 60 s; voltooide taken verhuizen naar de changelog." },
     { taak: "P2-01: Squad van 4 + classes", status: "bezig", pct: 85, detail: "Code compileert groen, event-catalog 21/21, DT_ClassDefs gevuld en gekoppeld (setup_class_data.py). Enige rest: de headless testsuite (verwacht 38 tests) + EclipseValidateData — die draaien automatisch zodra de owner-editor sluit. Daarna review (checkpoint 14.3.6: ClassId-migratie + v0-fixture-test in zelfde commit) en commit." },
     { taak: "Stap 3: MetaHuman-pijplijn", status: "bezig", pct: 75, detail: "MIJLPAAL (monitor 18:45): /Game/MetaHumans is GELAND — 908 MB met Common-basis + eerste MetaHuman 'SentinelC'; ook Atira_LODSettings + Locodrome staan erin. De owner-editor draait nog (Live Coding): zodra die sluit volgt inventaris + curatie + koppeling MH → DT_NamedCharacters-slots (Kaya/Brick/Vale/Dex/Petra/Kaine) en de toon-restyle-check per 15.7. Resterende MH-items: per stuk 1 Download-klik zoals SentinelC." },
-    { taak: "Audio-ronde 16.7 (ElevenLabs)", status: "bezig", pct: 5, detail: "Build-vrij element terwijl de editor bezet is: eerste SFX-set (wapenschot, impact, UI-tick, ambient-loop Kessara) + één muzieksting via de ElevenLabs-API (scopes open, HTTP 200) naar Saved/AudioStaging met manifest + kant-en-klaar importscript; alles gecachet zodat er nul herhaal-kosten zijn. Import in UE draait zodra de editor vrij is (16.7-endpoints)." },
+    { taak: "Audio-import + koppeling (16.12)", status: "gepland", pct: 0, detail: "De 8 gegenereerde assets (gebankt in 348b7f0, reisbare cache in Eclipse/AudioCache) importeren naar /Game/Audio via Tools/import_generated_audio.py zodra de commandlet-rij vrij is; daarna het Kessara-Layer-1-bed plaatsen (never-silent floor) en de sting aan de mission-complete-beat hangen. Follow-ups: 16.x-citatiefixes in de scripts, /Game/Audio-structuur vs 16.14." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build (-NoUba) + 31/31+ tests + validatie 0 + catalog vóór elke commit/push." },
     { taak: "Wereld zonder einde (Borderlands-compositie)", status: "gepland", pct: 5, detail: "Staande owner-taak (23-07): elke review-cam toont een gevulde horizon — geen zichtbaar wereld-einde; horizon-check van de plaatsingsronde was schoon op alle 6 cams. Skyline-audit + gelaagde silhouetten/landmarks naar Borderlands-voorbeeld hervat zodra de art-fix-ronde geland is (zelfde 15.8-loop)." },
     { taak: "Pack-slim-ronde (migrate + drop)", status: "gepland", pct: 0, detail: "Vervolg op de opruimronde (owner-vraag 23-07): gebruikte assets uit ParagonMinions (well + rocks) en SciFi_Materials_10 (7 albedo's) met dependencies migreren naar /Game/Art/Imported, builder-paden omzetten, dan beide packs van schijf — ~5,9 GB extra vrij. Start zodra de look-builder EclipseGrayboxBuilder.cpp vrijgeeft." },
@@ -184,6 +183,10 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-23 (avond — owner-keuze B + audio GELAND)", punten: [
+      "Westgevel-B district-breed doorgevoerd (412f14f, code GO + art GO): owner overrulede A via het paneel — BandHi 0.55 + per-gevel WestComp-compensatie (mid-lerp landt exact op palette-lit) op checkpoint-west, compound-gevel, warehouse-west en de skyline-familie; eindstand matcht de gekozen B op delta<2 en de zalm-gap is dicht. Material-authoring nu delete+recreate: wees-exports onmogelijk. Shots 00050–00055 = nieuwe referentie; 38/38, validatie 0.",
+      "Eerste audio-ronde gebankt (348b7f0, review GO): 8 ElevenLabs-assets (rifle, impact, UI-tick/confirm, Kessara-Layer-1-loopbed, 2 voetstappen, mission-complete-sting) met hash-cache (her-run = 0 credits) én reisbare kopie in Eclipse/AudioCache — geen machine betaalt dubbel. Import-script staat klaar voor de vrije editor.",
+      "MetaHumans geland: SentinelC + Common-basis (908 MB) via owner-kliks; curatie + koppeling aan DT_NamedCharacters staat in de rij achter de P2-01-tests." ] },
     { datum: "Sessie 2026-07-23 (namiddag — look-ronde + owner-A/B + SPEC-P2-02 GELAND)", punten: [
       "Look-ronde gebankt (eccd6f2, code GO + art GO): westgevel-banding kwantitatief opgelost (hue-spreiding 17°→4°), witte kiosk van laatste stijl-overtreding naar worker-teal (nieuw KitRow-paletslot), drie gele waarde-treden (Cover > CoverB > DecoLine), signs/posters/stencils volgen de lit-toon-masterkeuze. Characters byte-identiek — nul regressies.",
       "OWNER-A/B via het nieuwe nakijkpaneel: owner koos variant B (per-gevel warmte) boven de AI-aanbeveling A — B wordt nu district-breed doorgevoerd (BandHi 0.55 + compensatie op élke westgevel, mét wees-export-purge in de material-authoring). Het paneel toont keuze + komt met een nieuw cam-1-shot.",
