@@ -20,3 +20,6 @@ Eclipse/.vs/
 Eclipse/*.sln
 Eclipse/*.slnx
 Eclipse/.vsconfig
+
+# Fab direct-download staging (owner drops zips here; never committed raw)
+_fab_inbox/

@@ -413,6 +413,60 @@ void BuildDistrict(UWorld& World)
 		}
 	}
 
+	// PLACEHOLDER(15.5): occupation decals — Pillow-generated luminance patterns
+	// (Tools/generate_decals.py) tinted by the palette, as thin no-collision
+	// planes proud of their host surfaces. Dominion propaganda on the compound,
+	// hazard pads at the crossing, rebel stencils near the entries (03.3's
+	// "the world is ruled, and that shows" + the resistance answering back).
+	{
+		// TexGain = 1/measured-linear-average per generated map (same discipline
+		// as the surface textures: measured, never guessed).
+		struct FDecalDef { const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; FVector Location; FVector Scale; };
+		const FDecalDef Decals[] = {
+			// Dominion white-gold posters: compound north, east, and south walls.
+			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -1146, 210), FVector(1.6f, 0.04f, 2.4f) },
+			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(5854, -2000, 210), FVector(0.04f, 1.6f, 2.4f) },
+			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -2854, 210), FVector(1.6f, 0.04f, 2.4f) },
+			// Hazard pads at the artery/cross-street corners, amber.
+			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 1.3f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-3200, 700, 4), FVector(2.4f, 2.4f, 0.04f) },
+			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 1.3f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-4800, -700, 4), FVector(2.4f, 2.4f, 0.04f) },
+			// Rebel eclipse stencils: west wall by Entry_Main, warehouse south face.
+			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-9944, 420, 240), FVector(0.04f, 2.0f, 2.0f) },
+			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-4300, 2146, 220), FVector(1.8f, 0.04f, 1.8f) },
+		};
+
+		for (const FDecalDef& Decal : Decals)
+		{
+			UTexture* Tex = LoadObject<UTexture>(nullptr, Decal.TexPath);
+			if (Tex == nullptr || ToonMaterial == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: decal %s missing — skipped (run Tools/generate_decals.py + import)."), Decal.TexPath);
+				continue;
+			}
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), Decal.Lit);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Decal.Shade);
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+			Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Decal.TexGain);
+			Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Tex);
+			Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 1.0f);
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Decal.Location, FRotator::ZeroRotator, Params);
+			if (Actor != nullptr)
+			{
+				Actor->SetMobility(EComponentMobility::Movable);
+				Actor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
+				Actor->SetActorScale3D(Decal.Scale);
+				Actor->GetStaticMeshComponent()->SetMaterial(0, Mid);
+				Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+				Actor->GetStaticMeshComponent()->SetCastShadow(false);
+				Actor->SetActorEnableCollision(false);
+				Actor->Tags.Add(TEXT("Deco_Decal"));
+			}
+		}
+	}
+
 	// PLACEHOLDER(15.5/03.3): Kessara skyline massing OUTSIDE the playable
 	// perimeter — "silhouetted crane forests" in the amber smog. Pure backdrop:
 	// no nav, no cover, no mission space touched; the art pass replaces it with
