@@ -72,4 +72,8 @@ public:
 	/** Rows: FEclipseEnemyArchetypeRow — enemy stats resolved at mission spawn (SPEC-P1-05). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> EnemyArchetypes;
+
+	/** Rows: FEclipseBodyDefRow — visual bodies for player/squad/enemies (step-2 character pipeline); "Player" and "Rebel_*" rows are player-side. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> BodyDefs;
 };

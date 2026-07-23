@@ -2,8 +2,11 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/EclipseHealthAttributeSet.h"
+#include "Animation/AnimSequence.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Eclipse.h"
+#include "Engine/SkeletalMesh.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NavigationInvokerComponent.h"
 
@@ -43,6 +46,29 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	GetCharacterMovement()->MaxWalkSpeed = Tuning->RunSpeed;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = Tuning->CrouchSpeed;
 	InitializeHealth(Tuning->MaxHealth);
+}
+
+void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
+{
+	USkeletalMesh* BodyMesh = BodyDef.Mesh.LoadSynchronous();
+	if (BodyMesh == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("%s: body mesh %s missing — capsule body stands in (GDD 14.3.5)."),
+			*GetName(), *BodyDef.Mesh.ToString());
+		return;
+	}
+
+	USkeletalMeshComponent* MeshComponent = GetMesh();
+	MeshComponent->SetSkeletalMesh(BodyMesh);
+	MeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, BodyDef.MeshZOffset));
+	MeshComponent->SetRelativeRotation(FRotator(0.0f, BodyDef.MeshYaw, 0.0f));
+	MeshComponent->SetRelativeScale3D(FVector(BodyDef.MeshScale));
+
+	if (UAnimSequence* Idle = BodyDef.IdleAnim.LoadSynchronous())
+	{
+		MeshComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		MeshComponent->PlayAnimation(Idle, /*bLooping*/ true);
+	}
 }
 
 void AEclipseCharacter::InitializeHealth(float MaxHealth)

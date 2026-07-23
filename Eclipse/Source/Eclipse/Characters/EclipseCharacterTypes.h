@@ -5,6 +5,9 @@
 #include "Engine/DataTable.h"
 #include "EclipseCharacterTypes.generated.h"
 
+class UAnimSequence;
+class USkeletalMesh;
+
 /**
  * Character data (SPEC-P1-05). The movement numbers are the LOCKED graybox feel
  * targets (phase0/graybox_feel_targets.md §2, GDD 4.1.1) — changing them goes
@@ -40,11 +43,55 @@ public:
 	float MaxHealth = 100.0f;
 };
 
+/**
+ * Visual body definition (DT_BodyDefs row — step-2 character pipeline). Soft
+ * references only: a missing asset degrades to the capsule body with a logged
+ * warning, never a crash (GDD 14.3.5). PLACEHOLDER(GDD 15.7): the minimal
+ * idle-only anim tier; the locomotion AnimBlueprint tier is SPEC-P2-01 work.
+ */
+USTRUCT(BlueprintType)
+struct FEclipseBodyDefRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<USkeletalMesh> Mesh;
+
+	/** Looping idle; single-node playback until the ABP tier lands. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> IdleAnim;
+
+	/** Reserved for the SPEC-P2-01 locomotion tier. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> WalkAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> ShootAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> DeathAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body", meta = (ClampMin = 0.1))
+	float MeshScale = 1.0f;
+
+	/** Mesh-root drop below the capsule center; -90 fits a standing humanoid in the default capsule. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	float MeshZOffset = -90.0f;
+
+	/** UE humanoid meshes face +Y; -90 turns them to the capsule's forward. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	float MeshYaw = -90.0f;
+};
+
 /** One enemy archetype (DT_EnemyArchetypes row, SPEC-P1-05 data). */
 USTRUCT(BlueprintType)
 struct FEclipseEnemyArchetypeRow : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	/** DT_BodyDefs row that dresses this archetype (step-2 character pipeline); NAME_None = capsule. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Enemy")
+	FName BodyDef;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Enemy", meta = (ClampMin = 1))
 	float Health = 60.0f;

@@ -123,6 +123,28 @@ void AEclipseGameMode::SetupShotRig()
 	// alternates teleport and capture so every shot gets a stabilized frame.
 	GetWorldTimerManager().SetTimer(ShotRigTimer, this, &AEclipseGameMode::AdvanceShotRig, 2.0f, /*bLoop*/ true, /*FirstDelay*/ 8.0f);
 	UE_LOG(LogEclipse, Display, TEXT("ShotRig: armed (Part 15.9 fixed review cameras)."));
+
+	// Body showcase (step-2 character pipeline QC): one body per DT_BodyDefs row
+	// lined up in review-camera 1's view, dressed through the REAL ApplyBodyDef
+	// path — the review stills prove the data, not a bespoke preview path.
+	const UEclipseCampaignSubsystem* Campaign = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>() : nullptr;
+	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;
+	const UDataTable* BodyDefs = Setup != nullptr ? Setup->BodyDefs.LoadSynchronous() : nullptr;
+	if (BodyDefs != nullptr && BodyDefs->GetRowStruct() == FEclipseBodyDefRow::StaticStruct())
+	{
+		int32 BodyIndex = 0;
+		for (const TPair<FName, uint8*>& Row : BodyDefs->GetRowMap())
+		{
+			AEclipseCharacter* Body = SpawnBodyNear(FVector(3600.0f + BodyIndex * 240.0f, -2350.0f, 0.0f), Row.Key.ToString());
+			if (Body != nullptr)
+			{
+				Body->SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+				Body->ApplyBodyDef(*reinterpret_cast<const FEclipseBodyDefRow*>(Row.Value));
+				++BodyIndex;
+			}
+		}
+		UE_LOG(LogEclipse, Display, TEXT("ShotRig: body showcase spawned (%d bodies)."), BodyIndex);
+	}
 }
 
 void AEclipseGameMode::AdvanceShotRig()
@@ -290,7 +312,8 @@ void AEclipseGameMode::SpawnMissionActors()
 	const UEclipseCampaignSetupAsset* Setup = Campaign->GetActiveSetup();
 	const UEclipseCharacterTuningAsset* CharacterTuning = Setup != nullptr ? Setup->CharacterTuning.LoadSynchronous() : nullptr;
 	const FEclipseWeaponRow* PlayerWeaponRow = Setup != nullptr ? FirstRowOf<FEclipseWeaponRow>(Setup->Weapons.LoadSynchronous()) : nullptr;
-	const FEclipseEnemyArchetypeRow* ArchetypeRow = Setup != nullptr ? FirstRowOf<FEclipseEnemyArchetypeRow>(Setup->EnemyArchetypes.LoadSynchronous()) : nullptr;
+	const UDataTable* ArchetypeTable = Setup != nullptr ? Setup->EnemyArchetypes.LoadSynchronous() : nullptr;
+	const FEclipseEnemyArchetypeRow* ArchetypeRow = FirstRowOf<FEclipseEnemyArchetypeRow>(ArchetypeTable);
 	if (CharacterTuning == nullptr || PlayerWeaponRow == nullptr || ArchetypeRow == nullptr)
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("GameMode: ground data incomplete (tuning %s, weapons %s, archetypes %s) — struct defaults stand in (GDD 14.3.5)."),
@@ -300,12 +323,39 @@ void AEclipseGameMode::SpawnMissionActors()
 	}
 	const FEclipseWeaponRow DefaultWeaponRow;
 
+	// Visual bodies (step-2 character pipeline): DT_BodyDefs rows dress the
+	// spawns; a missing table or row = capsule bodies, never a crash (14.3.5).
+	const UDataTable* BodyDefs = Setup != nullptr ? Setup->BodyDefs.LoadSynchronous() : nullptr;
+	auto FindBodyDef = [BodyDefs](FName RowName) -> const FEclipseBodyDefRow*
+	{
+		return (BodyDefs != nullptr && !RowName.IsNone() && BodyDefs->GetRowStruct() == FEclipseBodyDefRow::StaticStruct())
+			? reinterpret_cast<const FEclipseBodyDefRow*>(BodyDefs->FindRowUnchecked(RowName))
+			: nullptr;
+	};
+	// Rebel body pool: rows whose name starts with "Rebel" dress squadmates,
+	// assigned stably by deploy order.
+	TArray<const FEclipseBodyDefRow*> RebelBodies;
+	if (BodyDefs != nullptr && BodyDefs->GetRowStruct() == FEclipseBodyDefRow::StaticStruct())
+	{
+		for (const TPair<FName, uint8*>& Row : BodyDefs->GetRowMap())
+		{
+			if (Row.Key.ToString().StartsWith(TEXT("Rebel")))
+			{
+				RebelBodies.Add(reinterpret_cast<const FEclipseBodyDefRow*>(Row.Value));
+			}
+		}
+	}
+
 	// The player pawn persists across runs: re-arm, re-tune and revive it so a
 	// lost mission never launches the next one with a downed, unarmed body.
 	if (AEclipseCharacter* PlayerBody = Cast<AEclipseCharacter>(PlayerPawn))
 	{
 		PlayerBody->ApplyTuning(CharacterTuning);
 		PlayerBody->ReviveForMission();
+		if (const FEclipseBodyDefRow* PlayerBodyDef = FindBodyDef(TEXT("Player")))
+		{
+			PlayerBody->ApplyBodyDef(*PlayerBodyDef);
+		}
 		EnsureWeapon(*PlayerBody).ApplyWeaponRow(PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
 
 		// Player body down ends the run (bind once; RemoveAll guards re-entry dupes).
@@ -316,6 +366,7 @@ void AEclipseGameMode::SpawnMissionActors()
 	// Squad of 2 (SPEC-P1-06): the picked roster soldiers, spawned beside the
 	// player, registered so orders and the downed pipeline reach them. They carry
 	// the player-side platform (GDD 8.3 fairness: same guns, same rules).
+	int32 SquadIndex = 0;
 	for (const FGuid& SoldierId : Mission->GetDeployedSoldierIds())
 	{
 		const FEclipseSoldierRecord* Record = Campaign->GetState().FindSoldier(SoldierId);
@@ -326,6 +377,11 @@ void AEclipseGameMode::SpawnMissionActors()
 			continue;
 		}
 		Body->ApplyTuning(CharacterTuning);
+		if (!RebelBodies.IsEmpty())
+		{
+			Body->ApplyBodyDef(*RebelBodies[SquadIndex % RebelBodies.Num()]);
+		}
+		++SquadIndex;
 		EnsureWeapon(*Body).ApplyWeaponRow(PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
 
 		AEclipseSquadmateController* Controller = GetWorld()->SpawnActor<AEclipseSquadmateController>();
@@ -339,36 +395,56 @@ void AEclipseGameMode::SpawnMissionActors()
 	}
 
 	// PLACEHOLDER(SPEC-P1-05): enemy placement reads the mission asset's spawn
-	// sets + DT_EnemyArchetypes in the content pass; the minimal presence below
-	// makes squad orders meaningful today (4-8 dummies per spec).
+	// sets in the content pass; presence below cycles through ALL archetype rows
+	// (step-2: per-archetype stats + bodies) so the mix is visible today.
 	int32 EnemyIndex = 0;
 	const FVector PrimarySite = FindSiteLocation(TEXT("Site_ControlPost"), PlayerLocation + FVector(3000.0f, 0.0f, 0.0f));
 
-	// Enemy ballistics derive from the archetype row (GDD 8.3 fairness: same
-	// hitscan seam, data-tuned): damage/cadence from the row, reach = sight.
-	FEclipseWeaponRow EnemyWeaponRow;
-	if (ArchetypeRow != nullptr)
+	TArray<TPair<FName, const FEclipseEnemyArchetypeRow*>> ArchetypeRows;
+	if (ArchetypeTable != nullptr && ArchetypeTable->GetRowStruct() == FEclipseEnemyArchetypeRow::StaticStruct())
 	{
-		EnemyWeaponRow.Damage = ArchetypeRow->Damage;
-		EnemyWeaponRow.FireInterval = ArchetypeRow->FireInterval;
-		EnemyWeaponRow.RangeCm = ArchetypeRow->PerceptionRadius;
-		EnemyWeaponRow.HeadshotMultiplier = 1.0f; // graybox capsules have no head bone; no lottery shots
+		for (const TPair<FName, uint8*>& Row : ArchetypeTable->GetRowMap())
+		{
+			ArchetypeRows.Emplace(Row.Key, reinterpret_cast<const FEclipseEnemyArchetypeRow*>(Row.Value));
+		}
 	}
 
 	for (int32 Index = 0; Index < 4; ++Index)
 	{
-		AEclipseCharacter* Enemy = SpawnBodyNear(PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f), FString::Printf(TEXT("Enforcer_%d"), Index));
+		const FEclipseEnemyArchetypeRow* RowForEnemy = !ArchetypeRows.IsEmpty()
+			? ArchetypeRows[Index % ArchetypeRows.Num()].Value : ArchetypeRow;
+		const FName RowName = !ArchetypeRows.IsEmpty()
+			? ArchetypeRows[Index % ArchetypeRows.Num()].Key : FName(TEXT("Enforcer"));
+
+		AEclipseCharacter* Enemy = SpawnBodyNear(PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f), FString::Printf(TEXT("%s_%d"), *RowName.ToString(), Index));
 		if (Enemy == nullptr)
 		{
 			continue;
+		}
+
+		// Enemy ballistics derive from the archetype row (GDD 8.3 fairness: same
+		// hitscan seam, data-tuned): damage/cadence from the row, reach = sight.
+		FEclipseWeaponRow EnemyWeaponRow;
+		if (RowForEnemy != nullptr)
+		{
+			EnemyWeaponRow.Damage = RowForEnemy->Damage;
+			EnemyWeaponRow.FireInterval = RowForEnemy->FireInterval;
+			EnemyWeaponRow.RangeCm = RowForEnemy->PerceptionRadius;
+			EnemyWeaponRow.HeadshotMultiplier = 1.0f; // placeholder bodies: no headshot lottery until hit zones land
+
+			Enemy->InitializeHealth(RowForEnemy->Health);
+			if (const FEclipseBodyDefRow* EnemyBodyDef = FindBodyDef(RowForEnemy->BodyDef))
+			{
+				Enemy->ApplyBodyDef(*EnemyBodyDef);
+			}
 		}
 		EnsureWeapon(*Enemy).ApplyWeaponRow(EnemyWeaponRow);
 		AEclipseEnemyController* Controller = GetWorld()->SpawnActor<AEclipseEnemyController>();
 		if (Controller != nullptr)
 		{
-			if (ArchetypeRow != nullptr)
+			if (RowForEnemy != nullptr)
 			{
-				Controller->ApplyArchetype(*ArchetypeRow);
+				Controller->ApplyArchetype(*RowForEnemy);
 			}
 			Controller->Possess(Enemy);
 			SpawnedMissionActors.Add(Controller);

@@ -23,3 +23,8 @@ Eclipse/.vsconfig
 
 # Fab direct-download staging (owner drops zips here; never committed raw)
 _fab_inbox/
+
+# Fab-library packs: machine-local via Epic Launcher (licensed content, GBs; re-add per machine via 'Add to Project')
+Eclipse/Content/SciFi*/
+Eclipse/Content/Paragon*/
+Eclipse/Content/Fab/

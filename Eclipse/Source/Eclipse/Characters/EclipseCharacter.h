@@ -32,6 +32,14 @@ public:
 	/** Apply tuning (movement speeds, max health) from data — never hardcode (GDD 14.2). */
 	void ApplyTuning(const UEclipseCharacterTuningAsset* Tuning);
 
+	/**
+	 * Dress this body from a DT_BodyDefs row (step-2 character pipeline): mesh +
+	 * looping idle. Missing assets degrade to the capsule silently-but-logged
+	 * (GDD 14.3.5). PLACEHOLDER(GDD 15.7): single-node idle until the SPEC-P2-01
+	 * locomotion ABP tier — moving bodies slide, and that is accepted at this tier.
+	 */
+	void ApplyBodyDef(const struct FEclipseBodyDefRow& BodyDef);
+
 	/** Direct health init for archetype-driven spawns (enemies from DT_EnemyArchetypes). */
 	void InitializeHealth(float MaxHealth);
 
