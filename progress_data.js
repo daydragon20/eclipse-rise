@@ -86,14 +86,14 @@ window.PROGRESS_DATA = {
 
   // A/B-keuzes die de owner in de viewer nakijkt — status: open | beslist; keuze vult de dev-sessie in na owner-antwoord.
   abTests: [
-    { titel: "Westgevel-kleur (checkpoint-muur, cam 1)", status: "open",
+    { titel: "Westgevel-kleur (checkpoint-muur, cam 1)", status: "beslist",
       vraag: "De westgevel leest zalmroze doordat hij nét in de mid-band van de cel-shading valt (ndl +0.52, BandHi 0.55); de zuidgevel leest verzadigd oxide — één gebouw oogt als twee assets. Welke variant leest beter als één gebouw, zonder de andere cams te schaden?",
       opties: [
         { label: "A — banddrempel 0.50", img: "progress_media/ab_westgevel_A.png", uitleg: "westgevel schuift de lit-band in en wordt pixel-gelijk aan de zonzijde (gemeten 251,160,53 ≈ 252,158,55); werkt district-breed, exposure-delta ≤2 op alle zes cams" },
         { label: "B — per-gevel tint-compensatie", img: "progress_media/ab_westgevel_B.png", uitleg: "alleen de gecompenseerde gevel wordt goed; de compound-gevel verderop en elke andere westgevel blijven zalmroze — schaalt niet" },
         { label: "referentie (oude stand)", img: "progress_media/ab_westgevel_ref.png", uitleg: "gebankte ronde vóór de fix: westgevel zalmroze (236,126,88), zuidgevel oxide — één gebouw leest als twee assets" }
       ],
-      aanbeveling: "A — objectief beter (systemisch, cel-logisch: zonzijde = lit; nul neveneffecten gemeten). A is als voorlopige stand geïmplementeerd; zeg B en de dev-sessie draait het om.", keuze: "" }
+      aanbeveling: "A werd aanbevolen op de metingen; de keuze is aan de owner en die koos B.", keuze: "B — per-gevel warmte (owner-keuze 2026-07-23). Wordt nu district-breed doorgevoerd: de warme B-look consequent op élke westgevel (in de losse test was alleen één gevel gecompenseerd). BandHi terug naar 0.55; nieuw cam-1-shot volgt in dit paneel; builder draait." }
   ],
 
   secties: [
