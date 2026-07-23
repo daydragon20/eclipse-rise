@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-23 09:00",
+  bijgewerkt: "2026-07-23 09:30",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
@@ -48,7 +48,7 @@ window.PROGRESS_DATA = {
         { naam: "Belichting / mood", pct: 85, notitie: "SM6-pad live: volumetric smog + zon-schaduwen + skylight + film grain (15.5-revisie); lit-toon-migratie (echte Lumen-GI) is de volgende milestone." },
         { naam: "Kleurenpalet & blok-dressing", pct: 60, notitie: "Palet + skyline-ring + EERSTE ECHTE TEXTURES (CC0 Poly Haven, world-aligned door de toon-pijplijn; gain genormaliseerd op gemeten lineair gemiddelde)." },
         { naam: "Gebouwen (echte kits)", pct: 10 },
-        { naam: "Straten / props / decals", pct: 20, notitie: "EERSTE ECHTE MESHES: CC0-props (vaten/wegbarrières/kratten) door de toon-pijplijn (mesh-UV, luminantie-only), no-collision dressing." },
+        { naam: "Straten / props / decals", pct: 30, notitie: "CC0-props (vaten/barrières/kratten) + Pillow-gegenereerde bezettings-decals (Dominion-posters, hazard-pads, verzets-stencils) — allemaal door de toon-pijplijn, no-collision." },
         { naam: "Bomen / vegetatie", pct: 0, notitie: "Eerste vegetatie Phase 3 (Sylvaris)." },
         { naam: "Characters / MetaHumans", pct: 0, notitie: "Phase 2→3." },
         { naam: "Weer & dag/nacht", pct: 0 },
@@ -93,6 +93,12 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-23 (loop-iteratie 5 — bezettings-decals via Pillow)", punten: [
+      "PILLOW IN GEBRUIK: Tools/generate_decals.py genereert abstracte luminantie-decals (AEGIS-oog-poster, hazard-strepen, verzets-eclips-stencil) — kleur komt ALTIJD van het palet (Dominion-goud, rebel-rood, amber), dus palet-discipline is structureel geborgd.",
+      "Decals geplaatst als no-collision planes: propaganda op de compound-gevels, hazard-pads bij de kruising, stencils bij Entry_Main en op het warehouse — het district vertelt nu bezetting én verzet (15.5/03.3).",
+      "Zelfde meetdiscipline als textures: gains per decal gemeten (7.8/1.3/7.1), niet geschat.",
+      "Groene bar: build ✓, 31/31 ✓, validatie 0 ✓, catalog 19/19 ✓."
+    ]},
     { datum: "Sessie 2026-07-23 (loop-iteratie 4 — eerste echte props + tools)", punten: [
       "EERSTE ECHTE 3D-MESHES in het district: CC0-props van Poly Haven (Barrel_01, concrete_road_barrier, plastic_crate_03) — FBX + diffuse gedownload via API, geïmporteerd (Tools/import_polyhaven_props.py), geplaatst als vaten-clusters, checkpoint-barrières en krat-stapels (no-collision dressing, deterministisch).",
       "Toon-materiaal kreeg een mesh-UV-pad (UVMode) zodat geïmporteerde props hun eigen UVs gebruiken; alle material-slots krijgen de toon-MID; tonemapper-les: bijna-neutrale heldere paletten worden bleek — vat-palet naar donker verzadigd roest.",
