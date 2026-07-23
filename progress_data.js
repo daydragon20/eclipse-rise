@@ -18,6 +18,17 @@ window.PROGRESS_DATA = {
     { taak: "Wachtrij eigenaar", status: "wachten", pct: 0, detail: "1) MetaHuman-items: 1× Download-klik per item in Window → Fab → My Library (login werkt) · 2) MH_<Naam>-gezichten per phase0/metahuman_recipes.md · 3) env-pack-pulls: Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci FI Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash · 4) 13.2-playtest (~30 min, stuurt R1). Grungy Surface: GESCHRAPT (CC0-vervanger loopt). KLAAR: Fab-login ✓, ElevenLabs-scopes ✓, Blender ✓." }
   ],
 
+  // A/B-keuzes die de owner in de viewer nakijkt — status: open | beslist; keuze vult de dev-sessie in na owner-antwoord.
+  abTests: [
+    { titel: "Westgevel-kleur (checkpoint-muur, cam 1)", status: "open",
+      vraag: "De westgevel leest zalmroze doordat hij nét in de mid-band van de cel-shading valt (ndl +0.52, BandHi 0.55); de zuidgevel leest verzadigd oxide — één gebouw oogt als twee assets. Welke variant leest beter als één gebouw, zonder de andere cams te schaden?",
+      opties: [
+        { label: "A — banddrempel 0.50", img: "", uitleg: "westgevel schuift de lit-band in; globale look-shift, effect op alle cams wordt mee-gecheckt" },
+        { label: "B — alternatief (lokale correctie)", img: "", uitleg: "zon-nudge of per-gevel tint-compensatie; details volgen uit de builder-A/B" }
+      ],
+      aanbeveling: "volgt na de shot-ronde van de look-builder (draait nu)", keuze: "" }
+  ],
+
   secties: [
     {
       titel: "1 · Roadmap", scope: "Part 13",

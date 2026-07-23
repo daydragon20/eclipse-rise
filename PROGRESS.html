@@ -126,6 +126,26 @@ function render(){
     h += '</div></section>';
   }
 
+  // A/B-keuzes voor de owner (data: progress_data.js -> abTests)
+  if (D.abTests && D.abTests.length){
+    var abBust = encodeURIComponent((A.generatedAt || D.bijgewerkt || "0"));
+    D.abTests.forEach(function(ab){
+      h += '<section class="kaart"><h2>Na te kijken: ' + ab.titel +
+           ' <span class="scope">A/B — jouw keuze; zeg A of B tegen de dev-sessie</span></h2>';
+      if (ab.vraag) { h += '<p class="notitie">' + ab.vraag + '</p>'; }
+      h += '<div class="galerij">';
+      (ab.opties || []).forEach(function(o){
+        h += '<figure>' +
+          (o.img ? '<img src="' + o.img + '?v=' + abBust + '" alt="">' : '<p class="notitie">shot volgt…</p>') +
+          '<figcaption><strong>' + o.label + '</strong>' + (o.uitleg ? ' — ' + o.uitleg : '') + '</figcaption></figure>';
+      });
+      h += '</div>';
+      if (ab.aanbeveling) { h += '<p class="notitie">Aanbeveling AI: ' + ab.aanbeveling + '</p>'; }
+      if (ab.keuze) { h += '<p class="notitie"><strong>Keuze owner: ' + ab.keuze + '</strong></p>'; }
+      h += '</section>';
+    });
+  }
+
   // kwaliteitsbalk uit AUTO-feiten
   var t = A.tests || {};
   var testsOk = (t.failed === 0 && (t.total|0) > 0);
