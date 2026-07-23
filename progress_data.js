@@ -7,6 +7,48 @@ window.PROGRESS_DATA = {
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
+  // Grove tijdsinschattingen — bewust ruw; door de dev-sessie per milestone bijgesteld o.b.v. tempo + resterende backlog.
+  eta: {
+    fase1: "~vrijwel af (97%) — resteert alleen jouw 30-min playtest (13.2)",
+    slice: "Vertical Slice (Fase 2): grove schatting enkele weken bij dit tempo",
+    totaal: "Hele game: grove schatting maanden — sterk afhankelijk van scope-keuzes en jouw playtests",
+    toelichting: "Ruwe inschatting, geen belofte: gebaseerd op het huidige commit-tempo en de resterende backlog per fase. Wordt elke milestone bijgesteld.",
+    bijgesteld: "2026-07-23"
+  },
+
+  // Assets-overzicht — wat is binnengehaald, zelf gemaakt, en wat nog te doen. Dev-sessie houdt dit actueel.
+  assets: {
+    gepakt: [
+      "8× RAISOR SciFi-soldier packs (Fab) — squad- én vijand-bodies via DT_BodyDefs",
+      "Paragon: Lt. Belica (Fab) — speler-body",
+      "Paragon: Minions (Fab) — extra bodies",
+      "Quaternius CC0-characters (rigged, mét anim-sets) — eerste bewoners",
+      "Poly Haven CC0-texturen: asfalt, beton, golfplaat, metaalplaat",
+      "Poly Haven CC0-props: vat, wegbarrière, krat",
+      "ambientCG CC0-materialen: Metal041B, Metal063, Concrete042A, CorrugatedSteel007A",
+      "1082 gratis UE-assets klaar in Fab-library (reserve, nog niet geïmporteerd)"
+    ],
+    gemaakt: [
+      "Toon-materiaal M_EclipseToon (cel-banden + penseel-hatching)",
+      "Lit-variant M_EclipseToonLit + decal-variant M_EclipseToonDecal",
+      "Ink-outline post-materiaal PP_EclipseInk (Laplaciaan, schone silhouet-/naadlijnen)",
+      "Pillow-decals: AEGIS-propaganda, hazard-strepen, verzets-stencils, 7 waarschuwingsplacards",
+      "Kessara-skyline in code: 56 fabriekshulks + 18 schoorstenen + 12 kraanportalen (seed 503)",
+      "Eerste gebouw-kits + vegetatie geplaatst in het district",
+      "Zelf-gegenereerde texturen: hazard-chevron (worn), stain-mask-falloff",
+      "8 stem-regels via ElevenLabs (gegenereerd + gecachet, 0 herhaal-kosten)",
+      "Straat-dressing: rijstrook-markering, 14 olie/roestvlekken, natrium-checkpointstrips"
+    ],
+    teDoen: [
+      "MetaHuman-gezichten: Kaya, Brick, Vale, Dex, Petra, Kaine (recepten klaar)",
+      "env-packs importeren: Factory Pack Vol.1, Industrial Building 49, UNIBLOCKS, Sci-Fi Hallway, Sci-Fi Light Pack",
+      "Wapen-meshes: FPS Weapon Bundle, Free Muzzle Flash",
+      "Meer gebouw-variatie + interieurs, meer vegetatie-soorten",
+      "Music- + SFX-endpoints (ElevenLabs) aanzetten",
+      "VFX, weer & dag/nacht"
+    ]
+  },
+
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
     { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "2 element-builders parallel: (1) look-ronde (wandbanding-beslissing, kiosk-normalisatie, gele waarde-hiërarchie), (2) P2-01 squad van 4 + classes; planner houdt de backlog risk-first (phase0/EXECUTION_PLAN.md). Reviews vóór elke commit; wakeup 60 s; voltooide taken verhuizen naar de changelog." },
@@ -15,7 +57,8 @@ window.PROGRESS_DATA = {
     { taak: "Stap 3: MetaHuman-pijplijn", status: "wachten", pct: 65, detail: "Slots + recepten klaar; Fab-login BEVESTIGD in log — nog nodig: per MetaHuman-item 1× de Download-klik in Window → Fab → My Library (auth-fout is weg), daarna MH_<Naam>-gezichten per phase0/metahuman_recipes.md." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build (-NoUba) + 31/31+ tests + validatie 0 + catalog vóór elke commit/push." },
     { taak: "Wereld zonder einde (Borderlands-compositie)", status: "gepland", pct: 5, detail: "Staande owner-taak (23-07): elke review-cam toont een gevulde horizon — geen zichtbaar wereld-einde; horizon-check van de plaatsingsronde was schoon op alle 6 cams. Skyline-audit + gelaagde silhouetten/landmarks naar Borderlands-voorbeeld hervat zodra de art-fix-ronde geland is (zelfde 15.8-loop)." },
-    { taak: "Wachtrij eigenaar", status: "wachten", pct: 0, detail: "1) MetaHuman-items: 1× Download-klik per item in Window → Fab → My Library (login werkt) · 2) MH_<Naam>-gezichten per phase0/metahuman_recipes.md · 3) env-pack-pulls: Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci FI Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash · 4) 13.2-playtest (~30 min, stuurt R1). Grungy Surface: GESCHRAPT (CC0-vervanger loopt). KLAAR: Fab-login ✓, ElevenLabs-scopes ✓, Blender ✓." }
+    { taak: "Pack-slim-ronde (migrate + drop)", status: "gepland", pct: 0, detail: "Vervolg op de opruimronde (owner-vraag 23-07): gebruikte assets uit ParagonMinions (well + rocks) en SciFi_Materials_10 (7 albedo's) met dependencies migreren naar /Game/Art/Imported, builder-paden omzetten, dan beide packs van schijf — ~5,9 GB extra vrij. Start zodra de look-builder EclipseGrayboxBuilder.cpp vrijgeeft." },
+    { taak: "Wachtrij eigenaar", status: "wachten", pct: 0, detail: "1) MetaHuman-items: 1× Download-klik per item in Window → Fab → My Library (login werkt) · 2) MH_<Naam>-gezichten per phase0/metahuman_recipes.md · 3) env-pack-pulls: Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci FI Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash · 4) CHARACTER-GAT (enige!): 1 gestileerd civilian/worker-pack, 4–6 bodies, Mannequin-rig, mét arbeider-varianten — voor Hollow Point-crew/idlers (SPEC-P2-03) en Kessara-burgers close-up · 5) 13.2-playtest (~30 min, stuurt R1) · 6) westgevel-A/B nakijken zodra de shots in het paneel staan. KLAAR: Fab-login ✓, ElevenLabs-scopes ✓, Blender ✓, GameAnimationSample mag weg (0 refs)." }
   ],
 
   // A/B-keuzes die de owner in de viewer nakijkt — status: open | beslist; keuze vult de dev-sessie in na owner-antwoord.
@@ -33,13 +76,13 @@ window.PROGRESS_DATA = {
     {
       titel: "1 · Roadmap", scope: "Part 13",
       items: [
-        { naam: "Fase 0 — Pre-productie", pct: 90, notitie: "Open: CI-runner, concept-art 0/10, feel-clips 0/5." },
-        { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, notitie: "Alle 8 specs + live loop af; carryover: 13.2-playtest (eigenaar)." },
-        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 9, notitie: "ACTIEF (owner-instructie 23-07): SPEC-P2-00 staat; body-pipeline + archetypes + named-slots + fidelity-basis + asset-curatiepass + curatie-plaatsing geland; SPEC-P2-03 (Hollow Point, IC-besluit) gebankt na review-ronde; P2-01 (squad van 4 + classes) in uitvoering." },
-        { naam: "Fase 3 — Early Build", pct: 0 },
-        { naam: "Fase 4 — Alpha", pct: 0 },
-        { naam: "Fase 5 — Beta", pct: 0 },
-        { naam: "Fase 6 — Release", pct: 0 }
+        { naam: "Fase 0 — Pre-productie", pct: 90, doel: "2026-07-24", notitie: "Open: CI-runner, concept-art, feel-clips." },
+        { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, doel: "2026-07-26", notitie: "Vrijwel af; resteert de 13.2-playtest (eigenaar)." },
+        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 9, doel: "2026-08-25", notitie: "ACTIEF: body-pipeline + archetypes + curatie geland; P2-01 (squad van 4 + classes) loopt." },
+        { naam: "Fase 3 — Early Build", pct: 0, doel: "2026-11-01" },
+        { naam: "Fase 4 — Alpha", pct: 0, doel: "2027-02-01" },
+        { naam: "Fase 5 — Beta", pct: 0, doel: "2027-05-01" },
+        { naam: "Fase 6 — Release", pct: 0, doel: "2027-08-01" }
       ]
     },
     {
