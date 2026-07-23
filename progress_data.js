@@ -3,19 +3,20 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-23 09:30",
+  bijgewerkt: "2026-07-23 11:30",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
-    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "3 agents parallel: P2-01 (squad van 4 + classes), wereld-zonder-einde (horizon-audit + Borderlands-compositie), asset-curatie (~280 Paragon-omgevings-meshes + materialen + CC0-sets). Reviews vóór elke commit; wakeup 60 s. Voltooide taken verhuizen naar de changelog." },
-    { taak: "Stap 3: MetaHuman-pijplijn", status: "wachten", pct: 65, detail: "Slots + recepten klaar; Fab-login BEVESTIGD in log — nog nodig: per MetaHuman-item 1× de Download-klik in Window → Fab → My Library (auth-fout is weg), daarna MH_<Naam>-gezichten per recept." },
-    { taak: "P2-01: Squad van 4 + classes", status: "bezig", pct: 15, detail: "SPEC-P2-01 geschreven en gepusht (Assault/Medic/Sniper gelockt, pre-classed recruits); nu: DT_ClassDefs + ClassId + MaxDeployed 4 + stabilize-window + scenario-suite op 4-schaal." },
-    { taak: "Graphics-iteraties (15.8-loop)", status: "bezig", pct: 100, detail: "7 iteraties gebankt: inktlijnen-fix, skyline, textures, straat-dressing, decals, eerste bewoners + (23-07) warning-signs (FD-pack, 3 placards), 2 patrol-figuren (Walk-loop), kabel-boog op ware maat, poort-portaal bij de gate, 2 nieuwe review-cams — build groen, 31/31, shots bekeken. Volgende: particles." },
-    { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build + 31/31 tests + validatie 0 + catalog 19/19 vóór elke commit/push." },
-    { taak: "Wereld zonder einde (Borderlands-compositie)", status: "bezig", pct: 5, detail: "Nieuwe staande taak (owner 23-07): elke review-cam moet een gevulde horizon tonen — geen zichtbaar wereld-einde; skyline-audit + uitbreiding met gelaagde silhouetten en landmark-vormen naar Borderlands-voorbeeld; agent draait." },
-    { taak: "Wachtrij eigenaar", status: "wachten", pct: 0, detail: "1) MetaHuman-items: 1× Download-klik per item (login werkt nu) · 2) MH_<Naam>-gezichten via de recepten · 3) resterende 'Add to Project'-kliks (Factory Pack e.a.) · 4) 13.2-playtest. KLAAR: Fab-login ✓, ElevenLabs-scopes ✓ (HTTP 200), Blender ✓." }
+    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "2 element-builders parallel: (1) grunge-vervanger + curatie-plaatsingsronde, (2) P2-01 squad van 4 + classes; planner houdt de backlog risk-first (phase0/EXECUTION_PLAN.md). Reviews vóór elke commit; wakeup 60 s; voltooide taken verhuizen naar de changelog." },
+    { taak: "Grunge-vervanger + curatie-plaatsingsronde", status: "bezig", pct: 10, detail: "Owner-besluit: Fab-re-download Grungy Surface GESCHRAPT — vervangen door ambientCG CC0 (Metal041B + CorrugatedSteel007A + Metal063 2K-upgrade). Daarna plaatsing per phase0/ASSET_CURATION.md: 4 nieuwe placards, SciFi10-deckplate, asfalt-upgrade, bassinring via EclipseGrayboxBuilder. Valt onder de toegestane stijl-fundering (15.5)." },
+    { taak: "P2-01: Squad van 4 + classes", status: "bezig", pct: 25, detail: "Element-builder implementeert SPEC-P2-01 (Assault/Medic/Sniper gelockt, pre-classed recruits): DT_ClassDefs + ClassId (mét save-migratie + v0-fixture-test, 14.3.6) + MaxDeployed 4 + stabilize-window + nieuwe events in EventCatalog + scenario-suite op 4-schaal. Stille orderfout = blocker." },
+    { taak: "Stap 3: MetaHuman-pijplijn", status: "wachten", pct: 65, detail: "Slots + recepten klaar; Fab-login BEVESTIGD in log — nog nodig: per MetaHuman-item 1× de Download-klik in Window → Fab → My Library (auth-fout is weg), daarna MH_<Naam>-gezichten per phase0/metahuman_recipes.md." },
+    { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build (-NoUba) + 31/31+ tests + validatie 0 + catalog vóór elke commit/push." },
+    { taak: "Wereld zonder einde (Borderlands-compositie)", status: "gepland", pct: 5, detail: "Staande owner-taak (23-07): elke review-cam toont een gevulde horizon — geen zichtbaar wereld-einde; skyline-audit + gelaagde silhouetten/landmarks naar Borderlands-voorbeeld. Hervat zodra de curatie-plaatsingsronde geland is (zelfde 15.8-loop)." },
+    { taak: "SPEC-P2-03 schrijven: Hollow Point + econ-check", status: "gepland", pct: 0, detail: "Volgende planner-slot (EXECUTION_PLAN T5): spec voor de beloopbare vault (slot-graph, strategische klok, zichtbare groei) + facility-besluit (open vraag 3) doorgerekend op de P1-03-ledger. Docs-only, botst met geen enkele lopende builder." },
+    { taak: "Wachtrij eigenaar", status: "wachten", pct: 0, detail: "1) MetaHuman-items: 1× Download-klik per item in Window → Fab → My Library (login werkt) · 2) MH_<Naam>-gezichten per phase0/metahuman_recipes.md · 3) env-pack-pulls: Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci FI Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash · 4) 13.2-playtest (~30 min, stuurt R1). Grungy Surface: GESCHRAPT (CC0-vervanger loopt). KLAAR: Fab-login ✓, ElevenLabs-scopes ✓, Blender ✓." }
   ],
 
   secties: [
@@ -24,7 +25,7 @@ window.PROGRESS_DATA = {
       items: [
         { naam: "Fase 0 — Pre-productie", pct: 90, notitie: "Open: CI-runner, concept-art 0/10, feel-clips 0/5." },
         { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, notitie: "Alle 8 specs + live loop af; carryover: 13.2-playtest (eigenaar)." },
-        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 8, notitie: "ACTIEF (owner-instructie 23-07): SPEC-P2-00 staat; body-pipeline + archetypes + named-slots + fidelity-basis geland; P2-01 (squad van 4 + classes) is de volgende systeemtaak." },
+        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 8, notitie: "ACTIEF (owner-instructie 23-07): SPEC-P2-00 staat; body-pipeline + archetypes + named-slots + fidelity-basis + asset-curatiepass geland; P2-01 (squad van 4 + classes) is in uitvoering; SPEC-P2-03 (Hollow Point) staat klaar als volgende spec." },
         { naam: "Fase 3 — Early Build", pct: 0 },
         { naam: "Fase 4 — Alpha", pct: 0 },
         { naam: "Fase 5 — Beta", pct: 0 },
