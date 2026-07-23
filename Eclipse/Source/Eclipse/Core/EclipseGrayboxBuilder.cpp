@@ -524,6 +524,205 @@ void BuildDistrict(UWorld& World)
 		}
 	}
 
+	// PLACEHOLDER(15.4): wrecked cars (RustyCarsFree Fab pack, machine-local)
+	// as street dressing, toon-restyled — rust-tinted cel with the car's own
+	// texture as luminance detail. No collision at this tier (promotion to nav
+	// obstacles goes through the squad scenario suite). Missing pack = skipped.
+	{
+		auto FindBaseTexture = [](UMaterialInterface* Material) -> UTexture*
+		{
+			if (Material == nullptr) { return nullptr; }
+			TArray<UTexture*> Textures;
+			Material->GetUsedTextures(Textures, EMaterialQualityLevel::High, true, ERHIFeatureLevel::SM6, true);
+			UTexture* Fallback = nullptr;
+			for (UTexture* Texture : Textures)
+			{
+				const FString TexName = Texture->GetName();
+				if (TexName.Contains(TEXT("Diff")) || TexName.Contains(TEXT("Base")) || TexName.Contains(TEXT("Alb")) || TexName.Contains(TEXT("Color")))
+				{
+					return Texture;
+				}
+				if (Fallback == nullptr) { Fallback = Texture; }
+			}
+			return Fallback;
+		};
+
+		struct FCarDef { const TCHAR* MeshPath; FVector Location; float Yaw; };
+		const FCarDef Cars[] = {
+			{ TEXT("/Game/RustyCarsFree/Geometries/SM_asset_00.SM_asset_00"), FVector(7600, 950, 0), 14.0f },
+			{ TEXT("/Game/RustyCarsFree/Geometries/SM_asset_01.SM_asset_01"), FVector(8600, -820, 0), 188.0f },
+			{ TEXT("/Game/RustyCarsFree/Geometries/SM_asset_02.SM_asset_02"), FVector(-8500, -1100, 0), 235.0f },
+			{ TEXT("/Game/RustyCarsFree/Geometries/SM_asset_03.SM_asset_03"), FVector(-6800, 5600, 0), 75.0f },
+			{ TEXT("/Game/RustyCarsFree/Geometries/SM_asset_04.SM_asset_04"), FVector(1500, -6900, 0), 320.0f },
+		};
+		const FLinearColor CarLit(0.190f, 0.115f, 0.070f), CarShade(0.070f, 0.045f, 0.055f); // rust wrecks
+		int32 CarsPlaced = 0;
+		for (const FCarDef& Car : Cars)
+		{
+			UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, Car.MeshPath);
+			if (Mesh == nullptr)
+			{
+				continue; // pack not pulled on this machine — dressing degrades silently (14.3.5)
+			}
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Car.Location, FRotator(0.0f, Car.Yaw, 0.0f), Params);
+			if (Actor == nullptr)
+			{
+				continue;
+			}
+			Actor->SetMobility(EComponentMobility::Movable);
+			Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+			Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+			Actor->SetActorEnableCollision(false);
+			Actor->Tags.Add(TEXT("Deco_Car"));
+			if (ToonMaterial != nullptr)
+			{
+				for (int32 SlotIndex = 0; SlotIndex < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++SlotIndex)
+				{
+					UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+					Mid->SetVectorParameterValue(TEXT("LitColor"), CarLit);
+					Mid->SetVectorParameterValue(TEXT("ShadeColor"), CarShade);
+					Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+					Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+					Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+					if (UTexture* BaseTexture = FindBaseTexture(Actor->GetStaticMeshComponent()->GetMaterial(SlotIndex)))
+					{
+						Mid->SetTextureParameterValue(TEXT("AlbedoTex"), BaseTexture);
+						Mid->SetScalarParameterValue(TEXT("AlbedoGain"), 3.2f);
+						Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.9f);
+					}
+					Actor->GetStaticMeshComponent()->SetMaterial(SlotIndex, Mid);
+				}
+			}
+			++CarsPlaced;
+		}
+		if (CarsPlaced > 0)
+		{
+			UE_LOG(LogEclipse, Display, TEXT("Graybox: %d wrecked cars dressed (RustyCarsFree)."), CarsPlaced);
+		}
+	}
+
+	// Self-authored props (Tools/blender/gen_street_props.py — the first
+	// hand-built ECLIPSE assets, 15.5 hero-asset ladder): sodium lamps with
+	// separate glow planes, propaganda boards with poster planes, vents,
+	// cable arcs, barricades. All no-collision dressing; missing assets =
+	// skipped (agent output not imported on this machine yet, 14.3.5).
+	{
+		const FLinearColor MetalLit(0.105f, 0.105f, 0.120f), MetalShade(0.040f, 0.040f, 0.052f);
+		const FLinearColor OliveLit(0.120f, 0.110f, 0.070f), OliveShade(0.050f, 0.045f, 0.035f);
+
+		auto MakeMid = [ToonMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade) -> UMaterialInstanceDynamic*
+		{
+			if (ToonMaterial == nullptr) { return nullptr; }
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), Lit);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Shade);
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			return Mid;
+		};
+		UMaterialInstanceDynamic* MetalMid = MakeMid(MetalLit, MetalShade);
+		UMaterialInstanceDynamic* OliveMid = MakeMid(OliveLit, OliveShade);
+		UMaterialInstanceDynamic* GenGlowMid = MakeMid(FLinearColor(2.2f, 1.0f, 0.3f), FLinearColor(2.2f, 1.0f, 0.3f));
+		UMaterialInstanceDynamic* PosterMid = MakeMid(FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f));
+		if (PosterMid != nullptr)
+		{
+			if (UTexture* PosterTex = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff")))
+			{
+				PosterMid->SetTextureParameterValue(TEXT("AlbedoTex"), PosterTex);
+				PosterMid->SetScalarParameterValue(TEXT("AlbedoGain"), 7.8f);
+				PosterMid->SetScalarParameterValue(TEXT("AlbedoMix"), 1.0f);
+				PosterMid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+			}
+		}
+
+		auto SpawnGen = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float Yaw)
+		{
+			if (Mesh == nullptr) { return; }
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, Yaw, 0.0f), Params);
+			if (Actor == nullptr) { return; }
+			Actor->SetMobility(EComponentMobility::Movable);
+			Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+			Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+			Actor->SetActorEnableCollision(false);
+			Actor->Tags.Add(TEXT("Deco_Gen"));
+			if (Mid != nullptr)
+			{
+				for (int32 SlotIndex = 0; SlotIndex < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++SlotIndex)
+				{
+					Actor->GetStaticMeshComponent()->SetMaterial(SlotIndex, Mid);
+				}
+			}
+		};
+
+		UStaticMesh* Lamp = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_SodiumLamp.SM_Prop_SodiumLamp"));
+		UStaticMesh* LampGlow = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/GlowPlane.GlowPlane"));
+		UStaticMesh* Board = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_PropagandaBoard.SM_Prop_PropagandaBoard"));
+		UStaticMesh* Poster = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/PosterPlane.PosterPlane"));
+		UStaticMesh* Vent = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_VentUnit.SM_Prop_VentUnit"));
+		UStaticMesh* Cable = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_CableArc.SM_Prop_CableArc"));
+		UStaticMesh* Barricade = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_Barricade.SM_Prop_Barricade"));
+
+		const struct { FVector Loc; float Yaw; } Lamps[] = {
+			{ FVector(-4650, -700, 0), 90.0f }, { FVector(-1250, 700, 0), 270.0f }, { FVector(2150, -700, 0), 90.0f },
+			{ FVector(4150, -1500, 0), 200.0f }, { FVector(-4000, 2100, 0), 20.0f },
+		};
+		for (const auto& L : Lamps)
+		{
+			SpawnGen(Lamp, MetalMid, L.Loc, L.Yaw);
+			SpawnGen(LampGlow, GenGlowMid, L.Loc, L.Yaw);
+		}
+		const struct { FVector Loc; float Yaw; } Boards[] = {
+			{ FVector(-8300, 500, 0), 100.0f }, { FVector(-3800, -950, 0), 30.0f }, { FVector(6300, 1200, 0), 250.0f },
+		};
+		for (const auto& B : Boards)
+		{
+			SpawnGen(Board, MetalMid, B.Loc, B.Yaw);
+			SpawnGen(Poster, PosterMid, B.Loc, B.Yaw);
+		}
+		SpawnGen(Vent, MetalMid, FVector(4600, -1200, 400), 15.0f);
+		SpawnGen(Vent, MetalMid, FVector(5800, -2300, 400), 190.0f);
+		SpawnGen(Vent, MetalMid, FVector(-4300, 3800, 400), 80.0f);
+		SpawnGen(Vent, MetalMid, FVector(-3800, 2200, 400), 285.0f);
+		SpawnGen(Barricade, OliveMid, FVector(-2900, 220, 0), 100.0f);
+		SpawnGen(Barricade, OliveMid, FVector(-5200, -260, 0), 80.0f);
+		SpawnGen(Barricade, OliveMid, FVector(3600, -1900, 0), 10.0f);
+
+		// First hand-built structure (Tools/blender/gen_building_kit.py): a
+		// worker-row facade in the empty NW zone + gantry portals at the gate.
+		// Masonry rides the calibrated Wall_ concrete cel MID (world-aligned
+		// albedo needs no UVs); metalwork rides the metal tint.
+		UMaterialInstanceDynamic* MasonryMid = MidForPalette(PaletteForLabel(TEXT("Wall_")));
+		UStaticMesh* KWall = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_WallPanel.SM_Kit_WallPanel"));
+		UStaticMesh* KWindow = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_WallWindow.SM_Kit_WallWindow"));
+		UStaticMesh* KDoor = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_Doorway.SM_Kit_Doorway"));
+		UStaticMesh* KPillar = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_CornerPillar.SM_Kit_CornerPillar"));
+		UStaticMesh* KTrim = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_RoofTrim.SM_Kit_RoofTrim"));
+		UStaticMesh* KChimney = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_Chimney.SM_Kit_Chimney"));
+		UStaticMesh* KGantry = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_GantryBeam.SM_Kit_GantryBeam"));
+
+		// Facade row at (-6600, 6800), facing the plaza (south, yaw 270): the
+		// module's +X facade turns to -Y. Modules step 400 units along X.
+		{
+			const FVector RowBase(-6600, 6800, 0);
+			UStaticMesh* RowModules[] = { KDoor, KWindow, KWall, KWindow };
+			for (int32 Index = 0; Index < 4; ++Index)
+			{
+				const FVector At = RowBase + FVector(Index * 400.0f, 0, 0);
+				SpawnGen(RowModules[Index], MasonryMid, At, 270.0f);
+				SpawnGen(KTrim, MasonryMid, At + FVector(0, 0, 350.0f), 270.0f);
+				SpawnGen(KPillar, MasonryMid, At + FVector(-200.0f, 0, 0), 0.0f);
+			}
+			SpawnGen(KPillar, MasonryMid, RowBase + FVector(1400.0f, 0, 0), 0.0f);
+			SpawnGen(KChimney, MasonryMid, RowBase + FVector(600.0f, 220.0f, 0), 0.0f);
+			SpawnGen(Vent, MetalMid, RowBase + FVector(1000.0f, 60.0f, 350.0f), 250.0f);
+		}
+		// PARKED (QC round 2026-07-23): CableArc imports ~100x oversized and the
+		// GantryBeam floats without legs — both return in a proper portal
+		// assembly pass (scale audit + support pillars) instead of guess-fixes.
+		(void)Cable;
+		(void)KGantry;
+	}
+
 	// PLACEHOLDER(15.5/03.3): Kessara skyline massing OUTSIDE the playable
 	// perimeter — "silhouetted crane forests" in the amber smog. Pure backdrop:
 	// no nav, no cover, no mission space touched; the art pass replaces it with
@@ -769,8 +968,13 @@ void BuildDistrict(UWorld& World)
 		// Pull the histogram key down: without it the mostly-bright emissive
 		// district washes to pastel (pass-27 forensics) — the dusk look wants
 		// saturated mids, not chalk.
+		// Color calibration (owner pass, 2026-07-23): Borderlands-punch — open
+		// the mids, saturate harder, tip the grade warm. The dusk mood stays;
+		// the somber gray-out goes.
 		Settings.bOverride_AutoExposureBias = true;
-		Settings.AutoExposureBias = -1.0f;
+		Settings.AutoExposureBias = -0.7f;
+		Settings.bOverride_ColorGain = true;
+		Settings.ColorGain = FVector4(1.05f, 1.00f, 0.93f, 1.0f);
 		Settings.bOverride_LocalExposureHighlightContrastScale = true;
 		Settings.LocalExposureHighlightContrastScale = 1.0f;
 		Settings.bOverride_LocalExposureShadowContrastScale = true;
@@ -783,9 +987,9 @@ void BuildDistrict(UWorld& World)
 		Settings.bOverride_FilmGrainIntensity = true;
 		Settings.FilmGrainIntensity = 0.07f;
 		Settings.bOverride_ColorSaturation = true;
-		Settings.ColorSaturation = FVector4(1.22f, 1.22f, 1.22f, 1.0f);
+		Settings.ColorSaturation = FVector4(1.38f, 1.38f, 1.38f, 1.0f);
 		Settings.bOverride_ColorContrast = true;
-		Settings.ColorContrast = FVector4(1.04f, 1.04f, 1.04f, 1.0f);
+		Settings.ColorContrast = FVector4(1.06f, 1.06f, 1.06f, 1.0f);
 		Settings.bOverride_VignetteIntensity = true;
 		Settings.VignetteIntensity = 0.35f;
 
