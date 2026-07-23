@@ -10,7 +10,7 @@ window.PROGRESS_DATA = {
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
     { taak: "Fab-packs binnenhalen", status: "klaar", pct: 100, detail: "11 packs binnen: 8× SciFi (RAISOR-familie), Paragon Belica + Twinblast + Minions (~50 skeletal meshes, ~950 animaties). MetaHuman-items faalden (EOS-login in de editor-Fab-tab nodig — stap 3-punt)." },
-    { taak: "Character-pipeline (stap 2)", status: "bezig", pct: 20, detail: "Verkenning klaar: alle 8 SciFi-packs delen de UE4-Mannequin-skeletfamilie → géén retargeting nodig voor v1. Nu: DT_BodyDefs + archetype-koppeling (Enforcer/Trooper/Shock/Veil/Radiant Guard) + ApplyBodyDef in AEclipseCharacter. Compile-moment vereist gesloten editor." },
+    { taak: "Character-pipeline (stap 2)", status: "bezig", pct: 75, detail: "GELAND: DT_BodyDefs (9 bodies) + 5 Dominion-archetypes + ApplyBodyDef; vijand-spawn cyclet archetypes, squad krijgt rebel-bodies, speler Belica. QC open: lit PBR-materialen te donker in de schemer (toon-restyle-slag volgt) + showcase-lijn deels achter de compound." },
     { taak: "MetaHuman-recepten (stap 3)", status: "gepland", pct: 0, detail: "Per named character (Kaya, Brick, Vale, Dex, Petra, Kaine) code/data-slots + exact Creator-recept voor de eigenaar." },
     { taak: "Graphics-iteraties (15.8-loop)", status: "bezig", pct: 100, detail: "6 iteraties gebankt vandaag: inktlijnen-fix, skyline, textures, straat-dressing, decals, eerste bewoners — loopt door met patrol-figuren + particles." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build + 31/31 tests + validatie 0 + catalog 19/19 vóór elke commit/push." },
@@ -60,7 +60,7 @@ window.PROGRESS_DATA = {
         { naam: "Gebouwen (echte kits)", pct: 10 },
         { naam: "Straten / props / decals", pct: 30, notitie: "CC0-props (vaten/barrières/kratten) + Pillow-gegenereerde bezettings-decals (Dominion-posters, hazard-pads, verzets-stencils) — allemaal door de toon-pijplijn, no-collision." },
         { naam: "Bomen / vegetatie", pct: 0, notitie: "Eerste vegetatie Phase 3 (Sylvaris)." },
-        { naam: "Characters / MetaHumans", pct: 12, notitie: "Eerste bewoners: Quaternius CC0-characters (rigged + geanimeerd, Idle-dressing, toon-restyled); squad-body-integratie + MetaHuman-evaluatie volgen." },
+        { naam: "Characters / MetaHumans", pct: 35, notitie: "Body-pipeline LIVE: speler/squad/vijanden dragen echte meshes (Belica, RAISOR-soldiers) via DT_BodyDefs; 5 Dominion-archetypes met eigen stats + body. QC: belichting/restyle; daarna MetaHuman-slots (stap 3)." },
         { naam: "Weer & dag/nacht", pct: 0 },
         { naam: "VFX", pct: 0 },
         { naam: "Nanite / Lumen / VSM op target-hardware", pct: 5, notitie: "Sterke PC gemeten: GTX 1080 Ti (11 GB, SM6) — Nanite/VSM/software-Lumen kunnen, géén RT-cores; HWRT-validatie later op RTX-klasse." }
@@ -103,6 +103,13 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-23 (stap 2 — character-body-pipeline GELAND)", punten: [
+      "11 Fab-packs binnen (eigenaar): 8× RAISOR SciFi-soldiers + Paragon Belica/Twinblast/Minions (~50 skeletal meshes, ~950 animaties; 10,8 GB — machine-lokaal, gitignored).",
+      "Sleutelvondst: de hele SciFi-familie deelt de UE4-Mannequin-skeletfamilie → anim-rijke packs voeden anim-arme, geen retargeting op dit tier.",
+      "DT_BodyDefs (9 bodies, registry-geresolved) + FEclipseBodyDefRow + ApplyBodyDef op de gedeelde AEclipseCharacter; DT_EnemyArchetypes uitgebreid naar 5 Dominion-archetypes (09.3) mét eigen body en stats; vijand-spawn cyclet archetypes; squad uit de Rebel-pool; speler = Belica.",
+      "MetaHumanCharacter + MetaHumanSDK + Python-plugins aan; shot-rig kreeg een body-showcase door het echte datapad; Fab-packs bewust buiten git.",
+      "Groene bar: build ✓, 31/31 ✓ (incl. squad-suite), validatie 0 ✓, catalog 19/19 ✓."
+    ]},
     { datum: "Sessie 2026-07-23 (loop-iteratie 6 — eerste bewoners)", punten: [
       "EERSTE CHARACTERS in het district: Quaternius CC0-pack (BlueSoldier M/V + 2 burgers, rigged mét animatiesets incl. Shoot/Death/RecieveHit — de squad-werkwoorden van later) via gdown gedownload en als skeletal meshes geïmporteerd.",
       "Geplaatst als Idle-figuren: Dominion-enforcers bij poort en checkpoint (goud cel), burgers bij het warehouse (grijs-teal) — visueel niveau, geen AI/collision (Part 9-werk komt later).",
