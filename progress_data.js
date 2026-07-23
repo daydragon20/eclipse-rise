@@ -93,6 +93,12 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-23 (loop-iteratie 3 — lit-toon-experiment)", punten: [
+      "Lit-toon-migratie gebouwd als veilig A/B-experiment: tweede master M_EclipseToonLit (DefaultLit — cel-banden als BaseColor, echt VSM/Lumen-licht erbovenop), alleen actief met -EclipseLitToon op SM6; Glow-strips blijven altijd unlit-emissive; default onveranderd.",
+      "A/B-verdict (eerlijk): bij de schemerzon op command-afstand vrijwel niet te onderscheiden van unlit (auto-exposure normaliseert) — beslissing wacht op interieur/dag-scènes waar GI/schaduw er echt toe doen; unlit blijft de gelockte default.",
+      "Groene bar: build ✓, 31/31 ✓, validatie 0 ✓, catalog 19/19 ✓.",
+      "Eigenaar-vraag beantwoord: CC0-spoor volledig autonoom (bewezen); Fab-spoor wacht op éénmalige Epic-login + per-pack library-klik; ElevenLabs Music/SFX-scopes voor taak D."
+    ]},
     { datum: "Sessie 2026-07-22 (nacht — loop-iteratie 2)", punten: [
       "Palet-discipline structureel: texture-variatie is nu luminantie-only in de shader — een roestige texture kan een Dominion-gevel nooit meer verkleuren; de post staat weer op het gelockte zalm-oxide.",
       "Straat-dressing als no-collision-deco: hoofdader + dwarsstraat met rijstrook-markering en 14 olie/roestvlekken; natrium-checkpointstrips (12) op de binnenmuren — de plaza vertelt nu een bezettingsverhaal (15.5).",

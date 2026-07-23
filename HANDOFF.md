@@ -156,7 +156,9 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 **Loop-iteratie 2 (zelfde nacht, alles groen + gepusht):** texture-variatie luminantie-only gemaakt (palet = enige kleur-autoriteit; Dominion-post weer zalm-oxide) · straat-dressing gelegd (hoofdader + dwarsstraat + markering + vlekken, no-collision) · 12 natrium-checkpointstrips op de binnenmuren · **SPEC-P2-00** (Vertical Slice-overview) via subagent opgeleverd + gereviewd in `phase0/specs/` — de ACTIVE_MILESTONE-omzetting naar Phase 2 blijft de call van de eigenaar (na de 13.2-playtest).
 
-**Bekende volgende zwakste punten (15.8-lijst):** (1) de **lit-toon-migratie** (echt N·L + VSM + software-Lumen-GI; dan wordt SSAO zinvol) — de grote milestone; (2) particles (vonken/as/embers, Kessara-smog); (3) daarna verticaliteit in het district zelf (03.3 layer-cake: bruggen/platforms als graybox-massing binnen de perimeter).
+**Loop-iteratie 3:** lit-toon-migratie gebouwd als vlag-gated A/B (`M_EclipseToonLit`, DefaultLit, alleen via `-EclipseLitToon` op SM6; Glow blijft unlit). A/B-verdict: bij schemer op command-afstand ~niet te onderscheiden — unlit blijft default; het lit-pad wint pas bij interieurs/dag/characters. Alles groen.
+
+**Bekende volgende zwakste punten (15.8-lijst):** (1) **CC0 3D-props** (vaten/pallets/containers/hekwerk via Poly Haven-API) als eerste echte mesh-vervanging van cover-blokken — volledig autonoom mogelijk; (2) particles (vonken/as/embers, Kessara-smog); (3) district-verticaliteit (03.3 layer-cake: bruggen/platforms binnen de perimeter); (4) lit-toon herbeoordelen zodra er een interieur/dag-scène is.
 
 **Owner-afspraken die blijven gelden (elke sessie):** geen installaties/downloads/acceptatie-prompts zonder expliciet akkoord vooraf (eerst uitleggen waarvoor); bouwen met `-NoUba`; PROGRESS.html nooit bewerken (data in `progress_data.js`; `progress_auto.js` is van de watcher). `gh` is hier NIET geïnstalleerd — push werkt via de vault-token in Windows Credential Manager (username gepind in repo-config).
 
