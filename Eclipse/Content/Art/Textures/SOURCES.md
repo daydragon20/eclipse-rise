@@ -22,6 +22,14 @@ header + the ids below against `https://api.polyhaven.com/files/<id>`).
 | `concrete_road_barrier` + `T_concrete_road_barrier_diff` | `concrete_road_barrier` | Artery checkpoint barriers |
 | `plastic_crate_03` + `T_plastic_crate_03_diff` | `plastic_crate_03` | Warehouse-yard crate stacks |
 
+**Characters** (`/Game/Art/Characters`, CC0 from [Quaternius](https://quaternius.com),
+"Ultimate Animated Character Pack" Nov 2019, downloaded 2026-07-23 via the pack's
+public Drive folder with gdown; import: `Tools/import_quaternius_characters.py`):
+`BlueSoldier_Male`, `BlueSoldier_Female`, `Casual_Bald`, `Casual2_Male` — rigged
+skeletal meshes + full animation takes (Idle/Walk/Run/Shoot_OneHanded/Death/…).
+Placed as Idle dressing figures (no AI/collision); the squad-body integration is
+a separate gameplay pass. Staging keeps the remaining pack for later picks.
+
 Style contract (15.5): textures enter the picture **through the toon pipeline** —
 multiplied into the cel bands via world-aligned projection in `M_EclipseToon`;
 the palette, banding, and ink outlines stay in charge. These are placeholder-grade

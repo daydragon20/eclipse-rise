@@ -6,8 +6,12 @@
 #include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Eclipse.h"
+#include "Animation/AnimSequence.h"
+#include "Animation/SkeletalMeshActor.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/ExponentialHeightFog.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/SkyLight.h"
 #include "Engine/StaticMesh.h"
@@ -464,6 +468,59 @@ void BuildDistrict(UWorld& World)
 				Actor->SetActorEnableCollision(false);
 				Actor->Tags.Add(TEXT("Deco_Decal"));
 			}
+		}
+	}
+
+	// PLACEHOLDER(15.7/09): first inhabitants — Quaternius CC0 animated
+	// characters (SOURCES.md) as looping-Idle dressing figures, toon-restyled
+	// flat cel (palette hue, no albedo). Visual tier only: no collision, no AI,
+	// no perception — the real crowd/NPC layer is Part 9 work; these prove the
+	// character silhouette + palette read at command distance.
+	{
+		struct FFigureDef { const TCHAR* MeshPath; const TCHAR* AnimPath; FLinearColor Lit; FLinearColor Shade; FVector Location; float Yaw; };
+		const FLinearColor EnforcerLit(0.300f, 0.235f, 0.095f), EnforcerShade(0.090f, 0.072f, 0.055f);   // Dominion white-gold (saturated — near-neutral washes to gray at x10, see the barrel lesson)
+		const FLinearColor CivilianLit(0.060f, 0.130f, 0.160f), CivilianShade(0.024f, 0.050f, 0.070f);   // worker gray-teal
+		const FFigureDef Figures[] = {
+			{ TEXT("/Game/Art/Characters/BlueSoldier_Male/BlueSoldier_Male.BlueSoldier_Male"), TEXT("/Game/Art/Characters/BlueSoldier_Male/BlueSoldier_MaleCharacterArmature_Idle.BlueSoldier_MaleCharacterArmature_Idle"), EnforcerLit, EnforcerShade, FVector(4150, -1750, 0), 180.0f },
+			{ TEXT("/Game/Art/Characters/BlueSoldier_Female/BlueSoldier_Female.BlueSoldier_Female"), TEXT("/Game/Art/Characters/BlueSoldier_Female/BlueSoldier_FemaleCharacterArmature_Idle.BlueSoldier_FemaleCharacterArmature_Idle"), EnforcerLit, EnforcerShade, FVector(-450, 630, 0), 250.0f },
+			{ TEXT("/Game/Art/Characters/Casual_Bald/Casual_Bald.Casual_Bald"), TEXT("/Game/Art/Characters/Casual_Bald/Casual_BaldCharacterArmature_Idle.Casual_BaldCharacterArmature_Idle"), CivilianLit, CivilianShade, FVector(-4250, 3250, 0), 30.0f },
+			{ TEXT("/Game/Art/Characters/Casual2_Male/Casual2_Male.Casual2_Male"), TEXT("/Game/Art/Characters/Casual2_Male/Casual2_MaleCharacterArmature_Idle.Casual2_MaleCharacterArmature_Idle"), CivilianLit, CivilianShade, FVector(2050, 850, 0), 300.0f },
+		};
+
+		for (const FFigureDef& Figure : Figures)
+		{
+			USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr, Figure.MeshPath);
+			if (Mesh == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: figure %s missing — skipped (run Tools/import_quaternius_characters.py)."), Figure.MeshPath);
+				continue;
+			}
+			ASkeletalMeshActor* Actor = World.SpawnActor<ASkeletalMeshActor>(Figure.Location, FRotator(0.0f, Figure.Yaw, 0.0f), Params);
+			if (Actor == nullptr)
+			{
+				continue;
+			}
+			USkeletalMeshComponent* Component = Actor->GetSkeletalMeshComponent();
+			Component->SetSkeletalMesh(Mesh);
+			if (UAnimSequence* Idle = LoadObject<UAnimSequence>(nullptr, Figure.AnimPath))
+			{
+				Component->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+				Component->PlayAnimation(Idle, /*bLooping*/ true);
+			}
+			if (ToonMaterial != nullptr)
+			{
+				UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+				Mid->SetVectorParameterValue(TEXT("LitColor"), Figure.Lit);
+				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Figure.Shade);
+				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				for (int32 SlotIndex = 0; SlotIndex < Component->GetNumMaterials(); ++SlotIndex)
+				{
+					Component->SetMaterial(SlotIndex, Mid);
+				}
+			}
+			Actor->SetActorEnableCollision(false);
+			Actor->Tags.Add(TEXT("Deco_Figure"));
 		}
 	}
 

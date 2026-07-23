@@ -81,6 +81,11 @@ def author_toon(mat_name, lit):
         mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT)
     else:
         mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_DEFAULT_LIT)
+    # Skeletal usage: without this flag the material renders BLACK on skeletal
+    # meshes in -game builds (first figure round: the silhouette guard). The
+    # editor auto-adds usages on the fly; cooked/game paths never do.
+    mat.set_editor_property("used_with_skeletal_mesh", True)
+    mat.set_editor_property("used_with_morph_targets", True)
 
     def vec_param(name, default, x, y):
         e = mel.create_material_expression(mat, unreal.MaterialExpressionVectorParameter, x, y)
