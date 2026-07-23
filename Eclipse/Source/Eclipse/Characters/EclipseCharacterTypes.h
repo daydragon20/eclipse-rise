@@ -99,6 +99,33 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	float MeshYaw = -90.0f;
 };
 
+/**
+ * Named story-character slot (DT_NamedCharacters — step-3 MetaHuman pipeline).
+ * The owner authors MH_<Name> in MetaHuman Creator (phase0/metahuman_recipes.md);
+ * until that asset exists the slot dresses itself from FallbackBodyDef, so the
+ * missing face never blocks missions or dialogue wiring (GDD 14.3.5).
+ */
+USTRUCT(BlueprintType)
+struct FEclipseNamedCharacterRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
+	FText DisplayName;
+
+	/** Imported MetaHuman body (MH_<Name>); unset = fallback body below. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
+	TSoftObjectPtr<USkeletalMesh> MetaHumanMesh;
+
+	/** DT_BodyDefs row that stands in while the MetaHuman is absent. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
+	FName FallbackBodyDef;
+
+	/** Rebel / Dominion — drives tint and bark selection later (GDD 08/16). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
+	FName Faction;
+};
+
 /** One enemy archetype (DT_EnemyArchetypes row, SPEC-P1-05 data). */
 USTRUCT(BlueprintType)
 struct FEclipseEnemyArchetypeRow : public FTableRowBase

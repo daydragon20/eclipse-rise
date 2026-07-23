@@ -118,7 +118,28 @@ ok = unreal.DataTableFunctionLibrary.fill_data_table_from_csv_string(arch, ARCH_
 unreal.log(f"DT_EnemyArchetypes: fill={'OK' if ok else 'MISLUKT'} (5 archetypes)")
 eal.save_asset("/Game/Data/DT_EnemyArchetypes")
 
+# Named story-character slots (step 3): MetaHumanMesh blijft leeg tot de
+# eigenaar MH_<Naam> maakt (phase0/metahuman_recipes.md); fallback dresses.
+NAMED_CSV = """---,DisplayName,MetaHumanMesh,FallbackBodyDef,Faction
+Kaya,"Kaya Renn","",Rebel_B,Rebel
+Brick,"Oram \"\"Brick\"\" Bex","",Rebel_A,Rebel
+Vale,"Torren Vale","",Rebel_C,Rebel
+Dex,"Dex Callum","",Rebel_C,Rebel
+Petra,"Petra Voss","",Rebel_B,Rebel
+Kaine,"Grand Marshal Sera Kaine","",RadiantGuard,Dominion"""
+NC_PATH = "/Game/Data/DT_NamedCharacters"
+if eal.does_asset_exist(NC_PATH):
+    nc = eal.load_asset(NC_PATH)
+else:
+    factory = unreal.DataTableFactory()
+    factory.set_editor_property("struct", unreal.load_object(None, "/Script/Eclipse.EclipseNamedCharacterRow"))
+    nc = unreal.AssetToolsHelpers.get_asset_tools().create_asset("DT_NamedCharacters", "/Game/Data", unreal.DataTable, factory)
+ok = unreal.DataTableFunctionLibrary.fill_data_table_from_csv_string(nc, NAMED_CSV)
+unreal.log(f"DT_NamedCharacters: fill={'OK' if ok else 'MISLUKT'} (6 slots)")
+eal.save_asset(NC_PATH)
+
 setup = eal.load_asset("/Game/Data/DA_CampaignSetup")
 setup.set_editor_property("body_defs", dt)
+setup.set_editor_property("named_characters", nc)
 eal.save_asset("/Game/Data/DA_CampaignSetup")
-unreal.log("DA_CampaignSetup.BodyDefs gekoppeld")
+unreal.log("DA_CampaignSetup.BodyDefs + NamedCharacters gekoppeld")

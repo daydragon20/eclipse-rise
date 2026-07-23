@@ -76,4 +76,8 @@ public:
 	/** Rows: FEclipseBodyDefRow — visual bodies for player/squad/enemies (step-2 character pipeline); "Player" and "Rebel_*" rows are player-side. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> BodyDefs;
+
+	/** Rows: FEclipseNamedCharacterRow — story-character slots (step-3 MetaHuman pipeline, phase0/metahuman_recipes.md). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> NamedCharacters;
 };
