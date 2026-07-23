@@ -88,6 +88,7 @@ Subsystem-wrapper + events (bestaande order-events op 4-sterkte; nieuwe tags in 
 **T5 — SPEC-P2-03 schrijven (Hollow Point) mét facility-econ-check** *(backlog #5 stap 0, main of tweede agent parallel aan T3/T4, ~1 dag)*
 Spec voor de walkable vault: slot-graph, strategische-klok-timers, zichtbare groei; open vraag 3 beslissen (Medbay vs. Intelligence Center) via een doorgerekende economie-loop op de P1-03-ledger; events vóór code.
 *DoD:* spec in `phase0/specs/` incl. econ-tabel (kosten/dagen/yield per facility-keuze met 11.1-prep-effect), besluit gedocumenteerd, review akkoord.
+*Status (2026-07-23):* spec geschreven — `phase0/specs/SPEC-P2-03_hollow_point_base.md` (besluit: Intelligence Center i.p.v. Medbay; Act-1-kostentabel ×0,8; missie-debrief = +1 dag). Wacht op review + commit.
 
 *Daarna klaarstaand:* T6 = P2-01 klasse-abilities via GAS + debug-UI (14.5 stap 4); T7 = body-swap Quaternius (backlog #3, eb, parallel); T8 = SPEC-P2-02 schrijven.
 
