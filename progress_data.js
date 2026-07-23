@@ -92,9 +92,10 @@ window.PROGRESS_DATA = {
       opties: [
         { label: "A — banddrempel 0.50", img: "progress_media/ab_westgevel_A.png", uitleg: "westgevel schuift de lit-band in en wordt pixel-gelijk aan de zonzijde (gemeten 251,160,53 ≈ 252,158,55); werkt district-breed, exposure-delta ≤2 op alle zes cams" },
         { label: "B — per-gevel tint-compensatie", img: "progress_media/ab_westgevel_B.png", uitleg: "alleen de gecompenseerde gevel wordt goed; de compound-gevel verderop en elke andere westgevel blijven zalmroze — schaalt niet" },
-        { label: "referentie (oude stand)", img: "progress_media/ab_westgevel_ref.png", uitleg: "gebankte ronde vóór de fix: westgevel zalmroze (236,126,88), zuidgevel oxide — één gebouw leest als twee assets" }
+        { label: "referentie (oude stand)", img: "progress_media/ab_westgevel_ref.png", uitleg: "gebankte ronde vóór de fix: westgevel zalmroze (236,126,88), zuidgevel oxide — één gebouw leest als twee assets" },
+        { label: "B — DOORGEVOERD (eindstand)", img: "progress_media/ab_westgevel_B_eindstand.png", uitleg: "jouw keuze district-breed: ook de compound-gevel door de gap (was zalm 236/120/88, nu warm 251/155/53), BldgB-west en de skyline-familie; 38/38 tests, validatie 0" }
       ],
-      aanbeveling: "A werd aanbevolen op de metingen; de keuze is aan de owner en die koos B.", keuze: "B — per-gevel warmte (owner-keuze 2026-07-23). Wordt nu district-breed doorgevoerd: de warme B-look consequent op élke westgevel (in de losse test was alleen één gevel gecompenseerd). BandHi terug naar 0.55; nieuw cam-1-shot volgt in dit paneel; builder draait." }
+      aanbeveling: "A werd aanbevolen op de metingen; de keuze is aan de owner en die koos B.", keuze: "B — per-gevel warmte (owner-keuze 2026-07-23), district-breed DOORGEVOERD (BandHi 0.55, compensatie op alle westgevels — zie eindstand-shot). In review voor commit." }
   ],
 
   secties: [
