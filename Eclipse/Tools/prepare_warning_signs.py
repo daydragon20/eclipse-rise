@@ -24,8 +24,14 @@ RAW = os.path.join(STAGING, "raw")
 
 # Pack index -> placard name (chosen from the 60-sign contact sheet, 15.8
 # round: STOP for the gate portal, radiation for the crossing lamp, TOXIC for
-# the west wall by Entry_Main).
-SIGNS = {"09": "stop", "17": "radiation", "30": "toxic"}
+# the west wall by Entry_Main). Curation pass 2026-07-23 adds four (see
+# phase0/ASSET_CURATION.md): route arrow (checkpoint wayfinding), labor
+# (worker sign, Underworks yards), blast (munitions/demolition), reactor
+# (heavy-rust radiation triangle, exclusion zone).
+SIGNS = {
+    "09": "stop", "17": "radiation", "30": "toxic",
+    "36": "route", "50": "labor", "51": "blast", "53": "reactor",
+}
 
 PLATE = (55, 55, 58)  # dark steel backing, tinted by the toon MID's cel bands
 OUT_SIZE = 1024

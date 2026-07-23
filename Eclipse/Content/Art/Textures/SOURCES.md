@@ -13,6 +13,16 @@ header + the ids below against `https://api.polyhaven.com/files/<id>`).
 | `T_corrugated_iron_02_diff` | `corrugated_iron_02` | Diffuse 2K JPG | Warehouse (BldgB) |
 | `T_metal_plate_diff` | `metal_plate` | Diffuse 2K JPG | Dominion post (BldgA) |
 
+**ambientCG CC0 albedos** (downloaded 2026-07-23 via `Tools/fetch_cc0.py`, imported
+by `Tools/inventory_curation_pass.py` — Color maps only; gains + intended slots in
+`phase0/ASSET_CURATION.md`):
+
+| Asset | ambientCG id | Map | Gain (1/mean-lin) |
+|---|---|---|---|
+| `T_Metal046B_diff` | `Metal046B` | Color 2K JPG | 19.76 |
+| `T_Concrete042A_diff` | `Concrete042A` | Color 2K JPG | 8.94 |
+| `T_Metal063_diff` | `Metal063` | Color 1K JPG (free-tier cap) | 6.39 |
+
 **Prop meshes** (`/Game/Art/Props`, FBX 2K, same CC0/Poly Haven origin, downloaded
 2026-07-23; import: `Tools/import_polyhaven_props.py`):
 
@@ -46,7 +56,10 @@ gate portal at the Entry_Main approach.
 gitignored). The pack ships decal cutouts over green-screen photo backing, so
 `Tools/prepare_warning_signs.py` (Pillow) crops each chosen sign to its alpha
 bounds and composites it on a dark steel plate; `Tools/import_warning_signs.py`
-exports the raw albedos / imports the cleaned placards. The derived placards
+exports the raw albedos / imports the cleaned placards. Curation pass
+2026-07-23 added four more placards from the 60-sign contact sheet:
+`T_sign_{route,labor,blast,reactor}_diff` (indices 36/50/51/53; gains in
+`phase0/ASSET_CURATION.md`). The derived placards
 travel with the project as incorporated content (Fab Standard License; private
 repo); the raw pack itself stays machine-local.
 

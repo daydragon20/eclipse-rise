@@ -17,7 +17,11 @@ import unreal
 STAGING = os.path.join(unreal.SystemLibrary.get_project_saved_directory(), "WarningSignStaging")
 RAW = os.path.join(STAGING, "raw")
 
-SIGNS = {"09": "stop", "17": "radiation", "30": "toxic"}
+# Kept in sync with prepare_warning_signs.py (curation pass 2026-07-23).
+SIGNS = {
+    "09": "stop", "17": "radiation", "30": "toxic",
+    "36": "route", "50": "labor", "51": "blast", "53": "reactor",
+}
 
 cleaned = [f"T_sign_{name}_diff.png" for name in SIGNS.values()]
 if all(os.path.isfile(os.path.join(STAGING, f)) for f in cleaned):

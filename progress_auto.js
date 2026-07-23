@@ -1,13 +1,23 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-23 12:37",
+    "generatedAt":  "2026-07-23 12:57",
     "tests":  {
                   "ok":  31,
                   "failed":  0,
                   "total":  31,
-                  "reportAge":  "36 min geleden"
+                  "reportAge":  "56 min geleden"
               },
     "commits":  [
+                    {
+                        "hash":  "c0e6c34",
+                        "date":  "23-07 12:46",
+                        "msg":  "[Repo] Team config in repo + dashboard sync (autonomy loop)"
+                    },
+                    {
+                        "hash":  "671de61",
+                        "date":  "23-07 12:45",
+                        "msg":  "[Art] Element-builder round: warning placards, patrols, true-scale cable, gate portal (GDD 15.5, 03.3)"
+                    },
                     {
                         "hash":  "70b8c36",
                         "date":  "23-07 12:14",
@@ -37,34 +47,24 @@ window.PROGRESS_AUTO = {
                         "hash":  "fb4fd8a",
                         "date":  "23-07 11:28",
                         "msg":  "[Characters] Toon-restyle the body pipeline + faction hues (GDD 15.5, 08)"
-                    },
-                    {
-                        "hash":  "9375bb7",
-                        "date":  "23-07 11:07",
-                        "msg":  "[Repo] Record step-2 landing on the live dashboard"
-                    },
-                    {
-                        "hash":  "23ac0bc",
-                        "date":  "23-07 11:06",
-                        "msg":  "[Characters] Land the step-2 body pipeline: DT_BodyDefs + archetype bodies (GDD 4.2, 09.3, 12.3)"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (3 min geleden)"
+                            "caption":  "Laatste run - beeld 1 (23 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (3 min geleden)"
+                            "caption":  "Laatste run - beeld 2 (23 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (3 min geleden)"
+                            "caption":  "Laatste run - beeld 3 (23 min geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (3 min geleden)"
+                            "caption":  "Laatste run - beeld 4 (23 min geleden)"
                         }
                     ]
 };
