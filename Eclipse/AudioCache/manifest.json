@@ -1,0 +1,177 @@
+{
+  "provider": "ElevenLabs (api.elevenlabs.io)",
+  "license": "Generated on the owner's ElevenLabs account; usable per that account's commercial license. Provenance: Eclipse/Content/Audio_SOURCES.md",
+  "generated_by": "Eclipse/Tools/generate_audio_assets.py",
+  "note": "No API key is ever stored here. Spec key = md5(endpoint|body): re-runs skip existing entries, so regeneration cost is zero.",
+  "assets": {
+    "SFX_Weapon_RebelRifle_Shot_01": {
+      "file": "SFX/SFX_Weapon_RebelRifle_Shot_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "Single gunshot from an improvised rebel energy rifle: one punchy, tight crack with a short mid-bass thump and a brief metallic tail. Stylized video game weapon one-shot, bold and readable, not a realistic battlefield recording. Dry, minimal reverb.",
+        "duration_seconds": 1.2,
+        "prompt_influence": 0.45
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "25252270806865c8d14da019ab25c0d0",
+      "sha256": "8a8a6e9f9f2d94a29bb6efb80b8dc81516b97eb3760949a5f7a6c8507df6d8cd",
+      "bytes": 211680,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 1.2,
+      "peak": 1.0,
+      "rms": 0.2314,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:35+00:00"
+    },
+    "SFX_Impact_BulletMetal_01": {
+      "file": "SFX/SFX_Impact_BulletMetal_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "Bullet impact on a hollow sheet-metal panel: one sharp metallic clank with a slight ring-out. Stylized video game hit sound, single one-shot, dry.",
+        "duration_seconds": 0.8,
+        "prompt_influence": 0.45
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "adb14639aa26da12710a09295ac3f03c",
+      "sha256": "e7e63f7ea229edf1c4c2eb8c6c8a5fce7b9f77d60c5638349b66d1ee6c11cce7",
+      "bytes": 141120,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 0.8,
+      "peak": 0.9325,
+      "rms": 0.0613,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:37+00:00"
+    },
+    "SFX_UI_Tick_01": {
+      "file": "SFX/SFX_UI_Tick_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "Tiny dry user-interface tick: a single short clean digital click, neutral pitch, video game menu navigation blip.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.5
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "effd825a59b29d8f518652ad97ccd218",
+      "sha256": "939a3cebca36582736bc778eed073bd077ded297db5bd651429fefb82364b417",
+      "bytes": 84672,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 0.48,
+      "peak": 0.1217,
+      "rms": 0.0124,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:39+00:00"
+    },
+    "SFX_UI_Confirm_01": {
+      "file": "SFX/SFX_UI_Confirm_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "Positive user-interface confirm chime: two quick ascending synthetic notes, clean and short, video game menu accept sound.",
+        "duration_seconds": 0.8,
+        "prompt_influence": 0.5
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "8eca252366f4deaffd393c5193eb18bb",
+      "sha256": "3e39b3c2241752a604b5aae1a2561ff37cf7c2a58880ffd2fdb28f9571c37a09",
+      "bytes": 141120,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 0.8,
+      "peak": 0.7619,
+      "rms": 0.1155,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:41+00:00"
+    },
+    "SFX_Amb_Kessara_Industrial_Loop_01": {
+      "file": "SFX/SFX_Amb_Kessara_Industrial_Loop_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "Industrial factory district ambience: a deep steady machine hum, rhythmic distant metal presses, a faint far-away alarm siren, an occasional short steam hiss. Oppressive but calm bed, no music, no voices, seamless loop.",
+        "duration_seconds": 14.0,
+        "prompt_influence": 0.3,
+        "loop": true
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "f67ccb105f89c2c64dc40e1a5f12533d",
+      "sha256": "60094046bfa5233fd6f68fa197a863636859ba40e0708ad64dd623ca6ed3c5d4",
+      "bytes": 2469600,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 14.0,
+      "peak": 1.0,
+      "rms": 0.098,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:47+00:00"
+    },
+    "SFX_Foot_Asphalt_01": {
+      "file": "SFX/SFX_Foot_Asphalt_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "One single footstep on asphalt: a boot stepping once on rough dry concrete-asphalt, short and dry, video game foley one-shot.",
+        "duration_seconds": 0.6,
+        "prompt_influence": 0.5
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "171889e02cfb935496f67b09d664125e",
+      "sha256": "0c89a6a44e6b75cc2676fcf7c2e20e525d8e343abbc7862f196efd10cd8be1b6",
+      "bytes": 105840,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 0.6,
+      "peak": 0.1423,
+      "rms": 0.0193,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:49+00:00"
+    },
+    "SFX_Foot_Metal_01": {
+      "file": "SFX/SFX_Foot_Metal_01.wav",
+      "category": "SFX",
+      "endpoint": "/v1/sound-generation",
+      "request": {
+        "text": "One single footstep on a metal grate walkway: a boot stepping once on hollow steel with a slight rattle, short and dry, video game foley one-shot.",
+        "duration_seconds": 0.6,
+        "prompt_influence": 0.5
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "37ad4926b892a905fb03a14a9a6788ad",
+      "sha256": "1c2ff7dc68358c5e2abdeb35098fbc02cc50936310225d99cefd94c4c9913289",
+      "bytes": 105840,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 0.6,
+      "peak": 0.6607,
+      "rms": 0.0383,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:48:50+00:00"
+    },
+    "MUS_Sting_MissionComplete_Resistance_01": {
+      "file": "Music/MUS_Sting_MissionComplete_Resistance_01.wav",
+      "category": "Music",
+      "endpoint": "/v1/music",
+      "request": {
+        "prompt": "Short cinematic mission-complete sting for a sci-fi resistance story. Dark but hopeful: opens on low sustained strings over a deep drone, then a small heroic motif rises in warm brass and strings \u2014 a simple, memorable four-note resistance theme \u2014 with subtle industrial percussion underneath, ending on a resolved, quietly triumphant chord. Hybrid orchestral, restrained, emotional, about 18 seconds.",
+        "music_length_ms": 18000
+      },
+      "output_format": "pcm_44100",
+      "spec_key": "08edaf3e0254921978148070fd186c66",
+      "sha256": "e0fa33c8190393f7dc357cc06dbbfa846751fda4afde7d239a54c5c8b1075afd",
+      "bytes": 3170304,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_s": 17.972,
+      "peak": 0.89,
+      "rms": 0.119,
+      "status": "ok",
+      "generated_at": "2026-07-23T16:49:00+00:00"
+    }
+  },
+  "usage_credits": {}
+}
