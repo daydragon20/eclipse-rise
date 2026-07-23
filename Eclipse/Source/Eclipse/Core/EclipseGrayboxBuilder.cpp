@@ -119,17 +119,18 @@ namespace
 		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
 		// Dominion post: oxide red, shade to maroon-purple (variation is
 		// luminance-only, hue stays palette). West-facade banding (15.8 look-ronde
-		// A/B, cam 1): under the -25/55 sun west faces sit at ndl +0.52 and used to
-		// land in the MID band while south faces (+0.74) went lit — BldgA_W read
-		// salmon-pink next to lit oxide, one asset as two color plates. Fixed
-		// globally by BandHi 0.55→0.50 in the toon masters (variant A, shot 00029:
-		// west 251/160/53 vs lit 252/158/55, exposure deltas ≤2 on every cam).
-		// Rejected: (B) per-gevel tint-compensatie — a BldgA_W entry whose mid-band
-		// lerp landed on the lit oxide fixed only that slab; the compound's other
-		// west faces through the gap stayed salmon (shot 00036: 190/125/91) and
-		// every west gevel district-wide (BldgB_W) kept the same split. Also
-		// rejected: sun-yaw nudge — SunRotation is synced with the hard-coded
-		// SunTravel in EclipseCharacter.cpp (out of scope this round).
+		// A/B, cam 1): under the -25/55 sun west faces sit at ndl +0.52 and land
+		// in the MID band while south faces (+0.74) go lit — BldgA_W read
+		// salmon-pink next to lit oxide, one asset as two color plates. OWNER
+		// CALL (2026-07-23, A/B panel): variant B — BandHi stays 0.55 in the toon
+		// masters and the affected west gevels take the per-gevel WestComp
+		// mid-band warmte-compensatie (see WestCompLabels below; B's original
+		// single-slab test is shot 00036), rolled out district-wide this round so
+		// the warm look is consistent everywhere. REJECTED: (A) global BandHi
+		// 0.55→0.50 in the masters (shot 00029, briefly committed as eccd6f2 and
+		// reverted by this pass) — the owner overruled A's quantitative edge on
+		// look. Also rejected: sun-yaw nudge — SunRotation is synced with the
+		// hard-coded SunTravel in EclipseCharacter.cpp (out of scope this round).
 		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },
 		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: worker teal over rusty corrugated sheet (ambientCG 007A, mean .367 — replaces corrugated_iron_02)
 		// Yellow value hierarchy (15.8 look-ronde, cam 3): every yellow element in
@@ -183,16 +184,59 @@ namespace
 	}
 
 	/**
+	 * Per-gevel mid-band warmte-compensatie — variant B, OWNER CALL (2026-07-23,
+	 * A/B panel, shot 00036 over variant A's 00029). Under the (-25,55) dusk sun
+	 * west faces sit at ndl +0.52: inside the masters' 0.10..0.55 mid band, so
+	 * they lerped 50% toward the shade tone and read salmon next to the lit
+	 * south faces (+0.74) — one asset as two color plates. Compensated blocks
+	 * get a MID whose LitColor' = 2*Lit − Shade: the mid-band lerp (halfway
+	 * Shade→Lit') then lands EXACTLY on the palette's true lit tone, so the
+	 * west gevel reads the same warm plate as the lit gevel. The shade band is
+	 * untouched, and the Lit' overshoot only ever shows on a compensated
+	 * block's thin lit end caps (wall slabs have no large lit face) or on the
+	 * backdrop hulks, where 13+ km of smog eats it.
+	 *
+	 * Scope — exactly the gevels whose mid-band read is visible district-side:
+	 *  - BldgA_W   the checkpoint-muur west gevel (B's original test slab);
+	 *  - BldgA_E   the compound gevel seen through the west entrance gap (its
+	 *              interior face points west — the 190/125/91 salmon in 00036);
+	 *  - BldgB_W   the warehouse west gevel;
+	 *  - Skyline*  backdrop hulks/chimneys/cranes, whose west sides carry the
+	 *              same split at silhouette distance.
+	 * Deliberately NOT compensated despite a mid-band west read: BldgB_E's
+	 * interior west face (yard side) and Wall_E's interior face — cold,
+	 * low-salience palettes where the mid band never produced the salmon-on-
+	 * oxide split; compensating them would touch more MIDs for no visible win.
+	 * NOT BldgA_N/S / BldgB_N/S: their big interior/exterior south faces sit in
+	 * the LIT band — compensation would repaint the checkpoint-muur lit read
+	 * itself (only their 1x1-unit west end caps stay mid, a sliver by design).
+	 */
+	constexpr const TCHAR* WestCompLabels[] = { TEXT("BldgA_W"), TEXT("BldgA_E"), TEXT("BldgB_W") };
+
+	bool IsWestCompensated(const TCHAR* Label)
+	{
+		for (const TCHAR* CompLabel : WestCompLabels)
+		{
+			if (FCString::Stricmp(Label, CompLabel) == 0)
+			{
+				return true;
+			}
+		}
+		return FCString::Strnicmp(Label, TEXT("Skyline"), 7) == 0;
+	}
+
+	/**
 	 * One sun definition shared by the light actor AND the toon material's LightDir
 	 * parameter — if these ever diverge, material banding and pawn lighting tell
 	 * two different stories about where the sun is.
 	 */
 	// Low dusk sun: vertical faces split hard into lit/shade (the cel read), the
-	// floor stays in the mid band (BandLo 0.10 < sin 25 deg = 0.423 < BandHi 0.50
-	// in M_EclipseToon — BandHi lowered from 0.55 in the 15.8 look-ronde so BOTH
-	// sun-facing verticals, west +0.52 and south +0.74, read lit; see the BldgA
-	// palette comment for the A/B evidence). Also synced with the hard-coded
-	// SunTravel in EclipseCharacter.cpp.
+	// floor stays in the mid band (BandLo 0.10 < sin 25 deg = 0.423 < BandHi 0.55
+	// in M_EclipseToon). West verticals (+0.52) sit in the mid band BY DESIGN —
+	// the owner-chosen variant B keeps BandHi 0.55 and warms the named west
+	// gevels via the per-gevel WestComp compensation instead (see WestCompLabels
+	// and the BldgA palette comment for the A/B history). Also synced with the
+	// hard-coded SunTravel in EclipseCharacter.cpp.
 	const FRotator SunRotation(-25.0f, 55.0f, 0.0f);
 
 	/**
@@ -270,11 +314,13 @@ void BuildDistrict(UWorld& World)
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Graybox: -EclipseLitToon set but M_EclipseToonLit missing — unlit toon fallback (run Tools/author_toon_material.py)."));
 	}
-	// Keyed by palette prefix, not by color: DecoPlaza shares Wall_'s graphite
-	// tint but carries its own deck-plate albedo — a color key would collapse
-	// the two into whichever MID spawned first.
+	// Keyed by palette prefix + west-comp flag, not by color: DecoPlaza shares
+	// Wall_'s graphite tint but carries its own deck-plate albedo — a color key
+	// would collapse the two into whichever MID spawned first — and a
+	// west-compensated gevel needs its own MID next to its uncompensated
+	// siblings (BldgA_W warm vs BldgA_N/S true-lit, owner call 2026-07-23).
 	TMap<uint32, UMaterialInstanceDynamic*> MidByPrefix;
-	auto MidForPalette = [ToonMaterial, ToonLitMaterial, ToonDecalMaterial, StainMask, BaseMaterial, &MidByPrefix, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
+	auto MidForPalette = [ToonMaterial, ToonLitMaterial, ToonDecalMaterial, StainMask, BaseMaterial, &MidByPrefix, &World](const FPaletteDef& Entry, bool bWestComp = false) -> UMaterialInstanceDynamic*
 	{
 		// Stains ride the translucent mask variant (15.8 art-fix) — unlit under
 		// every mode, like the glow strips below.
@@ -287,13 +333,16 @@ void BuildDistrict(UWorld& World)
 		{
 			return nullptr; // both materials missing = plain blocks, never a crash (GDD 14.3.5)
 		}
-		UMaterialInstanceDynamic*& Mid = MidByPrefix.FindOrAdd(GetTypeHash(FStringView(Entry.Prefix)));
+		UMaterialInstanceDynamic*& Mid = MidByPrefix.FindOrAdd(HashCombine(GetTypeHash(FStringView(Entry.Prefix)), bWestComp ? 1u : 0u));
 		if (Mid == nullptr)
 		{
 			Mid = UMaterialInstanceDynamic::Create(Master, &World);
 			if (Master != BaseMaterial)
 			{
-				Mid->SetVectorParameterValue(TEXT("LitColor"), Entry.Lit);
+				// WestComp (variant B, owner call 2026-07-23): LitColor' =
+				// 2*Lit − Shade lands the mid-band lerp exactly on the palette's
+				// lit tone — see the IsWestCompensated doc above the palette.
+				Mid->SetVectorParameterValue(TEXT("LitColor"), bWestComp ? Entry.Lit * 2.0f - Entry.Shade : Entry.Lit);
 				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Entry.Shade);
 				// The material's L = -LightDir, so pass the travel direction of the sun.
 				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
@@ -352,7 +401,7 @@ void BuildDistrict(UWorld& World)
 			Actor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
 			Actor->SetActorScale3D(Scale);
 			Actor->Tags.Add(Label);
-			if (UMaterialInstanceDynamic* Mid = MidForPalette(PaletteForLabel(Label)))
+			if (UMaterialInstanceDynamic* Mid = MidForPalette(PaletteForLabel(Label), IsWestCompensated(Label)))
 			{
 				Actor->GetStaticMeshComponent()->SetMaterial(0, Mid);
 			}

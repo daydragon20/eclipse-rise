@@ -28,8 +28,10 @@
 # LightDir parameter makes the district's read deterministic on every hardware
 # tier - the lit variant then ADDS real light on top for SM6 machines.
 #
-# Re-runnable by design: existing materials are cleared and rebuilt (the assets
-# are wholly owned by this script; palette/tuning live in MID parameters).
+# Re-runnable by design: existing materials are DELETED and re-created fresh
+# (see fresh_material - the in-place rebuild serialized deleted expressions as
+# orphan exports). The assets are wholly owned by this script; palette/tuning
+# live in MID parameters.
 
 import unreal
 
@@ -40,20 +42,20 @@ ART_PATH = "/Game/Art"
 # banding (EclipseCharacter's pawn MIDs inherit them too, keeping pawns and
 # district on the same sun story without touching that file).
 # 15.8 look-ronde A/B (cam 1, checkpoint-muur): under the -25/55 dusk sun,
-# west facades sit at ndl +0.52 and landed in the MID band (50% lerp toward
-# the shade tone - BldgA_W read salmon-pink) while south facades (+0.74) went
-# lit: one asset read as two color plates, district-wide on every west gevel
-# (BldgB_W washed the same way). BAND_HI 0.50 moves both sun-facing verticals
-# into the lit band - cel logic: faces toward the sun read lit - while the
-# floor (ndl = sin 25 deg = 0.423) stays safely in the mid band.
-# A/B evidence (2026-07-23): variant A (0.50, shot 00029) west face 251/160/53
-# vs lit 252/158/55 - one asset, one color; exposure deltas <= 2 on every cam
-# and the cam-5 sky corner is pixel-identical (not banding-related). Variant B
-# (0.55 + per-gevel tint-compensatie, shot 00036) fixed only the named slab:
-# the compound's other west faces stayed salmon (190/125/91). Sun-yaw was
-# rejected outright - SunRotation is synced with EclipseCharacter.cpp's
-# hard-coded SunTravel. Owner can overrule via the A/B panel.
-BAND_HI = 0.50
+# west facades sit at ndl +0.52 and land in the MID band (50% lerp toward the
+# shade tone - BldgA_W read salmon-pink) while south facades (+0.74) go lit:
+# one asset read as two color plates, district-wide on every west gevel.
+# OWNER CALL (2026-07-23, A/B panel): variant B - BAND_HI STAYS 0.55 and the
+# west-gevel warmth comes from the per-gevel mid-band compensation in
+# EclipseGrayboxBuilder.cpp (WestComp: LitColor' = 2*Lit - Shade puts the
+# mid-band lerp exactly on the palette's lit tone; shot 00036), rolled out
+# district-wide. Variant A - BAND_HI 0.50 so west verticals join the lit band
+# globally (shot 00029, briefly committed as eccd6f2) - is the REJECTED
+# variant: the owner overruled A's quantitative edge on look; do not "fix"
+# this back to 0.50. Sun-yaw was also rejected outright - SunRotation is
+# synced with EclipseCharacter.cpp's hard-coded SunTravel. The floor
+# (ndl = sin 25 deg = 0.423) stays safely in the mid band.
+BAND_HI = 0.55
 BAND_LO = 0.10
 
 TOON_HLSL = """
@@ -105,16 +107,39 @@ mel = unreal.MaterialEditingLibrary
 eal = unreal.EditorAssetLibrary
 
 
-def author_toon(mat_name, lit):
+def fresh_material(mat_name):
+    """Delete-and-recreate: returns a brand-new UMaterial at ART_PATH/mat_name.
+
+    The old in-place rebuild (load + delete_all_material_expressions) only
+    UNLINKED the expression UObjects from the material's graph - they stayed
+    alive inside the package, and save_asset then serialized them as orphan
+    exports (the stale BandHi-0.55 scalar the code review dug out of the
+    committed .uasset was exactly such a ghost; after the 0.55 restore no 0.50
+    ghost may linger the same way). Deleting the asset and creating it fresh is
+    the deterministic purge - the new package carries ONLY the expressions
+    authored below - with a garbage-collect in between so the stale package
+    cannot shadow the re-create. Safe by ownership contract: nothing on disk
+    references these masters (verified 2026-07-23: no other .uasset/.umap
+    contains their names) - builder and pawns load them by /Game/Art path at
+    runtime, and that path is exactly what this function preserves."""
     full_path = f"{ART_PATH}/{mat_name}"
     if eal.does_asset_exist(full_path):
-        mat = eal.load_asset(full_path)
-        mel.delete_all_material_expressions(mat)
-        unreal.log(f"{mat_name}: rebuilding existing asset")
-    else:
-        tools = unreal.AssetToolsHelpers.get_asset_tools()
-        mat = tools.create_asset(mat_name, ART_PATH, unreal.Material, unreal.MaterialFactoryNew())
-        unreal.log(f"{mat_name}: created new asset")
+        if not eal.delete_asset(full_path):
+            # No in-place fallback: that path is the orphan-export bug itself.
+            raise RuntimeError(f"{mat_name}: stale asset refused deletion - aborting re-author")
+        unreal.SystemLibrary.collect_garbage()
+        unreal.log(f"{mat_name}: stale asset deleted (orphan-export purge)")
+    tools = unreal.AssetToolsHelpers.get_asset_tools()
+    mat = tools.create_asset(mat_name, ART_PATH, unreal.Material, unreal.MaterialFactoryNew())
+    if mat is None:
+        raise RuntimeError(f"{mat_name}: create_asset failed")
+    unreal.log(f"{mat_name}: created fresh asset")
+    return mat
+
+
+def author_toon(mat_name, lit):
+    full_path = f"{ART_PATH}/{mat_name}"
+    mat = fresh_material(mat_name)
 
     if not lit:
         # Unlit: every scene-light bug on the SM5 fallback becomes irrelevant.
@@ -221,14 +246,7 @@ def author_toon(mat_name, lit):
 def author_toon_decal(mat_name):
     """Unlit translucent stain/decal variant: cel body + MaskTex-driven opacity."""
     full_path = f"{ART_PATH}/{mat_name}"
-    if eal.does_asset_exist(full_path):
-        mat = eal.load_asset(full_path)
-        mel.delete_all_material_expressions(mat)
-        unreal.log(f"{mat_name}: rebuilding existing asset")
-    else:
-        tools = unreal.AssetToolsHelpers.get_asset_tools()
-        mat = tools.create_asset(mat_name, ART_PATH, unreal.Material, unreal.MaterialFactoryNew())
-        unreal.log(f"{mat_name}: created new asset")
+    mat = fresh_material(mat_name)
 
     mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT)
     mat.set_editor_property("blend_mode", unreal.BlendMode.BLEND_TRANSLUCENT)
