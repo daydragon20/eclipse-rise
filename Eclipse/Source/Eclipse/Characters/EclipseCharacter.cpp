@@ -8,7 +8,38 @@
 #include "Eclipse.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
 #include "NavigationInvokerComponent.h"
+
+namespace
+{
+	/** Best-guess base-color texture of a pack material (restyle detail source). */
+	UTexture* FindBaseColorTexture(UMaterialInterface* Material)
+	{
+		if (Material == nullptr)
+		{
+			return nullptr;
+		}
+		TArray<UTexture*> Textures;
+		Material->GetUsedTextures(Textures, EMaterialQualityLevel::High, true, ERHIFeatureLevel::SM6, true);
+		UTexture* Fallback = nullptr;
+		for (UTexture* Texture : Textures)
+		{
+			const FString TexName = Texture->GetName();
+			if (TexName.Contains(TEXT("Diff")) || TexName.Contains(TEXT("Base")) || TexName.Contains(TEXT("Alb"))
+				|| TexName.Contains(TEXT("_BC")) || TexName.Contains(TEXT("Color")) || TexName.EndsWith(TEXT("_D")))
+			{
+				return Texture;
+			}
+			if (Fallback == nullptr)
+			{
+				Fallback = Texture;
+			}
+		}
+		return Fallback;
+	}
+}
 
 AEclipseCharacter::AEclipseCharacter()
 {
@@ -68,6 +99,44 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 	{
 		MeshComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 		MeshComponent->PlayAnimation(Idle, /*bLooping*/ true);
+	}
+
+	// Toon restyle (15.5 asset policy): every slot re-dressed with the cel
+	// master; the pack's own base texture stays as luminance detail, the
+	// faction palette supplies the hue. This also puts bodies on the same
+	// exposure tier as the unlit district — lit PBR underexposes to a
+	// silhouette against the emissive world (step-2 QC forensics).
+	if (BodyDef.bToonRestyle)
+	{
+		UMaterialInterface* ToonMaster = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon"));
+		if (ToonMaster == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("%s: M_EclipseToon missing — pack materials stay (GDD 14.3.5)."), *GetName());
+			return;
+		}
+		// Keep in sync with EclipseGrayboxBuilder's SunRotation (-25, 55): the
+		// cel bands must tell the same sun story as the district around them.
+		const FVector SunTravel = FRotator(-25.0f, 55.0f, 0.0f).Vector();
+		for (int32 SlotIndex = 0; SlotIndex < MeshComponent->GetNumMaterials(); ++SlotIndex)
+		{
+			UTexture* BaseTexture = FindBaseColorTexture(MeshComponent->GetMaterial(SlotIndex));
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaster, this);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), BodyDef.TintLit);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), BodyDef.TintShade);
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunTravel, 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
+			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+			if (BaseTexture != nullptr)
+			{
+				Mid->SetTextureParameterValue(TEXT("AlbedoTex"), BaseTexture);
+				// Generic gain: character textures hover ~0.3 linear; bodies are
+				// small on screen, so the unmeasured normalization is acceptable
+				// at this tier (the measured discipline applies to big surfaces).
+				Mid->SetScalarParameterValue(TEXT("AlbedoGain"), 3.2f);
+				Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.9f);
+			}
+			MeshComponent->SetMaterial(SlotIndex, Mid);
+		}
 	}
 }
 

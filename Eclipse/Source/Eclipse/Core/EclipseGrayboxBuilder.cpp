@@ -711,7 +711,10 @@ void BuildDistrict(UWorld& World)
 			{
 				SkyComponent->SetMobility(EComponentMobility::Movable);
 				SkyComponent->SetRealTimeCaptureEnabled(true);
-				SkyComponent->SetIntensity(1.0f);
+				// 2.2: lit PBR character bodies (step-2 pipeline) read at dusk;
+				// the unlit district ignores this entirely, so the district
+				// grade is untouched (first body-showcase round: near-black).
+				SkyComponent->SetIntensity(2.2f);
 			}
 		}
 	}

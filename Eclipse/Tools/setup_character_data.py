@@ -60,6 +60,25 @@ BODIES = {
     "RadiantGuard": ("SciFiWarrior", "SciFiCharacterPack"),
 }
 
+# Faction hue per body (15.5 palette discipline; saturated — near-neutral
+# washes to gray at the x10 range): (TintLit, TintShade).
+TINTS = {
+    "Player":       ((0.30, 0.14, 0.06), (0.100, 0.050, 0.050)),  # Cinder ember
+    "Rebel_A":      ((0.10, 0.16, 0.18), (0.040, 0.060, 0.080)),  # worker teal
+    "Rebel_B":      ((0.12, 0.17, 0.16), (0.045, 0.065, 0.075)),
+    "Rebel_C":      ((0.09, 0.14, 0.19), (0.035, 0.055, 0.085)),
+    "Enforcer":     ((0.30, 0.235, 0.095), (0.090, 0.072, 0.055)),  # Dominion gold
+    "Trooper":      ((0.26, 0.22, 0.11), (0.080, 0.070, 0.060)),
+    "Shock":        ((0.28, 0.10, 0.06), (0.100, 0.040, 0.050)),   # assault red
+    "Veil":         ((0.12, 0.09, 0.16), (0.045, 0.035, 0.070)),   # violet dark
+    "RadiantGuard": ((0.32, 0.28, 0.16), (0.110, 0.100, 0.070)),   # radiant white-gold
+}
+
+
+def color(c):
+    return f"\"(R={c[0]:.3f},G={c[1]:.3f},B={c[2]:.3f},A=1.0)\""
+
+
 rows = []
 for row_name, (mesh_pack, anim_pack) in BODIES.items():
     mesh = pick_mesh(mesh_pack)
@@ -70,9 +89,10 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     walk = pick_anim(anim_pack, "walk", "run", "jog")
     shoot = pick_anim(anim_pack, "shoot", "fire", "attack")
     death = pick_anim(anim_pack, "death", "die", "dead")
-    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{shoot}","{death}",1.0,-90.0,-90.0')
+    lit, shade = TINTS.get(row_name, ((0.20, 0.20, 0.22), (0.07, 0.07, 0.09)))
+    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{shoot}","{death}",true,{color(lit)},{color(shade)},1.0,-90.0,-90.0')
 
-csv_body = "---,Mesh,IdleAnim,WalkAnim,ShootAnim,DeathAnim,MeshScale,MeshZOffset,MeshYaw\n" + "\n".join(rows)
+csv_body = "---,Mesh,IdleAnim,WalkAnim,ShootAnim,DeathAnim,bToonRestyle,TintLit,TintShade,MeshScale,MeshZOffset,MeshYaw\n" + "\n".join(rows)
 
 DT_PATH = "/Game/Data/DT_BodyDefs"
 if eal.does_asset_exist(DT_PATH):

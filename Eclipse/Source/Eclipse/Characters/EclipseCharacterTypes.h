@@ -71,6 +71,22 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> DeathAnim;
 
+	/**
+	 * Toon restyle (15.5 asset policy: downloaded, then restyled): re-dress every
+	 * material slot with the cel master — the slot's own base texture becomes
+	 * luminance detail, the faction palette below supplies the hue. Keeps every
+	 * body on the same exposure tier as the unlit district (lit PBR bodies
+	 * underexpose to silhouettes against the emissive world).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	bool bToonRestyle = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body", meta = (EditCondition = "bToonRestyle"))
+	FLinearColor TintLit = FLinearColor(0.20f, 0.20f, 0.22f, 1.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body", meta = (EditCondition = "bToonRestyle"))
+	FLinearColor TintShade = FLinearColor(0.07f, 0.07f, 0.09f, 1.0f);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body", meta = (ClampMin = 0.1))
 	float MeshScale = 1.0f;
 

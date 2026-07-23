@@ -10,7 +10,8 @@ window.PROGRESS_DATA = {
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
     { taak: "Fab-packs binnenhalen", status: "klaar", pct: 100, detail: "11 packs binnen: 8× SciFi (RAISOR-familie), Paragon Belica + Twinblast + Minions (~50 skeletal meshes, ~950 animaties). MetaHuman-items faalden (EOS-login in de editor-Fab-tab nodig — stap 3-punt)." },
-    { taak: "Character-pipeline (stap 2)", status: "bezig", pct: 75, detail: "GELAND: DT_BodyDefs (9 bodies) + 5 Dominion-archetypes + ApplyBodyDef; vijand-spawn cyclet archetypes, squad krijgt rebel-bodies, speler Belica. QC open: lit PBR-materialen te donker in de schemer (toon-restyle-slag volgt) + showcase-lijn deels achter de compound." },
+    { taak: "Character-pipeline (stap 2)", status: "klaar", pct: 100, detail: "GELAND + QC: 9 bodies via DT_BodyDefs, 5 Dominion-archetypes, toon-restyle per slot (eigen texture als luminantie-detail, factie-kleur uit palet: Dominion-goud, rebel-teal, Veil-violet, Shock-rood) — zelfde exposure-laag als de wereld, mét inktlijnen." },
+    { taak: "Stap 3: MetaHuman-recepten", status: "bezig", pct: 10, detail: "Plugins actief (MetaHumanCharacter/SDK); wacht op Fab-tab-login van de eigenaar in de heropende editor; daarna per named character (Kaya, Brick, Vale, Dex, Petra, Kaine) slots + Creator-recept." },
     { taak: "MetaHuman-recepten (stap 3)", status: "gepland", pct: 0, detail: "Per named character (Kaya, Brick, Vale, Dex, Petra, Kaine) code/data-slots + exact Creator-recept voor de eigenaar." },
     { taak: "Graphics-iteraties (15.8-loop)", status: "bezig", pct: 100, detail: "6 iteraties gebankt vandaag: inktlijnen-fix, skyline, textures, straat-dressing, decals, eerste bewoners — loopt door met patrol-figuren + particles." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build + 31/31 tests + validatie 0 + catalog 19/19 vóór elke commit/push." },

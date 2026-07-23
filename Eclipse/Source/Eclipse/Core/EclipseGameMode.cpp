@@ -132,13 +132,15 @@ void AEclipseGameMode::SetupShotRig()
 	const UDataTable* BodyDefs = Setup != nullptr ? Setup->BodyDefs.LoadSynchronous() : nullptr;
 	if (BodyDefs != nullptr && BodyDefs->GetRowStruct() == FEclipseBodyDefRow::StaticStruct())
 	{
+		// Open plaza south of the compound: fully inside camera 1's frustum and
+		// clear of the compound walls (first showcase round hid half the line).
 		int32 BodyIndex = 0;
 		for (const TPair<FName, uint8*>& Row : BodyDefs->GetRowMap())
 		{
-			AEclipseCharacter* Body = SpawnBodyNear(FVector(3600.0f + BodyIndex * 240.0f, -2350.0f, 0.0f), Row.Key.ToString());
+			AEclipseCharacter* Body = SpawnBodyNear(FVector(3300.0f + (BodyIndex % 5) * 260.0f, -3300.0f - (BodyIndex / 5) * 300.0f, 0.0f), Row.Key.ToString());
 			if (Body != nullptr)
 			{
-				Body->SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+				Body->SetActorRotation(FRotator(0.0f, 200.0f, 0.0f));
 				Body->ApplyBodyDef(*reinterpret_cast<const FEclipseBodyDefRow*>(Row.Value));
 				++BodyIndex;
 			}
