@@ -18,6 +18,8 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Materials/MaterialInterface.h"
 #include "Quests/EclipseObjectiveTrigger.h"
 #include "UObject/ConstructorHelpers.h"
@@ -176,20 +178,37 @@ void BuildDistrict(UWorld& World)
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	// The SM6 target (strong PC) runs full-fidelity extras the SM5 laptop
+	// fallback cannot; computed here because the material choice below also
+	// depends on it (15.2C + the 15.5 fidelity revision).
+	const bool bFullFidelity = World.GetFeatureLevel() >= ERHIFeatureLevel::SM6;
+
 	// One dynamic instance per palette entry (not per block) keeps the dressing cheap.
 	// Toon master first (cel bands computed in-material — deterministic on the SM5
 	// fallback where scene lights never reach horizontals); engine shape material
 	// as the flat-color fallback when the authored asset is absent (GDD 14.3.5).
+	// The lit-toon migration experiment (15.5 revision) rides behind
+	// -EclipseLitToon on SM6: same banded color as BaseColor so VSM + software
+	// Lumen paint real light on top. Never the default until an A/B locks it.
+	const bool bLitToon = bFullFidelity && FParse::Param(FCommandLine::Get(), TEXT("EclipseLitToon"));
 	UMaterialInterface* ToonMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon"));
+	UMaterialInterface* ToonLitMaterial = bLitToon ? LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonLit.M_EclipseToonLit")) : nullptr;
 	UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
 	if (ToonMaterial == nullptr)
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Graybox: M_EclipseToon missing — falling back to flat engine-material dressing (GDD 14.3.5)."));
 	}
-	TMap<uint32, UMaterialInstanceDynamic*> MidByColor;
-	auto MidForPalette = [ToonMaterial, BaseMaterial, &MidByColor, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
+	if (bLitToon && ToonLitMaterial == nullptr)
 	{
-		UMaterialInterface* Master = ToonMaterial != nullptr ? ToonMaterial : BaseMaterial;
+		UE_LOG(LogEclipse, Warning, TEXT("Graybox: -EclipseLitToon set but M_EclipseToonLit missing — unlit toon fallback (run Tools/author_toon_material.py)."));
+	}
+	TMap<uint32, UMaterialInstanceDynamic*> MidByColor;
+	auto MidForPalette = [ToonMaterial, ToonLitMaterial, BaseMaterial, &MidByColor, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
+	{
+		// Glow strips stay unlit-emissive under every mode — they are light
+		// sources, not lit surfaces.
+		const bool bWantsLit = ToonLitMaterial != nullptr && FCString::Strnicmp(Entry.Prefix, TEXT("Glow"), 4) != 0;
+		UMaterialInterface* Master = bWantsLit ? ToonLitMaterial : (ToonMaterial != nullptr ? ToonMaterial : BaseMaterial);
 		if (Master == nullptr)
 		{
 			return nullptr; // both materials missing = plain blocks, never a crash (GDD 14.3.5)
@@ -198,13 +217,18 @@ void BuildDistrict(UWorld& World)
 		if (Mid == nullptr)
 		{
 			Mid = UMaterialInstanceDynamic::Create(Master, &World);
-			if (ToonMaterial != nullptr)
+			if (Master != BaseMaterial)
 			{
 				Mid->SetVectorParameterValue(TEXT("LitColor"), Entry.Lit);
 				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Entry.Shade);
 				// The material's L = -LightDir, so pass the travel direction of the sun.
 				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
-				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				if (!bWantsLit)
+				{
+					// Lit variant keeps EmissiveScale 1: BaseColor is albedo,
+					// the real lights supply the energy.
+					Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				}
 				// CC0 albedo pass: opt in per entry; a missing asset degrades to
 				// the flat cel look, never a crash (GDD 14.3.5).
 				if (Entry.TexPath != nullptr)
@@ -423,12 +447,6 @@ void BuildDistrict(UWorld& World)
 			Actor->Destroy();
 		}
 	}
-
-	// The SM6 target (strong PC, GTX 1080 Ti+) runs the full-fidelity extras the
-	// SM5 laptop fallback cannot: volumetric smog, shadowed sun shafts, a real
-	// captured skylight (15.2C + the 15.5 fidelity revision). The district's
-	// unlit toon read is identical on both tiers by construction.
-	const bool bFullFidelity = World.GetFeatureLevel() >= ERHIFeatureLevel::SM6;
 
 	// Low industrial sun; drives the SkyAtmosphere so the horizon carries the mood.
 	// Mid-afternoon sun: warm but high enough that shade sides stay readable —
