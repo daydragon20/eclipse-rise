@@ -28,3 +28,10 @@ _fab_inbox/
 Eclipse/Content/SciFi*/
 Eclipse/Content/Paragon*/
 Eclipse/Content/Fab/
+
+Eclipse/Content/FD_WarningSigns_V1/
+Eclipse/Content/RustyCarsFree/
+Eclipse/Content/Screen_Damage_Indicator/
+Eclipse/Content/__ExternalActors__/
+Eclipse/Content/__ExternalObjects__/
+.claude/scheduled_tasks.lock

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "if (Test-Path 'C:\\Dev\\ECLIPSE_GDD\\.claude\\STOP') { exit 0 } else { Write-Output '{\"decision\":\"block\",\"reason\":\"Autonome loop actief - niet stoppen; ga verder met de volgende backlog-taak (game-planner). Wacht nooit op de owner: zet owner-acties in het kliklijstje en progress_data.js en werk ondertussen door. Stoppen alleen als het bestand .claude/STOP bestaat (STOP-autonomie.bat).\"}' }"
+          }
+        ]
+      }
+    ]
+  }
+}
