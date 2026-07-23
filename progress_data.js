@@ -3,14 +3,14 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-23 13:45",
+  bijgewerkt: "2026-07-23 14:15",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
-    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "2 element-builders parallel: (1) art-fix-ronde (stain-falloff, placard-waarde, well-emissive), (2) P2-01 squad van 4 + classes; planner houdt de backlog risk-first (phase0/EXECUTION_PLAN.md). Reviews vóór elke commit; wakeup 60 s; voltooide taken verhuizen naar de changelog." },
-    { taak: "Art-fix-ronde (na curatie-plaatsing)", status: "bezig", pct: 15, detail: "De top-3 uit de §15.8-art-review van b70dcf9: DecoStain-roestvlekken krijgen alpha-falloff + per-instance variatie (nu harde rechthoeken), donkerste placards (radiation/TOXIC/blast/route) in waarde genormaliseerd, bassinring krijgt emissive-accent + apron één waarde-stap van het asfalt zodat het plaza-middelpunt leest in de aerial." },
+    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "2 element-builders parallel: (1) look-ronde (wandbanding-beslissing, kiosk-normalisatie, gele waarde-hiërarchie), (2) P2-01 squad van 4 + classes; planner houdt de backlog risk-first (phase0/EXECUTION_PLAN.md). Reviews vóór elke commit; wakeup 60 s; voltooide taken verhuizen naar de changelog." },
+    { taak: "Look-ronde: wandbanding + waarde-hiërarchie", status: "bezig", pct: 5, detail: "Top-3 uit de §15.8-review van de art-fix-ronde (prioriteit lighting → materials): (1) de checkpoint-muur leest als twee assets door cel-band-lichtinval (ndl +0.52 net onder BandHi 0.55) — A/B-beslissing BandHi 0.50 vs. zon-yaw-nudge; (2) witte kiosk door dezelfde waarde-normalisatie als de placards; (3) gele props één waardestap differentiëren (route-markering vs. barriers vs. crates) voor hiërarchie in het plaza-middenveld." },
     { taak: "P2-01: Squad van 4 + classes", status: "bezig", pct: 60, detail: "Element-builder implementeert SPEC-P2-01 (Assault/Medic/Sniper, pre-classed recruits): code staat er en compileert schoon (tussenstand 13/26 modules, 0 fouten) — DT_ClassDefs + EclipseClassLogic + ClassId-save-migratie + MaxDeployed 4 + stabilize-window + events. Hierna: class-data vullen, testsuite (-nullrhi) + validatie. Stille orderfout = blocker; review-checkpoint: migratie + v0-fixture-test in zelfde commit (14.3.6)." },
     { taak: "Stap 3: MetaHuman-pijplijn", status: "wachten", pct: 65, detail: "Slots + recepten klaar; Fab-login BEVESTIGD in log — nog nodig: per MetaHuman-item 1× de Download-klik in Window → Fab → My Library (auth-fout is weg), daarna MH_<Naam>-gezichten per phase0/metahuman_recipes.md." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build (-NoUba) + 31/31+ tests + validatie 0 + catalog vóór elke commit/push." },
@@ -104,6 +104,10 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-23 (middag — art-fix-ronde + asset-opruim GELAND)", punten: [
+      "15.8 art-fix-ronde gebankt (8e06d23, code GO + art GO): DecoStain-vlekken nu organisch via nieuw M_EclipseToonDecal + T_stain_mask-falloff en per-instance rotatie (gebankte plaatsingen bit-identiek); alle 7 placards waarde-genormaliseerd (p99→245) + tint-lift, gains her-gemeten; well-ring amber accent + volgt de lit-toon-masterkeuze; apron één waardestap; hazard-generator-bug gefixt (effen gele quad → worn chevron). Shots 00022–00027 = nieuwe referentie; 38/38 tests, validatie 0.",
+      "Asset-opruimronde (f1d0ad0, owner-opdracht): 5,2 GB machine-lokaal vrijgemaakt op bewijs — Twinblast (0 accepts) en FD-signs-pack (60 raws als bron bewaard) weg, SDI-template-filler weg met HUD-payload bewaard, zips/blends gededupliceerd. Binaire ref-scan 0 hits; tracked repo onaangetast; phase0/ASSET_CLEANUP.md is de bewijsvoering incl. KEEP-gepland-tabel per ronde.",
+      "Owner verwijdert zelf GameAnimationSample (18 GB): repo-breed 0 referenties, niets gemigreerd — bevestigd veilig." ] },
     { datum: "Sessie 2026-07-23 (middag — curatie-plaatsing + SPEC-P2-03 GELAND)", punten: [
       "Grunge-vervanger zonder owner-klik (owner-besluit): ambientCG CC0 Metal041B (DecoStain, gain 3.44) + CorrugatedSteel007A (warehouse, 2.72) + Metal063 1K→2K; fetch_cc0.py-zoekfix (q=-parameter); herbruikbaar import_cc0_albedos.py.",
       "Curatie-plaatsingsronde gebankt (b70dcf9): 4 nieuwe placards (route/labor/blast/reactor) in het sign-patroon, SciFi10-deckplate-apron + tile-locked bassinring als plaza-middelpunt, Megascans-4K-asfalt als Floor mét repo-eigen fallback, MID-cache-bugfix (keyde op kleur, nu paletprefix). Code-review GO + §15.8-art-review GO; shots 00008–00013 zijn de nieuwe referentie; horizon schoon op alle 6 cams.",
