@@ -60,20 +60,40 @@ lamp pair at the crossing; `SM_Kit_GantryBeam` + `SM_Kit_CornerPillar` form the
 gate portal at the Entry_Main approach.
 
 **Warning-sign placards** (`/Game/Art/Decals/T_sign_{stop,radiation,toxic}_diff`,
-2026-07-23): derived from the FD_WarningSigns_V1 Fab pack (machine-local,
-gitignored). The pack ships decal cutouts over green-screen photo backing, so
+2026-07-23): derived from the FD_WarningSigns_V1 Fab pack (machine-local at the
+time; removed from disk 2026-07-23, cleanup pass — the working source is now the
+complete raw-albedo export in `Saved/WarningSignStaging/raw`, see
+`phase0/ASSET_CLEANUP.md`). The pack ships decal cutouts over green-screen photo backing, so
 `Tools/prepare_warning_signs.py` (Pillow) crops each chosen sign to its alpha
 bounds and composites it on a dark steel plate; `Tools/import_warning_signs.py`
 exports the raw albedos / imports the cleaned placards. Curation pass
 2026-07-23 added four more placards from the 60-sign contact sheet:
 `T_sign_{route,labor,blast,reactor}_diff` (indices 36/50/51/53; gains in
-`phase0/ASSET_CURATION.md`). The derived placards
+`phase0/ASSET_CURATION.md`). 15.8 art-fix round (2026-07-23): the prepare tool
+now value-normalizes every cutout (p99 max-channel → 245) so the seven placards
+share one exposure anchor — the raw pack photos differed wildly and half the
+placards rendered near-black; gains re-measured on the normalized output
+(table in `phase0/ASSET_CURATION.md` §8). The derived placards
 travel with the project as incorporated content (Fab Standard License; private
 repo); the raw pack itself stays machine-local.
 
+**Generated decal maps** (`/Game/Art/Decals/T_decal_*_diff`, `T_stain_mask`;
+generator `Tools/generate_decals.py`, import `Tools/import_generated_decals.py`
+— re-runnable, deterministic, no external source): luminance patterns tinted by
+the palette (poster/hazard/stencil) plus `T_stain_mask` (15.8 art-fix), a
+radial/noise opacity falloff imported linear (sRGB off, grayscale) that drives
+`M_EclipseToonDecal` so the ground stains fade organically instead of reading
+as hard dark rectangles. Same round: the hazard-stripe generator bug fixed
+(bands tiled edge-to-edge → the map was a solid 225 plate and the pads read as
+flat pure-yellow quads); the worn-stripe map measures mean-lin 0.325 → builder
+gain 3.08.
+
 **Fab packs** (machine-local, gitignored — zie .gitignore): RustyCarsFree (5
-wrecks, dressed by the builder), FD_WarningSigns_V1, SciFi_Materials_10,
-Screen_Damage_Indicator + de character-packs hierboven.
+wrecks, dressed by the builder), SciFi_Materials_10, Screen_Damage_Indicator
+(payload only) + de character-packs hierboven. Cleanup pass 2026-07-23
+(`phase0/ASSET_CLEANUP.md`): ParagonTwinblast en FD_WarningSigns_V1 zijn van
+schijf verwijderd (provenance blijft geldig — alle afgeleide assets zijn
+repo-tracked; her-download kan altijd via de Fab-library).
 
 Style contract (15.5): textures enter the picture **through the toon pipeline** —
 multiplied into the cel bands via world-aligned projection in `M_EclipseToon`;

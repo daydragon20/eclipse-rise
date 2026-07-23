@@ -35,3 +35,14 @@ unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks(tasks)
 for task in tasks:
     for path in task.get_editor_property("imported_object_paths"):
         unreal.log(f"imported: {path}")
+        # Opacity masks (T_stain_mask, ...) are LINEAR data, not color: sRGB
+        # decode would reshape the falloff curve. Grayscale compression keeps
+        # the single channel clean (M_EclipseToonDecal samples .r).
+        if "_mask" in os.path.basename(path).lower():
+            asset = unreal.load_asset(path)
+            if asset is not None:
+                asset.set_editor_property("srgb", False)
+                asset.set_editor_property("compression_settings",
+                                          unreal.TextureCompressionSettings.TC_GRAYSCALE)
+                unreal.EditorAssetLibrary.save_loaded_asset(asset)
+                unreal.log(f"mask import: srgb off + grayscale ({path})")

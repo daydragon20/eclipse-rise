@@ -28,12 +28,13 @@ Tint pairs referenced below (from the builder palette, hue-shifted-cool shade ru
 ## 2. /Game/ParagonTwinblast — 34 static meshes → **0 accepted, 34 rejected**
 
 All FX helpers (muzzle flashes, water-impact cylinders, smoke planes, spline ribbons, jets) plus joke props (`SM_Cool_Sunglasses*`) and `TwinBlast_Hair`/`TwinBlast_Grenade` (character extras). `SM_AssetPlatform` here is a duplicate of A1 — use the Belica copy. Nothing reads industrial.
+**Pack removed from disk 2026-07-23** (cleanup pass, `ASSET_CLEANUP.md` D1) — re-download from the Fab library if ever needed.
 
 ## 3. /Game/ParagonMinions — 162 static meshes → **2 accepted, 1 conditional, 159 rejected**
 
 | # | Accept | Use | Restyle |
 |---|---|---|---|
-| A2 | `/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX` | 11.8 m circular basin ring (2048 tri): plaza centerpiece — **PLACED** (2026-07-23) at (600, 1800) on a 20 m DecoPlaza deck-plate apron, tile-locked so the pad graphic centers on the ring | graphite; AlbedoTex `T_4k_SciFi10_2_BaseColor` (circular pad graphic), gain **1.35**, world-aligned, TexWorldScale 1200, mix 0.8 |
+| A2 | `/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX` | 11.8 m circular basin ring (2048 tri): plaza centerpiece — **PLACED** (2026-07-23) at (600, 1800) on a 20 m DecoPlaza deck-plate apron, tile-locked so the pad graphic centers on the ring | **amber accent** (15.8 art-fix: graphite read grey-on-grey in the aerial) — Lit (0.52, 0.31, 0.06)/Shade (0.21, 0.115, 0.04), EmissiveScale ×1.3 on the unlit path, apron tint ×1.3 off Wall_; AlbedoTex `T_4k_SciFi10_2_BaseColor` (circular pad graphic), gain **1.35**, world-aligned, TexWorldScale 1200, mix 0.8; master follows the palette blocks' `-EclipseLitToon` choice |
 | A3 | `/Game/ParagonMinions/FX/Meshes/Debris/Granite_Large_Grey_Mossy_Rough` | 5.1 m boulder (8738 tri): slag/rubble heap in Contested pockets against the perimeter wall | stain; **no AlbedoTex** (the mossy hue must never enter — luminance discipline; flat cel + ink outline makes it read stylized slag) |
 | C1 | `/Game/ParagonMinions/FX/Meshes/Minion_Specific/Jungle/SM_Rock_Chunk_LowPoly` | CONDITIONAL: broken slab filler *inside* rubble piles only (348 tri — solo it reads low-poly, which 15.5 forbids; instanced 3–5× overlapping under A3 the facets read as Borderlands chunking) | stain; no AlbedoTex |
 
@@ -72,25 +73,30 @@ The BaseColors are flat-graphic trim/panel sheets (cream/orange/grey) — the mo
 **Scrapped (owner decision 2026-07-23):** `Grungy_Surface_slnnecvc` shipped only
 its MR map — the Fab re-download is **cancelled**; the equivalent grungy surface
 is ambientCG CC0 `Metal041B` (§9), which landed in the DecoStain slot. No owner
-click remains. **Not curation targets:** `MaterialFunctions/QMF_*`, default textures, MetaHuman base normals — Quixel/MetaHuman infrastructure, keep as-is, never restyle.
+click remains. The `Grungy_Surface_slnnecvc` directory was physically removed
+2026-07-23 (cleanup pass, `ASSET_CLEANUP.md` D6). **Not curation targets:** `MaterialFunctions/QMF_*`, default textures, MetaHuman base normals — Quixel/MetaHuman infrastructure, keep as-is, never restyle.
 
 ## 7. /Game/Screen_Damage_Indicator — 5 static meshes → **0 accepted; 2 assets flagged for the HUD lane**
 
 The 5 `LevelPrototyping` meshes are UE-template primitives (the graybox already owns that job) — rejected, as are the mannequin materials (162 of 167 assets are template filler). The pack's actual payload — `/Game/Screen_Damage_Indicator/UI/WBP_DamageIndicator` + `/Game/Screen_Damage_Indicator/Texture/T_BloodOverlay` — is combat-feedback HUD (GDD 08), flagged for the HUD/gameplay agent; not district dressing, no toon restyle.
+**Template filler (`UE/`, `L_DemoMap/`, `BluePrint/`) removed from disk 2026-07-23** (cleanup pass, `ASSET_CLEANUP.md` D3); the payload `UI/` + `Texture/` is kept for the HUD lane.
 
 ## 8. /Game/FD_WarningSigns_V1 (rest) — 60 sign albedos → **7 in the pipeline (4 new this pass), 53 rejected**
 
 All 60 albedos exported and judged on a contact sheet (`Tools/export_sign_albedos.py` → `Saved/WarningSignStaging/raw`). The pack's own decal MIs stay rejected (green-screen backing renders green cards — 2026-07-23 audit); accepted signs travel as derived placards via `prepare_warning_signs.py` (crop + dark-steel plate) into `/Game/Art/Decals`.
+**Pack removed from disk 2026-07-23** (cleanup pass, `ASSET_CLEANUP.md` D2): the placard source is now `Saved/WarningSignStaging/raw` (all 60 albedos exported) — re-derivation runs without the pack.
 
-| Placard (`/Game/Art/Decals/…`) | Pack index | mean-lin | gain | Use |
-|---|---|---|---|---|
-| `T_sign_stop_diff` | 09 | 0.113 | 8.9 | gate portal (in use) |
-| `T_sign_radiation_diff` | 17 | 0.093 | 10.7 | crossing lamp (in use) |
-| `T_sign_toxic_diff` | 30 | 0.154 | 6.5 | west wall, Entry_Main (in use) |
-| `T_sign_route_diff` **new** | 36 | 0.079 | **12.7** | **PLACED**: routing arrow on the second crossing lamp at the artery choke, red family (pairs with the radiation placard, review cam 6) |
-| `T_sign_labor_diff` **new** | 50 | 0.121 | **8.2** | **PLACED**: beside the warehouse yard's east gate gap on BldgB_E (labor stories, art bible §2.2), amber |
-| `T_sign_blast_diff` **new** | 51 | 0.099 | **10.2** | **PLACED**: Dominion post west face — munitions warning on the checkpoint approach, amber (pops on oxide red) |
-| `T_sign_reactor_diff` **new** | 53 | 0.061 | **16.4** | **PLACED**: west perimeter wall north of the gate, red — exclusion zone stacked over the rebel stencil story |
+**Value normalization (15.8 art-fix round, 2026-07-23):** the raw pack photos sit at wildly different exposures — half the placards rendered near-black (review shot 00012). `prepare_warning_signs.py` now scales every cutout so its p99 max-channel hits 245 (`NORM_TARGET`), and the builder's sign tints stepped up (lit ×1.4, shade to ~0.6×lit — value-only, hue unchanged). Means/gains below re-measured on the normalized placards.
+
+| Placard (`/Game/Art/Decals/…`) | Pack index | norm scale | mean-lin | gain | Use |
+|---|---|---|---|---|---|
+| `T_sign_stop_diff` | 09 | 1.00 | 0.113 | 8.9 | gate portal (in use) |
+| `T_sign_radiation_diff` | 17 | 1.03 | 0.098 | 10.2 | crossing lamp (in use) |
+| `T_sign_toxic_diff` | 30 | 1.05 | 0.168 | 5.9 | west wall, Entry_Main (in use) |
+| `T_sign_route_diff` | 36 | 1.00 | 0.079 | **12.7** | **PLACED**: routing arrow on the second crossing lamp at the artery choke, red family (pairs with the radiation placard, review cam 6) |
+| `T_sign_labor_diff` | 50 | 1.15 | 0.157 | **6.4** | **PLACED**: beside the warehouse yard's east gate gap on BldgB_E (labor stories, art bible §2.2), amber |
+| `T_sign_blast_diff` | 51 | 1.24 | 0.143 | **7.0** | **PLACED**: Dominion post west face — munitions warning on the checkpoint approach, amber (pops on oxide red) |
+| `T_sign_reactor_diff` | 53 | 1.09 | 0.068 | **14.8** | **PLACED**: west perimeter wall north of the gate, red — exclusion zone stacked over the rebel stencil story |
 
 All seven placards are now dressed by the builder (2026-07-23 placement round; sign-plane pattern, `Deco_Sign`). **Rejected (53):** joke/meme signs (`NO LIFE` 06/07, `STOP RUN` 08, camera 57/60, `LOVE` 27/28, `BAD DOG` 18–21, food 58/59 — off the grounded Expanse/Andor tone), civic-traffic family (22–26, 44–48 — reads suburban, not industrial oppression), skull/poison variants 14–16, 54–56 (duplicative of toxic/reactor), remaining rust-triangle variants (weaker reads of the accepted seven).
 

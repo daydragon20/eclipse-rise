@@ -127,8 +127,10 @@ namespace
 		{ TEXT("DecoStain"), FLinearColor(0.070f, 0.062f, 0.075f), FLinearColor(0.028f, 0.026f, 0.038f), TEXT("/Game/Art/Textures/T_Metal041B_diff.T_Metal041B_diff"), 400.0f, 3.44f, 0.7f }, // oil/rust staining — heavy-rust grunge grain (ambientCG Metal041B, mean .291; the CC0 stand-in for the scrapped Fab "Grungy Surface")
 		// Plaza deck-plate apron under the well centerpiece: SciFi10_1 X-braced
 		// plate (A1 recipe, mean .202), machine-local Fab pack — flat graphite
-		// cel when absent.
-		{ TEXT("DecoPlaza"), FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/SciFi_Materials_10/Textures/1/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 200.0f, 4.96f, 0.7f },
+		// cel when absent. 15.8 art-fix: tint lifted x1.3 off the Wall_ pair so
+		// the apron sits one value step off the asphalt (00011 read grey-on-grey);
+		// hue unchanged — luminance-only, 15.5.
+		{ TEXT("DecoPlaza"), FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/SciFi_Materials_10/Textures/1/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 200.0f, 4.96f, 0.7f },
 	};
 	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f), nullptr, 0.0f, 1.0f, 0.0f };
 
@@ -208,6 +210,18 @@ void BuildDistrict(UWorld& World)
 	UMaterialInterface* ToonMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon"));
 	UMaterialInterface* ToonLitMaterial = bLitToon ? LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonLit.M_EclipseToonLit")) : nullptr;
 	UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+	// 15.8 art-fix: ground stains ride a translucent variant of the unlit toon
+	// master whose baked opacity mask fades them out organically — the opaque
+	// path rendered them as hard dark rectangles ("carpet tiles", review shots
+	// 00008–00013). Either asset missing = the opaque master fallback (14.3.5).
+	UMaterialInterface* ToonDecalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonDecal.M_EclipseToonDecal"));
+	UTexture* StainMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_stain_mask.T_stain_mask"));
+	if (ToonDecalMaterial == nullptr || StainMask == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Graybox: stain decal path incomplete (material %s, mask %s) — stains fall back to hard-edged opaque cel (run Tools/author_toon_material.py + generate_decals.py/import_generated_decals.py)."),
+			ToonDecalMaterial != nullptr ? TEXT("ok") : TEXT("MISSING"), StainMask != nullptr ? TEXT("ok") : TEXT("MISSING"));
+		ToonDecalMaterial = nullptr;
+	}
 	if (ToonMaterial == nullptr)
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Graybox: M_EclipseToon missing — falling back to flat engine-material dressing (GDD 14.3.5)."));
@@ -220,12 +234,15 @@ void BuildDistrict(UWorld& World)
 	// tint but carries its own deck-plate albedo — a color key would collapse
 	// the two into whichever MID spawned first.
 	TMap<uint32, UMaterialInstanceDynamic*> MidByPrefix;
-	auto MidForPalette = [ToonMaterial, ToonLitMaterial, BaseMaterial, &MidByPrefix, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
+	auto MidForPalette = [ToonMaterial, ToonLitMaterial, ToonDecalMaterial, StainMask, BaseMaterial, &MidByPrefix, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
 	{
+		// Stains ride the translucent mask variant (15.8 art-fix) — unlit under
+		// every mode, like the glow strips below.
+		const bool bStainDecal = ToonDecalMaterial != nullptr && FCString::Stricmp(Entry.Prefix, TEXT("DecoStain")) == 0;
 		// Glow strips stay unlit-emissive under every mode — they are light
 		// sources, not lit surfaces.
-		const bool bWantsLit = ToonLitMaterial != nullptr && FCString::Strnicmp(Entry.Prefix, TEXT("Glow"), 4) != 0;
-		UMaterialInterface* Master = bWantsLit ? ToonLitMaterial : (ToonMaterial != nullptr ? ToonMaterial : BaseMaterial);
+		const bool bWantsLit = !bStainDecal && ToonLitMaterial != nullptr && FCString::Strnicmp(Entry.Prefix, TEXT("Glow"), 4) != 0;
+		UMaterialInterface* Master = bStainDecal ? ToonDecalMaterial : (bWantsLit ? ToonLitMaterial : (ToonMaterial != nullptr ? ToonMaterial : BaseMaterial));
 		if (Master == nullptr)
 		{
 			return nullptr; // both materials missing = plain blocks, never a crash (GDD 14.3.5)
@@ -271,6 +288,12 @@ void BuildDistrict(UWorld& World)
 						UE_LOG(LogEclipse, Warning, TEXT("Graybox: albedo %s missing — flat cel fallback (run Tools/import_polyhaven_textures.py / import_cc0_albedos.py)."), Entry.TexPath);
 					}
 				}
+				if (bStainDecal)
+				{
+					// Baked radial/noise falloff (Tools/generate_decals.py) —
+					// mesh-UV mask over the world-aligned grunge grain.
+					Mid->SetTextureParameterValue(TEXT("MaskTex"), StainMask);
+				}
 			}
 			else
 			{
@@ -280,9 +303,9 @@ void BuildDistrict(UWorld& World)
 		return Mid;
 	};
 
-	auto SpawnBlock = [&World, CubeMesh, &Params, &MidForPalette](const TCHAR* Label, const FVector& Location, const FVector& Scale)
+	auto SpawnBlock = [&World, CubeMesh, &Params, &MidForPalette](const TCHAR* Label, const FVector& Location, const FVector& Scale, float YawDeg = 0.0f)
 	{
-		AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator::ZeroRotator, Params);
+		AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, YawDeg, 0.0f), Params);
 		if (Actor != nullptr)
 		{
 			Actor->SetMobility(EComponentMobility::Movable);
@@ -453,9 +476,12 @@ void BuildDistrict(UWorld& World)
 			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -1146, 210), FVector(1.6f, 0.04f, 2.4f) },
 			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(5854, -2000, 210), FVector(0.04f, 1.6f, 2.4f) },
 			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -2854, 210), FVector(1.6f, 0.04f, 2.4f) },
-			// Hazard pads at the artery/cross-street corners, amber.
-			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 1.3f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-3200, 700, 4), FVector(2.4f, 2.4f, 0.04f) },
-			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 1.3f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-4800, -700, 4), FVector(2.4f, 2.4f, 0.04f) },
+			// Hazard pads at the artery/cross-street corners, amber. Gain 3.08 =
+			// 1/mean of the FIXED worn-stripe map (15.8 art-fix: the old
+			// generator tiled its bands edge-to-edge, so the pads were solid
+			// 225 plates reading as flat pure-yellow quads — shot 00013).
+			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 3.08f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-3200, 700, 4), FVector(2.4f, 2.4f, 0.04f) },
+			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 3.08f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-4800, -700, 4), FVector(2.4f, 2.4f, 0.04f) },
 			// Rebel eclipse stencils: west wall by Entry_Main, warehouse south face.
 			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-9944, 420, 240), FVector(0.04f, 2.0f, 2.0f) },
 			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-4300, 2146, 220), FVector(1.8f, 0.04f, 1.8f) },
@@ -505,28 +531,37 @@ void BuildDistrict(UWorld& World)
 	// missing textures = skipped (GDD 14.3.5).
 	{
 		struct FSignDef { const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; FVector Location; FVector Scale; };
-		const FLinearColor SignRedLit(0.300f, 0.060f, 0.050f), SignRedShade(0.110f, 0.030f, 0.035f);      // checkpoint red (stencil family)
-		const FLinearColor SignAmberLit(0.300f, 0.200f, 0.030f), SignAmberShade(0.120f, 0.080f, 0.020f);  // hazard amber (pad family)
+		// 15.8 art-fix (review shots 00008/00012/00013): the placards read as
+		// near-black plates. Value-normalized albedos (prepare_warning_signs.py
+		// NORM_TARGET pass) + re-measured gains, and the tints step up toward —
+		// never onto — the sodium strips' emissive budget: lit x1.4, shade to
+		// ~0.6x lit. Signs are man-made reflective placards, so their lit/shade
+		// gap is deliberately shallower than the architecture's; hue unchanged
+		// (15.5: the palette keeps hue authority, this is luminance-only).
+		const FLinearColor SignRedLit(0.420f, 0.084f, 0.070f), SignRedShade(0.250f, 0.050f, 0.042f);      // checkpoint red (stencil family)
+		const FLinearColor SignAmberLit(0.420f, 0.280f, 0.042f), SignAmberShade(0.250f, 0.167f, 0.025f);  // hazard amber (pad family)
 		const FSignDef Signs[] = {
+			// Gains: measured 1/linear-mean per normalized placard (tool output
+			// 2026-07-23 fix round; ASSET_CURATION.md §8 table updated).
 			// STOP hung under the gate portal's west beam, facing the Entry_Main approach.
 			{ TEXT("/Game/Art/Decals/T_sign_stop_diff.T_sign_stop_diff"), 8.9f, SignRedLit, SignRedShade, FVector(-8850, 0, 320), FVector(0.04f, 1.0f, 1.0f) },
 			// Radiation placard on the crossing lamp pole (artery x cross-street).
-			{ TEXT("/Game/Art/Decals/T_sign_radiation_diff.T_sign_radiation_diff"), 10.7f, SignAmberLit, SignAmberShade, FVector(-4650, -675, 230), FVector(0.9f, 0.04f, 0.9f) },
+			{ TEXT("/Game/Art/Decals/T_sign_radiation_diff.T_sign_radiation_diff"), 10.2f, SignAmberLit, SignAmberShade, FVector(-4650, -675, 230), FVector(0.9f, 0.04f, 0.9f) },
 			// TOXIC on the west wall inner face — the Dominion answer to the rebel stencil across the Entry_Main gap.
-			{ TEXT("/Game/Art/Decals/T_sign_toxic_diff.T_sign_toxic_diff"), 6.5f, SignAmberLit, SignAmberShade, FVector(-9944, -350, 260), FVector(0.04f, 1.4f, 1.4f) },
+			{ TEXT("/Game/Art/Decals/T_sign_toxic_diff.T_sign_toxic_diff"), 5.9f, SignAmberLit, SignAmberShade, FVector(-9944, -350, 260), FVector(0.04f, 1.4f, 1.4f) },
 			// Curation pass 2026-07-23, the four new placards (ASSET_CURATION.md §8):
 			// ROUTE arrow on the second crossing lamp — the artery choke's checkpoint
 			// routing, paired face-on with the radiation placard (review camera 6).
 			{ TEXT("/Game/Art/Decals/T_sign_route_diff.T_sign_route_diff"), 12.7f, SignRedLit, SignRedShade, FVector(-4230, -675, 240), FVector(0.9f, 0.04f, 0.9f) },
 			// LABOR beside the warehouse yard's east gate gap (Underworks labor
 			// stories, art bible §2.2) — on BldgB_E's east face, toward Spawn_Yard.
-			{ TEXT("/Game/Art/Decals/T_sign_labor_diff.T_sign_labor_diff"), 8.2f, SignAmberLit, SignAmberShade, FVector(-3146, 3250, 260), FVector(0.04f, 1.0f, 1.0f) },
+			{ TEXT("/Game/Art/Decals/T_sign_labor_diff.T_sign_labor_diff"), 6.4f, SignAmberLit, SignAmberShade, FVector(-3146, 3250, 260), FVector(0.04f, 1.0f, 1.0f) },
 			// BLAST on the Dominion post's west face — munitions fence warning on
 			// the checkpoint approach (amber pops on the oxide-red facade).
-			{ TEXT("/Game/Art/Decals/T_sign_blast_diff.T_sign_blast_diff"), 10.2f, SignAmberLit, SignAmberShade, FVector(4146, -2400, 250), FVector(0.04f, 0.9f, 0.9f) },
+			{ TEXT("/Game/Art/Decals/T_sign_blast_diff.T_sign_blast_diff"), 7.0f, SignAmberLit, SignAmberShade, FVector(4146, -2400, 250), FVector(0.04f, 0.9f, 0.9f) },
 			// REACTOR exclusion triangle on the west perimeter wall north of the
 			// gate — Dominion exclusion zone stacked over the rebel stencil story.
-			{ TEXT("/Game/Art/Decals/T_sign_reactor_diff.T_sign_reactor_diff"), 16.4f, SignRedLit, SignRedShade, FVector(-9944, 700, 270), FVector(0.04f, 1.2f, 1.2f) },
+			{ TEXT("/Game/Art/Decals/T_sign_reactor_diff.T_sign_reactor_diff"), 14.8f, SignRedLit, SignRedShade, FVector(-9944, 700, 270), FVector(0.04f, 1.2f, 1.2f) },
 		};
 
 		for (const FSignDef& Sign : Signs)
@@ -574,13 +609,26 @@ void BuildDistrict(UWorld& World)
 		SpawnBlock(TEXT("DecoPlaza"), PlazaCenter + FVector(0, 0, 2), FVector(20.0f, 20.0f, 0.05f));
 
 		UStaticMesh* Well = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX.SM_Well_Center_FX"));
-		if (Well != nullptr && ToonMaterial != nullptr)
+		// Same master choice as the palette blocks (code-review note, 15.8 fix
+		// round): under -EclipseLitToon the ring is a lit surface like the rest
+		// of the district, not a hard-coded unlit hold-out.
+		UMaterialInterface* WellMaster = ToonLitMaterial != nullptr ? ToonLitMaterial : ToonMaterial;
+		if (Well != nullptr && WellMaster != nullptr)
 		{
-			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
-			Mid->SetVectorParameterValue(TEXT("LitColor"), FLinearColor(0.230f, 0.250f, 0.290f));   // graphite (curation tint pair)
-			Mid->SetVectorParameterValue(TEXT("ShadeColor"), FLinearColor(0.075f, 0.082f, 0.130f));
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(WellMaster, &World);
+			// 15.8 art-fix: the graphite ring read grey-on-grey in the aerial
+			// (00011) — the centerpiece now carries an amber accent from the
+			// hazard/sodium family (hue in-palette, 03.3) with a modest bump on
+			// the unlit emissive path so the plaza's middelpunt actually reads.
+			// Stays well under the Glow strips' budget (2.2 x10).
+			Mid->SetVectorParameterValue(TEXT("LitColor"), FLinearColor(0.520f, 0.310f, 0.060f));   // amber centerpiece accent
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), FLinearColor(0.210f, 0.115f, 0.040f));
 			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
-			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			if (ToonLitMaterial == nullptr)
+			{
+				// Lit variant keeps EmissiveScale 1 (albedo path, real lights).
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale * 1.3f);
+			}
 			if (UTexture* PadTex = LoadObject<UTexture>(nullptr, TEXT("/Game/SciFi_Materials_10/Textures/2/T_4k_SciFi10_2_BaseColor.T_4k_SciFi10_2_BaseColor")))
 			{
 				// Circular pad graphic, measured mean-lin .742 -> gain 1.35.
@@ -948,11 +996,17 @@ void BuildDistrict(UWorld& World)
 			SpawnBlock(TEXT("DecoLine"), FVector(-3540, 0, 3), FVector(0.16f, 190.0f, 0.06f));
 			// Oil and rust staining, biased toward the driven crossing.
 			FRandomStream DecoRng(77);
+			// Per-instance yaw rides its OWN stream (15.8 art-fix): the 14
+			// banked placements draw position+scale from DecoRng in a fixed
+			// order — new draws on that stream would reshuffle the layout, so
+			// the variation stream is separate by contract.
+			FRandomStream StainVarRng(770);
 			for (int32 Index = 0; Index < 14; ++Index)
 			{
 				SpawnBlock(TEXT("DecoStain"),
 					FVector(DecoRng.FRandRange(-8000.0f, 8000.0f), DecoRng.FRandRange(-7000.0f, 7000.0f), 2.0f),
-					FVector(DecoRng.FRandRange(2.0f, 6.5f), DecoRng.FRandRange(2.0f, 6.5f), 0.04f));
+					FVector(DecoRng.FRandRange(2.0f, 6.5f), DecoRng.FRandRange(2.0f, 6.5f), 0.04f),
+					StainVarRng.FRandRange(0.0f, 360.0f));
 			}
 			// Sodium checkpoint strips on the inner wall faces (03.3: sodium
 			// checkpoints vs. Dominion white-gold) — three per wall.
