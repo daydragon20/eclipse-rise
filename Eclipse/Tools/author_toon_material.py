@@ -35,6 +35,27 @@ import unreal
 
 ART_PATH = "/Game/Art"
 
+# Cel band thresholds — baked as the parameter DEFAULTS of all three masters;
+# no MID overrides them, so this is the single authority for the district's
+# banding (EclipseCharacter's pawn MIDs inherit them too, keeping pawns and
+# district on the same sun story without touching that file).
+# 15.8 look-ronde A/B (cam 1, checkpoint-muur): under the -25/55 dusk sun,
+# west facades sit at ndl +0.52 and landed in the MID band (50% lerp toward
+# the shade tone - BldgA_W read salmon-pink) while south facades (+0.74) went
+# lit: one asset read as two color plates, district-wide on every west gevel
+# (BldgB_W washed the same way). BAND_HI 0.50 moves both sun-facing verticals
+# into the lit band - cel logic: faces toward the sun read lit - while the
+# floor (ndl = sin 25 deg = 0.423) stays safely in the mid band.
+# A/B evidence (2026-07-23): variant A (0.50, shot 00029) west face 251/160/53
+# vs lit 252/158/55 - one asset, one color; exposure deltas <= 2 on every cam
+# and the cam-5 sky corner is pixel-identical (not banding-related). Variant B
+# (0.55 + per-gevel tint-compensatie, shot 00036) fixed only the named slab:
+# the compound's other west faces stayed salmon (190/125/91). Sun-yaw was
+# rejected outright - SunRotation is synced with EclipseCharacter.cpp's
+# hard-coded SunTravel. Owner can overrule via the A/B panel.
+BAND_HI = 0.50
+BAND_LO = 0.10
+
 TOON_HLSL = """
 float3 N = normalize(NormalWS);
 float3 L = normalize(-LightDir.rgb);
@@ -128,8 +149,8 @@ def author_toon(mat_name, lit):
     light_dir = vec_param("LightDir", (-0.44, -0.62, -0.66, 0.0), -900, 20)
     # Bands tuned for the -25 deg dusk sun: floor lands in the mid tone (asphalt
     # must never be the brightest surface), sun-facing facades go lit.
-    band_hi = scalar_param("BandHi", 0.55, -900, 220)
-    band_lo = scalar_param("BandLo", 0.10, -900, 300)
+    band_hi = scalar_param("BandHi", BAND_HI, -900, 220)
+    band_lo = scalar_param("BandLo", BAND_LO, -900, 300)
     hatch_scale = scalar_param("HatchScale", 120.0, -900, 380)
     hatch_strength = scalar_param("HatchStrength", 0.22, -900, 460)
     # Unlit: authored color -> final pixel via the emissive range shared with
@@ -236,8 +257,8 @@ def author_toon_decal(mat_name):
     lit_color = vec_param("LitColor", (0.50, 0.50, 0.52, 1.0), -900, -380)
     shade_color = vec_param("ShadeColor", (0.14, 0.13, 0.18, 1.0), -900, -180)
     light_dir = vec_param("LightDir", (-0.44, -0.62, -0.66, 0.0), -900, 20)
-    band_hi = scalar_param("BandHi", 0.55, -900, 220)
-    band_lo = scalar_param("BandLo", 0.10, -900, 300)
+    band_hi = scalar_param("BandHi", BAND_HI, -900, 220)
+    band_lo = scalar_param("BandLo", BAND_LO, -900, 300)
     hatch_scale = scalar_param("HatchScale", 120.0, -900, 380)
     hatch_strength = scalar_param("HatchStrength", 0.22, -900, 460)
     emissive_scale = scalar_param("EmissiveScale", 1.0, -900, 540)

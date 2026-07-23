@@ -117,13 +117,40 @@ namespace
 		// with the 2K Poly Haven asphalt as repo-tracked fallback (mean .059).
 		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // asphalt — dark but never crushed
 		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
-		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },  // Dominion post: oxide red, shade to maroon-purple (variation is luminance-only, hue stays palette)
+		// Dominion post: oxide red, shade to maroon-purple (variation is
+		// luminance-only, hue stays palette). West-facade banding (15.8 look-ronde
+		// A/B, cam 1): under the -25/55 sun west faces sit at ndl +0.52 and used to
+		// land in the MID band while south faces (+0.74) went lit — BldgA_W read
+		// salmon-pink next to lit oxide, one asset as two color plates. Fixed
+		// globally by BandHi 0.55→0.50 in the toon masters (variant A, shot 00029:
+		// west 251/160/53 vs lit 252/158/55, exposure deltas ≤2 on every cam).
+		// Rejected: (B) per-gevel tint-compensatie — a BldgA_W entry whose mid-band
+		// lerp landed on the lit oxide fixed only that slab; the compound's other
+		// west faces through the gap stayed salmon (shot 00036: 190/125/91) and
+		// every west gevel district-wide (BldgB_W) kept the same split. Also
+		// rejected: sun-yaw nudge — SunRotation is synced with the hard-coded
+		// SunTravel in EclipseCharacter.cpp (out of scope this round).
+		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },
 		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: worker teal over rusty corrugated sheet (ambientCG 007A, mean .367 — replaces corrugated_iron_02)
+		// Yellow value hierarchy (15.8 look-ronde, cam 3): every yellow element in
+		// the plaza midfield sat on the same value (screen 255/211/0 slabs next to
+		// 245/216/1 lane paint) and the field read as one flat sheet of yellow.
+		// One value step between the families now: Cover barriers (full hazard,
+		// the primary cover read) > CoverB worn barriers (x0.72, alternating
+		// blocks) > DecoLine route paint (saturated worn yellow, mid-band ~x0.55
+		// of the barrier read). Hue stays in the hazard-amber family (15.5).
+		// CoverB MUST precede Cover: PaletteForLabel prefix-matches in order.
+		{ TEXT("CoverB"), FLinearColor(0.612f, 0.259f, 0.036f), FLinearColor(0.259f, 0.079f, 0.043f), nullptr, 0.0f, 1.0f, 0.0f },  // worn/older cover barriers, one value step down
 		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f), nullptr, 0.0f, 1.0f, 0.0f },  // hazard orange, reads as cover
 		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f), nullptr, 0.0f, 1.0f, 0.0f }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
 		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f), nullptr, 0.0f, 1.0f, 0.0f },  // sodium-orange window strips — bright enough to survive 15 km of smog
 		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f), nullptr, 0.0f, 1.0f, 0.0f }, // industrial plain under the skyline, darker than the district floor
-		{ TEXT("DecoLine"), FLinearColor(0.700f, 0.660f, 0.520f), FLinearColor(0.300f, 0.280f, 0.240f), nullptr, 0.0f, 1.0f, 0.0f }, // worn lane paint on the plaza asphalt
+		// Worn lane paint on the plaza asphalt. 15.8 look-ronde: the old
+		// near-neutral cream (0.700/0.660/0.520) washed to the same screen value
+		// as the Cover slabs (the x10 near-neutral pitfall) — now a saturated worn
+		// yellow one step under CoverB, so ground routing info stays subordinate
+		// to the cover read (bottom of the yellow hierarchy, see CoverB above).
+		{ TEXT("DecoLine"), FLinearColor(0.420f, 0.345f, 0.095f), FLinearColor(0.180f, 0.147f, 0.058f), nullptr, 0.0f, 1.0f, 0.0f },
 		{ TEXT("DecoStain"), FLinearColor(0.070f, 0.062f, 0.075f), FLinearColor(0.028f, 0.026f, 0.038f), TEXT("/Game/Art/Textures/T_Metal041B_diff.T_Metal041B_diff"), 400.0f, 3.44f, 0.7f }, // oil/rust staining — heavy-rust grunge grain (ambientCG Metal041B, mean .291; the CC0 stand-in for the scrapped Fab "Grungy Surface")
 		// Plaza deck-plate apron under the well centerpiece: SciFi10_1 X-braced
 		// plate (A1 recipe, mean .202), machine-local Fab pack — flat graphite
@@ -131,6 +158,15 @@ namespace
 		// the apron sits one value step off the asphalt (00011 read grey-on-grey);
 		// hue unchanged — luminance-only, 15.5.
 		{ TEXT("DecoPlaza"), FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/SciFi_Materials_10/Textures/1/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 200.0f, 4.96f, 0.7f },
+		// Worker-row facade kit (the Blender gen_building_kit masonry). 15.8
+		// look-ronde, cam 2: riding the near-neutral Wall_ tint the row washed to
+		// chalk white next to the saturated containers (screen 153/154/163 — the
+		// x10 near-neutral pitfall again, see the barrel lesson at the figures
+		// below). Saturated worker-teal instead, one value step under the BldgB
+		// warehouse so the yard's hierarchy holds: hue stays in the worker-teal
+		// family (15.5 palette discipline), same concrete grain for the masonry
+		// read (multiplicative luminance keeps saturation, so it cannot wash).
+		{ TEXT("KitRow"), FLinearColor(0.070f, 0.225f, 0.235f), FLinearColor(0.026f, 0.080f, 0.115f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },
 	};
 	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f), nullptr, 0.0f, 1.0f, 0.0f };
 
@@ -152,7 +188,11 @@ namespace
 	 * two different stories about where the sun is.
 	 */
 	// Low dusk sun: vertical faces split hard into lit/shade (the cel read), the
-	// floor stays in the mid band (BandLo < sin 25 deg < BandHi in M_EclipseToon).
+	// floor stays in the mid band (BandLo 0.10 < sin 25 deg = 0.423 < BandHi 0.50
+	// in M_EclipseToon — BandHi lowered from 0.55 in the 15.8 look-ronde so BOTH
+	// sun-facing verticals, west +0.52 and south +0.74, read lit; see the BldgA
+	// palette comment for the A/B evidence). Also synced with the hard-coded
+	// SunTravel in EclipseCharacter.cpp.
 	const FRotator SunRotation(-25.0f, 55.0f, 0.0f);
 
 	/**
@@ -350,7 +390,11 @@ void BuildDistrict(UWorld& World)
 	for (const FPointDef& Cover : CoverPoints)
 	{
 		const bool bRotated = (CoverIndex++ % 2) == 0;
-		SpawnBlock(TEXT("Cover"), FVector(Cover.X, Cover.Y, 60.0f),
+		// Alternating blocks take the CoverB tint (one value step down): the
+		// midfield's yellow gets hierarchy instead of twenty identical slabs
+		// (15.8 look-ronde, cam 3). Same hazard hue, same collision, same cover
+		// gameplay — nothing queries the label tag.
+		SpawnBlock(bRotated ? TEXT("Cover") : TEXT("CoverB"), FVector(Cover.X, Cover.Y, 60.0f),
 			FVector(bRotated ? 3.0f : 1.0f, bRotated ? 1.0f : 3.0f, 1.2f));
 	}
 
@@ -487,19 +531,28 @@ void BuildDistrict(UWorld& World)
 			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-4300, 2146, 220), FVector(1.8f, 0.04f, 1.8f) },
 		};
 
+		// Same master choice as the palette blocks and the well (15.8 look-ronde,
+		// lit-A/B agendapunt): under -EclipseLitToon the poster/hazard/stencil
+		// planes are lit surfaces like the walls they hang on, not unlit
+		// hold-outs. Default (no flag) is bit-identical unlit.
+		UMaterialInterface* DecalMaster = ToonLitMaterial != nullptr ? ToonLitMaterial : ToonMaterial;
 		for (const FDecalDef& Decal : Decals)
 		{
 			UTexture* Tex = LoadObject<UTexture>(nullptr, Decal.TexPath);
-			if (Tex == nullptr || ToonMaterial == nullptr)
+			if (Tex == nullptr || DecalMaster == nullptr)
 			{
 				UE_LOG(LogEclipse, Warning, TEXT("Graybox: decal %s missing — skipped (run Tools/generate_decals.py + import)."), Decal.TexPath);
 				continue;
 			}
-			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(DecalMaster, &World);
 			Mid->SetVectorParameterValue(TEXT("LitColor"), Decal.Lit);
 			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Decal.Shade);
 			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
-			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			if (ToonLitMaterial == nullptr)
+			{
+				// Lit variant keeps EmissiveScale 1: BaseColor is albedo.
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			}
 			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
 			Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Decal.TexGain);
 			Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Tex);
@@ -564,19 +617,26 @@ void BuildDistrict(UWorld& World)
 			{ TEXT("/Game/Art/Decals/T_sign_reactor_diff.T_sign_reactor_diff"), 14.8f, SignRedLit, SignRedShade, FVector(-9944, 700, 270), FVector(0.04f, 1.2f, 1.2f) },
 		};
 
+		// Sign placards follow the -EclipseLitToon master choice like the decals
+		// above (well-fix pattern); default unlit path bit-identical.
+		UMaterialInterface* SignMaster = ToonLitMaterial != nullptr ? ToonLitMaterial : ToonMaterial;
 		for (const FSignDef& Sign : Signs)
 		{
 			UTexture* Tex = LoadObject<UTexture>(nullptr, Sign.TexPath);
-			if (Tex == nullptr || ToonMaterial == nullptr)
+			if (Tex == nullptr || SignMaster == nullptr)
 			{
 				UE_LOG(LogEclipse, Warning, TEXT("Graybox: sign %s missing — skipped (run Tools/import_warning_signs.py chain)."), Sign.TexPath);
 				continue;
 			}
-			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(SignMaster, &World);
 			Mid->SetVectorParameterValue(TEXT("LitColor"), Sign.Lit);
 			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Sign.Shade);
 			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
-			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			if (ToonLitMaterial == nullptr)
+			{
+				// Lit variant keeps EmissiveScale 1: BaseColor is albedo.
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			}
 			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
 			Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Sign.TexGain);
 			Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Tex);
@@ -804,20 +864,30 @@ void BuildDistrict(UWorld& World)
 		const FLinearColor MetalLit(0.105f, 0.105f, 0.120f), MetalShade(0.040f, 0.040f, 0.052f);
 		const FLinearColor OliveLit(0.120f, 0.110f, 0.070f), OliveShade(0.050f, 0.045f, 0.035f);
 
-		auto MakeMid = [ToonMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade) -> UMaterialInstanceDynamic*
+		// bFollowLitMaster: poster planes follow the -EclipseLitToon master choice
+		// like the wall decals (15.8 look-ronde, well-fix pattern). Metal/olive
+		// prop tints stay on the unlit master for now (lit-A/B ronde agendapunt,
+		// with the cars/figures); glow planes are light sources and never migrate.
+		auto MakeMid = [ToonMaterial, ToonLitMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade, bool bFollowLitMaster = false) -> UMaterialInstanceDynamic*
 		{
-			if (ToonMaterial == nullptr) { return nullptr; }
-			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			const bool bLitMaster = bFollowLitMaster && ToonLitMaterial != nullptr;
+			UMaterialInterface* Master = bLitMaster ? ToonLitMaterial : ToonMaterial;
+			if (Master == nullptr) { return nullptr; }
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Master, &World);
 			Mid->SetVectorParameterValue(TEXT("LitColor"), Lit);
 			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Shade);
 			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
-			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			if (!bLitMaster)
+			{
+				// Lit variant keeps EmissiveScale 1: BaseColor is albedo.
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			}
 			return Mid;
 		};
 		UMaterialInstanceDynamic* MetalMid = MakeMid(MetalLit, MetalShade);
 		UMaterialInstanceDynamic* OliveMid = MakeMid(OliveLit, OliveShade);
 		UMaterialInstanceDynamic* GenGlowMid = MakeMid(FLinearColor(2.2f, 1.0f, 0.3f), FLinearColor(2.2f, 1.0f, 0.3f));
-		UMaterialInstanceDynamic* PosterMid = MakeMid(FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f));
+		UMaterialInstanceDynamic* PosterMid = MakeMid(FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), /*bFollowLitMaster*/ true);
 		if (PosterMid != nullptr)
 		{
 			if (UTexture* PosterTex = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff")))
@@ -884,9 +954,11 @@ void BuildDistrict(UWorld& World)
 
 		// First hand-built structure (Tools/blender/gen_building_kit.py): a
 		// worker-row facade in the empty NW zone + gantry portals at the gate.
-		// Masonry rides the calibrated Wall_ concrete cel MID (world-aligned
-		// albedo needs no UVs); metalwork rides the metal tint.
-		UMaterialInstanceDynamic* MasonryMid = MidForPalette(PaletteForLabel(TEXT("Wall_")));
+		// Masonry rides the KitRow worker-teal cel MID (world-aligned albedo
+		// needs no UVs) — NOT the Wall_ tint: near-neutral washed the row to
+		// chalk white (15.8 look-ronde, cam 2; see the KitRow palette entry).
+		// Metalwork rides the metal tint.
+		UMaterialInstanceDynamic* MasonryMid = MidForPalette(PaletteForLabel(TEXT("KitRow")));
 		UStaticMesh* KWall = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_WallPanel.SM_Kit_WallPanel"));
 		UStaticMesh* KWindow = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_WallWindow.SM_Kit_WallWindow"));
 		UStaticMesh* KDoor = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Kit_Doorway.SM_Kit_Doorway"));
