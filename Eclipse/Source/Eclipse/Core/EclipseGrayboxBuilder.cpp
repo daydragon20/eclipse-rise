@@ -305,6 +305,114 @@ void BuildDistrict(UWorld& World)
 			FVector(bRotated ? 3.0f : 1.0f, bRotated ? 1.0f : 3.0f, 1.2f));
 	}
 
+	// PLACEHOLDER(15.4): first real prop meshes — CC0 Poly Haven FBX restyled
+	// through the toon pipeline (mesh-UV albedo, luminance-only; provenance in
+	// Content/Art/Textures/SOURCES.md). Dressing tier for now: no collision —
+	// a later pass promotes correctly-sized props to real cover WITH the squad
+	// scenario suite re-run (SPEC-P1-06); missing assets degrade to nothing.
+	{
+		struct FPropDef { const TCHAR* Label; const TCHAR* MeshPath; const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; };
+		const FPropDef Props[] = {
+			{ TEXT("Prop_Barrel"), TEXT("/Game/Art/Props/Barrel_01.Barrel_01"), TEXT("/Game/Art/Textures/T_Barrel_01_diff.T_Barrel_01_diff"), 17.6f, FLinearColor(0.160f, 0.100f, 0.070f), FLinearColor(0.055f, 0.042f, 0.062f) },
+			{ TEXT("Prop_Barrier"), TEXT("/Game/Art/Props/concrete_road_barrier.concrete_road_barrier"), TEXT("/Game/Art/Textures/T_concrete_road_barrier_diff.T_concrete_road_barrier_diff"), 6.7f, FLinearColor(0.26f, 0.27f, 0.30f), FLinearColor(0.085f, 0.090f, 0.140f) },
+			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.080f, 0.280f, 0.300f), FLinearColor(0.030f, 0.100f, 0.150f) },
+		};
+
+		auto SpawnProp = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float YawDeg, float Scale)
+		{
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, YawDeg, 0.0f), Params);
+			if (Actor != nullptr)
+			{
+				Actor->SetMobility(EComponentMobility::Movable);
+				Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+				Actor->SetActorScale3D(FVector(Scale));
+				if (Mid != nullptr)
+				{
+					// Every slot: imported FBX props carry multiple material
+					// slots; any slot left on the default engine material
+					// renders as pale gray and breaks the palette (first prop
+					// round, camera 2 — the "white barrels").
+					for (int32 SlotIndex = 0; SlotIndex < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++SlotIndex)
+					{
+						Actor->GetStaticMeshComponent()->SetMaterial(SlotIndex, Mid);
+					}
+				}
+				Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+				Actor->SetActorEnableCollision(false);
+			}
+		};
+
+		FRandomStream PropRng(211);
+		for (int32 PropIndex = 0; PropIndex < static_cast<int32>(UE_ARRAY_COUNT(Props)); ++PropIndex)
+		{
+			const FPropDef& Prop = Props[PropIndex];
+			UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, Prop.MeshPath);
+			if (Mesh == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: prop %s missing — skipped (run Tools/import_polyhaven_props.py)."), Prop.MeshPath);
+				continue;
+			}
+			UTexture* Tex = LoadObject<UTexture>(nullptr, Prop.TexPath);
+			UMaterialInstanceDynamic* Mid = nullptr;
+			if (ToonMaterial != nullptr)
+			{
+				Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+				Mid->SetVectorParameterValue(TEXT("LitColor"), Prop.Lit);
+				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Prop.Shade);
+				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+				Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Prop.TexGain);
+				if (Tex != nullptr)
+				{
+					Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Tex);
+					Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.85f);
+				}
+			}
+			UE_LOG(LogEclipse, Display, TEXT("Graybox: prop %s slots=%d tex=%s mid=%s"),
+				Prop.Label, Mesh->GetStaticMaterials().Num(),
+				Tex != nullptr ? TEXT("ok") : TEXT("MISSING"),
+				Mid != nullptr ? TEXT("ok") : TEXT("null"));
+
+			if (PropIndex == 0)
+			{
+				// Barrel clusters: warehouse yard, control-post rear, road side.
+				const FVector Centers[] = { FVector(-3300, 3000, 0), FVector(6300, -2600, 0), FVector(2100, 750, 0), FVector(-8600, 8300, 0) };
+				for (const FVector& Center : Centers)
+				{
+					const int32 Count = 3 + (PropRng.RandRange(0, 1));
+					for (int32 Index = 0; Index < Count; ++Index)
+					{
+						SpawnProp(Mesh, Mid,
+							Center + FVector(PropRng.FRandRange(-200.0f, 200.0f), PropRng.FRandRange(-200.0f, 200.0f), 0.0f),
+							PropRng.FRandRange(0.0f, 360.0f), 1.4f);
+					}
+				}
+			}
+			else if (PropIndex == 1)
+			{
+				// Checkpoint barriers flanking the EW artery near the compound approach.
+				for (int32 Index = 0; Index < 6; ++Index)
+				{
+					const float X = -5500.0f + Index * 1700.0f;
+					const float Y = (Index % 2 == 0) ? 640.0f : -640.0f;
+					SpawnProp(Mesh, Mid, FVector(X, Y, 0), (Index % 2 == 0) ? 8.0f : 172.0f, 1.8f);
+				}
+			}
+			else
+			{
+				// Crate stacks in the warehouse yard: two on the ground, one on top.
+				const FVector Stacks[] = { FVector(-4300, 3350, 0), FVector(-3700, 2500, 0) };
+				for (const FVector& Base : Stacks)
+				{
+					SpawnProp(Mesh, Mid, Base, PropRng.FRandRange(0.0f, 360.0f), 2.2f);
+					SpawnProp(Mesh, Mid, Base + FVector(150, 40, 0), PropRng.FRandRange(0.0f, 360.0f), 2.2f);
+					SpawnProp(Mesh, Mid, Base + FVector(75, 20, 92), PropRng.FRandRange(0.0f, 360.0f), 2.2f);
+				}
+			}
+		}
+	}
+
 	// PLACEHOLDER(15.5/03.3): Kessara skyline massing OUTSIDE the playable
 	// perimeter — "silhouetted crane forests" in the amber smog. Pure backdrop:
 	// no nav, no cover, no mission space touched; the art pass replaces it with

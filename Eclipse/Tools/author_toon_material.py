@@ -46,8 +46,11 @@ col = lerp(col, LitColor.rgb, litStep);
 // 1.0 and texturing cannot re-meter the scene's auto-exposure; the clamp
 // kills specular-scratch outliers a 10-30x normalization would blow out.
 float3 an = abs(N);
-float2 tuv = (an.z > 0.6) ? WorldPos.xy : ((an.x >= an.y) ? WorldPos.yz : WorldPos.xz);
-float3 albedo = Texture2DSample(AlbedoTex, AlbedoTexSampler, tuv / max(TexWorldScale, 1.0)).rgb;
+float2 wuv = ((an.z > 0.6) ? WorldPos.xy : ((an.x >= an.y) ? WorldPos.yz : WorldPos.xz)) / max(TexWorldScale, 1.0);
+// UVMode 1 = authored mesh UVs (imported props); 0 = world-aligned (the
+// scaled graybox cubes, which have no usable UVs of their own).
+float2 tuv = lerp(wuv, MeshUV, saturate(UVMode));
+float3 albedo = Texture2DSample(AlbedoTex, AlbedoTexSampler, tuv).rgb;
 float varL = min(dot(albedo, float3(0.2126, 0.7152, 0.0722)) * AlbedoGain, 2.5);
 col *= lerp(1.0, varL, saturate(AlbedoMix));
 // Hatching reads as pen strokes, not corrugation: wide spacing with a thin
@@ -120,6 +123,8 @@ def author_toon(mat_name, lit):
     tex_world_scale = scalar_param("TexWorldScale", 400.0, -900, 800)
     albedo_mix = scalar_param("AlbedoMix", 0.0, -900, 880)
     albedo_gain = scalar_param("AlbedoGain", 1.8, -900, 960)
+    uv_mode = scalar_param("UVMode", 0.0, -900, 1040)
+    mesh_uv = mel.create_material_expression(mat, unreal.MaterialExpressionTextureCoordinate, -900, 1120)
 
     toon = mel.create_material_expression(mat, unreal.MaterialExpressionCustom, -420, 0)
     toon.set_editor_property("code", TOON_HLSL)
@@ -129,7 +134,8 @@ def author_toon(mat_name, lit):
     inputs = []
     for input_name in ("NormalWS", "LitColor", "ShadeColor", "LightDir", "BandHi", "BandLo",
                        "HatchScale", "HatchStrength", "EmissiveScale", "WorldPos",
-                       "AlbedoTex", "TexWorldScale", "AlbedoMix", "AlbedoGain"):
+                       "AlbedoTex", "TexWorldScale", "AlbedoMix", "AlbedoGain",
+                       "UVMode", "MeshUV"):
         custom_input = unreal.CustomInput()
         custom_input.set_editor_property("input_name", input_name)
         inputs.append(custom_input)
@@ -149,6 +155,8 @@ def author_toon(mat_name, lit):
     mel.connect_material_expressions(tex_world_scale, "", toon, "TexWorldScale")
     mel.connect_material_expressions(albedo_mix, "", toon, "AlbedoMix")
     mel.connect_material_expressions(albedo_gain, "", toon, "AlbedoGain")
+    mel.connect_material_expressions(uv_mode, "", toon, "UVMode")
+    mel.connect_material_expressions(mesh_uv, "", toon, "MeshUV")
 
     if not lit:
         mel.connect_material_property(toon, "", unreal.MaterialProperty.MP_EMISSIVE_COLOR)

@@ -13,6 +13,15 @@ header + the ids below against `https://api.polyhaven.com/files/<id>`).
 | `T_corrugated_iron_02_diff` | `corrugated_iron_02` | Diffuse 2K JPG | Warehouse (BldgB) |
 | `T_metal_plate_diff` | `metal_plate` | Diffuse 2K JPG | Dominion post (BldgA) |
 
+**Prop meshes** (`/Game/Art/Props`, FBX 2K, same CC0/Poly Haven origin, downloaded
+2026-07-23; import: `Tools/import_polyhaven_props.py`):
+
+| Asset | Poly Haven id | Used as |
+|---|---|---|
+| `Barrel_01` + `T_Barrel_01_diff` (oxide_grey variant) | `Barrel_01` | Barrel clusters (yards, checkpoints) |
+| `concrete_road_barrier` + `T_concrete_road_barrier_diff` | `concrete_road_barrier` | Artery checkpoint barriers |
+| `plastic_crate_03` + `T_plastic_crate_03_diff` | `plastic_crate_03` | Warehouse-yard crate stacks |
+
 Style contract (15.5): textures enter the picture **through the toon pipeline** —
 multiplied into the cel bands via world-aligned projection in `M_EclipseToon`;
 the palette, banding, and ink outlines stay in charge. These are placeholder-grade
