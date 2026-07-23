@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-23 14:15",
+  bijgewerkt: "2026-07-23 14:40",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -15,6 +15,29 @@ window.PROGRESS_DATA = {
     toelichting: "Ruwe inschatting, geen belofte: gebaseerd op het huidige commit-tempo en de resterende backlog per fase. Wordt elke milestone bijgesteld.",
     bijgesteld: "2026-07-23"
   },
+
+  // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
+  ownerActies: [
+    { titel: "Overbodige downloads annuleren", prio: "nu", waarom: "bespaart ~30 GB schijf", stappen: [
+      "Epic Games Launcher → Downloads",
+      "Annuleer: alle Paragon-helden (Kwang, Narbash, Wukong, Riktor, Sevarog…), Old West VOL 4/6, Path of Adventure JRPG-muziek, NWIRO AI Pro",
+      "Laat staan: Photogrammetry Snow, Plant Models Vol 60, Perfect Fire VFX"
+    ] },
+    { titel: "MetaHuman-gezichten binnenhalen", prio: "gauw", waarom: "nodig voor de named characters (Fase 2)", stappen: [
+      "Unreal → Window → Fab → My Library",
+      "Klik 1× Download bij elk MetaHuman-item",
+      "Zeg de agent: 'MetaHumans staan erin'"
+    ] },
+    { titel: "1 civilian/worker-pack toevoegen", prio: "optioneel", waarom: "enige character-gat: Kessara-burgers close-up", stappen: [
+      "Fab: zoek een gestileerd civilian/worker-pack (4–6 bodies, Mannequin-rig)",
+      "Add to Project → Eclipse"
+    ] },
+    { titel: "13.2-playtest (~30 min)", prio: "als je tijd hebt", waarom: "sluit Fase 1 af + stuurt de eerste review", stappen: [
+      "Speel de graybox-loop ~30 min in de editor",
+      "Noteer kort wat goed/slecht voelt",
+      "Geef het door aan de agent"
+    ] }
+  ],
 
   // Assets-overzicht — wat is binnengehaald, zelf gemaakt, en wat nog te doen. Dev-sessie houdt dit actueel.
   assets: {
@@ -66,23 +89,24 @@ window.PROGRESS_DATA = {
     { titel: "Westgevel-kleur (checkpoint-muur, cam 1)", status: "open",
       vraag: "De westgevel leest zalmroze doordat hij nét in de mid-band van de cel-shading valt (ndl +0.52, BandHi 0.55); de zuidgevel leest verzadigd oxide — één gebouw oogt als twee assets. Welke variant leest beter als één gebouw, zonder de andere cams te schaden?",
       opties: [
-        { label: "A — banddrempel 0.50", img: "", uitleg: "westgevel schuift de lit-band in; globale look-shift, effect op alle cams wordt mee-gecheckt" },
-        { label: "B — alternatief (lokale correctie)", img: "", uitleg: "zon-nudge of per-gevel tint-compensatie; details volgen uit de builder-A/B" }
+        { label: "A — banddrempel 0.50", img: "progress_media/ab_westgevel_A.png", uitleg: "westgevel schuift de lit-band in en wordt pixel-gelijk aan de zonzijde (gemeten 251,160,53 ≈ 252,158,55); werkt district-breed, exposure-delta ≤2 op alle zes cams" },
+        { label: "B — per-gevel tint-compensatie", img: "progress_media/ab_westgevel_B.png", uitleg: "alleen de gecompenseerde gevel wordt goed; de compound-gevel verderop en elke andere westgevel blijven zalmroze — schaalt niet" },
+        { label: "referentie (oude stand)", img: "progress_media/ab_westgevel_ref.png", uitleg: "gebankte ronde vóór de fix: westgevel zalmroze (236,126,88), zuidgevel oxide — één gebouw leest als twee assets" }
       ],
-      aanbeveling: "volgt na de shot-ronde van de look-builder (draait nu)", keuze: "" }
+      aanbeveling: "A — objectief beter (systemisch, cel-logisch: zonzijde = lit; nul neveneffecten gemeten). A is als voorlopige stand geïmplementeerd; zeg B en de dev-sessie draait het om.", keuze: "" }
   ],
 
   secties: [
     {
       titel: "1 · Roadmap", scope: "Part 13",
       items: [
-        { naam: "Fase 0 — Pre-productie", pct: 90, doel: "2026-07-24", notitie: "Open: CI-runner, concept-art, feel-clips." },
-        { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, doel: "2026-07-26", notitie: "Vrijwel af; resteert de 13.2-playtest (eigenaar)." },
-        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 9, doel: "2026-08-25", notitie: "ACTIEF: body-pipeline + archetypes + curatie geland; P2-01 (squad van 4 + classes) loopt." },
-        { naam: "Fase 3 — Early Build", pct: 0, doel: "2026-11-01" },
-        { naam: "Fase 4 — Alpha", pct: 0, doel: "2027-02-01" },
-        { naam: "Fase 5 — Beta", pct: 0, doel: "2027-05-01" },
-        { naam: "Fase 6 — Release", pct: 0, doel: "2027-08-01" }
+        { naam: "Fase 0 — Pre-productie", pct: 90, doel: "2026-07-24", groot: "Fundament: alle systeem-architectuur opgezet, de Borderlands-art-richting gelockt, en de tools klaar. De basis waar alles op bouwt.", notitie: "Open: CI-runner, concept-art, feel-clips.", nodig: { type: "wachten" } },
+        { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, doel: "2026-07-25", groot: "Bewijzen dat de kern-loop (missie → squad → gevecht → basis) écht leuk speelt — op blokken (graybox). Bewust nog geen mooie graphics; die volgen pas als het spel leuk is.", notitie: "Vrijwel af; resteert de 13.2-playtest.", nodig: { type: "owner", stappen: ["Speel de graybox-loop ~30 min in de editor (PIE)", "Noteer kort wat goed/slecht voelt", "Geef het door aan de agent — dit sluit Fase 1 af"] } },
+        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 9, doel: "2026-08-12", groot: "HET grote moment: het eerste district (Kessara) in vólle Borderlands-kwaliteit — echte gebouwen, characters met MetaHuman-gezichten, gevechts-feel. Hier zie je voor het eerst hoe de game er echt uit gaat zien.", notitie: "ACTIEF: body-pipeline + P2-01 (squad van 4 + classes) lopen.", nodig: { type: "owner", stappen: ["MetaHuman: 1× Download per item in Window→Fab, dan agent laten inpluggen", "1 gestileerd civilian/worker-pack toevoegen (enige character-gat)", "Westgevel-kleur A/B kiezen zodra de shots in het paneel staan"] } },
+        { naam: "Fase 3 — Early Build", pct: 0, doel: "2026-08-31", groot: "De wereld wordt groot: meer planeten + missies uitgerold, allemaal in de Borderlands-stijl. De vertical-slice-kwaliteit wordt over de hele game uitgesmeerd.", nodig: { type: "wachten" } },
+        { naam: "Fase 4 — Alpha", pct: 0, doel: "2026-09-20", groot: "Hele game speelbaar van begin tot eind — alle content zit erin, nog niet gepolijst.", nodig: { type: "wachten" } },
+        { naam: "Fase 5 — Beta", pct: 0, doel: "2026-10-10", groot: "Polijsten + optimaliseren: performance, bugfixes, alles naar AAA-afwerking.", nodig: { type: "wachten" } },
+        { naam: "Fase 6 — Release", pct: 0, doel: "2026-10-31", groot: "Afwerken en uitbrengen op Steam / Epic Games Store.", nodig: { type: "wachten" } }
       ]
     },
     {
