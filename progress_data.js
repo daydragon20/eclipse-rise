@@ -7,6 +7,16 @@ window.PROGRESS_DATA = {
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "PIE-playtest door eigenaar: OPEN (gate-vraag 13.2)",
 
+  // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
+  taken: [
+    { taak: "Fab-library uitlezen", status: "wachten", pct: 60, detail: "Launcher-cache (listings_v1.db) bestaat maar is leeg — eigenaar opent één keer Launcher → Unreal Engine → Library → Fab Library, dan lees ik de ~1000 assets zelf uit." },
+    { taak: "Character-pipeline (stap 2)", status: "gepland", pct: 0, detail: "C++/data op DT_NamePools + DA_CharacterTuning + DT_EnemyArchetypes: BaseCharacter-opzet, squad-identiteit (naam/traits/rang/permadeath), Dominion-archetypes, anim-retargeting. Start na Fab-packs (placeholders waar nodig)." },
+    { taak: "MetaHuman-recepten (stap 3)", status: "gepland", pct: 0, detail: "Per named character (Kaya, Brick, Vale, Dex, Petra, Kaine) code/data-slots + exact Creator-recept voor de eigenaar." },
+    { taak: "Graphics-iteraties (15.8-loop)", status: "bezig", pct: 100, detail: "6 iteraties gebankt vandaag: inktlijnen-fix, skyline, textures, straat-dressing, decals, eerste bewoners — loopt door met patrol-figuren + particles." },
+    { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build + 31/31 tests + validatie 0 + catalog 19/19 vóór elke commit/push." },
+    { taak: "Wachtrij eigenaar", status: "wachten", pct: 0, detail: "ElevenLabs-scopes Music/SFX (taak D-liveruns) · Blender-UAC-goedkeuring · Fab 'Add to Project'-kliks." }
+  ],
+
   secties: [
     {
       titel: "1 · Roadmap", scope: "Part 13",

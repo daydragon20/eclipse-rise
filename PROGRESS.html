@@ -40,6 +40,13 @@
   .chip-ok{border-color:rgba(12,163,12,0.45);color:#9fe29f}
   .chip-bad{border-color:rgba(208,59,59,0.55);color:#f0a2a2}
   .chip-open{border-color:rgba(250,178,25,0.5);color:#ffd57a}
+  .status{display:inline-block;min-width:64px;text-align:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.02em}
+  .status-bezig{background:rgba(250,178,25,0.16);color:#ffd57a;border:1px solid rgba(250,178,25,0.5)}
+  .status-wachten{background:rgba(236,131,90,0.14);color:#f2b49b;border:1px solid rgba(236,131,90,0.5)}
+  .status-klaar{background:rgba(12,163,12,0.16);color:#9fe29f;border:1px solid rgba(12,163,12,0.45)}
+  .status-gepland{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--hairline)}
+  .taakrij{display:grid;grid-template-columns:78px minmax(190px,300px) 1fr 52px;gap:4px 12px;align-items:center}
+  .taakrij .notitie{grid-column:2 / -1;margin-top:-2px}
   .galerij{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px}
   figure{background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;overflow:hidden}
   figure img{display:block;width:100%;height:auto}
@@ -101,6 +108,23 @@ function render(){
 
   // hero
   h += '<section class="kaart"><div class="rijen">' + balkRij({ naam: D.hero.label, pct: D.hero.pct }, true) + '</div></section>';
+
+  // live takenlijst van de dev-sessie (data: progress_data.js -> taken)
+  if (D.taken && D.taken.length){
+    h += '<section class="kaart"><h2>Nu bezig <span class="scope">live takenlijst van de AI-dev — bijgewerkt per iteratie</span></h2><div class="rijen">';
+    D.taken.forEach(function(t){
+      var p = Math.max(0, Math.min(100, t.pct|0));
+      var cls = { bezig:"status-bezig", wachten:"status-wachten", klaar:"status-klaar", gepland:"status-gepland" }[t.status] || "status-gepland";
+      h += '<div class="taakrij">' +
+        '<span class="status ' + cls + '">' + t.status + '</span>' +
+        '<span class="naam">' + t.taak + '</span>' +
+        '<div class="balk" aria-hidden="true"><div class="vul" style="width:' + p + '%;background:' + kleur(p) + '"></div></div>' +
+        '<span class="pct">' + p + '%</span>' +
+        (t.detail ? '<p class="notitie">' + t.detail + '</p>' : '') +
+        '</div>';
+    });
+    h += '</div></section>';
+  }
 
   // kwaliteitsbalk uit AUTO-feiten
   var t = A.tests || {};
