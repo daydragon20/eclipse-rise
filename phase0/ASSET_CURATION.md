@@ -33,7 +33,7 @@ All FX helpers (muzzle flashes, water-impact cylinders, smoke planes, spline rib
 
 | # | Accept | Use | Restyle |
 |---|---|---|---|
-| A2 | `/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX` | 11.8 m circular basin ring (2048 tri): plaza centerpiece — industrial vat / landing-pad rim between the crossing lamps | graphite; AlbedoTex `T_4k_SciFi10_2_BaseColor` (circular pad graphic), gain **1.35**, world-aligned, TexWorldScale ~1200 |
+| A2 | `/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX` | 11.8 m circular basin ring (2048 tri): plaza centerpiece — **PLACED** (2026-07-23) at (600, 1800) on a 20 m DecoPlaza deck-plate apron, tile-locked so the pad graphic centers on the ring | graphite; AlbedoTex `T_4k_SciFi10_2_BaseColor` (circular pad graphic), gain **1.35**, world-aligned, TexWorldScale 1200, mix 0.8 |
 | A3 | `/Game/ParagonMinions/FX/Meshes/Debris/Granite_Large_Grey_Mossy_Rough` | 5.1 m boulder (8738 tri): slag/rubble heap in Contested pockets against the perimeter wall | stain; **no AlbedoTex** (the mossy hue must never enter — luminance discipline; flat cel + ink outline makes it read stylized slag) |
 | C1 | `/Game/ParagonMinions/FX/Meshes/Minion_Specific/Jungle/SM_Rock_Chunk_LowPoly` | CONDITIONAL: broken slab filler *inside* rubble piles only (348 tri — solo it reads low-poly, which 15.5 forbids; instanced 3–5× overlapping under A3 the facets read as Borderlands chunking) | stain; no AlbedoTex |
 
@@ -53,8 +53,8 @@ The BaseColors are flat-graphic trim/panel sheets (cream/orange/grey) — the mo
 
 | Albedo (`/Game/SciFi_Materials_10/Textures/<n>/…`) | mean-lin | gain | Use in the district |
 |---|---|---|---|
-| `1/T_4k_SciFi10_1_BaseColor` | 0.202 | **4.96** | dark X-braced deck plate: plaza floor panels, A1 plinth, landing pad |
-| `2/T_4k_SciFi10_2_BaseColor` | 0.742 | **1.35** | circular pad centerpiece: under A2 ring, machine bases |
+| `1/T_4k_SciFi10_1_BaseColor` | 0.202 | **4.96** | dark X-braced deck plate — **PLACED** as the DecoPlaza apron under the A2 ring (TexWorldScale 200, mix 0.7); still open: A1 plinth, landing pad |
+| `2/T_4k_SciFi10_2_BaseColor` | 0.742 | **1.35** | circular pad centerpiece — **PLACED** on the A2 ring; still open: machine bases |
 | `5/T_4k_SciFi10_5_BaseColor` | 0.903 | **1.11** | perforated sheet panel: warehouse (BldgB) interior walls |
 | `6/T_4k_SciFi10_6_BaseColor` | 0.720 | **1.39** | machine-bank graphic: control-wall faces on machine blocks |
 | `7/T_4k_SciFi10_7_BaseColor` | 0.562 | **1.78** | cross-braced plating with corner castings: Dominion post (BldgA) trim |
@@ -67,9 +67,12 @@ The BaseColors are flat-graphic trim/panel sheets (cream/orange/grey) — the mo
 
 | # | Accept | Use | Gain |
 |---|---|---|---|
-| A9 | `/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B` | 4K asphalt albedo — upgrade for the district Floor slot (current `T_asphalt_03_diff` is 2K, gain 16.8) | mean 0.081 → gain **12.41**; keep TexWorldScale 700, TexMix 0.5 |
+| A9 | `/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B` | 4K asphalt albedo — **PLACED** (2026-07-23) as the Floor slot primary; the repo-tracked `T_asphalt_03_diff` (gain 16.8) is the declared fallback on machines without the pack | mean 0.081 → gain **12.41**; TexWorldScale 700, TexMix 0.5 |
 
-**Incomplete:** `Grungy_Surface_slnnecvc` shipped only its MR map — no albedo on this machine; unusable until re-downloaded (owner click below). **Not curation targets:** `MaterialFunctions/QMF_*`, default textures, MetaHuman base normals — Quixel/MetaHuman infrastructure, keep as-is, never restyle.
+**Scrapped (owner decision 2026-07-23):** `Grungy_Surface_slnnecvc` shipped only
+its MR map — the Fab re-download is **cancelled**; the equivalent grungy surface
+is ambientCG CC0 `Metal041B` (§9), which landed in the DecoStain slot. No owner
+click remains. **Not curation targets:** `MaterialFunctions/QMF_*`, default textures, MetaHuman base normals — Quixel/MetaHuman infrastructure, keep as-is, never restyle.
 
 ## 7. /Game/Screen_Damage_Indicator — 5 static meshes → **0 accepted; 2 assets flagged for the HUD lane**
 
@@ -84,28 +87,39 @@ All 60 albedos exported and judged on a contact sheet (`Tools/export_sign_albedo
 | `T_sign_stop_diff` | 09 | 0.113 | 8.9 | gate portal (in use) |
 | `T_sign_radiation_diff` | 17 | 0.093 | 10.7 | crossing lamp (in use) |
 | `T_sign_toxic_diff` | 30 | 0.154 | 6.5 | west wall, Entry_Main (in use) |
-| `T_sign_route_diff` **new** | 36 | 0.079 | **12.7** | checkpoint routing arrow at the artery choke |
-| `T_sign_labor_diff` **new** | 50 | 0.121 | **8.2** | Underworks labor-yard gate (labor stories, art bible §2.2) |
-| `T_sign_blast_diff` **new** | 51 | 0.099 | **10.2** | munitions/demolition fence by the Dominion post |
-| `T_sign_reactor_diff` **new** | 53 | 0.061 | **16.4** | heavy-rust exclusion-zone triangle on the perimeter wall |
+| `T_sign_route_diff` **new** | 36 | 0.079 | **12.7** | **PLACED**: routing arrow on the second crossing lamp at the artery choke, red family (pairs with the radiation placard, review cam 6) |
+| `T_sign_labor_diff` **new** | 50 | 0.121 | **8.2** | **PLACED**: beside the warehouse yard's east gate gap on BldgB_E (labor stories, art bible §2.2), amber |
+| `T_sign_blast_diff` **new** | 51 | 0.099 | **10.2** | **PLACED**: Dominion post west face — munitions warning on the checkpoint approach, amber (pops on oxide red) |
+| `T_sign_reactor_diff` **new** | 53 | 0.061 | **16.4** | **PLACED**: west perimeter wall north of the gate, red — exclusion zone stacked over the rebel stencil story |
 
-Placement of the four new placards is the district builder's call (sign-plane pattern already exists for 09/17/30). **Rejected (53):** joke/meme signs (`NO LIFE` 06/07, `STOP RUN` 08, camera 57/60, `LOVE` 27/28, `BAD DOG` 18–21, food 58/59 — off the grounded Expanse/Andor tone), civic-traffic family (22–26, 44–48 — reads suburban, not industrial oppression), skull/poison variants 14–16, 54–56 (duplicative of toxic/reactor), remaining rust-triangle variants (weaker reads of the accepted seven).
+All seven placards are now dressed by the builder (2026-07-23 placement round; sign-plane pattern, `Deco_Sign`). **Rejected (53):** joke/meme signs (`NO LIFE` 06/07, `STOP RUN` 08, camera 57/60, `LOVE` 27/28, `BAD DOG` 18–21, food 58/59 — off the grounded Expanse/Andor tone), civic-traffic family (22–26, 44–48 — reads suburban, not industrial oppression), skull/poison variants 14–16, 54–56 (duplicative of toxic/reactor), remaining rust-triangle variants (weaker reads of the accepted seven).
 
-## 9. ambientCG CC0 imports (this pass) — **3 accepted**
+## 9. ambientCG CC0 imports — **5 accepted, 2 parked**
 
-Imported by `inventory_curation_pass.py` from `Saved/CC0Staging/ambientcg` into `/Game/Art/Textures` (Color maps only — the toon pipeline has no use for PBR normal/roughness). Provenance appended to `Content/Art/Textures/SOURCES.md`.
+Imported from `Saved/CC0Staging/ambientcg` into `/Game/Art/Textures` (Color maps
+only — the toon pipeline has no use for PBR normal/roughness). First batch via
+`inventory_curation_pass.py` §B; follow-up batches via the reusable
+`Tools/import_cc0_albedos.py` (2026-07-23: the grunge-replacement round —
+`fetch_cc0.py` q=-search fix, `rust`/`corrugated` pulls). Provenance in
+`Content/Art/Textures/SOURCES.md`.
 
 | Asset | mean-lin | gain | Use |
 |---|---|---|---|
-| `/Game/Art/Textures/T_Metal046B_diff` (2K) | 0.051 | **19.76** | dark mottled steel: machine blocks, doors, BldgA shade surfaces |
-| `/Game/Art/Textures/T_Concrete042A_diff` (2K) | 0.112 | **8.94** | smooth shuttered concrete: perimeter-wall variant, bunkers |
-| `/Game/Art/Textures/T_Metal063_diff` (1K — ambientCG free tier caps this set) | 0.156 | **6.39** | rust-speckled blue-grey steel: containers, crates, gantry beams |
+| `/Game/Art/Textures/T_Metal046B_diff` (2K) | 0.051 | **19.76** | dark mottled steel: machine blocks, doors, BldgA shade surfaces (not placed yet) |
+| `/Game/Art/Textures/T_Concrete042A_diff` (2K) | 0.112 | **8.94** | smooth shuttered concrete: perimeter-wall variant, bunkers (not placed yet) |
+| `/Game/Art/Textures/T_Metal063_diff` (**2K re-import 2026-07-23**, was 1K) | 0.156 | **6.42** (was 6.39 @1K — slot value re-measured, same discipline) | rust-speckled blue-grey steel: containers, crates, gantry beams (not placed yet) |
+| `/Game/Art/Textures/T_Metal041B_diff` (2K) **new** | 0.291 | **3.44** | heavy-rust grunge — **PLACED** in the DecoStain slot (TexWorldScale 400, mix 0.7); the CC0 stand-in for the scrapped Fab "Grungy Surface" |
+| `/Game/Art/Textures/T_CorrugatedSteel007A_diff` (2K) **new** | 0.367 | **2.72** | rusty corrugated sheet — **PLACED** on the warehouse (BldgB, TexWorldScale 300, mix 0.45), replacing `T_corrugated_iron_02_diff` |
+
+**Parked (staged, not imported):** `MetalWalkway014` (grating with an Opacity
+map — not a tileable albedo; would need a masked-material path first),
+`CorrugatedSteel009` (fetch by-catch; 007A is the accepted rusty sheet).
 
 ---
 
 ## Tally & owner clicks
 
-**Accepted: 29** (9 meshes incl. 1 conditional + 18 textures/placards + 2 HUD-flagged) · **Rejected: ~340** (276 Paragon SM, 12 ivy, 5 proto meshes, 53 signs, 3 SciFi albedos + master/MIs, misc FX). Every accept renders through `M_EclipseToon` MIDs with the gains above; no raw material from any pack survives curation.
+**Accepted: 31** (9 meshes incl. 1 conditional + 20 textures/placards + 2 HUD-flagged) · **Rejected: ~340** (276 Paragon SM, 12 ivy, 5 proto meshes, 53 signs, 3 SciFi albedos + master/MIs, misc FX) · **Parked: 2** (ambientCG staging). Every accept renders through `M_EclipseToon` MIDs with the gains above; no raw material from any pack survives curation.
 
-**Owner clicks (optional, 1):**
-1. Window → Fab → re-download **Grungy Surface (slnnecvc)** — the albedo map is missing on this machine (only MR landed); until then the surface is unusable and stays rejected.
+**Owner clicks: 0.** The former Grungy-Surface re-download click is scrapped by
+owner decision (2026-07-23) — ambientCG `Metal041B` is the CC0-first replacement.

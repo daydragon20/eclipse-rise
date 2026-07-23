@@ -8,20 +8,28 @@ header + the ids below against `https://api.polyhaven.com/files/<id>`).
 
 | Asset | Poly Haven id | Map | Used on |
 |---|---|---|---|
-| `T_asphalt_03_diff` | `asphalt_03` | Diffuse 2K JPG | District floor (Floor) |
+| `T_asphalt_03_diff` | `asphalt_03` | Diffuse 2K JPG | Floor fallback (primary is the machine-local Megascans 4K asphalt, gain 12.41) |
 | `T_concrete_block_wall_diff` | `concrete_block_wall` | Diffuse 2K JPG | Perimeter walls (Wall_) |
-| `T_corrugated_iron_02_diff` | `corrugated_iron_02` | Diffuse 2K JPG | Warehouse (BldgB) |
+| `T_corrugated_iron_02_diff` | `corrugated_iron_02` | Diffuse 2K JPG | superseded on BldgB by `T_CorrugatedSteel007A_diff` (2026-07-23); kept on disk |
 | `T_metal_plate_diff` | `metal_plate` | Diffuse 2K JPG | Dominion post (BldgA) |
 
-**ambientCG CC0 albedos** (downloaded 2026-07-23 via `Tools/fetch_cc0.py`, imported
-by `Tools/inventory_curation_pass.py` — Color maps only; gains + intended slots in
+**ambientCG CC0 albedos** (downloaded via `Tools/fetch_cc0.py`, imported by
+`Tools/import_cc0_albedos.py` (first batch: `inventory_curation_pass.py` §B) —
+Color maps only; gains measured by `Tools/measure_albedo_gain.py`, placements in
 `phase0/ASSET_CURATION.md`):
 
-| Asset | ambientCG id | Map | Gain (1/mean-lin) |
-|---|---|---|---|
-| `T_Metal046B_diff` | `Metal046B` | Color 2K JPG | 19.76 |
-| `T_Concrete042A_diff` | `Concrete042A` | Color 2K JPG | 8.94 |
-| `T_Metal063_diff` | `Metal063` | Color 1K JPG (free-tier cap) | 6.39 |
+| Asset | ambientCG id | Map | Gain (1/mean-lin) | Slot |
+|---|---|---|---|---|
+| `T_Metal046B_diff` | `Metal046B` | Color 2K JPG | 19.76 | intended: machine blocks/doors (not placed yet) |
+| `T_Concrete042A_diff` | `Concrete042A` | Color 2K JPG | 8.94 | intended: wall variant/bunkers (not placed yet) |
+| `T_Metal063_diff` | `Metal063` | Color 2K JPG (2K re-import 2026-07-23, was 1K) | 6.42 (was 6.39 @1K) | intended: containers/crates/gantry (not placed yet) |
+| `T_Metal041B_diff` | `Metal041B` | Color 2K JPG | 3.44 | DecoStain grunge grain (placed) — CC0 stand-in for the scrapped Fab "Grungy Surface" (owner decision 2026-07-23) |
+| `T_CorrugatedSteel007A_diff` | `CorrugatedSteel007A` | Color 2K JPG | 2.72 | Warehouse (BldgB) (placed) |
+
+Staged but parked (in `Saved/CC0Staging/ambientcg`, deliberately not imported):
+`MetalWalkway014` (grating with an Opacity map — not a tileable albedo; needs a
+masked-material path first) and `CorrugatedSteel009` (fetch by-catch; 007A is
+the accepted rusty sheet).
 
 **Prop meshes** (`/Game/Art/Props`, FBX 2K, same CC0/Poly Haven origin, downloaded
 2026-07-23; import: `Tools/import_polyhaven_props.py`):

@@ -105,20 +105,30 @@ namespace
 	// unchanged by texturing (first textured round: the darker floor re-metered
 	// the whole scene into daylight). TexMix < 1 blends toward the flat cel
 	// color where a texture's value range fights the palette.
-	struct FPaletteDef { const TCHAR* Prefix; FLinearColor Lit; FLinearColor Shade; const TCHAR* TexPath; float TexScale; float TexGain; float TexMix; };
+	// FallbackTexPath (optional): machine-local Fab/Megascans primaries degrade
+	// to a repo-tracked CC0 texture instead of flat cel on machines without the
+	// pack (curation contract, phase0/ASSET_CURATION.md; GDD 14.3.5).
+	struct FPaletteDef { const TCHAR* Prefix; FLinearColor Lit; FLinearColor Shade; const TCHAR* TexPath; float TexScale; float TexGain; float TexMix; const TCHAR* FallbackTexPath; float FallbackTexGain; };
 	const FPaletteDef Palette[] = {
-		// TexGain = 1/measured-linear-average (System.Drawing sample pass,
-		// 2026-07-22): asphalt .059, concrete .049, metal .031, corrugated .095.
-		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f), TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 700.0f, 16.8f, 0.5f },  // asphalt — dark but never crushed
+		// TexGain = 1/measured-linear-average (Tools/measure_albedo_gain.py —
+		// exact sRGB EOTF + Rec.709; the toon HLSL clamps the per-pixel
+		// multiplier at 2.5, so raw gains stay honest here).
+		// Floor: Megascans 4K asphalt (A9, curation pass 2026-07-23, mean .081)
+		// with the 2K Poly Haven asphalt as repo-tracked fallback (mean .059).
+		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // asphalt — dark but never crushed
 		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
 		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },  // Dominion post: oxide red, shade to maroon-purple (variation is luminance-only, hue stays palette)
-		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_corrugated_iron_02_diff.T_corrugated_iron_02_diff"), 300.0f, 10.5f, 0.45f },  // warehouse: worker teal, shade to deep sea
+		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: worker teal over rusty corrugated sheet (ambientCG 007A, mean .367 — replaces corrugated_iron_02)
 		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f), nullptr, 0.0f, 1.0f, 0.0f },  // hazard orange, reads as cover
 		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f), nullptr, 0.0f, 1.0f, 0.0f }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
 		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f), nullptr, 0.0f, 1.0f, 0.0f },  // sodium-orange window strips — bright enough to survive 15 km of smog
 		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f), nullptr, 0.0f, 1.0f, 0.0f }, // industrial plain under the skyline, darker than the district floor
 		{ TEXT("DecoLine"), FLinearColor(0.700f, 0.660f, 0.520f), FLinearColor(0.300f, 0.280f, 0.240f), nullptr, 0.0f, 1.0f, 0.0f }, // worn lane paint on the plaza asphalt
-		{ TEXT("DecoStain"), FLinearColor(0.070f, 0.062f, 0.075f), FLinearColor(0.028f, 0.026f, 0.038f), nullptr, 0.0f, 1.0f, 0.0f }, // oil/rust staining, darker than the floor mid tone
+		{ TEXT("DecoStain"), FLinearColor(0.070f, 0.062f, 0.075f), FLinearColor(0.028f, 0.026f, 0.038f), TEXT("/Game/Art/Textures/T_Metal041B_diff.T_Metal041B_diff"), 400.0f, 3.44f, 0.7f }, // oil/rust staining — heavy-rust grunge grain (ambientCG Metal041B, mean .291; the CC0 stand-in for the scrapped Fab "Grungy Surface")
+		// Plaza deck-plate apron under the well centerpiece: SciFi10_1 X-braced
+		// plate (A1 recipe, mean .202), machine-local Fab pack — flat graphite
+		// cel when absent.
+		{ TEXT("DecoPlaza"), FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/SciFi_Materials_10/Textures/1/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 200.0f, 4.96f, 0.7f },
 	};
 	const FPaletteDef DefaultPalette = { TEXT(""), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f), nullptr, 0.0f, 1.0f, 0.0f };
 
@@ -206,8 +216,11 @@ void BuildDistrict(UWorld& World)
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Graybox: -EclipseLitToon set but M_EclipseToonLit missing — unlit toon fallback (run Tools/author_toon_material.py)."));
 	}
-	TMap<uint32, UMaterialInstanceDynamic*> MidByColor;
-	auto MidForPalette = [ToonMaterial, ToonLitMaterial, BaseMaterial, &MidByColor, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
+	// Keyed by palette prefix, not by color: DecoPlaza shares Wall_'s graphite
+	// tint but carries its own deck-plate albedo — a color key would collapse
+	// the two into whichever MID spawned first.
+	TMap<uint32, UMaterialInstanceDynamic*> MidByPrefix;
+	auto MidForPalette = [ToonMaterial, ToonLitMaterial, BaseMaterial, &MidByPrefix, &World](const FPaletteDef& Entry) -> UMaterialInstanceDynamic*
 	{
 		// Glow strips stay unlit-emissive under every mode — they are light
 		// sources, not lit surfaces.
@@ -217,7 +230,7 @@ void BuildDistrict(UWorld& World)
 		{
 			return nullptr; // both materials missing = plain blocks, never a crash (GDD 14.3.5)
 		}
-		UMaterialInstanceDynamic*& Mid = MidByColor.FindOrAdd(GetTypeHash(Entry.Lit.ToFColor(true)));
+		UMaterialInstanceDynamic*& Mid = MidByPrefix.FindOrAdd(GetTypeHash(FStringView(Entry.Prefix)));
 		if (Mid == nullptr)
 		{
 			Mid = UMaterialInstanceDynamic::Create(Master, &World);
@@ -234,19 +247,28 @@ void BuildDistrict(UWorld& World)
 					Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
 				}
 				// CC0 albedo pass: opt in per entry; a missing asset degrades to
-				// the flat cel look, never a crash (GDD 14.3.5).
+				// the declared fallback texture (machine-local Fab primaries →
+				// repo-tracked CC0), then to flat cel — never a crash (14.3.5).
 				if (Entry.TexPath != nullptr)
 				{
-					if (UTexture* Albedo = LoadObject<UTexture>(nullptr, Entry.TexPath))
+					UTexture* Albedo = LoadObject<UTexture>(nullptr, Entry.TexPath);
+					float Gain = Entry.TexGain;
+					if (Albedo == nullptr && Entry.FallbackTexPath != nullptr)
+					{
+						UE_LOG(LogEclipse, Warning, TEXT("Graybox: albedo %s missing — falling back to %s (machine-local pack not pulled)."), Entry.TexPath, Entry.FallbackTexPath);
+						Albedo = LoadObject<UTexture>(nullptr, Entry.FallbackTexPath);
+						Gain = Entry.FallbackTexGain;
+					}
+					if (Albedo != nullptr)
 					{
 						Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Albedo);
 						Mid->SetScalarParameterValue(TEXT("TexWorldScale"), Entry.TexScale);
-						Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Entry.TexGain);
+						Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Gain);
 						Mid->SetScalarParameterValue(TEXT("AlbedoMix"), Entry.TexMix);
 					}
 					else
 					{
-						UE_LOG(LogEclipse, Warning, TEXT("Graybox: albedo %s missing — flat cel fallback (run Tools/import_polyhaven_textures.py)."), Entry.TexPath);
+						UE_LOG(LogEclipse, Warning, TEXT("Graybox: albedo %s missing — flat cel fallback (run Tools/import_polyhaven_textures.py / import_cc0_albedos.py)."), Entry.TexPath);
 					}
 				}
 			}
@@ -492,6 +514,19 @@ void BuildDistrict(UWorld& World)
 			{ TEXT("/Game/Art/Decals/T_sign_radiation_diff.T_sign_radiation_diff"), 10.7f, SignAmberLit, SignAmberShade, FVector(-4650, -675, 230), FVector(0.9f, 0.04f, 0.9f) },
 			// TOXIC on the west wall inner face — the Dominion answer to the rebel stencil across the Entry_Main gap.
 			{ TEXT("/Game/Art/Decals/T_sign_toxic_diff.T_sign_toxic_diff"), 6.5f, SignAmberLit, SignAmberShade, FVector(-9944, -350, 260), FVector(0.04f, 1.4f, 1.4f) },
+			// Curation pass 2026-07-23, the four new placards (ASSET_CURATION.md §8):
+			// ROUTE arrow on the second crossing lamp — the artery choke's checkpoint
+			// routing, paired face-on with the radiation placard (review camera 6).
+			{ TEXT("/Game/Art/Decals/T_sign_route_diff.T_sign_route_diff"), 12.7f, SignRedLit, SignRedShade, FVector(-4230, -675, 240), FVector(0.9f, 0.04f, 0.9f) },
+			// LABOR beside the warehouse yard's east gate gap (Underworks labor
+			// stories, art bible §2.2) — on BldgB_E's east face, toward Spawn_Yard.
+			{ TEXT("/Game/Art/Decals/T_sign_labor_diff.T_sign_labor_diff"), 8.2f, SignAmberLit, SignAmberShade, FVector(-3146, 3250, 260), FVector(0.04f, 1.0f, 1.0f) },
+			// BLAST on the Dominion post's west face — munitions fence warning on
+			// the checkpoint approach (amber pops on the oxide-red facade).
+			{ TEXT("/Game/Art/Decals/T_sign_blast_diff.T_sign_blast_diff"), 10.2f, SignAmberLit, SignAmberShade, FVector(4146, -2400, 250), FVector(0.04f, 0.9f, 0.9f) },
+			// REACTOR exclusion triangle on the west perimeter wall north of the
+			// gate — Dominion exclusion zone stacked over the rebel stencil story.
+			{ TEXT("/Game/Art/Decals/T_sign_reactor_diff.T_sign_reactor_diff"), 16.4f, SignRedLit, SignRedShade, FVector(-9944, 700, 270), FVector(0.04f, 1.2f, 1.2f) },
 		};
 
 		for (const FSignDef& Sign : Signs)
@@ -523,6 +558,56 @@ void BuildDistrict(UWorld& World)
 				Actor->SetActorEnableCollision(false);
 				Actor->Tags.Add(TEXT("Deco_Sign"));
 			}
+		}
+	}
+
+	// PLACEHOLDER(15.5): plaza centerpiece — the curated Paragon basin ring (A2,
+	// phase0/ASSET_CURATION.md: 11.8 m industrial vat / landing-pad rim) on a
+	// SciFi10 deck-plate apron, in the open plaza north of the artery. Both ride
+	// graphite toon MIDs, world-aligned luminance albedos (UVMode 0). Position is
+	// tile-locked: (600, 1800) / TexWorldScale 1200 = frac (0.5, 0.5), so the
+	// circular pad graphic lands centered on the ring instead of quartered at
+	// the tile seams. Dressing tier: no collision; a missing machine-local pack
+	// degrades to the apron alone (GDD 14.3.5).
+	{
+		const FVector PlazaCenter(600, 1800, 0);
+		SpawnBlock(TEXT("DecoPlaza"), PlazaCenter + FVector(0, 0, 2), FVector(20.0f, 20.0f, 0.05f));
+
+		UStaticMesh* Well = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX.SM_Well_Center_FX"));
+		if (Well != nullptr && ToonMaterial != nullptr)
+		{
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaterial, &World);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), FLinearColor(0.230f, 0.250f, 0.290f));   // graphite (curation tint pair)
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), FLinearColor(0.075f, 0.082f, 0.130f));
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			if (UTexture* PadTex = LoadObject<UTexture>(nullptr, TEXT("/Game/SciFi_Materials_10/Textures/2/T_4k_SciFi10_2_BaseColor.T_4k_SciFi10_2_BaseColor")))
+			{
+				// Circular pad graphic, measured mean-lin .742 -> gain 1.35.
+				Mid->SetTextureParameterValue(TEXT("AlbedoTex"), PadTex);
+				Mid->SetScalarParameterValue(TEXT("TexWorldScale"), 1200.0f);
+				Mid->SetScalarParameterValue(TEXT("AlbedoGain"), 1.35f);
+				Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.8f);
+			}
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(PlazaCenter, FRotator::ZeroRotator, Params);
+			if (Actor != nullptr)
+			{
+				Actor->SetMobility(EComponentMobility::Movable);
+				Actor->GetStaticMeshComponent()->SetStaticMesh(Well);
+				for (int32 SlotIndex = 0; SlotIndex < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++SlotIndex)
+				{
+					Actor->GetStaticMeshComponent()->SetMaterial(SlotIndex, Mid);
+				}
+				Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+				Actor->SetActorEnableCollision(false);
+				Actor->Tags.Add(TEXT("Deco_Plaza"));
+			}
+		}
+		else
+		{
+			// Raw pack material must never show (15.5) — without the toon master
+			// the ring stays out entirely; the apron still marks the plaza.
+			UE_LOG(LogEclipse, Display, TEXT("Graybox: plaza well skipped (ParagonMinions pack or toon master absent) — deck-plate apron only (14.3.5)."));
 		}
 	}
 

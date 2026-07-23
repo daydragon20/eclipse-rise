@@ -53,10 +53,11 @@ def _download(url, dest):
 
 # ---------------- ambientCG ----------------
 def ambientcg_list(keyword, count=20):
-    url = "https://ambientcg.com/api/v2/full_json?type=Material&limit=200&sort=Popular"
+    # q= is echte trefwoordzoektocht (tags + naam); id-substring miste bv. "grunge"
+    url = ("https://ambientcg.com/api/v2/full_json?type=Material&sort=Popular"
+           f"&limit={max(count, 20)}&q=" + urllib.parse.quote(keyword))
     data = _get_json(url)
-    kw = keyword.lower()
-    hits = [a["assetId"] for a in data.get("foundAssets", []) if kw in a["assetId"].lower()]
+    hits = [a["assetId"] for a in data.get("foundAssets", [])]
     return hits[:count]
 
 
