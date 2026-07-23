@@ -91,6 +91,7 @@ Spec voor de walkable vault: slot-graph, strategische-klok-timers, zichtbare gro
 *Status (2026-07-23):* spec geschreven — `phase0/specs/SPEC-P2-03_hollow_point_base.md` (besluit: Intelligence Center i.p.v. Medbay; Act-1-kostentabel ×0,8; missie-debrief = +1 dag). Wacht op review + commit.
 
 *Daarna klaarstaand:* T6 = P2-01 klasse-abilities via GAS + debug-UI (14.5 stap 4); T7 = body-swap Quaternius (backlog #3, eb, parallel); T8 = SPEC-P2-02 schrijven.
+*Status T8/backlog #4 (2026-07-23):* spec geschreven — `phase0/specs/SPEC-P2-02_command_mode.md` (falsificatie-eerst: Stage-A-debug-feel-versie + R3-feel-gauntlet mét meetbare verdict-criteria vóór polish; besluiten: order-antwoorden op real-time klok onder dilatatie, per-soldier targeting, 8.4-tabel gemapt op bestaande verbs + 5 nieuwe, 3 nieuwe refusal-reasons, dilatatie als wrapper-laag). Wacht op review + commit.
 
 ---
 
