@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECLIPSE — Start hier</title>
+<style>
+  :root{
+    --bg:#0e1017; --bg2:#161a25; --card:#1b2030; --card2:#222839;
+    --tekst:#f2f5fb; --grijs:#9aa6be; --lijn:#2b3245;
+    --amber:#f5a623; --amber2:#ffcb6b; --groen:#37d67a; --rood:#ff5c6c; --oranje:#ff9f43; --geel:#ffd24d; --blauw:#5b9dff;
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef1f7; --bg2:#e3e8f2; --card:#ffffff; --card2:#f4f6fb;
+      --tekst:#161a25; --grijs:#5b6684; --lijn:#dbe1ee; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%, var(--bg2), var(--bg)) fixed;
+    color:var(--tekst); font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,sans-serif;
+    font-size:18px; line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:22px 16px 80px;
+  }
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:30px;margin:0;letter-spacing:.5px;font-weight:800}
+  h2{font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--grijs);margin:34px 0 14px;font-weight:700}
+  .sub{color:var(--grijs);margin:2px 0 0;font-size:15px}
+  .card{background:var(--card);border:1px solid var(--lijn);border-radius:var(--radius);padding:18px 18px}
+  .card+.card{margin-top:12px}
+
+  /* Header + stoplicht */
+  .top{display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:52px;height:52px;border-radius:14px;background:
+     radial-gradient(circle at 35% 35%, var(--amber2), var(--amber) 55%, #7a4b06);
+     box-shadow:0 0 0 3px rgba(245,166,35,.18), inset -6px -6px 12px rgba(0,0,0,.35);flex:none}
+  .status{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--lijn);
+     border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.06)}
+  .pulse{animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
+
+  /* Wake-box */
+  .wake{border:1px solid var(--rood);background:linear-gradient(180deg,rgba(255,92,108,.12),transparent)}
+  .wake b{color:var(--rood)}
+
+  /* Cockpit tiles */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  .tile{background:var(--card);border:1px solid var(--lijn);border-radius:var(--radius);padding:16px;text-align:center}
+  .tile .big{font-size:34px;font-weight:800;line-height:1}
+  .tile .lab{color:var(--grijs);font-size:13px;margin-top:6px;letter-spacing:.5px}
+  .tile small{display:block;color:var(--grijs);font-size:12px;margin-top:4px}
+
+  /* Progress bars */
+  .bar{height:12px;border-radius:999px;background:var(--card2);overflow:hidden;border:1px solid var(--lijn)}
+  .bar>span{display:block;height:100%;border-radius:999px;
+     background:linear-gradient(90deg,var(--amber),var(--amber2));transition:width .8s ease}
+  .barrow{display:flex;align-items:center;gap:12px}
+  .barrow .nm{flex:1;min-width:0}
+  .barrow .pc{font-variant-numeric:tabular-nums;font-weight:700;color:var(--amber2);width:46px;text-align:right}
+
+  /* Owner acties */
+  .act{display:flex;gap:14px;padding:16px;border-radius:var(--radius);background:var(--card2);border:1px solid var(--lijn);position:relative;overflow:hidden}
+  .act+.act{margin-top:10px}
+  .act .stripe{position:absolute;left:0;top:0;bottom:0;width:6px}
+  .act .ic{font-size:30px;flex:none;width:40px;text-align:center}
+  .act h3{margin:0 0 2px;font-size:19px}
+  .act .why{color:var(--grijs);font-size:14px;margin:0 0 8px}
+  .act ol{margin:6px 0 0;padding-left:20px}
+  .act ol li{margin:3px 0}
+  .badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;padding:3px 9px;border-radius:999px;color:#0e1017;vertical-align:middle;margin-left:8px}
+  .done-note{font-size:13px;color:var(--grijs);margin-top:10px}
+
+  /* jijGedaan chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .chip{background:var(--card2);border:1px solid var(--lijn);border-radius:999px;padding:7px 13px;font-size:14px}
+  .chip .t{color:var(--grijs);font-size:12px;margin-left:6px}
+
+  /* AI status 3-koloms */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .mini{background:var(--card2);border:1px solid var(--lijn);border-radius:14px;padding:14px}
+  .mini h4{margin:0 0 10px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--grijs)}
+  .work{margin-bottom:12px}
+  .work .wt{font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center}
+  .work .wd{color:var(--grijs);font-size:13px;margin:3px 0 6px}
+  .taglist{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{background:var(--card);border:1px solid var(--lijn);border-radius:8px;padding:5px 9px;font-size:13px;color:var(--grijs)}
+
+  /* Timeline */
+  .tl{position:relative;margin-left:8px;padding-left:26px}
+  .tl:before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--lijn)}
+  .step{position:relative;margin-bottom:16px}
+  .step .knop{position:absolute;left:-26px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--card);border:2px solid var(--grijs)}
+  .step.done .knop{background:var(--groen);border-color:var(--groen)}
+  .step.active .knop{background:var(--amber);border-color:var(--amber);box-shadow:0 0 0 5px rgba(245,166,35,.2)}
+  .step .nm{font-weight:700;font-size:17px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .step .gr{color:var(--grijs);font-size:14px;margin:3px 0 8px}
+  .step .doel{font-size:12px;color:var(--grijs)}
+  .nowtag{font-size:11px;font-weight:800;letter-spacing:1px;background:var(--amber);color:#0e1017;border-radius:999px;padding:2px 9px}
+
+  /* Foto's */
+  .gal{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .gal figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--lijn);background:var(--card2);cursor:zoom-in}
+  .gal img{width:100%;height:150px;object-fit:cover;display:block;transition:transform .3s}
+  .gal figure:hover img{transform:scale(1.05)}
+  .gal figcaption{font-size:12px;color:var(--grijs);padding:7px 10px}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:20px}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:10px}
+  .noot{color:var(--grijs);font-size:13px;margin-top:10px}
+
+  .footer{color:var(--grijs);font-size:13px;text-align:center;margin-top:34px}
+  .footer a{color:var(--blauw)}
+  @media (max-width:620px){
+    .tiles{grid-template-columns:1fr 1fr}
+    .cols{grid-template-columns:1fr}
+    .gal{grid-template-columns:1fr}
+    body{font-size:17px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">laden…</div>
+
+<div class="lightbox" id="lb" onclick="this.style.display='none'"><img src="" alt=""></div>
+
+<script src="progress_auto.js"></script>
+<script src="progress_data.js"></script>
+<script>
+const D = window.PROGRESS_DATA || {};
+const A = window.PROGRESS_AUTO || {};
+const $ = (h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild;};
+const esc = (s)=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const trim = (s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n-1).trim()+'…':s;};
+
+/* ---- tijd / versheid ---- */
+function parseNL(s){ if(!s) return null; const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]):null; }
+function geleden(d){
+  if(!d) return "onbekend";
+  const min=Math.max(0,Math.round((Date.now()-d)/60000));
+  if(min<1) return "net";
+  if(min<60) return min+" min geleden";
+  const u=Math.round(min/60); if(u<24) return u+" uur geleden";
+  const dg=Math.round(u/24); return dg+" dag"+(dg>1?"en":"")+" geleden";
+}
+const laatst = parseNL(D.bijgewerkt) || parseNL(A.generatedAt);
+const minOud = laatst ? (Date.now()-laatst)/60000 : 9999;
+let stoplicht;
+if(minOud<90)      stoplicht={kl:'var(--groen)',tx:'Live — de robot werkt',pulse:true,slaapt:false};
+else if(minOud<360)stoplicht={kl:'var(--geel)', tx:'Even rustig',pulse:false,slaapt:false};
+else               stoplicht={kl:'var(--rood)',  tx:'De robot slaapt',pulse:false,slaapt:true};
+
+/* ---- helpers ---- */
+function barRow(nm,pct,note){
+  pct=Math.max(0,Math.min(100,pct||0));
+  return `<div class="barrow" style="margin:9px 0">
+    <div class="nm"><div>${esc(nm)}${note?` <span style="color:var(--grijs);font-size:13px">— ${esc(note)}</span>`:''}</div>
+      <div class="bar" style="margin-top:5px"><span style="width:${pct}%"></span></div></div>
+    <div class="pc">${pct}%</div></div>`;
+}
+const PRIO={
+  'nu':{r:0,l:'NU',k:'var(--rood)'},
+  'gauw':{r:1,l:'BINNENKORT',k:'var(--oranje)'},
+  'als je tijd hebt':{r:2,l:'ALS JE TIJD HEBT',k:'var(--geel)'},
+  'optioneel':{r:3,l:'MAG OOK LATER',k:'var(--grijs)'}
+};
+function prio(p){return PRIO[(p||'').toLowerCase()]||{r:2,l:(p||'').toUpperCase(),k:'var(--grijs)'};}
+function actIcon(t){t=(t||'').toLowerCase();
+  if(t.includes('annul')||t.includes('overbodig')) return '🗑️';
+  if(t.includes('metahuman')||t.includes('gezicht')) return '🙂';
+  if(t.includes('civilian')||t.includes('worker')||t.includes('burger')) return '🚶';
+  if(t.includes('playtest')||t.includes('speel')) return '🎮';
+  if(t.includes('download')||t.includes('pack')) return '⬇️';
+  return '👉';}
+
+/* ---- render ---- */
+let H='';
+
+// HEADER
+H+=`<div class="top">
+  <div class="brand"><div class="logo"></div>
+    <div><h1>ECLIPSE</h1><p class="sub">Jouw game — in gewone taal</p></div></div>
+  <div class="status"><span class="dot ${stoplicht.pulse?'pulse':''}" style="background:${stoplicht.kl}"></span>
+    ${stoplicht.tx} · ${geleden(laatst)}</div>
+</div>`;
+
+// WAKE BOX (alleen als robot slaapt)
+if(stoplicht.slaapt){
+  H+=`<div class="card wake" style="margin-top:16px">
+    <div style="font-size:19px;font-weight:800">😴 De robot heeft al een tijd niks gedaan</div>
+    <p class="sub" style="margin-top:6px">Zo maak je hem wakker (2 stappen):</p>
+    <ol style="margin:6px 0 0;padding-left:22px">
+      <li>Open een <b>nieuwe chat</b> in VS Code (het ECLIPSE-project).</li>
+      <li>Plak de startprompt uit <b>NIEUWE_CHAT_PROMPT.txt</b> en druk enter.</li>
+    </ol></div>`;
+}
+
+// COCKPIT — 3 tegels
+const heel = (D.hero&&D.hero.pct)||0;
+const roadmap = (D.secties||[]).find(s=>/roadmap/i.test(s.titel));
+const fases = roadmap? roadmap.items:[];
+let activeIdx=-1; fases.forEach((f,i)=>{ if((f.pct||0)>0 && (f.pct||0)<100) activeIdx=i; });
+const fase = fases[activeIdx];
+const testTx = A.tests? `${A.tests.ok}/${A.tests.total}` : '—';
+H+=`<div class="tiles">
+  <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div><small>groeit traag — normaal</small></div>
+  <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div><div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div><small>hier gebeurt het nu</small></div>
+  <div class="tile"><div class="big" style="color:var(--groen)">${testTx}</div><div class="lab">TESTS GESLAAGD</div><small>alles wat werkt, blijft werken</small></div>
+</div>`;
+
+// WAT MOET JIJ DOEN
+const acties=(D.ownerActies||[]).slice().sort((a,b)=>prio(a.prio).r-prio(b.prio).r);
+H+=`<h2>🎯 Wat moet jij nu doen?</h2>`;
+if(!acties.length){
+  H+=`<div class="card" style="text-align:center;font-size:19px">🎉 Niks! De AI kan even helemaal alleen door.</div>`;
+}else{
+  H+=`<p class="sub" style="margin:-6px 0 12px">Dit zijn de enige dingen waar de AI jóuw hulp voor nodig heeft. De rest doet hij zelf.</p>`;
+  acties.forEach(a=>{const p=prio(a.prio);
+    H+=`<div class="act"><div class="stripe" style="background:${p.k}"></div>
+      <div class="ic">${actIcon(a.titel)}</div>
+      <div style="flex:1;min-width:0">
+        <h3>${esc(a.titel)}<span class="badge" style="background:${p.k}">${p.l}</span></h3>
+        ${a.waarom?`<p class="why">Waarom: ${esc(a.waarom)}</p>`:''}
+        <ol>${(a.stappen||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+      </div></div>`;
+  });
+  H+=`<p class="done-note">💬 Klaar met een taak? Typ het gewoon in de chat, bv. <b>"MetaHumans staan erin"</b> — dan pakt de AI het op.</p>`;
+}
+
+// WAT DE AI AL VAN JOU HEEFT
+if((D.jijGedaan||[]).length){
+  H+=`<h2>✅ Wat de AI al van jou heeft gezien</h2>
+    <div class="card"><div class="chips">
+    ${D.jijGedaan.map(g=>`<span class="chip">✔ ${esc(g.wat)}<span class="t">${esc(g.tijd||'')}</span></span>`).join('')}
+    </div></div>`;
+}
+
+// WAAR IS DE AI MEE BEZIG
+const bezig=(D.taken||[]).filter(t=>t.status==='bezig');
+const gepland=(D.taken||[]).filter(t=>t.status==='gepland');
+const cl=(D.changelog||[])[0];
+H+=`<h2>🤖 Waar is de AI mee bezig?</h2><div class="card"><div class="cols">
+  <div class="mini"><h4>⚙️ Nu bezig</h4>
+    ${bezig.map(t=>`<div class="work"><div class="wt">${esc(t.taak)}</div>
+      <div class="wd">${esc(trim(t.detail,120))}</div>
+      <div class="bar"><span style="width:${Math.min(100,t.pct||0)}%"></span></div></div>`).join('')||'<div class="wd">—</div>'}
+  </div>
+  <div class="mini"><h4>🕒 Straks</h4>
+    <div class="taglist">${gepland.map(t=>`<span class="tag">${esc(t.taak)}</span>`).join('')||'<span class="wd">—</span>'}</div>
+    ${cl?`<h4 style="margin-top:16px">✅ Net gedaan</h4>
+      <div class="wd" style="color:var(--amber2);font-weight:600">${esc(cl.datum.replace(/^Sessie\s*/,''))}</div>
+      <ul style="margin:6px 0 0;padding-left:18px;color:var(--grijs);font-size:13px">
+        ${(cl.punten||[]).slice(0,3).map(p=>`<li>${esc(trim(p,120))}</li>`).join('')}</ul>`:''}
+  </div>
+</div></div>`;
+
+// STAPPENPLAN
+H+=`<h2>📊 Hoe ver zijn we? (het stappenplan)</h2>
+  <p class="sub" style="margin:-6px 0 12px">De "hele game 8%" gaat traag omdat de laatste fases veruit het grootst zijn. Kijk naar de <b>oranje</b> fase — dáár zit je snelheid.</p>
+  <div class="card"><div class="tl">`;
+fases.forEach((f,i)=>{
+  const done=(f.pct||0)>=100 || i<activeIdx;
+  const active=i===activeIdx;
+  H+=`<div class="step ${done?'done':''} ${active?'active':''}">
+    <div class="knop"></div>
+    <div class="nm">${esc(f.naam)} ${active?'<span class="nowtag">JE BENT HIER</span>':''}</div>
+    ${f.groot?`<div class="gr">${esc(f.groot)}</div>`:''}
+    <div class="bar" style="max-width:340px"><span style="width:${Math.min(100,f.pct||0)}%"></span></div>
+    <div class="doel" style="margin-top:5px">${f.pct||0}%${f.doel?` · streefdatum ${esc(f.doel)}`:''}</div>
+  </div>`;
+});
+H+=`</div></div>`;
+
+// FOTO'S
+const shots=((A.screenshots&&A.screenshots.length)?A.screenshots:D.screenshots)||[];
+if(shots.length){
+  H+=`<h2>📸 Zo ziet de game er nu uit</h2><div class="card"><div class="gal">
+    ${shots.slice(0,4).map(s=>`<figure onclick="zoom('${esc(s.file)}')">
+      <img src="${esc(s.file)}" alt="" onerror="this.parentElement.style.display='none'">
+      <figcaption>${esc(s.caption||'')}</figcaption></figure>`).join('')}
+    </div>${D.screenshotNoot?`<p class="noot">${esc(D.screenshotNoot)}</p>`:''}</div>`;
+}
+
+// FOOTER
+H+=`<div class="footer">
+  Laatst bijgewerkt: <b>${esc(D.bijgewerkt||'?')}</b> · deze pagina vernieuwt zichzelf elke 30 sec.<br>
+  Alle technische details? → <a href="PROGRESS.html">PROGRESS.html</a> (voor de nerds 🤓)
+</div>`;
+
+document.getElementById('app').innerHTML=H;
+
+function zoom(src){const lb=document.getElementById('lb');lb.querySelector('img').src=src;lb.style.display='flex';}
+
+/* scroll bewaren + elke 30s verversen */
+window.scrollTo(0, parseInt(sessionStorage.getItem('eclipseScroll')||'0'));
+setInterval(()=>{sessionStorage.setItem('eclipseScroll',window.scrollY);location.reload();},30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+====================================================================
+ ECLIPSE — STARTPROMPT VOOR EEN NIEUWE CHAT
+ Plak ALLES hieronder in een verse Claude-chat in VS Code (ECLIPSE-project).
+ Gebruik dit om de robot weer aan het werk te zetten als hij gestopt is.
+====================================================================
+
+Je werkt aan ECLIPSE: Rise of the Resistance — single-player third-person
+Action-Strategy RPG in Unreal Engine 5.8 (C++), repo-root C:\Dev\ECLIPSE_GDD.
+Communiceer met mij (Nathan) in het Nederlands.
+
+STAP 0 — CONTEXT INLEZEN (in deze volgorde, vóór je iets doet):
+1. HANDOFF.md — vooral "LAATSTE STAND" onderaan.
+2. phase0/EXECUTION_PLAN.md — de genummerde backlog + de eerstvolgende 5
+   sprinttaken + de risicolijst + de owner-touchpoints-wachtrij (paragraaf 4).
+3. De `taken`-lijst in progress_data.js — de live status van vandaag.
+4. 13_roadmap.md (ACTIVE_MILESTONE) en 14_ai_dev_instructions.md (bouwregels).
+
+HUIDIGE STAND: Fase 2 "Thirteen Bullets" is de actieve milestone. P2-01
+(squad van 4 + classes) is GELAND (1a85b78). Lopende sporen: P2-02 Stage A
+(Command Mode, R3) + P2-03 stap 1-2 (Hollow Point data/logic) + commandlet-rij
+(pack-slim -> MetaHuman-curatie -> audio-import). Ga verder waar de
+`taken`-lijst in progress_data.js staat — die is leidend, niet deze regel.
+
+WERK MET DE AGENTS (spin ze zelf op via de Task-tool):
+- game-planner: begin van elke werk-cyclus en telkens als er geen duidelijke
+  volgende taak is -> levert de beste volgende taak + werkt progress_data.js bij.
+- element-builder: spawn er meerdere PARALLEL, één per afgebakend element.
+- code-reviewer: na elke build-groene iteratie, vóór commit/push. GO/NO-GO.
+- art-reviewer: telkens als er art/materials landen.
+
+HARDE WERKREGELS:
+- Bouw UE altijd met -NoUba. Elke iteratie eindigt GROEN: build, tests,
+  EclipseValidateData (0 fouten), EventCatalog in sync — vóór elke commit.
+- Bouwvolgorde per spec = 14.5 (dataschema -> pure-logic core + tests ->
+  subsystem-wrapper + events -> debug-UI -> echte UI/content laatst).
+- Commits: [System] Verb summary (GDD-ref). Cross-system alleen via de event-bus.
+- OWNER-CONSENT: geen installs/downloads/security-prompts zonder dat je het
+  eerst uitlegt én ik akkoord geef. Zet zulke taken in de "wacht-op-owner"-rij.
+  Let op: mijn account heeft GEEN admin-rechten — ik kan niks installeren dat
+  een beheerderswachtwoord vraagt. Queue dat als owner-actie, bouw er niet stil
+  omheen.
+
+DASHBOARD BIJHOUDEN (belangrijk — dit is hoe Nathan volgt wat je doet):
+- Werk NA ELKE iteratie progress_data.js bij: het veld `bijgewerkt` (huidige
+  tijd), de `taken`-statussen/pct, en `ownerActies` (haal weg wat af is).
+- Zodra je een owner-actie hebt geverifieerd: verplaats hem uit `ownerActies`
+  naar `jijGedaan` met de tijd erbij — zo ziet Nathan dat zijn actie is
+  aangekomen.
+- Bewerk ALLEEN progress_data.js. NOOIT PROGRESS.html, progress_auto.js of
+  START_HIER.html (START_HIER.html is Nathans simpele pagina; die leest
+  automatisch uit progress_data.js).
+
+GEEN AUTO-LOOP: gebruik GEEN /loop en GEEN ScheduleWakeup — die vuren niet
+betrouwbaar als de sessie onderbroken wordt. Werk in één doorlopende sessie.
+Tegen een sessielimiet aan? Draai push-all.bat, werk de "LAATSTE STAND" in
+HANDOFF.md bij, en zeg me dat ik deze prompt in een verse chat moet plakken.
+
+Begin nu: lees stap 0, geef me in 3-4 regels waar we staan en wat je als
+eerste doet, en ga dan aan de slag.

@@ -3,6 +3,8 @@
 
 > **Live progress dashboard:** open [`PROGRESS.html`](PROGRESS.html) in a browser and leave it open — it reloads itself every 60 s. Facts (commits, tests, newest screenshots) refresh automatically every 10 min via `start_progress_watcher.bat` (→ `Tools/update_progress.ps1`). Dev sessions update the judgment percentages by editing **`progress_data.js`** at milestones — never edit PROGRESS.html itself, and never hand-edit `progress_auto.js`. Owner instructions for the audio pipeline + studio working method are recorded verbatim in [`phase0/OWNER_MANDATE.md`](phase0/OWNER_MANDATE.md).
 
+> **Nathan's simpele pagina = [`START_HIER.html`](START_HIER.html)** (kindertaal, leest live uit `progress_data.js`). Dit is de pagina die de owner opent — PROGRESS.html is de detailversie. **Elke dev-iteratie MOET `progress_data.js` bijwerken**: het veld `bijgewerkt` (tijd), de `taken`-statussen, `ownerActies` (weghalen wat af is), en een geverifieerde owner-actie verhuizen naar `jijGedaan` met tijd. Bewerk NOOIT START_HIER.html direct. Verse-chat startprompt staat in [`NIEUWE_CHAT_PROMPT.txt`](NIEUWE_CHAT_PROMPT.txt). Géén `/loop`/ScheduleWakeup gebruiken (vuurt onbetrouwbaar).
+
 > **Read order for whoever picks this up:** this file → `DOCUMENTATION_README.md` → `00_INDEX.md` → `13_roadmap.md` (ACTIVE_MILESTONE) → `14_ai_dev_instructions.md`. Then the phase specs in `phase0/specs/`.
 
 ---
@@ -150,7 +152,15 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 - *Hygiëne:* `__pycache__/` ge-gitignored. `Eclipse/Content/MetaHumans|Atira_LODSettings|Locodrome` staan bewust untracked tot de MetaHuman-curatie (aparte taak) besluit wat reist.
 - *Sessies 23-07 (niet eerder in dit bestand bijgeschreven):* zie de changelog in `progress_data.js` — o.a. body-pipeline (RAISOR/Belica via DT_BodyDefs), westgevel-B district-breed (412f14f), eerste audio-ronde gebankt (348b7f0), SPEC-P2-02/-P2-03 geschreven + gereviewd, MetaHumans-basis geland (908 MB, curatie in de rij).
 
-**Eerstvolgende stappen (per EXECUTION_PLAN §2):** (1) **P2-02 Stage A** — Command Mode debug-feel: hold-to-enter + 0.30-dilatatie + per-soldier-selectie op de bestaande 4 verbs (R3-falsificatie; bouwplan klaar); (2) parallel tweede spoor: **P2-03 stap 1-2** (DT_Facilities + pure EclipseBaseLogic, mét v3→v4-migratie + fixture zelfde commit); (3) commandlet-rij (één tegelijk): pack-slim-ronde → MetaHuman-curatie → audio-import (16.12); (4) owner-touchpoints in de wachtrij: 13.2-playtest, MetaHuman-download-kliks, civilian-pack, straks de Stage-A-feel-gauntlet (~20 min, het R3-verdict).
+**Vervolg dezelfde dag (middag/avond — drie sporen parallel gebouwd):**
+- **P2-02 Stage A geland** ([Command]-commit): hold Q/pad-LB → 0.30-dilatatie via pure state-machine (`EclipseCommandLogic`) + wrapper-component met sluitende fail-safe (release/death/mission-end/travel → exact 1.0; tick alleen tijdens de hold), per-soldier-selectie (cycle + reticle-pick, range uit DA_CommandModeTuning) door het bestaande IssueOrder-contract, `Event.Command.ModeEntered/Exited` (catalog 23/23), debug-HUD, `Eclipse.Command.Dump`, 3 headless tests. Review GO; de MAJOR (pick-range was dode data) + alle minors in dezelfde changeset gefixt. **Feel-gauntlet (R3-verdict, ~20 min) staat nu in Nathans kliklijst — draaiboek: `phase0/FEEL_GAUNTLET_P2-02.md`.** Stage B start pas ná verdict "true"; bij "false" geldt de fallback-ladder uit de spec.
+- **P2-03 stap 1-2 geland** ([Base]-commit, via element-builder + eigen review): DT_Facilities-schema, slot-graph-asset, DA_BaseTuning, `FEclipseBaseState` mét save v3→v4-migratie + byte-getrouwe v3-fixture in hetzelfde commit (14.3.6/R6 tweede keer bewezen); spec-startstand = type-default (gratis L1 Command Center op Slot_A); hash-dekking uitgebreid. Stap 3 (wrapper + Event.Base.*) = volgende iteratie.
+- **Pack-slim-ronde af** ([Art]-commit): alle 11 curatie-accepts naar `/Game/Art/Imported` (repo-tracked, provenance in SOURCES.md), builder-refs via 3 mini-stubs pixel-gelijk gehouden (string-swap = eerste edit 15.8-ronde), Minions+SciFi10 van schijf — **~5,9 GB vrij**, scan-bewijs 0 refs (ASSET_CLEANUP §7-10).
+- **m4/m6/m7-follow-ups geland** ([Squad]-commit): spawn-fan + cover-scorer-constanten naar DA_SquadTuning (gedrag-neutraal), catalog-formulering eerlijk gemaakt.
+- **SPEC-P2-04 geschreven + main-review verwerkt** (concept ACCEPTED): geen prologue (recap-cards + cold-reader-falsificatie), R7-Gauntlet als bouwstap 1, nul nieuwe objective-primitieven, M1.3 als enige world-state-change via de P2-05-seam, Brick = Assault-rosterrecord; de 4 open punten beslist in de spec zelf.
+- **Groene bar (unie, alle sporen samen): 47/47 tests · validatie 3 validators/0 fouten · catalog 23/23.**
+
+**Eerstvolgende stappen:** (1) owner: **Stage-A-feel-gauntlet** (R3) + 13.2-playtest + MetaHuman-kliks; (2) commandlet-rij: setup_command_tuning.py + P2-03-materialisatie → MetaHuman-curatie → audio-import (16.12) → 15.8-dressing-ronde (start met de builder-string-swap); (3) code: P2-03 stap 3 (wrapper/events), daarna SPEC-P2-04 bouwstap 1 (R7-Gauntlet); Stage B wacht op het R3-verdict.
 
 ---
 
