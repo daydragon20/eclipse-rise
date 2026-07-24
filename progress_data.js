@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-24 10:20",
+  bijgewerkt: "2026-07-24 16:30",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -15,6 +15,15 @@ window.PROGRESS_DATA = {
     toelichting: "Ruwe inschatting, geen belofte: gebaseerd op het huidige commit-tempo en de resterende backlog per fase. Wordt elke milestone bijgesteld.",
     bijgesteld: "2026-07-23"
   },
+
+  // Wat de AI al van Nathan heeft ontvangen én verwerkt/nagekeken — zodat hij ziet dat zijn acties zijn aangekomen.
+  // Dev-sessie: zodra je een owner-actie verifieert, verplaats hem van ownerActies naar hier met de tijd. Nieuwste bovenaan.
+  jijGedaan: [
+    { wat: "Westgevel-kleur A/B gekozen (jij koos B)", tijd: "2026-07-23" },
+    { wat: "Blender geïnstalleerd / goedgekeurd", tijd: "2026-07-23" },
+    { wat: "ElevenLabs Music/SFX-scopes aangezet", tijd: "2026-07-23" },
+    { wat: "Ingelogd op Fab + Epic Launcher", tijd: "2026-07-23" }
+  ],
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
@@ -74,8 +83,8 @@ window.PROGRESS_DATA = {
 
   // Live takenlijst van de AI-dev-sessie — status: bezig | wachten | klaar | gepland.
   taken: [
-    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "NU: P2-01-testsuite draait (laatste stap) → review 14.3.6 → commit. Commandlet-rij daarna (één tegelijk): pack-slim-ronde (Minions+SciFi10, migratielijst verbreed naar álle curatie-accepts), MetaHuman-curatie, audio-import + Layer-1-bed. Code-spoor direct na P2-01-merge: P2-02 Stage A (main) parallel aan P2-03 stap 1-2 (tweede agent) — file-ownership botst niet (Squad/ vs Base/+Strategy/). Reviews vóór elke commit; wakeup 60 s." },
-    { taak: "P2-01: Squad van 4 + classes", status: "bezig", pct: 85, detail: "Code compileert groen, event-catalog 21/21, DT_ClassDefs gevuld en gekoppeld (setup_class_data.py). Enige rest: de headless testsuite (verwacht 38 tests) + EclipseValidateData — die draaien automatisch zodra de owner-editor sluit. Daarna review (checkpoint 14.3.6: ClassId-migratie + v0-fixture-test in zelfde commit) en commit." },
+    { taak: "Autonomy-loop actief", status: "bezig", pct: 100, detail: "P2-01 GELAND (1a85b78) → nieuwe cyclus: game-planner draait, dan P2-02 Stage A (main: hold-to-enter + 0.30-dilatatie + per-soldier-selectie, R3-falsificatie) parallel aan P2-03 stap 1-2 (tweede agent: DT_Facilities + pure EclipseBaseLogic; v3→v4-migratie + fixture zelfde commit) — file-ownership botst niet (Squad/ vs Base/+Strategy/). Commandlet-rij (één tegelijk): pack-slim-ronde → MetaHuman-curatie → audio-import + Layer-1-bed. Reviews vóór elke commit." },
+    { taak: "P2-01: Squad van 4 + classes", status: "klaar", pct: 100, detail: "GELAND (1a85b78, review GO): squad van 4 met Assault/Medic/Sniper als data (DT_ClassDefs — geen subclasses), ClassId op het roster mét save v2→v3-migratie + v0/v2-fixture-tests in hetzelfde commit (14.3.6/R6), medic-auto-triage incl. her-dispatch naar een tweede casualty (review-M1-fix, anti-shuttle-peek), nieuwe ClassDefs-validator in EclipseValidateData. Eindstand: build ✓, 38/38 tests ✓, validatie 3 validators/0 fouten ✓, catalog 21/21 ✓. Follow-ups (klein): m4 spawn-fan → tuning, m6 cover-scorerconstanten → tuning, m7 catalog-formulering." },
     { taak: "Stap 3: MetaHuman-pijplijn", status: "bezig", pct: 75, detail: "MIJLPAAL (monitor 18:45): /Game/MetaHumans is GELAND — 908 MB met Common-basis + eerste MetaHuman 'SentinelC'; ook Atira_LODSettings + Locodrome staan erin. De owner-editor draait nog (Live Coding): zodra die sluit volgt inventaris + curatie + koppeling MH → DT_NamedCharacters-slots (Kaya/Brick/Vale/Dex/Petra/Kaine) en de toon-restyle-check per 15.7. Resterende MH-items: per stuk 1 Download-klik zoals SentinelC." },
     { taak: "Audio-import + koppeling (16.12)", status: "gepland", pct: 0, detail: "De 8 gegenereerde assets (gebankt in 348b7f0, reisbare cache in Eclipse/AudioCache) importeren naar /Game/Audio via Tools/import_generated_audio.py zodra de commandlet-rij vrij is; daarna het Kessara-Layer-1-bed plaatsen (never-silent floor) en de sting aan de mission-complete-beat hangen. Follow-ups: 16.x-citatiefixes in de scripts, /Game/Audio-structuur vs 16.14." },
     { taak: "Groene bar bewaken", status: "bezig", pct: 100, detail: "Elke iteratie: build (-NoUba) + 31/31+ tests + validatie 0 + catalog vóór elke commit/push." },
@@ -106,7 +115,7 @@ window.PROGRESS_DATA = {
       items: [
         { naam: "Fase 0 — Pre-productie", pct: 90, doel: "2026-07-24", groot: "Fundament: alle systeem-architectuur opgezet, de Borderlands-art-richting gelockt, en de tools klaar. De basis waar alles op bouwt.", notitie: "Open: CI-runner, concept-art, feel-clips.", nodig: { type: "wachten" } },
         { naam: "Fase 1 — Prototype \"The Loop\"", pct: 97, doel: "2026-07-25", groot: "Bewijzen dat de kern-loop (missie → squad → gevecht → basis) écht leuk speelt — op blokken (graybox). Bewust nog geen mooie graphics; die volgen pas als het spel leuk is.", notitie: "Vrijwel af; resteert de 13.2-playtest.", nodig: { type: "owner", stappen: ["Speel de graybox-loop ~30 min in de editor (PIE)", "Noteer kort wat goed/slecht voelt", "Geef het door aan de agent — dit sluit Fase 1 af"] } },
-        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 9, doel: "2026-08-12", groot: "HET grote moment: het eerste district (Kessara) in vólle Borderlands-kwaliteit — echte gebouwen, characters met MetaHuman-gezichten, gevechts-feel. Hier zie je voor het eerst hoe de game er echt uit gaat zien.", notitie: "ACTIEF: body-pipeline + P2-01 (squad van 4 + classes) lopen.", nodig: { type: "owner", stappen: ["MetaHuman: 1× Download per item in Window→Fab, dan agent laten inpluggen", "1 gestileerd civilian/worker-pack toevoegen (enige character-gat)", "Westgevel-kleur A/B kiezen zodra de shots in het paneel staan"] } },
+        { naam: "Fase 2 — Vertical Slice \"Thirteen Bullets\"", pct: 13, doel: "2026-08-12", groot: "HET grote moment: het eerste district (Kessara) in vólle Borderlands-kwaliteit — echte gebouwen, characters met MetaHuman-gezichten, gevechts-feel. Hier zie je voor het eerst hoe de game er echt uit gaat zien.", notitie: "P2-01 (squad van 4 + classes) GELAND; nu P2-02 Stage A + P2-03 parallel.", nodig: { type: "owner", stappen: ["MetaHuman: 1× Download per item in Window→Fab, dan agent laten inpluggen", "1 gestileerd civilian/worker-pack toevoegen (enige character-gat)", "Westgevel-kleur A/B kiezen zodra de shots in het paneel staan"] } },
         { naam: "Fase 3 — Early Build", pct: 0, doel: "2026-08-31", groot: "De wereld wordt groot: meer planeten + missies uitgerold, allemaal in de Borderlands-stijl. De vertical-slice-kwaliteit wordt over de hele game uitgesmeerd.", nodig: { type: "wachten" } },
         { naam: "Fase 4 — Alpha", pct: 0, doel: "2026-09-20", groot: "Hele game speelbaar van begin tot eind — alle content zit erin, nog niet gepolijst.", nodig: { type: "wachten" } },
         { naam: "Fase 5 — Beta", pct: 0, doel: "2026-10-10", groot: "Polijsten + optimaliseren: performance, bugfixes, alles naar AAA-afwerking.", nodig: { type: "wachten" } },
@@ -186,6 +195,12 @@ window.PROGRESS_DATA = {
   screenshotNoot: "Sterke PC (GTX 1080 Ti, SM6) — texture-ronde: CC0-albedo's (asfalt/beton/metaalplaat/golfplaat) door de toon-pijplijn, exposure-neutraal genormaliseerd; skyline + inktlijnen + schemer-mood intact.",
 
   changelog: [
+    { datum: "Sessie 2026-07-24 (middag — P2-01 GELAND)", punten: [
+      "SPEC-P2-01 gebankt (1a85b78, review GO 0 blockers): squad van 4 met de eerste 3 klassen (Assault/Medic/Sniper) als púre data — DT_ClassDefs bepaalt kit, signature-verb (Class.Verb.*) en order-modulatie; ontbrekende row degradeert naar classless (14.3.5), nergens een klasse-branch in code.",
+      "Checkpoint 14.3.6/R6 aantoonbaar vervuld: save-schema v2→v3 (roster-ClassId) mét migratie-entry, v0-fixture-test (hele keten 0→3) én echte v2-fixture-test in hetzélfde commit; pre-v3 saves landen deterministisch op classless recruits.",
+      "Review-vondst direct gedicht: EclipseValidateData dekte DT_ClassDefs niet — derde validator toegevoegd (verb-familie, Stabilize→window/Killzone→range-consistentie, weapon/body-cross-refs per campaign-setup); eindstand 3 validators, 0 fouten.",
+      "Review-M1-fix: medic her-dispatcht na een afgeronde triage-run naar een casualty die mid-run neerging — met CanStabilizeSoldier-peek zodat geredde/verlopen patiënten nooit een shuttle-loop veroorzaken.",
+      "Groene bar eindstand: build ✓ (-NoUba), 38/38 tests ✓ (6 nieuw), validatie 0 ✓, catalog 21/21 ✓." ] },
     { datum: "Sessie 2026-07-23 (avond — owner-keuze B + audio GELAND)", punten: [
       "Westgevel-B district-breed doorgevoerd (412f14f, code GO + art GO): owner overrulede A via het paneel — BandHi 0.55 + per-gevel WestComp-compensatie (mid-lerp landt exact op palette-lit) op checkpoint-west, compound-gevel, warehouse-west en de skyline-familie; eindstand matcht de gekozen B op delta<2 en de zalm-gap is dicht. Material-authoring nu delete+recreate: wees-exports onmogelijk. Shots 00050–00055 = nieuwe referentie; 38/38, validatie 0.",
       "Eerste audio-ronde gebankt (348b7f0, review GO): 8 ElevenLabs-assets (rifle, impact, UI-tick/confirm, Kessara-Layer-1-loopbed, 2 voetstappen, mission-complete-sting) met hash-cache (her-run = 0 credits) én reisbare kopie in Eclipse/AudioCache — geen machine betaalt dubbel. Import-script staat klaar voor de vrije editor.",

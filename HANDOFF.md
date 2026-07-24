@@ -138,7 +138,23 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
-## LAATSTE STAND (2026-07-22, ~21:40 CET — EERSTE SESSIE OP DE STERKE PC)
+## LAATSTE STAND (2026-07-24 — P2-01 GELAND)
+
+**Waar gestopt:** Phase 2 "Thirteen Bullets" is de actieve milestone (owner-instructie 23-07; de 13.2-playtest van Phase 1 blijft een staande owner-actie). **SPEC-P2-01 (Squad van 4 + eerste 3 classes: Assault/Medic/Sniper) is geland en gepusht** na een volle groene bar én een onafhankelijke code-review (verdict GO, 0 blockers).
+
+**Deze sessie (samengevat):**
+- *Groene bar P2-01:* build ✓ (-NoUba) · **tests 38/38** (6 nieuwe, incl. v0-fixture-migratietest én een echte v2-fixture-test) · **EclipseValidateData 3 validators / 0 fouten** · catalog **21/21**.
+- *Checkpoint 14.3.6 (R6) vervuld:* save-schema v2→v3 (roster-ClassId-tail) mét migratie-entry + fixture-tests in hetzélfde commit; pre-v3 saves landen deterministisch op classless (NAME_None).
+- *DoD-gat gedicht:* EclipseValidateData dekte DT_ClassDefs niet — nieuwe derde validator toegevoegd (verb-familie, verb↔tunable-consistentie, weapon/body-cross-refs per campaign-setup, negatieve-tunable-vangnet voor script-gevulde tabellen).
+- *Review-fixes in dezelfde changeset:* M1 — medic-her-dispatch: na een afgeronde triage-run krijgt een tweede casualty alsnog zijn poging (peek `CanStabilizeSoldier` voorkomt shuttle-loops op geredde/verlopen patiënten); m2 stilte-log; m3 struct-checks; m5 asset-telling. Follow-ups genoteerd: m4 (spawn-fan-offsets → SquadTuning), m6 (cover-scorerconstanten → tuning), m7 (catalog-formulering SoldierDowned-consumer).
+- *Hygiëne:* `__pycache__/` ge-gitignored. `Eclipse/Content/MetaHumans|Atira_LODSettings|Locodrome` staan bewust untracked tot de MetaHuman-curatie (aparte taak) besluit wat reist.
+- *Sessies 23-07 (niet eerder in dit bestand bijgeschreven):* zie de changelog in `progress_data.js` — o.a. body-pipeline (RAISOR/Belica via DT_BodyDefs), westgevel-B district-breed (412f14f), eerste audio-ronde gebankt (348b7f0), SPEC-P2-02/-P2-03 geschreven + gereviewd, MetaHumans-basis geland (908 MB, curatie in de rij).
+
+**Eerstvolgende stappen (per EXECUTION_PLAN §2):** (1) **P2-02 Stage A** — Command Mode debug-feel: hold-to-enter + 0.30-dilatatie + per-soldier-selectie op de bestaande 4 verbs (R3-falsificatie; bouwplan klaar); (2) parallel tweede spoor: **P2-03 stap 1-2** (DT_Facilities + pure EclipseBaseLogic, mét v3→v4-migratie + fixture zelfde commit); (3) commandlet-rij (één tegelijk): pack-slim-ronde → MetaHuman-curatie → audio-import (16.12); (4) owner-touchpoints in de wachtrij: 13.2-playtest, MetaHuman-download-kliks, civilian-pack, straks de Stage-A-feel-gauntlet (~20 min, het R3-verdict).
+
+---
+
+## VORIGE STAND (2026-07-22, ~21:40 CET — EERSTE SESSIE OP DE STERKE PC)
 
 **Waar gestopt:** eerste Fable 5-sessie op de sterke PC (na de installateur-bootstrap). Werkboom schoon, alles gecommit en gepusht; **groene bar hier onafhankelijk herbevestigd: build ✓ (-NoUba), 31/31 tests ✓, validatie 0 fouten ✓, catalog 19/19 ✓.**
 

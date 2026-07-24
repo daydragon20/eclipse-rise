@@ -21,6 +21,9 @@ Eclipse/*.sln
 Eclipse/*.slnx
 Eclipse/.vsconfig
 
+# Python bytecode (Tools/ scripts)
+__pycache__/
+
 # Fab direct-download staging (owner drops zips here; never committed raw)
 _fab_inbox/
 

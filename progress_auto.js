@@ -1,70 +1,70 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-23 12:57",
+    "generatedAt":  "2026-07-23 21:58",
     "tests":  {
-                  "ok":  31,
+                  "ok":  38,
                   "failed":  0,
-                  "total":  31,
-                  "reportAge":  "56 min geleden"
+                  "total":  38,
+                  "reportAge":  "7 uur geleden"
               },
     "commits":  [
                     {
-                        "hash":  "c0e6c34",
-                        "date":  "23-07 12:46",
-                        "msg":  "[Repo] Team config in repo + dashboard sync (autonomy loop)"
+                        "hash":  "3b7a5a8",
+                        "date":  "23-07 19:04",
+                        "msg":  "[Repo] Dashboard: B-doorvoering + audio naar changelog; editor-vrije pipeline in de rij"
                     },
                     {
-                        "hash":  "671de61",
-                        "date":  "23-07 12:45",
-                        "msg":  "[Art] Element-builder round: warning placards, patrols, true-scale cable, gate portal (GDD 15.5, 03.3)"
+                        "hash":  "348b7f0",
+                        "date":  "23-07 19:03",
+                        "msg":  "[Audio] Eerste SFX-set + verzets-sting via ElevenLabs, met reisbare cache (GDD 16.12)"
                     },
                     {
-                        "hash":  "70b8c36",
-                        "date":  "23-07 12:14",
-                        "msg":  "[Docs] Add SPEC-P2-01: Squad of 4 and the three slice classes (GDD 4.2.3, 14.3.4)"
+                        "hash":  "412f14f",
+                        "date":  "23-07 19:03",
+                        "msg":  "[Art] Owner-keuze B district-breed: WestComp-compensatie + BandHi 0.55, wees-vrije masters (GDD 15.8)"
                     },
                     {
-                        "hash":  "8cf65f1",
-                        "date":  "23-07 12:13",
-                        "msg":  "[Docs] Add the full risk-first execution plan (planner agent, GDD 13)"
+                        "hash":  "91da33c",
+                        "date":  "23-07 18:52",
+                        "msg":  "[Repo] A/B-paneel: B-eindstand-shot toegevoegd (district-breed doorgevoerd, 15.8)"
                     },
                     {
-                        "hash":  "9c1a77f",
-                        "date":  "23-07 12:10",
-                        "msg":  "[Docs] Enter Phase 2 on explicit owner instruction (GDD 13.2, hierarchy rule 4)"
+                        "hash":  "805a9d3",
+                        "date":  "23-07 18:47",
+                        "msg":  "[Repo] Dashboard: P2-01 op 85% - alleen tests wachten op editor-close"
                     },
                     {
-                        "hash":  "c66f2be",
-                        "date":  "23-07 12:02",
-                        "msg":  "[Characters] Step-3 slots: DT_NamedCharacters for the six story characters (GDD 02, 15.7)"
+                        "hash":  "b804b45",
+                        "date":  "23-07 18:45",
+                        "msg":  "[Repo] Dashboard: MetaHumans geland (SentinelC + Common, 908 MB) - koppeling volgt bij editor-close"
                     },
                     {
-                        "hash":  "d2b9eb4",
-                        "date":  "23-07 11:59",
-                        "msg":  "[Art] First hand-built assets + color calibration + car wrecks (GDD 15.5)"
+                        "hash":  "ba88580",
+                        "date":  "23-07 18:43",
+                        "msg":  "[Repo] Dashboard: look/A-B/P2-02 naar changelog; B-doorvoering + audio-ronde live; MetaHuman-landing gedetecteerd"
                     },
                     {
-                        "hash":  "fb4fd8a",
-                        "date":  "23-07 11:28",
-                        "msg":  "[Characters] Toon-restyle the body pipeline + faction hues (GDD 15.5, 08)"
+                        "hash":  "29cd549",
+                        "date":  "23-07 15:29",
+                        "msg":  "[Docs] Add SPEC-P2-02: Command Mode final feel, falsificatie-eerst (GDD 8.4, 4.1.2, 9.5, 14.5)"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (23 min geleden)"
+                            "caption":  "Laatste run - beeld 1 (3 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (23 min geleden)"
+                            "caption":  "Laatste run - beeld 2 (3 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (23 min geleden)"
+                            "caption":  "Laatste run - beeld 3 (3 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (23 min geleden)"
+                            "caption":  "Laatste run - beeld 4 (3 uur geleden)"
                         }
                     ]
 };

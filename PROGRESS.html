@@ -7,196 +7,264 @@
 <style>
   :root{
     color-scheme: dark;
-    --plane:#0d0d0d; --surface:#1a1a19; --surface-2:#222220;
-    --ink:#ffffff; --ink-2:#c3c2b7; --ink-3:#898781;
-    --hairline:rgba(255,255,255,0.10); --grid:#2c2c2a;
-    --groen:#0ca30c; --geel:#fab219; --oranje:#ec835a; --rood:#d03b3b;
+    --plane:#0c0b09; --surface:#171512; --surface-2:#201d18; --surface-3:#282219;
+    --ink:#f4efe4; --ink-2:#bcb3a2; --ink-3:#7f776a;
+    --hairline:rgba(240,220,180,0.09); --ring-bg:#332c22;
+    --amber:#f0a52e; --amber-soft:#f6c877; --rust:#d9743a;
+    --groen:#63c257; --geel:#f0a52e; --oranje:#dd7a3c; --rood:#d85742;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{background:var(--plane)}
-  body{background:var(--plane);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-       font-size:14px;line-height:1.5;max-width:1080px;margin:0 auto;padding:36px 22px 56px;-webkit-font-smoothing:antialiased}
-  header h1{font-size:26px;font-weight:650;letter-spacing:-0.01em}
-  .meta{color:var(--ink-2);font-size:13px;margin-top:4px}
-  .badge-live{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;
-              background:rgba(12,163,12,0.18);color:#7fdc7f;border:1px solid rgba(12,163,12,0.4);vertical-align:2px}
-  section.kaart{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:20px 22px;margin-top:16px}
-  .kaart h2{font-size:16px;font-weight:650}
-  .kaart .scope{color:var(--ink-3);font-size:12.5px;font-weight:400;margin-left:6px}
-  .rijen{margin-top:14px;display:flex;flex-direction:column;gap:11px}
-  .rij{display:grid;grid-template-columns:minmax(210px,330px) 1fr 52px;gap:4px 14px;align-items:center}
-  .naam{font-size:13.5px;color:var(--ink)}
-  .pct{font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
-  .balk{height:10px;width:100%;border-radius:0 4px 4px 0;background:var(--grid);overflow:hidden}
-  .vul{height:100%;border-radius:0 4px 4px 0}
-  .notitie{grid-column:1 / -1;color:var(--ink-3);font-size:12px;margin-top:-4px}
-  .rij.totaal .naam{font-weight:700}
-  .rij.totaal .balk{height:14px}
-  hr.scheiding{border:0;border-top:1px solid var(--hairline);margin:14px 0}
+  body{background:radial-gradient(1100px 420px at 50% -160px, rgba(240,165,46,0.10), transparent 70%),var(--plane);
+       color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.55;
+       max-width:1040px;margin:0 auto;padding:34px 22px 60px;-webkit-font-smoothing:antialiased}
+  code{color:var(--amber-soft);font-size:12px}
+  header h1{font-size:25px;font-weight:700;letter-spacing:-0.015em}
+  header h1 .accent{color:var(--amber)}
+  .meta{color:var(--ink-2);font-size:12.5px;margin-top:5px}
+  .badge-live{display:inline-block;margin-left:9px;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:0.06em;
+              background:rgba(99,194,87,0.15);color:#8fe083;border:1px solid rgba(99,194,87,0.4);vertical-align:3px}
+  .pols{display:inline-block;width:8px;height:8px;border-radius:999px;background:#8fe083;margin-right:6px;
+        box-shadow:0 0 0 0 rgba(143,224,131,0.6);animation:puls 2.2s infinite}
+  @keyframes puls{0%{box-shadow:0 0 0 0 rgba(143,224,131,0.5)}70%{box-shadow:0 0 0 8px rgba(143,224,131,0)}100%{box-shadow:0 0 0 0 rgba(143,224,131,0)}}
+  section.kaart{background:linear-gradient(180deg,var(--surface),rgba(23,21,18,0.6));border:1px solid var(--hairline);border-radius:14px;
+                padding:18px 20px;margin-top:14px;box-shadow:0 8px 24px -18px rgba(0,0,0,0.9)}
+  .kaart h2{font-size:15px;font-weight:700;display:flex;align-items:baseline;gap:9px;letter-spacing:-0.01em}
+  .kaart h2::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--amber);flex:0 0 auto;transform:translateY(1px)}
+  .kaart.warn h2::before{background:var(--rust)}
+  .kaart .scope{color:var(--ink-3);font-size:12px;font-weight:400}
+  /* HERO */
+  .hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+  .donut{width:120px;height:120px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+         background:conic-gradient(var(--amber) calc(var(--p)*3.6deg), var(--ring-bg) 0);box-shadow:0 0 30px -8px rgba(240,165,46,0.5)}
+  .donut-gat{width:94px;height:94px;border-radius:50%;background:var(--surface);display:grid;place-items:center;text-align:center}
+  .donut-num{font-size:29px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .donut-cap{font-size:10px;color:var(--ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-top:3px}
+  .hero-txt{flex:1 1 240px;min-width:210px}
+  .hero-label{font-size:19px;font-weight:750}
+  .hero-sub{color:var(--ink-2);font-size:12.5px;margin-top:1px}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12.5px;
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:550;
         background:var(--surface-2);border:1px solid var(--hairline);color:var(--ink-2)}
-  .chip .glyph{font-weight:700}
-  .chip-ok{border-color:rgba(12,163,12,0.45);color:#9fe29f}
-  .chip-bad{border-color:rgba(208,59,59,0.55);color:#f0a2a2}
-  .chip-open{border-color:rgba(250,178,25,0.5);color:#ffd57a}
-  .status{display:inline-block;min-width:64px;text-align:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.02em}
-  .status-bezig{background:rgba(250,178,25,0.16);color:#ffd57a;border:1px solid rgba(250,178,25,0.5)}
-  .status-wachten{background:rgba(236,131,90,0.14);color:#f2b49b;border:1px solid rgba(236,131,90,0.5)}
-  .status-klaar{background:rgba(12,163,12,0.16);color:#9fe29f;border:1px solid rgba(12,163,12,0.45)}
+  .chip .glyph{font-weight:800}
+  .chip-ok{border-color:rgba(99,194,87,0.45);color:#9fe093;background:rgba(99,194,87,0.08)}
+  .chip-bad{border-color:rgba(216,87,66,0.55);color:#f0a89b;background:rgba(216,87,66,0.08)}
+  .chip-open{border-color:rgba(240,165,46,0.45);color:var(--amber-soft);background:rgba(240,165,46,0.07)}
+  /* lees-uitleg */
+  .gids{display:flex;flex-wrap:wrap;gap:14px 20px;margin-top:4px;font-size:12.5px;color:var(--ink-2)}
+  .gids b{color:var(--ink)}
+  .stip{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:0}
+  /* owner-acties */
+  .acties{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .actie{background:var(--surface-2);border:1px solid rgba(240,165,46,0.25);border-left:3px solid var(--amber);border-radius:10px;padding:12px 15px}
+  .actie .titel{font-weight:700;font-size:13.5px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .actie .prio{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:var(--amber-soft);
+               background:rgba(240,165,46,0.12);border:1px solid rgba(240,165,46,0.35);border-radius:999px;padding:1px 8px}
+  .actie .waarom{color:var(--ink-3);font-size:11.5px;font-weight:400}
+  .actie ol{margin:9px 0 0 18px;font-size:12.5px;color:var(--ink-2)}
+  .actie ol li{margin-top:3px}
+  .geen-actie{margin-top:12px;color:#9fe093;font-size:13px}
+  /* bars/rijen — klikbaar */
+  .rijen{margin-top:14px;display:flex;flex-direction:column;gap:4px}
+  .klik{display:grid;gap:5px 13px;align-items:center;padding:8px 10px;margin:0 -10px;border-radius:9px;cursor:pointer}
+  .klik:hover{background:rgba(255,255,255,0.03)}
+  .rij{grid-template-columns:minmax(190px,300px) 1fr 46px 16px}
+  .faserij{grid-template-columns:minmax(130px,1fr) 128px minmax(90px,1.6fr) 44px 16px}
+  .taakrij{grid-template-columns:74px minmax(150px,1fr) 90px 44px 16px}
+  .naam{font-size:13.5px;color:var(--ink)}
+  .faserij .naam,.rij.totaal .naam{font-weight:650}
+  .pct{font-size:13px;font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums;text-align:right}
+  .balk{height:9px;width:100%;border-radius:999px;background:var(--ring-bg);overflow:hidden}
+  .vul{height:100%;border-radius:999px;transition:width .5s ease;box-shadow:0 0 12px -2px currentColor}
+  .caret{color:var(--ink-3);font-size:11px;text-align:right;transition:transform .2s}
+  .klik.open .caret{transform:rotate(90deg);color:var(--amber)}
+  .rij.totaal{cursor:default} .rij.totaal .balk{height:13px}
+  .detail{grid-column:1 / -1;display:none;margin-top:8px;padding:13px 15px;background:var(--surface);border:1px solid var(--hairline);
+          border-radius:10px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .klik.open .detail{display:block}
+  .detail .kop{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:800;margin-top:11px}
+  .detail .kop:first-child{margin-top:0}
+  .detail ol{margin:5px 0 0 18px}.detail ol li{margin-top:3px}
+  .nodig-owner{color:var(--amber-soft);font-weight:600}
+  .nodig-wachten{color:#9fe093;font-weight:600}
+  /* status */
+  .status{display:inline-block;min-width:64px;text-align:center;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;text-transform:uppercase}
+  .status-bezig{background:rgba(240,165,46,0.15);color:var(--amber-soft);border:1px solid rgba(240,165,46,0.5)}
+  .status-wachten{background:rgba(221,122,60,0.13);color:#f0b48f;border:1px solid rgba(221,122,60,0.5)}
+  .status-klaar{background:rgba(99,194,87,0.15);color:#9fe093;border:1px solid rgba(99,194,87,0.45)}
   .status-gepland{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--hairline)}
-  .taakrij{display:grid;grid-template-columns:78px minmax(190px,300px) 1fr 52px;gap:4px 12px;align-items:center}
-  .taakrij .notitie{grid-column:2 / -1;margin-top:-2px}
+  .klok{font-variant-numeric:tabular-nums;font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;color:var(--amber);
+        text-align:right;white-space:nowrap;background:rgba(240,165,46,0.08);border:1px solid rgba(240,165,46,0.22);border-radius:6px;padding:2px 7px}
+  .klok-af{color:#9fe093;background:rgba(99,194,87,0.10);border-color:rgba(99,194,87,0.3)}
+  /* assets */
+  .assets{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+  .assets .kol{background:var(--surface-2);border:1px solid var(--hairline);border-radius:11px;padding:13px 15px}
+  .assets .kol h3{font-size:11.5px;font-weight:800;letter-spacing:0.03em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .assets .kol .telling{margin-left:auto;font-size:11px;color:var(--ink-3);font-weight:700;background:var(--surface-3);padding:1px 8px;border-radius:999px}
+  .assets ul{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:7px}
+  .assets li{font-size:12.5px;color:var(--ink-2);padding-left:16px;position:relative;line-height:1.45}
+  .assets li::before{content:"";position:absolute;left:0;top:6px;width:8px;height:8px;border-radius:50%}
+  .kol-gepakt li::before{background:var(--groen)} .kol-gemaakt li::before{background:var(--amber)} .kol-tedoen li::before{background:var(--ink-3)}
+  .kol-gepakt h3{color:#9fe093} .kol-gemaakt h3{color:var(--amber-soft)} .kol-tedoen h3{color:var(--ink-2)}
   .galerij{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px}
-  figure{background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;overflow:hidden}
+  figure{background:var(--surface-2);border:1px solid var(--hairline);border-radius:11px;overflow:hidden}
   figure img{display:block;width:100%;height:auto}
-  figcaption{padding:8px 12px;font-size:12.5px;color:var(--ink-2)}
-  ul.log{margin:10px 0 0 18px;color:var(--ink-2);font-size:13px}
-  ul.log li{margin-top:5px}
+  figcaption{padding:9px 13px;font-size:12.5px;color:var(--ink-2)}
+  ul.log{margin:11px 0 0 2px;color:var(--ink-2);font-size:12.5px;list-style:none;display:flex;flex-direction:column;gap:6px}
+  ul.log li{padding-left:16px;position:relative}
+  ul.log li::before{content:"▸";position:absolute;left:0;color:var(--amber);font-size:11px;top:1px}
   .commits{margin-top:12px;font-size:12.5px;color:var(--ink-2);overflow-x:auto}
   .commits table{border-collapse:collapse;width:100%}
-  .commits td{padding:4px 10px 4px 0;border-bottom:1px solid var(--hairline);white-space:nowrap}
+  .commits td{padding:5px 10px 5px 0;border-bottom:1px solid var(--hairline);white-space:nowrap}
   .commits td.msg{white-space:normal}
-  .commits code{color:#ffd57a;font-size:12px}
-  footer{margin-top:22px;color:var(--ink-3);font-size:12px}
+  details.ouder{margin-top:15px}
+  details.ouder>summary{cursor:pointer;color:var(--ink-3);font-size:13px;padding:9px 13px;list-style:none;background:var(--surface);border:1px solid var(--hairline);border-radius:10px}
+  details.ouder>summary::-webkit-details-marker{display:none}
+  details.ouder>summary::before{content:"▸ ";color:var(--amber)}
+  details.ouder[open]>summary::before{content:"▾ "}
+  footer{margin-top:24px;color:var(--ink-3);font-size:11.5px;line-height:1.6}
 </style>
 </head>
 <body>
 <header>
-  <h1>ECLIPSE: Rise of the Resistance — Voortgang<span class="badge-live">LIVE</span></h1>
+  <h1><span class="accent">ECLIPSE</span> · Rise of the Resistance<span class="badge-live">LIVE</span></h1>
   <p class="meta" id="meta-regel">laden…</p>
 </header>
 <main id="app"><section class="kaart"><h2>Dashboard laden…</h2>
-  <p class="meta">Als dit blijft staan: controleer of <code>progress_data.js</code> en <code>progress_auto.js</code> naast dit bestand staan.</p>
+  <p class="meta">Blijft dit staan? Controleer of <code>progress_data.js</code> + <code>progress_auto.js</code> naast dit bestand staan.</p>
 </section></main>
-<footer>
-  Dit dashboard leest zichzelf: <code>progress_data.js</code> (inschattingen, per milestone bijgewerkt door de dev-sessie)
-  + <code>progress_auto.js</code> (feiten, elke 10 min ververst door <code>Tools\update_progress.ps1</code> — start via
-  <code>start_progress_watcher.bat</code>). De pagina herlaadt zichzelf elke 60&nbsp;seconden; F5 mag ook altijd.
-</footer>
+<footer>Klik op elk blok voor uitleg. Klokjes zijn grove schattingen en tikken elke seconde; de pagina herlaadt elke 60&nbsp;s.</footer>
 
 <script>
-// Cache-busting: de databestanden telkens vers inladen (file:// en http:// beide oké).
 (function laadData(){
-  var stamp = Date.now();
-  var bronnen = ["progress_data.js", "progress_auto.js"];
-  var klaar = 0;
-  bronnen.forEach(function(src){
-    var s = document.createElement("script");
-    s.src = src + "?v=" + stamp;
-    s.onload = s.onerror = function(){ if (++klaar === bronnen.length) render(); };
-    document.head.appendChild(s);
-  });
+  var stamp = Date.now(), bronnen = ["progress_data.js","progress_auto.js"], klaar = 0;
+  bronnen.forEach(function(src){ var s=document.createElement("script"); s.src=src+"?v="+stamp;
+    s.onload=s.onerror=function(){ if(++klaar===bronnen.length) render(); }; document.head.appendChild(s); });
 })();
+function kleur(p){ return p>=90?"var(--groen)":p>=40?"var(--geel)":p>=10?"var(--oranje)":"var(--rood)"; }
+function esc(s){ return String(s==null?"":s); }
+function attr(s){ return esc(s).replace(/"/g,'&quot;'); }
 
-function kleur(p){ return p >= 90 ? "var(--groen)" : p >= 40 ? "var(--geel)" : p >= 10 ? "var(--oranje)" : "var(--rood)"; }
+function nodigHTML(n){
+  if (n && n.type === "owner"){
+    var st = (n.stappen||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('');
+    return '<div class="kop">Wat jij moet doen om dit af te ronden</div><div class="nodig-owner">Jouw actie nodig:</div><ol>'+st+'</ol>';
+  }
+  return '<div class="kop">Wat jij moet doen</div><div class="nodig-wachten">⏳ Niets — de agent is hier zelf mee bezig en maakt het helemaal af.</div>';
+}
+function balk(p){ return '<div class="balk"><div class="vul" style="width:'+p+'%;color:'+kleur(p)+';background:'+kleur(p)+'"></div></div>'; }
 
-function balkRij(item, isTotaal){
-  var p = Math.max(0, Math.min(100, item.pct|0));
-  var h = '<div class="rij' + (isTotaal ? ' totaal' : '') + '">' +
-    '<span class="naam">' + item.naam + '</span>' +
-    '<div class="balk" aria-hidden="true"><div class="vul" style="width:' + p + '%;background:' + kleur(p) + '"></div></div>' +
-    '<span class="pct">' + p + '%</span>';
-  if (item.notitie) { h += '<p class="notitie">' + item.notitie + '</p>'; }
-  return h + '</div>';
+function tikKlokken(){
+  var nu = Date.now(), els = document.querySelectorAll('.klok[data-doel]');
+  for (var i=0;i<els.length;i++){ var el=els[i], pct=parseInt(el.getAttribute('data-pct')||'0',10);
+    if (pct>=100){ el.textContent='✓ af'; el.className='klok klok-af'; continue; }
+    var s=Math.floor((new Date(el.getAttribute('data-doel')+'T23:59:59').getTime()-nu)/1000);
+    if (s<=0){ el.textContent='afrondend'; el.className='klok klok-af'; continue; }
+    var d=Math.floor(s/86400); s-=d*86400; var u=Math.floor(s/3600); s-=u*3600; var m=Math.floor(s/60), sec=s-m*60;
+    var p=function(n){return(n<10?'0':'')+n;}; el.textContent=d+'d '+p(u)+':'+p(m)+':'+p(sec); el.className='klok'; }
 }
 
 function render(){
-  var D = window.PROGRESS_DATA, A = window.PROGRESS_AUTO || {};
-  if (!D) { return; } // dan blijft de laad-melding staan (progress_data.js ontbreekt)
-  var h = "";
+  var D=window.PROGRESS_DATA, A=window.PROGRESS_AUTO||{}; if(!D) return; var h="";
 
-  // hero
-  h += '<section class="kaart"><div class="rijen">' + balkRij({ naam: D.hero.label, pct: D.hero.pct }, true) + '</div></section>';
+  // HERO
+  var tt=A.tests||{}, testsOk=(tt.failed===0&&(tt.total|0)>0), hp=Math.max(0,Math.min(100,D.hero.pct|0));
+  h+='<section class="kaart hero"><div class="donut" style="--p:'+hp+'"><div class="donut-gat"><div><span class="donut-num">'+hp+'%</span><div class="donut-cap">totaal</div></div></div></div>'+
+     '<div class="hero-txt"><div class="hero-label">'+esc(D.hero.label)+'</div><div class="hero-sub">Single-player Action-Strategy RPG · Borderlands-stijl</div>'+
+     '<div class="chips"><span class="chip '+(testsOk?'chip-ok':'chip-bad')+'"><span class="glyph">'+(testsOk?'&#10003;':'&#10007;')+'</span> Tests '+(tt.total?(tt.ok+'/'+tt.total):'n.v.t.')+'</span>'+
+     '<span class="chip chip-open"><span class="glyph">!</span> '+esc(D.playtestChip)+'</span></div></div></section>';
 
-  // live takenlijst van de dev-sessie (data: progress_data.js -> taken)
-  if (D.taken && D.taken.length){
-    h += '<section class="kaart"><h2>Nu bezig <span class="scope">live takenlijst van de AI-dev — bijgewerkt per iteratie</span></h2><div class="rijen">';
-    D.taken.forEach(function(t){
-      var p = Math.max(0, Math.min(100, t.pct|0));
-      var cls = { bezig:"status-bezig", wachten:"status-wachten", klaar:"status-klaar", gepland:"status-gepland" }[t.status] || "status-gepland";
-      h += '<div class="taakrij">' +
-        '<span class="status ' + cls + '">' + t.status + '</span>' +
-        '<span class="naam">' + t.taak + '</span>' +
-        '<div class="balk" aria-hidden="true"><div class="vul" style="width:' + p + '%;background:' + kleur(p) + '"></div></div>' +
-        '<span class="pct">' + p + '%</span>' +
-        (t.detail ? '<p class="notitie">' + t.detail + '</p>' : '') +
-        '</div>';
-    });
-    h += '</div></section>';
+  // LEES-UITLEG
+  h+='<section class="kaart"><h2>Hoe lees je dit? <span class="scope">klik op elk blok voor uitleg</span></h2><div class="gids">'+
+     '<span><span class="stip" style="background:var(--groen)"></span><b>groen</b> = af</span>'+
+     '<span><span class="stip" style="background:var(--geel)"></span><b>geel</b> = mee bezig</span>'+
+     '<span><span class="stip" style="background:var(--oranje)"></span><b>oranje</b> = pas begonnen / wacht</span>'+
+     '<span><span class="stip" style="background:var(--rood)"></span><b>rood</b> = nog niet gestart</span>'+
+     '<span>▸ <b>klik een blok</b> → wat gebeurt er + wat jij moet doen</span></div></section>';
+
+  // WAT MOET JIJ DOEN
+  var acts = D.ownerActies||[];
+  h+='<section class="kaart warn"><h2>Wat moet JIJ doen? <span class="scope">de rest doet de agent zelf</span></h2>';
+  if (acts.length){ h+='<div class="acties">';
+    acts.forEach(function(a){
+      var st=(a.stappen||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('');
+      h+='<div class="actie"><div class="titel">'+esc(a.titel)+(a.prio?'<span class="prio">'+esc(a.prio)+'</span>':'')+(a.waarom?'<span class="waarom">— '+esc(a.waarom)+'</span>':'')+'</div><ol>'+st+'</ol></div>';
+    }); h+='</div>';
+  } else { h+='<p class="geen-actie">✓ Op dit moment hoef je niets te doen — de agent werkt door.</p>'; }
+  h+='</section>';
+
+  // FASES (klikbaar)
+  var road=D.secties&&D.secties[0];
+  if (road){ h+='<section class="kaart"><h2>Fases <span class="scope">klik een fase → wat gebeurt er + wat jij moet doen · klokjes = grove schatting</span></h2><div class="rijen">';
+    road.items.forEach(function(i){ var p=Math.max(0,Math.min(100,i.pct|0));
+      var klok=i.doel?'<span class="klok" data-doel="'+esc(i.doel)+'" data-pct="'+p+'">…</span>':'<span></span>';
+      var det='<div class="detail">'+(i.groot?'<div class="kop">Wat gebeurt er in deze fase</div>'+esc(i.groot):'')+nodigHTML(i.nodig)+'</div>';
+      h+='<div class="klik faserij"><span class="naam">'+esc(i.naam)+'</span>'+klok+balk(p)+'<span class="pct">'+p+'%</span><span class="caret">▸</span>'+det+'</div>';
+    }); h+='</div></section>';
   }
 
-  // A/B-keuzes voor de owner (data: progress_data.js -> abTests)
-  if (D.abTests && D.abTests.length){
-    var abBust = encodeURIComponent((A.generatedAt || D.bijgewerkt || "0"));
-    D.abTests.forEach(function(ab){
-      h += '<section class="kaart"><h2>Na te kijken: ' + ab.titel +
-           ' <span class="scope">A/B — jouw keuze; zeg A of B tegen de dev-sessie</span></h2>';
-      if (ab.vraag) { h += '<p class="notitie">' + ab.vraag + '</p>'; }
-      h += '<div class="galerij">';
-      (ab.opties || []).forEach(function(o){
-        h += '<figure>' +
-          (o.img ? '<img src="' + o.img + '?v=' + abBust + '" alt="">' : '<p class="notitie">shot volgt…</p>') +
-          '<figcaption><strong>' + o.label + '</strong>' + (o.uitleg ? ' — ' + o.uitleg : '') + '</figcaption></figure>';
-      });
-      h += '</div>';
-      if (ab.aanbeveling) { h += '<p class="notitie">Aanbeveling AI: ' + ab.aanbeveling + '</p>'; }
-      if (ab.keuze) { h += '<p class="notitie"><strong>Keuze owner: ' + ab.keuze + '</strong></p>'; }
-      h += '</section>';
-    });
+  // NU BEZIG (klikbaar)
+  if (D.taken&&D.taken.length){ h+='<section class="kaart"><h2>Nu bezig <span class="scope">live — klik voor details</span></h2><div class="rijen">';
+    D.taken.forEach(function(t){ var p=Math.max(0,Math.min(100,t.pct|0));
+      var cls={bezig:"status-bezig",wachten:"status-wachten",klaar:"status-klaar",gepland:"status-gepland"}[t.status]||"status-gepland";
+      var det='<div class="detail">'+(t.detail?esc(t.detail):'—')+'</div>';
+      h+='<div class="klik taakrij"><span class="status '+cls+'">'+esc(t.status)+'</span><span class="naam">'+esc(t.taak)+'</span>'+balk(p)+'<span class="pct">'+p+'%</span><span class="caret">▸</span>'+det+'</div>';
+    }); h+='</div></section>';
   }
 
-  // kwaliteitsbalk uit AUTO-feiten
-  var t = A.tests || {};
-  var testsOk = (t.failed === 0 && (t.total|0) > 0);
-  h += '<section class="kaart"><h2>Kwaliteitsbalk <span class="scope">automatisch gelezen' +
-       (t.reportAge ? ' — rapport: ' + t.reportAge : '') + '</span><div class="chips">';
-  h += '<span class="chip ' + (testsOk ? 'chip-ok' : 'chip-bad') + '"><span class="glyph">' + (testsOk ? '&#10003;' : '&#10007;') + '</span> Tests: ' +
-       (t.total ? (t.ok + '/' + t.total + (t.failed ? ' (' + t.failed + ' ROOD)' : ' groen')) : 'nog geen rapport') + '</span>';
-  h += '<span class="chip chip-open"><span class="glyph">!</span> ' + D.playtestChip + '</span>';
-  h += '</div></section>';
-
-  // secties met balken
-  D.secties.forEach(function(sec){
-    h += '<section class="kaart"><h2>' + sec.titel + ' <span class="scope">' + (sec.scope || '') + '</span></h2>';
-    if (typeof sec.totaal === "number") {
-      h += '<div class="rijen">' + balkRij({ naam: "Totaal", pct: sec.totaal }, true) + '</div><hr class="scheiding">';
-    }
-    h += '<div class="rijen">' + sec.items.map(function(i){ return balkRij(i, false); }).join('') + '</div></section>';
-  });
-
-  // screenshots: verse AUTO-set wint van de vaste milestone-set
-  var shots = (A.screenshots && A.screenshots.length) ? A.screenshots : D.screenshots;
-  var bust = encodeURIComponent(A.generatedAt || D.bijgewerkt || "0");
-  h += '<section class="kaart"><h2>Screenshots <span class="scope">' + D.screenshotNoot + '</span></h2><div class="galerij">';
-  shots.forEach(function(s){
-    h += '<figure><img src="' + s.file + '?v=' + bust + '" alt=""><figcaption>' + s.caption + '</figcaption></figure>';
-  });
-  h += '</div></section>';
-
-  // recente commits (AUTO)
-  if (A.commits && A.commits.length){
-    h += '<section class="kaart"><h2>Recente commits <span class="scope">automatisch uit git</span></h2><div class="commits"><table>';
-    A.commits.forEach(function(c){
-      h += '<tr><td><code>' + c.hash + '</code></td><td>' + c.date + '</td><td class="msg">' + c.msg + '</td></tr>';
-    });
-    h += '</table></div></section>';
+  // ASSETS
+  if (D.assets){ var kolom=function(titel,cls,arr){ var l=(arr||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
+      return '<div class="kol '+cls+'"><h3>'+titel+'<span class="telling">'+(arr?arr.length:0)+'</span></h3><ul>'+l+'</ul></div>'; };
+    h+='<section class="kaart"><h2>Assets <span class="scope">binnengehaald · zelf gemaakt · nog te doen</span></h2><div class="assets">'+
+       kolom('Binnengehaald','kol-gepakt',D.assets.gepakt)+kolom('Zelf gemaakt','kol-gemaakt',D.assets.gemaakt)+kolom('Nog te doen','kol-tedoen',D.assets.teDoen)+'</div></section>';
   }
 
-  // changelog (handmatig)
-  D.changelog.forEach(function(cl){
-    h += '<section class="kaart"><h2>' + cl.datum + '</h2><ul class="log">' +
-         cl.punten.map(function(p){ return '<li>' + p + '</li>'; }).join('') + '</ul></section>';
+  // A/B — beantwoorde vragen (keuze ingevuld) verdwijnen automatisch
+  var openAB=(D.abTests||[]).filter(function(ab){ return !ab.keuze; });
+  if (openAB.length){ var abBust=encodeURIComponent(A.generatedAt||D.bijgewerkt||"0");
+    openAB.forEach(function(ab){ h+='<section class="kaart"><h2>Na te kijken: '+esc(ab.titel)+' <span class="scope">A/B — zeg A of B</span></h2>';
+      if(ab.vraag)h+='<p class="meta">'+esc(ab.vraag)+'</p>'; h+='<div class="galerij">';
+      (ab.opties||[]).forEach(function(o){ h+='<figure>'+(o.img?'<img src="'+o.img+'?v='+abBust+'" alt="">':'<p class="meta" style="padding:14px">shot volgt…</p>')+'<figcaption><strong>'+esc(o.label)+'</strong>'+(o.uitleg?' — '+esc(o.uitleg):'')+'</figcaption></figure>'; });
+      h+='</div>'+(ab.keuze?'<p class="meta"><strong>Keuze: '+esc(ab.keuze)+'</strong></p>':'')+'</section>'; });
+  }
+
+  // OVERIGE SECTIES (klikbaar)
+  D.secties.slice(1).forEach(function(sec){ h+='<section class="kaart"><h2>'+esc(sec.titel)+' <span class="scope">'+esc(sec.scope||'')+'</span></h2><div class="rijen">';
+    if(typeof sec.totaal==="number") h+='<div class="rij totaal" style="display:grid;grid-template-columns:minmax(190px,300px) 1fr 46px 16px;gap:5px 13px;padding:8px 0"><span class="naam">Totaal</span>'+balk(sec.totaal)+'<span class="pct">'+sec.totaal+'%</span><span></span></div>';
+    sec.items.forEach(function(i){ var p=Math.max(0,Math.min(100,i.pct|0));
+      var det='<div class="detail">'+(i.notitie?esc(i.notitie):'Onderdeel van de bouw.')+nodigHTML(i.nodig)+'</div>';
+      h+='<div class="klik rij"><span class="naam">'+esc(i.naam)+'</span>'+balk(p)+'<span class="pct">'+p+'%</span><span class="caret">▸</span>'+det+'</div>';
+    }); h+='</div></section>';
   });
 
-  document.getElementById("app").innerHTML = h;
-  document.getElementById("meta-regel").textContent =
-    "Feiten ververst: " + (A.generatedAt || "nog niet (start de watcher)") +
-    " · inschattingen bijgewerkt: " + D.bijgewerkt +
-    " · pagina herlaadt elke 60 s";
+  // SCREENSHOTS
+  var shots=(A.screenshots&&A.screenshots.length)?A.screenshots:D.screenshots, bust=encodeURIComponent(A.generatedAt||D.bijgewerkt||"0");
+  h+='<section class="kaart"><h2>Screenshots <span class="scope">'+esc(D.screenshotNoot)+'</span></h2><div class="galerij">';
+  shots.forEach(function(s){ h+='<figure><img src="'+s.file+'?v='+bust+'" alt=""><figcaption>'+esc(s.caption)+'</figcaption></figure>'; }); h+='</div></section>';
+
+  // COMMITS
+  if (A.commits&&A.commits.length){ h+='<section class="kaart"><h2>Recente commits <span class="scope">live uit git</span></h2><div class="commits"><table>';
+    A.commits.forEach(function(c){ h+='<tr><td><code>'+esc(c.hash)+'</code></td><td>'+esc(c.date)+'</td><td class="msg">'+esc(c.msg)+'</td></tr>'; }); h+='</table></div></section>';
+  }
+
+  // CHANGELOG (laatste 5 + inklap)
+  var log=D.changelog||[];
+  log.slice(0,5).forEach(function(cl){ h+='<section class="kaart"><h2>'+esc(cl.datum)+'</h2><ul class="log">'+cl.punten.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul></section>'; });
+  var ouder=log.slice(5);
+  if (ouder.length){ h+='<details class="ouder"><summary>Oudere sessies ('+ouder.length+')</summary>';
+    ouder.forEach(function(cl){ h+='<section class="kaart"><h2>'+esc(cl.datum)+'</h2><ul class="log">'+cl.punten.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul></section>'; }); h+='</details>';
+  }
+
+  document.getElementById("app").innerHTML=h;
+  var laatste=(A.commits&&A.commits[0])?(A.commits[0].date+" — "+A.commits[0].msg):"geen commit-data";
+  document.getElementById("meta-regel").innerHTML='<span class="pols"></span>Laatste commit: '+esc(laatste)+' · feiten: '+esc(A.generatedAt||"watcher niet actief")+' · herlaadt elke 60 s';
+  tikKlokken(); if(!window.__ki){ window.__ki=setInterval(tikKlokken,1000); }
 }
 
-// zelf-verversen: elke 60 s volledig herladen zodat data én afbeeldingen vers zijn
+// klik-om-uit-te-klappen (één keer, blijft leven over renders)
+document.getElementById("app").addEventListener("click", function(e){
+  var row=e.target.closest(".klik"); if(row) row.classList.toggle("open");
+});
 setTimeout(function(){ location.reload(); }, 60000);
 </script>
 </body>
