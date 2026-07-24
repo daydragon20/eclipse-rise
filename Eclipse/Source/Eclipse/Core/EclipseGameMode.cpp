@@ -22,6 +22,7 @@
 #include "TimerManager.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Squad/EclipseSquadSubsystem.h"
+#include "Squad/EclipseSquadTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 
@@ -405,8 +406,12 @@ void AEclipseGameMode::SpawnMissionActors()
 				*Record->ClassId.ToString(), *Record->Name);
 		}
 
-		// Fan the squad out so four bodies never stack in one capsule scrum.
-		const FVector SpawnOffset(150.0f + 130.0f * (SquadIndex % 2), 150.0f + 130.0f * (SquadIndex / 2), 0.0f);
+		// Fan the squad out so four bodies never stack in one capsule scrum;
+		// base/step live in DA_SquadTuning (P2-01 review m4).
+		const UEclipseSquadTuningAsset* SquadTuning = Setup != nullptr ? Setup->SquadTuning.LoadSynchronous() : nullptr;
+		const float FanBaseCm = SquadTuning != nullptr ? SquadTuning->SpawnFanBaseCm : 150.0f;
+		const float FanStepCm = SquadTuning != nullptr ? SquadTuning->SpawnFanStepCm : 130.0f;
+		const FVector SpawnOffset(FanBaseCm + FanStepCm * (SquadIndex % 2), FanBaseCm + FanStepCm * (SquadIndex / 2), 0.0f);
 		AEclipseCharacter* Body = SpawnBodyNear(PlayerLocation + SpawnOffset,
 			Record != nullptr ? Record->Name : TEXT("Squadmate"));
 		if (Body == nullptr)

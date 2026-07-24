@@ -79,13 +79,16 @@ FVector ComputePushedOrderPoint(const FVector& SoldierLocation, const FVector& O
 	return OrderedLocation + ToOrder.GetSafeNormal2D() * PushDistanceCm;
 }
 
-float ScoreCoverSample(bool bBlocksThreatLine, float DistanceToOrderCm, float DistanceToThreatCm, float LaneBias)
+float ScoreCoverSample(bool bBlocksThreatLine, float DistanceToOrderCm, float DistanceToThreatCm, float LaneBias,
+	float CoverBlockBonus, float DistanceWeightPerCm)
 {
 	// The lane bonus applies only to covered samples: no bias value can talk a
 	// soldier out of cover — the class changes taste, never competence (GDD 9.5
 	// bug bar). Among covered samples, Sniper bias prefers the longer lane.
-	const float LaneBonus = bBlocksThreatLine ? FMath::Max(0.0f, LaneBias) * DistanceToThreatCm * 0.001f : 0.0f;
-	return (bBlocksThreatLine ? 10.0f : 0.0f) + LaneBonus - DistanceToOrderCm * 0.001f;
+	// Bonus/weight come from DA_SquadTuning (P2-01 review m6); the defaults
+	// mirror the shipped P1-06 numbers so missing tuning is behavior-neutral.
+	const float LaneBonus = bBlocksThreatLine ? FMath::Max(0.0f, LaneBias) * DistanceToThreatCm * DistanceWeightPerCm : 0.0f;
+	return (bBlocksThreatLine ? CoverBlockBonus : 0.0f) + LaneBonus - DistanceToOrderCm * DistanceWeightPerCm;
 }
 
 } // namespace EclipseSquadOrderLogic

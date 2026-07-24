@@ -178,7 +178,9 @@ FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& Ordered
 			bBlocked,
 			FVector::Dist(Sample, OrderedLocation),
 			FVector::Dist(Sample, NearestEnemy->GetActorLocation()),
-			ClassKit.CoverLaneBias);
+			ClassKit.CoverLaneBias,
+			Tuning != nullptr ? Tuning->CoverBlockBonus : 10.0f,
+			Tuning != nullptr ? Tuning->CoverDistanceWeightPerCm : 0.001f);
 		if (Score > BestScore)
 		{
 			BestScore = Score;

@@ -46,5 +46,6 @@ namespace EclipseSquadOrderLogic
 	 * to the sample nearest the order; LaneBias > 0 (Sniper) prefers covered
 	 * samples with a longer clear lane to the threat.
 	 */
-	ECLIPSE_API float ScoreCoverSample(bool bBlocksThreatLine, float DistanceToOrderCm, float DistanceToThreatCm, float LaneBias);
+	ECLIPSE_API float ScoreCoverSample(bool bBlocksThreatLine, float DistanceToOrderCm, float DistanceToThreatCm, float LaneBias,
+		float CoverBlockBonus = 10.0f, float DistanceWeightPerCm = 0.001f);
 }

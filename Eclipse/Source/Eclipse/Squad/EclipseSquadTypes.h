@@ -98,6 +98,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0.1))
 	float ResponseTimeoutSeconds = 1.0f;
 
+	/** Cover-scorer: flat bonus for a sample that blocks the threat line (P2-01 review m6 — was hardcoded). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
+	float CoverBlockBonus = 10.0f;
+
+	/** Cover-scorer: score weight per cm for order-distance penalty and lane bonus. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
+	float CoverDistanceWeightPerCm = 0.001f;
+
+	/** Squad spawn fan: base offset from the player (P2-01 review m4 — was hardcoded). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
+	float SpawnFanBaseCm = 150.0f;
+
+	/** Squad spawn fan: per-soldier step so four bodies never stack in one capsule scrum. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
+	float SpawnFanStepCm = 130.0f;
+
 	/** Rows: FEclipseSquadOrderDefRow keyed by order id. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad")
 	TSoftObjectPtr<UDataTable> OrderDefs;
