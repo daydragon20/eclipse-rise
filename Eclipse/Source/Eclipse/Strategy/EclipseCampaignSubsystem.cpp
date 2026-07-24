@@ -158,8 +158,6 @@ namespace
 					}
 				}
 			}
-			// Whatever shape came in, the in-memory state is now current.
-			State.SchemaVersion = 3;
 		}
 		else
 		{
@@ -168,6 +166,62 @@ namespace
 			for (FEclipseSoldierRecord& Soldier : State.Roster)
 			{
 				Ar << Soldier.ClassId;
+			}
+		}
+
+		// Schema v4 (SPEC-P2-03): the walkable-base facility states, appended at
+		// block end - the same mechanical tail as v2/v3. The read is version-gated:
+		// a pre-v4 block has no tail and keeps the type's seeded default. An empty
+		// base is not a legal campaign (5.3.1 mandatory core), so empty-after-read
+		// also lands on the spec start state - Command Center pre-built at L1
+		// (SPEC-P2-03 locked decision 2) - never a crash (GDD 14.3.5).
+		if (Ar.IsLoading())
+		{
+			if (State.SchemaVersion >= 4)
+			{
+				State.BaseState.Facilities.Reset();
+				int32 FacilityCount = 0;
+				Ar << FacilityCount;
+				for (int32 Index = 0; Index < FacilityCount && !Ar.IsError(); ++Index)
+				{
+					FEclipseFacilityState& Facility = State.BaseState.Facilities.AddDefaulted_GetRef();
+					Ar << Facility.SlotId;
+					Ar << Facility.FacilityId;
+					Ar << Facility.Level;
+					Ar << Facility.DaysRemaining;
+					int32 StaffCount = 0;
+					Ar << StaffCount;
+					for (int32 StaffIndex = 0; StaffIndex < StaffCount && !Ar.IsError(); ++StaffIndex)
+					{
+						FGuid SoldierId;
+						Ar << SoldierId;
+						Facility.AssignedSoldierIds.Add(SoldierId);
+					}
+				}
+			}
+			if (State.BaseState.Facilities.IsEmpty())
+			{
+				State.BaseState = FEclipseBaseState();
+			}
+			// Whatever shape came in, the in-memory state is now current.
+			State.SchemaVersion = 4;
+		}
+		else
+		{
+			int32 FacilityCount = State.BaseState.Facilities.Num();
+			Ar << FacilityCount;
+			for (FEclipseFacilityState& Facility : State.BaseState.Facilities)
+			{
+				Ar << Facility.SlotId;
+				Ar << Facility.FacilityId;
+				Ar << Facility.Level;
+				Ar << Facility.DaysRemaining;
+				int32 StaffCount = Facility.AssignedSoldierIds.Num();
+				Ar << StaffCount;
+				for (FGuid& SoldierId : Facility.AssignedSoldierIds)
+				{
+					Ar << SoldierId;
+				}
 			}
 		}
 	}
@@ -219,6 +273,25 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 					return false;
 				}
 				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 3;
+				const int32 EmptyCount = 0;
+				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
+				return true;
+			}));
+
+		// v3 -> v4 (SPEC-P2-03): the Campaign block gained the trailing base
+		// facility tail. Same mechanical empty-count append; the serializer's
+		// empty-base rule then lands migrated campaigns deterministically on the
+		// spec start state — Command Center pre-built at L1, slots B–D unbuilt
+		// (SPEC-P2-03 locked decision 2), never a crash (GDD 14.3.5).
+		SaveSubsystem->RegisterMigration(3, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
+			[](TMap<FName, TArray<uint8>>& SaveBlocks)
+			{
+				TArray<uint8>* CampaignBlock = SaveBlocks.Find(TEXT("Campaign"));
+				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
+				{
+					return false;
+				}
+				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 4;
 				const int32 EmptyCount = 0;
 				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
 				return true;

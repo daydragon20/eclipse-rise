@@ -14,8 +14,9 @@ namespace EclipseSave
 	 * and add a migration + test in the same commit (GDD 14.3.6).
 	 * v2: Campaign block gained UnlockedLoadoutTags (SPEC-P1-03).
 	 * v3: Campaign block gained the roster ClassId tail (SPEC-P2-01).
+	 * v4: Campaign block gained the base facility tail (SPEC-P2-03).
 	 */
-	inline constexpr int32 CurrentSchemaVersion = 3;
+	inline constexpr int32 CurrentSchemaVersion = 4;
 
 	inline const FString AutosaveSlotName = TEXT("Autosave");
 	inline const FString ManualSlotName = TEXT("Manual");

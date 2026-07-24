@@ -56,6 +56,18 @@ uint32 FEclipseCampaignState::ComputeStateHash() const
 		Hash = HashCombine(Hash, GetTypeHash(LoadoutTag.GetTagName()));
 	}
 
+	for (const FEclipseFacilityState& Facility : BaseState.Facilities)
+	{
+		Hash = HashCombine(Hash, GetTypeHash(Facility.SlotId));
+		Hash = HashCombine(Hash, GetTypeHash(Facility.FacilityId));
+		Hash = HashCombine(Hash, GetTypeHash(Facility.Level));
+		Hash = HashCombine(Hash, GetTypeHash(Facility.DaysRemaining));
+		for (const FGuid& SoldierId : Facility.AssignedSoldierIds)
+		{
+			Hash = HashCombine(Hash, GetTypeHash(SoldierId));
+		}
+	}
+
 	return Hash;
 }
 

@@ -125,6 +125,89 @@ struct FEclipseProductionOrder
 };
 
 /**
+ * Shared base-identity ids (SPEC-P2-03 locked decision 2). These are the data
+ * contract between the campaign state's seeded default below, the save
+ * migration, and the authored DA_BaseLayout/DT_Facilities assets - the assets
+ * must use these ids for the pre-built Command Center or migrated saves and
+ * asset-less fallbacks (GDD 14.3.5) would disagree about slot A.
+ */
+namespace EclipseBaseDefaults
+{
+	inline const FName CommandSlotId(TEXT("Slot_A"));
+	inline const FName CommandCenterFacilityId(TEXT("CommandCenter"));
+}
+
+/**
+ * One facility slot's mutable state (SPEC-P2-03). Level = highest COMPLETED
+ * level (0 = nothing built yet), so "operational at level X" stays queryable
+ * during upgrades; DaysRemaining > 0 = construction toward Level + 1 is in
+ * progress. Static definition (allowed rows, adjacency, streaming ids) lives in
+ * UEclipseBaseLayoutAsset; costs/timers/yields in DT_Facilities (GDD 14.2).
+ */
+USTRUCT(BlueprintType)
+struct FEclipseFacilityState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	FName SlotId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	FName FacilityId;
+
+	/** Highest completed level; 0 = under first construction or (transiently) empty. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	int32 Level = 0;
+
+	/** 0 = operational; > 0 = days of construction left toward Level + 1. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	int32 DaysRemaining = 0;
+
+	/**
+	 * Staff assignment lives in base state; the roster record is untouched and
+	 * muster validation reads this (SPEC-P2-03 staffing v1). Role is positional:
+	 * staff on a site under construction is the crew, staff on an operational
+	 * site is the analyst - no role enum until Phase 3 needs one.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TArray<FGuid> AssignedSoldierIds;
+};
+
+/**
+ * The walkable base (SPEC-P2-03). Default-constructed state already contains
+ * the pre-built L1 Command Center (5.3.1 mandatory core, locked decision 2): an
+ * empty base is not a legal campaign, so the spec start state is the TYPE's
+ * default - new campaigns, migrated pre-v4 saves and asset-less fallbacks all
+ * land on it deterministically (GDD 14.3.5).
+ */
+USTRUCT(BlueprintType)
+struct FEclipseBaseState
+{
+	GENERATED_BODY()
+
+	FEclipseBaseState()
+	{
+		FEclipseFacilityState& CommandCenter = Facilities.AddDefaulted_GetRef();
+		CommandCenter.SlotId = EclipseBaseDefaults::CommandSlotId;
+		CommandCenter.FacilityId = EclipseBaseDefaults::CommandCenterFacilityId;
+		CommandCenter.Level = 1;
+	}
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TArray<FEclipseFacilityState> Facilities;
+
+	const FEclipseFacilityState* FindBySlot(FName SlotId) const
+	{
+		return Facilities.FindByPredicate([SlotId](const FEclipseFacilityState& F) { return F.SlotId == SlotId; });
+	}
+
+	FEclipseFacilityState* FindBySlot(FName SlotId)
+	{
+		return Facilities.FindByPredicate([SlotId](const FEclipseFacilityState& F) { return F.SlotId == SlotId; });
+	}
+};
+
+/**
  * The campaign. Serialized member-by-member (explicit operator<< in the save
  * provider) so byte layout is deliberate; SchemaVersion changes require a
  * migration entry + test in the same commit (GDD 14.3.6).
@@ -134,9 +217,9 @@ struct FEclipseCampaignState
 {
 	GENERATED_BODY()
 
-	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). */
+	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Campaign")
-	int32 SchemaVersion = 3;
+	int32 SchemaVersion = 4;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 Day = 0;
@@ -161,6 +244,10 @@ struct FEclipseCampaignState
 	/** Loadout options earned by completed production (SPEC-P1-03: the choice must matter next mission). Append-only, insertion-ordered. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TArray<FGameplayTag> UnlockedLoadoutTags;
+
+	/** The walkable base (SPEC-P2-03); starts with the pre-built Command Center via FEclipseBaseState's seeded default. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	FEclipseBaseState BaseState;
 
 	int32 GetBalance(const FGameplayTag& ResourceType) const
 	{

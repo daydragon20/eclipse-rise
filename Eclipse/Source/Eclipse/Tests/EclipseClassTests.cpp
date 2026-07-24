@@ -300,10 +300,11 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 	FString Error;
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
-	// Reconstruct a byte-faithful v2 file from the v3 save: strip the trailing
-	// ClassId tail (count + FNames-as-ANSI-strings) from the Campaign block —
-	// the only registered block, so it ends the file — then rewrite the file
-	// header version, the block size, and the block's leading state version.
+	// Reconstruct a byte-faithful v2 file from the v4 save: strip the trailing
+	// base tail (SPEC-P2-03's v4 append) and then the ClassId tail (count +
+	// FNames-as-ANSI-strings) from the Campaign block — the only registered
+	// block, so those tails end the file — then rewrite the file header
+	// version, the block size, and the block's leading state version.
 	// Layout (save container contract): [u32 Magic][i32 Ver][i32 Blocks]
 	// [FString "Campaign" = i32 9 + 9 bytes][i64 BlockSize][block bytes...].
 	TArray<uint8> FileBytes;
@@ -312,13 +313,21 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v3"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 3);
-	TestEqual(TEXT("Sanity: block leads with state schema v3"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 3);
+	TestEqual(TEXT("Sanity: file header is v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 4);
+	TestEqual(TEXT("Sanity: block leads with state schema v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 4);
 
 	int32 TailSize = sizeof(int32);
 	for (const FEclipseSoldierRecord& Soldier : Source.Campaign->GetState().Roster)
 	{
 		TailSize += sizeof(int32) + Soldier.ClassId.ToString().Len() + 1; // ANSI FString: len-with-null + bytes
+	}
+	TailSize += sizeof(int32); // base facility count (v4 tail)
+	for (const FEclipseFacilityState& Facility : Source.Campaign->GetState().BaseState.Facilities)
+	{
+		TailSize += sizeof(int32) + Facility.SlotId.ToString().Len() + 1;
+		TailSize += sizeof(int32) + Facility.FacilityId.ToString().Len() + 1;
+		TailSize += 3 * sizeof(int32); // Level, DaysRemaining, staff count
+		TailSize += Facility.AssignedSoldierIds.Num() * sizeof(FGuid);
 	}
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 2;
@@ -329,7 +338,7 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseClassTest::FFixture Target = EclipseClassTest::FFixture::Make();
 	TestTrue(TEXT("v2 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 2->3 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("The 2->3 and 3->4 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
 
 	const TArray<FEclipseSoldierRecord>& Loaded = Target.Campaign->GetState().Roster;
 	TestEqual(TEXT("All soldiers came home"), Loaded.Num(), 4);

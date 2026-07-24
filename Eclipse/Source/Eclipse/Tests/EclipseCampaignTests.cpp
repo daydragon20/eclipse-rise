@@ -322,10 +322,11 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
 	// Rewrite the header's schema version to 0: the whole chain (0->1 no-op,
-	// 1->2 loadout-unlock append, 2->3 ClassId append) must run and the load
-	// must still succeed (SPEC-P1-02: migration scaffold proven by CI, not by
-	// hope). The tail-appends are harmless on this current-shaped block:
-	// readers stop at the original trailing counts and ignore appended bytes.
+	// 1->2 loadout-unlock append, 2->3 ClassId append, 3->4 base-tail append)
+	// must run and the load must still succeed (SPEC-P1-02: migration scaffold
+	// proven by CI, not by hope). The tail-appends are harmless on this
+	// current-shaped block: readers stop at the original trailing counts and
+	// ignore appended bytes.
 	TArray<uint8> FileBytes;
 	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
 	const int32 VersionOffset = sizeof(uint32);
@@ -334,8 +335,82 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("Load of v0 file succeeds via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3)"), Target.Save->GetLastLoadMigrationStepCount(), 3);
+	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4)"), Target.Save->GetLastLoadMigrationStepCount(), 4);
 	TestEqual(TEXT("Migrated state matches source"),
+		Target.Campaign->GetState().ComputeStateHash(),
+		Source.Campaign->GetState().ComputeStateHash());
+
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+	Source.Shutdown();
+	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignBaseStateMigrationTest,
+	"Eclipse.Strategy.Campaign.SaveMigrationV3RecordsWithoutBaseState",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-03 / GDD 14.3.6: a byte-faithful v3 file (no base tail) must land
+	// deterministically on the spec start state - Command Center pre-built at
+	// L1, slots B-D unbuilt (locked decision 2) - via exactly the 3->4 step.
+	const FString SlotName = TEXT("AutomationBaseMigration");
+	const FString SlotPath = UEclipseSaveSubsystem::GetSlotFilePath(SlotName);
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+
+	EclipseCampaignTest::FFixture Source = EclipseCampaignTest::FFixture::Make();
+	FString Error;
+	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
+	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
+
+	// Reconstruct a v3 file from the v4 save: strip the trailing base tail
+	// (count + per-facility: SlotId/FacilityId as ANSI FStrings, Level,
+	// DaysRemaining, staff count + FGuids) from the Campaign block - the only
+	// registered block, so it ends the file - then rewrite the file header
+	// version, the block size, and the block's leading state version.
+	// Layout (save container contract): [u32 Magic][i32 Ver][i32 Blocks]
+	// [FString "Campaign" = i32 9 + 9 bytes][i64 BlockSize][block bytes...].
+	TArray<uint8> FileBytes;
+	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
+
+	const int32 HeaderVersionOffset = sizeof(uint32);
+	const int32 BlockSizeOffset = 12 + (4 + 9);
+	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
+	TestEqual(TEXT("Sanity: file header is v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 4);
+	TestEqual(TEXT("Sanity: block leads with state schema v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 4);
+
+	int32 BaseTailSize = sizeof(int32);
+	for (const FEclipseFacilityState& Facility : Source.Campaign->GetState().BaseState.Facilities)
+	{
+		BaseTailSize += sizeof(int32) + Facility.SlotId.ToString().Len() + 1; // ANSI FString: len-with-null + bytes
+		BaseTailSize += sizeof(int32) + Facility.FacilityId.ToString().Len() + 1;
+		BaseTailSize += 3 * sizeof(int32); // Level, DaysRemaining, staff count
+		BaseTailSize += Facility.AssignedSoldierIds.Num() * sizeof(FGuid);
+	}
+
+	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 3;
+	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 3;
+	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= BaseTailSize;
+	FileBytes.SetNum(FileBytes.Num() - BaseTailSize);
+	TestTrue(TEXT("v3-shaped file written"), FFileHelper::SaveArrayToFile(FileBytes, *SlotPath));
+
+	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
+	TestTrue(TEXT("v3 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
+	TestEqual(TEXT("Exactly the 3->4 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+
+	const FEclipseBaseState& Base = Target.Campaign->GetState().BaseState;
+	TestEqual(TEXT("Spec start state: exactly one facility"), Base.Facilities.Num(), 1);
+	const FEclipseFacilityState* CommandCenter = Base.FindBySlot(EclipseBaseDefaults::CommandSlotId);
+	TestNotNull(TEXT("Command Center sits at slot A"), CommandCenter);
+	if (CommandCenter != nullptr)
+	{
+		TestEqual(TEXT("Pre-built facility is the Command Center"), CommandCenter->FacilityId, EclipseBaseDefaults::CommandCenterFacilityId);
+		TestEqual(TEXT("Command Center is L1 (free, pre-built - locked decision 2)"), CommandCenter->Level, 1);
+		TestEqual(TEXT("Command Center is operational"), CommandCenter->DaysRemaining, 0);
+		TestEqual(TEXT("No staff assigned at migration"), CommandCenter->AssignedSoldierIds.Num(), 0);
+	}
+	TestEqual(TEXT("Migrated state matches source (base included in hash)"),
 		Target.Campaign->GetState().ComputeStateHash(),
 		Source.Campaign->GetState().ComputeStateHash());
 
