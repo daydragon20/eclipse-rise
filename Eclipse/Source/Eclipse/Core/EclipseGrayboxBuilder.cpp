@@ -1,5 +1,6 @@
 #include "Core/EclipseGrayboxBuilder.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/ExponentialHeightFogComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
@@ -26,6 +27,8 @@
 #include "Misc/Parse.h"
 #include "Materials/MaterialInterface.h"
 #include "Quests/EclipseObjectiveTrigger.h"
+#include "Sound/AmbientSound.h"
+#include "Sound/SoundBase.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -249,6 +252,16 @@ namespace
 	 * physical units with Lumen.
 	 */
 	const float ToonEmissiveScale = 10.0f;
+
+	/**
+	 * Layer-1 ambient bed volume (GDD 16.7): the never-silent floor sits low so
+	 * barks, dialogue, and the 16.12 stingers always ride on top. Debug-tier
+	 * named constant by choice — the real mix (with ducking) moves into the
+	 * coming 16.7 audio-layer DataAsset; a one-value DA now would be ceremony
+	 * (14.2 governs balance data, and a placeholder mix level is not balance yet).
+	 */
+	constexpr float AmbientBedVolume = 0.35f;
+	const TCHAR* AmbientBedCuePath = TEXT("/Game/Audio/SFX/Cue_SFX_Amb_Kessara_Industrial_Loop_01.Cue_SFX_Amb_Kessara_Industrial_Loop_01");
 }
 
 namespace EclipseGraybox
@@ -1201,6 +1214,12 @@ void BuildDistrict(UWorld& World)
 		for (TActorIterator<ASkyLight> It(&World); It; ++It) { Stale.Add(*It); }
 		for (TActorIterator<ASkyAtmosphere> It(&World); It; ++It) { Stale.Add(*It); }
 		for (TActorIterator<AExponentialHeightFog> It(&World); It; ++It) { Stale.Add(*It); }
+		// Tag-scoped so authored ambient audio from a later art map survives; a
+		// mid-play rebuild must not stack a second never-silent bed (review fix).
+		for (TActorIterator<AAmbientSound> It(&World); It; ++It)
+		{
+			if (It->ActorHasTag(TEXT("Audio_AmbientBed"))) { Stale.Add(*It); }
+		}
 		for (AActor* Actor : Stale)
 		{
 			Actor->Destroy();
@@ -1294,6 +1313,44 @@ void BuildDistrict(UWorld& World)
 			// 03.3: amber smog; 15.5 revision: more atmosphere within the style).
 			FogComponent->SetVolumetricFog(bFullFidelity);
 		}
+	}
+
+	// Layer-1 ambient bed (GDD 16.7/16.12): the Kessara industrial loop as the
+	// district's never-silent sound floor, spawned with the graybox like the
+	// lights and smog above. ONE flat 2D bed rather than attenuated emitters at
+	// the industrial edges: the bed's contract is "audible everywhere, always",
+	// and a 2D source makes that structural — no falloff radii to tune or
+	// coverage holes to audit at this graybox tier, while positioned edge
+	// emitters arrive later as 16.7 Layer-2 spot sources ON TOP of this floor.
+	// The attenuation override below is load-bearing for that choice: the
+	// imported cue carries ATT_Ambient_Bed baked in, and without the override
+	// the bed would fall off around one point — silent corners, 16.7 broken.
+	// Missing cue = one log line and a silent district, never a crash (14.3.5).
+	if (USoundBase* AmbientBed = LoadObject<USoundBase>(nullptr, AmbientBedCuePath))
+	{
+		if (AAmbientSound* Bed = World.SpawnActor<AAmbientSound>(FVector(0, 0, 200), FRotator::ZeroRotator, Params))
+		{
+			if (UAudioComponent* BedComponent = Bed->GetAudioComponent())
+			{
+				BedComponent->SetSound(AmbientBed);
+				BedComponent->SetVolumeMultiplier(AmbientBedVolume);
+				BedComponent->bAllowSpatialization = false;
+				BedComponent->bOverrideAttenuation = true;
+				BedComponent->AttenuationOverrides.bAttenuate = false;
+				BedComponent->AttenuationOverrides.bSpatialize = false;
+				if (World.HasBegunPlay() && !BedComponent->IsPlaying())
+				{
+					// InitGame builds run pre-BeginPlay and ride the component's
+					// auto-activate; a mid-play rebuild must kick playback itself.
+					BedComponent->Play();
+				}
+			}
+			Bed->Tags.Add(TEXT("Audio_AmbientBed"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Graybox: ambient bed cue %s missing — district runs without its sound floor (GDD 14.3.5; run Tools/generate_audio_assets.py + import_generated_audio.py)."), AmbientBedCuePath);
 	}
 
 	// Graphic-novel grade: locked-ish exposure (no graybox swim), saturation punch,
