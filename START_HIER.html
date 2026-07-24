@@ -64,7 +64,9 @@
   /* Owner acties */
   .act{display:flex;gap:14px;padding:16px;border-radius:var(--radius);background:var(--card2);border:1px solid var(--lijn);position:relative;overflow:hidden}
   .act+.act{margin-top:10px}
+  .act.pending{opacity:.72}
   .act .stripe{position:absolute;left:0;top:0;bottom:0;width:6px}
+  .act.pending .stripe{background:var(--amber)!important}
   .act .ic{font-size:30px;flex:none;width:40px;text-align:center}
   .act h3{margin:0 0 2px;font-size:19px}
   .act .why{color:var(--grijs);font-size:14px;margin:0 0 8px}
@@ -72,13 +74,22 @@
   .act ol li{margin:3px 0}
   .badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;padding:3px 9px;border-radius:999px;color:#0e1017;vertical-align:middle;margin-left:8px}
   .done-note{font-size:13px;color:var(--grijs);margin-top:10px}
+  .actbtn{margin-top:12px;display:inline-flex;align-items:center;gap:8px;background:var(--groen);color:#0e1017;border:none;
+     border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
+  .actbtn:active{transform:translateY(1px)}
+  .pendlab{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:var(--amber2);font-size:15px;margin-top:4px}
+  .undo{display:block;background:none;border:none;color:var(--grijs);text-decoration:underline;cursor:pointer;font-size:14px;font-family:inherit;padding:0;margin-top:8px}
+  .reject{background:linear-gradient(180deg,rgba(255,92,108,.16),transparent);border:1px solid var(--rood);border-radius:10px;padding:8px 12px;margin:4px 0 8px;font-size:14px}
+  .subhead{font-size:14px;font-weight:800;color:var(--grijs);margin:22px 0 8px;letter-spacing:1px;text-transform:uppercase}
+  .copybar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:var(--card2);border:1px dashed var(--amber);border-radius:14px;padding:14px;margin-top:12px}
+  .copybtn{background:var(--amber);color:#0e1017;border:none;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer;font-size:15px;font-family:inherit}
 
   /* jijGedaan chips */
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
   .chip{background:var(--card2);border:1px solid var(--lijn);border-radius:999px;padding:7px 13px;font-size:14px}
   .chip .t{color:var(--grijs);font-size:12px;margin-left:6px}
 
-  /* AI status 3-koloms */
+  /* AI status */
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .mini{background:var(--card2);border:1px solid var(--lijn);border-radius:14px;padding:14px}
   .mini h4{margin:0 0 10px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--grijs)}
@@ -122,7 +133,6 @@
 </head>
 <body>
 <div class="wrap" id="app">laden…</div>
-
 <div class="lightbox" id="lb" onclick="this.style.display='none'"><img src="" alt=""></div>
 
 <script src="progress_auto.js"></script>
@@ -130,12 +140,29 @@
 <script>
 const D = window.PROGRESS_DATA || {};
 const A = window.PROGRESS_AUTO || {};
-const $ = (h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild;};
-const esc = (s)=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc = (s)=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const trim = (s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n-1).trim()+'…':s;};
+const slug = (s)=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+/* ---- localStorage: wat Nathan heeft afgevinkt (wacht op controle AI) ---- */
+function getDone(){try{return JSON.parse(localStorage.getItem('eclipseDone')||'{}');}catch(e){return {};}}
+function setDone(o){localStorage.setItem('eclipseDone',JSON.stringify(o));}
+function markDone(sl,titel){const d=getDone();d[sl]={titel:titel,tijd:new Date().toLocaleString('nl-BE')};setDone(d);render();}
+function unmark(sl){const d=getDone();delete d[sl];setDone(d);render();}
+function copyForAI(){
+  const d=getDone();
+  const lijst=Object.values(d).map(x=>'- '+x.titel).join('\n');
+  const msg='Hoi! Ik heb deze taken gedaan — kun je ze nakijken en van mijn lijst halen als ze kloppen? '
+    +'Als iets nog niet goed is, zet het terug met een korte reden (afgekeurd-veld).\n\n'+lijst;
+  const ta=document.createElement('textarea');ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+  const b=document.getElementById('copybtn');if(b){const o=b.textContent;b.textContent='✓ Gekopieerd!';setTimeout(()=>b.textContent=o,2000);}
+}
 
 /* ---- tijd / versheid ---- */
-function parseNL(s){ if(!s) return null; const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]):null; }
+function parseNL(s){const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]):null;}
 function geleden(d){
   if(!d) return "onbekend";
   const min=Math.max(0,Math.round((Date.now()-d)/60000));
@@ -143,21 +170,6 @@ function geleden(d){
   if(min<60) return min+" min geleden";
   const u=Math.round(min/60); if(u<24) return u+" uur geleden";
   const dg=Math.round(u/24); return dg+" dag"+(dg>1?"en":"")+" geleden";
-}
-const laatst = parseNL(D.bijgewerkt) || parseNL(A.generatedAt);
-const minOud = laatst ? (Date.now()-laatst)/60000 : 9999;
-let stoplicht;
-if(minOud<90)      stoplicht={kl:'var(--groen)',tx:'Live — de robot werkt',pulse:true,slaapt:false};
-else if(minOud<360)stoplicht={kl:'var(--geel)', tx:'Even rustig',pulse:false,slaapt:false};
-else               stoplicht={kl:'var(--rood)',  tx:'De robot slaapt',pulse:false,slaapt:true};
-
-/* ---- helpers ---- */
-function barRow(nm,pct,note){
-  pct=Math.max(0,Math.min(100,pct||0));
-  return `<div class="barrow" style="margin:9px 0">
-    <div class="nm"><div>${esc(nm)}${note?` <span style="color:var(--grijs);font-size:13px">— ${esc(note)}</span>`:''}</div>
-      <div class="bar" style="margin-top:5px"><span style="width:${pct}%"></span></div></div>
-    <div class="pc">${pct}%</div></div>`;
 }
 const PRIO={
   'nu':{r:0,l:'NU',k:'var(--rood)'},
@@ -174,125 +186,172 @@ function actIcon(t){t=(t||'').toLowerCase();
   if(t.includes('download')||t.includes('pack')) return '⬇️';
   return '👉';}
 
-/* ---- render ---- */
-let H='';
+/* ================= RENDER ================= */
+function render(){
+  const laatst = parseNL(D.bijgewerkt) || parseNL(A.generatedAt);
+  const minOud = laatst ? (Date.now()-laatst)/60000 : 9999;
+  let sl_kl,sl_tx,sl_pulse,slaapt;
+  if(minOud<90){sl_kl='var(--groen)';sl_tx='Live — de robot werkt';sl_pulse=true;slaapt=false;}
+  else if(minOud<360){sl_kl='var(--geel)';sl_tx='Even rustig';sl_pulse=false;slaapt=false;}
+  else{sl_kl='var(--rood)';sl_tx='De robot slaapt';sl_pulse=false;slaapt=true;}
 
-// HEADER
-H+=`<div class="top">
-  <div class="brand"><div class="logo"></div>
-    <div><h1>ECLIPSE</h1><p class="sub">Jouw game — in gewone taal</p></div></div>
-  <div class="status"><span class="dot ${stoplicht.pulse?'pulse':''}" style="background:${stoplicht.kl}"></span>
-    ${stoplicht.tx} · ${geleden(laatst)}</div>
-</div>`;
-
-// WAKE BOX (alleen als robot slaapt)
-if(stoplicht.slaapt){
-  H+=`<div class="card wake" style="margin-top:16px">
-    <div style="font-size:19px;font-weight:800">😴 De robot heeft al een tijd niks gedaan</div>
-    <p class="sub" style="margin-top:6px">Zo maak je hem wakker (2 stappen):</p>
-    <ol style="margin:6px 0 0;padding-left:22px">
-      <li>Open een <b>nieuwe chat</b> in VS Code (het ECLIPSE-project).</li>
-      <li>Plak de startprompt uit <b>NIEUWE_CHAT_PROMPT.txt</b> en druk enter.</li>
-    </ol></div>`;
-}
-
-// COCKPIT — 3 tegels
-const heel = (D.hero&&D.hero.pct)||0;
-const roadmap = (D.secties||[]).find(s=>/roadmap/i.test(s.titel));
-const fases = roadmap? roadmap.items:[];
-let activeIdx=-1; fases.forEach((f,i)=>{ if((f.pct||0)>0 && (f.pct||0)<100) activeIdx=i; });
-const fase = fases[activeIdx];
-const testTx = A.tests? `${A.tests.ok}/${A.tests.total}` : '—';
-H+=`<div class="tiles">
-  <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div><small>groeit traag — normaal</small></div>
-  <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div><div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div><small>hier gebeurt het nu</small></div>
-  <div class="tile"><div class="big" style="color:var(--groen)">${testTx}</div><div class="lab">TESTS GESLAAGD</div><small>alles wat werkt, blijft werken</small></div>
-</div>`;
-
-// WAT MOET JIJ DOEN
-const acties=(D.ownerActies||[]).slice().sort((a,b)=>prio(a.prio).r-prio(b.prio).r);
-H+=`<h2>🎯 Wat moet jij nu doen?</h2>`;
-if(!acties.length){
-  H+=`<div class="card" style="text-align:center;font-size:19px">🎉 Niks! De AI kan even helemaal alleen door.</div>`;
-}else{
-  H+=`<p class="sub" style="margin:-6px 0 12px">Dit zijn de enige dingen waar de AI jóuw hulp voor nodig heeft. De rest doet hij zelf.</p>`;
-  acties.forEach(a=>{const p=prio(a.prio);
-    H+=`<div class="act"><div class="stripe" style="background:${p.k}"></div>
-      <div class="ic">${actIcon(a.titel)}</div>
-      <div style="flex:1;min-width:0">
-        <h3>${esc(a.titel)}<span class="badge" style="background:${p.k}">${p.l}</span></h3>
-        ${a.waarom?`<p class="why">Waarom: ${esc(a.waarom)}</p>`:''}
-        <ol>${(a.stappen||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
-      </div></div>`;
-  });
-  H+=`<p class="done-note">💬 Klaar met een taak? Typ het gewoon in de chat, bv. <b>"MetaHumans staan erin"</b> — dan pakt de AI het op.</p>`;
-}
-
-// WAT DE AI AL VAN JOU HEEFT
-if((D.jijGedaan||[]).length){
-  H+=`<h2>✅ Wat de AI al van jou heeft gezien</h2>
-    <div class="card"><div class="chips">
-    ${D.jijGedaan.map(g=>`<span class="chip">✔ ${esc(g.wat)}<span class="t">${esc(g.tijd||'')}</span></span>`).join('')}
-    </div></div>`;
-}
-
-// WAAR IS DE AI MEE BEZIG
-const bezig=(D.taken||[]).filter(t=>t.status==='bezig');
-const gepland=(D.taken||[]).filter(t=>t.status==='gepland');
-const cl=(D.changelog||[])[0];
-H+=`<h2>🤖 Waar is de AI mee bezig?</h2><div class="card"><div class="cols">
-  <div class="mini"><h4>⚙️ Nu bezig</h4>
-    ${bezig.map(t=>`<div class="work"><div class="wt">${esc(t.taak)}</div>
-      <div class="wd">${esc(trim(t.detail,120))}</div>
-      <div class="bar"><span style="width:${Math.min(100,t.pct||0)}%"></span></div></div>`).join('')||'<div class="wd">—</div>'}
-  </div>
-  <div class="mini"><h4>🕒 Straks</h4>
-    <div class="taglist">${gepland.map(t=>`<span class="tag">${esc(t.taak)}</span>`).join('')||'<span class="wd">—</span>'}</div>
-    ${cl?`<h4 style="margin-top:16px">✅ Net gedaan</h4>
-      <div class="wd" style="color:var(--amber2);font-weight:600">${esc(cl.datum.replace(/^Sessie\s*/,''))}</div>
-      <ul style="margin:6px 0 0;padding-left:18px;color:var(--grijs);font-size:13px">
-        ${(cl.punten||[]).slice(0,3).map(p=>`<li>${esc(trim(p,120))}</li>`).join('')}</ul>`:''}
-  </div>
-</div></div>`;
-
-// STAPPENPLAN
-H+=`<h2>📊 Hoe ver zijn we? (het stappenplan)</h2>
-  <p class="sub" style="margin:-6px 0 12px">De "hele game 8%" gaat traag omdat de laatste fases veruit het grootst zijn. Kijk naar de <b>oranje</b> fase — dáár zit je snelheid.</p>
-  <div class="card"><div class="tl">`;
-fases.forEach((f,i)=>{
-  const done=(f.pct||0)>=100 || i<activeIdx;
-  const active=i===activeIdx;
-  H+=`<div class="step ${done?'done':''} ${active?'active':''}">
-    <div class="knop"></div>
-    <div class="nm">${esc(f.naam)} ${active?'<span class="nowtag">JE BENT HIER</span>':''}</div>
-    ${f.groot?`<div class="gr">${esc(f.groot)}</div>`:''}
-    <div class="bar" style="max-width:340px"><span style="width:${Math.min(100,f.pct||0)}%"></span></div>
-    <div class="doel" style="margin-top:5px">${f.pct||0}%${f.doel?` · streefdatum ${esc(f.doel)}`:''}</div>
+  let H='';
+  // HEADER
+  H+=`<div class="top">
+    <div class="brand"><div class="logo"></div>
+      <div><h1>ECLIPSE</h1><p class="sub">Jouw game — in gewone taal</p></div></div>
+    <div class="status"><span class="dot ${sl_pulse?'pulse':''}" style="background:${sl_kl}"></span>
+      ${sl_tx} · ${geleden(laatst)}</div>
   </div>`;
-});
-H+=`</div></div>`;
 
-// FOTO'S
-const shots=((A.screenshots&&A.screenshots.length)?A.screenshots:D.screenshots)||[];
-if(shots.length){
-  H+=`<h2>📸 Zo ziet de game er nu uit</h2><div class="card"><div class="gal">
-    ${shots.slice(0,4).map(s=>`<figure onclick="zoom('${esc(s.file)}')">
-      <img src="${esc(s.file)}" alt="" onerror="this.parentElement.style.display='none'">
-      <figcaption>${esc(s.caption||'')}</figcaption></figure>`).join('')}
-    </div>${D.screenshotNoot?`<p class="noot">${esc(D.screenshotNoot)}</p>`:''}</div>`;
+  // WAKE BOX
+  if(slaapt){
+    H+=`<div class="card wake" style="margin-top:16px">
+      <div style="font-size:19px;font-weight:800">😴 De robot heeft al een tijd niks gedaan</div>
+      <p class="sub" style="margin-top:6px">Zo maak je hem wakker (2 stappen):</p>
+      <ol style="margin:6px 0 0;padding-left:22px">
+        <li>Open een <b>nieuwe chat</b> in VS Code (het ECLIPSE-project).</li>
+        <li>Plak de startprompt uit <b>NIEUWE_CHAT_PROMPT.txt</b> en druk enter.</li>
+      </ol></div>`;
+  }
+
+  // COCKPIT
+  const heel=(D.hero&&D.hero.pct)||0;
+  const roadmap=(D.secties||[]).find(s=>/roadmap/i.test(s.titel));
+  const fases=roadmap?roadmap.items:[];
+  let activeIdx=-1; fases.forEach((f,i)=>{if((f.pct||0)>0&&(f.pct||0)<100)activeIdx=i;});
+  const fase=fases[activeIdx];
+  const testTx=A.tests?`${A.tests.ok}/${A.tests.total}`:'—';
+  H+=`<div class="tiles">
+    <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div><small>groeit traag — normaal</small></div>
+    <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div><div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div><small>hier gebeurt het nu</small></div>
+    <div class="tile"><div class="big" style="color:var(--groen)">${testTx}</div><div class="lab">TESTS GESLAAGD</div><small>alles wat werkt, blijft werken</small></div>
+  </div>`;
+
+  // WAT MOET JIJ DOEN — met aanvink-knoppen
+  const done=getDone();
+  // opschonen: verdwenen uit ownerActies (AI keurde goed) of heeft 'afgekeurd' → uit de wachtlijst halen
+  let changed=false;
+  Object.keys(done).forEach(k=>{
+    const a=(D.ownerActies||[]).find(x=>slug(x.titel)===k);
+    if(!a || a.afgekeurd){delete done[k];changed=true;}
+  });
+  if(changed) setDone(done);
+
+  const acties=(D.ownerActies||[]).slice().sort((a,b)=>prio(a.prio).r-prio(b.prio).r);
+  const todo=[], pending=[];
+  acties.forEach(a=>{ (done[slug(a.titel)] && !a.afgekeurd) ? pending.push(a) : todo.push(a); });
+
+  H+=`<h2>🎯 Wat moet jij nu doen?</h2>`;
+  if(!acties.length){
+    H+=`<div class="card" style="text-align:center;font-size:19px">🎉 Niks! De AI kan even helemaal alleen door.</div>`;
+  }else{
+    if(todo.length){
+      H+=`<p class="sub" style="margin:-6px 0 12px">Dit zijn de enige dingen waar de AI jóuw hulp voor nodig heeft. Klaar met eentje? Druk op de groene knop.</p>`;
+      todo.forEach(a=>{const p=prio(a.prio);const s=slug(a.titel);
+        H+=`<div class="act"><div class="stripe" style="background:${p.k}"></div>
+          <div class="ic">${actIcon(a.titel)}</div>
+          <div style="flex:1;min-width:0">
+            <h3>${esc(a.titel)}<span class="badge" style="background:${p.k}">${p.l}</span></h3>
+            ${a.afgekeurd?`<div class="reject">⚠️ De AI kon dit nog niet afvinken: ${esc(a.afgekeurd)} — probeer opnieuw.</div>`:''}
+            ${a.waarom?`<p class="why">Waarom: ${esc(a.waarom)}</p>`:''}
+            <ol>${(a.stappen||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+            <button class="actbtn" data-mark="${esc(s)}" data-titel="${esc(a.titel)}">✓ Ik heb dit gedaan</button>
+          </div></div>`;
+      });
+    }
+    if(pending.length){
+      H+=`<div class="subhead">⏳ Wacht op controle door de AI</div>`;
+      pending.forEach(a=>{const s=slug(a.titel);
+        H+=`<div class="act pending"><div class="stripe"></div>
+          <div class="ic">⏳</div>
+          <div style="flex:1;min-width:0">
+            <h3>${esc(a.titel)}</h3>
+            <div class="pendlab">✓ Jij hebt dit afgevinkt — de AI kijkt het na</div>
+            <button class="undo" data-unmark="${esc(s)}">↩ toch nog niet gedaan</button>
+          </div></div>`;
+      });
+      H+=`<div class="copybar">
+        <div style="flex:1;min-width:170px">Laat de AI je ${pending.length} afgevinkte ta${pending.length>1?'ken':'ak'} nakijken:</div>
+        <button id="copybtn" class="copybtn" data-copy>📋 Kopieer voor de AI</button></div>`;
+      H+=`<p class="done-note">Plak dat bericht in de VS Code-chat. Klopt het → de taak verdwijnt hier. Nog niet klaar → hij komt terug met uitleg.</p>`;
+    }
+  }
+
+  // WAT DE AI AL VAN JOU HEEFT
+  if((D.jijGedaan||[]).length){
+    H+=`<h2>✅ Wat de AI al van jou heeft gezien</h2>
+      <div class="card"><div class="chips">
+      ${D.jijGedaan.map(g=>`<span class="chip">✔ ${esc(g.wat)}<span class="t">${esc(g.tijd||'')}</span></span>`).join('')}
+      </div></div>`;
+  }
+
+  // WAAR IS DE AI MEE BEZIG
+  const bezig=(D.taken||[]).filter(t=>t.status==='bezig');
+  const gepland=(D.taken||[]).filter(t=>t.status==='gepland');
+  const cl=(D.changelog||[])[0];
+  H+=`<h2>🤖 Waar is de AI mee bezig?</h2><div class="card"><div class="cols">
+    <div class="mini"><h4>⚙️ Nu bezig</h4>
+      ${bezig.map(t=>`<div class="work"><div class="wt">${esc(t.taak)}</div>
+        <div class="wd">${esc(trim(t.detail,120))}</div>
+        <div class="bar"><span style="width:${Math.min(100,t.pct||0)}%"></span></div></div>`).join('')||'<div class="wd">—</div>'}
+    </div>
+    <div class="mini"><h4>🕒 Straks</h4>
+      <div class="taglist">${gepland.map(t=>`<span class="tag">${esc(t.taak)}</span>`).join('')||'<span class="wd">—</span>'}</div>
+      ${cl?`<h4 style="margin-top:16px">✅ Net gedaan</h4>
+        <div class="wd" style="color:var(--amber2);font-weight:600">${esc(cl.datum.replace(/^Sessie\s*/,''))}</div>
+        <ul style="margin:6px 0 0;padding-left:18px;color:var(--grijs);font-size:13px">
+          ${(cl.punten||[]).slice(0,3).map(p=>`<li>${esc(trim(p,120))}</li>`).join('')}</ul>`:''}
+    </div>
+  </div></div>`;
+
+  // STAPPENPLAN
+  H+=`<h2>📊 Hoe ver zijn we? (het stappenplan)</h2>
+    <p class="sub" style="margin:-6px 0 12px">De "hele game 8%" gaat traag omdat de laatste fases veruit het grootst zijn. Kijk naar de <b>oranje</b> fase — dáár zit je snelheid.</p>
+    <div class="card"><div class="tl">`;
+  fases.forEach((f,i)=>{
+    const dn=(f.pct||0)>=100||i<activeIdx; const ac=i===activeIdx;
+    H+=`<div class="step ${dn?'done':''} ${ac?'active':''}">
+      <div class="knop"></div>
+      <div class="nm">${esc(f.naam)} ${ac?'<span class="nowtag">JE BENT HIER</span>':''}</div>
+      ${f.groot?`<div class="gr">${esc(f.groot)}</div>`:''}
+      <div class="bar" style="max-width:340px"><span style="width:${Math.min(100,f.pct||0)}%"></span></div>
+      <div class="doel" style="margin-top:5px">${f.pct||0}%${f.doel?` · streefdatum ${esc(f.doel)}`:''}</div>
+    </div>`;
+  });
+  H+=`</div></div>`;
+
+  // FOTO'S
+  const shots=((A.screenshots&&A.screenshots.length)?A.screenshots:D.screenshots)||[];
+  if(shots.length){
+    H+=`<h2>📸 Zo ziet de game er nu uit</h2><div class="card"><div class="gal">
+      ${shots.slice(0,4).map(s=>`<figure onclick="zoom('${esc(s.file)}')">
+        <img src="${esc(s.file)}" alt="" onerror="this.parentElement.style.display='none'">
+        <figcaption>${esc(s.caption||'')}</figcaption></figure>`).join('')}
+      </div>${D.screenshotNoot?`<p class="noot">${esc(D.screenshotNoot)}</p>`:''}</div>`;
+  }
+
+  // FOOTER
+  H+=`<div class="footer">
+    Laatst bijgewerkt: <b>${esc(D.bijgewerkt||'?')}</b> · deze pagina vernieuwt zichzelf elke 30 sec.<br>
+    Alle technische details? → <a href="PROGRESS.html">PROGRESS.html</a> (voor de nerds 🤓)
+  </div>`;
+
+  document.getElementById('app').innerHTML=H;
 }
-
-// FOOTER
-H+=`<div class="footer">
-  Laatst bijgewerkt: <b>${esc(D.bijgewerkt||'?')}</b> · deze pagina vernieuwt zichzelf elke 30 sec.<br>
-  Alle technische details? → <a href="PROGRESS.html">PROGRESS.html</a> (voor de nerds 🤓)
-</div>`;
-
-document.getElementById('app').innerHTML=H;
 
 function zoom(src){const lb=document.getElementById('lb');lb.querySelector('img').src=src;lb.style.display='flex';}
 
-/* scroll bewaren + elke 30s verversen */
+/* klik-afhandeling (delegatie — overleeft re-render) */
+document.getElementById('app').addEventListener('click',e=>{
+  const m=e.target.closest('[data-mark]'); if(m){markDone(m.getAttribute('data-mark'),m.getAttribute('data-titel'));return;}
+  const u=e.target.closest('[data-unmark]'); if(u){unmark(u.getAttribute('data-unmark'));return;}
+  const c=e.target.closest('[data-copy]'); if(c){copyForAI();return;}
+});
+
+render();
+
+/* scroll bewaren + elke 30s verversen (leest verse data) */
 window.scrollTo(0, parseInt(sessionStorage.getItem('eclipseScroll')||'0'));
 setInterval(()=>{sessionStorage.setItem('eclipseScroll',window.scrollY);location.reload();},30000);
 </script>

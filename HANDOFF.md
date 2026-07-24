@@ -160,7 +160,13 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 - **SPEC-P2-04 geschreven + main-review verwerkt** (concept ACCEPTED): geen prologue (recap-cards + cold-reader-falsificatie), R7-Gauntlet als bouwstap 1, nul nieuwe objective-primitieven, M1.3 als enige world-state-change via de P2-05-seam, Brick = Assault-rosterrecord; de 4 open punten beslist in de spec zelf.
 - **Groene bar (unie, alle sporen samen): 47/47 tests · validatie 3 validators/0 fouten · catalog 23/23.**
 
-**Eerstvolgende stappen:** (1) owner: **Stage-A-feel-gauntlet** (R3) + 13.2-playtest + MetaHuman-kliks; (2) commandlet-rij: setup_command_tuning.py + P2-03-materialisatie → MetaHuman-curatie → audio-import (16.12) → 15.8-dressing-ronde (start met de builder-string-swap); (3) code: P2-03 stap 3 (wrapper/events), daarna SPEC-P2-04 bouwstap 1 (R7-Gauntlet); Stage B wacht op het R3-verdict.
+**Cyclus 3 (avond — R7 groen, MetaHumans gecureerd, P2-03 stap 3 + P2-04 stap 2):**
+- **R7 = GROEN, geland** (`60014e6`): de missie-runtime draagt aantoonbaar authored missies (M1.1-skelet op het echte laadpad; mandatory-set, rewards, regio-onaangetast) — M1.2-M1.4-authoring vrijgegeven. In dezelfde changeset de **debrief-dag-regel** (P2-03 locked decision 4: elke missie kost mechanisch een dag, win óf verlies, mét dag-asserts op beide paden).
+- **MetaHuman-curatie geland** (`15dfe61`, review GO): SentinelC (908 MB) verplaatst naar zijn geauthorde root (dode kruisrefs gerepareerd), Kaya provisioneel bedraad via setup_metahuman_data.py, single-writer-fix op setup_character_data.py, .gitignore dekt de machine-lokale character-content, 15.7-beslisdocument (aanbeveling B) bij owner/art-review. Builder-string-swap naar de Imported-paden (`7036849`).
+- **P2-03 stap 3 geland** (`69b5f4b`, review GO): transactie-API + Event.Base.* ×4 (uitsluitend commit-emissie) + UEclipseBaseSubsystem-wrapper + alle 5 stap-1-2-bevindingen mét tests + gematerialiseerde Hollow Point-data; zes stap-4-5-follow-ups verankerd in de taak. **P2-04 stap 2 Quests-deel geland** (`16ce2bd`, review GO): DT_StoryMissions-schema + pure story-sequencing. **Audio 16.12 geïmporteerd** (`937f35f`): bed/cues/sting als engine-assets; bed-plaatsing + sting-koppeling lopen. **Eindbar unie: 54/54 tests · validatie 0 · catalog 27/27.**
+- **SPEC-P2-05 geschreven + geaccepteerd** (Foothold-trio; geen nieuwe events — LiberationPhaseAdvanced gedropt als P2-00-amendement; bouw ná StoryFlags v5).
+
+**Eerstvolgende stappen:** (1) owner: **feel-gauntlet** (R3, bovenaan de actielijst) + MH-kliks (Frey/Hannah/Mason) + 15.7-keuze; (2) code: StoryFlags v4→v5 (derde R6-toets) → Strategy-offer-precedence → M1.1-content; Stage B wacht op het R3-verdict; (3) commandlet-rij: setup_base_data → audio-import (16.12) → 15.8-dressing (cold-DDC-check, stub-verwijdering, shotronde + 15.7-vergelijk).
 
 ---
 
