@@ -67,8 +67,13 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 		// the accept to a reasoned NoRoute refusal so an accepted order never
 		// stalls silently (GDD 8.4 never-silent contract — the pure decision
 		// table cannot see the chosen destination).
+		// Class modulation in data (SPEC-P2-01, GDD 9.5): Assault kits push the
+		// ordered point further along the approach; the order surface is unchanged.
 		const UEclipseSquadTuningAsset* Tuning = ResolveTuning();
-		const FVector Destination = Order == EEclipseSquadOrder::MoveTo ? SelectCoverPointNear(TargetLocation) : TargetLocation;
+		const FVector PushedTarget = Order == EEclipseSquadOrder::MoveTo && GetPawn() != nullptr
+			? EclipseSquadOrderLogic::ComputePushedOrderPoint(GetPawn()->GetActorLocation(), TargetLocation, ClassKit.OrderPushDistanceCm)
+			: TargetLocation;
+		const FVector Destination = Order == EEclipseSquadOrder::MoveTo ? SelectCoverPointNear(PushedTarget) : TargetLocation;
 		const float AcceptanceRadius = Order == EEclipseSquadOrder::MoveTo
 			? (Tuning != nullptr ? Tuning->MoveAcceptanceRadius : 50.0f)
 			: (Tuning != nullptr ? Tuning->RegroupAcceptanceRadius : 150.0f);
@@ -166,7 +171,14 @@ FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& Ordered
 			Hit, Sample + FVector(0, 0, 50.0f), NearestEnemy->GetActorLocation() + FVector(0, 0, 50.0f), ECC_Visibility, Params)
 			&& Hit.GetActor() != NearestEnemy;
 
-		const float Score = (bBlocked ? 10.0f : 0.0f) - FVector::Dist(Sample, OrderedLocation) * 0.001f;
+		// Pure scorer (SPEC-P2-01): the class kit's lane bias makes Snipers
+		// prefer the covered sample with the longer clear lane; bias 0 keeps
+		// the SPEC-P1-06 nearest-cover behavior bit-for-bit.
+		const float Score = EclipseSquadOrderLogic::ScoreCoverSample(
+			bBlocked,
+			FVector::Dist(Sample, OrderedLocation),
+			FVector::Dist(Sample, NearestEnemy->GetActorLocation()),
+			ClassKit.CoverLaneBias);
 		if (Score > BestScore)
 		{
 			BestScore = Score;
@@ -174,4 +186,84 @@ FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& Ordered
 		}
 	}
 	return BestPoint;
+}
+
+bool AEclipseSquadmateController::BeginTriage(AEclipseCharacter* DownedBody)
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	if (DownedBody == nullptr || Body == nullptr || Body->IsDowned() || Body == DownedBody)
+	{
+		return false;
+	}
+	if (!ClassKit.bAutoTriage || ClassKit.StabilizeWindowSeconds <= 0.0f)
+	{
+		return false; // data says this kit does not triage — no class names in code
+	}
+	if (TriageTarget.IsValid())
+	{
+		return false; // one patient at a time; FinishTriage re-dispatches for casualties that went down mid-run
+	}
+
+	// Close to touch range; the squad tuning's move acceptance keeps the number
+	// in data. The move is fire-and-forget: OnMoveCompleted picks it back up —
+	// zero per-frame work (GDD 12.4).
+	const UEclipseSquadTuningAsset* Tuning = ResolveTuning();
+	const float AcceptanceRadius = Tuning != nullptr ? Tuning->MoveAcceptanceRadius : 50.0f;
+
+	FAIMoveRequest Request(DownedBody);
+	Request.SetAcceptanceRadius(AcceptanceRadius);
+	Request.SetUsePathfinding(true);
+	const FPathFollowingRequestResult Result = MoveTo(Request);
+	if (Result.Code == EPathFollowingRequestResult::Failed)
+	{
+		UE_LOG(LogEclipse, Display, TEXT("Triage: no route to the casualty — the window keeps ticking (SPEC-P2-01)."));
+		return false;
+	}
+
+	TriageTarget = DownedBody;
+	TriageMoveId = Result.MoveId;
+	CurrentOrder = EEclipseSquadOrder::MoveTo;
+
+	// AlreadyAtGoal never fires OnMoveCompleted for a new id — finish inline.
+	if (Result.Code == EPathFollowingRequestResult::AlreadyAtGoal)
+	{
+		FinishTriage();
+	}
+	return true;
+}
+
+void AEclipseSquadmateController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+	Super::OnMoveCompleted(RequestID, Result);
+
+	if (!TriageTarget.IsValid() || RequestID != TriageMoveId)
+	{
+		return; // a regular order's move, or the patient despawned mid-run
+	}
+	if (!Result.IsSuccess())
+	{
+		TriageTarget.Reset(); // route died — report nothing false; the mission clock decides the outcome
+		return;
+	}
+	FinishTriage();
+}
+
+void AEclipseSquadmateController::FinishTriage()
+{
+	AEclipseCharacter* Patient = TriageTarget.Get();
+	TriageTarget.Reset();
+	UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+	if (Squad == nullptr)
+	{
+		return;
+	}
+	if (Patient != nullptr)
+	{
+		Squad->NotifyTriageArrived(this, Patient);
+	}
+	// This responder is free again: a casualty that went down mid-run gets its
+	// dispatch now, not never (SPEC-P2-01; recursion terminates because every
+	// arrival either saves or expires its patient, and the pending scan skips
+	// both).
+	Squad->DispatchPendingTriage();
 }

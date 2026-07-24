@@ -18,10 +18,12 @@ Payload structs live in `Core/EclipseEventPayloads.h`. Rows move to `implemented
 | `Event.Mission.ObjectiveCompleted` | `FEclipseMissionEventPayload` (mission id, objective id) | MissionSubsystem (objective components report in) | Mission phases, UI | P1-05 | implemented |
 | `Event.Mission.Completed` | `FEclipseMissionEventPayload` (mission id, results) | MissionSubsystem (debrief) | Economy, Roster, Base UI | P1-05 | implemented |
 | `Event.Mission.Failed` | `FEclipseMissionEventPayload` (mission id, results) | MissionSubsystem (debrief) | Economy, Roster, Base UI | P1-05 | implemented |
-| `Event.Squad.OrderIssued` | `FEclipseSquadEventPayload` (soldier id, order, target) | Order input layer | Squad AI, debug UI | P1-06 | declared |
-| `Event.Squad.OrderAcknowledged` | `FEclipseSquadEventPayload` (soldier id, order, bark line) | Squad AI | Debug UI, (later) VO | P1-06 | declared |
-| `Event.Squad.OrderRefused` | `FEclipseSquadEventPayload` (soldier id, order, reason) | Squad AI | Debug UI, scenario tests | P1-06 | declared |
-| `Event.Squad.SoldierDowned` | `FEclipseSquadEventPayload` (soldier id, cause) | Character/health | Mission runtime (debrief resolution) | P1-06/07 | declared |
+| `Event.Squad.OrderIssued` | `FEclipseSquadEventPayload` (soldier id, order, target) | SquadSubsystem (order dispatch) | Squad AI, debug UI | P1-06/P2-01 | implemented |
+| `Event.Squad.OrderAcknowledged` | `FEclipseSquadEventPayload` (soldier id, order, bark line) | SquadSubsystem (after decision) | Debug UI, (later) VO | P1-06/P2-01 | implemented |
+| `Event.Squad.OrderRefused` | `FEclipseSquadEventPayload` (soldier id, order, reason) | SquadSubsystem (after decision) | Debug UI, scenario tests | P1-06/P2-01 | implemented |
+| `Event.Squad.SoldierDowned` | `FEclipseSquadEventPayload` (soldier id, cause) | SquadSubsystem (body OnDowned) | Mission runtime (debrief resolution), Medic auto-triage | P1-06/07/P2-01 | implemented |
+| `Event.Squad.SoldierStabilized` | `FEclipseSquadEventPayload` (soldier id, stabilizer id, bark line) | SquadSubsystem (triage arrival inside the window) | Mission runtime (casualty resolution), debrief UI | P2-01 | implemented |
+| `Event.Squad.ClassAbilityUsed` | `FEclipseSquadEventPayload` (soldier id, ability verb tag) | SquadSubsystem (signature verb fired) | Debug UI, (later) VO/XP | P2-01 | implemented |
 | `Event.Roster.SoldierAdded` | `FEclipseRosterEventPayload` (soldier record) | CampaignSubsystem (commit) | Barracks UI | P1-07 | implemented |
 | `Event.Roster.SoldierDied` | `FEclipseRosterEventPayload` (soldier id, cause, day) | CampaignSubsystem (commit) | Barracks UI, Memorial | P1-07 | implemented |
 | `Event.Roster.SoldierWounded` | `FEclipseRosterEventPayload` (soldier id, days out) | CampaignSubsystem (commit) | Barracks UI | P1-07 | implemented |

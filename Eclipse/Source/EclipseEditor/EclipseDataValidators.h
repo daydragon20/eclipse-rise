@@ -15,4 +15,7 @@ namespace EclipseDataValidators
 
 	/** SPEC-P1-03: production tables must contain valid rows (positive time, some cost). */
 	ECLIPSEEDITOR_API int32 ValidateProductionItemTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
+
+	/** SPEC-P2-01: class-def rows must be internally sane (verb family, verb-matching tunables) and their weapon/body refs must resolve in the campaign setup they're wired into — runtime degrades such rows silently (GDD 14.3.5), so CI is where they get loud. */
+	ECLIPSEEDITOR_API int32 ValidateClassDefTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
 }

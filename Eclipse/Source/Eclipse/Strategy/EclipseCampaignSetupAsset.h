@@ -77,6 +77,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> BodyDefs;
 
+	/**
+	 * Rows: FEclipseClassDefRow — the soldier classes (SPEC-P2-01, GDD 4.2.3).
+	 * Starting recruits are pre-classed from these rows (Academy assignment is
+	 * Phase 3); missing table = classless recruits, never a crash (GDD 14.3.5).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> ClassDefs;
+
 	/** Rows: FEclipseNamedCharacterRow — story-character slots (step-3 MetaHuman pipeline, phase0/metahuman_recipes.md). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> NamedCharacters;

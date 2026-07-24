@@ -1,5 +1,6 @@
 #include "Quests/EclipseMissionSubsystem.h"
 
+#include "Characters/EclipseClassLogic.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
@@ -207,11 +208,51 @@ void UEclipseMissionSubsystem::CompleteObjectiveByTarget(FName TargetId)
 
 void UEclipseMissionSubsystem::NotifySoldierDowned(const FGuid& SoldierId, FName Cause)
 {
+	NotifySoldierDownedAt(SoldierId, Cause, -1.0);
+}
+
+void UEclipseMissionSubsystem::NotifySoldierDownedAt(const FGuid& SoldierId, FName Cause, double AtSeconds)
+{
 	if (Phase == EEclipseMissionPhase::None || Phase == EEclipseMissionPhase::Finished)
 	{
 		return;
 	}
 	DownedSoldiers.Add(SoldierId, Cause);
+
+	// The down opens its stabilize window (SPEC-P2-01). Only the first down of
+	// a run starts the clock for that soldier — a re-report cannot extend it.
+	if (!DownedAtSeconds.Contains(SoldierId))
+	{
+		const UWorld* World = GetGameInstance() != nullptr ? GetGameInstance()->GetWorld() : nullptr;
+		DownedAtSeconds.Add(SoldierId, AtSeconds >= 0.0 ? AtSeconds : (World != nullptr ? World->GetTimeSeconds() : 0.0));
+	}
+}
+
+bool UEclipseMissionSubsystem::TryStabilizeSoldier(const FGuid& SoldierId, float WindowSeconds, double AtSeconds)
+{
+	if (!CanStabilizeSoldier(SoldierId, WindowSeconds, AtSeconds))
+	{
+		return false;
+	}
+	StabilizedSoldiers.Add(SoldierId);
+	return true;
+}
+
+bool UEclipseMissionSubsystem::CanStabilizeSoldier(const FGuid& SoldierId, float WindowSeconds, double AtSeconds) const
+{
+	if (Phase == EEclipseMissionPhase::None || Phase == EEclipseMissionPhase::Finished)
+	{
+		return false;
+	}
+	const double* DownedAt = DownedAtSeconds.Find(SoldierId);
+	if (DownedAt == nullptr || StabilizedSoldiers.Contains(SoldierId))
+	{
+		return false; // not down, or already saved — one save per down
+	}
+
+	const UWorld* World = GetGameInstance() != nullptr ? GetGameInstance()->GetWorld() : nullptr;
+	const double Now = AtSeconds >= 0.0 ? AtSeconds : (World != nullptr ? World->GetTimeSeconds() : 0.0);
+	return EclipseClassLogic::IsStabilizeWindowOpen(*DownedAt, Now, WindowSeconds);
 }
 
 bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
@@ -264,7 +305,7 @@ bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
 	}
 
 	const TArray<FEclipseResolvedCasualty> Casualties = EclipseRosterLogic::ResolveCasualties(
-		DownedSoldiers, Campaign->GetState(), bSuccess && RosterTuning != nullptr, WoundedDaysOut);
+		DownedSoldiers, Campaign->GetState(), bSuccess && RosterTuning != nullptr, WoundedDaysOut, StabilizedSoldiers);
 
 	const FEclipseCampaignTransaction Consequences = EclipseMissionLogic::ComposeConsequences(
 		LastOutcome, PendingRewards, Casualties, Campaign->GetState(),
@@ -312,6 +353,8 @@ void UEclipseMissionSubsystem::ResetRuntime()
 	CompletedObjectiveIds.Reset();
 	DeployedSoldierIds.Reset();
 	DownedSoldiers.Reset();
+	DownedAtSeconds.Reset();
+	StabilizedSoldiers.Reset();
 	bProgressRegionOnSuccess = true;
 	Phase = EEclipseMissionPhase::None;
 }

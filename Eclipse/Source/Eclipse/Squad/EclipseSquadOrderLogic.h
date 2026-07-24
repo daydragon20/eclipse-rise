@@ -31,4 +31,20 @@ namespace EclipseSquadOrderLogic
 
 	/** Deterministic bark pick (soldier id + order salt) so a given soldier has a stable voice in tests and replays. */
 	ECLIPSE_API FString PickBarkLine(const TArray<FString>& Pool, const FGuid& SoldierId, uint32 Salt);
+
+	/**
+	 * Per-class push modulation (SPEC-P2-01, GDD 9.5: "aggressive soldiers push
+	 * further"): extends the ordered point PushDistanceCm past itself along the
+	 * soldier->order direction. Zero push or a degenerate direction returns the
+	 * ordered point unchanged — obeying the letter of the order stays default.
+	 */
+	ECLIPSE_API FVector ComputePushedOrderPoint(const FVector& SoldierLocation, const FVector& OrderedLocation, float PushDistanceCm);
+
+	/**
+	 * One ring sample's cover score (the SPEC-P1-06 scorer, factored pure so the
+	 * class bias is testable headless). Blocked line-of-fire dominates; ties go
+	 * to the sample nearest the order; LaneBias > 0 (Sniper) prefers covered
+	 * samples with a longer clear lane to the threat.
+	 */
+	ECLIPSE_API float ScoreCoverSample(bool bBlocksThreatLine, float DistanceToOrderCm, float DistanceToThreatCm, float LaneBias);
 }

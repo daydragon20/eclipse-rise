@@ -24,6 +24,8 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderAcknowledged, "Event.Squad.OrderAcknowledged", "Squadmate accepted an order with a bark line; silence is forbidden (GDD 9.5).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderRefused, "Event.Squad.OrderRefused", "Squadmate refused an order with a reason; silent failure is a release blocker (GDD 8.4).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierDowned, "Event.Squad.SoldierDowned", "A squadmate went down in mission; resolution to dead/wounded happens at debrief (SPEC-P1-06/07).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierStabilized, "Event.Squad.SoldierStabilized", "A downed squadmate was stabilized inside the data-driven window - the Medic save that turns permadeath into a wound (SPEC-P2-01, GDD 4.2.5).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_ClassAbilityUsed, "Event.Squad.ClassAbilityUsed", "A class signature verb fired (Stabilize/Momentum/Killzone); payload names the verb tag (SPEC-P2-01, GDD 4.2.3).")
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierAdded, "Event.Roster.SoldierAdded", "A soldier joined the roster; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierDied, "Event.Roster.SoldierDied", "A soldier died permanently; emitted by CampaignState commit only (SPEC-P1-07).")
@@ -33,4 +35,8 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Resource_Credits, "Resource.Credits", "Money — the grey world (GDD 6.2). Phase 1 wallet resource.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Resource_Materials, "Resource.Materials", "Industrial matter for construction/manufacturing (GDD 6.2). Phase 1 wallet resource.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Resource_Intel, "Resource.Intel", "Secrets; decays weekly to force spending (GDD 6.2). Phase 1 wallet resource.")
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Class_Verb_Momentum, "Class.Verb.Momentum", "Assault signature verb identity (GDD 4.2.3); mechanics land per-spec, numbers in DT_ClassDefs.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Class_Verb_Stabilize, "Class.Verb.Stabilize", "Medic signature verb identity (GDD 4.2.3/4.2.5); window seconds live in DT_ClassDefs.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Class_Verb_Killzone, "Class.Verb.Killzone", "Sniper signature verb identity (GDD 4.2.3); lane range lives in DT_ClassDefs (Command Mode wiring = SPEC-P2-02).")
 }

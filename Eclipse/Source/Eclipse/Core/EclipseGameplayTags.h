@@ -33,11 +33,13 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_Completed)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_Failed)
 
-	// Squad (SPEC-P1-06)
+	// Squad (SPEC-P1-06; SPEC-P2-01 class facts)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderIssued)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderAcknowledged)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderRefused)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierDowned)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierStabilized)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_ClassAbilityUsed)
 
 	// Roster & Memorial (SPEC-P1-07)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierAdded)
@@ -50,4 +52,11 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Resource_Credits)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Resource_Materials)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Resource_Intel)
+
+	// Class signature-verb identities (SPEC-P2-01, GDD 4.2.3). Not events; the
+	// DT_ClassDefs SignatureVerb column keys off these — timing/range numbers
+	// stay in the class rows, never in code.
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Class_Verb_Momentum)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Class_Verb_Stabilize)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Class_Verb_Killzone)
 }

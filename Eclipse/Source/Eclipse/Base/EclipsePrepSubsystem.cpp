@@ -7,6 +7,7 @@
 #include "Engine/GameInstance.h"
 #include "HAL/IConsoleManager.h"
 #include "Squad/EclipseRosterLogic.h"
+#include "Squad/EclipseSquadTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "StructUtils/InstancedStruct.h"
@@ -77,6 +78,21 @@ const UEclipsePrepTuningAsset* UEclipsePrepSubsystem::ResolveTuning() const
 	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
 	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;
 	return Setup != nullptr ? Setup->PrepTuning.LoadSynchronous() : nullptr;
+}
+
+int32 UEclipsePrepSubsystem::ResolveSquadmateCount() const
+{
+	// One source of truth for deployment scale (SPEC-P2-01): the squad tuning's
+	// MaxDeployed counts the player, prep picks the rest. The prep tuning's
+	// SquadSize remains only as the no-squad-tuning fallback (GDD 14.3.5).
+	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
+	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;
+	if (const UEclipseSquadTuningAsset* SquadTuning = Setup != nullptr ? Setup->SquadTuning.LoadSynchronous() : nullptr)
+	{
+		return FMath::Max(1, SquadTuning->MaxDeployed - 1);
+	}
+	const UEclipsePrepTuningAsset* PrepTuning = ResolveTuning();
+	return PrepTuning != nullptr ? PrepTuning->SquadSize : 2;
 }
 
 TArray<EclipsePrepLogic::FEclipseLoadoutOption> UEclipsePrepSubsystem::ResolveLoadoutOptions() const
@@ -166,8 +182,7 @@ bool UEclipsePrepSubsystem::LaunchMission(const TArray<FGuid>& SquadSoldierIds, 
 	}
 
 	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
-	const UEclipsePrepTuningAsset* Tuning = ResolveTuning();
-	const int32 SquadSize = Tuning != nullptr ? Tuning->SquadSize : 2;
+	const int32 SquadSize = ResolveSquadmateCount();
 
 	if (!EclipsePrepLogic::ValidateSquadPick(Campaign->GetState(), SquadSoldierIds, SquadSize, OutError))
 	{
@@ -207,8 +222,7 @@ bool UEclipsePrepSubsystem::AutoLaunch(FString& OutError)
 		return false;
 	}
 
-	const UEclipsePrepTuningAsset* Tuning = ResolveTuning();
-	const int32 SquadSize = Tuning != nullptr ? Tuning->SquadSize : 2;
+	const int32 SquadSize = ResolveSquadmateCount();
 
 	TArray<FGuid> Squad;
 	for (const FEclipseSoldierRecord& Soldier : Campaign->GetState().Roster)

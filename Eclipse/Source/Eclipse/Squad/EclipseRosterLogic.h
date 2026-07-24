@@ -26,16 +26,20 @@ namespace EclipseRosterLogic
 	ECLIPSE_API FEclipseSoldierRecord GenerateSoldier(FName OriginId, const FEclipseNameGenerationParams& Params, int32 Seed);
 
 	/**
-	 * The Phase 1 death-resolution policy (SPEC-P1-07):
+	 * The death-resolution policy (SPEC-P1-07, extended by SPEC-P2-01):
 	 *  - mission failed  -> every downed soldier is dead (nobody carried them out)
 	 *  - mission won     -> downed soldiers come home Wounded (out WoundedDaysOut)
-	 * The "extraction without body" stub is the failure branch.
+	 *  - stabilized      -> Wounded even on failure (the GDD 4.2.5 save: a
+	 *    stabilize inside the window converts permadeath into an injury)
+	 * The stabilized branch needs WoundedDaysOut > 0 to express a wound; without
+	 * roster tuning the conservative all-dead reading stands (GDD 14.3.5).
 	 */
 	ECLIPSE_API TArray<FEclipseResolvedCasualty> ResolveCasualties(
 		const TMap<FGuid, FName>& DownedSoldiers,
 		const FEclipseCampaignState& State,
 		bool bMissionSuccess,
-		int32 WoundedDaysOut);
+		int32 WoundedDaysOut,
+		const TSet<FGuid>& StabilizedSoldiers = TSet<FGuid>());
 
 	/** Availability read (SPEC-P1-08 squad picking): wounded soldiers return when the clock passes their recovery day. */
 	ECLIPSE_API bool IsSoldierAvailableOnDay(const FEclipseSoldierRecord& Soldier, int32 Day);

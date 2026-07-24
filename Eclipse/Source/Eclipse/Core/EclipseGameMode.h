@@ -9,9 +9,10 @@ class AEclipseCharacter;
 
 /**
  * Graybox game mode (SPEC-P1-05): possesses the player body, and — driven by the
- * mission lifecycle on the event bus — spawns the squad of 2 (SPEC-P1-06) and the
- * mission's enemy sets on Event.Mission.Started, and tears them down on
- * Completed/Failed. All spawn parameters come from mission/tuning data (GDD 14.2).
+ * mission lifecycle on the event bus — spawns the squad of 4 (player + 3, class
+ * kits from DT_ClassDefs — SPEC-P2-01) and the mission's enemy sets on
+ * Event.Mission.Started, and tears them down on Completed/Failed. All spawn
+ * parameters come from mission/tuning data (GDD 14.2).
  */
 UCLASS()
 class ECLIPSE_API AEclipseGameMode : public AGameModeBase

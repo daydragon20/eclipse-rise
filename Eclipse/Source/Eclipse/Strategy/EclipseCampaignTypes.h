@@ -70,6 +70,14 @@ struct FEclipseSoldierRecord
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	FName TraitId;
 
+	/**
+	 * DT_ClassDefs row id (SPEC-P2-01, GDD 4.2.3). NAME_None = classless
+	 * Recruit — pre-v3 saves migrate to that, and the Academy assignment flow
+	 * is Phase 3. Muster shows it read-only.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	FName ClassId;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 MissionsServed = 0;
 
@@ -126,9 +134,9 @@ struct FEclipseCampaignState
 {
 	GENERATED_BODY()
 
-	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). */
+	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Campaign")
-	int32 SchemaVersion = 2;
+	int32 SchemaVersion = 3;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 Day = 0;

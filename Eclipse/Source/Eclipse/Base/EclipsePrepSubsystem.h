@@ -48,6 +48,14 @@ public:
 	/** Debug/Gauntlet: first available squad, first loadout, first insertion (SPEC-P1-08 AutoLaunch). */
 	bool AutoLaunch(FString& OutError);
 
+	/**
+	 * Squadmates to pick = DA_SquadTuning.MaxDeployed - 1 (the player fills the
+	 * fourth slot — SPEC-P2-01). Falls back to DA_PrepTuning.SquadSize, then 2,
+	 * when tuning is missing (GDD 14.3.5).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Eclipse|Prep")
+	int32 ResolveSquadmateCount() const;
+
 private:
 	const class UEclipsePrepTuningAsset* ResolveTuning() const;
 	TArray<EclipsePrepLogic::FEclipseLoadoutOption> ResolveLoadoutOptions() const;

@@ -4,6 +4,7 @@
 #include "AI/EclipseSquadmateController.h"
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Characters/EclipseClassLogic.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Core/EclipseGameplayTags.h"
@@ -373,30 +374,80 @@ void AEclipseGameMode::SpawnMissionActors()
 		PlayerBody->OnDowned.AddUObject(this, &AEclipseGameMode::HandlePlayerDowned);
 	}
 
-	// Squad of 2 (SPEC-P1-06): the picked roster soldiers, spawned beside the
-	// player, registered so orders and the downed pipeline reach them. They carry
-	// the player-side platform (GDD 8.3 fairness: same guns, same rules).
+	// Squad of 4 = player + 3 (SPEC-P2-01): the picked roster soldiers, spawned
+	// in a fan beside the player, registered so orders and the downed pipeline
+	// reach them. Class is data over the shared body (GDD 12.3): the kit picks
+	// the weapon row and an optional body override; the classless fallback
+	// carries the player-side platform (GDD 8.3 fairness: same guns, same rules).
+	const UDataTable* WeaponsTable = Setup != nullptr ? Setup->Weapons.LoadSynchronous() : nullptr;
+	const UDataTable* ClassDefs = Setup != nullptr ? Setup->ClassDefs.LoadSynchronous() : nullptr;
+	if (ClassDefs != nullptr && ClassDefs->GetRowStruct() != FEclipseClassDefRow::StaticStruct())
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("GameMode: ClassDefs table has the wrong row struct — squad deploys classless (GDD 14.3.5)."));
+		ClassDefs = nullptr;
+	}
+
 	int32 SquadIndex = 0;
 	for (const FGuid& SoldierId : Mission->GetDeployedSoldierIds())
 	{
 		const FEclipseSoldierRecord* Record = Campaign->GetState().FindSoldier(SoldierId);
-		AEclipseCharacter* Body = SpawnBodyNear(PlayerLocation + FVector(150.0f, 150.0f, 0.0f),
+
+		// Kit resolution is the pure core (SPEC-P2-01): a missing row or table
+		// degrades to the classless kit, never a crash.
+		const FEclipseClassDefRow* ClassRow = (ClassDefs != nullptr && Record != nullptr && !Record->ClassId.IsNone())
+			? reinterpret_cast<const FEclipseClassDefRow*>(ClassDefs->FindRowUnchecked(Record->ClassId))
+			: nullptr;
+		const EclipseClassLogic::FEclipseResolvedClassKit Kit =
+			EclipseClassLogic::ResolveClassKit(Record != nullptr ? *Record : FEclipseSoldierRecord(), ClassRow);
+		if (Record != nullptr && !Record->ClassId.IsNone() && ClassRow == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("GameMode: class '%s' of %s has no DT_ClassDefs row — classless kit stands in (GDD 14.3.5)."),
+				*Record->ClassId.ToString(), *Record->Name);
+		}
+
+		// Fan the squad out so four bodies never stack in one capsule scrum.
+		const FVector SpawnOffset(150.0f + 130.0f * (SquadIndex % 2), 150.0f + 130.0f * (SquadIndex / 2), 0.0f);
+		AEclipseCharacter* Body = SpawnBodyNear(PlayerLocation + SpawnOffset,
 			Record != nullptr ? Record->Name : TEXT("Squadmate"));
 		if (Body == nullptr)
 		{
 			continue;
 		}
 		Body->ApplyTuning(CharacterTuning);
-		if (!RebelBodies.IsEmpty())
+
+		// Visible kit: the class body override wins; otherwise the shared Rebel
+		// pool dresses the soldier (step-2 pipeline), assigned stably by order.
+		const FEclipseBodyDefRow* ClassBody = FindBodyDef(Kit.BodyDefOverride);
+		if (ClassBody != nullptr)
+		{
+			Body->ApplyBodyDef(*ClassBody);
+		}
+		else if (!RebelBodies.IsEmpty())
 		{
 			Body->ApplyBodyDef(*RebelBodies[SquadIndex % RebelBodies.Num()]);
 		}
 		++SquadIndex;
-		EnsureWeapon(*Body).ApplyWeaponRow(PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
+
+		// Class weapon row from data; the platform default (first row) is the
+		// classless fallback — fairness stays intact either way (GDD 8.3).
+		const FEclipseWeaponRow* KitWeaponRow = nullptr;
+		if (WeaponsTable != nullptr && !Kit.WeaponRow.IsNone() && WeaponsTable->GetRowStruct() == FEclipseWeaponRow::StaticStruct())
+		{
+			KitWeaponRow = reinterpret_cast<const FEclipseWeaponRow*>(WeaponsTable->FindRowUnchecked(Kit.WeaponRow));
+			if (KitWeaponRow == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("GameMode: weapon row '%s' (class '%s') missing — platform default stands in (GDD 14.3.5)."),
+					*Kit.WeaponRow.ToString(), *Kit.ClassId.ToString());
+			}
+		}
+		const FEclipseWeaponRow& SquadWeaponRow = KitWeaponRow != nullptr ? *KitWeaponRow
+			: (PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
+		EnsureWeapon(*Body).ApplyWeaponRow(SquadWeaponRow);
 
 		AEclipseSquadmateController* Controller = GetWorld()->SpawnActor<AEclipseSquadmateController>();
 		if (Controller != nullptr)
 		{
+			Controller->ApplyClassKit(Kit); // before registration: the downed wiring reads the kit
 			Controller->Possess(Body);
 			Squad->RegisterSquadmate(Controller, SoldierId);
 			SpawnedMissionActors.Add(Controller);

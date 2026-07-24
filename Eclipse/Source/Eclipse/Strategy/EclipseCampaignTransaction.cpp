@@ -30,6 +30,7 @@ uint32 FEclipseCampaignState::ComputeStateHash() const
 		Hash = HashCombine(Hash, GetTypeHash(Soldier.Name));
 		Hash = HashCombine(Hash, GetTypeHash(Soldier.OriginId));
 		Hash = HashCombine(Hash, GetTypeHash(Soldier.TraitId));
+		Hash = HashCombine(Hash, GetTypeHash(Soldier.ClassId));
 		Hash = HashCombine(Hash, GetTypeHash(Soldier.MissionsServed));
 		Hash = HashCombine(Hash, GetTypeHash(static_cast<uint8>(Soldier.Status)));
 		Hash = HashCombine(Hash, GetTypeHash(Soldier.WoundedUntilDay));

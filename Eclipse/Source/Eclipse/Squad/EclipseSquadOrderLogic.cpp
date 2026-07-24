@@ -64,4 +64,28 @@ FString PickBarkLine(const TArray<FString>& Pool, const FGuid& SoldierId, uint32
 	return Pool[Hash % static_cast<uint32>(Pool.Num())];
 }
 
+FVector ComputePushedOrderPoint(const FVector& SoldierLocation, const FVector& OrderedLocation, float PushDistanceCm)
+{
+	if (PushDistanceCm <= 0.0f)
+	{
+		return OrderedLocation;
+	}
+	const FVector ToOrder = OrderedLocation - SoldierLocation;
+	if (ToOrder.SizeSquared2D() < 1.0f)
+	{
+		return OrderedLocation; // ordered onto our own feet — nothing to push along
+	}
+	// Push stays planar: classes modulate ground positioning, not altitude.
+	return OrderedLocation + ToOrder.GetSafeNormal2D() * PushDistanceCm;
+}
+
+float ScoreCoverSample(bool bBlocksThreatLine, float DistanceToOrderCm, float DistanceToThreatCm, float LaneBias)
+{
+	// The lane bonus applies only to covered samples: no bias value can talk a
+	// soldier out of cover — the class changes taste, never competence (GDD 9.5
+	// bug bar). Among covered samples, Sniper bias prefers the longer lane.
+	const float LaneBonus = bBlocksThreatLine ? FMath::Max(0.0f, LaneBias) * DistanceToThreatCm * 0.001f : 0.0f;
+	return (bBlocksThreatLine ? 10.0f : 0.0f) + LaneBonus - DistanceToOrderCm * 0.001f;
+}
+
 } // namespace EclipseSquadOrderLogic

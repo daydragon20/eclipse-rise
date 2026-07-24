@@ -40,7 +40,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Prep", meta = (ClampMin = 0))
 	int32 IntelRevealCost = 5;
 
-	/** Squad size for Phase 1 (SPEC-P1-06: squad of 2). */
+	/** Fallback squadmate count when no squad tuning resolves; DA_SquadTuning.MaxDeployed - 1 is the real source (SPEC-P2-01). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Prep", meta = (ClampMin = 1))
 	int32 SquadSize = 2;
 

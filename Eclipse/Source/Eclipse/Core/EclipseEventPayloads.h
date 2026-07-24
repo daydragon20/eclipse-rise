@@ -91,7 +91,7 @@ struct FEclipsePrepEventPayload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	FName MissionId;
 
-	/** Roster ids of the picked squad (2 in Phase 1 — SPEC-P1-06). */
+	/** Roster ids of the picked squad (MaxDeployed - 1 squadmates; player + 3 per SPEC-P2-01). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	TArray<FGuid> SquadSoldierIds;
 
@@ -154,6 +154,14 @@ struct FEclipseSquadEventPayload
 	/** Cause of a SoldierDowned fact. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	FName Cause;
+
+	/** Who performed the save (SoldierStabilized) or fired the verb (ClassAbilityUsed) — SPEC-P2-01. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FGuid StabilizerId;
+
+	/** Signature verb that fired (ClassAbilityUsed only; Class.Verb.* family). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FGameplayTag AbilityVerb;
 };
 
 /** Event.Roster.* / Event.Memorial.* — persistent-people facts (SPEC-P1-07, Pillar 3). */

@@ -1,5 +1,6 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 
+#include "Characters/EclipseCharacterTypes.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
@@ -133,6 +134,42 @@ namespace
 				Ar << TagName;
 			}
 		}
+
+		// Schema v3 (SPEC-P2-01): soldier ClassIds, appended at block end in
+		// roster order — tail-append keeps the migration mechanical (GDD 14.3.6).
+		// The read is version-gated on the block's own leading SchemaVersion: a
+		// v2 block simply has no tail, and its soldiers come home classless
+		// Recruits (NAME_None — the GDD 4.2.3 default), never a crash.
+		if (Ar.IsLoading())
+		{
+			if (State.SchemaVersion >= 3)
+			{
+				int32 ClassIdCount = 0;
+				Ar << ClassIdCount;
+				for (int32 Index = 0; Index < ClassIdCount && !Ar.IsError(); ++Index)
+				{
+					FName ClassId;
+					Ar << ClassId;
+					// Count mismatch tolerated: extra names drop, short tails leave
+					// the remaining soldiers classless (GDD 14.3.5).
+					if (State.Roster.IsValidIndex(Index))
+					{
+						State.Roster[Index].ClassId = ClassId;
+					}
+				}
+			}
+			// Whatever shape came in, the in-memory state is now current.
+			State.SchemaVersion = 3;
+		}
+		else
+		{
+			int32 ClassIdCount = State.Roster.Num();
+			Ar << ClassIdCount;
+			for (FEclipseSoldierRecord& Soldier : State.Roster)
+			{
+				Ar << Soldier.ClassId;
+			}
+		}
 	}
 }
 
@@ -164,6 +201,24 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 					return false;
 				}
 				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 2;
+				const int32 EmptyCount = 0;
+				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
+				return true;
+			}));
+
+		// v2 -> v3 (SPEC-P2-01): the Campaign block gained a trailing roster
+		// ClassId array. Same mechanical tail-append: pre-class soldiers come
+		// home as classless Recruits (ClassId None — GDD 4.2.3's default), and
+		// the serializer's own version gate backstops any block this step missed.
+		SaveSubsystem->RegisterMigration(2, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
+			[](TMap<FName, TArray<uint8>>& SaveBlocks)
+			{
+				TArray<uint8>* CampaignBlock = SaveBlocks.Find(TEXT("Campaign"));
+				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
+				{
+					return false;
+				}
+				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 3;
 				const int32 EmptyCount = 0;
 				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
 				return true;
@@ -243,9 +298,31 @@ void UEclipseCampaignSubsystem::StartNewCampaign(const UEclipseCampaignSetupAsse
 		UE_LOG(LogEclipse, Warning, TEXT("StartNewCampaign: no roster tuning asset — recruits get fallback names (GDD 14.3.5)."));
 	}
 
+	// Pre-classed authored recruits (SPEC-P2-01 decision 2): the starting roster
+	// cycles the DT_ClassDefs rows in table order — deterministic, data-driven,
+	// and the Academy assignment flow stays Phase 3. Missing table = classless
+	// Recruits with a logged warning (GDD 14.3.5), never a crash.
+	TArray<FName> StartingClassIds;
+	if (const UDataTable* ClassDefs = Setup->ClassDefs.LoadSynchronous())
+	{
+		if (ClassDefs->GetRowStruct() == FEclipseClassDefRow::StaticStruct())
+		{
+			StartingClassIds = ClassDefs->GetRowNames();
+		}
+	}
+	if (StartingClassIds.IsEmpty())
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("StartNewCampaign: no class defs table — recruits start classless (GDD 14.3.5)."));
+	}
+
 	for (int32 Index = 0; Index < Setup->StartingRosterSize; ++Index)
 	{
-		State.Roster.Add(EclipseRosterLogic::GenerateSoldier(OriginId, NameParams, Index + 1));
+		FEclipseSoldierRecord Soldier = EclipseRosterLogic::GenerateSoldier(OriginId, NameParams, Index + 1);
+		if (!StartingClassIds.IsEmpty())
+		{
+			Soldier.ClassId = StartingClassIds[Index % StartingClassIds.Num()];
+		}
+		State.Roster.Add(MoveTemp(Soldier));
 	}
 
 	UE_LOG(LogEclipse, Display, TEXT("New campaign: day %d, %d regions, %d soldiers."), State.Day, State.Regions.Num(), State.Roster.Num());

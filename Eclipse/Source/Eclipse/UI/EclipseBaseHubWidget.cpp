@@ -242,9 +242,12 @@ void UEclipseBaseHubWidget::RefreshBarracks()
 
 		const bool bAvailable = EclipseRosterLogic::IsSoldierAvailableOnDay(Soldier, State.Day);
 		const bool bPicked = PickedSquad.Contains(Soldier.SoldierId);
-		FString Label = FString::Printf(TEXT("%s %s [%s]%s"),
+		// Class shows read-only (SPEC-P2-01 decision 2: pre-classed recruits;
+		// the Academy assignment flow is Phase 3).
+		FString Label = FString::Printf(TEXT("%s %s <%s> [%s]%s"),
 			bPicked ? TEXT("[X]") : TEXT("[ ]"),
 			*Soldier.Name,
+			Soldier.ClassId.IsNone() ? TEXT("Recruit") : *Soldier.ClassId.ToString(),
 			*Soldier.TraitId.ToString(),
 			bAvailable ? TEXT("") : *FString::Printf(TEXT(" — WOUNDED, back day %d"), Soldier.WoundedUntilDay));
 

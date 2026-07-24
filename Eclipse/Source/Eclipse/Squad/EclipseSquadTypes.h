@@ -64,6 +64,14 @@ class ECLIPSE_API UEclipseSquadTuningAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	/**
+	 * Deployed squad size including the player (SPEC-P2-01: 4 = player + 3).
+	 * Preparation derives its squadmate pick count from this; fireteams (8+)
+	 * are Phase 3 (GDD 4.1.6).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 1))
+	int32 MaxDeployed = 4;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
 	float FollowDistance = 400.0f;
 

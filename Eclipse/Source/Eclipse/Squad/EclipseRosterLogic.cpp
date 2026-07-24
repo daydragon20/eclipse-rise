@@ -39,19 +39,25 @@ TArray<FEclipseResolvedCasualty> ResolveCasualties(
 	const TMap<FGuid, FName>& DownedSoldiers,
 	const FEclipseCampaignState& State,
 	bool bMissionSuccess,
-	int32 WoundedDaysOut)
+	int32 WoundedDaysOut,
+	const TSet<FGuid>& StabilizedSoldiers)
 {
 	TArray<FEclipseResolvedCasualty> Casualties;
 	for (const TPair<FGuid, FName>& Downed : DownedSoldiers)
 	{
 		const FEclipseSoldierRecord* Record = State.FindSoldier(Downed.Key);
 
+		// A stabilize inside the window (SPEC-P2-01) survives even a failed
+		// mission — but only when the wound can be expressed (days > 0); a
+		// missing-tuning zero keeps the conservative all-dead reading.
+		const bool bStabilized = StabilizedSoldiers.Contains(Downed.Key) && WoundedDaysOut > 0;
+
 		FEclipseResolvedCasualty& Casualty = Casualties.AddDefaulted_GetRef();
 		Casualty.SoldierId = Downed.Key;
 		Casualty.SoldierName = Record != nullptr ? Record->Name : FString();
 		Casualty.Cause = Downed.Value;
-		Casualty.bDead = !bMissionSuccess;
-		Casualty.DaysOut = bMissionSuccess ? WoundedDaysOut : 0;
+		Casualty.bDead = !bMissionSuccess && !bStabilized;
+		Casualty.DaysOut = Casualty.bDead ? 0 : WoundedDaysOut;
 	}
 	return Casualties;
 }

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/DataTable.h"
+#include "GameplayTagContainer.h"
 #include "EclipseCharacterTypes.generated.h"
 
 class UAnimSequence;
@@ -124,6 +125,66 @@ struct FEclipseNamedCharacterRow : public FTableRowBase
 	/** Rebel / Dominion — drives tint and bark selection later (GDD 08/16). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	FName Faction;
+};
+
+/**
+ * One soldier class (DT_ClassDefs row; row name = class id — SPEC-P2-01,
+ * GDD 4.2.3). Classes are data, not subclasses (GDD 12.3): the one
+ * AEclipseCharacter body stays; a class changes kit, one signature verb and
+ * bark flavor — never the shared movement/health/order contract. A soldier
+ * whose ClassId has no row here degrades to the classless kit (GDD 14.3.5).
+ */
+USTRUCT(BlueprintType)
+struct FEclipseClassDefRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class")
+	FText DisplayName;
+
+	/** DT_Weapons row this class carries; NAME_None = the platform default (first row). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class")
+	FName WeaponRow;
+
+	/** Optional DT_BodyDefs row that dresses this class (visible kit); NAME_None = the shared squad body pool. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class")
+	FName BodyDefOverride;
+
+	/** Signature verb identity (Class.Verb.* family — Momentum/Stabilize/Killzone). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class")
+	FGameplayTag SignatureVerb;
+
+	/** Seconds after a down in which this class can stabilize (GDD 4.2.5 window; 30 for Medic, 0 = cannot). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class", meta = (ClampMin = 0))
+	float StabilizeWindowSeconds = 0.0f;
+
+	/** Killzone lane range in cm (6000 for Sniper, 0 = none; Command Mode wiring = SPEC-P2-02). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class", meta = (ClampMin = 0))
+	float KillzoneRangeCm = 0.0f;
+
+	/** Bark-pool set id for class-flavored lines (content tier fills the pools). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class")
+	FName BarkSet;
+
+	/**
+	 * Per-class order modulation as data (GDD 9.5: traits/classes modulate
+	 * parameters, orders stay unchanged in surface). Assault pushes past the
+	 * ordered point by this many cm toward the order direction; 0 = obey exactly.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class", meta = (ClampMin = 0))
+	float OrderPushDistanceCm = 0.0f;
+
+	/**
+	 * Cover-scorer lane bias (existing ring scorer, SPEC-P1-06): 0 = nearest
+	 * cover wins; higher values prefer covered samples with a longer clear lane
+	 * to the threat (Sniper overwatch preference).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class", meta = (ClampMin = 0))
+	float CoverLaneBias = 0.0f;
+
+	/** Auto-triage: move to downed squadmates and stabilize without an order (Medic true). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Class")
+	bool bAutoTriage = false;
 };
 
 /** One enemy archetype (DT_EnemyArchetypes row, SPEC-P1-05 data). */
