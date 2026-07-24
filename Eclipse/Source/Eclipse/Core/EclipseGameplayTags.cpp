@@ -27,6 +27,9 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierStabilized, "Event.Squad.SoldierStabilized", "A downed squadmate was stabilized inside the data-driven window - the Medic save that turns permadeath into a wound (SPEC-P2-01, GDD 4.2.5).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_ClassAbilityUsed, "Event.Squad.ClassAbilityUsed", "A class signature verb fired (Stabilize/Momentum/Killzone); payload names the verb tag (SPEC-P2-01, GDD 4.2.3).")
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeEntered, "Event.Command.ModeEntered", "Command Mode hold began; payload carries the applied dilation (SPEC-P2-02). Audio ducks/filters on this (SPEC-P2-09); UI is a consumer, never the emitter.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeExited, "Event.Command.ModeExited", "Command Mode ended (release or fail-safe); payload carries HeldSeconds + OrdersIssuedWhileHeld — the R3 feel-gauntlet telemetry (SPEC-P2-02).")
+
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierAdded, "Event.Roster.SoldierAdded", "A soldier joined the roster; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierDied, "Event.Roster.SoldierDied", "A soldier died permanently; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierWounded, "Event.Roster.SoldierWounded", "A soldier was wounded and is out N days; emitted by CampaignState commit only (SPEC-P1-07).")

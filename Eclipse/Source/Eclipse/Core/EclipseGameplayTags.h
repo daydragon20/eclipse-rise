@@ -41,6 +41,10 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierStabilized)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_ClassAbilityUsed)
 
+	// Command Mode lifecycle (SPEC-P2-02)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeEntered)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeExited)
+
 	// Roster & Memorial (SPEC-P1-07)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierAdded)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierDied)

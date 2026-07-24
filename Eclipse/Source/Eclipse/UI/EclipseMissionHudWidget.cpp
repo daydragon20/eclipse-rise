@@ -1,6 +1,7 @@
 #include "UI/EclipseMissionHudWidget.h"
 
 #include "Blueprint/WidgetTree.h"
+#include "Characters/EclipseCommandModeComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Engine/GameInstance.h"
@@ -79,6 +80,20 @@ void UEclipseMissionHudWidget::Rebuild()
 			for (const FString& Line : Squad->GetOrderStateLines())
 			{
 				AddLine(FString::Printf(TEXT("  %s"), *Line));
+			}
+		}
+	}
+
+	// Command Mode debug lines (SPEC-P2-02 step 4 — the HUD stays a consumer;
+	// the component owns the state). Rebuild is event-driven, so these refresh
+	// on ModeEntered/Exited and every order fact.
+	if (const APlayerController* Controller = GetOwningPlayer())
+	{
+		if (const UEclipseCommandModeComponent* Command = Controller->FindComponentByClass<UEclipseCommandModeComponent>())
+		{
+			for (const FString& Line : Command->GetDebugLines())
+			{
+				AddLine(Line);
 			}
 		}
 	}

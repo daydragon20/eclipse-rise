@@ -185,3 +185,22 @@ struct FEclipseRosterEventPayload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	int32 DaysOut = 0;
 };
+
+/** Event.Command.* — Command Mode lifecycle facts (SPEC-P2-02). */
+USTRUCT(BlueprintType)
+struct FEclipseCommandEventPayload
+{
+	GENERATED_BODY()
+
+	/** World rate applied while held (ModeEntered; from DA_CommandModeTuning). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float DilationFactor = 1.0f;
+
+	/** How long the mode was held, in wall-clock seconds (ModeExited; locked decision 2 telemetry). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float HeldSeconds = 0.0f;
+
+	/** Orders issued during the hold (ModeExited; the R3 usage-pull metric). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 OrdersIssuedWhileHeld = 0;
+};

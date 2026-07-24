@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Characters/EclipseCommandModeComponent.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
@@ -20,6 +21,11 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "UI/EclipseBaseHubWidget.h"
 #include "UI/EclipseMissionHudWidget.h"
+
+AEclipsePlayerController::AEclipsePlayerController()
+{
+	CommandMode = CreateDefaultSubobject<UEclipseCommandModeComponent>(TEXT("CommandMode"));
+}
 
 void AEclipsePlayerController::BeginPlay()
 {
@@ -213,6 +219,25 @@ void AEclipsePlayerController::SetupInputComponent()
 		MapKey(OrderActions[Index], OrderPadKeys[Index]);
 	}
 
+	// Command Mode (SPEC-P2-02 Stage A, provisional debug bindings — documented
+	// on the HUD): hold Q / pad LB. LB was the pad stance-modifier; stance moves
+	// inside the held mode (Y toggles), KB keeps LeftAlt at issue time.
+	CommandHoldAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(CommandHoldAction, EKeys::Q);
+	MapKey(CommandHoldAction, EKeys::Gamepad_LeftShoulder);
+	SelectNextAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(SelectNextAction, EKeys::Tab);
+	MapKey(SelectNextAction, EKeys::MouseScrollUp);
+	MapKey(SelectNextAction, EKeys::Gamepad_RightShoulder);
+	SelectPrevAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(SelectPrevAction, EKeys::MouseScrollDown);
+	MapKey(SelectPrevAction, EKeys::Gamepad_LeftTrigger); // pad prev (review minor; RT stays fire)
+	DirectPickAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(DirectPickAction, EKeys::E);
+	MapKey(DirectPickAction, EKeys::Gamepad_FaceButton_Left);
+	StanceToggleAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(StanceToggleAction, EKeys::Gamepad_FaceButton_Top);
+
 	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleMove);
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleLook);
@@ -225,6 +250,13 @@ void AEclipsePlayerController::SetupInputComponent()
 	Input->BindActionValueLambda(OrderActions[1], ETriggerEvent::Started, [this](const FInputActionValue&) { IssueSquadOrder(EEclipseSquadOrder::FocusTarget); });
 	Input->BindActionValueLambda(OrderActions[2], ETriggerEvent::Started, [this](const FInputActionValue&) { IssueSquadOrder(EEclipseSquadOrder::Hold); });
 	Input->BindActionValueLambda(OrderActions[3], ETriggerEvent::Started, [this](const FInputActionValue&) { IssueSquadOrder(EEclipseSquadOrder::Regroup); });
+
+	Input->BindActionValueLambda(CommandHoldAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->OnHoldPressed(); } });
+	Input->BindActionValueLambda(CommandHoldAction, ETriggerEvent::Completed, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->OnHoldReleased(); } });
+	Input->BindActionValueLambda(SelectNextAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(+1); } });
+	Input->BindActionValueLambda(SelectPrevAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(-1); } });
+	Input->BindActionValueLambda(DirectPickAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->PickSoldierUnderReticle(); } });
+	Input->BindActionValueLambda(StanceToggleAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->ToggleHeldStance(); } });
 }
 
 void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)
@@ -340,10 +372,30 @@ void AEclipsePlayerController::IssueSquadOrder(EEclipseSquadOrder Order)
 		? GetPawn()->GetActorLocation()
 		: AimLocation;
 
-	// Stance stub (SPEC-P1-06): hold Left Alt while ordering for Aggressive, else
-	// Ready. PLACEHOLDER(GDD 8.4): stance drives posture/ROE in the feel pass.
-	const EEclipseSquadStance Stance = (IsInputKeyDown(EKeys::LeftAlt) || IsInputKeyDown(EKeys::Gamepad_LeftShoulder))
-		? EEclipseSquadStance::Aggressive
-		: EEclipseSquadStance::Ready;
-	Squad->IssueOrderToAll(Order, Target, AimActor, Stance);
+	// Stance stub (SPEC-P1-06): outside the mode, hold Left Alt while ordering
+	// for Aggressive (pad LB is the command hold now — SPEC-P2-02); inside the
+	// held mode the component's toggled stance applies. PLACEHOLDER(GDD 8.4):
+	// stance drives posture/ROE in the feel pass.
+	const bool bHeld = CommandMode != nullptr && CommandMode->IsHeld();
+	const EEclipseSquadStance Stance = bHeld
+		? CommandMode->GetHeldStance()
+		: (IsInputKeyDown(EKeys::LeftAlt) ? EEclipseSquadStance::Aggressive : EEclipseSquadStance::Ready);
+
+	// Per-soldier dispatch (SPEC-P2-02 locked decision 4): a selection routes
+	// through the existing IssueOrder; no selection keeps the Phase 1 broadcast.
+	// A stale selection (died this hold) falls back to everyone — audibly, via
+	// the normal ack/refusal chain, never silently dropped.
+	const FGuid Selected = bHeld ? CommandMode->GetSelectedSoldier() : FGuid();
+	if (Selected.IsValid() && Squad->IssueOrder(Selected, Order, Target, AimActor, Stance))
+	{
+		// single-soldier path took it
+	}
+	else
+	{
+		Squad->IssueOrderToAll(Order, Target, AimActor, Stance);
+	}
+	if (bHeld)
+	{
+		CommandMode->NotifyOrderIssued();
+	}
 }

@@ -240,6 +240,34 @@ void UEclipseSquadSubsystem::NotifyTriageArrived(AEclipseSquadmateController* Ar
 	UE_LOG(LogEclipse, Display, TEXT("[SQUAD Stabilize] %s"), *Bark);
 }
 
+TArray<FGuid> UEclipseSquadSubsystem::GetAliveSquadmateIds() const
+{
+	TArray<FGuid> Ids;
+	Ids.Reserve(Squadmates.Num());
+	for (const FSquadmateEntry& Entry : Squadmates)
+	{
+		const AEclipseSquadmateController* Controller = Entry.Controller.Get();
+		const AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
+		if (Body != nullptr && !Body->IsDowned())
+		{
+			Ids.Add(Entry.SoldierId);
+		}
+	}
+	return Ids;
+}
+
+bool UEclipseSquadSubsystem::IsRegisteredSquadmate(const FGuid& SoldierId) const
+{
+	for (const FSquadmateEntry& Entry : Squadmates)
+	{
+		if (Entry.SoldierId == SoldierId)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void UEclipseSquadSubsystem::UnregisterAll()
 {
 	Squadmates.Reset();
@@ -266,7 +294,9 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 	AEclipseSquadmateController* Controller = Entry != nullptr ? Entry->Controller.Get() : nullptr;
 	if (Controller == nullptr)
 	{
-		UE_LOG(LogEclipse, Error, TEXT("IssueOrder: no squadmate with id %s"), *SoldierId.ToString());
+		// Warning, not Error: a Command Mode selection that outlived its soldier
+		// lands here by design and falls back to the broadcast path (SPEC-P2-02).
+		UE_LOG(LogEclipse, Warning, TEXT("IssueOrder: no squadmate with id %s — caller falls back to all"), *SoldierId.ToString());
 		return false;
 	}
 

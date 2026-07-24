@@ -55,6 +55,12 @@ public:
 
 	int32 GetSquadmateCount() const { return Squadmates.Num(); }
 
+	/** Registered squadmates whose body is up, in stable registration order (Command Mode selection — SPEC-P2-02). */
+	TArray<FGuid> GetAliveSquadmateIds() const;
+
+	/** True when the id belongs to a registered squadmate (selection filter: enemies/player never selectable). */
+	bool IsRegisteredSquadmate(const FGuid& SoldierId) const;
+
 	/** Per-squadmate "id: order" lines for the mission HUD (SPEC-P1-06 order-state widget). */
 	TArray<FString> GetOrderStateLines() const;
 
