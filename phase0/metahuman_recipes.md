@@ -53,6 +53,17 @@
 - **Haar:** streng zilverblond, strak achterover of scherpe korte snit.
 - **Uitstraling:** eervol-door-eigen-code, dodelijk competent — de vijand die je bijna respecteert.
 
+## Beslispunt 15.7 — toon-restyle over MetaHuman-materialen (art-reviewer/owner)
+*Vastgelegd 2026-07-24 na de SentinelC-curatieronde; NIET doorgevoerd — stijl-beleidskeuze.*
+
+De eerste MetaHuman (SentinelC, provisioneel Kaya-slot) draagt fotoreële baked-VT-materialen (`MI_Face_Skin_Baked_LODx_VT`, `MI_Body_Baked_VT`, subsurface-profielen, groom-shaders). Opties:
+
+- **A. Volledige toon-restyle (de bestaande body-weg).** Zelfde pad als DT_BodyDefs `bToonRestyle`: elk materiaal-slot her-dressen met de cel-master (basistextuur wordt luminantie-detail, factie-tint bepaalt hue). Pro: ÉÉN-STIJL-WET (15.5) zonder uitzondering; MetaHumans zitten op dezelfde exposure-tier als de unlit district (lit PBR onderbelicht tot silhouet). Contra: subsurface/oog/lacrimal-shading gaat verloren — ogen kunnen "dood" ogen op close-up.
+- **B. Hybride (aanbeveling agent).** Huid + body + teeth door de toon-master; ogen (`MI_EyeL/R_Baked`), lacrimal en grooms behouden hun eigen shader maar met exposure-compensatie naar de toon-tier. Pro: karakterkoppen blijven leesbaar-Borderlands én de ogen leven in dialoog-close-ups. Contra: twee shading-families op één gezicht — vraagt één 15.8-reviewronde op de vaste camera's.
+- **C. Gedocumenteerde uitzondering.** MetaHuman-shading intact laten voor named characters. Contra: breekt de stijl-wet zichtbaar (fotoreëel hoofd op cel-shaded wereld) — alleen verdedigbaar als B faalt in review.
+
+**Aanbeveling: B**, te valideren met één vaste-camera shotronde (15.8) op het Kaya-slot zodra de gezichts-tier rendert. Keuze is aan art-reviewer/owner; tot die tijd blijft de koppeling data-only (geen runtime-consument van `MetaHumanMesh`, dus niets rendert nog fotoreëel in-game).
+
 ## Wat de agent daarna doet (geen actie van jou)
 - Import koppelen aan `DT_NamedCharacters` (slot per character), toon-restyle over de MetaHuman-materialen, outfit/body-combinatie met onze pack-kleding, idle/gesprekshouding, en de missie/dialoog-hooks per SPEC-P2-04.
 - Zolang een `MH_*` ontbreekt, draait het slot automatisch op de fallback-body uit `DT_BodyDefs` — niets blokkeert.

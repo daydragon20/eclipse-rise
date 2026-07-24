@@ -118,8 +118,10 @@ ok = unreal.DataTableFunctionLibrary.fill_data_table_from_csv_string(arch, ARCH_
 unreal.log(f"DT_EnemyArchetypes: fill={'OK' if ok else 'MISLUKT'} (5 archetypes)")
 eal.save_asset("/Game/Data/DT_EnemyArchetypes")
 
-# Named story-character slots (step 3): MetaHumanMesh blijft leeg tot de
-# eigenaar MH_<Naam> maakt (phase0/metahuman_recipes.md); fallback dresses.
+# Named story-character slots (step 3). SINGLE-WRITER-REGEL (MH-review 24-07):
+# de MetaHumanMesh-kolom is eigendom van setup_metahuman_data.py — dit script
+# vult de tabel alleen CREATE-ONLY. Een re-run op een bestaande tabel laat de
+# named-tabel volledig ongemoeid, anders zou het de Kaya-koppeling stil wissen.
 NAMED_CSV = """---,DisplayName,MetaHumanMesh,FallbackBodyDef,Faction
 Kaya,"Kaya Renn","",Rebel_B,Rebel
 Brick,"Oram \"\"Brick\"\" Bex","",Rebel_A,Rebel
@@ -130,13 +132,14 @@ Kaine,"Grand Marshal Sera Kaine","",RadiantGuard,Dominion"""
 NC_PATH = "/Game/Data/DT_NamedCharacters"
 if eal.does_asset_exist(NC_PATH):
     nc = eal.load_asset(NC_PATH)
+    unreal.log("DT_NamedCharacters bestaat - create-only, niet aangeraakt (MetaHumanMesh-kolom is van setup_metahuman_data.py).")
 else:
     factory = unreal.DataTableFactory()
     factory.set_editor_property("struct", unreal.load_object(None, "/Script/Eclipse.EclipseNamedCharacterRow"))
     nc = unreal.AssetToolsHelpers.get_asset_tools().create_asset("DT_NamedCharacters", "/Game/Data", unreal.DataTable, factory)
-ok = unreal.DataTableFunctionLibrary.fill_data_table_from_csv_string(nc, NAMED_CSV)
-unreal.log(f"DT_NamedCharacters: fill={'OK' if ok else 'MISLUKT'} (6 slots)")
-eal.save_asset(NC_PATH)
+    ok = unreal.DataTableFunctionLibrary.fill_data_table_from_csv_string(nc, NAMED_CSV)
+    unreal.log(f"DT_NamedCharacters: fill={'OK' if ok else 'MISLUKT'} (6 slots)")
+    eal.save_asset(NC_PATH)
 
 setup = eal.load_asset("/Game/Data/DA_CampaignSetup")
 setup.set_editor_property("body_defs", dt)

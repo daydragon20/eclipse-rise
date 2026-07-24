@@ -32,6 +32,12 @@ Eclipse/Content/SciFi*/
 Eclipse/Content/Paragon*/
 Eclipse/Content/Fab/
 
+# MetaHuman/Fab character content: machine-local (908 MB+; re-download per machine via Window->Fab)
+Eclipse/Content/CharacterAssemblies/
+Eclipse/Content/MetaHumans/
+Eclipse/Content/Atira_LODSettings/
+Eclipse/Content/Locodrome/
+
 Eclipse/Content/FD_WarningSigns_V1/
 Eclipse/Content/RustyCarsFree/
 Eclipse/Content/Screen_Damage_Indicator/
