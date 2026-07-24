@@ -153,6 +153,44 @@ bool FEclipseEconomyDeterministicTickTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEconomyFacilityYieldTickTest,
+	"Eclipse.Economy.Ledger.FacilityYieldEntersDayTick",
+	EclipseEconomyTest::TestFlags)
+
+bool FEclipseEconomyFacilityYieldTickTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-03: facility output (the IC's intel) rides the SAME deterministic
+	// day tick as region yields — its own ledger lines (GDD 7.6), and facility
+	// credits count toward the wage clamp like region credits do.
+	FEclipseEconomyTickParams Params = EclipseEconomyTest::MakeParams();
+	Params.Regions.Reset(); // isolate the facility stream
+	Params.FacilityYields.YieldPerDay.Add(EclipseTags::Resource_Intel.GetTag(), 3);
+	Params.FacilityYields.YieldPerDay.Add(EclipseTags::Resource_Credits.GetTag(), 10);
+
+	FEclipseCampaignState State = EclipseEconomyTest::MakeState();
+	State.Wallet.Add(EclipseTags::Resource_Credits.GetTag(), 0); // broke: the 6.5 Act 1 feeling
+
+	FEclipseCampaignTransaction Tick;
+	TestTrue(TEXT("Tick produced"), EclipseEconomyLogic::BuildDayTick(State, Params, Tick));
+
+	TestEqual(TEXT("Facility intel enters the tick (+3, reason FacilityYield)"),
+		EclipseEconomyTest::SumAdjustments(Tick, EclipseTags::Resource_Intel.GetTag(), TEXT("FacilityYield")), 3);
+	TestEqual(TEXT("Facility credits enter the tick (+10)"),
+		EclipseEconomyTest::SumAdjustments(Tick, EclipseTags::Resource_Credits.GetTag(), TEXT("FacilityYield")), 10);
+
+	// Wages due 2 x 15 = 30; only the facility's 10 C exist -> clamped short pay.
+	TestEqual(TEXT("Wage clamp counts facility credits (Wages_Short -10)"),
+		EclipseEconomyTest::SumAdjustments(Tick, EclipseTags::Resource_Credits.GetTag(), TEXT("Wages_Short")), -10);
+
+	// The composed tick must commit against real state (never overdraw).
+	TArray<FEclipseAppliedMutation> Applied;
+	FString Error;
+	TestTrue(TEXT("Tick commits"), EclipseCampaignLogic::CommitTransaction(State, Tick, Applied, Error));
+	TestEqual(TEXT("Credits end at 0 (10 in, 10 out)"), State.GetBalance(EclipseTags::Resource_Credits.GetTag()), 0);
+	TestEqual(TEXT("Intel: 40 + 3"), State.GetBalance(EclipseTags::Resource_Intel.GetTag()), 43);
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEconomyIntelDecayTest,
 	"Eclipse.Economy.Ledger.IntelDecay",
 	EclipseEconomyTest::TestFlags)

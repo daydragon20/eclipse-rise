@@ -56,6 +56,15 @@ public:
 
 private:
 	void EmitEventsForApplied(const TArray<FEclipseAppliedMutation>& Applied);
+
+	/**
+	 * Stamp DA_BaseTuning's construction-tick numbers onto AdvanceDay mutations
+	 * so every day-advance path (hub, debrief, console) ticks with the same
+	 * data (GDD 14.2); without a tuning asset the mutation defaults — the
+	 * SPEC-P2-03 spec values — stand (GDD 14.3.5).
+	 */
+	void StampAdvanceDayTuning(FEclipseCampaignTransaction& Transaction) const;
+
 	void RegisterConsoleCommands();
 	void UnregisterConsoleCommands();
 

@@ -45,6 +45,12 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeEntered)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeExited)
 
+	// Hollow Point base (SPEC-P2-03)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Base_ConstructionStarted)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Base_FacilityBuilt)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Base_FacilityUpgraded)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Base_StaffAssigned)
+
 	// Roster & Memorial (SPEC-P1-07)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierAdded)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierDied)
@@ -63,4 +69,10 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Class_Verb_Momentum)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Class_Verb_Stabilize)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Class_Verb_Killzone)
+
+	// Base staff role identities (SPEC-P2-03 staffing v1). Not events; the
+	// StaffAssigned payload reports the positional role through these — staff
+	// on a building site is the crew, on an operational site the analyst.
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Base_Staff_Crew)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Base_Staff_Analyst)
 }

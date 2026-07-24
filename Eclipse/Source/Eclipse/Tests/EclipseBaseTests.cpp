@@ -9,10 +9,15 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Base/EclipseBaseLogic.h"
+#include "Base/EclipseBaseSubsystem.h"
 #include "Base/EclipseBaseTypes.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/DataTable.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
 #include "Misc/AutomationTest.h"
+#include "Strategy/EclipseCampaignSetupAsset.h"
+#include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseCampaignTypes.h"
 
 namespace EclipseBaseTest
@@ -324,6 +329,214 @@ bool FEclipseBaseRushTest::RunTest(const FString& Parameters)
 	TestFalse(TEXT("Rushing an operational site rejects"), ValidateRush(&Site, Tuning, 9999, Error));
 	TestEqual(TEXT("Operational rush cost is 0"), ComputeRushCost(&Site, Tuning), 0);
 	TestFalse(TEXT("Null site rejects, never crashes"), ValidateRush(nullptr, Tuning, 9999, Error));
+
+	// Guard (review R6/e): ApplyRush on an operational site is a no-op — a
+	// double-apply must never double-bump the level.
+	const FEclipseFacilityCompletion Guarded = ApplyRush(Site);
+	TestEqual(TEXT("Guarded double-rush completes nothing (NewLevel 0)"), Guarded.NewLevel, 0);
+	TestEqual(TEXT("Level not double-bumped"), Site.Level, 1);
+	TestEqual(TEXT("Site stays operational"), Site.DaysRemaining, 0);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBaseUpgradeCompletionTest,
+	"Eclipse.Base.UpgradeCompletionYieldRetentionAndAnalystSuspension",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseBaseUpgradeCompletionTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseBaseLogic;
+
+	// Review R6/b: tick a yielding facility from L1 to L2 and pin three
+	// contracts at once — the completion reads Upgraded (NewLevel == 2, not
+	// Built), the L1 yield keeps flowing during the upgrade, and the analyst
+	// bonus is suspended while Level >= 1 && DaysRemaining > 0 (staff on a
+	// building site is positionally the crew). Rows are test-local data:
+	// which facility has an L2 is data, never code.
+	const FGameplayTag Intel = EclipseTags::Resource_Intel.GetTag();
+	const FEclipseBaseTuningParams Tuning = EclipseBaseTest::MakeTuning();
+	const FName SlotId(TEXT("Slot_D"));
+	const FName FacilityId(TEXT("IntelligenceCenter"));
+	const FGuid Analyst(21, 22, 23, 24);
+
+	FEclipseFacilityRow YieldingRow;
+	FEclipseFacilityLevelData& L1 = YieldingRow.Levels.AddDefaulted_GetRef();
+	L1.BuildDays = 4;
+	L1.YieldPerDay.Add(Intel, 2);
+	FEclipseFacilityLevelData& L2 = YieldingRow.Levels.AddDefaulted_GetRef();
+	L2.BuildDays = 3;
+	L2.YieldPerDay.Add(Intel, 4);
+	const auto Resolver = [&YieldingRow, FacilityId](FName Id) -> const FEclipseFacilityRow* { return Id == FacilityId ? &YieldingRow : nullptr; };
+
+	FEclipseBaseState Base;
+	FEclipseFacilityState& Site = StartConstruction(Base, SlotId, FacilityId, *GetLevelData(&YieldingRow, 1));
+	ApplyRush(Site);
+	Site.AssignedSoldierIds.Add(Analyst);
+	TestEqual(TEXT("Operational + analyst: 2 + 1 Intel"), ComputeFacilityYields(Base, Tuning, Resolver).YieldPerDay.FindRef(Intel), 3);
+
+	// The upgrade order targets L2 through the shared state validator.
+	int32 TargetLevel = 0;
+	FString Error;
+	TestTrue(TEXT("Upgrade order validates on state"), ValidateStartConstructionState(Base, SlotId, FacilityId, TargetLevel, Error));
+	TestEqual(TEXT("Order targets L2"), TargetLevel, 2);
+	StartConstruction(Base, SlotId, FacilityId, *GetLevelData(&YieldingRow, 2));
+	TestEqual(TEXT("Level stays 1 during the upgrade"), Site.Level, 1);
+	TestEqual(TEXT("Upgrade takes the L2 build days"), Site.DaysRemaining, 3);
+
+	// Yield retention + analyst suspension: L1 keeps producing, the staffed
+	// soldier now positionally works construction — no bonus.
+	TestEqual(TEXT("During upgrade: L1 yield retained, bonus suspended (2, not 3 or 4)"),
+		ComputeFacilityYields(Base, Tuning, Resolver).YieldPerDay.FindRef(Intel), 2);
+
+	// Crewed 3-day upgrade completes on tick 2 (crew -1).
+	TestEqual(TEXT("Upgrade day 1: still building"), TickConstructionDay(Base, Tuning).Num(), 0);
+	TestEqual(TEXT("Yield still retained on day 1"), ComputeFacilityYields(Base, Tuning, Resolver).YieldPerDay.FindRef(Intel), 2);
+	TArray<FEclipseFacilityCompletion> Completions = TickConstructionDay(Base, Tuning);
+	TestEqual(TEXT("Upgrade completes on day 2 (crewed)"), Completions.Num(), 1);
+	if (Completions.Num() == 1)
+	{
+		TestEqual(TEXT("Completion is L2 — Upgraded, not Built"), Completions[0].NewLevel, 2);
+		TestEqual(TEXT("Completion names the slot"), Completions[0].SlotId, SlotId);
+		TestEqual(TEXT("Released staff captured before the reset (R6/d)"), Completions[0].ReleasedSoldierIds.Num(), 1);
+		TestTrue(TEXT("Released id is the assigned soldier"), Completions[0].ReleasedSoldierIds.Contains(Analyst));
+	}
+	TestEqual(TEXT("Site operational at L2"), Site.Level, 2);
+	TestEqual(TEXT("Staff released on completion"), Site.AssignedSoldierIds.Num(), 0);
+	TestEqual(TEXT("Post-upgrade: L2 yield, no analyst (released)"), ComputeFacilityYields(Base, Tuning, Resolver).YieldPerDay.FindRef(Intel), 4);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBaseCrewTimingRuleTest,
+	"Eclipse.Base.CrewTimingDataRule",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseBaseCrewTimingRuleTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseBaseLogic;
+
+	// Review R6/c, decided semantics (see TickConstructionDay header): a crew
+	// present on the finishing day earns the full -1, even when assigned
+	// last-minute. The coarse 1-day clock makes that the whole contract; the
+	// optimizer still pays one soldier-day of undeployability per day saved,
+	// and accumulating crew-days would push hidden fractional state into the
+	// save schema. This test pins the rule so a future change is a decision.
+	const FEclipseBaseTuningParams Tuning = EclipseBaseTest::MakeTuning();
+	FEclipseFacilityLevelData FourDays;
+	FourDays.BuildDays = 4;
+
+	// Control: continuously crewed from day 1 completes on day 3 (4 - 1).
+	int32 ControlCompletionDay = 0;
+	{
+		FEclipseBaseState Base;
+		FEclipseFacilityState& Site = StartConstruction(Base, TEXT("Slot_B"), TEXT("Barracks"), FourDays);
+		Site.AssignedSoldierIds.Add(FGuid(1, 1, 1, 1));
+		for (int32 Day = 1; Day <= 4 && ControlCompletionDay == 0; ++Day)
+		{
+			if (TickConstructionDay(Base, Tuning).Num() > 0)
+			{
+				ControlCompletionDay = Day;
+			}
+		}
+		TestEqual(TEXT("Continuous crew: completes day 3"), ControlCompletionDay, 3);
+	}
+
+	// Last-minute crew: uncrewed days 1-2, assigned before day 3 — same day 3.
+	{
+		FEclipseBaseState Base;
+		FEclipseFacilityState& Site = StartConstruction(Base, TEXT("Slot_B"), TEXT("Barracks"), FourDays);
+		TestEqual(TEXT("Day 1 uncrewed: building"), TickConstructionDay(Base, Tuning).Num(), 0);
+		TestEqual(TEXT("Day 2 uncrewed: building"), TickConstructionDay(Base, Tuning).Num(), 0);
+		Site.AssignedSoldierIds.Add(FGuid(2, 2, 2, 2));
+		TArray<FEclipseFacilityCompletion> Completions = TickConstructionDay(Base, Tuning);
+		TestEqual(TEXT("Last-minute crew: completes day 3 — the full -1 (data rule)"), Completions.Num(), 1);
+		if (Completions.Num() == 1)
+		{
+			TestEqual(TEXT("Crew released"), Completions[0].ReleasedSoldierIds.Num(), 1);
+		}
+	}
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBaseWrapperOrderFlowTest,
+	"Eclipse.Base.WrapperOrderFlow",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseBaseWrapperOrderFlowTest::RunTest(const FString& Parameters)
+{
+	// The step-3 wrapper end-to-end against in-memory data: validated orders
+	// become atomic campaign transactions (GDD 14.3.3), the ledger stays the
+	// hard funds gate, and staffing respects the DA_BaseTuning cap.
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseBaseSubsystem* BaseSubsystem = GameInstance->GetSubsystem<UEclipseBaseSubsystem>();
+	if (!TestNotNull(TEXT("Base subsystem exists"), BaseSubsystem))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	UEclipseBaseLayoutAsset* Layout = NewObject<UEclipseBaseLayoutAsset>();
+	Layout->Slots = EclipseBaseTest::MakeSlots();
+	UEclipseBaseTuningAsset* Tuning = NewObject<UEclipseBaseTuningAsset>();
+	Tuning->AnalystBonusResource = EclipseTags::Resource_Intel.GetTag();
+
+	UEclipseCampaignSetupAsset* Setup = NewObject<UEclipseCampaignSetupAsset>();
+	Setup->StartingRosterSize = 2;
+	Setup->StartingResources.Add(EclipseTags::Resource_Materials.GetTag(), 300);
+	Setup->StartingResources.Add(EclipseTags::Resource_Credits.GetTag(), 200);
+	Setup->BaseLayout = Layout;
+	Setup->BaseTuning = Tuning;
+	Setup->Facilities = EclipseBaseTest::MakeFacilitiesTable();
+	Campaign->StartNewCampaign(Setup);
+
+	FString Error;
+
+	// Build order by facility id: the wrapper finds the authored slot (B),
+	// spends 120 M and starts the 2-day build in one commit.
+	TestTrue(TEXT("Barracks order accepted"), BaseSubsystem->TryStartConstruction(TEXT("Barracks"), Error));
+	const FEclipseFacilityState* BarracksSite = Campaign->GetState().BaseState.FindBySlot(TEXT("Slot_B"));
+	TestNotNull(TEXT("Barracks state exists at Slot_B"), BarracksSite);
+	if (BarracksSite != nullptr)
+	{
+		TestEqual(TEXT("2 build days queued"), BarracksSite->DaysRemaining, 2);
+	}
+	TestEqual(TEXT("Materials spent (300 - 120)"), Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag()), 180);
+
+	// Double order on the building slot rejects; an unaffordable IC rejects on
+	// the funds pre-check (the P1-03 rejection reused).
+	TestFalse(TEXT("Second Barracks order rejects"), BaseSubsystem->TryStartConstruction(TEXT("Barracks"), Error));
+	TestTrue(TEXT("Error says under construction"), Error.Contains(TEXT("under construction")));
+	TestFalse(TEXT("IC at 180 M rejects (needs 240)"), BaseSubsystem->TryStartConstruction(TEXT("IntelligenceCenter"), Error));
+	TestTrue(TEXT("Error names materials"), Error.Contains(TEXT("insufficient materials")));
+
+	// Rush: 60 C x 2 days = 120 C, completes in that same commit.
+	// (Re-fetch after every commit: state pointers are reads, not handles.)
+	TestTrue(TEXT("Rush accepted"), BaseSubsystem->TryRushConstruction(TEXT("Slot_B"), Error));
+	BarracksSite = Campaign->GetState().BaseState.FindBySlot(TEXT("Slot_B"));
+	if (BarracksSite != nullptr)
+	{
+		TestEqual(TEXT("Barracks operational at L1"), BarracksSite->Level, 1);
+		TestEqual(TEXT("No days remaining"), BarracksSite->DaysRemaining, 0);
+	}
+	TestEqual(TEXT("Credits spent (200 - 120)"), Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()), 80);
+
+	// Staffing: cap = MaxCrewPerSite (1), one job per person, unassign works.
+	const FGuid SoldierA = Campaign->GetState().Roster[0].SoldierId;
+	const FGuid SoldierB = Campaign->GetState().Roster[1].SoldierId;
+	TestTrue(TEXT("Assign staff to Slot_B"), BaseSubsystem->TryAssignStaff(TEXT("Slot_B"), SoldierA, Error));
+	BarracksSite = Campaign->GetState().BaseState.FindBySlot(TEXT("Slot_B"));
+	if (BarracksSite != nullptr)
+	{
+		TestEqual(TEXT("One soldier assigned"), BarracksSite->AssignedSoldierIds.Num(), 1);
+	}
+	TestFalse(TEXT("Second assignment rejects (cap 1)"), BaseSubsystem->TryAssignStaff(TEXT("Slot_B"), SoldierB, Error));
+	TestTrue(TEXT("Error says fully staffed"), Error.Contains(TEXT("fully staffed")));
+	TestFalse(TEXT("Empty slot rejects staff"), BaseSubsystem->TryAssignStaff(TEXT("Slot_C"), SoldierB, Error));
+	TestTrue(TEXT("Unassign works"), BaseSubsystem->TryUnassignStaff(TEXT("Slot_B"), SoldierA, Error));
+	TestFalse(TEXT("Double unassign rejects"), BaseSubsystem->TryUnassignStaff(TEXT("Slot_B"), SoldierA, Error));
+
+	GameInstance->Shutdown();
 	return true;
 }
 

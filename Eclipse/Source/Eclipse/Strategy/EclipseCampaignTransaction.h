@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Base/EclipseBaseLogic.h"
 #include "GameplayTagContainer.h"
 #include "Strategy/EclipseCampaignTypes.h"
 #include "EclipseCampaignTransaction.generated.h"
@@ -28,7 +29,11 @@ enum class EEclipseCampaignMutationType : uint8
 	CompleteProduction,
 	WoundSoldier,
 	AdvanceDay,
-	MarkMissionServed
+	MarkMissionServed,
+	// SPEC-P2-03 base mutations (14.3.3: base state changes only through here).
+	StartConstruction,
+	RushConstruction,
+	AssignStaff
 };
 
 /**
@@ -81,12 +86,44 @@ struct FEclipseCampaignMutation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FName ProductionItemId;
 
+	/** QueueProduction: days to completion. StartConstruction: build days from DT_Facilities (applied with the never-instant floor of 1). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	int32 EtaDays = 0;
 
 	/** CompleteProduction: loadout option the finished item unlocks (SPEC-P1-03). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FGameplayTag LoadoutTag;
+
+	/** StartConstruction / RushConstruction / AssignStaff: the base slot (SPEC-P2-03). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	FName SlotId;
+
+	/** StartConstruction: DT_Facilities row to build/upgrade at the slot. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	FName FacilityId;
+
+	/**
+	 * AssignStaff: a valid tag assigns (SoldierId at SlotId), an empty tag
+	 * unassigns (SPEC-P2-03: "none = unassign"). The stored role stays
+	 * positional - staff on a building site is the crew, staff on an
+	 * operational site is the analyst - so the tag is intent, not state; the
+	 * emitted StaffAssigned fact reports the role the assignment actually took.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	FGameplayTag StaffRoleTag;
+
+	/**
+	 * AdvanceDay: construction-tick tuning (DA_BaseTuning), stamped onto the
+	 * mutation by the campaign subsystem at commit time so every day - hub,
+	 * debrief, console - ticks with the same data-driven numbers (GDD 14.2).
+	 * Defaults are the SPEC-P2-03 spec values, so headless tests and setups
+	 * without a tuning asset behave to spec (GDD 14.3.5).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	int32 CrewDayReduction = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	int32 MaxStaffPerSite = 1;
 };
 
 USTRUCT(BlueprintType)
@@ -114,6 +151,19 @@ struct FEclipseAppliedMutation
 	int32 NewBalance = 0;
 	int32 DayAfter = 0;
 	int32 ProductionCompletesOnDay = 0;
+
+	/** AdvanceDay (construction tick) / RushConstruction: build steps completed by this mutation (SPEC-P2-03). */
+	TArray<EclipseBaseLogic::FEclipseFacilityCompletion> FacilityCompletions;
+
+	/** StartConstruction: the level this order builds toward, and the campaign day it completes uncrewed. */
+	int32 TargetLevel = 0;
+	int32 EtaDay = 0;
+
+	/** AssignStaff (assign only): true when the site was under construction at apply time - the positional crew role. */
+	bool bAssignedAsCrew = false;
+
+	/** AssignStaff: the facility occupying the slot at apply time (the mutation itself only names the slot). */
+	FName StaffedFacilityId;
 };
 
 namespace EclipseCampaignLogic

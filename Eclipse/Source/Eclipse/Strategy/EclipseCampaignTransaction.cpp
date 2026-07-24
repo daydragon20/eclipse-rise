@@ -207,6 +207,49 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 	}
 	case EEclipseCampaignMutationType::AdvanceDay:
 		return true;
+	case EEclipseCampaignMutationType::StartConstruction:
+	{
+		if (Mutation.EtaDays <= 0)
+		{
+			OutError = TEXT("StartConstruction: build days must be positive");
+			return false;
+		}
+		// State-only invariants via the shared base core (SPEC-P2-03); the
+		// wrapper's ValidateBuildOrder already covered slot-graph placement,
+		// level data and the funds pre-check - and the spend mutations in this
+		// same transaction remain the hard funds gate (P1-03 pattern).
+		int32 TargetLevel = 0;
+		return EclipseBaseLogic::ValidateStartConstructionState(State.BaseState, Mutation.SlotId, Mutation.FacilityId, TargetLevel, OutError);
+	}
+	case EEclipseCampaignMutationType::RushConstruction:
+	{
+		// The credit price travels as an AdjustResource mutation in the same
+		// transaction (atomic); here only the state precondition matters.
+		return EclipseBaseLogic::ValidateRushState(State.BaseState, Mutation.SlotId, OutError);
+	}
+	case EEclipseCampaignMutationType::AssignStaff:
+	{
+		const bool bAssign = Mutation.StaffRoleTag.IsValid();
+		if (bAssign)
+		{
+			const FEclipseSoldierRecord* Soldier = State.FindSoldier(Mutation.SoldierId);
+			if (Soldier == nullptr)
+			{
+				OutError = FString::Printf(TEXT("AssignStaff: unknown soldier %s"), *Mutation.SoldierId.ToString());
+				return false;
+			}
+			if (Soldier->Status != EEclipseSoldierStatus::Available)
+			{
+				// The staffing dilemma cuts both ways: only a deployable soldier
+				// can be committed to base duty (SPEC-P2-03 staffing v1).
+				OutError = FString::Printf(TEXT("AssignStaff: %s is not available"), *Soldier->Name);
+				return false;
+			}
+		}
+		// Unassign carries no roster requirement: a dead or wounded soldier must
+		// always be releasable from a post (GDD 14.3.5 - no stuck states).
+		return EclipseBaseLogic::ValidateStaffChange(State.BaseState, Mutation.SlotId, Mutation.SoldierId, bAssign, OutError);
+	}
 	case EEclipseCampaignMutationType::MarkMissionServed:
 	{
 		const FEclipseSoldierRecord* Soldier = State.FindSoldier(Mutation.SoldierId);
@@ -305,6 +348,39 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 	case EEclipseCampaignMutationType::AdvanceDay:
 	{
 		State.Day += 1;
+		// Construction advances with the day, inside this same commit
+		// (SPEC-P2-03 clock rules: "construction progresses while you fight").
+		// Tuning rides on the mutation (stamped from DA_BaseTuning by the
+		// subsystem; defaults = spec values), keeping this apply pure.
+		EclipseBaseLogic::FEclipseBaseTuningParams Tuning;
+		Tuning.CrewDayReduction = Mutation.CrewDayReduction;
+		Tuning.MaxCrewPerSite = Mutation.MaxStaffPerSite;
+		Applied.FacilityCompletions = EclipseBaseLogic::TickConstructionDay(State.BaseState, Tuning);
+		break;
+	}
+	case EEclipseCampaignMutationType::StartConstruction:
+	{
+		FEclipseFacilityState& Facility = EclipseBaseLogic::StartConstruction(State.BaseState, Mutation.SlotId, Mutation.FacilityId, Mutation.EtaDays);
+		Applied.TargetLevel = Facility.Level + 1;
+		Applied.EtaDay = State.Day + Facility.DaysRemaining;
+		break;
+	}
+	case EEclipseCampaignMutationType::RushConstruction:
+	{
+		FEclipseFacilityState* Facility = State.BaseState.FindBySlot(Mutation.SlotId);
+		check(Facility != nullptr);
+		Applied.FacilityCompletions.Add(EclipseBaseLogic::ApplyRush(*Facility));
+		break;
+	}
+	case EEclipseCampaignMutationType::AssignStaff:
+	{
+		const bool bAssign = Mutation.StaffRoleTag.IsValid();
+		FEclipseFacilityState* Facility = EclipseBaseLogic::ApplyStaffChange(State.BaseState, Mutation.SlotId, Mutation.SoldierId, bAssign);
+		check(Facility != nullptr);
+		// Role is positional (SPEC-P2-03): capture it at apply time so the
+		// emitted fact stays true even if a later mutation changes the site.
+		Applied.bAssignedAsCrew = bAssign && Facility->DaysRemaining > 0;
+		Applied.StaffedFacilityId = Facility->FacilityId;
 		break;
 	}
 	case EEclipseCampaignMutationType::MarkMissionServed:

@@ -1,5 +1,6 @@
 #include "Economy/EclipseEconomySubsystem.h"
 
+#include "Base/EclipseBaseSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
@@ -92,6 +93,13 @@ FEclipseEconomyTickParams UEclipseEconomySubsystem::ResolveTickParams() const
 	FEclipseEconomyTickParams Params;
 	Params.CreditsTag = EclipseTags::Resource_Credits.GetTag();
 	Params.IntelTag = EclipseTags::Resource_Intel.GetTag();
+
+	// Facility output rides the same tick as region yields (SPEC-P2-03: one
+	// deterministic tick); the base wrapper owns the base-data resolution.
+	if (const UEclipseBaseSubsystem* Base = GetGameInstance()->GetSubsystem<UEclipseBaseSubsystem>())
+	{
+		Params.FacilityYields = Base->ComputeTodaysFacilityYields();
+	}
 
 	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
 	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;

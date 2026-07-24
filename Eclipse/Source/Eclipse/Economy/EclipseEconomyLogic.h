@@ -46,6 +46,14 @@ struct FEclipseEconomyTickParams
 	TArray<FEclipseRegionYieldParams> Regions;
 	TArray<FEclipseProductionItemParams> ProductionItems;
 
+	/**
+	 * Facility output entering this same tick, parallel to region yields
+	 * (SPEC-P2-03: one deterministic tick keeps the 12.3 replay contract).
+	 * Resolved by the base wrapper (operational levels + analyst bonus);
+	 * facility credits count toward the wage clamp like region credits do.
+	 */
+	EclipseBaseLogic::FEclipseFacilityYieldParams FacilityYields;
+
 	FGameplayTag CreditsTag;
 	FGameplayTag IntelTag;
 };

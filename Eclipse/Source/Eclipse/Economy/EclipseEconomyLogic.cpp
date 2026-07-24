@@ -56,8 +56,29 @@ bool BuildDayTick(const FEclipseCampaignState& State, const FEclipseEconomyTickP
 		Mutation.Reason = TEXT("RegionYield");
 	}
 
-	// Balance the later mutations validate against includes today's yields.
-	const int32 CreditsAfterYields = State.GetBalance(Params.CreditsTag) + YieldTotals.FindRef(Params.CreditsTag);
+	// 1b. Facility yields (SPEC-P2-03): the base produces in this same tick,
+	//     as its own ledger lines — every number keeps its origin (GDD 7.6).
+	TArray<FGameplayTag> FacilityKeys;
+	Params.FacilityYields.YieldPerDay.GenerateKeyArray(FacilityKeys);
+	FacilityKeys.Sort([](const FGameplayTag& A, const FGameplayTag& B) { return A.GetTagName().LexicalLess(B.GetTagName()); });
+	for (const FGameplayTag& Key : FacilityKeys)
+	{
+		const int32 Amount = Params.FacilityYields.YieldPerDay[Key];
+		if (Amount > 0)
+		{
+			FEclipseCampaignMutation& Mutation = OutTransaction.Mutations.AddDefaulted_GetRef();
+			Mutation.Type = EEclipseCampaignMutationType::AdjustResource;
+			Mutation.ResourceType = Key;
+			Mutation.Amount = Amount;
+			Mutation.Reason = TEXT("FacilityYield");
+		}
+	}
+
+	// Balance the later mutations validate against includes today's yields
+	// (region and facility alike — the wage clamp sees the whole day's income).
+	const int32 CreditsAfterYields = State.GetBalance(Params.CreditsTag)
+		+ YieldTotals.FindRef(Params.CreditsTag)
+		+ FMath::Max(0, Params.FacilityYields.YieldPerDay.FindRef(Params.CreditsTag));
 
 	// 2. Wages (GDD 6.4.1 stub): every non-dead soldier draws pay — wounded
 	//    soldiers on payroll is deliberate (people, not units).

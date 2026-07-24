@@ -186,6 +186,37 @@ struct FEclipseRosterEventPayload
 	int32 DaysOut = 0;
 };
 
+/** Event.Base.* — Hollow Point construction/staffing facts (SPEC-P2-03), emitted only by the CampaignState commit (GDD 14.3.3). */
+USTRUCT(BlueprintType)
+struct FEclipseBaseEventPayload
+{
+	GENERATED_BODY()
+
+	/** The authored facility slot (UEclipseBaseLayoutAsset slot-graph). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName SlotId;
+
+	/** DT_Facilities row occupying/entering the slot. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName FacilityId;
+
+	/** ConstructionStarted: target level. FacilityBuilt: 1. FacilityUpgraded: the new level. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 Level = 0;
+
+	/** ConstructionStarted: campaign day the build completes uncrewed (a crew or rush beats it). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 EtaDay = 0;
+
+	/** StaffAssigned: the (un)assigned soldier (same id type as FEclipseRosterEventPayload). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FGuid SoldierId;
+
+	/** StaffAssigned: Base.Staff.Crew / Base.Staff.Analyst (positional role at commit), empty = unassigned. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FGameplayTag RoleTag;
+};
+
 /** Event.Command.* — Command Mode lifecycle facts (SPEC-P2-02). */
 USTRUCT(BlueprintType)
 struct FEclipseCommandEventPayload

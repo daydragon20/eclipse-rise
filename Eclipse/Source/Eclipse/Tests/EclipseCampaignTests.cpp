@@ -284,6 +284,25 @@ bool FEclipseCampaignSaveRoundTripTest::RunTest(const FString& Parameters)
 	Flip.Mutations.Add(Owner);
 	TestTrue(TEXT("Region flip commits"), Source.Campaign->CommitTransaction(Flip, Error));
 
+	// A MANNED facility in the fixture (SPEC-P2-03 review R6/a): the staff-guid
+	// serialization loops must be exercised by the hash-equality assert below —
+	// an unmanned base would leave them dead code in this round trip.
+	FEclipseCampaignTransaction BaseOrders;
+	BaseOrders.Source = TEXT("Test");
+	FEclipseCampaignMutation Build;
+	Build.Type = EEclipseCampaignMutationType::StartConstruction;
+	Build.SlotId = TEXT("Slot_D");
+	Build.FacilityId = TEXT("IntelligenceCenter");
+	Build.EtaDays = 4;
+	BaseOrders.Mutations.Add(Build);
+	FEclipseCampaignMutation Staff;
+	Staff.Type = EEclipseCampaignMutationType::AssignStaff;
+	Staff.SlotId = TEXT("Slot_D");
+	Staff.SoldierId = FGuid(5, 6, 7, 8); // Oscar Line, alive and Available
+	Staff.StaffRoleTag = EclipseTags::Base_Staff_Crew.GetTag();
+	BaseOrders.Mutations.Add(Staff);
+	TestTrue(TEXT("Base build + staff commits"), Source.Campaign->CommitTransaction(BaseOrders, Error));
+
 	const uint32 SourceHash = Source.Campaign->GetState().ComputeStateHash();
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
@@ -299,6 +318,18 @@ bool FEclipseCampaignSaveRoundTripTest::RunTest(const FString& Parameters)
 		TestTrue(TEXT("Dead soldier stays dead across save/load"), DeadSoldier->Status == EEclipseSoldierStatus::Dead);
 	}
 	TestEqual(TEXT("Memorial survives save/load"), Target.Campaign->GetState().Memorial.Num(), 1);
+
+	// The manned facility survives byte-for-byte (R6/a): construction state and
+	// the assigned soldier guid both round-trip.
+	const FEclipseFacilityState* MannedSite = Target.Campaign->GetState().BaseState.FindBySlot(TEXT("Slot_D"));
+	TestNotNull(TEXT("Manned facility survives save/load"), MannedSite);
+	if (MannedSite != nullptr)
+	{
+		TestEqual(TEXT("Facility id round-trips"), MannedSite->FacilityId, FName(TEXT("IntelligenceCenter")));
+		TestEqual(TEXT("Construction days round-trip"), MannedSite->DaysRemaining, 4);
+		TestEqual(TEXT("Exactly one staff assignment"), MannedSite->AssignedSoldierIds.Num(), 1);
+		TestTrue(TEXT("Staff guid round-trips"), MannedSite->AssignedSoldierIds.Contains(FGuid(5, 6, 7, 8)));
+	}
 
 	IFileManager::Get().Delete(*UEclipseSaveSubsystem::GetSlotFilePath(SlotName), false, true, true);
 	Source.Shutdown();
@@ -343,6 +374,181 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 	IFileManager::Get().Delete(*SlotPath, false, true, true);
 	Source.Shutdown();
 	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignBaseCommitEventsTest,
+	"Eclipse.Strategy.Campaign.BaseCommitEmitsEvents",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignBaseCommitEventsTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-03 events contract: all four Event.Base.* facts leave the
+	// CampaignState commit and only the commit — build order, staffing (with
+	// the positional role), day-tick completion incl. the staff release, and
+	// rush completing in its own commit (spec lines 100-105).
+	EclipseCampaignTest::FFixture Fixture = EclipseCampaignTest::FFixture::Make();
+
+	TArray<TPair<FGameplayTag, FEclipseBaseEventPayload>> BaseEvents;
+	const FGameplayTag BaseFamily = EclipseTags::Event_Base_FacilityBuilt.GetTag().RequestDirectParent();
+	FEclipseEventSubscriptionHandle Handle = Fixture.Bus->Subscribe(
+		BaseFamily,
+		FEclipseEventNativeDelegate::CreateLambda([&BaseEvents](FGameplayTag Tag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseBaseEventPayload* Base = Payload.GetPtr<FEclipseBaseEventPayload>())
+			{
+				BaseEvents.Emplace(Tag, *Base);
+			}
+		}));
+
+	auto CountOf = [&BaseEvents](const FGameplayTag& Tag)
+	{
+		int32 Count = 0;
+		for (const TPair<FGameplayTag, FEclipseBaseEventPayload>& Event : BaseEvents)
+		{
+			if (Event.Key == Tag)
+			{
+				++Count;
+			}
+		}
+		return Count;
+	};
+
+	const FGuid Crew(11, 12, 13, 14);
+	FString Error;
+
+	// Seed: wallet + one Available soldier for staffing.
+	FEclipseCampaignTransaction Seed;
+	Seed.Source = TEXT("Test");
+	Seed.Mutations.Add(EclipseCampaignTest::MakeAdjustResource(EclipseTags::Resource_Materials.GetTag(), 500, TEXT("Seed")));
+	Seed.Mutations.Add(EclipseCampaignTest::MakeAdjustResource(EclipseTags::Resource_Credits.GetTag(), 500, TEXT("Seed")));
+	Seed.Mutations.Add(EclipseCampaignTest::MakeAddSoldier(Crew, TEXT("Mira Voss")));
+	TestTrue(TEXT("Seed commits"), Fixture.Campaign->CommitTransaction(Seed, Error));
+	TestEqual(TEXT("Seed emits no base events"), BaseEvents.Num(), 0);
+
+	// Build order: spend + start atomically -> exactly one ConstructionStarted.
+	FEclipseCampaignTransaction BuildOrder;
+	BuildOrder.Source = TEXT("Test");
+	BuildOrder.Mutations.Add(EclipseCampaignTest::MakeAdjustResource(EclipseTags::Resource_Materials.GetTag(), -240, TEXT("Build_IntelligenceCenter")));
+	{
+		FEclipseCampaignMutation& Start = BuildOrder.Mutations.AddDefaulted_GetRef();
+		Start.Type = EEclipseCampaignMutationType::StartConstruction;
+		Start.SlotId = TEXT("Slot_D");
+		Start.FacilityId = TEXT("IntelligenceCenter");
+		Start.EtaDays = 4;
+	}
+	TestTrue(TEXT("Build order commits"), Fixture.Campaign->CommitTransaction(BuildOrder, Error));
+	TestEqual(TEXT("ConstructionStarted emitted once"), CountOf(EclipseTags::Event_Base_ConstructionStarted), 1);
+	if (BaseEvents.Num() == 1)
+	{
+		const FEclipseBaseEventPayload& Started = BaseEvents[0].Value;
+		TestEqual(TEXT("Payload names the slot"), Started.SlotId, FName(TEXT("Slot_D")));
+		TestEqual(TEXT("Payload names the facility"), Started.FacilityId, FName(TEXT("IntelligenceCenter")));
+		TestEqual(TEXT("Target level is 1"), Started.Level, 1);
+		TestEqual(TEXT("ETA = day 0 + 4 uncrewed days"), Started.EtaDay, 4);
+	}
+
+	// Staffing: the fact carries the positional role - a building site takes a crew.
+	FEclipseCampaignTransaction StaffOrder;
+	StaffOrder.Source = TEXT("Test");
+	{
+		FEclipseCampaignMutation& Assign = StaffOrder.Mutations.AddDefaulted_GetRef();
+		Assign.Type = EEclipseCampaignMutationType::AssignStaff;
+		Assign.SlotId = TEXT("Slot_D");
+		Assign.SoldierId = Crew;
+		Assign.StaffRoleTag = EclipseTags::Base_Staff_Crew.GetTag();
+	}
+	TestTrue(TEXT("Staff order commits"), Fixture.Campaign->CommitTransaction(StaffOrder, Error));
+	TestEqual(TEXT("StaffAssigned emitted once"), CountOf(EclipseTags::Event_Base_StaffAssigned), 1);
+	if (BaseEvents.Num() == 2)
+	{
+		TestEqual(TEXT("Assigned soldier in payload"), BaseEvents[1].Value.SoldierId, Crew);
+		TestEqual(TEXT("Role is crew (positional: site under construction)"), BaseEvents[1].Value.RoleTag, EclipseTags::Base_Staff_Crew.GetTag());
+	}
+
+	// Day ticks: crewed 4-day build completes on day 3 - FacilityBuilt and the
+	// staff release (StaffAssigned, empty role) leave that same AdvanceDay commit.
+	auto AdvanceOneDay = [&Fixture, &Error]()
+	{
+		FEclipseCampaignTransaction Advance;
+		Advance.Source = TEXT("Test");
+		FEclipseCampaignMutation& Mutation = Advance.Mutations.AddDefaulted_GetRef();
+		Mutation.Type = EEclipseCampaignMutationType::AdvanceDay;
+		return Fixture.Campaign->CommitTransaction(Advance, Error);
+	};
+	TestTrue(TEXT("Day 1 commits"), AdvanceOneDay());
+	TestTrue(TEXT("Day 2 commits"), AdvanceOneDay());
+	TestEqual(TEXT("Nothing built after 2 days"), CountOf(EclipseTags::Event_Base_FacilityBuilt), 0);
+	TestTrue(TEXT("Day 3 commits"), AdvanceOneDay());
+	TestEqual(TEXT("FacilityBuilt emitted on the completing tick"), CountOf(EclipseTags::Event_Base_FacilityBuilt), 1);
+	TestEqual(TEXT("Completion releases the crew (second StaffAssigned)"), CountOf(EclipseTags::Event_Base_StaffAssigned), 2);
+	if (BaseEvents.Num() == 4)
+	{
+		TestEqual(TEXT("Built at L1"), BaseEvents[2].Value.Level, 1);
+		TestEqual(TEXT("Release names the crew"), BaseEvents[3].Value.SoldierId, Crew);
+		TestFalse(TEXT("Release role is empty (none = unassigned)"), BaseEvents[3].Value.RoleTag.IsValid());
+	}
+	const FEclipseFacilityState* Site = Fixture.Campaign->GetState().BaseState.FindBySlot(TEXT("Slot_D"));
+	TestNotNull(TEXT("Site exists"), Site);
+	if (Site != nullptr)
+	{
+		TestEqual(TEXT("Site operational at L1"), Site->Level, 1);
+		TestEqual(TEXT("Crew released in state"), Site->AssignedSoldierIds.Num(), 0);
+	}
+
+	// Upgrade order + rush: FacilityUpgraded fires in the SAME commit as the
+	// rush mutation (SPEC-P2-03 clock rules), never a tick later.
+	FEclipseCampaignTransaction UpgradeOrder;
+	UpgradeOrder.Source = TEXT("Test");
+	{
+		FEclipseCampaignMutation& Start = UpgradeOrder.Mutations.AddDefaulted_GetRef();
+		Start.Type = EEclipseCampaignMutationType::StartConstruction;
+		Start.SlotId = TEXT("Slot_D");
+		Start.FacilityId = TEXT("IntelligenceCenter");
+		Start.EtaDays = 2;
+	}
+	TestTrue(TEXT("Upgrade order commits"), Fixture.Campaign->CommitTransaction(UpgradeOrder, Error));
+	TestEqual(TEXT("Second ConstructionStarted"), CountOf(EclipseTags::Event_Base_ConstructionStarted), 2);
+	if (BaseEvents.Num() == 5)
+	{
+		TestEqual(TEXT("Upgrade order targets L2"), BaseEvents[4].Value.Level, 2);
+		TestEqual(TEXT("Upgrade ETA = day 3 + 2"), BaseEvents[4].Value.EtaDay, 5);
+	}
+
+	FEclipseCampaignTransaction RushOrder;
+	RushOrder.Source = TEXT("Test");
+	RushOrder.Mutations.Add(EclipseCampaignTest::MakeAdjustResource(EclipseTags::Resource_Credits.GetTag(), -120, TEXT("Rush_IntelligenceCenter")));
+	{
+		FEclipseCampaignMutation& Rush = RushOrder.Mutations.AddDefaulted_GetRef();
+		Rush.Type = EEclipseCampaignMutationType::RushConstruction;
+		Rush.SlotId = TEXT("Slot_D");
+	}
+	TestTrue(TEXT("Rush commits"), Fixture.Campaign->CommitTransaction(RushOrder, Error));
+	TestEqual(TEXT("FacilityUpgraded in the rush commit itself"), CountOf(EclipseTags::Event_Base_FacilityUpgraded), 1);
+	TestEqual(TEXT("Rush never reads as Built"), CountOf(EclipseTags::Event_Base_FacilityBuilt), 1);
+	Site = Fixture.Campaign->GetState().BaseState.FindBySlot(TEXT("Slot_D"));
+	if (Site != nullptr)
+	{
+		TestEqual(TEXT("Site operational at L2"), Site->Level, 2);
+	}
+
+	// Atomicity: an invalid base mutation rejects the whole transaction and
+	// leaks no facts (the P1-02 contract holds for the new mutation types).
+	const int32 EventsBefore = BaseEvents.Num();
+	const uint32 HashBefore = Fixture.Campaign->GetState().ComputeStateHash();
+	FEclipseCampaignTransaction BadRush;
+	BadRush.Source = TEXT("Test");
+	{
+		FEclipseCampaignMutation& Rush = BadRush.Mutations.AddDefaulted_GetRef();
+		Rush.Type = EEclipseCampaignMutationType::RushConstruction;
+		Rush.SlotId = TEXT("Slot_D"); // operational: nothing to rush
+	}
+	TestFalse(TEXT("Rushing an operational site rejects"), Fixture.Campaign->CommitTransaction(BadRush, Error));
+	TestEqual(TEXT("No events leaked from the rejected commit"), BaseEvents.Num(), EventsBefore);
+	TestEqual(TEXT("State untouched"), Fixture.Campaign->GetState().ComputeStateHash(), HashBefore);
+
+	Fixture.Bus->Unsubscribe(Handle);
+	Fixture.Shutdown();
 	return true;
 }
 

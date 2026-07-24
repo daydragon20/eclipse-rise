@@ -16,14 +16,18 @@ namespace
 	{
 		Facility.Level += 1;
 		Facility.DaysRemaining = 0;
-		// The crew's job is done; keeping them assigned would silently convert
-		// construction crew into analysts (SPEC-P2-03 keeps that an explicit order).
-		Facility.AssignedSoldierIds.Reset();
 
 		FEclipseFacilityCompletion Completion;
 		Completion.SlotId = Facility.SlotId;
 		Completion.FacilityId = Facility.FacilityId;
 		Completion.NewLevel = Facility.Level;
+		// Capture the released staff BEFORE the reset so the commit can emit
+		// StaffAssigned(RoleTag none) per soldier (SPEC-P2-03 review R6/d).
+		Completion.ReleasedSoldierIds = Facility.AssignedSoldierIds;
+
+		// The crew's job is done; keeping them assigned would silently convert
+		// construction crew into analysts (SPEC-P2-03 keeps that an explicit order).
+		Facility.AssignedSoldierIds.Reset();
 		return Completion;
 	}
 }
@@ -75,23 +79,12 @@ bool ValidateBuildOrder(const FEclipseBaseState& BaseState, TConstArrayView<FEcl
 		return false;
 	}
 
+	// State-only invariants + target level: one source of truth shared with the
+	// mutation layer's validation (GDD 14.3.3 - the commit re-checks these).
 	int32 TargetLevel = 1;
-	if (const FEclipseFacilityState* Existing = BaseState.FindBySlot(SlotId))
+	if (!ValidateStartConstructionState(BaseState, SlotId, FacilityId, TargetLevel, OutError))
 	{
-		if (Existing->DaysRemaining > 0)
-		{
-			OutError = FString::Printf(TEXT("Build: slot '%s' is already under construction"), *SlotId.ToString());
-			return false;
-		}
-		if (Existing->Level > 0)
-		{
-			if (Existing->FacilityId != FacilityId)
-			{
-				OutError = FString::Printf(TEXT("Build: slot '%s' is occupied by '%s'"), *SlotId.ToString(), *Existing->FacilityId.ToString());
-				return false;
-			}
-			TargetLevel = Existing->Level + 1; // same facility, operational: this is an upgrade order
-		}
+		return false;
 	}
 
 	const FEclipseFacilityLevelData* LevelData = GetLevelData(FacilityRow, TargetLevel);
@@ -120,7 +113,36 @@ bool ValidateBuildOrder(const FEclipseBaseState& BaseState, TConstArrayView<FEcl
 	return true;
 }
 
-FEclipseFacilityState& StartConstruction(FEclipseBaseState& BaseState, FName SlotId, FName FacilityId, const FEclipseFacilityLevelData& LevelData)
+bool ValidateStartConstructionState(const FEclipseBaseState& BaseState, FName SlotId, FName FacilityId, int32& OutTargetLevel, FString& OutError)
+{
+	OutTargetLevel = 1;
+	if (SlotId.IsNone() || FacilityId.IsNone())
+	{
+		OutError = TEXT("Build: slot and facility ids must be set");
+		return false;
+	}
+
+	if (const FEclipseFacilityState* Existing = BaseState.FindBySlot(SlotId))
+	{
+		if (Existing->DaysRemaining > 0)
+		{
+			OutError = FString::Printf(TEXT("Build: slot '%s' is already under construction"), *SlotId.ToString());
+			return false;
+		}
+		if (Existing->Level > 0)
+		{
+			if (Existing->FacilityId != FacilityId)
+			{
+				OutError = FString::Printf(TEXT("Build: slot '%s' is occupied by '%s'"), *SlotId.ToString(), *Existing->FacilityId.ToString());
+				return false;
+			}
+			OutTargetLevel = Existing->Level + 1; // same facility, operational: this is an upgrade order
+		}
+	}
+	return true;
+}
+
+FEclipseFacilityState& StartConstruction(FEclipseBaseState& BaseState, FName SlotId, FName FacilityId, int32 BuildDays)
 {
 	FEclipseFacilityState* Facility = BaseState.FindBySlot(SlotId);
 	if (Facility == nullptr)
@@ -131,8 +153,13 @@ FEclipseFacilityState& StartConstruction(FEclipseBaseState& BaseState, FName Slo
 	Facility->FacilityId = FacilityId;
 	// Construction is never free time-wise: even a 0-day data row costs one
 	// strategic day. Rush is the only instant path (5.4 money vs. time).
-	Facility->DaysRemaining = FMath::Max(1, LevelData.BuildDays);
+	Facility->DaysRemaining = FMath::Max(1, BuildDays);
 	return *Facility;
+}
+
+FEclipseFacilityState& StartConstruction(FEclipseBaseState& BaseState, FName SlotId, FName FacilityId, const FEclipseFacilityLevelData& LevelData)
+{
+	return StartConstruction(BaseState, SlotId, FacilityId, LevelData.BuildDays);
 }
 
 TArray<FEclipseFacilityCompletion> TickConstructionDay(FEclipseBaseState& BaseState, const FEclipseBaseTuningParams& Tuning)
@@ -187,9 +214,86 @@ bool ValidateRush(const FEclipseFacilityState* Facility, const FEclipseBaseTunin
 	return true;
 }
 
+bool ValidateRushState(const FEclipseBaseState& BaseState, FName SlotId, FString& OutError)
+{
+	const FEclipseFacilityState* Facility = BaseState.FindBySlot(SlotId);
+	if (Facility == nullptr || Facility->DaysRemaining <= 0)
+	{
+		OutError = FString::Printf(TEXT("Rush: nothing under construction at slot '%s'"), *SlotId.ToString());
+		return false;
+	}
+	return true;
+}
+
 FEclipseFacilityCompletion ApplyRush(FEclipseFacilityState& Facility)
 {
+	if (Facility.DaysRemaining <= 0)
+	{
+		// Guard (SPEC-P2-03 review R6/e): rushing an operational site is a no-op
+		// - a double-apply must never double-bump the level. NewLevel = 0 tells
+		// the caller nothing completed.
+		FEclipseFacilityCompletion NoOp;
+		NoOp.SlotId = Facility.SlotId;
+		NoOp.FacilityId = Facility.FacilityId;
+		return NoOp;
+	}
 	return CompleteConstruction(Facility);
+}
+
+bool ValidateStaffChange(const FEclipseBaseState& BaseState, FName SlotId, const FGuid& SoldierId, bool bAssign, FString& OutError)
+{
+	if (!SoldierId.IsValid())
+	{
+		OutError = TEXT("Staff: soldier id is not set");
+		return false;
+	}
+
+	const FEclipseFacilityState* Facility = BaseState.FindBySlot(SlotId);
+	if (Facility == nullptr)
+	{
+		// An empty, never-built slot has no facility state to staff; the crew
+		// arrives with the construction order, not before.
+		OutError = FString::Printf(TEXT("Staff: no facility at slot '%s'"), *SlotId.ToString());
+		return false;
+	}
+
+	if (bAssign)
+	{
+		// One person, one job (SPEC-P2-03 staffing v1: assignment makes the
+		// soldier undeployable - a double booking would double-spend them).
+		for (const FEclipseFacilityState& Other : BaseState.Facilities)
+		{
+			if (Other.AssignedSoldierIds.Contains(SoldierId))
+			{
+				OutError = FString::Printf(TEXT("Staff: soldier %s is already assigned at slot '%s'"), *SoldierId.ToString(), *Other.SlotId.ToString());
+				return false;
+			}
+		}
+	}
+	else if (!Facility->AssignedSoldierIds.Contains(SoldierId))
+	{
+		OutError = FString::Printf(TEXT("Staff: soldier %s is not assigned at slot '%s'"), *SoldierId.ToString(), *SlotId.ToString());
+		return false;
+	}
+	return true;
+}
+
+FEclipseFacilityState* ApplyStaffChange(FEclipseBaseState& BaseState, FName SlotId, const FGuid& SoldierId, bool bAssign)
+{
+	FEclipseFacilityState* Facility = BaseState.FindBySlot(SlotId);
+	if (Facility == nullptr)
+	{
+		return nullptr;
+	}
+	if (bAssign)
+	{
+		Facility->AssignedSoldierIds.AddUnique(SoldierId);
+	}
+	else
+	{
+		Facility->AssignedSoldierIds.Remove(SoldierId);
+	}
+	return Facility;
 }
 
 FEclipseFacilityYieldParams ComputeFacilityYields(const FEclipseBaseState& BaseState, const FEclipseBaseTuningParams& Tuning, FEclipseFacilityRowResolver FindFacilityRow)

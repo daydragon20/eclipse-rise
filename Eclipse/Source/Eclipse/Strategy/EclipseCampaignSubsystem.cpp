@@ -1,5 +1,6 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 
+#include "Base/EclipseBaseTypes.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
@@ -403,8 +404,11 @@ void UEclipseCampaignSubsystem::StartNewCampaign(const UEclipseCampaignSetupAsse
 
 bool UEclipseCampaignSubsystem::CommitTransaction(const FEclipseCampaignTransaction& Transaction, FString& OutError)
 {
+	FEclipseCampaignTransaction Stamped = Transaction;
+	StampAdvanceDayTuning(Stamped);
+
 	TArray<FEclipseAppliedMutation> Applied;
-	if (!EclipseCampaignLogic::CommitTransaction(State, Transaction, Applied, OutError))
+	if (!EclipseCampaignLogic::CommitTransaction(State, Stamped, Applied, OutError))
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Campaign transaction from '%s' rejected: %s"), *Transaction.Source.ToString(), *OutError);
 		return false;
@@ -412,6 +416,23 @@ bool UEclipseCampaignSubsystem::CommitTransaction(const FEclipseCampaignTransact
 
 	EmitEventsForApplied(Applied);
 	return true;
+}
+
+void UEclipseCampaignSubsystem::StampAdvanceDayTuning(FEclipseCampaignTransaction& Transaction) const
+{
+	const UEclipseBaseTuningAsset* Tuning = ActiveSetup != nullptr ? ActiveSetup->BaseTuning.LoadSynchronous() : nullptr;
+	if (Tuning == nullptr)
+	{
+		return; // mutation defaults are the SPEC-P2-03 values (GDD 14.3.5)
+	}
+	for (FEclipseCampaignMutation& Mutation : Transaction.Mutations)
+	{
+		if (Mutation.Type == EEclipseCampaignMutationType::AdvanceDay)
+		{
+			Mutation.CrewDayReduction = Tuning->CrewDayReduction;
+			Mutation.MaxStaffPerSite = Tuning->MaxCrewPerSite;
+		}
+	}
 }
 
 bool UEclipseCampaignSubsystem::CommitTransactionBP(const FEclipseCampaignTransaction& Transaction)
@@ -429,6 +450,37 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 		UE_LOG(LogEclipse, Warning, TEXT("Campaign commit applied but no event bus is available — facts not broadcast."));
 		return;
 	}
+
+	// Build steps completed inside a commit (day tick or rush) become facts in
+	// that same commit (SPEC-P2-03 clock rules), including the staff release
+	// as StaffAssigned with an empty role (review R6/d).
+	auto BroadcastCompletions = [Bus](const TArray<EclipseBaseLogic::FEclipseFacilityCompletion>& Completions)
+	{
+		for (const EclipseBaseLogic::FEclipseFacilityCompletion& Completion : Completions)
+		{
+			if (Completion.NewLevel < 1)
+			{
+				continue; // guarded no-op (e.g. rushing an operational site): nothing happened, no fact
+			}
+
+			FEclipseBaseEventPayload Payload;
+			Payload.SlotId = Completion.SlotId;
+			Payload.FacilityId = Completion.FacilityId;
+			Payload.Level = Completion.NewLevel;
+			Bus->Broadcast(Completion.NewLevel == 1 ? EclipseTags::Event_Base_FacilityBuilt : EclipseTags::Event_Base_FacilityUpgraded,
+				FInstancedStruct::Make(Payload));
+
+			for (const FGuid& ReleasedId : Completion.ReleasedSoldierIds)
+			{
+				FEclipseBaseEventPayload Release;
+				Release.SlotId = Completion.SlotId;
+				Release.FacilityId = Completion.FacilityId;
+				Release.SoldierId = ReleasedId;
+				// RoleTag stays empty: "none = unassign" (SPEC-P2-03 events table).
+				Bus->Broadcast(EclipseTags::Event_Base_StaffAssigned, FInstancedStruct::Make(Release));
+			}
+		}
+	};
 
 	for (const FEclipseAppliedMutation& Record : Applied)
 	{
@@ -513,6 +565,39 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			FEclipseCampaignEventPayload Payload;
 			Payload.Day = Record.DayAfter;
 			Bus->Broadcast(EclipseTags::Event_Campaign_DayAdvanced, FInstancedStruct::Make(Payload));
+			// Construction that finished on this day's tick (SPEC-P2-03).
+			BroadcastCompletions(Record.FacilityCompletions);
+			break;
+		}
+		case EEclipseCampaignMutationType::StartConstruction:
+		{
+			FEclipseBaseEventPayload Payload;
+			Payload.SlotId = Mutation.SlotId;
+			Payload.FacilityId = Mutation.FacilityId;
+			Payload.Level = Record.TargetLevel;
+			Payload.EtaDay = Record.EtaDay;
+			Bus->Broadcast(EclipseTags::Event_Base_ConstructionStarted, FInstancedStruct::Make(Payload));
+			break;
+		}
+		case EEclipseCampaignMutationType::RushConstruction:
+		{
+			// Rush = instant completion: FacilityBuilt/Upgraded fires in this
+			// same commit as the rush mutation (SPEC-P2-03 clock rules).
+			BroadcastCompletions(Record.FacilityCompletions);
+			break;
+		}
+		case EEclipseCampaignMutationType::AssignStaff:
+		{
+			FEclipseBaseEventPayload Payload;
+			Payload.SlotId = Mutation.SlotId;
+			Payload.FacilityId = Record.StaffedFacilityId;
+			Payload.SoldierId = Mutation.SoldierId;
+			if (Mutation.StaffRoleTag.IsValid())
+			{
+				// The positional role the assignment actually took at apply time.
+				Payload.RoleTag = Record.bAssignedAsCrew ? EclipseTags::Base_Staff_Crew.GetTag() : EclipseTags::Base_Staff_Analyst.GetTag();
+			}
+			Bus->Broadcast(EclipseTags::Event_Base_StaffAssigned, FInstancedStruct::Make(Payload));
 			break;
 		}
 		default:

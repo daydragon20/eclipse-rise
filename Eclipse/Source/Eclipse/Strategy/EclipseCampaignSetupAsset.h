@@ -6,6 +6,8 @@
 #include "EclipseCampaignSetupAsset.generated.h"
 
 class UDataTable;
+class UEclipseBaseLayoutAsset;
+class UEclipseBaseTuningAsset;
 class UEclipseCharacterTuningAsset;
 class UEclipseEconomyDataAsset;
 class UEclipsePrepTuningAsset;
@@ -88,4 +90,16 @@ public:
 	/** Rows: FEclipseNamedCharacterRow — story-character slots (step-3 MetaHuman pipeline, phase0/metahuman_recipes.md). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> NamedCharacters;
+
+	/** The Hollow Point slot-graph (SPEC-P2-03); missing = build orders reject with a logged warning, the loop never gates (GDD 14.3.5). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipseBaseLayoutAsset> BaseLayout;
+
+	/** Base construction tunables (SPEC-P2-03); missing = the spec-default numbers apply. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UEclipseBaseTuningAsset> BaseTuning;
+
+	/** Rows: FEclipseFacilityRow — facility costs/timers/yields per level (SPEC-P2-03). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> Facilities;
 };

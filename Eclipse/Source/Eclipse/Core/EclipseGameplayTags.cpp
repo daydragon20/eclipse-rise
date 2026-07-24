@@ -30,6 +30,11 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeEntered, "Event.Command.ModeEntered", "Command Mode hold began; payload carries the applied dilation (SPEC-P2-02). Audio ducks/filters on this (SPEC-P2-09); UI is a consumer, never the emitter.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeExited, "Event.Command.ModeExited", "Command Mode ended (release or fail-safe); payload carries HeldSeconds + OrdersIssuedWhileHeld — the R3 feel-gauntlet telemetry (SPEC-P2-02).")
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_ConstructionStarted, "Event.Base.ConstructionStarted", "A build/upgrade order was accepted at a slot; emitted by CampaignState commit only (SPEC-P2-03).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_FacilityBuilt, "Event.Base.FacilityBuilt", "A facility reached L1 (day tick or rush, in that commit); vault presentation swaps the slot state on this (SPEC-P2-03, GDD 5.4).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_FacilityUpgraded, "Event.Base.FacilityUpgraded", "A facility reached L2+ (slice: Workshop only, per data); emitted by CampaignState commit only (SPEC-P2-03).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_StaffAssigned, "Event.Base.StaffAssigned", "Base staffing changed (crew/analyst by position, empty role = unassigned incl. completion release); emitted by CampaignState commit only (SPEC-P2-03).")
+
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierAdded, "Event.Roster.SoldierAdded", "A soldier joined the roster; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierDied, "Event.Roster.SoldierDied", "A soldier died permanently; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierWounded, "Event.Roster.SoldierWounded", "A soldier was wounded and is out N days; emitted by CampaignState commit only (SPEC-P1-07).")
@@ -42,4 +47,7 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Class_Verb_Momentum, "Class.Verb.Momentum", "Assault signature verb identity (GDD 4.2.3); mechanics land per-spec, numbers in DT_ClassDefs.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Class_Verb_Stabilize, "Class.Verb.Stabilize", "Medic signature verb identity (GDD 4.2.3/4.2.5); window seconds live in DT_ClassDefs.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Class_Verb_Killzone, "Class.Verb.Killzone", "Sniper signature verb identity (GDD 4.2.3); lane range lives in DT_ClassDefs (Command Mode wiring = SPEC-P2-02).")
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Base_Staff_Crew, "Base.Staff.Crew", "Construction-crew role identity (SPEC-P2-03 staffing v1); positional — staff on a building site. Day reduction lives in DA_BaseTuning.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Base_Staff_Analyst, "Base.Staff.Analyst", "IC-analyst role identity (SPEC-P2-03 staffing v1); positional — staff on an operational site. Bonus lives in DA_BaseTuning.")
 }
