@@ -15,8 +15,9 @@ namespace EclipseSave
 	 * v2: Campaign block gained UnlockedLoadoutTags (SPEC-P1-03).
 	 * v3: Campaign block gained the roster ClassId tail (SPEC-P2-01).
 	 * v4: Campaign block gained the base facility tail (SPEC-P2-03).
+	 * v5: Campaign block gained the story-flag tail (SPEC-P2-04).
 	 */
-	inline constexpr int32 CurrentSchemaVersion = 4;
+	inline constexpr int32 CurrentSchemaVersion = 5;
 
 	inline const FString AutosaveSlotName = TEXT("Autosave");
 	inline const FString ManualSlotName = TEXT("Manual");

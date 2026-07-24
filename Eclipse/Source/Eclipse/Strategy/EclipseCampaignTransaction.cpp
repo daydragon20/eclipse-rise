@@ -68,6 +68,11 @@ uint32 FEclipseCampaignState::ComputeStateHash() const
 		}
 	}
 
+	for (const FGameplayTag& StoryFlag : StoryFlags)
+	{
+		Hash = HashCombine(Hash, GetTypeHash(StoryFlag.GetTagName()));
+	}
+
 	return Hash;
 }
 
@@ -250,6 +255,23 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 		// always be releasable from a post (GDD 14.3.5 - no stuck states).
 		return EclipseBaseLogic::ValidateStaffChange(State.BaseState, Mutation.SlotId, Mutation.SoldierId, bAssign, OutError);
 	}
+	case EEclipseCampaignMutationType::SetStoryFlag:
+	{
+		if (!Mutation.StoryFlagTag.IsValid())
+		{
+			OutError = TEXT("SetStoryFlag: invalid beat tag");
+			return false;
+		}
+		if (State.StoryFlags.Contains(Mutation.StoryFlagTag))
+		{
+			// Same no-op discipline as SetRegionOwner: composers filter via
+			// ShouldCommitBeat; a duplicate reaching the API is a caller bug
+			// worth rejecting loudly (SPEC-P2-04 beat idempotence).
+			OutError = FString::Printf(TEXT("SetStoryFlag: beat %s already set"), *Mutation.StoryFlagTag.ToString());
+			return false;
+		}
+		return true;
+	}
 	case EEclipseCampaignMutationType::MarkMissionServed:
 	{
 		const FEclipseSoldierRecord* Soldier = State.FindSoldier(Mutation.SoldierId);
@@ -381,6 +403,11 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 		// emitted fact stays true even if a later mutation changes the site.
 		Applied.bAssignedAsCrew = bAssign && Facility->DaysRemaining > 0;
 		Applied.StaffedFacilityId = Facility->FacilityId;
+		break;
+	}
+	case EEclipseCampaignMutationType::SetStoryFlag:
+	{
+		State.StoryFlags.Add(Mutation.StoryFlagTag);
 		break;
 	}
 	case EEclipseCampaignMutationType::MarkMissionServed:

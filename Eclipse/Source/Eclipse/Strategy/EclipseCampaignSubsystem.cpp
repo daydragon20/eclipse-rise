@@ -204,8 +204,6 @@ namespace
 			{
 				State.BaseState = FEclipseBaseState();
 			}
-			// Whatever shape came in, the in-memory state is now current.
-			State.SchemaVersion = 4;
 		}
 		else
 		{
@@ -223,6 +221,51 @@ namespace
 				{
 					Ar << SoldierId;
 				}
+			}
+		}
+
+		// Schema v5 (SPEC-P2-04): committed story beats, appended at block end —
+		// the same mechanical tail as v2..v4. A pre-v5 block has no tail: that
+		// campaign simply hasn't reached a beat yet (empty flags), never a crash.
+		if (Ar.IsLoading())
+		{
+			State.StoryFlags.Reset();
+			if (State.SchemaVersion >= 5)
+			{
+				int32 FlagCount = 0;
+				Ar << FlagCount;
+				for (int32 Index = 0; Index < FlagCount && !Ar.IsError(); ++Index)
+				{
+					FName FlagName;
+					Ar << FlagName;
+					const FGameplayTag Flag = FGameplayTag::RequestGameplayTag(FlagName, /*ErrorIfNotFound*/ false);
+					if (Flag.IsValid())
+					{
+						// AddUnique defends the set-only invariant against
+						// corrupt or hand-edited files (duplicates must not
+						// round-trip).
+						State.StoryFlags.AddUnique(Flag);
+					}
+					else
+					{
+						// Removed content must never brick a save (GDD 14.3.5)
+						// — but vanished story progress deserves a trace.
+						UE_LOG(LogEclipse, Warning, TEXT("Campaign load: story flag '%s' is no longer a registered tag — dropped."), *FlagName.ToString());
+					}
+				}
+			}
+			// Whatever shape came in, the in-memory state is now current.
+			// (Convention: this normalize lives at the LAST tail — v6 moves it.)
+			State.SchemaVersion = 5;
+		}
+		else
+		{
+			int32 FlagCount = State.StoryFlags.Num();
+			Ar << FlagCount;
+			for (const FGameplayTag& Flag : State.StoryFlags)
+			{
+				FName FlagName = Flag.GetTagName();
+				Ar << FlagName;
 			}
 		}
 	}
@@ -293,6 +336,23 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 					return false;
 				}
 				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 4;
+				const int32 EmptyCount = 0;
+				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
+				return true;
+			}));
+
+		// v4 -> v5 (SPEC-P2-04): the Campaign block gained the trailing story-flag
+		// tail. Same mechanical empty-count append — a pre-story campaign simply
+		// hasn't reached a beat yet; the serializer's version gate backstops.
+		SaveSubsystem->RegisterMigration(4, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
+			[](TMap<FName, TArray<uint8>>& SaveBlocks)
+			{
+				TArray<uint8>* CampaignBlock = SaveBlocks.Find(TEXT("Campaign"));
+				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
+				{
+					return false;
+				}
+				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 5;
 				const int32 EmptyCount = 0;
 				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
 				return true;
@@ -567,6 +627,14 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			Bus->Broadcast(EclipseTags::Event_Campaign_DayAdvanced, FInstancedStruct::Make(Payload));
 			// Construction that finished on this day's tick (SPEC-P2-03).
 			BroadcastCompletions(Record.FacilityCompletions);
+			break;
+		}
+		case EEclipseCampaignMutationType::SetStoryFlag:
+		{
+			FEclipseStoryEventPayload Payload;
+			Payload.BeatTag = Record.Mutation.StoryFlagTag;
+			Payload.Day = Record.DayAfter;
+			Bus->Broadcast(EclipseTags::Event_Story_BeatReached, FInstancedStruct::Make(Payload));
 			break;
 		}
 		case EEclipseCampaignMutationType::StartConstruction:

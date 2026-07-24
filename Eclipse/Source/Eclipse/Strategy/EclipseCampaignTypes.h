@@ -217,9 +217,9 @@ struct FEclipseCampaignState
 {
 	GENERATED_BODY()
 
-	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). */
+	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). v5: +StoryFlags tail (SPEC-P2-04). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Campaign")
-	int32 SchemaVersion = 4;
+	int32 SchemaVersion = 5;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 Day = 0;
@@ -248,6 +248,14 @@ struct FEclipseCampaignState
 	/** The walkable base (SPEC-P2-03); starts with the pre-built Command Center via FEclipseBaseState's seeded default. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	FEclipseBaseState BaseState;
+
+	/**
+	 * Committed story beats (SPEC-P2-04): set-only in Phase 2, written solely
+	 * by the SetStoryFlag mutation. Pre-v5 saves migrate to empty — a campaign
+	 * that predates the story layer simply hasn't reached a beat yet.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TArray<FGameplayTag> StoryFlags;
 
 	int32 GetBalance(const FGameplayTag& ResourceType) const
 	{

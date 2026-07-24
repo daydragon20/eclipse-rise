@@ -35,6 +35,8 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_FacilityUpgraded, "Event.Base.FacilityUpgraded", "A facility reached L2+ (slice: Workshop only, per data); emitted by CampaignState commit only (SPEC-P2-03).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_StaffAssigned, "Event.Base.StaffAssigned", "Base staffing changed (crew/analyst by position, empty role = unassigned incl. completion release); emitted by CampaignState commit only (SPEC-P2-03).")
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Story_BeatReached, "Event.Story.BeatReached", "A story beat committed to campaign state (set-only flag); emitted by CampaignState commit only (SPEC-P2-04). Consumers: pinned-offer refresh, UI (P2-07), audio sting (16.12), soak asserts.")
+
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierAdded, "Event.Roster.SoldierAdded", "A soldier joined the roster; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierDied, "Event.Roster.SoldierDied", "A soldier died permanently; emitted by CampaignState commit only (SPEC-P1-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Roster_SoldierWounded, "Event.Roster.SoldierWounded", "A soldier was wounded and is out N days; emitted by CampaignState commit only (SPEC-P1-07).")

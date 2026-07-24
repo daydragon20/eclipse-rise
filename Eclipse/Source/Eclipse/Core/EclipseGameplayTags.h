@@ -51,6 +51,9 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Base_FacilityUpgraded)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Base_StaffAssigned)
 
+	// Story beats (SPEC-P2-04)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Story_BeatReached)
+
 	// Roster & Memorial (SPEC-P1-07)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierAdded)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Roster_SoldierDied)

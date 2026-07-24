@@ -217,6 +217,21 @@ struct FEclipseBaseEventPayload
 	FGameplayTag RoleTag;
 };
 
+/** Event.Story.* — committed story beats (SPEC-P2-04); emitted only by the CampaignState commit (GDD 14.3.3). */
+USTRUCT(BlueprintType)
+struct FEclipseStoryEventPayload
+{
+	GENERATED_BODY()
+
+	/** The beat that just committed (Story.Beat.* once the content tags land; any set-only flag works). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FGameplayTag BeatTag;
+
+	/** Campaign day the beat committed on. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 Day = 0;
+};
+
 /** Event.Command.* — Command Mode lifecycle facts (SPEC-P2-02). */
 USTRUCT(BlueprintType)
 struct FEclipseCommandEventPayload

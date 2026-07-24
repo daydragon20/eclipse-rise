@@ -366,7 +366,7 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("Load of v0 file succeeds via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4)"), Target.Save->GetLastLoadMigrationStepCount(), 4);
+	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4, 4->5)"), Target.Save->GetLastLoadMigrationStepCount(), 5);
 	TestEqual(TEXT("Migrated state matches source"),
 		Target.Campaign->GetState().ComputeStateHash(),
 		Source.Campaign->GetState().ComputeStateHash());
@@ -583,8 +583,8 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 4);
-	TestEqual(TEXT("Sanity: block leads with state schema v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 4);
+	TestEqual(TEXT("Sanity: file header is v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 5);
+	TestEqual(TEXT("Sanity: block leads with state schema v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 5);
 
 	int32 BaseTailSize = sizeof(int32);
 	for (const FEclipseFacilityState& Facility : Source.Campaign->GetState().BaseState.Facilities)
@@ -594,16 +594,23 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 		BaseTailSize += 3 * sizeof(int32); // Level, DaysRemaining, staff count
 		BaseTailSize += Facility.AssignedSoldierIds.Num() * sizeof(FGuid);
 	}
+	// The v5 story tail sits after the base tail and must strip too — a
+	// byte-faithful v3 file predates both (SPEC-P2-04).
+	int32 StripSize = BaseTailSize + sizeof(int32);
+	for (const FGameplayTag& Flag : Source.Campaign->GetState().StoryFlags)
+	{
+		StripSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1;
+	}
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 3;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 3;
-	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= BaseTailSize;
-	FileBytes.SetNum(FileBytes.Num() - BaseTailSize);
+	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= StripSize;
+	FileBytes.SetNum(FileBytes.Num() - StripSize);
 	TestTrue(TEXT("v3-shaped file written"), FFileHelper::SaveArrayToFile(FileBytes, *SlotPath));
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("v3 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 3->4 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("Exactly the 3->4 and 4->5 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
 
 	const FEclipseBaseState& Base = Target.Campaign->GetState().BaseState;
 	TestEqual(TEXT("Spec start state: exactly one facility"), Base.Facilities.Num(), 1);
@@ -622,6 +629,145 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 
 	IFileManager::Get().Delete(*SlotPath, false, true, true);
 	Source.Shutdown();
+	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignStoryFlagMigrationTest,
+	"Eclipse.Strategy.Campaign.SaveMigrationV4RecordsWithoutStoryFlags",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04 / GDD 14.3.6 (third R6 exercise): a byte-faithful v4 file (no
+	// story tail) must land on empty StoryFlags — the campaign simply hasn't
+	// reached a beat yet — via exactly the 4->5 step.
+	const FString SlotName = TEXT("AutomationStoryMigration");
+	const FString SlotPath = UEclipseSaveSubsystem::GetSlotFilePath(SlotName);
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+
+	EclipseCampaignTest::FFixture Source = EclipseCampaignTest::FFixture::Make();
+	FString Error;
+	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
+	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
+
+	// Reconstruct a v4 file from the v5 save: the story tail is the last thing
+	// in the Campaign block — for a beat-less campaign exactly one int32 count.
+	// Same container math as the v3 reconstruction above.
+	TArray<uint8> FileBytes;
+	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
+
+	const int32 HeaderVersionOffset = sizeof(uint32);
+	const int32 BlockSizeOffset = 12 + (4 + 9);
+	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
+	TestEqual(TEXT("Sanity: file header is v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 5);
+	TestEqual(TEXT("Sanity: block leads with state schema v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 5);
+	TestEqual(TEXT("Sanity: the scripted campaign has no beats yet"), Source.Campaign->GetState().StoryFlags.Num(), 0);
+
+	int32 StoryTailSize = sizeof(int32);
+	for (const FGameplayTag& Flag : Source.Campaign->GetState().StoryFlags)
+	{
+		StoryTailSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1; // ANSI FName-as-FString
+	}
+
+	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 4;
+	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 4;
+	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= StoryTailSize;
+	FileBytes.SetNum(FileBytes.Num() - StoryTailSize);
+	TestTrue(TEXT("v4-shaped file written"), FFileHelper::SaveArrayToFile(FileBytes, *SlotPath));
+
+	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
+	TestTrue(TEXT("v4 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
+	TestEqual(TEXT("Exactly the 4->5 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("Pre-story campaign lands on empty flags"), Target.Campaign->GetState().StoryFlags.Num(), 0);
+	TestEqual(TEXT("Migrated state matches source (flags included in hash)"),
+		Target.Campaign->GetState().ComputeStateHash(),
+		Source.Campaign->GetState().ComputeStateHash());
+
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+	Source.Shutdown();
+	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignStoryFlagCommitTest,
+	"Eclipse.Strategy.Campaign.StoryFlagCommitEmitsAndRefusesDuplicates",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignStoryFlagCommitTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04: beats are set-only facts — one commit sets the flag and emits
+	// Event.Story.BeatReached exactly once; a duplicate reaching the API is a
+	// caller bug the transaction rejects (composers filter via ShouldCommitBeat).
+	const FString SlotName = TEXT("AutomationStoryCommit");
+	IFileManager::Get().Delete(*UEclipseSaveSubsystem::GetSlotFilePath(SlotName), false, true, true);
+
+	EclipseCampaignTest::FFixture Fixture = EclipseCampaignTest::FFixture::Make();
+	FString Error;
+	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Fixture.Campaign, Error));
+
+	// A registered tag stands in for the beat identity; the layer never
+	// inspects families, only exact membership (same stand-in the story
+	// sequencing tests use).
+	const FGameplayTag Beat = EclipseTags::Class_Verb_Momentum.GetTag();
+
+	int32 BeatEvents = 0;
+	FGameplayTag LastBeat;
+	UEclipseEventBusSubsystem* Bus = Fixture.GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	FEclipseEventSubscriptionHandle Handle = Bus->Subscribe(
+		EclipseTags::Event_Story_BeatReached,
+		FEclipseEventNativeDelegate::CreateLambda([&BeatEvents, &LastBeat](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			++BeatEvents;
+			if (const FEclipseStoryEventPayload* Story = Payload.GetPtr<FEclipseStoryEventPayload>())
+			{
+				LastBeat = Story->BeatTag;
+			}
+		}));
+
+	const uint32 HashBefore = Fixture.Campaign->GetState().ComputeStateHash();
+
+	FEclipseCampaignTransaction SetBeat;
+	SetBeat.Source = TEXT("Test");
+	FEclipseCampaignMutation& Mutation = SetBeat.Mutations.AddDefaulted_GetRef();
+	Mutation.Type = EEclipseCampaignMutationType::SetStoryFlag;
+	Mutation.StoryFlagTag = Beat;
+	TestTrue(TEXT("Beat commit accepted"), Fixture.Campaign->CommitTransaction(SetBeat, Error));
+	TestTrue(TEXT("Flag set in state"), Fixture.Campaign->GetState().StoryFlags.Contains(Beat));
+	TestEqual(TEXT("BeatReached emitted exactly once"), BeatEvents, 1);
+	TestEqual(TEXT("Payload names the beat"), LastBeat, Beat);
+	TestTrue(TEXT("Hash covers story flags"), Fixture.Campaign->GetState().ComputeStateHash() != HashBefore);
+
+	TestFalse(TEXT("Duplicate beat rejected (set-only idempotence)"), Fixture.Campaign->CommitTransaction(SetBeat, Error));
+	TestEqual(TEXT("Rejection emitted nothing"), BeatEvents, 1);
+
+	// Two identical beats inside ONE transaction must also fail as a whole —
+	// the scratch-copy validation sees the first mutation's write (review pin).
+	const FGameplayTag SecondBeat = EclipseTags::Class_Verb_Stabilize.GetTag();
+	FEclipseCampaignTransaction DoubleBeat;
+	DoubleBeat.Source = TEXT("Test");
+	for (int32 Index = 0; Index < 2; ++Index)
+	{
+		FEclipseCampaignMutation& Dup = DoubleBeat.Mutations.AddDefaulted_GetRef();
+		Dup.Type = EEclipseCampaignMutationType::SetStoryFlag;
+		Dup.StoryFlagTag = SecondBeat;
+	}
+	TestFalse(TEXT("Intra-transaction duplicate rejects atomically"), Fixture.Campaign->CommitTransaction(DoubleBeat, Error));
+	TestFalse(TEXT("Atomic rejection committed neither"), Fixture.Campaign->GetState().StoryFlags.Contains(SecondBeat));
+	TestEqual(TEXT("Atomic rejection emitted nothing"), BeatEvents, 1);
+
+	// Round-trip: the flag survives save/load on the v5 tail, hash included.
+	TestTrue(TEXT("Save succeeds"), Fixture.Save->SaveToSlot(SlotName, Error));
+	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
+	TestTrue(TEXT("Load succeeds"), Target.Save->LoadFromSlot(SlotName, Error));
+	TestTrue(TEXT("Flag survives the round-trip"), Target.Campaign->GetState().StoryFlags.Contains(Beat));
+	TestEqual(TEXT("Non-empty flags round-trip in the hash"),
+		Target.Campaign->GetState().ComputeStateHash(),
+		Fixture.Campaign->GetState().ComputeStateHash());
+
+	Bus->Unsubscribe(Handle);
+	IFileManager::Get().Delete(*UEclipseSaveSubsystem::GetSlotFilePath(SlotName), false, true, true);
+	Fixture.Shutdown();
 	Target.Shutdown();
 	return true;
 }

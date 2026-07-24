@@ -33,7 +33,9 @@ enum class EEclipseCampaignMutationType : uint8
 	// SPEC-P2-03 base mutations (14.3.3: base state changes only through here).
 	StartConstruction,
 	RushConstruction,
-	AssignStaff
+	AssignStaff,
+	// SPEC-P2-04: story beats are facts in campaign state, set-only in Phase 2.
+	SetStoryFlag
 };
 
 /**
@@ -81,6 +83,10 @@ struct FEclipseCampaignMutation
 	/** AddMemorialEntry */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FEclipseMemorialEntry MemorialEntry;
+
+	/** SetStoryFlag (SPEC-P2-04): the beat to commit; composers filter already-set beats via EclipseStoryLogic::ShouldCommitBeat. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	FGameplayTag StoryFlagTag;
 
 	/** QueueProduction / CompleteProduction */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")

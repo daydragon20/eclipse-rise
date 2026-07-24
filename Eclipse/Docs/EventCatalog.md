@@ -16,7 +16,7 @@ Payload structs live in `Core/EclipseEventPayloads.h`. Rows move to `implemented
 | `Event.Prep.MissionLaunchRequested` | `FEclipsePrepEventPayload` (mission id, squad ids, loadout, insertion, intel level) | PrepSubsystem (validated launch) | Mission runtime | P1-08 | implemented |
 | `Event.Mission.Started` | `FEclipseMissionEventPayload` (mission id) | MissionSubsystem | Squad (spawn), UI | P1-05 | implemented |
 | `Event.Mission.ObjectiveCompleted` | `FEclipseMissionEventPayload` (mission id, objective id) | MissionSubsystem (objective components report in) | Mission phases, UI | P1-05 | implemented |
-| `Event.Mission.Completed` | `FEclipseMissionEventPayload` (mission id, results) | MissionSubsystem (debrief) | Economy, Roster, Base UI | P1-05 | implemented |
+| `Event.Mission.Completed` | `FEclipseMissionEventPayload` (mission id, results) | MissionSubsystem (debrief) | Economy, Roster, Base UI, audio sting (16.12) | P1-05 | implemented |
 | `Event.Mission.Failed` | `FEclipseMissionEventPayload` (mission id, results) | MissionSubsystem (debrief) | Economy, Roster, Base UI | P1-05 | implemented |
 | `Event.Squad.OrderIssued` | `FEclipseSquadEventPayload` (soldier id, order, target) | SquadSubsystem (order dispatch) | Squad AI, debug UI | P1-06/P2-01 | implemented |
 | `Event.Squad.OrderAcknowledged` | `FEclipseSquadEventPayload` (soldier id, order, bark line) | SquadSubsystem (after decision) | Debug UI, (later) VO | P1-06/P2-01 | implemented |
@@ -30,6 +30,7 @@ Payload structs live in `Core/EclipseEventPayloads.h`. Rows move to `implemented
 | `Event.Base.FacilityBuilt` | `FEclipseBaseEventPayload` (slot id, facility id, level = 1) | CampaignSubsystem (commit: construction-tick completion, or the rush commit itself) | Vault presentation (state swap + global growth tier), UI, audio, soak asserts | P2-03 | implemented |
 | `Event.Base.FacilityUpgraded` | `FEclipseBaseEventPayload` (slot id, facility id, new level) | CampaignSubsystem (commit) | Same as FacilityBuilt | P2-03 | implemented |
 | `Event.Base.StaffAssigned` | `FEclipseBaseEventPayload` (slot id, facility id, soldier id, role tag: crew/analyst/empty = unassigned incl. completion release) | CampaignSubsystem (commit) | Muster/roster UI (soldier unavailable), vault presentation (crew idlers) | P2-03 | implemented |
+| `Event.Story.BeatReached` | `FEclipseStoryEventPayload` (beat tag, day) | CampaignSubsystem (commit: SetStoryFlag mutation) | Story pinned-offer refresh (map), UI (P2-07), (later) beat-sting audio (16.12), soak asserts | P2-04 | implemented |
 | `Event.Roster.SoldierAdded` | `FEclipseRosterEventPayload` (soldier record) | CampaignSubsystem (commit) | Barracks UI | P1-07 | implemented |
 | `Event.Roster.SoldierDied` | `FEclipseRosterEventPayload` (soldier id, cause, day) | CampaignSubsystem (commit) | Barracks UI, Memorial | P1-07 | implemented |
 | `Event.Roster.SoldierWounded` | `FEclipseRosterEventPayload` (soldier id, days out) | CampaignSubsystem (commit) | Barracks UI | P1-07 | implemented |

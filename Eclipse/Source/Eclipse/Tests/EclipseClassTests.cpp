@@ -313,8 +313,8 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 4);
-	TestEqual(TEXT("Sanity: block leads with state schema v4"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 4);
+	TestEqual(TEXT("Sanity: file header is v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 5);
+	TestEqual(TEXT("Sanity: block leads with state schema v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 5);
 
 	int32 TailSize = sizeof(int32);
 	for (const FEclipseSoldierRecord& Soldier : Source.Campaign->GetState().Roster)
@@ -329,6 +329,11 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 		TailSize += 3 * sizeof(int32); // Level, DaysRemaining, staff count
 		TailSize += Facility.AssignedSoldierIds.Num() * sizeof(FGuid);
 	}
+	TailSize += sizeof(int32); // story-flag count (v5 tail — SPEC-P2-04)
+	for (const FGameplayTag& Flag : Source.Campaign->GetState().StoryFlags)
+	{
+		TailSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1;
+	}
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 2;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 2;
@@ -338,7 +343,7 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseClassTest::FFixture Target = EclipseClassTest::FFixture::Make();
 	TestTrue(TEXT("v2 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("The 2->3 and 3->4 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
+	TestEqual(TEXT("The 2->3, 3->4 and 4->5 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 3);
 
 	const TArray<FEclipseSoldierRecord>& Loaded = Target.Campaign->GetState().Roster;
 	TestEqual(TEXT("All soldiers came home"), Loaded.Num(), 4);
