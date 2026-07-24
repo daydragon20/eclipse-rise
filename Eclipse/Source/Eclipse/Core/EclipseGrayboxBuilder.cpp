@@ -158,7 +158,7 @@ namespace
 		// cel when absent. 15.8 art-fix: tint lifted x1.3 off the Wall_ pair so
 		// the apron sits one value step off the asphalt (00011 read grey-on-grey);
 		// hue unchanged — luminance-only, 15.5.
-		{ TEXT("DecoPlaza"), FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/SciFi_Materials_10/Textures/1/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 200.0f, 4.96f, 0.7f },
+		{ TEXT("DecoPlaza"), FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 200.0f, 4.96f, 0.7f },
 		// Worker-row facade kit (the Blender gen_building_kit masonry). 15.8
 		// look-ronde, cam 2: riding the near-neutral Wall_ tint the row washed to
 		// chalk white next to the saturated containers (screen 153/154/163 — the
@@ -717,7 +717,10 @@ void BuildDistrict(UWorld& World)
 		const FVector PlazaCenter(600, 1800, 0);
 		SpawnBlock(TEXT("DecoPlaza"), PlazaCenter + FVector(0, 0, 2), FVector(20.0f, 20.0f, 0.05f));
 
-		UStaticMesh* Well = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX.SM_Well_Center_FX"));
+		// Pack-slim (ASSET_CLEANUP §10): loads from the repo-tracked Imported copy;
+	// the old ParagonMinions path only survives as a redirector stub on this
+	// machine and may be deleted once a shot round verifies this line.
+	UStaticMesh* Well = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Imported/Meshes/SM_Well_Center_FX.SM_Well_Center_FX"));
 		// Same master choice as the palette blocks (code-review note, 15.8 fix
 		// round): under -EclipseLitToon the ring is a lit surface like the rest
 		// of the district, not a hard-coded unlit hold-out.
@@ -738,7 +741,7 @@ void BuildDistrict(UWorld& World)
 				// Lit variant keeps EmissiveScale 1 (albedo path, real lights).
 				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale * 1.3f);
 			}
-			if (UTexture* PadTex = LoadObject<UTexture>(nullptr, TEXT("/Game/SciFi_Materials_10/Textures/2/T_4k_SciFi10_2_BaseColor.T_4k_SciFi10_2_BaseColor")))
+			if (UTexture* PadTex = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_2_BaseColor.T_4k_SciFi10_2_BaseColor")))
 			{
 				// Circular pad graphic, measured mean-lin .742 -> gain 1.35.
 				Mid->SetTextureParameterValue(TEXT("AlbedoTex"), PadTex);
