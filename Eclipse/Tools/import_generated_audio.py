@@ -118,7 +118,9 @@ for name, entry in sorted(manifest.get("assets", {}).items()):
         cue_path = f"{dest}/{cue_name}"
         if not unreal.EditorAssetLibrary.does_asset_exist(cue_path):
             factory = unreal.SoundCueFactoryNew()
-            factory.set_editor_property("initial_sound_wave", wave)
+            # UE 5.8: 'initial_sound_wave' is protected/deprecated - the
+            # factory takes the array property now.
+            factory.set_editor_property("initial_sound_waves", [wave])
             cue = asset_tools.create_asset(cue_name, dest, unreal.SoundCue, factory)
             if cue is not None:
                 att = att_amb if is_ambient(name) else att_sfx
