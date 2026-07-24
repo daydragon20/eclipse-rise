@@ -175,6 +175,7 @@ bool FEclipsePrepFullCircleTest::RunTest(const FString& Parameters)
 
 	TestTrue(TEXT("Objectives scripted"), Mission->CompleteObjective(TEXT("Obj_Primary"), Error) && Mission->CompleteObjective(TEXT("Obj_Exfil"), Error));
 	TestTrue(TEXT("Debrief commits"), Mission->ResolveDebrief(true, Error));
+	TestEqual(TEXT("Debrief advanced the clock by exactly one day (SPEC-P2-03 locked decision 4)"), Campaign->GetState().Day, 2);
 	TestEqual(TEXT("Reward visible in wallet"), Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()), 60);
 	TestTrue(TEXT("Board changed"), Campaign->GetState().FindRegion(TEXT("Checkpoint"))->Owner == EEclipseRegionOwner::Contested);
 

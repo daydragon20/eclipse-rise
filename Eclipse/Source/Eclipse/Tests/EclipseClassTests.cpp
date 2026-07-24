@@ -415,12 +415,17 @@ bool FEclipseClassMedicStabilizeScenarioTest::RunTest(const FString& Parameters)
 		Fixture.Mission->TryStabilizeSoldier(SniperId, MedicKit.StabilizeWindowSeconds, 231.0));
 
 	// Failed extraction: the stabilized Assault survives as Wounded; the
-	// unstabilized Sniper is the SPEC-P1-07 failure-branch death.
+	// unstabilized Sniper is the SPEC-P1-07 failure-branch death. The wound is
+	// stamped against the MISSION day — the debrief transaction advances the
+	// clock in the same commit (SPEC-P2-03 locked decision 4), so capture the
+	// day before resolving.
+	const int32 MissionDay = Fixture.Campaign->GetState().Day;
 	TestTrue(TEXT("Failed debrief still commits (fail-forward)"), Fixture.Mission->ResolveDebrief(false, Error));
 	const FEclipseCampaignState& State = Fixture.Campaign->GetState();
+	TestEqual(TEXT("A lost mission also costs a day (SPEC-P2-03 decision 4)"), State.Day, MissionDay + 1);
 	TestTrue(TEXT("Stabilized Assault comes home Wounded, not dead (the Medic save)"),
 		State.FindSoldier(AssaultId)->Status == EEclipseSoldierStatus::Wounded);
-	TestEqual(TEXT("Wound duration from roster data"), State.FindSoldier(AssaultId)->WoundedUntilDay, State.Day + 5);
+	TestEqual(TEXT("Wound duration from roster data, stamped on the mission day"), State.FindSoldier(AssaultId)->WoundedUntilDay, MissionDay + 5);
 	TestTrue(TEXT("Unstabilized Sniper died on the failed mission"),
 		State.FindSoldier(SniperId)->Status == EEclipseSoldierStatus::Dead);
 	TestEqual(TEXT("Exactly one memorial entry — the wall got one name, not two"), State.Memorial.Num(), 1);

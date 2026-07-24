@@ -127,6 +127,14 @@ FEclipseCampaignTransaction ComposeConsequences(
 		}
 	}
 
+	// Mission resolution advances the strategic clock by exactly one day, win
+	// or lose (SPEC-P2-03 locked decision 4; SPEC-P2-04 decision 12 inherits
+	// it) — time is a cost of going out, and the base's construction/yield
+	// ticks ride the same commit. Last in the transaction so memorial entries
+	// record the day the mission happened on, not the morning after.
+	FEclipseCampaignMutation& DayTick = Transaction.Mutations.AddDefaulted_GetRef();
+	DayTick.Type = EEclipseCampaignMutationType::AdvanceDay;
+
 	return Transaction;
 }
 
