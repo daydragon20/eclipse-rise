@@ -12,7 +12,7 @@ registry.wait_for_completion()
 
 for pack in ["SciFiSoldier", "SciFiSoldier02", "SciFiSoldier03", "SciFiGirl",
              "SciFiCharacter", "SciFiCharacterPack", "SciFiWarrior", "SciFiWarrior02",
-             "ParagonLtBelica", "ParagonMinions"]:
+             "ParagonLtBelica"]:  # ParagonMinions: dropped in the pack-slim round (2026-07-24)
     for a in registry.get_assets_by_path(f"/Game/{pack}", recursive=True):
         if str(a.asset_class_path.asset_name) != "Skeleton":
             continue

@@ -11,7 +11,9 @@ import unreal
 PACKS = [
     "SciFiSoldier", "SciFiSoldier02", "SciFiSoldier03", "SciFiGirl",
     "SciFiCharacter", "SciFiCharacterPack", "SciFiWarrior", "SciFiWarrior02",
-    "ParagonLtBelica", "ParagonTwinblast", "ParagonMinions",
+    # ParagonMinions left disk in the pack-slim round (2026-07-24) — its
+    # curation accepts live on under /Game/Art/Imported (no skeletal payload).
+    "ParagonLtBelica", "ParagonTwinblast",
 ]
 
 registry = unreal.AssetRegistryHelpers.get_asset_registry()

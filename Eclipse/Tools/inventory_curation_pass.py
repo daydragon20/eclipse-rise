@@ -6,8 +6,8 @@
 #   B. Import the ambientCG CC0 Color maps staged by Tools/fetch_cc0.py
 #      (Saved/CC0Staging/ambientcg) into /Game/Art/Textures — albedo only,
 #      the toon pipeline has no use for PBR normal/roughness sets.
-#   C. Export the tileable albedo candidates (SciFi_Materials_10 BaseColor
-#      1..10 + the Fab Megascans asphalt B map) to Saved/CurationStaging/raw
+#   C. Export the tileable albedo candidates (the accepted SciFi10 BaseColor
+#      sheets + the Fab Megascans asphalt B map) to Saved/CurationStaging/raw
 #      so the Pillow side (Tools/measure_albedo_gain.py) can measure the
 #      linear average -> AlbedoGain = 1/mean (same discipline as the
 #      System.Drawing pass of 2026-07-22, EclipseGrayboxBuilder palette).
@@ -29,12 +29,14 @@ os.makedirs(RAW_DIR, exist_ok=True)
 ROOTS = [
     "/Game/ParagonLtBelica",
     "/Game/ParagonTwinblast",
-    "/Game/ParagonMinions",
-    "/Game/SciFi_Materials_10",
     "/Game/Fab",
     "/Game/Screen_Damage_Indicator",
     "/Game/FD_WarningSigns_V1",
     "/Game/RustyCarsFree",
+    # The Minions + SciFi10 packs left disk in the pack-slim round
+    # (2026-07-24, phase0/ASSET_CLEANUP.md): every curation accept now
+    # lives repo-tracked under /Game/Art/Imported — inventoried here.
+    "/Game/Art/Imported",
 ]
 WANTED = ("StaticMesh", "Material", "MaterialInstanceConstant", "Texture2D")
 
@@ -107,7 +109,10 @@ if tasks:
 
 # -------------------------------------- C. export albedo candidates (gain pass)
 EXPORT = [
-    f"/Game/SciFi_Materials_10/Textures/{i}/T_4k_SciFi10_{i}_BaseColor" for i in range(1, 11)
+    # The 7 accepted SciFi10 albedos are repo-tracked in /Game/Art/Imported
+    # since the pack-slim round (2026-07-24); the 3 rejected sheets (3/4/8)
+    # left with the pack.
+    f"/Game/Art/Imported/Textures/T_4k_SciFi10_{i}_BaseColor" for i in (1, 2, 5, 6, 7, 9, 10)
 ] + [
     "/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B",
 ]

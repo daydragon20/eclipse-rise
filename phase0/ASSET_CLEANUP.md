@@ -83,3 +83,77 @@ See the execution log at the bottom of this file: editor-process check, per-dire
 - Pre-delete binary reference scan over `__ExternalActors__`/`__ExternalObjects__`/`Maps`/`Art`/`Data`: **0 hits** on every deleted path — no level actor or tracked asset referenced anything that was removed, so no new missing-reference errors are possible from this pass.
 - Headless `EclipseValidateData` sanity: a parallel builder claimed the editor right after deletion. Ready-to-run when free (the running builder round provides the full green bar regardless):
   `& "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" "C:\Dev\ECLIPSE_GDD\Eclipse\Eclipse.uproject" -run=EclipseValidateData -unattended -nopause -nosplash -NoUba`
+
+---
+
+# Pack-slim round — migrate ALL curation accepts, drop Minions + SciFi10
+*2026-07-24 | Owner order 23-07 (progress_data.js "Pack-slim-ronde"): move every curation accept — placed AND accepted-unplaced — to repo-tracked `/Game/Art/Imported`, then drop `Content/ParagonMinions` + `Content/SciFi_Materials_10` from disk. Same evidence rule as the pass above.*
+
+## 7. Migration (11 accepts, `Tools/migrate_curation_accepts.py`)
+
+Method: per accept **duplicate → consolidate** (old into new) in one headless
+pythonscript commandlet — consolidation re-points every on-disk referencer and
+deterministically leaves a `UObjectRedirector` at the old pack path (unlike
+`rename_asset`, which only leaves one "when needed"). Migrated meshes got their
+default material slots re-pointed to `/Game/Art/M_EclipseToon` (raw pack
+materials never render, 15.5 — placements always override with toon MIDs),
+which severed the last hard dependencies into the packs.
+
+| Curation id | Old (pack) | New (repo-tracked) |
+|---|---|---|
+| A2 (placed: plaza ring) | `/Game/ParagonMinions/FX/Meshes/Environment/Maps/Agora/SM_Well_Center_FX` | `/Game/Art/Imported/Meshes/SM_Well_Center_FX` |
+| A3 (rubble round) | `/Game/ParagonMinions/FX/Meshes/Debris/Granite_Large_Grey_Mossy_Rough` | `/Game/Art/Imported/Meshes/Granite_Large_Grey_Mossy_Rough` |
+| C1 (rubble round, conditional) | `/Game/ParagonMinions/FX/Meshes/Minion_Specific/Jungle/SM_Rock_Chunk_LowPoly` | `/Game/Art/Imported/Meshes/SM_Rock_Chunk_LowPoly` |
+| A1 (warehouse-yard round) | `/Game/ParagonLtBelica/Characters/Maps/BackGroundAssets/SM_AssetPlatform` | `/Game/Art/Imported/Meshes/SM_AssetPlatform` |
+| SciFi10 albedos 1, 2 (placed) + 5, 6, 7, 9, 10 (texturing round) | `/Game/SciFi_Materials_10/Textures/<n>/T_4k_SciFi10_<n>_BaseColor` | `/Game/Art/Imported/Textures/T_4k_SciFi10_<n>_BaseColor` |
+
+Migrated payload: **11 assets, ~2.4 MB on disk** (the packs' bulk was the
+never-accepted non-BaseColor map sets and the 300+ rejected meshes).
+`/Game/Art/Imported` is repo-tracked (not gitignored) — the 15.8 dressing
+round keeps its sources on every machine. Provenance + license note:
+`Content/Art/Imported/SOURCES.md`.
+
+**Pre-drop verification (headless, logged):** every migrated mesh loads with
+the curation tri-counts (A2 2048, A3 8738, A1 4096) and only
+`M_EclipseToon` in its slots; all 7 textures load at 4096²; dependency audit
+per asset: **zero references into any pack**. One measurement note: C1 reports
+350 tris from a fresh DDC build where the pack's saved registry tag said 348
+(same source geometry, 247 verts — duplicate is byte-derived; count artifact,
+not data loss).
+
+## 8. Reference scan before the drop (same methodology as §Method)
+
+- `Eclipse/Source` grep `/Game/ParagonMinions|/Game/SciFi_Materials_10`: **3 hits, all known** — `EclipseGrayboxBuilder.cpp:161/720/741` (DecoPlaza TexPath, plaza well, pad texture). Source/ is owned by the code lane this round (parallel P2 work) and was deliberately not touched; see §9 redirector stubs + follow-up.
+- `Eclipse/Tools/*.py` grep: **0 live references** (the only textual occurrences are the old→new mapping table inside `migrate_curation_accepts.py` itself — the migration record, idempotent: re-runs log MIGRATE-SKIP because the destinations exist).
+- `Eclipse/Config`: 0 hits. Plugins ship no Content.
+- **Binary scan, 631 files, 0 hits**: `__ExternalActors__` (160), `__ExternalObjects__` (6), `Maps` (1), `Art` incl. `Art/Imported` (132), `Data` (21), `Audio` (10), `MetaHumans` (232), `Locodrome` (9), `Atira_LODSettings` (1), `RustyCarsFree` (57), `Screen_Damage_Indicator` (2), `Collections`/`Developers` (0). The district is runtime-generated (`EclipseGameMode` → `EclipseGraybox::BuildDistrict` when the map doesn't carry it), so no level package ever serialized a pack path.
+- Migrated assets' own packages: binary self-scan of `Art/Imported`, **0 pack-path hits**; mesh packages contain `M_EclipseToon` slot refs as intended.
+
+## 9. DELETE — executed 2026-07-24
+
+| # | Path | Freed | Reason / evidence |
+|---|---|---|---|
+| D8 | `Content/ParagonMinions` | **4,866.0 MB** | All 3 accepts (A2/A3/C1) migrated + verified (§7); 159 rejected meshes (curation §3); 0 references anywhere (§8). Gitignored, 0 tracked files; Fab re-add possible from the owner library. |
+| D9 | `Content/SciFi_Materials_10` | **1,010.4 MB** | All 7 accepted albedos migrated + verified (§7); pack master/MIs + albedos 3/4/8 were rejected (curation §5); the pack's bulk was the non-BaseColor PBR map sets the toon pipeline never uses. 0 references (§8). |
+
+**Total freed: 5,881.4 MB (5.74 GB, disk-measured before/after).** Deletion
+discipline as §3: `Get-Process UnrealEditor, UnrealEditor-Cmd` check
+immediately before the delete (**free**), `Remove-Item -Recurse -Force` per
+directory, `git status --porcelain` on both dirs after (**empty** — pure
+filesystem operation).
+
+**Kept machine-local (4.1 KB):** three ~1.4 KB redirector stubs at the exact
+paths the C++ builder still loads —
+`ParagonMinions/.../SM_Well_Center_FX.uasset`,
+`SciFi_Materials_10/Textures/1|2/T_4k_SciFi10_1|2_BaseColor.uasset` — verified
+post-drop to resolve to `/Game/Art/Imported/...`, so this machine's runtime
+graybox (plaza well + apron/pad textures) is pixel-unchanged until the string
+swap lands. Machines without the stubs degrade gracefully (flat cel + log,
+GDD 14.3.5). The other 8 redirectors left disk with the packs (referenced by
+nothing; the dressing round uses the new paths).
+
+## 10. Follow-ups owned by other lanes (NOT edited in this round)
+
+- **`EclipseGrayboxBuilder.cpp` 161/720/741** (Source/ lane, first edit of the 15.8 dressing round): swap the three old pack paths for `/Game/Art/Imported/Meshes/SM_Well_Center_FX.SM_Well_Center_FX`, `/Game/Art/Imported/Textures/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor`, `/Game/Art/Imported/Textures/T_4k_SciFi10_2_BaseColor.T_4k_SciFi10_2_BaseColor`; then the three redirector stubs may be deleted. The `:767` log-line wording ("ParagonMinions pack ... absent") can update in the same edit.
+- **ASSET_CURATION.md §1/§3/§5**: add "migrated to `/Game/Art/Imported` (pack-slim 2026-07-24); Minions + SciFi10 packs off disk, re-add via Fab library if ever needed."
+- `Saved/CurationStaging/inventory.json` still lists the packs' pre-drop inventory — historical curation evidence, deliberately untouched.
