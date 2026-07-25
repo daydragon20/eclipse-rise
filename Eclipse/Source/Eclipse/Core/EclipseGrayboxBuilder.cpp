@@ -1063,11 +1063,259 @@ void BuildDistrict(UWorld& World)
 		// corner pillars as legs OUTSIDE the y=+-460 lane lines, beams scaled
 		// 1.8 along their span so they bridge the 1080-unit gap flush with the
 		// pillar outer faces. Metal tint; same no-collision dressing tier.
+		// 15.8 dressing round: the beams carry the SciFi10 dense-grid plating
+		// (slot 10, curation §5 destination, measured gain 2.35) over the same
+		// metal tint — world-aligned (UVMode 0), so the kit beam needs no
+		// authored UVs. Missing albedo = flat metal cel (14.3.5).
+		UMaterialInstanceDynamic* GantryMid = MakeMid(MetalLit, MetalShade);
+		if (GantryMid != nullptr)
+		{
+			if (UTexture* GridTex = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_10_BaseColor.T_4k_SciFi10_10_BaseColor")))
+			{
+				GantryMid->SetTextureParameterValue(TEXT("AlbedoTex"), GridTex);
+				GantryMid->SetScalarParameterValue(TEXT("TexWorldScale"), 150.0f);
+				GantryMid->SetScalarParameterValue(TEXT("AlbedoGain"), 2.35f);
+				GantryMid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.6f);
+			}
+			else
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: SciFi10 grid albedo missing — gantry beams stay flat metal cel (14.3.5)."));
+			}
+		}
 		for (const float GateX : { -8850.0f, -8550.0f })
 		{
 			SpawnGen(KPillar, MetalMid, FVector(GateX, -500.0f, 0), 0.0f);
 			SpawnGen(KPillar, MetalMid, FVector(GateX, 500.0f, 0), 0.0f);
-			SpawnGen(KGantry, MetalMid, FVector(GateX, 0, 370.0f), 0.0f, FVector(1.0f, 1.8f, 1.0f));
+			SpawnGen(KGantry, GantryMid != nullptr ? GantryMid : MetalMid, FVector(GateX, 0, 370.0f), 0.0f, FVector(1.0f, 1.8f, 1.0f));
+		}
+	}
+
+	// PLACEHOLDER(15.8): dressing round on the migrated curation accepts
+	// (/Game/Art/Imported, pack-slim ASSET_CLEANUP §7–10) plus the three parked
+	// ambientCG albedos — the last "accepted, not placed" rows of
+	// phase0/ASSET_CURATION.md go live here. Dressing tier throughout:
+	// deterministic placements, no collision, every surface through the toon
+	// masters with the MEASURED curation gains (never estimated). Missing
+	// asset = log + skip (GDD 14.3.5).
+	{
+		UMaterialInterface* DressMaster = ToonLitMaterial != nullptr ? ToonLitMaterial : ToonMaterial;
+		if (DressMaster == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: toon masters missing — 15.8 dressing skipped (raw materials never render, 15.5)."));
+		}
+		else
+		{
+			const bool bUnlitMaster = ToonLitMaterial == nullptr;
+			// Standard curation restyle contract: palette tint + optional
+			// world-aligned albedo (UVMode 0 default — none of these meshes
+			// needs authored UVs; luminance only, hue stays with the palette).
+			auto MakeDressMid = [DressMaster, bUnlitMaster, &World](const FLinearColor& Lit, const FLinearColor& Shade, const TCHAR* TexPath = nullptr, float TexGain = 1.0f, float TexScale = 300.0f, float TexMix = 0.6f) -> UMaterialInstanceDynamic*
+			{
+				UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(DressMaster, &World);
+				Mid->SetVectorParameterValue(TEXT("LitColor"), Lit);
+				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Shade);
+				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+				if (bUnlitMaster)
+				{
+					// Lit variant keeps EmissiveScale 1: BaseColor is albedo.
+					Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				}
+				if (TexPath != nullptr)
+				{
+					if (UTexture* Albedo = LoadObject<UTexture>(nullptr, TexPath))
+					{
+						Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Albedo);
+						Mid->SetScalarParameterValue(TEXT("TexWorldScale"), TexScale);
+						Mid->SetScalarParameterValue(TEXT("AlbedoGain"), TexGain);
+						Mid->SetScalarParameterValue(TEXT("AlbedoMix"), TexMix);
+					}
+					else
+					{
+						UE_LOG(LogEclipse, Warning, TEXT("Graybox: dressing albedo %s missing — flat cel fallback (14.3.5)."), TexPath);
+					}
+				}
+				return Mid;
+			};
+			// Masses keep shadows (physical presence); thin panels/pads pass
+			// bCastShadow=false like the decal planes (VSM budget, 12.4).
+			auto SpawnDress = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, const FRotator& Rotation, const FVector& Scale, const TCHAR* Tag, bool bCastShadow)
+			{
+				if (Mesh == nullptr) { return; }
+				AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, Rotation, Params);
+				if (Actor == nullptr) { return; }
+				Actor->SetMobility(EComponentMobility::Movable);
+				Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+				Actor->SetActorScale3D(Scale);
+				if (Mid != nullptr)
+				{
+					// Every slot (the "white barrels" lesson, first prop round).
+					for (int32 SlotIndex = 0; SlotIndex < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++SlotIndex)
+					{
+						Actor->GetStaticMeshComponent()->SetMaterial(SlotIndex, Mid);
+					}
+				}
+				Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+				Actor->GetStaticMeshComponent()->SetCastShadow(bCastShadow);
+				Actor->SetActorEnableCollision(false);
+				Actor->Tags.Add(Tag);
+			};
+
+			// Palette tints (curation tint table; liner = BldgB worker-teal
+			// x0.8 so the interior sits one value step under the exterior —
+			// luminance-only, hue authority stays with the palette, 15.5).
+			const FLinearColor StainLit(0.070f, 0.062f, 0.075f), StainShade(0.028f, 0.026f, 0.038f);
+			const FLinearColor GraphiteLit(0.230f, 0.250f, 0.290f), GraphiteShade(0.075f, 0.082f, 0.130f);
+			const FLinearColor OxideLit(0.560f, 0.160f, 0.085f), OxideShade(0.200f, 0.045f, 0.085f);
+			const FLinearColor MachineLit(0.105f, 0.105f, 0.120f), MachineShade(0.040f, 0.040f, 0.052f);
+			const FLinearColor LinerLit(0.048f, 0.240f, 0.248f), LinerShade(0.016f, 0.080f, 0.120f);
+
+			// --- Contested rubble: A3 slag boulder + C1 chunk filler (curation
+			// §3) in pockets against the perimeter wall — the wall is where the
+			// occupation grinds ("Contested" pockets, 03.3). Stain tint, NO
+			// albedo: the mossy source hue must never enter (15.5); flat cel +
+			// ink outline reads as stylized slag. C1 only ever instanced 3–5x
+			// overlapping under/around A3 — solo it reads low-poly (forbidden).
+			UStaticMesh* Boulder = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Imported/Meshes/Granite_Large_Grey_Mossy_Rough.Granite_Large_Grey_Mossy_Rough"));
+			UStaticMesh* Chunk = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Imported/Meshes/SM_Rock_Chunk_LowPoly.SM_Rock_Chunk_LowPoly"));
+			if (Boulder != nullptr)
+			{
+				UMaterialInstanceDynamic* RubbleMid = MakeDressMid(StainLit, StainShade);
+				struct FPocketDef { FVector Center; float BoulderYaw; float BoulderScale; };
+				const FPocketDef Pockets[] = {
+					{ FVector(-9700.0f, -1600.0f, 0.0f), 20.0f, 0.85f },  // west wall south of the gate (cam 5 left frame)
+					{ FVector(-9650.0f, 3800.0f, 0.0f), 140.0f, 1.0f },   // west wall north section (cam 2 backdrop)
+					{ FVector(-2800.0f, 9600.0f, 0.0f), 260.0f, 0.75f },  // north wall (cam 4 overview)
+				};
+				// Deterministic pockets on every machine; the variation stream
+				// is private by contract (the DecoRng lesson, 15.8 art-fix).
+				FRandomStream RubbleRng(158);
+				if (Chunk == nullptr)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("Graybox: C1 rock chunk missing — rubble pockets run boulder-only (14.3.5)."));
+				}
+				for (const FPocketDef& Pocket : Pockets)
+				{
+					// Measured bounds (headless pass 2026-07-24): the debris
+					// pivot sits 84.4 units above the mesh base — grounded at
+					// 84.4*scale minus a settle-sink so slag reads bedded into
+					// the asphalt, never floating.
+					SpawnDress(Boulder, RubbleMid, Pocket.Center + FVector(0, 0, 84.4f * Pocket.BoulderScale - 18.0f),
+						FRotator(0.0f, Pocket.BoulderYaw, 0.0f), FVector(Pocket.BoulderScale), TEXT("Deco_Rubble"), true);
+					if (Chunk != nullptr)
+					{
+						const int32 ChunkCount = 3 + RubbleRng.RandRange(0, 2);
+						for (int32 Index = 0; Index < ChunkCount; ++Index)
+						{
+							const float ChunkScale = RubbleRng.FRandRange(0.35f, 0.55f);
+							SpawnDress(Chunk, RubbleMid,
+								Pocket.Center + FVector(RubbleRng.FRandRange(-170.0f, 170.0f), RubbleRng.FRandRange(-170.0f, 170.0f), 84.4f * ChunkScale - 15.0f * RubbleRng.FRand()),
+								FRotator(0.0f, RubbleRng.FRandRange(0.0f, 360.0f), 0.0f), FVector(ChunkScale), TEXT("Deco_Rubble"), true);
+						}
+					}
+				}
+			}
+			else
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: A3 slag boulder missing — Contested rubble skipped (14.3.5)."));
+			}
+
+			// --- Warehouse-yard loading dock: A1 plinth pair (curation §1) at
+			// the BldgB east gap, SciFi10_1 deck plate (gain 4.96, the plinth's
+			// curation recipe) on graphite. Measured: 200x200x10 plate, pivot at
+			// base — Z x2 makes it a 20 cm dock step without breaking the
+			// extruded-disc silhouette.
+			UStaticMesh* Plinth = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Imported/Meshes/SM_AssetPlatform.SM_AssetPlatform"));
+			if (Plinth != nullptr)
+			{
+				UMaterialInstanceDynamic* PlinthMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 4.96f, 200.0f, 0.7f);
+				SpawnDress(Plinth, PlinthMid, FVector(-2900.0f, 2500.0f, 1.0f), FRotator(0.0f, 15.0f, 0.0f), FVector(1.4f, 1.4f, 2.0f), TEXT("Deco_Dock"), true);
+				SpawnDress(Plinth, PlinthMid, FVector(-2900.0f, 2820.0f, 1.0f), FRotator::ZeroRotator, FVector(1.4f, 1.4f, 2.0f), TEXT("Deco_Dock"), true);
+			}
+			else
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: A1 plinth missing — loading dock skipped (14.3.5)."));
+			}
+
+			// --- SciFi10_9 diamond tread plate (gain 2.70): ramp onto the dock
+			// plus an entrance pad at the compound west gap (curation §5:
+			// "ramps, catwalks"). Thin pads: no shadow, like the lane paint.
+			UMaterialInstanceDynamic* TreadMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_9_BaseColor.T_4k_SciFi10_9_BaseColor"), 2.70f, 200.0f, 0.7f);
+			SpawnDress(CubeMesh, TreadMid, FVector(-2690.0f, 2820.0f, 12.0f), FRotator(-8.5f, 0.0f, 0.0f), FVector(1.4f, 1.2f, 0.06f), TEXT("Deco_Ramp"), false);
+			SpawnDress(CubeMesh, TreadMid, FVector(4100.0f, -1600.0f, 3.0f), FRotator::ZeroRotator, FVector(1.6f, 2.0f, 0.04f), TEXT("Deco_Ramp"), false);
+
+			// --- SciFi10_5 perforated sheet (gain 1.11): warehouse interior
+			// liners proud of the BldgB inner faces — read through the east gap
+			// (cam 2 sightline). Interior sits one value step under the
+			// exterior corrugated read (LinerLit above).
+			UMaterialInstanceDynamic* LinerMid = MakeDressMid(LinerLit, LinerShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_5_BaseColor.T_4k_SciFi10_5_BaseColor"), 1.11f, 300.0f, 0.5f);
+			SpawnDress(CubeMesh, LinerMid, FVector(-4740.0f, 3000.0f, 200.0f), FRotator::ZeroRotator, FVector(0.05f, 11.0f, 3.6f), TEXT("Deco_Liner"), false);
+			SpawnDress(CubeMesh, LinerMid, FVector(-4000.0f, 2260.0f, 200.0f), FRotator::ZeroRotator, FVector(11.0f, 0.05f, 3.6f), TEXT("Deco_Liner"), false);
+			SpawnDress(CubeMesh, LinerMid, FVector(-4000.0f, 3740.0f, 200.0f), FRotator::ZeroRotator, FVector(11.0f, 0.05f, 3.6f), TEXT("Deco_Liner"), false);
+
+			// --- SciFi10_7 cross-braced plating (gain 1.78): Dominion post trim
+			// bands proud of the BldgA west + north facades (curation §5), oxide
+			// family — the compound reads authored, not extruded.
+			UMaterialInstanceDynamic* TrimMid = MakeDressMid(OxideLit, OxideShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_7_BaseColor.T_4k_SciFi10_7_BaseColor"), 1.78f, 250.0f, 0.6f);
+			SpawnDress(CubeMesh, TrimMid, FVector(4145.0f, -2400.0f, 350.0f), FRotator::ZeroRotator, FVector(0.05f, 8.0f, 0.55f), TEXT("Deco_Trim"), false);
+			SpawnDress(CubeMesh, TrimMid, FVector(5000.0f, -1145.0f, 350.0f), FRotator::ZeroRotator, FVector(16.0f, 0.05f, 0.55f), TEXT("Deco_Trim"), false);
+
+			// --- Machine banks: dark mottled steel bodies (ambientCG Metal046B,
+			// gain 19.76 — curation §9 "machine blocks") with a SciFi10_6
+			// control-face graphic (gain 1.39, curation §5) on the working side.
+			// Two at the checkpoint's north wall, three as the Site_AlarmRelay
+			// bank — the relay finally has machinery to sabotage.
+			UMaterialInstanceDynamic* MachineBodyMid = MakeDressMid(MachineLit, MachineShade, TEXT("/Game/Art/Textures/T_Metal046B_diff.T_Metal046B_diff"), 19.76f, 250.0f, 0.6f);
+			UMaterialInstanceDynamic* MachineFaceMid = MakeDressMid(FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_6_BaseColor.T_4k_SciFi10_6_BaseColor"), 1.39f, 180.0f, 0.85f);
+			struct FMachineDef { FVector BodyLoc; FVector BodyScale; FVector FaceLoc; FVector FaceScale; };
+			const FMachineDef Machines[] = {
+				{ FVector(4450.0f, -1080.0f, 68.0f), FVector(1.5f, 0.8f, 1.35f), FVector(4450.0f, -1039.0f, 75.0f), FVector(1.3f, 0.05f, 1.1f) },
+				{ FVector(4640.0f, -1080.0f, 68.0f), FVector(1.5f, 0.8f, 1.35f), FVector(4640.0f, -1039.0f, 75.0f), FVector(1.3f, 0.05f, 1.1f) },
+				{ FVector(5075.0f, 1350.0f, 68.0f), FVector(0.8f, 1.4f, 1.35f), FVector(5034.0f, 1350.0f, 75.0f), FVector(0.05f, 1.2f, 1.1f) },
+				{ FVector(5075.0f, 1500.0f, 68.0f), FVector(0.8f, 1.4f, 1.35f), FVector(5034.0f, 1500.0f, 75.0f), FVector(0.05f, 1.2f, 1.1f) },
+				{ FVector(5075.0f, 1650.0f, 68.0f), FVector(0.8f, 1.4f, 1.35f), FVector(5034.0f, 1650.0f, 75.0f), FVector(0.05f, 1.2f, 1.1f) },
+			};
+			for (const FMachineDef& Machine : Machines)
+			{
+				SpawnDress(CubeMesh, MachineBodyMid, Machine.BodyLoc, FRotator::ZeroRotator, Machine.BodyScale, TEXT("Deco_Machine"), true);
+				SpawnDress(CubeMesh, MachineFaceMid, Machine.FaceLoc, FRotator::ZeroRotator, Machine.FaceScale, TEXT("Deco_Machine"), false);
+			}
+
+			// --- Cargo containers: ambientCG Metal063 rust-speckled steel
+			// (gain 6.42 — curation §9 "containers"). Two stacked-yard units by
+			// the dock approach, one askew at the cross-street choke; the
+			// Dominion supply unit rides oxide red (palette hue, story tell).
+			UMaterialInstanceDynamic* ContainerMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Textures/T_Metal063_diff.T_Metal063_diff"), 6.42f, 300.0f, 0.75f);
+			// Art-review 25-07 (shot 00058): at mix 0.75 Metal063's cool rust
+			// chroma pushed the oxide tint to magenta — palette hue must win
+			// (15.5), so the Dominion unit runs a lower texture mix; the next
+			// shot round verifies the read.
+			UMaterialInstanceDynamic* ContainerRedMid = MakeDressMid(OxideLit, OxideShade, TEXT("/Game/Art/Textures/T_Metal063_diff.T_Metal063_diff"), 6.42f, 300.0f, 0.45f);
+			SpawnDress(CubeMesh, ContainerMid, FVector(-2560.0f, 3500.0f, 130.0f), FRotator(0.0f, 90.0f, 0.0f), FVector(6.1f, 2.44f, 2.6f), TEXT("Deco_Container"), true);
+			SpawnDress(CubeMesh, ContainerRedMid, FVector(-2290.0f, 3460.0f, 130.0f), FRotator(0.0f, 96.0f, 0.0f), FVector(6.1f, 2.44f, 2.6f), TEXT("Deco_Container"), true);
+			SpawnDress(CubeMesh, ContainerMid, FVector(-3450.0f, 1500.0f, 130.0f), FRotator(0.0f, 100.0f, 0.0f), FVector(6.1f, 2.44f, 2.6f), TEXT("Deco_Container"), true);
+
+			// --- Perimeter-wall variant: ambientCG Concrete042A shuttered
+			// concrete (gain 8.94 — curation §9 "perimeter-wall variant,
+			// bunkers"). Buttresses break the wall's unbroken band read (the
+			// cam-4 perimeterband watch-item) + a low checkpoint bunker at the
+			// gate approach. Positions clear the placed signs/stencils/strips.
+			UMaterialInstanceDynamic* BunkerMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Textures/T_Concrete042A_diff.T_Concrete042A_diff"), 8.94f, 400.0f, 0.6f);
+			const struct { FVector Loc; FVector Scale; } Buttresses[] = {
+				{ FVector(-9890.0f, -800.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
+				{ FVector(-9890.0f, 950.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
+				{ FVector(-9890.0f, -3200.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
+				{ FVector(-9890.0f, 5200.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
+				{ FVector(-3000.0f, 9890.0f, 170.0f), FVector(1.4f, 1.0f, 3.4f) },
+				{ FVector(1000.0f, 9890.0f, 170.0f), FVector(1.4f, 1.0f, 3.4f) },
+			};
+			for (const auto& Buttress : Buttresses)
+			{
+				SpawnDress(CubeMesh, BunkerMid, Buttress.Loc, FRotator::ZeroRotator, Buttress.Scale, TEXT("Deco_Bunker"), true);
+			}
+			SpawnDress(CubeMesh, BunkerMid, FVector(-9350.0f, -750.0f, 55.0f), FRotator(0.0f, 5.0f, 0.0f), FVector(2.2f, 1.6f, 1.1f), TEXT("Deco_Bunker"), true);
+			SpawnDress(CubeMesh, BunkerMid, FVector(-9350.0f, -750.0f, 121.0f), FRotator(0.0f, 5.0f, 0.0f), FVector(2.6f, 2.0f, 0.22f), TEXT("Deco_Bunker"), true);
+
+			UE_LOG(LogEclipse, Display, TEXT("Graybox: 15.8 dressing placed — SciFi10 slots 1/5/6/7/9 (+10 on the gantry), machine banks, containers, wall variant; rubble/dock only when their meshes loaded (warnings above otherwise)."));
 		}
 	}
 
