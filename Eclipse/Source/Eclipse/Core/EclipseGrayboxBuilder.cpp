@@ -687,7 +687,26 @@ void BuildDistrict(UWorld& World)
 		// (spec). Peak opacity 0.85 puts the core at ~0.49x the asphalt, dark
 		// enough to ground a mass, far off the "silhouette black" the boulder
 		// stain was flagged for.
-		BlobMid = MakeGroundDecalMid(FLinearColor(0.066f, 0.072f, 0.084f), FLinearColor(0.022f, 0.024f, 0.038f), BlobMask, 0.85f, nullptr);
+		// Dressing-iteratie 3 — same numbers, no longer carried by hand. These were
+		// authored as absolutes back when the floor was two value steps lighter, so
+		// they were one more floor move away from the silent drift that put the pool
+		// at 6.25x its target in step 4. x0.775 of the CURRENT floor entry reproduces
+		// (0.066,0.072,0.084)/(0.022,0.024,0.038) to within 1%, so this changes no
+		// pixel today and cannot drift tomorrow.
+		// The LEVEL is deliberately left where it is. DRESSING_ITERATIE_3 par. 5 sets
+		// the target at a core of ~0.62x the ground beside it and warns that going
+		// darker turns the blob into the silhouette black the boulder stain was
+		// already flagged for. Measured, cam 7, 7 sites / 5248 px against a 14px ring
+		// of their own surrounding ground (Tools/measure_masked_region.py):
+		//   as authored (x0.775)  0.0742 in / 0.1193 ring = 0.62x  — ON target
+		//   trial at x0.40        0.0576 in / 0.1190 ring = 0.48x  — reverted, under
+		//                                                            the par. 5 bound
+		// So the read defect the art-review reported ("zero contact anchoring in all
+		// six frames") is NOT this level: it is coverage, fixed in the loops below,
+		// plus the skirt still being derived from footprint instead of height, which
+		// is par. 5's own explanation for why no container blob was findable in 00065
+		// and is its own measured step.
+		BlobMid = MakeGroundDecalMid(FloorPalette.Lit * 0.775f, FloorPalette.Shade * 0.775f, BlobMask, 0.85f, nullptr);
 	}
 
 	// Thin no-collision ground quad for the two light-pass cues. Non-uniform
@@ -730,7 +749,30 @@ void BuildDistrict(UWorld& World)
 			FVector2D(Lamp.X + FMath::Cos(YawRad) * 80.0f, Lamp.Y + FMath::Sin(YawRad) * 80.0f),
 			FVector2D(Lamp.PoolSize, Lamp.PoolSize), Lamp.Yaw, PoolDecalZ, TEXT("Deco_LampPool"));
 	}
-	UE_LOG(LogEclipse, Display, TEXT("Graybox: light pass — %d lamp pools (%s) from the same LampPosts[] the poles use; blob shadows %s and spawn with their masses."),
+	// Grounding coverage (dressing-iteratie 3, review item 6). Blobs used to spawn
+	// from four mass classes only — rubble, machine banks, containers, the bunker —
+	// none of which is the cover field, so the art-review's verdict on the overview
+	// frame was "the whole cover field, every prop, the poles and the figures float".
+	// These two loops add the 20 cover blocks and the 6 lamp poles, the two classes
+	// that stand in the middle of the street where the camera looks. With the value
+	// ceiling down, contact darkening is the ONLY cue left that ties an object to the
+	// ground it stands on, so the gap matters more now than it did before that fix.
+	// These two classes are spawned from their OWN authored coordinate lists — the
+	// same discipline the lamp pools follow — so a blob can never drift away from
+	// the thing that casts it, and moving a cover block moves its shadow.
+	// Sizes: cover blocks are 300x120 at the spawn below, so 1.4x the footprint;
+	// lamp poles are a 0.54 m base, so a deliberately small 150-unit disc — a pole
+	// needs a bite of contact, not a puddle.
+	for (const FPointDef& Cover : CoverPoints)
+	{
+		SpawnGroundDecal(BlobMid, FVector2D(Cover.X, Cover.Y), FVector2D(420.0f, 240.0f), 0.0f, BlobDecalZ, TEXT("Deco_Blob"));
+	}
+	for (const FLampPostDef& Lamp : LampPosts)
+	{
+		SpawnGroundDecal(BlobMid, FVector2D(Lamp.X, Lamp.Y), FVector2D(150.0f, 150.0f), Lamp.Yaw, BlobDecalZ, TEXT("Deco_Blob"));
+	}
+
+	UE_LOG(LogEclipse, Display, TEXT("Graybox: light pass — %d lamp pools (%s) from the same LampPosts[] the poles use; blob shadows %s, now on cover blocks and lamp feet as well as the dressing masses."),
 		PoolMid != nullptr ? static_cast<int32>(UE_ARRAY_COUNT(LampPosts)) : 0,
 		PoolMid != nullptr ? TEXT("ok") : TEXT("SKIPPED"),
 		BlobMid != nullptr ? TEXT("ok") : TEXT("SKIPPED"));
