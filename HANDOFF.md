@@ -84,7 +84,12 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 
   **Dus: er is navmesh, er is een nav-agent, er is een pad — en `MoveToLocation` faalt toch.** Dat is een scherpe, ongemakkelijke stand, en het is precies het soort plek waar plausibel redeneren geld kost. Ik heb nog één ding geprobeerd (`bProjectDestinationToNavigation` aanzetten, want een gedeeltelijk pad wijst op een doel net naast de mesh); dat veranderde niets en is **teruggedraaid** — een wijziging die niets aantoonbaar oplost hoort niet in de boom, hoe redelijk hij ook klinkt.
 
-  **Waar de volgende sessie begint:** vijf hypotheses liggen achter de rug, en de resterende ruimte is de pathfollowing-component van de AI-controller zelf — dus wat er tussen "pad gevonden" en "aanvraag geaccepteerd" gebeurt. Dat is een klein stuk code met een goedkope proef eromheen: de speelronde meet navmesh, agent, pad en weigeringen in één run.
+  **Waar de volgende sessie begint, met de aanwijzing erbij.** Vijf hypotheses liggen achter de rug; de resterende ruimte is wat er gebeurt tussen "pad gevonden" en "aanvraag geaccepteerd". Twee concrete aanknopingspunten uit het log:
+
+  - **De engine meldt zelf niets** bij de afwijzing, en dat is geen toeval: `AAIController::MoveTo` schrijft zijn faalreden naar de **visual log** (`UE_VLOG`), niet naar het tekstlog. Vandaar de stilte. Eerste stap is dus die reden zichtbaar maken — de teruggegeven `EPathFollowingRequestResult` meelogen in de weigering, of visual logging aanzetten.
+  - Het navmesh-build-blok logt **`agent radius 35.0`** terwijl de capsule van het personage **34** is. Waarschijnlijk onschuldig, maar het is het enige getal in de hele keten dat niet klopt met wat eromheen staat, en het is goedkoop na te kijken.
+
+  De proef eromheen is klaar: de speelronde meet navmesh, nav-agent, pad én weigeringen in één run, dus een poging is binnen een minuut beoordeeld.
 
   De dekkingspunt-projectie is blijven staan: hij loste dit niet op, maar hij is op eigen merites juist. Een dekkingspunt dat buiten de navmesh valt hoort terug te vallen op het bevolen punt — dat is precies het principe dat in de functie zelf staat: *het order naar de letter uitvoeren wint van het optimaliseren van de geest*.
 
