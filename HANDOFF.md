@@ -1,5 +1,86 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-22 (first strong-PC session).*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-25 (nachtsessie: testharnas + feel-audit).*
+
+---
+
+# OCHTENDRAPPORT — nacht 25→26 juli 2026
+
+**Bar bij elke commit: build ✓ (-NoUba) · tests 107/107 (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Drie commits, alle drie gepusht: `f1049e9` (harnas + S1/S2/S3), `2dc235d` (speelronde), `f3c5211` (feel-audit fase 3).
+
+## 1. Wat is af en gemeten — met de getallen
+
+**De testharnas draait.** Laag 1 leest na het spawnen de daadwerkelijk toegepaste waarden van het movement component en de camera en legt ze naast `DA_CharacterTuning` — 19 velden, allemaal gelijk. Laag 2 injecteert input via Enhanced Input, op dezelfde `UInputAction`-objecten die jouw controller aanstuurt, en meet over tijd. Alles headless, in de suite, elke ronde mee.
+
+| Meting | Gemeten | Was | Referentie |
+|---|---|---|---|
+| Tijd tot topsnelheid (rennen) | **0,300 s** | — | 420 / 1400 = 0,300 |
+| Stoptijd vanaf rennen | **0,150 s** | 0,083 s | Bijlage B bij 4×1/2000 |
+| Glijafstand vanaf rennen | **26,6 cm** | 12,0 cm | 28 cm |
+| 180-omkering (weer op topsnelheid) | **0,400 s** | — | — |
+| Springhoogte | **127,5 cm** | — | v²/2g = 128 |
+| Airtime | **1,008 s** | — | 2v/g = 1,020 |
+| Seconden per 360 kijken | **1,500 s** | **0,600 s** | 360 / 240 |
+| Kantelsnelheid | **+180 gr/s** (omhoog) | — | StickPitchSpeed 180 |
+| Topsnelheid vooruit / zijwaarts / achteruit | **420 / 420 / 357** | 420 / 420 / **420** | 1,00 / 1,00 / 0,85 (Gears 5 TU3) |
+| Stick op 0,05, 1 s | **0,00 cm en 0,00 gr** | — | 0 |
+| Stick op 0,45, 1 s | **144,3 cm** | — | > 0 |
+
+**S1 — "personage schaalt met snelheid": oorzaak gevonden, gefixt, gepind.** Van de vier kandidaten bewegen er drie niet mee: mesh-schaal (1,000), boomlengte (300,0) en FOV (80,0) zijn identiek bij stilstand, rennen en sprinten. Wat wél meebewoog was de **gemeten camera-tot-pawn-afstand**: 312,07 cm stil tegen **342,26 cm rennend**, oftewel de schijnbare hoogte zakte van 31,50° naar 28,84° — **8,4% kleiner van gaan rennen**. Oorzaak is `bEnableCameraLag`: de achterstand is exact `snelheid / CameraLagSpeed`, de enige speed-gekoppelde term in de rig. Gefixt met `CameraLagMaxDistance = 6` uu. Na de fix: rennen→sprinten **0,00%**, stilstand→sprinten **1,67%**.
+
+**S2 — sprint is een toggle op L3, hold op Shift.** Gemeten: L3-toggle levert 650 cm/s. Alle vier de uitstappen (niet meer vooruit duwen, mikken, vuren, nogmaals L3) staan als losse assert; schuin sturen beëindigt hem níét.
+
+**S3 — de dump is betrouwbaar op een toets.** F9 is nu een echte Enhanced-Input-binding in code en heeft géén configlaag nodig. `Saved/Config/` was de verkeerde plek: dat is de gegenereerde laag, van de engine, niet in de repo, teruggeschreven bij afsluiten. De regels staan nu óók in `Config/DefaultInput.ini`, en bij missiestart logt de game hoeveel debug-bindings er werkelijk geladen zijn. De dump zet zijn regel ook op het scherm.
+
+**De missie speelt zichzelf uit.** `Eclipse.Playthrough.M11PlaysItselfFromLaunchToDebrief` start M1.1 via het échte laadpad (`SelectMission` + `AutoLaunch`), loopt met geïnjecteerde input naar het controlepost, vecht, haalt het doelwit neer, loopt naar extractie en bereikt de debrief. Uitkomst van de groene ronde: **geslaagd, 2/3 objectives, dag +1, 25 materialen en 50 credits als commit-feit** (`Event.Economy.ResourcesChanged`, reden `MissionReward`), **regio niet geflipt** (correct per SPEC-P2-04 besluit 6), order beantwoord binnen **0,001 s**, game-thread **0,80 ms gemiddeld / 9,77 ms slechtste** over 2736 ticks, 44,8 s gesimuleerde speeltijd.
+
+**Drie defecten die de harnas vond en die niemand had kunnen zien door code te lezen:**
+
+1. **Kijken liep 2,5× te snel.** De tuning zegt 240 gr/s en het gidspaneel toont "1,50 s per 360"; het was 600 gr/s en 0,60 s. `bEnableLegacyInputScales` stond aan (engine-default), dus `AddYawInput`/`AddPitchInput` vermenigvuldigden nog met `InputYawScale = 2.5` en `InputPitchScale = **-**2.5` uit `BaseGame.ini`. Het negatieve teken betekende dat de handler een verborgen omkering compenseerde — daarom was "invert Y" niet te beredeneren.
+2. **"Take out the patrol leader" was af door erlangs te lopen.** De overlap-trigger voltooide objectives zonder naar het type te kijken, en `DestroyTarget` had zelf géén voltooiingspad. De missie eindigde in een keurige geslaagde debrief zonder dat er iets gebeurd was, en de hele suite stond groen.
+3. **Achteruitlopen was even snel als vooruit rennen.** UE kent geen richtingsstraf; `GetMaxSpeed()` is de enige plek waar dat kan.
+
+## 2. Wat is niet gelukt, en waarom
+
+- **Niets is mislukt**, maar vier audit-items zijn bewust níét gebouwd omdat het bouwopdrachten zijn en geen tuningrondes: turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip), de sprint-camerastack (CAM-11), camera-shake/recoil/hitmarkers (§8 FEEDBACK bestaat volledig niet), en coyote time + sprong-inputbuffer (JMP-07/08). Zie §4 voor mijn aanbeveling per stuk.
+- **De squad weigert bij insertie alle drie de MoveTo-orders**, met reden `NoRoute` en met barks ("No route, boss.", "Can't get there from here.", "That path's blocked."). Systeemtechnisch is dat precies goed — elke order krijgt exact één antwoord en de weigering is beredeneerd, nooit stil — maar het betekent dat er op dat moment geen navmesh-pad is. Voor jou leest dat als een squad die bij aankomst niets doet. Ik heb het niet gefixt omdat het een eigen onderzoek is (navmesh-generatie rond invokers) en het buiten de opdracht van vannacht viel.
+
+## 3. Beslissingen die ik zelf genomen heb, en waarop
+
+| Beslissing | Grond |
+|---|---|
+| **Hold of toggle hangt aan de DUUR van de toestand**, niet aan het apparaat alleen. Momentaan op een schouderknop → hold op beide; momentaan op een stickknop → hold op toetsenbord, toggle op de pad; aanhoudend → toggle op beide. | De hele bindingslijst is er langs gelegd (`BESTURING.md`). Alleen sprint wijzigde; mikken, Command Mode en stance bleven, nu mét reden. |
+| **Hurken blijft een toggle op beide apparaten.** | Hurken is de stealth-default (GDD 04) en die houd je minuten aan — dat is "aanhoudend", niet "momentaan". Een hele infiltratie op Ctrl is een handkramp, geen feel. |
+| **`bEnableLegacyInputScales` uit**, en de stick wordt daarmee 2,5× trager. | De getunede waarde is de waarheid, of het getal betekent niets. De muis blijft exact even snel (`MouseLookScale` 1,0 → 2,5, een kale schaal zonder eenheid — daar telt gedrag). |
+| **De camera-lag geklemd op 6 uu in plaats van uitgezet.** | Camera-lag bestaat om kleine, schokkerige correcties glad te strijken, niet om een halve meter afstand te kopen. Boven ~72 cm/s zit hij op zijn klem en is hij dus constant. |
+| **"Patrol leader" is één doelwit**, niet de hele patrouille van vier. | Het objective zegt enkelvoud. Met "alle vier" hield één schutter achter dekking het objective 94 seconden open terwijl de missie inhoudelijk klaar was — de speelronde liet dat meteen zien. |
+| **Beloningen worden gemeten aan commit-feiten, niet aan wallet-delta's.** | De dagtick boekt legitiem eigen inkomsten en uitgaven; het saldo ging −84 credits terwijl de missie er 50 uitkeerde. Zelfde discipline als de M1.1-Gauntlet. |
+
+**Eén ding wil ik expliciet noemen, want het is een correctie op jouw melding.** Je meldde dat het personage GROTER wordt naarmate je sneller loopt. De meting zegt het omgekeerde: kleiner, 8,4% tussen stilstand en rennen. Eén defect, twee lezingen — wat vaststaat is de koppeling en de grootte, en die is nu weg. Wat "nagenoeg onzichtbaar bij langzaam lopen" was, weet ik dus nog niet zeker; als je dat na deze build nog steeds ziet, is er een tweede oorzaak en dan zoek ik verder met een meting.
+
+## 4. Wat op jou wacht — met mijn aanbeveling, zodat ja of nee volstaat
+
+| # | Vraag | Mijn aanbeveling |
+|---|---|---|
+| 1 | **Speel de build en zeg of S1 weg is.** Druk F9 terwijl je langzaam loopt en nog eens terwijl je sprint; de regel staat op je scherm. | Doe dit eerst — het is de enige open vraag uit jouw sessie waar ik geen meting voor heb. |
+| 2 | **Kijken is nu 2,5× trager (1,50 s per 360 in plaats van 0,60 s).** Goed zo, of te traag? | **Eerst zo laten.** 240 gr/s is jouw eigen getunede waarde en 600 gr/s is fors boven de genre-band. Te traag? Dan is het één getal: `StickYawSpeed` in `DA_CharacterTuning`. |
+| 3 | **Command Mode trekt de camera 73% terug (300→520), maar `DA_CommandModeTuning` zegt 15% en de GDD 4.1.1 ook.** Eén waarheid kiezen. | **Houd de 73% en corrigeer de GDD-regel** via change management. 520 is bewust geauthord om het veld te lezen; 15% (=345) is nooit gespeeld. Maar dit is smaak, dus jouw call. |
+| 4 | **De squad weigert bij insertie elke order met `NoRoute`.** Wil je dat ik dat uitzoek? | **Ja.** Het gedrag is correct maar het leest als een dode squad. Waarschijnlijk navmesh-generatie rond de invokers; een avond werk, met de speelronde als bewijs. |
+| 5 | **Hurken ook als hold aanbieden, als optie naast de toggle?** | **Ja, maar later** — het vraagt een instellingenmenu, en dat is SPEC-P2-07. |
+| 6 | **Coyote time (110 ms) + sprong-inputbuffer (150 ms) bouwen?** | **Ja.** De referentie noemt het "de goedkoopste feel-winst die er is" en het harnas kan het meten. Ik heb het niet gedaan omdat het de sprongtiming raakt die je net getest hebt. |
+| 7 | **Turn-in-place bouwen** (nu blijft je rug bevroren staan als je alleen de camera draait)? | **Ja, maar het vraagt een draai-animatie.** Zonder animatie krijg je voetslip, en dan ruil je het ene zichtbare defect voor het andere. |
+| 8 | **Camera-shake, recoil, hitmarkers, sprint-camerastack** — §8 FEEDBACK bestaat volledig niet. | **Na de vorige punten.** Dit is de grootste feel-winst die er nog ligt (Gears koopt met 1,2× sprint méér snelheidsgevoel dan wij met 1,55×), maar het is een bouwopdracht van meerdere sessies. |
+
+## 5. De eerlijke stand: speelt het beter?
+
+**Ja, en dat is meetbaar — maar niet overal waar jij het gemeld hebt.**
+
+Wat aantoonbaar beter is: het personage verandert niet meer van grootte als je van tempo wisselt (8,4% → 0,00% tussen rennen en sprinten). Stoppen kost nu 150 ms en 27 cm in plaats van 83 ms en 12 cm, dus er is massa die tot stilstand komt in plaats van een figuur die op zijn plek staat. Achteruitlopen is 15% trager dan vooruit rennen in plaats van even snel. De sprint zit op L3 waar je hem verwacht en blijft aan tot je iets doet wat hem hoort te beëindigen. En de camera draait op de snelheid die in de tuning staat, wat hij eerder aantoonbaar niet deed.
+
+Waar ik terughoudend ben: dit zijn vier tuningwaarden en één camera-klem. Ze halen het onnatuurlijke eraf; ze voegen nog niets toe. De vijf kanalen waarmee Gears zijn snelheidsgevoel koopt — camera zakken, shake, blur, ademhaling, niet kunnen vuren — hebben we er nul van. Zolang §8 FEEDBACK leeg is, blijft schieten "de vijand valt om" in plaats van "ik raakte hem". Dat is het volgende grote ding, en het is echt bouwen, geen afstellen.
+
+En één ding dat niet over feel gaat maar wel over vertrouwen: de missie speelt zichzelf nu uit, van start tot debrief, met asserts op de uitkomst. Dat vond in de eerste ronde meteen een objective dat afging zonder dat er geschoten was — met een volledig groene testsuite eromheen. Elke fix die vannacht landde is daarna opnieuw uitgespeeld als bewijs dat er niets brak.
+
+---
 
 > **Live progress dashboard:** open [`PROGRESS.html`](PROGRESS.html) in a browser and leave it open — it reloads itself every 60 s. Facts (commits, tests, newest screenshots) refresh automatically every 10 min via `start_progress_watcher.bat` (→ `Tools/update_progress.ps1`). Dev sessions update the judgment percentages by editing **`progress_data.js`** at milestones — never edit PROGRESS.html itself, and never hand-edit `progress_auto.js`. Owner instructions for the audio pipeline + studio working method are recorded verbatim in [`phase0/OWNER_MANDATE.md`](phase0/OWNER_MANDATE.md).
 
