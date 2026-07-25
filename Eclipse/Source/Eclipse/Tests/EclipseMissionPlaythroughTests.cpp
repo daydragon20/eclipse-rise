@@ -243,8 +243,18 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		{
 			return Harness.Body->GetCharacterMovement()->IsMovingOnGround() && Harness.SpeedCm() < 1.0f;
 		});
-		Report(*this, TEXT("val bij insertie"), InsertionZ - Harness.Location().Z, TEXT("cm"), TEXT("nog geen norm — dit is de eerste halve seconde van elke missie"));
-		Report(*this, TEXT("tijd tot de speler staat"), Harness.ElapsedSeconds - InsertionStart, TEXT("s"), TEXT("zolang is de besturing niet van hem"));
+		const double InsertionFall = InsertionZ - Harness.Location().Z;
+		const double InsertionSettle = Harness.ElapsedSeconds - InsertionStart;
+		Report(*this, TEXT("val bij insertie"), InsertionFall, TEXT("cm"), TEXT("~0 — hij hoort te STAAN, niet te landen"));
+		Report(*this, TEXT("tijd tot de speler staat"), InsertionSettle, TEXT("s"), TEXT("~0 — zolang is de besturing niet van hem"));
+		// Er is nu wél een norm, want er is gemeten dat 0 haalbaar is: de pawn wordt
+		// op de getraceerde vloer gezet in plaats van 100 cm erboven. Was 160,7 cm
+		// over 0,35 s. Ruime drempel, want een andere map mag een paar cm afwijken —
+		// maar niet anderhalve meter.
+		TestTrue(FString::Printf(TEXT("speelronde: de speler STAAT bij insertie, hij valt er niet in (%.1f cm)"), InsertionFall),
+			InsertionFall < 20.0);
+		TestTrue(FString::Printf(TEXT("speelronde: de besturing is meteen van hem (%.3f s)"), InsertionSettle),
+			InsertionSettle < 0.15);
 		FHitResult Ground;
 		FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseFootCheck), false, Harness.Body);
 		const FVector From = Harness.Location();

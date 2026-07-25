@@ -13,6 +13,8 @@
 #include "Engine/GameInstance.h"
 #include "EngineUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "NavigationSystem.h"
 #include "InputAction.h"
@@ -312,11 +314,44 @@ void AEclipsePlayerController::EnterMissionMode()
 		// uses Entry_Main until the insertion-choice UI lands).
 		for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
 		{
-			if (It->ActorHasTag(TEXT("Entry_Main")))
+			if (!It->ActorHasTag(TEXT("Entry_Main")))
 			{
-				ControlledPawn->SetActorLocation(It->GetActorLocation() + FVector(0, 0, 100.0f));
-				break;
+				continue;
 			}
+
+			// Op de GROND zetten in plaats van er een vaste marge boven. De vorige
+			// versie zette de pawn 100 cm boven het insertiepunt, en omdat het
+			// insertiepunt zelf ook al boven de vloer staat, viel de speler bij
+			// ELKE missiestart 1,6 meter — 0,35 seconde waarin de besturing niet
+			// van hem was (gemeten door de speelronde, 2026-07-26).
+			//
+			// De marge bestond om te voorkomen dat je in de vloer spawnt, en die
+			// zorg blijft terecht; hij wordt alleen niet meer geraden. Traceren
+			// naar beneden geeft de echte vloer, en daar komt de halve capsule plus
+			// een paar centimeter bovenop — dat is exact de rusthoogte, dus er valt
+			// niets meer te vallen én niets meer in te zakken.
+			const FVector Entry = It->GetActorLocation();
+			FVector Target = Entry + FVector(0.0f, 0.0f, 100.0f);
+			const ACharacter* Body = Cast<ACharacter>(ControlledPawn);
+			const float HalfHeight = Body != nullptr && Body->GetCapsuleComponent() != nullptr
+				? Body->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 88.0f;
+
+			FHitResult Ground;
+			FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseInsertion), false, ControlledPawn);
+			if (GetWorld()->LineTraceSingleByChannel(Ground, Entry + FVector(0.0f, 0.0f, 200.0f),
+					Entry - FVector(0.0f, 0.0f, 2000.0f), ECC_Visibility, Params))
+			{
+				Target = Ground.ImpactPoint + FVector(0.0f, 0.0f, HalfHeight + 5.0f);
+			}
+			else
+			{
+				// Geen vloer gevonden (gat, of het insertiepunt hangt boven niets):
+				// terug naar de oude marge, en luid, want dan valt hij alsnog.
+				UE_LOG(LogEclipse, Warning,
+					TEXT("Insertie: geen vloer onder Entry_Main — terug op de vaste marge van 100 cm, de speler valt bij de start (GDD 14.3.5)."));
+			}
+			ControlledPawn->SetActorLocation(Target);
+			break;
 		}
 	}
 }
