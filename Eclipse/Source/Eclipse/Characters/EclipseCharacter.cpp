@@ -152,6 +152,11 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	}
 	CoyoteTimeSeconds = Tuning->CoyoteTimeSeconds;
 	JumpInputBufferSeconds = Tuning->JumpInputBufferSeconds;
+	// Traversal (TRV-01/05). WalkableFloorAngle blijft bewust op de engine-default:
+	// 44,77 graden is een industrieconstante die bij Quake, Half-Life, Source en UE
+	// onafhankelijk terugkeert — zie de toelichting in DA_CharacterTuning.
+	Movement->MaxStepHeight = Tuning->MaxStepHeightCm;
+	Movement->PerchRadiusThreshold = Tuning->PerchRadiusThresholdCm;
 
 	// VERIFICATIE, en die is er gekomen na een terechte owner-melding: "niets is
 	// veranderd in de game". Een opgeslagen DataAsset wint van een C++-default voor
@@ -193,6 +198,7 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 		WarnIfStale(TEXT("CameraProbeSize"), Tuning->CameraProbeSize, Defaults->CameraProbeSize);
 		WarnIfStale(TEXT("CoyoteTimeSeconds"), Tuning->CoyoteTimeSeconds, Defaults->CoyoteTimeSeconds);
 		WarnIfStale(TEXT("JumpInputBufferSeconds"), Tuning->JumpInputBufferSeconds, Defaults->JumpInputBufferSeconds);
+		WarnIfStale(TEXT("MaxStepHeightCm"), Tuning->MaxStepHeightCm, Defaults->MaxStepHeightCm);
 		WarnIfStale(TEXT("ViewPitchMin"), Tuning->ViewPitchMin, Defaults->ViewPitchMin);
 		WarnIfStale(TEXT("StickDeadzone"), Tuning->StickDeadzone, Defaults->StickDeadzone);
 		WarnIfStale(TEXT("StickYawSpeed"), Tuning->StickYawSpeed, Defaults->StickYawSpeed);

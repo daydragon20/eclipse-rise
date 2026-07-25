@@ -102,6 +102,13 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 	CheckFloat(TEXT("StrafeSpeedRatio"), Movement->GetMaxSpeed() > 0.0f ? T.StrafeSpeedRatio : 0.0f, T.StrafeSpeedRatio);
 	TestTrue(TEXT("laag 1: bUseSeparateBrakingFriction staat aan, anders is BrakingFriction dood gewicht"),
 		Movement->bUseSeparateBrakingFriction);
+	CheckFloat(TEXT("MaxStepHeight (TRV-01)"), Movement->MaxStepHeight, T.MaxStepHeightCm);
+	CheckFloat(TEXT("PerchRadiusThreshold (TRV-05)"), Movement->PerchRadiusThreshold, T.PerchRadiusThresholdCm);
+	// De loopbare hellingshoek blijft BEWUST de engine-default: 44,77 graden keert
+	// bij Quake, Half-Life, Source en UE onafhankelijk terug. Gepind zodat een
+	// toekomstige "opruiming" hem niet stilletjes op een smaakwaarde zet.
+	TestEqual(TEXT("laag 1: WalkableFloorAngle staat op de engine-default (industrieconstante)"),
+		Movement->GetWalkableFloorAngle(), 44.765f, 0.05f);
 
 	// Capabilities die geen getal zijn maar wél de reden dat een getal werkt.
 	TestTrue(TEXT("laag 1: bOrientRotationToMovement staat aan (lichaam volgt looprichting)"),
@@ -298,6 +305,16 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 	TestTrue(FString::Printf(TEXT("laag 2: springhoogte volgt v^2/2g (%.0f vs %.0f cm)"), JumpHeight, PredictedApex),
 		FMath::Abs(JumpHeight - PredictedApex) < FMath::Max(10.0f, PredictedApex * 0.15f));
 	TestTrue(FString::Printf(TEXT("laag 2: airtime is plausibel (%.3f s)"), Airtime), Airtime > 0.4 && Airtime < 2.0);
+
+	// --- 4a. stap-hoogte: wat er GEBEURT, niet wat er op het veld staat -----
+	// De maat zelf zegt niets; wat telt is of kniehoge dekking een stap of een
+	// hindernis is. Twee blokken, één onder en één boven de drempel.
+	const float LowStepGain = Harness.MeasureStepUp(20.0f);
+	const float HighStepGain = Harness.MeasureStepUp(50.0f);
+	Report(*this, TEXT("hoogtewinst op een blok van 20 cm"), LowStepGain, TEXT("cm"), TEXT("~20 — een stoeprand blijft een stap"));
+	Report(*this, TEXT("hoogtewinst op een blok van 50 cm"), HighStepGain, TEXT("cm"), TEXT("~0 — kniehoge dekking hoort een vault te worden"));
+	TestTrue(FString::Printf(TEXT("laag 2: over een stoeprand van 20 cm stapt hij heen (%.1f cm)"), LowStepGain), LowStepGain > 15.0f);
+	TestTrue(FString::Printf(TEXT("laag 2: op kniehoogte (50 cm) stapt hij NIET meer geruisloos omhoog (%.1f cm)"), HighStepGain), HighStepGain < 10.0f);
 
 	// --- 4b. de twee vergevingsvensters (JMP-07/08) -------------------------
 	// Coyote time: van een rand AF LOPEN en een fractie te laat drukken. De val

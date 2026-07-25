@@ -11,6 +11,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
+#include "Eclipse.h"
 #include "Engine/World.h"
 #include "AI/NavigationSystemBase.h"
 #include "GameFramework/WorldSettings.h"
@@ -424,6 +425,66 @@ namespace EclipseFeelHarness
 			Step();
 		}
 		return Hostile.IsDowned();
+	}
+
+	float FHarness::MeasureStepUp(float HeightCm, double MaxSeconds)
+	{
+		UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+		if (Cube == nullptr || World == nullptr || Body == nullptr)
+		{
+			return 0.0f;
+		}
+
+		// Tot stilstand komen en de kijkrichting nullen, zodat "vooruit" +X is en
+		// het blok gegarandeerd op de looplijn staat.
+		HoldFor(TEXT("Move"), FVector2D::ZeroVector, 1.5, [this]() { return SpeedCm() < 0.5f; });
+		Controller->SetControlRotation(FRotator::ZeroRotator);
+		Idle(0.1f);
+
+		const FVector Start = Body->GetActorLocation();
+		// Blok met zijn BOVENKANT op HeightCm boven de vloer (vloer = Z 0). De
+		// engine-kubus is 100 uu, dus schaal Z = hoogte / 100 en het middelpunt
+		// ligt op de halve hoogte.
+		// 250 vooruit met een halve diepte van 100: de voorkant staat op 150 cm van
+		// de startpositie, dus ruim buiten de capsule (radius 34) én met genoeg
+		// aanloop. De eerste versie was 600 uu diep en stond daarmee bovenop het
+		// personage — dat mat 0 cm hoogtewinst op elke hoogte, wat op een defect
+		// leek maar de meetopstelling was.
+		AStaticMeshActor* StepActor = World->SpawnActor<AStaticMeshActor>(
+			FVector(Start.X + 250.0f, Start.Y, HeightCm * 0.5f), FRotator::ZeroRotator);
+		if (StepActor == nullptr)
+		{
+			return 0.0f;
+		}
+		UStaticMeshComponent* Mesh = StepActor->GetStaticMeshComponent();
+		Mesh->SetMobility(EComponentMobility::Movable);
+		Mesh->SetStaticMesh(Cube);
+		Mesh->SetCollisionProfileName(TEXT("BlockAll"));
+		StepActor->SetActorScale3D(FVector(2.0f, 8.0f, FMath::Max(HeightCm, 1.0f) / 100.0f));
+
+		// De HOOGSTE stand tijdens de wandeling, niet de eindstand. Een blok van
+		// 20 cm wordt beklommen én er wordt aan de andere kant weer afgestapt, dus
+		// de eindhoogte is gewoon de vloer — die eerste versie mat 1198 cm afgelegd
+		// met 0 cm winst en zag er daardoor uit als "geblokkeerd" terwijl hij er
+		// juist overheen liep.
+		float Peak = static_cast<float>(Start.Z);
+		{
+			const int32 MaxSteps = FMath::Max(1, FMath::RoundToInt(MaxSeconds / StepSeconds));
+			for (int32 I = 0; I < MaxSteps; ++I)
+			{
+				Inject(TEXT("Move"), FVector2D(0.0f, 1.0f));
+				Step();
+				Peak = FMath::Max(Peak, static_cast<float>(Body->GetActorLocation().Z));
+			}
+		}
+		const float Gained = Peak - static_cast<float>(Start.Z);
+		UE_LOG(LogEclipse, Display, TEXT("harnas stap-meting: blok %.0f cm · horizontaal afgelegd %.1f cm · hoogste stand +%.2f cm"),
+			HeightCm, FVector::Dist2D(Body->GetActorLocation(), Start), Gained);
+		StepActor->Destroy();
+		// Terug naar de vertrekhoogte, anders erft de volgende meting deze stap.
+		Body->SetActorLocation(Start, false, nullptr, ETeleportType::TeleportPhysics);
+		Idle(0.3f);
+		return Gained;
 	}
 
 	void Report(FAutomationTestBase& Test, const TCHAR* Label, double Value, const TCHAR* Unit, const TCHAR* Expectation)

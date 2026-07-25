@@ -198,6 +198,31 @@ niet-vanzelfsprekend zijn: (1) `CheckJumpInput` hoogt `JumpCurrentCount` op
 `bPressedJump` weer wist — een gebufferde sprong die je in `Landed()` afvuurt,
 verdwijnt dus stil.
 
+### TRAVERSAL (TRV-01/02/05) — en een tegenspraak in de referentie zelf
+
+**Let op bij het naslaan: Bijlage D van `FEEL_REFERENTIE.md` is op twee van deze
+rijen VEROUDERD.** Bijlage D noemt `MaxStepHeight` 30 en `WalkableFloorAngle` 40;
+de herziene §10 van hetzélfde document komt op 35 uit en laat de hellingshoek
+juist staan, allebei mét bronnen en allebei expliciet gemarkeerd als correctie op
+een eerder advies. De body is de latere en beter onderbouwde tekst en wint.
+
+| Item | Was | Wordt | Waarom |
+|---|---|---|---|
+| `MaxStepHeight` | 45 (engine-default) | **35** | 45 is geen slordigheid — als percentage van de personagehoogte (25,6%) is het de norm van de hele id/Valve/Epic-lijn. Maar de GDD voert vault en mantle op als eigen verbs, dus kniehoge dekking hoort een vault te zijn en geen geruisloze stap. Ontwerpkeuze die uit de GDD volgt. |
+| `WalkableFloorAngle` | 44,77 | **44,77 — ONGEWIJZIGD** | Vier onafhankelijke bronnen komen op ~45° uit (Quake III 45,573°, Half-Life dezelfde test, Source 45,573°, UE 44,77°). Het eerdere voorstel van 40 was een smaakoordeel daartegen in. Nu gepind in laag 1 zodat een latere "opruiming" hem niet stil verzet. |
+| `PerchRadiusThreshold` | 0 (engine-default) | **10** | Met 0 kun je op een centimeter geometrie balanceren. |
+
+**Gemeten gedrag, want de maat zelf zegt niets:** een blok van 20 cm levert
+**+19,98 cm** hoogtewinst (de stoeprand blijft een stap), een blok van 50 cm
+levert **0,00 cm** en het personage stopt er na 116 cm tegenaan (kniehoogte is nu
+een hindernis). Dat is de bedoeling van de wijziging, en het staat als assert.
+
+De meting kostte onderweg twee eigen fouten die het vermelden waard zijn omdat ze
+allebei op een gameplay-defect leken: het testblok was eerst 600 uu diep en stond
+dus bovenop het personage (0 cm op élke hoogte), en daarna mat ik de EINDhoogte
+in plaats van de hoogste stand — het personage stapte over het blokje van 20 cm
+heen en er aan de andere kant weer af, dus de eindhoogte was gewoon de vloer.
+
 **Nog niet gedaan, met reden** — dit zijn bouwopdrachten, geen tuningrondes:
 turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip),
 sprint-camerastack (CAM-11), camera-shake en recoil/hitmarkers (§8 FEEDBACK

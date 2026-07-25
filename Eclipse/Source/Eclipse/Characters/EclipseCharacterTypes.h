@@ -144,6 +144,48 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0, ClampMax = 0.5))
 	float JumpInputBufferSeconds = 0.15f;
 
+	// ---- Feel-audit fase 3, gebied TRAVERSAL --------------------------------
+	// LET OP bij het naslaan: Bijlage D van FEEL_REFERENTIE.md is op deze twee
+	// rijen VEROUDERD. Zij noemt 30 uu en 40 graden; de herziene §10 in hetzelfde
+	// document komt op 35 uu uit en laat de hellingshoek juist STAAN, met bronnen.
+	// De body is de latere en beter onderbouwde tekst en wint hier.
+
+	/**
+	 * Hoe hoog het personage geruisloos op stapt. Engine-default 45.
+	 *
+	 * 45 is géén slordigheid: als percentage van de personagehoogte (25,6% van
+	 * 176 cm) is het precies de norm van de hele id/Valve/Epic-lijn — Quake 32%,
+	 * Half-Life 25%, UE 25,6%. Het bestaat zodat een personage stoepranden, puin
+	 * en trapmeshes kan absorberen zónder traversal-animatie.
+	 *
+	 * Voor ECLIPSE is de vraag daarom niet "is 45 te hoog" maar "willen we de
+	 * traversal-laag zien". De GDD voert vault en mantle op als eigen verbs, dus
+	 * ja: op 35 uu (20%) blijft een echte traptrede (~17,8 cm) een stap, maar
+	 * wordt kniehoge dekking een vault in plaats van een geruisloze stap omhoog.
+	 * Dat is een ontwerpkeuze die uit de GDD volgt, geen correctie van de engine.
+	 * [OFFICIEEL] Quake III bg_local.h, Valve Dimensions; [ENGINE] CMC-ctor.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 1))
+	float MaxStepHeightCm = 35.0f;
+
+	/**
+	 * Hoe smal een richel mag zijn om er nog op te blijven staan. Engine-default
+	 * 0 betekent: je kunt op een centimeter geometrie balanceren. UE krimpt bij
+	 * een perch-test de capsule voor de vloercontrole, zodat je óf echte voetsteun
+	 * hebt óf valt; met 0 is die test uitgeschakeld. 10 uu maakt leesbaar waar je
+	 * kunt staan. [ENGINE] CMC-ctor.
+	 *
+	 * De loopbare hellingshoek blijft BEWUST op de engine-default (44,77°). Een
+	 * eerder voorstel in dit project was 40, maar dat was een smaakoordeel tegen
+	 * vier onafhankelijke bronnen in: Quake III komt op 45,573° uit, Half-Life
+	 * gebruikt letterlijk dezelfde test, Source meet 45,573° en UE 44,77°. Het
+	 * getal keert terug omdat 0.7 een goedkope magische normaal-Z is. Niet
+	 * aankomen; wél de Quake-waarschuwing overnemen dat een helling diagonaal
+	 * belopen veel steiler voelt — dus ramps as-uitgelijnd bouwen.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float PerchRadiusThresholdCm = 10.0f;
+
 	/**
 	 * Graden/s waarmee het lichaam naar zijn looprichting draait. Engine-default
 	 * 360, TP-template 500. Op 360 kost een omkering een halve seconde draaien

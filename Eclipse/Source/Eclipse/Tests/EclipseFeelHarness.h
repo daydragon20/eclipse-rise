@@ -161,6 +161,14 @@ namespace EclipseFeelHarness
 
 		/** Richt op een lichaam en vuur tot het neerligt. False = time-out. */
 		bool EngageHostile(class AEclipseCharacter& Hostile, double MaxSeconds);
+
+		/**
+		 * Zet een blok van HeightCm hoog voor de neus van het personage en loop
+		 * ertegenaan. Geeft de gewonnen hoogte terug: ongeveer HeightCm = eroverheen
+		 * gestapt, ongeveer 0 = geblokkeerd. Dat is de enige eerlijke meting van
+		 * stap-hoogte — het getal op het component zegt niets over wat er gebeurt.
+		 */
+		float MeasureStepUp(float HeightCm, double MaxSeconds = 3.0);
 	};
 
 	/** Eén regel met naam, gemeten waarde en eenheid — het log dat de owner leest.
