@@ -16,6 +16,21 @@ Elke regel heeft een **ID** (`LOC-01`, `CAM-07`, …). Een audit rapporteert per
 groen / afwijkend / niet gebouwd. De ID's zijn stabiel; voeg toe aan het eind van een
 blok, hernummer nooit.
 
+**Auditvolgorde die het meeste oplevert:**
+
+1. **Bijlage D** — de concrete voorstellenlijst. Elke rij is een enkel veld met een huidige
+   en een voorgestelde waarde. Begin hier; dit is het snelst afvinkbaar.
+2. **Bijlage C** — de stand per gebied, zodat je weet welke gebieden überhaupt bestaan.
+   Vier van de tien gebieden zijn nu grotendeels leeg; daar heeft "afwijkend" geen betekenis.
+3. **Bijlage C2** — de camera-checklist naar Nesky. Puur ja/nee, geen getallen nodig.
+4. **De ⚠-rijen** — dat zijn conflicten tussen code, GDD en spec. Die horen niet door een
+   audit opgelost te worden maar door change management.
+5. Pas daarna de volledige tabellen per gebied.
+
+De drie gebieden met het grootste gat tussen "gedocumenteerde conventie" en "gebouwd" zijn
+**§8 FEEDBACK** (bestaat volledig niet), **§9 ANIMATIE** (geen richting, aim-offset, lean,
+foot IK of turn-in-place) en **§10 TRAVERSAL** (alles engine-default).
+
 Elke regel draagt een bronlabel:
 
 | Label | Betekenis |
@@ -133,6 +148,22 @@ competitief getunede waarde. En de rest van diezelfde patch is leerzaam: de basi
 ging +50% omhoog terwijl de topsnelheid onaangeroerd bleef**, met als expliciet doel
 *"improve responsiveness, reduce some of the delayed [feel]"*. **Versnelling is de
 responsiviteitsknop, topsnelheid niet.**
+
+### 4. Wat elke referentie feitelijk oplevert
+
+Niet elke titel is overal bruikbaar voor. Dit voorkomt dat een audit in de verkeerde bron gaat graven.
+
+| Titel | Levert wél | Levert niet |
+|---|---|---|
+| **Borderlands** (UE3/UE4) | verscheepte bewegings-uu, het spread/bloom-model in graden, het hit-feedbackmodel, crit-formule, art direction | **niets over TPS-camera** — het spel is first-person; ook geen acceleratie-, rem- of ADS-waarden |
+| **Gears of War** (UE3/UE4/UE5) | de 1.2×-sprintratio, de sprint-camerastack, richtingsratio's, inertialisatie + fasematching + motion warping (drie gepubliceerde papers), aim-assist-terminologie, annuleervensters op dekking | **geen enkele boomlengte, schouderoffset, camera-lag of pitch-limiet** — nooit gepubliceerd |
+| **Mass Effect** (UE3) | de enige gepubliceerde FOV-ladder in graden (70/80/90/84), de ADS-zoomladder met gevoeligheids- en assist-multipliers, de drie aim-assist-schakelaars | camerapositie-offsets (zitten in binaire `.pcc`), snelheden, dodge-timing |
+| **Warframe** (Evolution) | het beste toegankelijkheidsverhaal dat er is (shake, recoil-types, deadzone-taxonomie), de FOV-invariantieregel, "shake is lokaal", per-intentie aim-assist-gating | bewegingsgetallen (parkour-schaal, niet overdraagbaar), camera-offsets in enige eenheid |
+| **The Division** (Snowdrop) | de "additional FOV"-delta-aanpak, Motion Sickness Mode, de drieledige gevoeligheidssplitsing | ⚠ vrijwel alles. Ubisoft publiceert geen units, geen bereiken, geen defaults; er is geen Snowdrop-talk over beweging of camera gevonden. **De aanname dat Division 2 uitgebreide aim-opties verscheept is niet bevestigd** |
+
+Eén structurele convergentie die opvalt: **drie gevoeligheidstrappen** (heup / ADS / scoped) is
+het antwoord waar Division 2, Warframe én Mass Effect onafhankelijk op uitkomen. ECLIPSE heeft
+er nu twee.
 
 ---
 
@@ -451,12 +482,12 @@ de rencyclus versneld afgespeeld (`StrideRate` 0.6–1.8).
 
 | ID | Item | Conventie | Bron | Aanbeveling ECLIPSE |
 |---|---|---|---|---|
-| TRV-01 | Step-up hoogte | `MaxStepHeight` default **45 uu**. Dat is 45 cm — hoger dan een traptrede (~18 cm) en hoger dan een stoeprand (~15 cm). Het personage stapt dus geluidloos over dingen waar hij eigenlijk overheen zou moeten klimmen | [ENGINE] CMC-ctor | **Verlagen naar 30 uu.** Alles daarboven hoort een mantle-animatie te krijgen (TRV-06). 45 uu laten staan is de makkelijkste manier om je traversal-laag onzichtbaar te maken |
-| TRV-02 | Loopbare helling | `WalkableFloorZ = 0.71` → `WalkableFloorAngle = acos(0.71) =` **44.77°** | [ENGINE] CMC-ctor `SetWalkableFloorZ(0.71f)` + `SetWalkableFloorZ`-implementatie | 44.77° is royaal. Voor een tactische shooter is **40°** leesbaarder: steiler dan dat lees je visueel als "niet beloopbaar" |
-| TRV-03 | Trappen | Conventie: trapmeshes krijgen een **onzichtbare hellingcollisie** eroverheen, zodat de speler niet per trede wordt gestept. Zonder dat schokt de camera per trede | [REDENERING] op vakconventie | Verplicht maken in de graybox-builder: elke trap krijgt een ramp-collider. Dit is een level-art-regel, geen movementregel |
-| TRV-04 | Tegen een muur lopen | UE glijdt langs oppervlakken (`SlideAlongSurface`) in plaats van dood te stoppen. Bij een schuine muur behoud je dus de tangentiële snelheid | [ENGINE] `UMovementComponent::SlideAlongSurface`, gebruikt door `PhysWalking` | Correct gedrag, laten staan. Wat je **wel** moet toevoegen: een animatie-reactie (hand tegen de muur, of minimaal een snelheidsafhankelijke stop-pose) — anders loopt de speler op de plaats |
-| TRV-05 | Richels | `bCanWalkOffLedges = true`; `LedgeCheckThreshold = 4.0`; `PerchRadiusThreshold = 0` (je mag met de rand van de capsule op het randje balanceren), `PerchAdditionalHeight = 40` | [ENGINE] CMC-ctor | `PerchRadiusThreshold` op **0** betekent dat je op een centimeter geometrie kunt blijven staan. Voor leesbaarheid: **op ~10 uu zetten**, dan val je af zodra minder dan 10 uu van de capsuleradius wordt gedragen |
-| TRV-06 | Mantle/vault | GDD 4.1.1: vault/mantle tot **2.4 m**. Conventie: gescheiden in *vault* (laag, snel, doorlopend) en *mantle* (hoog, trager, met stilstand) | [OFFICIEEL] eigen GDD | Drempels: **vault 30–120 cm (0.45 s, behoudt snelheid)**, **mantle 120–240 cm (0.9 s, stopt de beweging)**. Onder 30 cm doet TRV-01 het werk |
+| TRV-01 | Step-up hoogte | ⚠ **Herzien — mijn eerste advies was verkeerd onderbouwd.** Uitgedrukt als percentage van de personagehoogte is 45 uu geen uitschieter maar precies de norm van de hele id/Valve/Epic-lijn: Quake `STEPSIZE 18` qu op een hull van 56 = **32%**; Half-Life/Source **18 units** op 72 = **25%**; UE **45 cm** op 176 = **25.6%**. Unity is de uitzondering met een *realistische* aanbeveling van "0.1–0.4 voor een 2 m mens" = 5–20%. Een echte traptrede is ~17.8 cm ≈ **10%** | [OFFICIEEL] Quake III `bg_local.h`, Valve Dimensions-documentatie, Unity CharacterController-handleiding; [ENGINE] UE CMC-ctor | **De hoge waarde is opzet**, niet slordigheid: hij laat het personage stoepranden, puin, drempels en trapmeshes absorberen **zonder traversal-animatie**. Voor ECLIPSE is de vraag dus niet "is 45 te hoog" maar "willen we de traversal-laag zichtbaar hebben". Omdat de GDD vault/mantle als eigen verbs opvoert: **verlagen naar 35 uu (20%)** — nog steeds boven een traptrede, maar laag genoeg dat kniehoge dekking een vault wordt in plaats van een stap. Dat is een *ontwerp*keuze, geen correctie |
+| TRV-02 | Loopbare helling | ⚠ **Herzien.** **45° is een industrieconstante**, geen tuningkeuze: Quake III `MIN_WALK_NORMAL 0.7f` → acos(0.7) = **45.573°**; Half-Life gebruikt letterlijk dezelfde test (`normal[2] < 0.7`) op drie plekken; Source meet 45.573°; UE komt op **44.77°** uit. Het getal recurreert omdat 0.7 een goedkope magische normaal-Z is | [OFFICIEEL] Quake III `bg_local.h:25`, Half-Life `pm_shared.c`; [ENGINE] UE `SetWalkableFloorZ(0.71f)` | **44.77° laten staan.** Mijn eerdere voorstel van 40° was een smaakoordeel tegen vier onafhankelijke bronnen in. Wel de Quake-waarschuwing overnemen: *"walking up a slope along a diagonal will feel much steeper"* — **hellingen en ramps as-uitgelijnd bouwen** in de graybox |
+| TRV-03 | Trappen | **Bevestigd als officiële praktijk.** Epic publiceert er een tutorial over ("Setting up Collision Geometry for Stairs") en stelt de regel expliciet: *"Simple collision… tends to affect player movement. Complex collision usually refers to the visual model geometry and tends to affect bullet hits."* De Source-variant is een `toolsplayerclip`-ramp over de treden | [OFFICIEEL] Epic-tutorial + Epic-staf in de bijbehorende thread; [GEMETEN] Source-mappingpraktijk | Verplicht maken in de graybox-builder: **elke trap krijgt een simpele ramp-collider voor beweging en de mesh alleen voor kogeltreffers.** Zonder dat schokt de camera per trede |
+| TRV-04 | Tegen een muur lopen | **Universeel: glijden, nooit dood stoppen.** Dezelfde functie in de hele id-lijn — projecteer de snelheid op het vlak en ga door. Quake III's `PM_ClipVelocity` gebruikt `OVERCLIP 1.001f`, en dát detail is het belangrijkste: de speler wordt een haartje *van* het vlak af geduwd zodat de trace van het volgende frame niet meteen opnieuw botst | [OFFICIEEL] Quake III `bg_pmove.c:145`, Half-Life `pm_shared.c:715`; [ENGINE] UE `SlideAlongSurface` | UE doet dit al correct. Wat je **wel** moet toevoegen: een animatie-reactie (hand tegen de muur, of minimaal een snelheidsafhankelijke stop-pose) — anders loopt de speler op de plaats |
+| TRV-05 | Richels | `bCanWalkOffLedges = true`; `LedgeCheckThreshold = 4.0`; `PerchRadiusThreshold = 0`, `PerchAdditionalHeight = 40`. Ter vergelijking: Quake, Quake III en Half-Life hebben **geen enkele richel-test** — je loopt er gewoon af. UE's perch-systeem is de rijkere variant: het krimpt de capsule voor de vloertest, zodat je niet op een splinter kunt balanceren maar óf echte voetsteun hebt óf valt | [ENGINE] CMC-ctor; [OFFICIEEL] Quake III `bg_pmove.c`, Half-Life `pm_shared.c` (afwezigheid van de test) | `PerchRadiusThreshold` op **0** betekent dat je op een centimeter geometrie kunt blijven staan. Voor leesbaarheid: **op ~10 uu zetten** |
+| TRV-06 | Mantle/vault | **De canonieke drempels bestaan, en ze zijn uitgedrukt als fractie van de personagehoogte — dus volledig overdraagbaar.** GDC 2012, Arne Olav Hallingstad (Lead Gameplay Programmer, Splash Damage, *BRINK*), "Vault, Slide, Mantle": obstakel binnen **2.5× de breedte van de bounding box**; **vault bij ledge-hoogte 0.4–0.8× personagehoogte**; **mantle bij 0.8–1.4×**; **auto wall hop** boven mantle-hoogte + spronghoogte | [OFFICIEEL] GDC 2012-deck, Splash Damage | Voor een personage van 1.76 m: **vault 70–140 cm, mantle 140–246 cm**, daarboven auto-hop. Dat sluit naadloos aan op de GDD's mantle-plafond van **2.4 m**. Let op dat de banden **aaneengesloten** zijn — geen dode zone tussen vault en mantle, en dát is wat traversal niet-pietluttig laat voelen. Onder 70 cm doet de step-up (TRV-01) het werk |
 | TRV-07 | Mantle-uitlijning | Root-motion-animaties passen zelden precies op de gevonden rand | [ENGINE] `Engine/Plugins/Animation/MotionWarping` is beschikbaar | `MotionWarpingComponent` gebruiken om de root-motion naar het gevonden randpunt te warpen. Zelf uitlijnen is de moeilijke weg |
 | TRV-08 | Traversal-detectie | Conventie: een capsule-sweep vooruit + een neerwaartse trace om de randhoogte te vinden, elk frame terwijl er vooruit-input is | [REDENERING] | Detectie vooraf laten lopen zodat de prompt/animatie *voordat* de speler de knop indrukt al klaarstaat; anders voelt vault altijd te laat |
 | TRV-09 | Sprint-slide | `graybox_feel_targets.md` noemt dit "de signature verb" | [OFFICIEEL] eigen GDD (LOCKED) | Slide is fysiek een tijdelijke `BrakingDeceleration`-verlaging + capsulehoogte-reductie + root motion. **Nog niet gebouwd.** Duur **0.7 s**, alleen vanuit sprint, cooldown 1.0 s |
@@ -525,11 +556,33 @@ in de tabellen als **[REDENERING]**, en mag dus als eerste worden omgestoten.
     voetplanting-IK niet.
 16. **Ontwerpintentie achter Borderlands' schadegetallen.** De mechaniek is gereverse-engineerd,
     maar er is geen Gearbox-uitspraak over waarom of hoe het getuned is.
+17. **Verscheepte aim-assist-conehoeken in graden voor enige westerse AAA-shooter.** Halopedia,
+    de Destiny-wiki's en Bungie's eigen posts beschrijven allemaal de *structuur* zonder één
+    getal. De enige conehoeken in graden die überhaupt gevonden zijn, zijn Warframe's
+    *ability*-cones (15° / 55° / 90°) en die zijn iets anders.
+18. **Verscheepte exponentwaarden voor responscurves.** Twee onderzoeksrondes, nul resultaten.
+    Alleen UE's 1.0 en Call of Duty's kwalitatieve curvevormen. ECLIPSE's 2.0 blijft onbewezen.
+19. **Camera-boomlengtes en schouderoffsets van enige shipped TPS.** Alleen Unity's
+    Cinemachine-voorbeeldconfiguratie is publiek. Mass Effect's `SFXCameraMode_*`-offsets zitten
+    in binaire `.pcc`-bestanden en zijn nooit gepubliceerd.
+20. **Pitch-limieten van enige referentietitel.** Alleen Epic's eigen template geeft er twee.
+21. **Nick Weihs' GDC 2013-slides over aim assist.** Alleen video op archive.org; geen transcript,
+    geen deck. De taxonomie is bruikbaar, de implementatiedetails niet.
+22. **The Division's bewegingscijfers, ADS-tijden, camera-afstanden en de deadzone/aim-acceleratie-
+    patchgeschiedenis.** Ubisoft publiceert geen FOV-bereik, geen units en geen defaults.
+    ⚠ Bovendien: de aanname dat Division 2 uitgebreide aim-opties verscheepte is **niet bevestigd** —
+    gevonden is alleen een binaire Aim Assist-toggle plus een aparte granaat-toggle.
+23. **Mass Effect's walk/sprint-snelheden, dodge-afstand en -duur**, en alle Andromeda-getallen.
+24. **Warframe's default-FOV** (alleen het bereik 52–90 verticaal is gemeten) en de
+    camera-preset-offsets in enige eenheid.
 
 **Sinds deze ronde wél onderbouwd, en dus uit deze lijst verdwenen:** Borderlands'
 bewegingswaarden (§0b), strafe- en achteruit-ratio's (LOC-11/LOC-12), recoil en spreiding in
 graden (§4), het hele hit-feedback-model (FDB-01/FDB-02), blend- en transitietijden
-(ANI-01b/ANI-14), en de aim-assist-taxonomie (INP-14).
+(ANI-01b/ANI-14), de aim-assist-taxonomie (INP-14), **de ADS-gevoeligheidsformule (INP-06 —
+opgelost met UE's eigen broncode)**, de deadzone-band (INP-01, met XInput als hardste bron),
+de sprint-FOV-kick (CAM-10, Mass Effect LE1), de pitch-limieten (CAM-07, Epic's template), en
+de latentiebudgetten (INP-11b, twee onafhankelijke studies).
 
 **Bewust niet overgenomen omdat het niet overdraagbaar is:**
 
@@ -541,6 +594,18 @@ graden (§4), het hele hit-feedback-model (FDB-01/FDB-02), blend- en transitieti
 | BL3's FOV 90/110 op PC vs 70 op console | FOV is beeldverhouding- en platformafhankelijk |
 | Elke gevoeligheidsschaal (0–100, 0–500, "sensitivity 7") | Geen fysieke eenheid |
 | Elke "aim assist strength" uit een ander spel | Betekent alleen iets binnen die eigen implementatie van friction-versus-adhesion |
+
+**Wat een volgende onderzoeksronde het beste kan aanvallen**, in volgorde van rendement:
+
+1. **§8 FEEDBACK** draagt de meeste [REDENERING] van alle gebieden (hitmarker-duren,
+   schadegetal-timings, haptiekduren, muzzle-flash- en tracer-conventies). Kansrijke bronnen:
+   GDC-audio-talks over wapengeluid, en frame-analyse van hitmarkers door derden.
+2. **§9 ANIMATIE**: verscheepte locomotie-blendtijden en lean-hoeken. The Coalition's papers
+   gaven de *transitie*-architectuur maar geen blendspace-parameters.
+3. **§10 TRAVERSAL**: step-up-hoogtes en hellinglimieten van shipped games. Source-engine
+   (18 units) en Quake-afgeleiden zijn hier de kansrijkste harde bron, plus level-designdocs.
+4. **The Division** als geheel — deze ronde leverde er vrijwel niets over op, en het is
+   onduidelijk of dat aan de bronnen of aan de bereikbaarheid lag.
 
 **Wel veilig overgenomen, want in een fysieke of gedeelde eenheid:** alle `uu/s`-waarden
 (1 uu = 1 cm, en élke referentietitel in dit document draait op Unreal — BL1/2/TPS en
@@ -756,6 +821,50 @@ zodat een audit weet waar hij moet beginnen.
 
 ---
 
+## Bijlage C2 — Camera-auditlijst naar John Nesky
+
+John Nesky's *"50 Game Camera Mistakes"* (GDC 2014) is de canonieke camera-talk. **Let op:
+de talk bevat vrijwel geen getallen** — dat is geen zoekfout maar opzet; Nesky geeft
+principes omdat *"what works for one game might not work for another"*. Gebruik hem dus als
+**checklist**, niet als parameterbron. Hieronder de items die op een TPS met een
+squad-commandolaag van toepassing zijn, met de ECLIPSE-stand. **[OFFICIEEL]**
+
+| # | Fout | ECLIPSE |
+|---|---|---|
+| 4 | Een default-cameraafstand die de zichtlijn waarschijnlijk breekt | boom 300 in een dichte graybox — controleren |
+| 5 | Obstakels de zichtlijn van opzij laten breken | niet afgevangen |
+| 6 | De camera van een obstakel wegduwen terwijl de speler hem er juist heen draait | niet afgevangen |
+| 7 | De speler de camera in een obstakel laten duwen | probe 12 is te klein — zie CAM-06 |
+| 8 | Onafhankelijke krachten om de camera laten vechten | nu nog één systeem; bewaken zodra sprint-, dekking- en commando-camera's erbij komen |
+| 10 | De camera door smalle pilaren laten snijden | niet afgevangen |
+| 11 | Een heuvel als te vermijden muur interpreteren | niet afgevangen |
+| 12 | De camera zijwaarts zwenken bij occluders van achteren | niet afgevangen |
+| 13 | De near-clip-plane door de avatar laten snijden | risico bij ADS (arm ×0.55 → 165 uu) |
+| 14 | Dezelfde cameraafstand voor alle hoeken gebruiken | ja, één afstand |
+| 15 | Dezelfde FOV voor kikkerperspectief en normaal | ja, één FOV |
+| **16** | **Pitch, afstand en FOV onafhankelijk verschuiven** | ADS koppelt ze correct; sprint-/commando-camera moet dat ook doen |
+| 22 | Erop rekenen dat de speler de camera continu bestuurt | relevant voor de commando-modus |
+| 23 | De camera-yaw met rust laten terwijl de speler rent | bewuste keuze; geen auto-follow |
+| 27 | De regel van derden verkeerd toepassen | schouderoffset (0,55,65) — beoordelen |
+| 29 | Volledig op procedurele camera's leunen | n.v.t. in graybox |
+| 33 | Het eigen lichaam doelen laten occluderen | reëel risico met zware armor — zie CAM-06b |
+| 34 | De speler camerabesturing geven en die dan afpakken | commando-modus doet dit; controleren |
+| 35 | Direct een camera-hint toepassen nadat de speler zelf gedraaid heeft | n.v.t. |
+| 37 | Geen omgekeerde besturing aanbieden | ✅ aanwezig (`bInvertLookY`) |
+| **38** | **Op onbedoelde controllerinput reageren** | deadzone 0.08 is te laag — zie INP-01 |
+| **39** | **Lineaire gevoeligheid gebruiken** | ✅ machtscurve aanwezig (exponent onbewezen) |
+| 40 | De camerapivot te ver laten afdrijven | n.v.t. |
+| 41 | Een te kleine FOV gebruiken | 80 TP / 64 ADS — beoordelen |
+| **42** | **De FOV snel verschuiven** | nog geen FOV-kick; bij bouwen smoothen |
+| **43** | **De camera overmatig schudden** | nog geen shake |
+| **44** | **De camera met de loopcyclus laten stuiteren** | geen head-bob — goed zo |
+| 45 | Transleren of roteren bij een sprong van de avatar | geen landings-dip; bij bouwen klein houden (JMP-10) |
+| 46 | Snel naar een nieuwe camerapositie springen | commando-modus blendt in **0.0 s** — zie EXT-01 |
+| **47** | **Pitchsnelheid vasthouden tot aan de limiet** | niet gedempt — zie CAM-07b |
+| 50 | Een algemene "constraint solver" schrijven die de camera optimaliseert | niet doen |
+
+---
+
 ## Bijlage D — Concrete voorstellenlijst
 
 Alles uit dit document dat neerkomt op één waarde, op één rij. Dit is wat een audit
@@ -787,10 +896,15 @@ verandert niets.
 | TRV-01 | `MaxStepHeight` | ongezet (45) | **30** | 45 cm stapt geluidloos over dingen die een mantle horen te zijn |
 | TRV-02 | `WalkableFloorAngle` | ongezet (44.77°) | **40°** | leesbaarder wat wel en niet beloopbaar is |
 | TRV-05 | `PerchRadiusThreshold` | ongezet (0) | **10** | nu kun je op een centimeter geometrie balanceren |
-| INP-01 | `StickDeadzone` / `MoveDeadzone` | 0.08 | **0.12–0.15 + schuif** | 0.08 is op één gemeten pad afgesteld; engine-defaults zijn 0.20–0.25 |
-| INP-06 | `AdsLookMultiplier` | 0.35 | **0.60** | de code-comment pleit zelf voor 0.60; 0.35 is meer dan twee keer zo streng als de FOV-factor vraagt |
+| INP-01 | `StickDeadzone` / `MoveDeadzone` | 0.08 | **0.15 + schuif 0.05–0.30** | XInput zelf zegt 0.24/0.265, UE 0.20–0.25, Warframe 0.20; 0.08 is op één gemeten pad afgesteld |
+| INP-03 | buitenste drempel | bestaat niet | **`UpperThreshold` 0.95** | sommige sticks halen de eenheidscirkel niet |
+| INP-06 | `AdsLookMultiplier` | 0.35 | **0.745** | UE's eigen `UInputModifierFOVScaling`: `tan(32°)/tan(40°)`. Dit is geen smaak maar meetkunde |
 | INP-14 | `AimAssistFloor` | 0.45 | **0.55–0.65** | 45% kijksnelheid is aan de sterke kant |
-| INP-14c | aim-assist-zichtlijn | alleen hoek + afstand | **+ zichtlijntrace** | Gears moest hiervoor patchen |
+| INP-14c | aim-assist-zichtlijn | alleen hoek + afstand | **+ zichtlijntrace** | Gears én Destiny moesten hiervoor patchen |
+| INP-14e | `AimAssistConeDegrees` | 4.0 vast | **4.0 / zoomfactor** | Destiny en Mass Effect verkleinen de cone allebei met de zoom |
+| CAM-07 | `ViewPitchMax` | +70 | **+75 (asymmetrisch)** | Epic's eigen template gebruikt −70 / +80 |
+| CAM-10 | FOV-kick bij sprint | bestaat niet | **+10°, gesmoothd, uitzetbaar** | Mass Effect LE1: 70 → 80 → 90 |
+| FDB-10b | recoil-weergavekeuze | bestaat niet | **Camera / Reticle / Reduced** | DE's oplossing voor recoil-misselijkheid |
 | EXT-01 | `EnterBlendSeconds` / `ExitBlendSeconds` | 0.0 / 0.0 | **0.15 / 0.10** | de commando-modus klapt er nu hard in |
 | CAM-08 | ⚠ FOV | code 80, GDD 90 | **80, GDD corrigeren** | Gears 5 verscheept ook 80; change management vereist |
 | CAM-13 | ⚠ commando-pullback | spec 15%, code +73% | **één waarheid kiezen** | de character leest `CameraPullbackPercent` nooit |
@@ -822,6 +936,26 @@ Bijlage A. Reproduceerbaar zonder internet.
 - Feedback-/schadegetalsysteem: `Better Damage Feedback` (ZetaDæmon) — bl-sdk.github.io/willow2-mod-db
 - Nauwkeurigheidsmodel en -tabel, crit-formule, aim assist — borderlands.fandom.com (Accuracy, Critical hit, Aim Assist)
 - BL2 "reduced gravity" — kb.speeddemosarchive.com/Borderlands_2
+
+**[OFFICIEEL] — Mass Effect, Warframe, The Division**
+
+- Mass Effect LE1 verscheepte FOV-ladder (`SFXCameraMode_*`) en `BIOWeapon.ini` AimModes — getranscribeerd door modders op nexusmods.com (mods 497 en 2963)
+- BioWare, *Gameplay Calibrations* (ME:LE) — ea.com/ea-play/news/gameplay-calibrations
+- Christina Norman, GDC, *Refining the Real-Time Combat in Mass Effect 2* — gamedeveloper.com
+- Digital Extremes: dev-workshop over screen shake en recoil-types (Devstream 189, hotfix 40.0.3), gamepad-documentatie (warframe.com/gamepad), zichtlijn-FOV-regel, Melee 3.0-workshop — forums.warframe.com, wiki.warframe.com
+- Ubisoft-support: aim assist, "Additional Field of Vision", Motion Sickness Mode — ubisoft.com/help
+
+**[OFFICIEEL] — vaktheorie**
+
+- John Nesky, GDC 2014, *50 Game Camera Mistakes* — zie Bijlage C2. **Bevat bewust geen getallen.**
+- Nick Weihs (Insomniac), GDC 2013, *Techniques for Building Aim Assist in Console Shooters* — gdcvault.com/play/1017942. ⚠ Alleen video; geen transcript of slides publiek, dus alleen de taxonomie is bruikbaar.
+- Jan Willem Nijman (Vlambeer), *The Art of Screenshake* — archive.org
+- Josh Sutphin, *Doing Thumbstick Dead Zones Right* — joshsutphin.com; Ryan Juckett (Hypersect), *Interpreting Analog Sticks* — blog.hypersect.com
+- Daniel Holden, *Spring-It-On* (halveringstijd-parametrisatie van dempers) — theorangeduck.com
+- Microsoft XInput `XINPUT_GAMEPAD_*_THUMB_DEADZONE` — learn.microsoft.com
+- NVIDIA Reflex-latentieonderzoek — developer.nvidia.com; Liu & Claypool, ACM MMSys 2023 — dl.acm.org/doi/10.1145/3587819.3590977
+- Unity Cinemachine 3.1 `CinemachineThirdPersonFollow` — docs.unity3d.com
+- *Game AI Pro* hfst. 47, *Tips and Tricks for a Robust Third-Person Camera System* — gameaipro.com
 
 **[GEMETEN] — Gears, community**
 
