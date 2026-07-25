@@ -543,6 +543,17 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		}
 	}
 	Report(*this, TEXT("vijanden gespawnd voor deze missie"), HostilesAtStart, TEXT(""), TEXT("> 0 — anders valt er niets te halen"));
+
+	// Spawnposities bewaren om straks te zien of ze uberhaupt bewogen hebben.
+	TMap<TWeakObjectPtr<AEclipseCharacter>, FVector> HostileStartPositions;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Character = *It;
+		if (Character != nullptr && Character != Harness.Body && !Character->IsPlayerSide())
+		{
+			HostileStartPositions.Add(Character, Character->GetActorLocation());
+		}
+	}
 	TestTrue(TEXT("speelronde: er staan vijanden om uit te schakelen"), HostilesAtStart > 0);
 
 	// Welk objective vraagt om een dood doelwit?
@@ -657,6 +668,31 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		{
 			++HostilesDowned;
 		}
+	}
+
+	// Bewegen de VIJANDEN ook? Zij hadden net zo min navmesh als de squad, en een
+	// vijand die op zijn spawnplek blijft staan maakt van het gevecht een
+	// schiettent. De positie is vastgelegd vóór het oprukken; nu de vergelijking.
+	{
+		int32 Moved = 0;
+		float BestMove = 0.0f;
+		for (const TPair<TWeakObjectPtr<AEclipseCharacter>, FVector>& Pair : HostileStartPositions)
+		{
+			const AEclipseCharacter* Hostile = Pair.Key.Get();
+			if (Hostile == nullptr)
+			{
+				continue;
+			}
+			const float Moved2D = static_cast<float>(FVector::Dist2D(Hostile->GetActorLocation(), Pair.Value));
+			BestMove = FMath::Max(BestMove, Moved2D);
+			if (Moved2D > 100.0f)
+			{
+				++Moved;
+			}
+		}
+		Report(*this, TEXT("vijanden die van hun spawnplek kwamen"), Moved, TEXT(""),
+			*FString::Printf(TEXT("van %d — stilstaande vijanden maken er een schiettent van"), HostileStartPositions.Num()));
+		Report(*this, TEXT("grootste vijandbeweging"), BestMove, TEXT("cm"));
 	}
 
 	Report(*this, TEXT("afgelegde weg naar het controlepost"), FVector::Dist2D(Harness.Location(), StartLocation), TEXT("cm"));

@@ -107,6 +107,12 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 
   De dekkingspunt-projectie is blijven staan: hij loste dit niet op, maar hij is op eigen merites juist. Een dekkingspunt dat buiten de navmesh valt hoort terug te vallen op het bevolen punt — dat is precies het principe dat in de functie zelf staat: *het order naar de letter uitvoeren wint van het optimaliseren van de geest*.
 
+- **De vijanden bewegen NIET.** Nieuw gemeten, vlak voor het einde van de nacht: **0 van de 4 vijanden komt van zijn spawnplek, grootste beweging 0,00 cm** — over een heel gevecht. Ze schieten wel (in een eerdere ronde ging de speler er zelfs aan dood), maar ze blijven staan waar ze neergezet zijn. Het gevecht is dus een schiettent.
+
+  **Dat is een defect en geen ontbrekend systeem**, en dat onderscheid is hier belangrijk: `AEclipseEnemyController::SenseAndAct` roept gewoon `MoveToActor(Target, Archetype.EngageRange)` aan. De beweging is bedoeld, geschreven en wordt aangeroepen — ze komt alleen niet uit. Dat is dezelfde vorm als de squad-storing van vannacht: een stille `MoveTo`-mislukking.
+
+  Ik ben er niet meer aan begonnen. Niet omdat het groot is, maar omdat ik vannacht heb geleerd wat het kost om een nieuwe hypothese-jacht te openen als de aandacht op is — dat leverde acht doodlopende sporen op terwijl het antwoord in mijn eigen log stond. **De eerstvolgende stap is bekend en goedkoop:** log de uitkomstcode van die `MoveToActor` (precies de truc die bij de squad de doorbraak gaf; toen de regel níét vuurde, wist ik dat de weigering ergens anders vandaan kwam). De meting staat al in elke bar-run, dus een poging is binnen een minuut beoordeeld.
+
 ## 3. Beslissingen die ik zelf genomen heb, en waarop
 
 | Beslissing | Grond |
