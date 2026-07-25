@@ -37,6 +37,20 @@ namespace
 		TEXT("1 = show the P2-02 R3 criteria panel on the debug HUD and arm its manual keys (F4-F8). Default off."),
 		ECVF_Default);
 
+	/**
+	 * In-game test guide (phase0/INGAME_TESTGIDS.md; owner picked variant A —
+	 * detect and tick off, never lock a control). Default OFF like every other
+	 * debug tier: 1 opens the guide the moment the mission HUD mounts. F3 toggles
+	 * it either way, following the F2/H convention that a keypress is the tester
+	 * explicitly asking for a panel. Deliberately absent: Eclipse.Guide.Strict —
+	 * variant B stays unbuilt until A proves its detection per control.
+	 */
+	TAutoConsoleVariable<int32> CVarEclipseGuideOverlay(
+		TEXT("Eclipse.Guide.Overlay"),
+		0,
+		TEXT("1 = open the in-game test guide as soon as the mission HUD mounts (F3 toggles it at any time). Default off."),
+		ECVF_Default);
+
 	/** In-place refresh cadence, wall clock: a burst of order facts may not turn into a burst of string work. */
 	constexpr double GauntletRefreshIntervalSeconds = 0.1;
 
@@ -104,6 +118,12 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	ConfidenceAnswer = EEclipseGauntletAnswer::Unanswered;
 	PlaytestAnswers.Init(EEclipseGauntletAnswer::Unanswered, PlaytestQuestionCount);
 
+	// Same reasoning for the guide: a new mission is a new walk through the list,
+	// and the previous run's summary was archived on teardown.
+	GuideProgress.Reset();
+	bGuideSummaryEmitted = false;
+	bGuideVisible = CVarEclipseGuideOverlay.GetValueOnGameThread() > 0;
+
 	BuildStaticPanels();
 
 	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
@@ -143,6 +163,7 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	RefreshDeviceHighlight();
 	RefreshPlaytestRows();
 	RefreshGauntletRows(/*bForce*/ true);
+	RefreshGuideRows(/*bForce*/ true);
 	Rebuild();
 }
 
@@ -179,8 +200,10 @@ void UEclipseMissionHudWidget::NativeDestruct()
 
 	// Teardown is "closing the gauntlet" (mission end, level travel, quit): the
 	// verdict block must survive it. Nothing measured or answered = nothing to
-	// say, and a shot round is not a gauntlet at all.
-	if (IsDebugHudAllowed() && ComposeVerdict(GatherCriteria()).OpenCount < CriterionCount)
+	// say, and a shot round is not a gauntlet at all. A half-walked test guide is
+	// evidence too, so it counts as something to say.
+	if (IsDebugHudAllowed()
+		&& (ComposeVerdict(GatherCriteria()).OpenCount < CriterionCount || GuideProgress.HasAnyProgress()))
 	{
 		EmitVerdictSummary();
 	}
@@ -198,6 +221,10 @@ void UEclipseMissionHudWidget::OnAnyFact(FGameplayTag /*EventTag*/, const FInsta
 	Rebuild();
 	ApplyPanelVisibility();
 	RefreshGauntletRows(/*bForce*/ false);
+
+	// The guide's responsiveness row carries the live order measurement, so it
+	// follows the same throttled, hidden-is-free path — never a rebuild.
+	RefreshGuideRows(/*bForce*/ false);
 }
 
 void UEclipseMissionHudWidget::Rebuild()
@@ -221,7 +248,7 @@ void UEclipseMissionHudWidget::Rebuild()
 		// The mode word and the two controls that matter come FIRST (13.2 finding):
 		// a tester who boots into a run should never have to guess whether the game
 		// has his input. The base hub says the mirror image of this line.
-		AddLine(FString::Printf(TEXT("== MISSION ACTIVE  [%s]%s%s  —  WASD move · Q hold = Command Mode · F2 controls =="),
+		AddLine(FString::Printf(TEXT("== MISSION ACTIVE  [%s]%s%s  —  WASD move · Q hold = Command Mode · F2 controls · F3 testgids =="),
 			*UEnum::GetValueAsString(Mission->GetPhase()).RightChop(FString(TEXT("EEclipseMissionPhase::")).Len()),
 			bAlarm ? TEXT("  ALARM") : TEXT(""),
 			bCasualty ? TEXT("  CASUALTY") : TEXT("")));
@@ -303,6 +330,7 @@ void UEclipseMissionHudWidget::BuildStaticPanels()
 	// write into orphaned widgets that are no longer in the tree.
 	GauntletRows.Reset();
 	PlaytestRows.Reset();
+	GuideRows.Reset();
 	MouseKeyboardCells.Reset();
 	ControllerCells.Reset();
 
@@ -315,7 +343,7 @@ void UEclipseMissionHudWidget::BuildStaticPanels()
 		GauntletRows.Add(AddHudTextRow(*WidgetTree, *GauntletPanel, FString()));
 	}
 	AddHudTextRow(*WidgetTree, *GauntletPanel,
-		TEXT("F4 schone pick · F5 mis-pick · F6 comfort · F7 vertrouwen · F8 nieuwe beat · F2 besturing · H playtest"),
+		TEXT("F4 schone pick · F5 mis-pick · F6 comfort · F7 vertrouwen · F8 nieuwe beat · F2 besturing · F3 testgids · H playtest"),
 		ColourDim);
 
 	// ---- Control overview (F2): label column + the two device columns --------
@@ -360,6 +388,15 @@ void UEclipseMissionHudWidget::BuildStaticPanels()
 		PlaytestRows.Add(AddHudTextRow(*WidgetTree, *PlaytestPanel, FString()));
 	}
 	AddHudTextRow(*WidgetTree, *PlaytestPanel, TEXT("toggle per regel: 6 7 8 9 0  (onbeantwoord -> goed -> slecht)"), ColourDim);
+
+	// ---- In-game test guide (F3): fixed rows, refreshed in place ------------
+	GuidePanel = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+	Root->AddChildToVerticalBox(GuidePanel);
+	GuideRows.Reserve(EclipseTestGuide::GuidePanelLineCount);
+	for (int32 Line = 0; Line < EclipseTestGuide::GuidePanelLineCount; ++Line)
+	{
+		GuideRows.Add(AddHudTextRow(*WidgetTree, *GuidePanel, FString()));
+	}
 }
 
 bool UEclipseMissionHudWidget::IsGauntletPanelVisible() const
@@ -387,6 +424,7 @@ void UEclipseMissionHudWidget::ApplyPanelVisibility()
 	Apply(GauntletPanel, IsGauntletPanelVisible());
 	Apply(ControlsPanel, bControlsVisible);
 	Apply(PlaytestPanel, bPlaytestVisible);
+	Apply(GuidePanel, IsGuidePanelVisible());
 }
 
 void UEclipseMissionHudWidget::RefreshGauntletRows(bool bForce)
@@ -436,6 +474,139 @@ void UEclipseMissionHudWidget::RefreshPlaytestRows()
 		{
 			PlaytestRows[Line]->SetText(FText::FromString(Lines[Line]));
 		}
+	}
+}
+
+FString UEclipseMissionHudWidget::DescribeOrderRoundTrip() const
+{
+	// The same wall-clock meter criterion 1 is judged on (the squad layer owns it);
+	// the guide only quotes it, so the two panels can never disagree. Empty means
+	// "not measured", never "fine so far".
+	const UWorld* World = GetWorld();
+	const UEclipseSquadSubsystem* Squad = World != nullptr ? World->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+	if (Squad == nullptr)
+	{
+		return FString();
+	}
+
+	const EclipseSquadOrderLogic::FEclipseOrderRoundTripStats& Stats = Squad->GetOrderRoundTripStats();
+	if (Stats.SampleCount <= 0)
+	{
+		return FString();
+	}
+	constexpr double BarSeconds = EclipseSquadOrderLogic::FEclipseOrderRoundTripStats::BarSeconds;
+	return FString::Printf(TEXT("%d/%d binnen %.2f s (slechtste %.3f s)"),
+		Stats.WithinBarCount, Stats.SampleCount, BarSeconds, Stats.WorstSeconds);
+}
+
+void UEclipseMissionHudWidget::RefreshGuideRows(bool bForce)
+{
+	if (GuideRows.IsEmpty() || !IsGuidePanelVisible())
+	{
+		return; // hidden guide = zero work per fact
+	}
+
+	const double NowWallSeconds = FPlatformTime::Seconds();
+	if (!bForce && (NowWallSeconds - LastGuideRefreshWallSeconds) < GauntletRefreshIntervalSeconds)
+	{
+		return;
+	}
+	LastGuideRefreshWallSeconds = NowWallSeconds;
+
+	const int32 ActiveStep = GuideProgress.GetActiveIndex();
+	const TArray<FString> Lines = EclipseTestGuide::ComposeGuidePanelLines(GuideProgress, DescribeOrderRoundTrip());
+	for (int32 Line = 0; Line < GuideRows.Num() && Line < Lines.Num(); ++Line)
+	{
+		UTextBlock* Row = GuideRows[Line];
+		if (Row == nullptr)
+		{
+			continue;
+		}
+		Row->SetText(FText::FromString(Lines[Line]));
+
+		// Line 0 is the header, the last line the tally; in between one step each,
+		// in the order ComposeGuidePanelLines guarantees. The active step is the
+		// only bright row — settled steps dim so the eye lands on what to do next.
+		const int32 StepIndex = Line - 1;
+		const bool bStepRow = StepIndex >= 0 && StepIndex < EclipseTestGuide::GuideStepCount;
+		Row->SetColorAndOpacity(FSlateColor(bStepRow
+			? (StepIndex == ActiveStep ? ColourNeutral : ColourDim)
+			: ColourNeutral));
+	}
+}
+
+void UEclipseMissionHudWidget::ToggleGuidePanel()
+{
+	bGuideVisible = !bGuideVisible;
+	ApplyPanelVisibility();
+	RefreshGuideRows(/*bForce*/ true);
+}
+
+void UEclipseMissionHudWidget::ConfirmGuideStep()
+{
+	if (!IsGuidePanelVisible() || !GuideProgress.ConfirmActive())
+	{
+		return; // a closed guide steals no key; a finished guide has nothing to settle
+	}
+	OnGuideStepSettled();
+}
+
+void UEclipseMissionHudWidget::SkipGuideStep()
+{
+	if (!IsGuidePanelVisible() || !GuideProgress.RejectActive())
+	{
+		return;
+	}
+	OnGuideStepSettled();
+}
+
+void UEclipseMissionHudWidget::NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal Signal)
+{
+	// Cheapest possible early-out: this runs from the controller's extra Started
+	// bindings, i.e. only when the player actually presses something, and with the
+	// guide closed it costs one bool test. No tick, no key polling, no consumption.
+	if (!IsGuidePanelVisible() || !GuideProgress.NoteSignal(Signal))
+	{
+		return;
+	}
+	OnGuideStepSettled();
+}
+
+void UEclipseMissionHudWidget::OnGuideStepSettled()
+{
+	using namespace EclipseGauntletOverlay;
+
+	// Deel 3 IS the 13.2 checklist, so answering it in the guide answers it in the
+	// playtest block: one set of books on the owner's gate question.
+	const TArray<EclipseTestGuide::EEclipseGuideStepState>& States = GuideProgress.GetStates();
+	for (int32 Step = 0; Step < States.Num(); ++Step)
+	{
+		const int32 Question = EclipseTestGuide::GetPlaytestQuestionIndex(Step);
+		if (Question == INDEX_NONE || !PlaytestAnswers.IsValidIndex(Question))
+		{
+			continue;
+		}
+		switch (States[Step])
+		{
+		case EclipseTestGuide::EEclipseGuideStepState::Confirmed:
+			PlaytestAnswers[Question] = EEclipseGauntletAnswer::Good;
+			break;
+		case EclipseTestGuide::EEclipseGuideStepState::Rejected:
+			PlaytestAnswers[Question] = EEclipseGauntletAnswer::Bad;
+			break;
+		default:
+			break; // Pending/Skipped leave the row unanswered — never a fabricated verdict
+		}
+	}
+	RefreshPlaytestRows();
+	RefreshGuideRows(/*bForce*/ true);
+
+	// Finishing the list archives it through the gauntlet's existing summary path
+	// — one mechanism, one file. Once per mount: further keys have nothing to add.
+	if (GuideProgress.IsComplete() && !bGuideSummaryEmitted)
+	{
+		bGuideSummaryEmitted = true;
+		EmitVerdictSummary();
 	}
 }
 
@@ -610,6 +781,15 @@ void UEclipseMissionHudWidget::EmitVerdictSummary()
 	TArray<FString> Block = Verdict.Lines;
 	Block.Add(FString());
 	Block.Append(ComposePlaytestBlock(PlaytestAnswers));
+
+	// The test guide rides along in the same block and the same file (spec §4: the
+	// guide is a mode of this overlay, not a second archive). A guide nobody walked
+	// adds nothing — an empty section would only dilute the verdict above it.
+	if (GuideProgress.HasAnyProgress())
+	{
+		Block.Add(FString());
+		Block.Append(EclipseTestGuide::ComposeGuideSummaryBlock(GuideProgress));
+	}
 
 	for (const FString& Line : Block)
 	{

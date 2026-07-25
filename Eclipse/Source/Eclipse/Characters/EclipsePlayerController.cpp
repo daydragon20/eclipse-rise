@@ -21,6 +21,7 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "UI/EclipseBaseHubWidget.h"
 #include "UI/EclipseMissionHudWidget.h"
+#include "UI/EclipseTestGuideLogic.h"
 
 AEclipsePlayerController::AEclipsePlayerController()
 {
@@ -271,9 +272,11 @@ void AEclipsePlayerController::SetupInputComponent()
 	Input->BindActionValueLambda(DirectPickAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->PickSoldierUnderReticle(); } });
 	Input->BindActionValueLambda(StanceToggleAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->ToggleHeldStance(); } });
 
-	// Debug overlay (feel gauntlet, SPEC-P2-02 R3). Function keys and 6-0 only:
-	// every gameplay binding above stays untouched, and F1 is the engine's. The
-	// handlers route into the one HUD widget — there is no second overlay.
+	// Debug overlay (feel gauntlet, SPEC-P2-02 R3) + the in-game test guide
+	// (phase0/INGAME_TESTGIDS.md). Function keys and letters that no gameplay
+	// action claims: F1 is the engine's, F2/F4-F8/H were already the gauntlet's,
+	// and F3/J/N were free (checked against every EKeys reference in the module).
+	// The handlers route into the one HUD widget — there is no second overlay.
 	struct FDebugOverlayBinding
 	{
 		FKey Key;
@@ -282,6 +285,9 @@ void AEclipsePlayerController::SetupInputComponent()
 	const FDebugOverlayBinding DebugBindings[] = {
 		{ EKeys::F2, [](UEclipseMissionHudWidget& Hud) { Hud.ToggleControlsPanel(); } },
 		{ EKeys::H,  [](UEclipseMissionHudWidget& Hud) { Hud.TogglePlaytestPanel(); } },
+		{ EKeys::F3, [](UEclipseMissionHudWidget& Hud) { Hud.ToggleGuidePanel(); } },
+		{ EKeys::J,  [](UEclipseMissionHudWidget& Hud) { Hud.ConfirmGuideStep(); } },
+		{ EKeys::N,  [](UEclipseMissionHudWidget& Hud) { Hud.SkipGuideStep(); } },
 		{ EKeys::F4, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ true); } },
 		{ EKeys::F5, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ false); } },
 		{ EKeys::F6, [](UEclipseMissionHudWidget& Hud) { Hud.CycleComfortAnswer(); } },
@@ -308,6 +314,53 @@ void AEclipsePlayerController::SetupInputComponent()
 			if (MissionHud != nullptr && MissionHud->IsInViewport())
 			{
 				Invoke(*MissionHud);
+			}
+		});
+	}
+
+	// Test-guide detection (variant A). A SECOND delegate on the actions bound
+	// above — Enhanced Input dispatches every binding that matches an action and
+	// event, so the gameplay handler keeps running untouched, nothing is consumed
+	// and no mapping changes. ETriggerEvent::Started, not Triggered: Started fires
+	// once when an action actuates (None -> Triggered raises Started first,
+	// EnhancedPlayerInput.cpp), so holding W does not call the guide every frame.
+	// This is why the guide needs no tick and reads no keys itself.
+	struct FGuideSignalBinding
+	{
+		UInputAction* Action;
+		EclipseTestGuide::EEclipseGuideSignal Signal;
+	};
+	const FGuideSignalBinding GuideSignals[] = {
+		{ MoveAction,          EclipseTestGuide::EEclipseGuideSignal::Move },
+		{ LookAction,          EclipseTestGuide::EEclipseGuideSignal::Look },
+		{ FireAction,          EclipseTestGuide::EEclipseGuideSignal::Fire },
+		{ SprintAction,        EclipseTestGuide::EEclipseGuideSignal::Sprint },
+		{ CrouchAction,        EclipseTestGuide::EEclipseGuideSignal::Crouch },
+		{ CommandHoldAction,   EclipseTestGuide::EEclipseGuideSignal::CommandMode },
+		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext },
+		{ SelectPrevAction,    EclipseTestGuide::EEclipseGuideSignal::SelectPrev },
+		{ DirectPickAction,    EclipseTestGuide::EEclipseGuideSignal::DirectPick },
+		{ StanceToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Stance },
+		// All four order keys answer the one "orders" step; the step is about the
+		// order path working, not about which of the four you happened to press.
+		{ OrderActions[0],     EclipseTestGuide::EEclipseGuideSignal::Order },
+		{ OrderActions[1],     EclipseTestGuide::EEclipseGuideSignal::Order },
+		{ OrderActions[2],     EclipseTestGuide::EEclipseGuideSignal::Order },
+		{ OrderActions[3],     EclipseTestGuide::EEclipseGuideSignal::Order }
+	};
+
+	for (const FGuideSignalBinding& Binding : GuideSignals)
+	{
+		if (Binding.Action == nullptr)
+		{
+			continue; // a missing action costs the guide one undetectable step, never a crash (GDD 14.3.5)
+		}
+		const EclipseTestGuide::EEclipseGuideSignal Signal = Binding.Signal;
+		Input->BindActionValueLambda(Binding.Action, ETriggerEvent::Started, [this, Signal](const FInputActionValue&)
+		{
+			if (MissionHud != nullptr && MissionHud->IsInViewport())
+			{
+				MissionHud->NoteGuideSignal(Signal);
 			}
 		});
 	}

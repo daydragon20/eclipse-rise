@@ -109,10 +109,15 @@ private:
 	TObjectPtr<UInputAction> StanceToggleAction;
 
 	/**
-	 * Debug-overlay bindings (F2/H/F4-F8 + the playtest row keys), built from one
-	 * table in SetupInputComponent. They only ever call into the mission HUD; with
-	 * no HUD mounted (base mode, -EclipseShot) they do nothing at all, and the
-	 * panels themselves ignore their keys while closed.
+	 * Debug-overlay bindings (F2/F3/H/F4-F8, J/N and the playtest row keys), built
+	 * from one table in SetupInputComponent. They only ever call into the mission
+	 * HUD; with no HUD mounted (base mode, -EclipseShot) they do nothing at all,
+	 * and the panels themselves ignore their keys while closed.
+	 *
+	 * The test guide's *detection* needs no entry here: it binds a second
+	 * ETriggerEvent::Started delegate onto the gameplay actions that already
+	 * exist, so it observes without owning, consuming or remapping anything
+	 * (phase0/INGAME_TESTGIDS.md, variant A).
 	 */
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> DebugOverlayActions;

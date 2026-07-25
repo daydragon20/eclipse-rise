@@ -4,6 +4,7 @@
 #include "Core/EclipseEventBusSubsystem.h"
 #include "CoreMinimal.h"
 #include "UI/EclipseGauntletOverlayLogic.h"
+#include "UI/EclipseTestGuideLogic.h"
 #include "EclipseMissionHudWidget.generated.h"
 
 class IConsoleObject;
@@ -14,9 +15,9 @@ class UVerticalBox;
 /**
  * Debug-grade in-mission HUD (SPEC-P1-05 objective list + SPEC-P1-06 order-state
  * widget) and — since the P2-02 feel gauntlet — the single in-game debug overlay:
- * control overview (F2), the five R3 criteria, and the 13.2 playtest checklist
- * (H). One widget on purpose: a second overlay would draw the same facts twice.
- * No art, the readout *is* the deliverable (GDD 14.5 step 4).
+ * control overview (F2), the five R3 criteria, the 13.2 playtest checklist (H)
+ * and the in-game test guide (F3). One widget on purpose: a second overlay would
+ * draw the same facts twice. No art, the readout *is* the deliverable (14.5 step 4).
  *
  * Two rendering paths, deliberately separated:
  *  - the live sections (objectives, squad orders, Command Mode state) rebuild
@@ -48,9 +49,26 @@ public:
 	 */
 	static bool IsDebugHudAllowed();
 
-	/** F2 — control overview; H — 13.2 playtest checklist. Driven by the controller's debug bindings. */
+	/** F2 — control overview; H — 13.2 playtest checklist; F3 — the in-game test guide. Driven by the controller's debug bindings. */
 	void ToggleControlsPanel();
 	void TogglePlaytestPanel();
+	void ToggleGuidePanel();
+
+	/**
+	 * Test guide, variant A (phase0/INGAME_TESTGIDS.md BESLOTEN block): J settles
+	 * the active step positively ("gehaald" / "goed" / "ja"), N negatively ("sla
+	 * over" / "niet goed" / "nee"). Both no-op while the guide panel is closed —
+	 * a closed panel steals no key, exactly like the gauntlet's manual keys.
+	 */
+	void ConfirmGuideStep();
+	void SkipGuideStep();
+
+	/**
+	 * One of the player controller's EXISTING input actions fired. The guide
+	 * listens next to the real handler and never consumes, blocks or rewrites it;
+	 * with the panel closed this is a single bool test and nothing else happens.
+	 */
+	void NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal Signal);
 
 	/** Criterion 2 by hand: one clean pick, or one mis-pick (a mis-pick falsifies the criterion — draaiboek). */
 	void NoteTargetingPick(bool bCleanPick);
@@ -82,6 +100,15 @@ private:
 
 	void RefreshPlaytestRows();
 
+	/** In-place refresh of the guide rows; wall-clock throttled, and free while the guide is hidden. */
+	void RefreshGuideRows(bool bForce);
+
+	/** A settled guide step: refresh, mirror deel-3 answers into the 13.2 rows, and archive once when the list runs out. */
+	void OnGuideStepSettled();
+
+	/** Criterion 1's measurement as one short phrase for the guide's responsiveness row; empty while nothing is measured. */
+	FString DescribeOrderRoundTrip() const;
+
 	/** Mark the column of the device the player last touched (Enhanced Input's device subsystem tells us; no polling). */
 	void RefreshDeviceHighlight();
 
@@ -89,6 +116,9 @@ private:
 
 	/** True when the R3 criteria panel is switched on (CVar Eclipse.Gauntlet.Overlay). */
 	bool IsGauntletPanelVisible() const;
+
+	/** True while the test guide is on screen (CVar Eclipse.Guide.Overlay starts it open; F3 toggles). */
+	bool IsGuidePanelVisible() const { return bGuideVisible; }
 
 	/** Read the five criteria out of the layers that own them. */
 	EclipseGauntletOverlay::FEclipseGauntletCriteria GatherCriteria() const;
@@ -109,6 +139,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> PlaytestPanel;
 
+	UPROPERTY()
+	TObjectPtr<UVerticalBox> GuidePanel;
+
 	/** One row per verdict line (title + 5 criteria + tally), created once. */
 	UPROPERTY()
 	TArray<TObjectPtr<UTextBlock>> GauntletRows;
@@ -116,6 +149,10 @@ private:
 	/** One row per playtest block line (header + 5 statements + gate), created once. */
 	UPROPERTY()
 	TArray<TObjectPtr<UTextBlock>> PlaytestRows;
+
+	/** One row per guide panel line (header + 20 steps + tally), created once. */
+	UPROPERTY()
+	TArray<TObjectPtr<UTextBlock>> GuideRows;
 
 	/** Column cells of the control table (index 0 = the column header), for the active-device highlight. */
 	UPROPERTY()
@@ -136,11 +173,23 @@ private:
 	EclipseGauntletOverlay::EEclipseGauntletAnswer ConfidenceAnswer = EclipseGauntletOverlay::EEclipseGauntletAnswer::Unanswered;
 	TArray<EclipseGauntletOverlay::EEclipseGauntletAnswer> PlaytestAnswers;
 
+	/**
+	 * Test-guide state (variant A). Progress is the only thing the guide owns; the
+	 * steps themselves are pure data and the detection comes from the controller's
+	 * existing input actions.
+	 */
+	EclipseTestGuide::FEclipseGuideProgress GuideProgress;
+
 	bool bControlsVisible = false;
 	bool bPlaytestVisible = false;
+	bool bGuideVisible = false;
+
+	/** The completion summary is written once per mount, not once per keypress after the last step. */
+	bool bGuideSummaryEmitted = false;
 
 	/** Wall-clock stamp of the last in-place refresh (throttle; never the dilated clock). */
 	double LastGauntletRefreshWallSeconds = 0.0;
+	double LastGuideRefreshWallSeconds = 0.0;
 
 	IConsoleObject* SummaryCommand = nullptr;
 };
