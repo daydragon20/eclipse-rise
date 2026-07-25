@@ -43,6 +43,12 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "SPEEL_ECLIPSE.bat leert je drie dingen die niet meer kloppen", prio: "gauw", waarom: "Je leest dat bestand bij elke start, dus het moet kloppen. Ik heb het niet zelf bijgewerkt omdat je er op dat moment zelf in bezig was — ik ga niet over je eigen bestand heen schrijven. Zeg 'bat bijwerken' en ik doe het, of pas de drie regels zelf aan. De volledige geverifieerde lijst staat intussen in BESTURING.md, met per actie de handler-functie die eraan hangt.", stappen: [
+      "Regel over 1e/3e persoon zegt R3 — die is er bewust AF, precies omdat jij hem per ongeluk raakte met je richtstick. Op de pad zit er nu geen knop meer op; toetsenbord houdt C",
+      "Springen en mikken staan er niet in, want die bestonden vanochtend nog niet: Spatie/A voor springen, RMB/LT voor mikken",
+      "LT doet twee dingen afhankelijk van de context: mikken in het veld, vorige soldaat tijdens de Q/LB-hold",
+      "Bij hurken mag een kanttekening: dat was tot vandaag een DODE toets (bCanCrouch stond nergens aan), dus als je het test is het nieuw gedrag"
+    ] },
     { titel: "Start opnieuw: de tuning ZIT er nu in (gemeten), je speelde ervoor", prio: "nu", waarom: "Je verdenking was scherp en de asset-datum was een echte rode vlag — maar de meting draait de uitkomst om. Een DataAsset dat is opgeslagen VOORDAT een property bestond heeft voor die property geen opgeslagen waarde, dus valt hij terug op de C++-default. Alle waarden uit de tuning-ronde zijn nieuwe velden. Er staat nu een logregel die uitleest wat er ná het toepassen echt op het component staat, en die zegt: accel 1400, draai 500 gr/s, luchtcontrole 0,35, sprong 500, valrem 1500, min-analoog 20 — op alle vier de gespawnde characters, zonder één waarschuwing. Je speelde om 20:48 en 21:26; de locomotie-tuning landde daarvoor nog niet in de build die jij draaide.", stappen: [
       "Start de game opnieuw (SPEEL_ECLIPSE.bat) — dan draai je op de build mét de tuning",
       "Let vooral op omkeren: de draaisnelheid van het lichaam ging van 360 naar 500 gr/s, en dat was de eigenlijke oorzaak van het schaatsgevoel",
