@@ -14,6 +14,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
+#include "NavigationSystem.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "InputModifiers.h"
@@ -255,6 +256,23 @@ void AEclipsePlayerController::EnterMissionMode()
 					? TEXT("skipped — no game viewport (headless run), as designed")
 					: TEXT("NOT CREATED — widget construction failed")))
 			: (MissionHud->IsInViewport() ? TEXT("mounted") : TEXT("created but NOT in the viewport")));
+
+	// Kan de squad überhaupt ergens heen? Zonder navmesh weigert elke MoveTo met
+	// NoRoute, en dat ziet er voor de speler uit als een squad die niets doet.
+	// Deze regel maakt "volgt mijn squad me?" een MEETBARE vraag in plaats van een
+	// indruk — dezelfde reden als de bindings-regel hieronder.
+	if (const UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
+	{
+		FNavLocation Projected;
+		const bool bNavUnderPawn = GetPawn() != nullptr
+			&& Nav->ProjectPointToNavigation(GetPawn()->GetActorLocation(), Projected, FVector(500.0f, 500.0f, 500.0f));
+		UE_LOG(LogEclipse, Display, TEXT("Navigatie: %d grens(zen), navmesh onder de speler = %s. Zonder navmesh weigert de squad elke verplaatsingsorder met 'no route'."),
+			Nav->GetNavigationBounds().Num(), bNavUnderPawn ? TEXT("JA") : TEXT("NEE"));
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Navigatie: GEEN navigatiesysteem in deze wereld — de squad kan nergens heen."));
+	}
 
 	// S3, feel-audit 2026-07-25: de owner bond F9 aan Eclipse.Feel.Dump via
 	// DebugExecBindings en er kwam nooit een regel in het log. "De binding is niet
