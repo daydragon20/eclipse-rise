@@ -75,7 +75,16 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
   | Het orderdoel ligt buiten de navmesh | doel projecteren | **ligt erop**, en alle 3 de soldaten ook |
   | Het gekozen DEKKINGSpunt ligt achter geometrie, buiten de mesh | punt op de mesh projecteren met terugval | **nog steeds drie weigeringen** |
 
-  Daarmee staat vast dat `MoveToLocation` zélf faalt terwijl vertrekpunt én doel op de navmesh liggen. De volgende verdachte is dus niet de geometrie maar de opzet van het pad-volgen: de nav-agent van de squadpawn tegenover de geregistreerde nav data, of de pathfollowing-component van de AI-controller. Dat is waar de volgende sessie moet beginnen, en drie doodlopende sporen liggen al achter de rug.
+  Daarna nog twee, en die pellen het verder af:
+
+  | Hypothese | Meting | Uitkomst |
+  |---|---|---|
+  | De nav-agent van de squadpawn vindt geen nav data | agent opzoeken | **`RecastNavMesh-Default`** — hij resolvet gewoon |
+  | Er ís geen pad naar het doel | padzoeker rechtstreeks bevragen | **pad gevonden** (gedeeltelijk) |
+
+  **Dus: er is navmesh, er is een nav-agent, er is een pad — en `MoveToLocation` faalt toch.** Dat is een scherpe, ongemakkelijke stand, en het is precies het soort plek waar plausibel redeneren geld kost. Ik heb nog één ding geprobeerd (`bProjectDestinationToNavigation` aanzetten, want een gedeeltelijk pad wijst op een doel net naast de mesh); dat veranderde niets en is **teruggedraaid** — een wijziging die niets aantoonbaar oplost hoort niet in de boom, hoe redelijk hij ook klinkt.
+
+  **Waar de volgende sessie begint:** vijf hypotheses liggen achter de rug, en de resterende ruimte is de pathfollowing-component van de AI-controller zelf — dus wat er tussen "pad gevonden" en "aanvraag geaccepteerd" gebeurt. Dat is een klein stuk code met een goedkope proef eromheen: de speelronde meet navmesh, agent, pad en weigeringen in één run.
 
   De dekkingspunt-projectie is blijven staan: hij loste dit niet op, maar hij is op eigen merites juist. Een dekkingspunt dat buiten de navmesh valt hoort terug te vallen op het bevolen punt — dat is precies het principe dat in de functie zelf staat: *het order naar de letter uitvoeren wint van het optimaliseren van de geest*.
 

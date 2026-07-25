@@ -44,6 +44,7 @@
 #include "HAL/IConsoleManager.h"
 #include "Misc/AutomationTest.h"
 #include "NavigationData.h"
+#include "NavigationPath.h"
 #include "NavigationSystem.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Quests/EclipseMissionTypes.h"
@@ -385,6 +386,31 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 			}
 			AddInfo(FString::Printf(TEXT("speelronde: orderdoel op navmesh = %s · soldaten op navmesh = %d van %d"),
 				bTargetOnMesh ? TEXT("JA") : TEXT("NEE"), OnMesh, Soldiers));
+
+			// De beslissende vraag, nu de geometrie is vrijgepleit: KAN er een pad
+			// gevonden worden? Vindt de padzoeker er wel een en faalt MoveToLocation
+			// toch, dan ligt het aan de controller-opzet. Vindt hij er geen terwijl
+			// begin en eind allebei op de mesh liggen, dan matcht de nav-agent van
+			// deze pawn niet met de geregistreerde nav data.
+			for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+			{
+				AEclipseCharacter* Soldier = *It;
+				if (Soldier == nullptr || Soldier == Harness.Body || !Soldier->IsPlayerSide())
+				{
+					continue;
+				}
+				const ANavigationData* AgentData = Nav->GetNavDataForProps(Soldier->GetNavAgentPropertiesRef());
+				const FPathFindingResult Path = Nav->FindPathSync(
+					FPathFindingQuery(Soldier, *Nav->GetDefaultNavDataInstance(),
+						Soldier->GetNavAgentLocation(), OrderTarget));
+				AddInfo(FString::Printf(
+					TEXT("speelronde: '%s' — nav-data voor zijn agent = %s · padzoeker = %s%s"),
+					*Soldier->GetName(),
+					AgentData != nullptr ? *AgentData->GetName() : TEXT("GEEN"),
+					Path.IsSuccessful() ? TEXT("pad gevonden") : TEXT("GEEN pad"),
+					Path.IsPartial() ? TEXT(" (gedeeltelijk)") : TEXT("")));
+				break; // één soldaat is genoeg om dit te beantwoorden
+			}
 		}
 		Squad->IssueOrderToAll(EEclipseSquadOrder::MoveTo, OrderTarget, nullptr);
 		Harness.Idle(0.5f);

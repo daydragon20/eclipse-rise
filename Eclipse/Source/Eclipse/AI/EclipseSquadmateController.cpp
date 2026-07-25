@@ -77,6 +77,12 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 		const float AcceptanceRadius = Order == EEclipseSquadOrder::MoveTo
 			? (Tuning != nullptr ? Tuning->MoveAcceptanceRadius : 50.0f)
 			: (Tuning != nullptr ? Tuning->RegroupAcceptanceRadius : 150.0f);
+		// bProjectDestinationToNavigation is hier BEWUST niet aangezet, en dat is de
+		// uitkomst van een proef: ik heb het geprobeerd omdat de padzoeker een
+		// GEDEELTELIJK pad teruggaf, wat op een doel net naast de mesh wees. Het
+		// veranderde niets aan de weigeringen, dus het bewijs ontbreekt en de
+		// wijziging is teruggedraaid. Een aanpassing die niets aantoonbaar oplost
+		// hoort niet in de boom, hoe redelijk hij ook klinkt.
 		if (MoveToLocation(Destination, AcceptanceRadius) == EPathFollowingRequestResult::Failed)
 		{
 			StopMovement();
