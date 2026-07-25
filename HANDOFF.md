@@ -140,9 +140,27 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
-## ÉÉN ONGECOMMITTE WIJZIGING (2026-07-25 16:45) — alleen relevant bij een crash
+## GEPARKEERDE WIJZIGING (2026-07-25 17:25) — owner test de game
 
-`Eclipse/Source/Eclipse/Core/EclipseGrayboxBuilder.cpp` bevat één niet-gecommitte
+Twee palet-wijzigingen voor dressing-iteratie 3 staan **als patch geparkeerd**, niet
+in de werkboom:
+`<scratchpad>/pending_pool_barrier.patch` (3749 bytes), toepassen met `git apply`.
+
+Inhoud: (1) stap 4 — de pool herderiveerd naar authored ×0.35-0.40 omdat hij op
+6.25× zijn eigen vloer stond waar het ontwerp 2.18× zegt (drie onafhankelijke
+bewijzen in de patch-comment); (2) stap 7 tweede bisectiestap — de barrière van
+authored 0.0945 naar 0.046, want 0.0945 landde op frame 0.2909 waar het doel ≤0.15
+is. Beide zijn NIET gebouwd en dus niet geverifieerd.
+
+**Waarom geparkeerd in plaats van in de boom gelaten:** de owner ging de game testen.
+Als Unreal hem vraagt de modules te herbouwen, zou hij ongeverifieerde palet-waarden
+binnenkrijgen en een andere build testen dan wat er gecommit is. Boom staat nu exact
+op de gecommitte staat. Na zijn testsessie: patch toepassen, build, shotronde,
+meten tegen de doelen hierboven, dan committen.
+
+## AFGEHANDELD (2026-07-25 16:45) — inmiddels geland als `a333013`, hier voor de historie
+
+`Eclipse/Source/Eclipse/Core/EclipseGrayboxBuilder.cpp` bevatte één niet-gecommitte
 wijziging: de `SpawnGen(LampGlow, ...)`-aanroep is verwijderd. Reden staat in het
 commentaar ter plekke: de tweede art-review vond die emissieve plaat als een
 letterlijke sticker plat in de straat aan de mastvoet (shot 00092, (1105,628)-
