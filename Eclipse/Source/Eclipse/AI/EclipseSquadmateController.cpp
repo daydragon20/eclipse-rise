@@ -83,8 +83,19 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 		// veranderde niets aan de weigeringen, dus het bewijs ontbreekt en de
 		// wijziging is teruggedraaid. Een aanpassing die niets aantoonbaar oplost
 		// hoort niet in de boom, hoe redelijk hij ook klinkt.
-		if (MoveToLocation(Destination, AcceptanceRadius) == EPathFollowingRequestResult::Failed)
+		const EPathFollowingRequestResult::Type MoveResult = MoveToLocation(Destination, AcceptanceRadius);
+		if (MoveResult == EPathFollowingRequestResult::Failed)
 		{
+			// De UITKOMSTCODE erbij, want de engine houdt hem voor zich:
+			// AAIController::MoveTo schrijft zijn faalreden naar de VISUAL log
+			// (UE_VLOG) en niet naar het tekstlog. Daardoor was elke weigering van
+			// buitenaf een zwarte doos — vijf hypotheses zijn erop stukgelopen.
+			// Eén regel maakt "geweigerd" onderscheidbaar van "geweigerd, en wel
+			// hierom", en dat is het verschil tussen zoeken en meten.
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Squad: MoveToLocation geweigerd (%s) — doel %s, acceptatiestraal %.0f, pawn %s."),
+				*UEnum::GetValueAsString(MoveResult), *Destination.ToCompactString(), AcceptanceRadius,
+				GetPawn() != nullptr ? *GetPawn()->GetActorLocation().ToCompactString() : TEXT("geen"));
 			StopMovement();
 			CurrentOrder = EEclipseSquadOrder::Hold;
 			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;

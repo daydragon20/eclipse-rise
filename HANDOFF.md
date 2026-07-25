@@ -84,6 +84,18 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 
   **Dus: er is navmesh, er is een nav-agent, er is een pad — en `MoveToLocation` faalt toch.** Dat is een scherpe, ongemakkelijke stand, en het is precies het soort plek waar plausibel redeneren geld kost. Ik heb nog één ding geprobeerd (`bProjectDestinationToNavigation` aanzetten, want een gedeeltelijk pad wijst op een doel net naast de mesh); dat veranderde niets en is **teruggedraaid** — een wijziging die niets aantoonbaar oplost hoort niet in de boom, hoe redelijk hij ook klinkt.
 
+  **GEVONDEN.** De weigering komt niet uit `MoveToLocation` maar uit de pure beslistabel dáárvoor. `GatherFacts` zet:
+
+  ```
+  Facts.bHasPathToTarget = Path != nullptr && Path->IsValid() && !Path->IsPartial();
+  ```
+
+  en `DecideOrder` weigert met `NoRoute` zodra dat false is. **Een GEDEELTELIJK pad telt dus als geen pad.** Mijn eigen meting van twee ronden eerder zei het al letterlijk — *"padzoeker = pad gevonden (gedeeltelijk)"* — en ik heb er overheen gelezen omdat ik op dat moment naar `MoveToLocation` zocht. Dat is de duurste soort fout van deze nacht: het antwoord stond al in mijn eigen log.
+
+  **En het is geen bug maar een ontwerpkeuze die zich tegen zichzelf keert.** "Orders zijn beloftes" (GDD 8.4) rechtvaardigt weigeren als je niet volledig kunt voldoen. Maar de gemeten praktijk is dat vrijwel elk pad naar een aangewezen punt gedeeltelijk is — je wijst een plek aan op een muur, in dekking, of een halve meter naast de mesh — dus wordt élke order geweigerd, en dan betekent de belofte niets meer.
+
+  **Dat is jouw beslissing, niet de mijne**, want het gaat over wat een order-belofte betékent. De twee opties staan in §4.
+
   **Waar de volgende sessie begint, met de aanwijzing erbij.** Vijf hypotheses liggen achter de rug; de resterende ruimte is wat er gebeurt tussen "pad gevonden" en "aanvraag geaccepteerd". Twee concrete aanknopingspunten uit het log:
 
   - **De engine meldt zelf niets** bij de afwijzing, en dat is geen toeval: `AAIController::MoveTo` schrijft zijn faalreden naar de **visual log** (`UE_VLOG`), niet naar het tekstlog. Vandaar de stilte. Eerste stap is dus die reden zichtbaar maken — de teruggegeven `EPathFollowingRequestResult` meelogen in de weigering, of visual logging aanzetten.
@@ -119,6 +131,7 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 | 7 | **Turn-in-place bouwen** (nu blijft je rug bevroren staan als je alleen de camera draait)? | **Ja, maar het vraagt een draai-animatie.** Zonder animatie krijg je voetslip, en dan ruil je het ene zichtbare defect voor het andere. |
 | 7b | **`AdsLookMultiplier`: 0.35 (nu) of 0.60?** Het commentaar redeneerde naar 0.60 terwijl het veld op 0.35 stond — het commentaar is gecorrigeerd, de waarde niet aangeraakt. | **Laat 0.35 staan tot je hebt gemikt.** Beide zijn onderbouwd (0.35 = wat CoD/Apex verschepen, 0.60 = richting de meetkundig neutrale 0.745). Dit is smaak, en jij hebt ADS nog niet beoordeeld. |
 | 7c | ~~Elke missie begon met een val van 1,6 meter die 0,35 s duurde~~ — **opgelost**. De pawn werd 100 cm bóven het insertiepunt gezet, en dat punt staat zelf al boven de vloer. Nu wordt er naar de grond getraceerd en staat hij meteen. Gemeten: **160,7 → 0,0 cm** en 0,35 → 0,017 s. | Niets te beslissen. Ik had dit eerst als "vraagt beeld" op jouw lijst gezet en dat was te snel geoordeeld — het harnas kan het perfect meten, en de geslaagde speelronde bewijst dat hij niet in de vloer spawnt. |
+| 4b | **Telt een GEDEELTELIJK pad als "ik kan er komen"?** Dat is de hele oorzaak van de weigerende squad: één conditie, `!Path->IsPartial()`. Nu geldt: gedeeltelijk = geen route = weigeren. | **Ja, laat een gedeeltelijk pad tellen — mits de soldaat dan zegt hoe ver hij komt.** "Orders zijn beloftes" pleit voor weigeren, maar in de praktijk is bijna elk pad naar een aangewezen punt gedeeltelijk (je wijst een muur aan, dekking, of net naast de mesh), dus weigert hij álles en betekent de belofte niets. Een soldaat die zegt *"tot daar kom ik"* en dan gaat, houdt de belofte beter dan een die "no route" zegt en blijft staan. Maar dit gaat over wat een order bij ons betékent, dus het is jouw call. |
 | 8 | **Camera-shake, recoil, hitmarkers, sprint-camerastack** — §8 FEEDBACK bestaat volledig niet. | **Na de vorige punten.** Dit is de grootste feel-winst die er nog ligt (Gears koopt met 1,2× sprint méér snelheidsgevoel dan wij met 1,55×), maar het is een bouwopdracht van meerdere sessies. |
 
 ## 5. De eerlijke stand: speelt het beter?
