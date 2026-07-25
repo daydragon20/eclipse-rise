@@ -91,6 +91,13 @@ public:
 	 */
 	void SetCommandModeCamera(bool bActive);
 
+	/**
+	 * Debug-grade ADS (GDD 14.5): pull the boom in and narrow the FOV so aiming
+	 * reads. No spread model and no accuracy change — that is the combat feel
+	 * pass, not this.
+	 */
+	void SetAiming(bool bNewAiming);
+
 	UCameraComponent* GetViewCamera() const { return ViewCamera; }
 
 	virtual void Tick(float DeltaSeconds) override;
@@ -124,6 +131,7 @@ private:
 	// never receives tuning still frames correctly instead of sitting at 0.
 	bool bFirstPerson = false;
 	bool bCommandModeCamera = false;
+	bool bAiming = false;
 	float ThirdPersonArmLength = 300.0f;
 	float CommandModeArmLength = 520.0f;
 	float CommandModeCameraRise = 120.0f;

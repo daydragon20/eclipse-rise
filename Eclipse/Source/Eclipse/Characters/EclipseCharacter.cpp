@@ -174,6 +174,16 @@ void AEclipseCharacter::SetCommandModeCamera(bool bActive)
 	RefreshCameraTargets();
 }
 
+void AEclipseCharacter::SetAiming(bool bNewAiming)
+{
+	if (bAiming == bNewAiming)
+	{
+		return;
+	}
+	bAiming = bNewAiming;
+	RefreshCameraTargets();
+}
+
 void AEclipseCharacter::RefreshCameraTargets()
 {
 	// Command Mode wins over the view toggle: pulling back to read the field is
@@ -188,6 +198,14 @@ void AEclipseCharacter::RefreshCameraTargets()
 	{
 		TargetArmLength = bFirstPerson ? 0.0f : ThirdPersonArmLength;
 		TargetFOV = bFirstPerson ? FirstPersonFOV : ThirdPersonFOV;
+		if (bAiming)
+		{
+			// Aiming pulls in and narrows: 0.55 of the boom and 0.8 of the FOV.
+			// Relative to whichever view you are in, so ADS works the same in
+			// first and third person instead of needing two more constants.
+			TargetArmLength *= 0.55f;
+			TargetFOV *= 0.80f;
+		}
 	}
 
 	const bool bNeedsBlend =

@@ -39,7 +39,7 @@ bool FEclipseGuideStepListTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("Eleven controls, four systems and five questions"), Steps.Num(), GuideStepCount);
 	// 12 controls since the camera landed (the first/third-person toggle is a
 	// control the guide has to teach like any other), 4 systems, 5 questions.
-	TestEqual(TEXT("The list is twenty-one steps long"), GuideStepCount, 21);
+	TestEqual(TEXT("The list is twenty-three steps long"), GuideStepCount, 23);
 
 	// The guide's promise is not "press this key" but "press this key AND here is
 	// what proves it worked". A step missing either device column or its
@@ -214,7 +214,7 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		// them afterwards, so a drifting line count would write into thin air.
 		TestEqual(TEXT("Header + twenty steps + tally"), Lines.Num(), GuidePanelLineCount);
 
-		TestTrue(TEXT("The header counts within its part"), Lines[0].Contains(TEXT("stap 1/12")));
+		TestTrue(TEXT("The header counts within its part"), Lines[0].Contains(TEXT("stap 1/14")));
 		TestTrue(TEXT("The header names the part"), Lines[0].Contains(TEXT("deel 1: controls")));
 		TestTrue(TEXT("The header names the hide key"), Lines[0].Contains(TEXT("[F3]")));
 		TestTrue(TEXT("In deel 1, N is a skip"), Lines[0].Contains(TEXT("[N] sla over")));
@@ -234,7 +234,7 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		TestFalse(TEXT("A future step does not shout its expectation"), Lines[2].Contains(Steps[1].Expectation));
 		TestFalse(TEXT("A future step is not marked active"), Lines[2].StartsWith(TEXT(">>")));
 
-		TestTrue(TEXT("The tally line closes the panel"), Lines.Last().Contains(TEXT("nog open 21")));
+		TestTrue(TEXT("The tally line closes the panel"), Lines.Last().Contains(TEXT("nog open 23")));
 	}
 
 	// A settled step collapses to marker + label + how it was settled.
@@ -245,7 +245,7 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		TestTrue(TEXT("A settled step says it was detected"), Lines[1].Contains(TEXT("gedetecteerd")));
 		TestFalse(TEXT("A settled step folds its expectation away"), Lines[1].Contains(Steps[0].Expectation));
 		TestTrue(TEXT("The next step became active"), Lines[2].StartsWith(TEXT(">>")));
-		TestTrue(TEXT("The header follows along"), Lines[0].Contains(TEXT("stap 2/12")));
+		TestTrue(TEXT("The header follows along"), Lines[0].Contains(TEXT("stap 2/14")));
 		TestTrue(TEXT("The tally counts the detection"), Lines.Last().Contains(TEXT("gedetecteerd 1")));
 	}
 
@@ -308,7 +308,7 @@ bool FEclipseGuideSummaryTest::RunTest(const FString& Parameters)
 		const TArray<FString> Block = ComposeGuideSummaryBlock(Fresh);
 		TestEqual(TEXT("Title + three part headers + twenty steps + tally"), Block.Num(), GuideStepCount + 5);
 		TestTrue(TEXT("The block names the variant it was built as"), Block[0].Contains(TEXT("variant A")));
-		TestTrue(TEXT("Everything is open"), Block.Last().Contains(TEXT("21 nog open")));
+		TestTrue(TEXT("Everything is open"), Block.Last().Contains(TEXT("23 nog open")));
 		TestTrue(TEXT("An untouched step claims nothing"), Block[2].Contains(TEXT("nog open")));
 	}
 

@@ -1,0 +1,132 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
+#include "EclipseLocomotionTypes.generated.h"
+
+class UAnimSequence;
+class USkeleton;
+
+/**
+ * How much locomotion a body actually got (GDD 14.3.5 degradation ladder). Every
+ * rung is a playable body; only the bottom rung is "the engine draws a ref pose".
+ * The ladder exists because DT_BodyDefs points at nine different packs and not
+ * one of them carries the same take list — Belica has Jog_Fwd and no walk,
+ * SciFiSoldier02 has ThirdPersonWalk/Run, SciFiSoldier has no animations at all.
+ * A missing take must cost that body one rung, never the frame.
+ */
+enum class EEclipseLocomotionTier : uint8
+{
+	/** No idle on this skeleton: nothing to stand in, the mesh draws its ref pose. */
+	Unavailable = 0,
+	/** Idle only — the pre-2026-07-25 behavior: the body stands and slides when it moves. */
+	IdleOnly = 1,
+	/** Idle + one gait: speed cross-fades idle into that gait. */
+	OneGait = 2,
+	/** Idle + walk + run: the full minimal locomotion (SPEC-P2-01 debug tier). */
+	TwoGaits = 3,
+};
+
+/**
+ * The clips one body plays, already resolved AND already checked against that
+ * body's skeleton, plus the speed anchors the blend runs on.
+ *
+ * "Already checked" is the load-bearing part: these packs share a skeleton
+ * FAMILY, not a skeleton asset, so BlueSoldier_Male's Walk is a different
+ * USkeleton from SciFiSoldier02's. Handing a clip to the wrong skeleton does not
+ * throw — it silently evaluates to a mangled or empty pose, which is the exact
+ * failure mode GDD 14.3.5 forbids. So resolution rejects a mismatch up front and
+ * the body drops a rung with a log line instead.
+ */
+USTRUCT()
+struct FEclipseLocomotionSet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> Idle = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> Walk = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> Run = nullptr;
+
+	/** One-shot; holds its last frame. Not part of the locomotion ladder. */
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> Death = nullptr;
+
+	// Blend anchors, mirrored from DA_CharacterTuning (GDD 14.2 — feel numbers
+	// are data). The defaults here are the LOCKED feel targets
+	// (phase0/graybox_feel_targets.md §2) so a body that never sees a tuning
+	// asset still blends on the right numbers instead of on zero.
+	UPROPERTY(Transient)
+	float WalkSpeed = 180.0f;
+
+	UPROPERTY(Transient)
+	float RunSpeed = 420.0f;
+
+	UPROPERTY(Transient)
+	float SprintSpeed = 650.0f;
+
+	ECLIPSE_API EEclipseLocomotionTier GetTier() const;
+};
+
+/**
+ * Where one frame's pose comes from: three weights that always sum to 1. Not a
+ * USTRUCT on purpose — it is a pure computation result, never serialized and
+ * never edited, and the automation tests build it by the hundred.
+ */
+struct FEclipseLocomotionBlend
+{
+	float IdleWeight = 1.0f;
+	float WalkWeight = 0.0f;
+	float RunWeight = 0.0f;
+};
+
+/**
+ * The pure half of the locomotion layer. Everything here is a function of its
+ * arguments — no world, no assets, no time — which is what lets the headless
+ * tests pin the speed->pose contract without an editor, a mesh or a skeleton
+ * (EclipseAnimLocomotionTests.cpp). Implementations live in EclipseAnimInstance.cpp.
+ */
+namespace EclipseLocomotion
+{
+	/** Under this ground speed the body is standing. Sub-centimetre drift (a
+	 *  capsule settling, a push from a squadmate) must not flicker into a walk. */
+	inline constexpr float StandingSpeedThreshold = 5.0f;
+
+	/** How far the gait clock may be stretched to chase the ground speed. Bounded
+	 *  because an unbounded rate is how a sprint reads as a cartoon and a nudged
+	 *  body reads as a slideshow. */
+	inline constexpr float MinStrideRate = 0.6f;
+	inline constexpr float MaxStrideRate = 1.8f;
+
+	/** Which rung of the ladder a set of resolved clips lands on. */
+	ECLIPSE_API EEclipseLocomotionTier ClassifyTier(bool bHasIdle, bool bHasWalk, bool bHasRun);
+
+	/**
+	 * A clip may only play on the exact skeleton it was authored against. Same
+	 * family is not the same asset, and "close enough" is what produces a body
+	 * folded inside out (see FEclipseLocomotionSet's note).
+	 */
+	ECLIPSE_API bool IsUsableOn(const USkeleton* ClipSkeleton, const USkeleton* MeshSkeleton);
+
+	/**
+	 * Ground speed -> pose weights. Idle cross-fades into walk up to WalkSpeed,
+	 * walk cross-fades into run up to RunSpeed, and everything above RunSpeed
+	 * (sprint) is full run played faster — see ComputeStrideRate. At most two
+	 * weights are ever non-zero, which is what keeps the evaluate path to one
+	 * blend.
+	 */
+	ECLIPSE_API FEclipseLocomotionBlend ComputeBlend(float GroundSpeed, const FEclipseLocomotionSet& Set);
+
+	/**
+	 * Play-rate multiplier for the gait clock: the clips were authored at some
+	 * speed, the body is moving at another, and the gap between the two is what
+	 * the eye reads as skating. This does not remove foot sliding — that needs
+	 * distance matching or IK — it just stops the legs from being obviously out
+	 * of step at the tuned speeds. Returns 1 while standing.
+	 */
+	ECLIPSE_API float ComputeStrideRate(float GroundSpeed, const FEclipseLocomotionSet& Set, const FEclipseLocomotionBlend& Blend);
+}

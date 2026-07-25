@@ -189,7 +189,17 @@ namespace
 		// to 0.150 drops it to ~0.50 and the warehouse reads as weathered painted
 		// steel instead of a lightstrip. Value is deliberately left alone: it sits
 		// under the ceiling rule already, so this changes colour only.
-		{ TEXT("BldgB"),  FLinearColor(0.150f, 0.290f, 0.300f), FLinearColor(0.050f, 0.098f, 0.140f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: weathered worker teal over rusty corrugated sheet (ambientCG 007A, mean .367)
+		// Cyan, bisection step 1 (owner call 2026-07-25 "doe het voorstel"). The
+		// art-review's proposal, taken as-is: do NOT lower ColorSaturation 1.38 —
+		// that is the owner's Borderlands punch and it would desaturate ten other
+		// families to fix one — but push THIS family far up in red and re-measure.
+		// Authored 0.150/0.290/0.300 is saturation 0.50 and still renders at frame
+		// saturation 0.82 mean / 1.00 worst over 101 075 px (4.87% of cam 3), so
+		// authored saturation does not translate 1:1 any more than authored value
+		// did. Hence bisect, do not compute: red to the midpoint of its own range
+		// (0.150 -> 0.225 lit, 0.050 -> 0.095 shade) and measure what comes out.
+		// Target: frame saturation <= 0.55 for the family.
+		{ TEXT("BldgB"),  FLinearColor(0.225f, 0.290f, 0.300f), FLinearColor(0.095f, 0.098f, 0.140f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: weathered worker teal over rusty corrugated sheet (ambientCG 007A, mean .367)
 		// Yellow value hierarchy (15.8 look-ronde, cam 3): every yellow element in
 		// the plaza midfield sat on the same value (screen 255/211/0 slabs next to
 		// 245/216/1 lane paint) and the field read as one flat sheet of yellow.
@@ -824,7 +834,10 @@ void BuildDistrict(UWorld& World)
 			// Same desaturation as BldgB: the review read this crate as a neon-cyan
 			// "tech krate" from another planet's palette (measured hue 191, sat 0.77).
 			// Keep it in the worker-teal family, take the neon out.
-			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.140f, 0.260f, 0.270f), FLinearColor(0.052f, 0.096f, 0.135f) },
+			// Same bisection step as BldgB above — the crate is the same family and
+			// must move with it, or the warehouse and its crates drift into two
+			// different teals.
+			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.205f, 0.260f, 0.270f), FLinearColor(0.093f, 0.096f, 0.135f) },
 		};
 
 		auto SpawnProp = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float YawDeg, float Scale)
@@ -1579,7 +1592,18 @@ void BuildDistrict(UWorld& World)
 		// B sat above both R and G here too. The art-review called them "a
 		// mauve-violet potato". Rust/graphite family means B <= G, so R >= G >= B.
 		const FLinearColor RubbleLit(0.098f, 0.088f, 0.078f), RubbleShade(0.040f, 0.036f, 0.031f);
-			const FLinearColor GraphiteLit(0.230f, 0.250f, 0.290f), GraphiteShade(0.075f, 0.082f, 0.130f);
+			// Cyan, and this is where it actually came from (owner call 2026-07-25).
+			// The art-review called the neon "the teal family" and I bisected BldgB
+			// and the crates for it — measured, that only removed 29 600 of the
+			// 101 075 neon pixels in cam 3, and pushing red further did NOTHING
+			// (71 453 -> 71 267, 0.3%). Cropping the worst pixel showed why: it is a
+			// CONTAINER, which runs on Graphite, not on the teal palette entry.
+			// GraphiteShade was (0.075, 0.082, 0.130) — blue at 1.73x red — which
+			// breaks the rule this same iteration already banked in par. 8: every
+			// dark/shade tint keeps B <= G, or the grade's ColorSaturation 1.38
+			// screams the excess out. So the fix is the project's own rule applied
+			// to the entry that was exempt from it, not a new number.
+			const FLinearColor GraphiteLit(0.230f, 0.250f, 0.250f), GraphiteShade(0.075f, 0.082f, 0.082f);
 			// Dressing-iteratie 3, step 8 — the magenta container, third attempt, and
 		// the first one aimed at the actual cause. Round 1 blamed the texture mix
 		// (0.75 -> 0.45): wrong variable, the container stayed magenta. The second

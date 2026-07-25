@@ -24,6 +24,21 @@
 #include "UI/EclipseMissionHudWidget.h"
 #include "UI/EclipseTestGuideLogic.h"
 
+namespace
+{
+	/**
+	 * Invert-Y is taste, not a defect, and the owner asked for it to stop being a
+	 * discussion: -1 follows DA_CharacterTuning, 0 forces normal, 1 forces
+	 * inverted. A console variable rather than a setting because there is no
+	 * options menu yet (SPEC-P2-07 owns UI) and this must not wait for one.
+	 */
+	TAutoConsoleVariable<int32> CVarEclipseInvertLookY(
+		TEXT("Eclipse.Look.InvertY"),
+		-1,
+		TEXT("Y-as van het kijken: -1 = volg DA_CharacterTuning, 0 = normaal, 1 = omgekeerd."),
+		ECVF_Default);
+}
+
 AEclipsePlayerController::AEclipsePlayerController()
 {
 	CommandMode = CreateDefaultSubobject<UEclipseCommandModeComponent>(TEXT("CommandMode"));
@@ -128,6 +143,16 @@ void AEclipsePlayerController::EnterMissionMode()
 	{
 		MissionHud->AddToViewport(5);
 	}
+	// Say out loud whether the debug HUD actually mounted (GDD 14.3.5). Without
+	// this line the owner's "F3 does nothing" was unanswerable from a log: every
+	// debug key silently no-ops when the widget is absent, so a missing HUD and a
+	// broken key look identical from the outside.
+	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 test guide, H playtest)."),
+		MissionHud == nullptr
+			? (UEclipseMissionHudWidget::IsDebugHudAllowed()
+				? TEXT("NOT CREATED — widget construction failed")
+				: TEXT("suppressed by -EclipseShot, as designed"))
+			: (MissionHud->IsInViewport() ? TEXT("mounted") : TEXT("created but NOT in the viewport")));
 
 	// Mission mode: no cursor at all — the absence IS the signal that the pawn has
 	// your input now (the other half of the 13.2 readability fix above).
@@ -217,12 +242,21 @@ void AEclipsePlayerController::SetupInputComponent()
 	// wins (EnhancedInput default). Left2D matches HandleMove's axes directly
 	// (X = right, Y = forward), so no swizzle is needed on the stick.
 	MapKey(MoveAction, EKeys::Gamepad_Left2D);
-	// Stick look is mapped RAW here on purpose. It used to carry a (2.0, 1.5)
-	// scalar modifier with a PLACEHOLDER(GDD 8.1) note that the feel pass would
-	// give look its own curve and deltatime scaling — that is what HandleLook now
-	// does, in degrees per second with a deadzone and an exponential response.
-	// Leaving the modifier in would silently double-scale it.
-	MapKey(LookAction, EKeys::Gamepad_Right2D);
+	// Stick look carries no SCALAR here on purpose: it used to have a (2.0, 1.5)
+	// modifier with a PLACEHOLDER(GDD 8.1) note that the feel pass would give look
+	// its own curve and deltatime scaling — that is what HandleLook now does, in
+	// degrees per second with a deadzone and an exponential response. Leaving the
+	// scalar in would silently double-scale it.
+	// It DOES need a Y negate, and only on this mapping (owner playtest
+	// 2026-07-25): UE reports mouse Y and stick Y with opposite signs, so a single
+	// handler cannot be right for both. Negating here keeps the mouse correct and
+	// fixes the stick, instead of flipping the handler and breaking the mouse.
+	{
+		FEnhancedActionKeyMapping& StickLook = MappingContext->MapKey(LookAction, EKeys::Gamepad_Right2D);
+		UInputModifierScalar* StickYFlip = NewObject<UInputModifierScalar>(this);
+		StickYFlip->Scalar = FVector(1.0, -1.0, 1.0);
+		StickLook.Modifiers.Add(StickYFlip);
+	}
 	MapKey(FireAction, EKeys::Gamepad_RightTrigger);
 	MapKey(SprintAction, EKeys::Gamepad_LeftThumbstick);
 	MapKey(CrouchAction, EKeys::Gamepad_FaceButton_Right);
@@ -260,6 +294,22 @@ void AEclipsePlayerController::SetupInputComponent()
 	StanceToggleAction = MakeAction(EInputActionValueType::Boolean);
 	MapKey(StanceToggleAction, EKeys::Gamepad_FaceButton_Top);
 
+	// Genre parity (owner playtest 2026-07-25): jump and aim did not exist at all,
+	// and LT — the aim button in this genre — was carrying "previous soldier".
+	JumpAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(JumpAction, EKeys::SpaceBar);
+	MapKey(JumpAction, EKeys::Gamepad_FaceButton_Bottom);   // A
+	AimAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(AimAction, EKeys::RightMouseButton);
+	// LT is deliberately mapped TWICE — to aim here and to SelectPrev above — and
+	// the two handlers split on CommandMode->IsHeld(). That is the owner's
+	// preferred context-dependent behaviour WITHOUT a second mapping context:
+	// SPEC-P2-07 owns the Enhanced Input context stacks, and pre-empting it with a
+	// rival stack is exactly what this must not do. One branch in each handler is
+	// not a mode system; it is the same button reading the state that already
+	// exists.
+	MapKey(AimAction, EKeys::Gamepad_LeftTrigger);
+
 	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleMove);
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleLook);
@@ -287,7 +337,13 @@ void AEclipsePlayerController::SetupInputComponent()
 		if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn())) { Body->SetCommandModeCamera(false); }
 	});
 	Input->BindActionValueLambda(SelectNextAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(+1); } });
+	// LT shares itself with aim: during the hold it cycles, in the field it does
+	// not (the aim handler takes the opposite branch). Mouse-scroll keeps working
+	// either way — a wheel is not ambiguous.
 	Input->BindActionValueLambda(SelectPrevAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(-1); } });
+	Input->BindAction(JumpAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleJump);
+	Input->BindAction(AimAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleAimStart);
+	Input->BindAction(AimAction, ETriggerEvent::Completed, this, &AEclipsePlayerController::HandleAimStop);
 	Input->BindActionValueLambda(DirectPickAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->PickSoldierUnderReticle(); } });
 	Input->BindActionValueLambda(StanceToggleAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->ToggleHeldStance(); } });
 
@@ -296,27 +352,35 @@ void AEclipsePlayerController::SetupInputComponent()
 	// action claims: F1 is the engine's, F2/F4-F8/H were already the gauntlet's,
 	// and F3/J/N were free (checked against every EKeys reference in the module).
 	// The handlers route into the one HUD widget — there is no second overlay.
+	// PadKey is EKeys::Invalid where a debug function has no controller button:
+	// the gauntlet's measurement keys stay keyboard-only on purpose (they are the
+	// reviewer's instrumentation, not controls the player exercises), but the
+	// GUIDE has to be reachable on a pad or a controller playtest cannot use it —
+	// which is what the owner ran into. Special_Left/Right (View and Menu) were
+	// the only untaken pad buttons; View opens the guide, Menu confirms, and
+	// skipping doubles up on B, which is "no" on every console.
 	struct FDebugOverlayBinding
 	{
 		FKey Key;
+		FKey PadKey;
 		void (*Invoke)(UEclipseMissionHudWidget&);
 	};
 	const FDebugOverlayBinding DebugBindings[] = {
-		{ EKeys::F2, [](UEclipseMissionHudWidget& Hud) { Hud.ToggleControlsPanel(); } },
-		{ EKeys::H,  [](UEclipseMissionHudWidget& Hud) { Hud.TogglePlaytestPanel(); } },
-		{ EKeys::F3, [](UEclipseMissionHudWidget& Hud) { Hud.ToggleGuidePanel(); } },
-		{ EKeys::J,  [](UEclipseMissionHudWidget& Hud) { Hud.ConfirmGuideStep(); } },
-		{ EKeys::N,  [](UEclipseMissionHudWidget& Hud) { Hud.SkipGuideStep(); } },
-		{ EKeys::F4, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ true); } },
-		{ EKeys::F5, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ false); } },
-		{ EKeys::F6, [](UEclipseMissionHudWidget& Hud) { Hud.CycleComfortAnswer(); } },
-		{ EKeys::F7, [](UEclipseMissionHudWidget& Hud) { Hud.CycleConfidenceAnswer(); } },
-		{ EKeys::F8, [](UEclipseMissionHudWidget& Hud) { Hud.MarkEncounterBeat(); } },
-		{ EKeys::Six,   [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(0); } },
-		{ EKeys::Seven, [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(1); } },
-		{ EKeys::Eight, [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(2); } },
-		{ EKeys::Nine,  [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(3); } },
-		{ EKeys::Zero,  [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(4); } }
+		{ EKeys::F2, EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.ToggleControlsPanel(); } },
+		{ EKeys::H,  EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.TogglePlaytestPanel(); } },
+		{ EKeys::F3, EKeys::Gamepad_Special_Left,    [](UEclipseMissionHudWidget& Hud) { Hud.ToggleGuidePanel(); } },
+		{ EKeys::J,  EKeys::Gamepad_Special_Right,   [](UEclipseMissionHudWidget& Hud) { Hud.ConfirmGuideStep(); } },
+		{ EKeys::N,  EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.SkipGuideStep(); } },
+		{ EKeys::F4, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ true); } },
+		{ EKeys::F5, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ false); } },
+		{ EKeys::F6, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.CycleComfortAnswer(); } },
+		{ EKeys::F7, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.CycleConfidenceAnswer(); } },
+		{ EKeys::F8, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.MarkEncounterBeat(); } },
+		{ EKeys::Six, EKeys::Invalid,   [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(0); } },
+		{ EKeys::Seven, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(1); } },
+		{ EKeys::Eight, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(2); } },
+		{ EKeys::Nine, EKeys::Invalid,  [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(3); } },
+		{ EKeys::Zero, EKeys::Invalid,  [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(4); } }
 	};
 
 	DebugOverlayActions.SetNum(static_cast<int32>(UE_ARRAY_COUNT(DebugBindings)));
@@ -324,6 +388,10 @@ void AEclipsePlayerController::SetupInputComponent()
 	{
 		DebugOverlayActions[Index] = MakeAction(EInputActionValueType::Boolean);
 		MapKey(DebugOverlayActions[Index], DebugBindings[Index].Key);
+		if (DebugBindings[Index].PadKey.IsValid())
+		{
+			MapKey(DebugOverlayActions[Index], DebugBindings[Index].PadKey);
+		}
 
 		void (*Invoke)(UEclipseMissionHudWidget&) = DebugBindings[Index].Invoke;
 		Input->BindActionValueLambda(DebugOverlayActions[Index], ETriggerEvent::Started, [this, Invoke](const FInputActionValue&)
@@ -355,6 +423,8 @@ void AEclipsePlayerController::SetupInputComponent()
 		{ FireAction,          EclipseTestGuide::EEclipseGuideSignal::Fire },
 		{ SprintAction,        EclipseTestGuide::EEclipseGuideSignal::Sprint },
 		{ CrouchAction,        EclipseTestGuide::EEclipseGuideSignal::Crouch },
+		{ JumpAction,          EclipseTestGuide::EEclipseGuideSignal::Jump },
+		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim },
 		{ ToggleViewAction,    EclipseTestGuide::EEclipseGuideSignal::ToggleView },
 		{ CommandHoldAction,   EclipseTestGuide::EEclipseGuideSignal::CommandMode },
 		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext },
@@ -402,7 +472,9 @@ void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)
 void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 {
 	const FVector2D Axis = Value.Get<FVector2D>();
-	const float InvertY = bInvertLookY ? -1.0f : 1.0f;
+	const int32 InvertOverride = CVarEclipseInvertLookY.GetValueOnGameThread();
+	const bool bInvert = InvertOverride < 0 ? bInvertLookY : (InvertOverride > 0);
+	const float InvertY = bInvert ? -1.0f : 1.0f;
 
 	// Mouse and stick are different devices and must not share a curve. A mouse
 	// has no drift and no rest position, so it stays RAW — deadzoning or curving
@@ -504,6 +576,47 @@ void AEclipsePlayerController::HandleCrouch()
 	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
 	{
 		Body->bIsCrouched ? Body->UnCrouch() : Body->Crouch();
+	}
+}
+
+void AEclipsePlayerController::HandleJump()
+{
+	if (ACharacter* Body = Cast<ACharacter>(GetPawn()))
+	{
+		Body->Jump();
+	}
+}
+
+void AEclipsePlayerController::HandleAimStart()
+{
+	// LT is aim in the field and "previous soldier" during the Command hold. The
+	// split lives here rather than in a second mapping context, because the input
+	// context stack belongs to SPEC-P2-07 and must not be forked early.
+	if (CommandMode != nullptr && CommandMode->IsHeld())
+	{
+		return;
+	}
+	SetAiming(true);
+}
+
+void AEclipsePlayerController::HandleAimStop()
+{
+	SetAiming(false);
+}
+
+void AEclipsePlayerController::SetAiming(bool bNewAiming)
+{
+	if (bAiming == bNewAiming)
+	{
+		return;
+	}
+	bAiming = bNewAiming;
+	// Debug-grade ADS (GDD 14.5): narrow the FOV so aiming READS, and slow the
+	// stick so the smaller angle is not harder to hold. No weapon spread model,
+	// no accuracy change, no new system — those belong to the combat feel pass.
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+	{
+		Body->SetAiming(bAiming);
 	}
 }
 

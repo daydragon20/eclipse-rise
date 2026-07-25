@@ -46,6 +46,12 @@ private:
 	void HandleCrouch();
 	/** C / R3: swap first and third person on the pawn (owner request 2026-07-25). */
 	void HandleToggleView();
+	/** Space / A — did not exist before the 2026-07-25 controller-parity pass. */
+	void HandleJump();
+	/** RMB / LT. LT only aims outside the Command hold; inside it, it cycles. */
+	void HandleAimStart();
+	void HandleAimStop();
+	void SetAiming(bool bNewAiming);
 	/** Which device the look axis should be read as — mouse raw, stick curved. */
 	bool IsUsingGamepadLook() const;
 	/** Push the tuning asset's look/pitch numbers onto this controller. */
@@ -98,6 +104,14 @@ private:
 	 *  Enhanced Input context stacks and this must not pre-empt it. */
 	UPROPERTY()
 	TObjectPtr<UInputAction> ToggleViewAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> JumpAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> AimAction;
+
+	bool bAiming = false;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> OrderActions;

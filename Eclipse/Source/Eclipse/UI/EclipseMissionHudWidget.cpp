@@ -175,6 +175,8 @@ void UEclipseMissionHudWidget::NativeConstruct()
 				ApplyPanelVisibility();
 				RefreshGuideRows(/*bForce*/ true);
 				Rebuild();
+				UE_LOG(LogEclipse, Display, TEXT("Test guide: CVar set after mount -> panel %s (%d rows)."),
+					bGuideVisible ? TEXT("OPEN") : TEXT("closed"), GuideRows.Num());
 			}));
 	}
 
@@ -566,6 +568,10 @@ void UEclipseMissionHudWidget::ToggleGuidePanel()
 	bGuideVisible = !bGuideVisible;
 	ApplyPanelVisibility();
 	RefreshGuideRows(/*bForce*/ true);
+	// Audible on the log, because "F3 does nothing" and "F3 opened a panel you
+	// cannot see" are different bugs and looked identical to the owner.
+	UE_LOG(LogEclipse, Display, TEXT("Test guide: panel %s (%d rows built)."),
+		bGuideVisible ? TEXT("OPEN") : TEXT("closed"), GuideRows.Num());
 }
 
 void UEclipseMissionHudWidget::ConfirmGuideStep()

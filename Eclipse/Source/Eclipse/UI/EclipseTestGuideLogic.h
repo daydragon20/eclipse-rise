@@ -52,6 +52,8 @@ namespace EclipseTestGuide
 		Fire,
 		Sprint,
 		Crouch,
+		Jump,
+		Aim,
 		ToggleView,
 		CommandMode,
 		SelectNext,
@@ -85,7 +87,7 @@ namespace EclipseTestGuide
 	 * (empty expectation, no signal) if that table ever grows, and the test asserts
 	 * the counts still match.
 	 */
-	inline constexpr int32 ControlStepCount = 12;
+	inline constexpr int32 ControlStepCount = 14;
 
 	/** Deel 2 — squad obedience, order responsiveness, objective tick, debrief payout. */
 	inline constexpr int32 SystemStepCount = 4;
