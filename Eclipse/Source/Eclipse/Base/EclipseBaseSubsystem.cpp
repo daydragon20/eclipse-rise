@@ -1,11 +1,13 @@
 #include "Base/EclipseBaseSubsystem.h"
 
 #include "Base/EclipseBaseTypes.h"
+#include "Base/EclipseVaultBuilder.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
+#include "Engine/World.h"
 #include "HAL/IConsoleManager.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
@@ -16,14 +18,38 @@ void UEclipseBaseSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	// The campaign ledger must exist before any order can commit; the bus
 	// before that so commit facts are never dropped (same chain as Economy).
-	Collection.InitializeDependency<UEclipseEventBusSubsystem>();
+	UEclipseEventBusSubsystem* Bus = Collection.InitializeDependency<UEclipseEventBusSubsystem>();
 	Collection.InitializeDependency<UEclipseCampaignSubsystem>();
+
+	if (Bus != nullptr)
+	{
+		// One family subscription carries all four Event.Base.* facts (the
+		// strategy-map-widget / economy-family pattern). Every one of them can
+		// change what a chamber must show - started (scaffold on), built/upgraded
+		// (state swap + global growth tier), staff assigned/released (idlers) -
+		// so the vault re-renders on the family and never on a tick (GDD 12.4).
+		// No ExpectedPayloadType: this consumer reads the committed state, not the
+		// payload, so it stays uncoupled from the payload struct (like the other
+		// family subscriptions in the project).
+		const FGameplayTag BaseFamily = EclipseTags::Event_Base_FacilityBuilt.GetTag().RequestDirectParent();
+		BaseEventsHandle = Bus->Subscribe(
+			BaseFamily,
+			FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseBaseSubsystem::OnBaseFact));
+	}
 
 	RegisterConsoleCommands();
 }
 
 void UEclipseBaseSubsystem::Deinitialize()
 {
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
+		{
+			Bus->Unsubscribe(BaseEventsHandle);
+		}
+	}
+
 	UnregisterConsoleCommands();
 	Super::Deinitialize();
 }
@@ -299,6 +325,76 @@ bool UEclipseBaseSubsystem::TryUnassignStaff(FName SlotId, const FGuid& SoldierI
 	return Campaign->CommitTransaction(Transaction, OutError);
 }
 
+UWorld* UEclipseBaseSubsystem::GetVaultWorld() const
+{
+	UGameInstance* GameInstance = GetGameInstance();
+	return GameInstance != nullptr ? GameInstance->GetWorld() : nullptr;
+}
+
+void UEclipseBaseSubsystem::EnsureVaultPresent()
+{
+	RefreshVault(/*bForceRebuild*/ true);
+}
+
+void UEclipseBaseSubsystem::OnBaseFact(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	// A fact is never an invitation to spawn a vault (bForceRebuild = false):
+	// only a vault that already stands in this world re-renders.
+	RefreshVault(/*bForceRebuild*/ false);
+}
+
+void UEclipseBaseSubsystem::RefreshVault(bool bForceRebuild)
+{
+	UWorld* World = GetVaultWorld();
+	if (World == nullptr)
+	{
+		if (bForceRebuild)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Vault: no world to render into — the vault stays unbuilt (GDD 14.3.5)."));
+		}
+		return;
+	}
+
+	// Cheapest gate first, and deliberately BEFORE any asset resolve: a mission
+	// world (or a menu world) carries no vault, so a Base fact must not even
+	// touch the layout asset there - no work, no warnings, nothing to leak.
+	if (!bForceRebuild && !EclipseVault::IsVaultPresent(*World))
+	{
+		RenderedVaultPlanHash = 0;
+		return;
+	}
+
+	const UEclipseCampaignSubsystem* Campaign = GetCampaign();
+	if (Campaign == nullptr)
+	{
+		if (bForceRebuild)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Vault: no campaign subsystem — nothing to render the vault from (GDD 14.3.5)."));
+		}
+		return;
+	}
+
+	// ResolveLayout() logs the missing-asset warning once; BuildVault then stands
+	// the vault up empty (anchor only) instead of crashing (GDD 14.3.5).
+	const FEclipseBaseState& BaseState = Campaign->GetState().BaseState;
+	const UEclipseBaseLayoutAsset* Layout = ResolveLayout();
+
+	// The coalescer: one commit emits up to four Event.Base.* facts against the
+	// same post-commit state, so the first fact renders the final vault and the
+	// rest hash identically and cost nothing. A null layout hashes to 0 - the
+	// empty-vault render - so the loud warning above stays a once-per-change log.
+	const uint32 PlanHash = Layout != nullptr
+		? EclipseVault::ComputePlanHash(EclipseVault::PlanSlots(Layout->Slots, BaseState))
+		: 0u;
+	if (!bForceRebuild && PlanHash == RenderedVaultPlanHash)
+	{
+		return;
+	}
+
+	EclipseVault::RebuildVault(*World, Layout, BaseState);
+	RenderedVaultPlanHash = PlanHash;
+}
+
 void UEclipseBaseSubsystem::LogBaseReport() const
 {
 	const UEclipseCampaignSubsystem* Campaign = GetCampaign();
@@ -372,6 +468,15 @@ void UEclipseBaseSubsystem::RegisterConsoleCommands()
 		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
 		{
 			LogBaseReport();
+		}),
+		ECVF_Default));
+
+	ConsoleCommands.Add(Console.RegisterConsoleCommand(
+		TEXT("Eclipse.Base.Vault"),
+		TEXT("Render the walkable Hollow Point vault from today's campaign state (SPEC-P2-03 step 4-5 parity loop); re-renders an existing one."),
+		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+		{
+			EnsureVaultPresent();
 		}),
 		ECVF_Default));
 

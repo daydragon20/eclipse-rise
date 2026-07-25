@@ -2,12 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "Base/EclipseBaseLogic.h"
+#include "Core/EclipseEventBusSubsystem.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "EclipseBaseSubsystem.generated.h"
 
 class IConsoleObject;
 class UDataTable;
 class UEclipseCampaignSetupAsset;
+class UWorld;
 
 /**
  * Hollow Point base wrapper (SPEC-P2-03 step 3). Owns no state — facilities
@@ -20,6 +22,11 @@ class UEclipseCampaignSetupAsset;
  * Same shape as the Economy/Prep wrappers: data in, one transaction out —
  * a new GameInstance subsystem rather than more surface on the campaign
  * ledger, so the ledger stays domain-neutral.
+ *
+ * Step 4-5 adds the walkable-vault presentation (EclipseVaultBuilder) as a PURE
+ * bus consumer: the standing vault re-renders on the existing Event.Base.*
+ * facts — no new tags, no polling, no tick (GDD 12.4). Orders still flow the
+ * other way through the API above, never through the bus (GDD 14.3.3).
  */
 UCLASS()
 class ECLIPSE_API UEclipseBaseSubsystem : public UGameInstanceSubsystem
@@ -55,6 +62,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Base")
 	bool TryUnassignStaff(FName SlotId, const FGuid& SoldierId, FString& OutError);
 
+	/**
+	 * Render the Hollow Point vault into the game instance's current world and
+	 * pin it to today's campaign state (SPEC-P2-03 step 4-5). Idempotent: an
+	 * existing vault is torn down and rebuilt, so this doubles as the manual
+	 * re-render (console: Eclipse.Base.Vault). A missing DA_BaseLayout is a loud
+	 * warning + an empty vault, never a crash (GDD 14.3.5).
+	 *
+	 * This is the level/entry seam the P1-08 menu-hub retirement hooks; from here
+	 * on the vault keeps itself current off the Event.Base.* facts alone.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Eclipse|Base")
+	void EnsureVaultPresent();
+
 	/** DA_BaseTuning as plain params (asset values when linked, spec defaults otherwise — GDD 14.3.5). */
 	EclipseBaseLogic::FEclipseBaseTuningParams ResolveTuningParams() const;
 
@@ -72,10 +92,32 @@ private:
 	void UnregisterConsoleCommands();
 	void LogBaseReport() const;
 
+	/**
+	 * The Event.Base.* consumer (all four facts through one family subscription,
+	 * same shape as the strategy map widget on Event.Story.BeatReached).
+	 */
+	void OnBaseFact(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/**
+	 * Re-render the standing vault from campaign state. Without bForceRebuild
+	 * this is a strict no-op unless a vault already stands in this world (a
+	 * mission world must never get one uninvited) and the plan actually changed -
+	 * the four facts of one commit therefore cost exactly one rebuild.
+	 */
+	void RefreshVault(bool bForceRebuild);
+
+	/** The world the vault lives in: the game instance's current world (null outside a world). */
+	UWorld* GetVaultWorld() const;
+
 	/** One-shot warning flags (GDD 14.3.5: degrade loudly, once). */
 	mutable bool bWarnedMissingLayout = false;
 	mutable bool bWarnedMissingFacilities = false;
 	mutable bool bWarnedNoAnalystResource = false;
+
+	FEclipseEventSubscriptionHandle BaseEventsHandle;
+
+	/** Plan hash of the vault standing right now (0 = none); the re-render coalescer's dirty check. */
+	uint32 RenderedVaultPlanHash = 0;
 
 	TArray<IConsoleObject*> ConsoleCommands;
 };

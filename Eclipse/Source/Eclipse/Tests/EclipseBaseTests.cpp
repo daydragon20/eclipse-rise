@@ -8,17 +8,29 @@
 // Step 4-5 (anchored step-3 review findings) adds the casualty staff-release
 // (no ghost analyst), the mutation-layer staff cap, and the day-N-completion-
 // yields-on-day-N pin the nightly soak leans on.
+//
+// The walkable-vault parity Gauntlet (SPEC-P2-03 step 4-5, blocking the P1-08
+// menu-hub retirement) lives at the bottom of this file: it spawns the vault
+// into a headless world and holds four contracts - PARITY (what the vault
+// physically places == what the state says == what the hub renders),
+// DETERMINISM (two builds on one state are byte-identical), DEGRADATION (a
+// missing layout is a warning + an empty vault, never a crash - GDD 14.3.5) and
+// VISIBILITY (a state row without a layout slot is shown and tagged, never
+// silently hidden), plus the bus wiring: the standing vault re-renders on the
+// existing Event.Base.* facts alone (no tick, GDD 12.4).
 
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Base/EclipseBaseLogic.h"
 #include "Base/EclipseBaseSubsystem.h"
 #include "Base/EclipseBaseTypes.h"
+#include "Base/EclipseVaultBuilder.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Economy/EclipseEconomyLogic.h"
 #include "Engine/DataTable.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
+#include "Engine/World.h"
 #include "Misc/AutomationTest.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
@@ -107,6 +119,60 @@ namespace EclipseBaseTest
 		EclipseBaseLogic::FEclipseBaseTuningParams Tuning; // the DA_BaseTuning spec values are the struct defaults
 		Tuning.AnalystBonusResource = EclipseTags::Resource_Intel.GetTag();
 		return Tuning;
+	}
+
+	/**
+	 * A throwaway game world for the vault probes: actors only, never ticked -
+	 * which is itself the GDD 12.4 contract under test (the builder does all its
+	 * work in one call and leaves nothing behind that needs a frame).
+	 */
+	struct FScopedTestWorld
+	{
+		FScopedTestWorld()
+		{
+			World = UWorld::CreateWorld(EWorldType::Game, /*bInformEngineOfWorld*/ false);
+		}
+
+		~FScopedTestWorld()
+		{
+			if (World != nullptr)
+			{
+				World->DestroyWorld(/*bBroadcastWorldDestroyedEvent*/ false);
+			}
+		}
+
+		UWorld* World = nullptr;
+	};
+
+	/**
+	 * A base state that exercises every row of the SPEC-P2-03 visible-growth
+	 * table at once: Slot_A = the pre-built operational Command Center,
+	 * Slot_B = Barracks under construction with a crew on site (and the authored
+	 * bunk-camp empty state underneath), Slot_C = Workshop operational at L2 with
+	 * an analyst, Slot_D = untouched (no state row at all - not even an empty one).
+	 */
+	FEclipseBaseState MakeGrowthSpreadState()
+	{
+		using namespace EclipseBaseLogic;
+		FEclipseBaseState Base; // seeded: CC L1 at Slot_A (locked decision 2)
+
+		StartConstruction(Base, TEXT("Slot_B"), TEXT("Barracks"), /*BuildDays*/ 2);
+		Base.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Add(FGuid(5, 0, 0, 1));
+
+		// Re-fetch after every structural change: the facility array reallocates.
+		StartConstruction(Base, TEXT("Slot_C"), TEXT("Workshop"), /*BuildDays*/ 3);
+		ApplyRush(*Base.FindBySlot(TEXT("Slot_C"))); // operational L1
+		StartConstruction(Base, TEXT("Slot_C"), TEXT("Workshop"), /*BuildDays*/ 3);
+		ApplyRush(*Base.FindBySlot(TEXT("Slot_C"))); // operational L2 (the only slice upgrade)
+		Base.FindBySlot(TEXT("Slot_C"))->AssignedSoldierIds.Add(FGuid(5, 0, 0, 2)); // rush releases staff: assign after
+
+		return Base;
+	}
+
+	/** The placed marker for a slot, or null when the vault never placed one. */
+	const EclipseVault::FEclipseVaultSlotView* FindView(const TArray<EclipseVault::FEclipseVaultSlotView>& Views, FName SlotId)
+	{
+		return Views.FindByPredicate([SlotId](const EclipseVault::FEclipseVaultSlotView& View) { return View.SlotId == SlotId; });
 	}
 }
 
@@ -838,6 +904,441 @@ bool FEclipseBaseCompletionYieldDayTest::RunTest(const FString& Parameters)
 		}
 	}
 	TestEqual(TEXT("FacilityYield ledger line lands the same day"), FacilityIntel, 2);
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// The walkable-vault parity Gauntlet (SPEC-P2-03 step 4-5; GDD 5.4, 12.4, 14.3.5)
+// ---------------------------------------------------------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVaultStateParityTest,
+	"Eclipse.Base.VaultStateParity",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseVaultStateParityTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVault;
+
+	// The Gauntlet's core claim (SPEC-P2-03 Integration, the gate in front of the
+	// P1-08 menu-hub retirement): what the vault PHYSICALLY places equals what
+	// FEclipseBaseState says - per slot, field for field. The menu hub and
+	// Eclipse.Base.Report derive their rows from exactly those state fields
+	// (FacilityId / Level + DaysRemaining / AssignedSoldierIds), so state-vault
+	// parity IS hub-vault parity: one truth, three surfaces.
+	UEclipseBaseLayoutAsset* Layout = NewObject<UEclipseBaseLayoutAsset>();
+	Layout->Slots = EclipseBaseTest::MakeSlots();
+	const FEclipseBaseState Base = EclipseBaseTest::MakeGrowthSpreadState();
+
+	EclipseBaseTest::FScopedTestWorld Scoped;
+	if (!TestNotNull(TEXT("Headless test world"), Scoped.World))
+	{
+		return false;
+	}
+
+	BuildVault(*Scoped.World, Layout, Base);
+	TestTrue(TEXT("The vault stands (anchor placed)"), IsVaultPresent(*Scoped.World));
+
+	const TArray<FEclipseVaultSlotView> Views = ReadSlotMarkers(*Scoped.World);
+	TestEqual(TEXT("Exactly one slot marker per layout slot"), Views.Num(), Layout->Slots.Num());
+
+	for (const FEclipseBaseSlotDef& Slot : Layout->Slots)
+	{
+		const FEclipseVaultSlotView* View = EclipseBaseTest::FindView(Views, Slot.SlotId);
+		if (!TestNotNull(FString::Printf(TEXT("Slot %s is physically placed"), *Slot.SlotId.ToString()), View))
+		{
+			continue;
+		}
+
+		// The state side of the comparison, derived from state alone.
+		const FEclipseFacilityState* Facility = Base.FindBySlot(Slot.SlotId);
+		const FName StateFacility = Facility != nullptr ? Facility->FacilityId : FName(NAME_None);
+		const int32 StateLevel = Facility != nullptr ? Facility->Level : 0;
+		const int32 StateStaff = Facility != nullptr ? Facility->AssignedSoldierIds.Num() : 0;
+		const TCHAR* StateVisual =
+			Facility == nullptr ? TEXT("Empty")
+			: (Facility->DaysRemaining > 0 ? TEXT("Constructing")
+			: (Facility->Level >= 1 ? TEXT("Built") : TEXT("Empty")));
+
+		const FString Where = Slot.SlotId.ToString();
+		TestEqual(*FString::Printf(TEXT("%s: placed facility == state facility"), *Where), View->FacilityId, StateFacility);
+		TestEqual(*FString::Printf(TEXT("%s: placed level == state level"), *Where), View->Level, StateLevel);
+		TestEqual(*FString::Printf(TEXT("%s: placed staff == state staff"), *Where), View->StaffCount, StateStaff);
+		TestEqual(*FString::Printf(TEXT("%s: placed read == state read"), *Where), VisualToString(View->Visual), StateVisual);
+		TestFalse(*FString::Printf(TEXT("%s: a layout slot is never an orphan"), *Where), View->bOrphan);
+	}
+
+	// The reads pinned literally against the SPEC-P2-03 visible-growth table, so
+	// a change in the derivation above cannot move both sides of the comparison
+	// at once and still pass.
+	const FEclipseVaultSlotView* SlotA = EclipseBaseTest::FindView(Views, EclipseBaseDefaults::CommandSlotId);
+	const FEclipseVaultSlotView* SlotB = EclipseBaseTest::FindView(Views, TEXT("Slot_B"));
+	const FEclipseVaultSlotView* SlotC = EclipseBaseTest::FindView(Views, TEXT("Slot_C"));
+	const FEclipseVaultSlotView* SlotD = EclipseBaseTest::FindView(Views, TEXT("Slot_D"));
+	if (SlotA != nullptr && SlotB != nullptr && SlotC != nullptr && SlotD != nullptr)
+	{
+		TestEqual(TEXT("Slot A: the pre-built Command Center reads Built"), VisualToString(SlotA->Visual), TEXT("Built"));
+		TestEqual(TEXT("Slot A: at L1"), SlotA->Level, 1);
+		TestEqual(TEXT("Slot B: a building site reads Constructing, not Built"), VisualToString(SlotB->Visual), TEXT("Constructing"));
+		TestEqual(TEXT("Slot B: no level completed yet"), SlotB->Level, 0);
+		TestEqual(TEXT("Slot B: the crew on site is placed"), SlotB->StaffCount, 1);
+		TestEqual(TEXT("Slot C: the Workshop reads Built"), VisualToString(SlotC->Visual), TEXT("Built"));
+		TestEqual(TEXT("Slot C: at L2 - the only slice upgrade"), SlotC->Level, 2);
+		TestEqual(TEXT("Slot D: an untouched slot reads Empty"), VisualToString(SlotD->Visual), TEXT("Empty"));
+		TestEqual(TEXT("Slot D: no facility"), SlotD->FacilityId, FName(NAME_None));
+	}
+
+	// Double-ended parity: the pure decision (PlanSlots) and the physical result
+	// agree too, so a divergence can only come from the plan, never from the
+	// placement code drifting away from it.
+	const TArray<FEclipseVaultSlotPlan> Plans = PlanSlots(Layout->Slots, Base);
+	TestEqual(TEXT("One marker per planned slot"), Views.Num(), Plans.Num());
+	for (const FEclipseVaultSlotPlan& Plan : Plans)
+	{
+		const FEclipseVaultSlotView* View = EclipseBaseTest::FindView(Views, Plan.SlotId);
+		if (View == nullptr)
+		{
+			AddError(FString::Printf(TEXT("Planned slot %s was never placed"), *Plan.SlotId.ToString()));
+			continue;
+		}
+		TestEqual(*FString::Printf(TEXT("%s: plan facility == placed facility"), *Plan.SlotId.ToString()), View->FacilityId, Plan.FacilityId);
+		TestEqual(*FString::Printf(TEXT("%s: plan level == placed level"), *Plan.SlotId.ToString()), View->Level, Plan.Level);
+		TestEqual(*FString::Printf(TEXT("%s: plan read == placed read"), *Plan.SlotId.ToString()), VisualToString(View->Visual), VisualToString(Plan.Visual));
+	}
+
+	// Over-staffed state (a raised DA_BaseTuning cap, or Phase 3 roles): the
+	// idler geometry caps at four chunky stand-ins, but the marker still reports
+	// the TRUE count - parity is about the state, not about how many figures fit.
+	FEclipseBaseState Crowded = Base;
+	for (int32 Index = 0; Index < 6; ++Index)
+	{
+		Crowded.FindBySlot(TEXT("Slot_C"))->AssignedSoldierIds.Add(FGuid(6, 0, 0, Index));
+	}
+	RebuildVault(*Scoped.World, Layout, Crowded);
+	const TArray<FEclipseVaultSlotView> CrowdedViews = ReadSlotMarkers(*Scoped.World);
+	const FEclipseVaultSlotView* CrowdedView = EclipseBaseTest::FindView(CrowdedViews, TEXT("Slot_C"));
+	if (TestNotNull(TEXT("Slot C still placed after the re-render"), CrowdedView))
+	{
+		TestEqual(TEXT("Marker reports the true staff count, capped geometry or not"), CrowdedView->StaffCount, 7);
+	}
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVaultDeterminismTest,
+	"Eclipse.Base.VaultBuildDeterminism",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseVaultDeterminismTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVault;
+
+	// Determinism is what makes the vault reviewable in diffs and re-renderable
+	// on every Event.Base.* fact without visual drift (the same regime as the
+	// district graybox): two builds on one state must produce an identical
+	// content signature - every marker tag + location and every mesh instance
+	// transform. Actor names are engine counters and stay out of it by design.
+	UEclipseBaseLayoutAsset* Layout = NewObject<UEclipseBaseLayoutAsset>();
+	Layout->Slots = EclipseBaseTest::MakeSlots();
+	const FEclipseBaseState Base = EclipseBaseTest::MakeGrowthSpreadState();
+
+	EclipseBaseTest::FScopedTestWorld Scoped;
+	if (!TestNotNull(TEXT("Headless test world"), Scoped.World))
+	{
+		return false;
+	}
+
+	BuildVault(*Scoped.World, Layout, Base);
+	const TArray<FString> First = ComputeVaultSignature(*Scoped.World);
+	TestTrue(TEXT("The signature has real content"), First.Num() > 40);
+
+	// Instanced geometry must be part of the signature (GDD 12.4 says the shell
+	// is instanced; if the ISM components ever stopped being reachable from the
+	// anchor, the signature would silently degrade to marker-only).
+	int32 InstanceLines = 0;
+	for (const FString& Line : First)
+	{
+		if (Line.StartsWith(TEXT("ISM ")))
+		{
+			++InstanceLines;
+		}
+	}
+	TestTrue(TEXT("Instanced mesh transforms are signed too"), InstanceLines > 30);
+
+	RebuildVault(*Scoped.World, Layout, Base);
+	const TArray<FString> Second = ComputeVaultSignature(*Scoped.World);
+	TestEqual(TEXT("A rebuild signs the same number of items"), Second.Num(), First.Num());
+
+	int32 FirstMismatch = INDEX_NONE;
+	for (int32 Index = 0; Index < FMath::Min(First.Num(), Second.Num()); ++Index)
+	{
+		if (First[Index] != Second[Index])
+		{
+			FirstMismatch = Index;
+			AddError(FString::Printf(TEXT("Vault build is not deterministic at line %d: '%s' vs '%s'"),
+				Index, *First[Index], *Second[Index]));
+			break;
+		}
+	}
+	TestEqual(TEXT("Two builds on one state are identical"), FirstMismatch, INDEX_NONE);
+
+	// And the signature is not vacuous: one completed build step changes it.
+	FEclipseBaseState Advanced = Base;
+	EclipseBaseLogic::ApplyRush(*Advanced.FindBySlot(TEXT("Slot_B"))); // Barracks completes
+	RebuildVault(*Scoped.World, Layout, Advanced);
+	TestFalse(TEXT("A completed facility changes the signature"), ComputeVaultSignature(*Scoped.World) == Second);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVaultMissingLayoutTest,
+	"Eclipse.Base.VaultDegradesWithoutLayout",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseVaultMissingLayoutTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVault;
+
+	// GDD 14.3.5 on the presentation layer: a missing DA_BaseLayout is a loud
+	// warning plus an empty vault (anchor only) - never a crash, never a silent
+	// pass. Both the build and the re-render path degrade the same way, and
+	// neither stacks a second anchor.
+	AddExpectedMessage(TEXT("no DA_BaseLayout linked"), ELogVerbosity::Warning, EAutomationExpectedMessageFlags::Contains, 2);
+
+	const FEclipseBaseState Base = EclipseBaseTest::MakeGrowthSpreadState();
+
+	EclipseBaseTest::FScopedTestWorld Scoped;
+	if (!TestNotNull(TEXT("Headless test world"), Scoped.World))
+	{
+		return false;
+	}
+
+	BuildVault(*Scoped.World, /*Layout*/ nullptr, Base);
+	TestTrue(TEXT("The anchor still stands (nothing crashed)"), IsVaultPresent(*Scoped.World));
+	TestEqual(TEXT("No slot chamber is placed"), ReadSlotMarkers(*Scoped.World).Num(), 0);
+	TestEqual(TEXT("The empty vault signs exactly one item: the anchor"), ComputeVaultSignature(*Scoped.World).Num(), 1);
+
+	RebuildVault(*Scoped.World, /*Layout*/ nullptr, Base);
+	TestTrue(TEXT("The re-render path degrades identically"), IsVaultPresent(*Scoped.World));
+	TestEqual(TEXT("Still exactly one anchor - no stacking"), ComputeVaultSignature(*Scoped.World).Num(), 1);
+
+	// The empty vault is not amnesia: the pure planner still accounts for every
+	// state row (as orphans) and Eclipse.Base.Report keeps printing them. Loud
+	// degradation means "show less", never "lie".
+	const TArray<FEclipseBaseSlotDef> NoSlots;
+	const TArray<FEclipseVaultSlotPlan> LayoutlessPlans = PlanSlots(NoSlots, Base);
+	TestEqual(TEXT("Every state row is still accounted for"), LayoutlessPlans.Num(), Base.Facilities.Num());
+	for (const FEclipseVaultSlotPlan& Plan : LayoutlessPlans)
+	{
+		TestTrue(*FString::Printf(TEXT("%s is tagged as an orphan without a layout"), *Plan.SlotId.ToString()), Plan.bOrphan);
+	}
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVaultOrphanRowTest,
+	"Eclipse.Base.VaultShowsOrphanStateRow",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseVaultOrphanRowTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVault;
+
+	// A stale save (or a trimmed layout) can hold a facility at a slot the layout
+	// no longer declares. The Eclipse.Base.Report rule applies to the vault: such
+	// a row is SHOWN and tagged as an orphan, never silently hidden - hidden
+	// state is the bug class that makes a save look healthy while it is not.
+	// The facility id here is the rejected Medbay variant, so this also covers an
+	// unknown presentation binding: neutral blockout, no site marker, no crash.
+	FEclipseBaseState Base; // CC L1 at Slot_A
+	EclipseBaseLogic::StartConstruction(Base, TEXT("Slot_Ghost"), TEXT("Medbay"), /*BuildDays*/ 3);
+	EclipseBaseLogic::ApplyRush(*Base.FindBySlot(TEXT("Slot_Ghost"))); // operational L1 in the save
+
+	UEclipseBaseLayoutAsset* Layout = NewObject<UEclipseBaseLayoutAsset>();
+	Layout->Slots = EclipseBaseTest::MakeSlots(); // four slots, none of them Slot_Ghost
+
+	EclipseBaseTest::FScopedTestWorld Scoped;
+	if (!TestNotNull(TEXT("Headless test world"), Scoped.World))
+	{
+		return false;
+	}
+
+	BuildVault(*Scoped.World, Layout, Base);
+	const TArray<FEclipseVaultSlotView> Views = ReadSlotMarkers(*Scoped.World);
+	TestEqual(TEXT("Layout slots plus the orphan are all placed"), Views.Num(), Layout->Slots.Num() + 1);
+
+	const FEclipseVaultSlotView* Ghost = EclipseBaseTest::FindView(Views, TEXT("Slot_Ghost"));
+	if (TestNotNull(TEXT("The orphaned state row is physically shown"), Ghost))
+	{
+		TestTrue(TEXT("It is tagged as an orphan"), Ghost->bOrphan);
+		TestEqual(TEXT("It names its facility"), Ghost->FacilityId, FName(TEXT("Medbay")));
+		TestEqual(TEXT("It keeps its level"), Ghost->Level, 1);
+		TestEqual(TEXT("It reads Built like the state says"), VisualToString(Ghost->Visual), TEXT("Built"));
+	}
+	for (const FEclipseBaseSlotDef& Slot : Layout->Slots)
+	{
+		const FEclipseVaultSlotView* View = EclipseBaseTest::FindView(Views, Slot.SlotId);
+		if (View != nullptr)
+		{
+			TestFalse(*FString::Printf(TEXT("%s is not tagged as an orphan"), *Slot.SlotId.ToString()), View->bOrphan);
+		}
+	}
+
+	// The chamber sits inside the shell, not in the void: the orphan gets a real
+	// place in the vault (the plan positions it off the Spine like any slot).
+	const TArray<FEclipseVaultSlotPlan> Plans = PlanSlots(Layout->Slots, Base);
+	const FEclipseVaultSlotPlan* GhostPlan = Plans.FindByPredicate([](const FEclipseVaultSlotPlan& Plan) { return Plan.SlotId == FName(TEXT("Slot_Ghost")); });
+	if (TestNotNull(TEXT("The orphan is planned, not appended nowhere"), GhostPlan))
+	{
+		TestTrue(TEXT("The orphan chamber is the last one (authored slots keep their order)"), Plans.Last().SlotId == GhostPlan->SlotId);
+	}
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVaultPlanHashTest,
+	"Eclipse.Base.VaultPlanHashCoalescer",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseVaultPlanHashTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVault;
+
+	// The re-render coalescer's contract (UEclipseBaseSubsystem::RefreshVault):
+	// one campaign commit emits up to four Event.Base.* facts against the SAME
+	// post-commit state, so the first fact renders the final vault and the rest
+	// must hash identically and cost nothing. Equally important: every parity
+	// field has to move the hash, or a real change would be swallowed.
+	const TArray<FEclipseBaseSlotDef> Slots = EclipseBaseTest::MakeSlots();
+	const FEclipseBaseState Base = EclipseBaseTest::MakeGrowthSpreadState();
+	const uint32 Hash = ComputePlanHash(PlanSlots(Slots, Base));
+
+	TestTrue(TEXT("Planning is pure: the same state hashes the same twice"),
+		ComputePlanHash(PlanSlots(Slots, Base)) == Hash);
+
+	FEclipseBaseState Staffed = Base;
+	Staffed.FindBySlot(EclipseBaseDefaults::CommandSlotId)->AssignedSoldierIds.Add(FGuid(9, 0, 0, 1));
+	TestFalse(TEXT("A staff change moves the hash (idlers are a visible read)"),
+		ComputePlanHash(PlanSlots(Slots, Staffed)) == Hash);
+
+	FEclipseBaseState Completed = Base;
+	EclipseBaseLogic::ApplyRush(*Completed.FindBySlot(TEXT("Slot_B"))); // Constructing -> Built
+	TestFalse(TEXT("A completed build moves the hash"),
+		ComputePlanHash(PlanSlots(Slots, Completed)) == Hash);
+
+	FEclipseBaseState Orphaned = Base;
+	EclipseBaseLogic::StartConstruction(Orphaned, TEXT("Slot_Ghost"), TEXT("Workshop"), /*BuildDays*/ 2);
+	TestFalse(TEXT("An appearing orphan row moves the hash"),
+		ComputePlanHash(PlanSlots(Slots, Orphaned)) == Hash);
+
+	TArray<FEclipseBaseSlotDef> Trimmed = Slots;
+	Trimmed.Pop();
+	TestFalse(TEXT("A trimmed layout moves the hash (chamber count and centering)"),
+		ComputePlanHash(PlanSlots(Trimmed, Base)) == Hash);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVaultEventRerenderTest,
+	"Eclipse.Base.VaultRerendersOnBaseFacts",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseVaultEventRerenderTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVault;
+
+	// The wiring, end to end and headless: nobody calls the builder after the
+	// first render. Orders go through the subsystem API, the CampaignState commit
+	// emits the existing Event.Base.* facts, and the standing vault picks them up
+	// off the bus (GDD 14.3.3 both ways: orders down the API, facts up the bus).
+	// No tick, no polling - the assertions below run without a single frame.
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseBaseSubsystem* BaseSubsystem = GameInstance->GetSubsystem<UEclipseBaseSubsystem>();
+	UWorld* World = GameInstance->GetWorld();
+	if (!TestNotNull(TEXT("Base subsystem exists"), BaseSubsystem) || !TestNotNull(TEXT("The game instance has a world"), World))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	UEclipseBaseLayoutAsset* Layout = NewObject<UEclipseBaseLayoutAsset>();
+	Layout->Slots = EclipseBaseTest::MakeSlots();
+	UEclipseBaseTuningAsset* Tuning = NewObject<UEclipseBaseTuningAsset>();
+	Tuning->AnalystBonusResource = EclipseTags::Resource_Intel.GetTag();
+
+	UEclipseCampaignSetupAsset* Setup = NewObject<UEclipseCampaignSetupAsset>();
+	Setup->StartingRosterSize = 2;
+	Setup->StartingResources.Add(EclipseTags::Resource_Materials.GetTag(), 300);
+	Setup->StartingResources.Add(EclipseTags::Resource_Credits.GetTag(), 200);
+	Setup->BaseLayout = Layout;
+	Setup->BaseTuning = Tuning;
+	Setup->Facilities = EclipseBaseTest::MakeFacilitiesTable();
+	Campaign->StartNewCampaign(Setup);
+
+	// Snapshot read of one slot marker: the marker array is a fresh snapshot per
+	// call, so this hands back a value - never a pointer into a temporary.
+	FEclipseVaultSlotView SlotB;
+	const auto ReadSlot = [World, &SlotB](FName SlotId) -> bool
+	{
+		const TArray<FEclipseVaultSlotView> Snapshot = ReadSlotMarkers(*World);
+		if (const FEclipseVaultSlotView* Found = EclipseBaseTest::FindView(Snapshot, SlotId))
+		{
+			SlotB = *Found;
+			return true;
+		}
+		return false;
+	};
+
+	// A Base fact before anything stands is a strict no-op: the bus is never an
+	// invitation to spawn a vault into a mission or menu world.
+	FString Error;
+	TestTrue(TEXT("A build order commits without a vault present"), BaseSubsystem->TryStartConstruction(TEXT("Barracks"), Error));
+	TestFalse(TEXT("No vault was spawned by the fact alone"), IsVaultPresent(*World));
+
+	// The level/entry seam renders it once; from here the bus keeps it current.
+	BaseSubsystem->EnsureVaultPresent();
+	TestTrue(TEXT("The vault stands after the entry render"), IsVaultPresent(*World));
+	if (TestTrue(TEXT("Slot_B is placed"), ReadSlot(TEXT("Slot_B"))))
+	{
+		TestEqual(TEXT("It renders the in-flight order: Constructing"), VisualToString(SlotB.Visual), TEXT("Constructing"));
+		TestEqual(TEXT("No level completed yet"), SlotB.Level, 0);
+	}
+
+	// Event.Base.StaffAssigned: the crew appears in the chamber, nothing else moved.
+	const FGuid SoldierA = Campaign->GetState().Roster[0].SoldierId;
+	TestTrue(TEXT("Crew assigned to the building site"), BaseSubsystem->TryAssignStaff(TEXT("Slot_B"), SoldierA, Error));
+	if (TestTrue(TEXT("Slot_B still placed"), ReadSlot(TEXT("Slot_B"))))
+	{
+		TestEqual(TEXT("The staff fact re-rendered the crew idler"), SlotB.StaffCount, 1);
+		TestEqual(TEXT("Still under construction"), VisualToString(SlotB.Visual), TEXT("Constructing"));
+	}
+
+	// Event.Base.FacilityBuilt (+ the completion's StaffAssigned release, two
+	// facts from ONE commit): the chamber flips to Built and the crew is gone.
+	TestTrue(TEXT("Rush commits"), BaseSubsystem->TryRushConstruction(TEXT("Slot_B"), Error));
+	if (TestTrue(TEXT("Slot_B still placed"), ReadSlot(TEXT("Slot_B"))))
+	{
+		TestEqual(TEXT("The completion fact re-rendered the built facility"), VisualToString(SlotB.Visual), TEXT("Built"));
+		TestEqual(TEXT("Operational at L1"), SlotB.Level, 1);
+		TestEqual(TEXT("The released crew left the chamber (no ghost idler)"), SlotB.StaffCount, 0);
+	}
+
+	// Full-vault parity after the whole event chain: every marker still matches
+	// the committed campaign state - the re-renders never drifted from it.
+	const FEclipseBaseState& CommittedState = Campaign->GetState().BaseState;
+	const TArray<FEclipseVaultSlotView> Views = ReadSlotMarkers(*World);
+	TestEqual(TEXT("One marker per layout slot after the chain"), Views.Num(), Layout->Slots.Num());
+	for (const FEclipseVaultSlotPlan& Plan : PlanSlots(Layout->Slots, CommittedState))
+	{
+		const FEclipseVaultSlotView* View = EclipseBaseTest::FindView(Views, Plan.SlotId);
+		if (View == nullptr)
+		{
+			AddError(FString::Printf(TEXT("Slot %s vanished from the vault during the event chain"), *Plan.SlotId.ToString()));
+			continue;
+		}
+		TestEqual(*FString::Printf(TEXT("%s: still parity on facility"), *Plan.SlotId.ToString()), View->FacilityId, Plan.FacilityId);
+		TestEqual(*FString::Printf(TEXT("%s: still parity on level"), *Plan.SlotId.ToString()), View->Level, Plan.Level);
+		TestEqual(*FString::Printf(TEXT("%s: still parity on staff"), *Plan.SlotId.ToString()), View->StaffCount, Plan.StaffCount);
+		TestEqual(*FString::Printf(TEXT("%s: still parity on the read"), *Plan.SlotId.ToString()), VisualToString(View->Visual), VisualToString(Plan.Visual));
+	}
+
+	GameInstance->Shutdown();
 	return true;
 }
 
