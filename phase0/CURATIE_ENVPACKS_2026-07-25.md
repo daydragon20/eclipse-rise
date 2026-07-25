@@ -60,6 +60,47 @@ overgebracht — repo-tracked, met provenance-regel in SOURCES.md. Dat hield de 
 vorige keer klein terwijl de gebruikte assets wél reisden, en het voorkomt dat een
 verworpen pack voorgoed in de git-historie zit.
 
+## 3a. GEMETEN in de editor (17:17) — en het weerlegt mijn eigen eerste indruk
+
+Gedraaid met `Tools/inventory_envpacks_2026_07_25.py` (report-only, raakt geen asset
+aan). Beslisregels: ≤6000 tris = dressing-gewicht, 6000-20000 = alleen hero-prop,
+>20000 = afwijzen op deze tier; ≥2 materiaalslots gewenst omdat de toon-master **per
+zone** tint.
+
+| Pack | meshes | dressing | hero | te zwaar | **1-slot** | textures (4K+) |
+|---|---|---|---|---|---|---|
+| Uniblocks | 3200 | 3179 | 13 | 8 | **2506 (78%)** | 203 (121) |
+| Factory_Pack_V1 | 151 | 146 | 5 | 0 | **35 (23%)** | 139 (110) |
+| Sci_fi_hallway | 19 | 17 | 2 | 0 | **18 (95%)** | 69 (23) |
+| IBuilding_49 | 1 | 0 | 0 | **1** | 1 | 5 (5) |
+
+**§1 zei dat Uniblocks "de kit-kandidaat" was. Dat was een gok op mesh-aantal, en de
+meting spreekt hem tegen.** 78% van die 3200 meshes heeft één materiaalslot, en één
+slot kan geen palet-scheiding dragen. Voor een klein prop is dat prima — een vat mag
+één tint zijn — maar voor architectuur is het fataal: een wandpaneel heeft wand,
+trim en lijst nodig in verschillende waarden, en dat is precies wat de tweede
+art-review als "lege middenband" aanwees. **Factory_Pack_V1 heeft vier keer betere
+slot-discipline (23% 1-slot) en nul meshes boven budget** — dat is het pack dat de
+toon-pijplijn wél kan dragen, ondanks dat het kleiner is.
+
+Per pack:
+- **Factory_Pack_V1 — de sterkste kandidaat.** 146 van 151 meshes op dressing-gewicht,
+  geen enkele te zwaar, zwaarste is een vat op 17k tris met 4 slots (hero-prop).
+  Dit is het pack voor de machine-banken en het leidingwerk waar nu graybox staat.
+- **Uniblocks — selectief, en alleen waar één tint klopt.** De 13 hero- en 8
+  te-zware meshes vallen af (zwaarste: een bush op 52k tris). De rest is bruikbaar
+  als *massa* en als kleine props, niet als getinte architectuur. Cureer per ruimte,
+  en check per stuk het slot-aantal vóór je hem als wandpaneel gebruikt.
+- **Sci_fi_hallway — 18 van 19 meshes 1-slot.** Als interieurkit voor de vault is dat
+  een probleem in dezelfde richting. Parkeren tot de vault een art-pass krijgt.
+- **IBuilding_49 — afgewezen op deze tier.** Eén mesh van 26.385 tris met één slot.
+  Te zwaar én niet tintbaar; het district draait op een SM5-laptop (12.4).
+
+**Textuur-waarschuwing:** 254 van de 416 textures zijn 4K of groter. Bruikbaar als
+luminantie-albedo, maar elke gain MOET gemeten worden met
+`Tools/measure_albedo_gain.py`. Geschatte gains zijn precies waar de
+magenta-container en de vloer-omkering op stukliepen.
+
 ## 4. Wat de editor nodig heeft (werklijst, mechanisch zodra het slot vrij is)
 
 Dit zijn de échte curatiecriteria en geen ervan is leesbaar zonder de editor:
