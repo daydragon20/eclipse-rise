@@ -128,7 +128,14 @@ namespace
 		// Measured gains untouched (12.41/16.8 = 1/linear-mean; the toon HLSL
 		// clamps the per-pixel multiplier at 2.5) — the mean multiplier stays
 		// 1.0, so this retint moves the histogram only by the tint delta.
-		{ TEXT("Floor"),  FLinearColor(0.166f, 0.180f, 0.209f), FLinearColor(0.054f, 0.059f, 0.094f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — Wall_ x0.72, never crushed
+		// Dressing-iteratie 3, step 2: two value steps down (x0.518 = 0.72^2) from
+		// the iteration-2 tint. Iteration 2 anchored the floor to Wall_ and so made
+		// it LIGHTER; the anchor is the SKY, because that is what dusk means. Mid
+		// 0.1198 -> 0.0621, which lands ~1.9x the measured horizon sky (0.0595 lin)
+		// once step 1 pins the key. Wall_ stays put, so the ground/wall value step
+		// finally exists on screen (the review measured band and floor at an
+		// identical 0.1237 in the overview frame). Measured gains untouched.
+		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — anchored under the SKY, never crushed
 		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
 		// Dominion post: oxide red, shade to maroon-purple (variation is
 		// luminance-only, hue stays palette). West-facade banding (15.8 look-ronde
@@ -1879,6 +1886,16 @@ void BuildDistrict(UWorld& World)
 		{
 			// Haze, not soup: the district must read across its full 200 m at
 			// command distance (15.5); the smog hugs the ground via the falloff.
+			// Dressing-iteratie 3 note — density 0.02 was TRIED here and REVERTED
+			// (2026-07-25). It was aimed at a "ground brightens toward the horizon"
+			// defect that turned out to be a measurement error: a probe rect at the
+			// horizon band contained clipped non-floor pixels. A clean depth scan on
+			// cam 4 (Tools/measure_frame_values.py, five rects from near to far)
+			// reads 0.0489 / 0.0495 / 0.0553 / 0.0536 / 0.0523 linear — flat within
+			// ~7%, not the 2x I had derived. Raising the density changed the
+			// near-to-far ratio by 0.02x, i.e. nothing. The floor's aerial
+			// perspective is therefore NOT fog-limited at this density, and the
+			// value stays where it was measured to belong.
 			FogComponent->SetFogDensity(0.006f);
 			FogComponent->SetFogHeightFalloff(0.2f);
 			FogComponent->SetFogInscatteringColor(FLinearColor(0.42f, 0.32f, 0.24f));
@@ -1945,8 +1962,21 @@ void BuildDistrict(UWorld& World)
 		// Color calibration (owner pass, 2026-07-23): Borderlands-punch — open
 		// the mids, saturate harder, tip the grade warm. The dusk mood stays;
 		// the somber gray-out goes.
+		// Dressing-iteratie 3, step 1 — THE metering fix (art-review of shots
+		// 00064-00069 measured it): the frames rendered palette albedo at x1.79
+		// (floor mid authored 0.1198 -> 0.2145 linear on screen). With a free-
+		// running histogram and a floor that fills 60-80% of every frame, that
+		// floor's screen value is a FIXED POINT — the histogram drags the dominant
+		// surface to mid-grey whatever we author. That is why iteration 2's dusk
+		// retint changed nothing readable, and worse: it made the floor 16%
+		// LIGHTER (Rec709 lum 0.1539 -> 0.1791) because it anchored to Wall_, the
+		// brightest large surface, instead of to the sky. Until the key is pinned,
+		// no colour decision on a dominant surface is art-directable.
+		// -1.55 = -0.7 - log2(1.79): exactly the measured overshoot, not a guess.
+		// Verify by re-shooting and measuring the floor back at 0.1198 +/-0.01
+		// linear (Tools/measure_frame_values.py) — never by eye.
 		Settings.bOverride_AutoExposureBias = true;
-		Settings.AutoExposureBias = -0.7f;
+		Settings.AutoExposureBias = -1.55f;
 		Settings.bOverride_ColorGain = true;
 		Settings.ColorGain = FVector4(1.05f, 1.00f, 0.93f, 1.0f);
 		Settings.bOverride_LocalExposureHighlightContrastScale = true;
