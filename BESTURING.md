@@ -1,9 +1,16 @@
 # ECLIPSE — besturing, per actie geverifieerd
 
 *Bijgewerkt 2026-07-26. Deze lijst is uit de code gelezen, niet uit het geheugen:
-elke rij is een `MapKey`-regel plus een `BindAction`-regel in
-`Eclipse/Source/Eclipse/Characters/EclipsePlayerController.cpp`. Staat er "ja" in
-de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
+op één uitzondering na is elke rij een `MapKey`-regel plus een `BindAction`-regel
+in `Eclipse/Source/Eclipse/Characters/EclipsePlayerController.cpp`. Staat er "ja"
+in de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
+
+*De uitzondering is **stance op toetsenbord**: LeftAlt is géén Enhanced-Input-actie
+en heeft dus geen mapping en geen handler — `IssueSquadOrder` vraagt op het moment
+van geven of de toets neer is. Dat werkt, maar het staat buiten het
+actiesysteem, en deze lijst hoort dat te zeggen in plaats van "ja" te claimen.
+Alle overige rijen zijn deze ronde één voor één tegen de `MapKey`-regels
+gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 
 ## Veld (buiten Command Mode)
 
@@ -27,7 +34,7 @@ de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
 | Vorige soldaat | scroll omlaag | LT **tijdens de hold** | ja — `CycleSoldierSelection(-1)` |
 | Soldaat onder richtkruis | E | X | ja — `PickSoldierUnderReticle` |
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |
-| Stance | Alt (bij het geven) | Y (togglen) | ja — `ToggleHeldStance` |
+| Stance | Alt **ingedrukt houden terwijl je de order geeft** | Y (togglen) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven |
 
 **LT doet twee dingen en dat is bewust.** Buiten Command Mode is LT mikken (de
 genre-conventie); tijdens de Q/LB-hold is LT "vorige soldaat". Beide handlers
