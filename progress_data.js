@@ -43,17 +43,23 @@ window.PROGRESS_DATA = {
       "Als er geen 'Add to Project' staat: zeg het, dan zoek ik een andere route",
       "Zeg daarna: 'lightpack staat erin'"
     ] },
-    { titel: "Feel-gauntlet Command Mode (~20 min) — het R3-verdict", prio: "nu", waarom: "beslist of Stage B (nieuwe orders/camera/UI) mag starten; expres op de lelijke build. Je mag de editor hiervoor gewoon weer openen — de landing draait nu eerst; alleen als de agent later opnieuw moet bouwen vraagt hij je nog eens te sluiten", stappen: [
-      "Open phase0/FEEL_GAUNTLET_P2-02.md (het draaiboek met besturing + meetcriteria)",
-      "Speel in PIE: houd Q (of LB op de pad) — wereld vertraagt naar 30%; geef orders met 1-4/D-pad; kies soldaten met Tab/RB of E/X",
-      "Score de 5 criteria uit het draaiboek en zeg: 'R3-verdict: true' of 'false' + wat je zag"
+    { titel: "SPELEN — de game begeleidt je nu zelf (F3). Levert R3-verdict én 13.2 in één sessie", prio: "nu", waarom: "de twee dingen die geen enkele test kan geven: voelt Command Mode goed (R3, beslist of Stage B mag starten) en wil je vrijwillig een tweede ronde (13.2, sluit Fase 1 af). Je hebt geen document meer naast je scherm nodig — de game vertelt per stap wat je moet doen én waaraan je ziet dat het klopt. Bar bij deze build: 95/95 tests, validatie 0.", stappen: [
+      "Start de game en druk F3 — de testgids opent met 20 stappen in drie delen",
+      "Deel 1 (11 controls): doe wat er staat; de meeste stappen vinken zichzelf af zodra je de toets gebruikt. J = gehaald, N = sla over",
+      "LET OP bij bukken (Ctrl/B): die toets was tot vandaag dood en is net gerepareerd — juist daar graag melden als er niets gebeurt",
+      "Deel 2 (4 systeem-oordelen) + deel 3 (de 5 vragen uit 13.2): J = goed/ja, N = niet goed/nee",
+      "F2 geeft daarnaast de gauntlet-overlay met de vijf R3-criteria live",
+      "Aan het eind staat er een kopieerbare samenvatting in Saved/Logs — plak die hier"
     ] },
-    // Civilian/worker-pack: overgenomen door de agent — 11 CC0-bodies binnen (zie takenlijst); alleen deze optionele close-up-kliks resten:
-    { titel: "13.2-playtest (~30 min)", prio: "als je tijd hebt", waarom: "sluit Fase 1 af + stuurt de eerste review", stappen: [
-      "Speel de graybox-loop ~30 min in de editor",
-      "Noteer kort wat goed/slecht voelt",
-      "Geef het door aan de agent"
-    ] }
+    { titel: "Eén beslissing: mogen de kit-meshes met hun 4K-textures de repo in?", prio: "gauw", waarom: "de 12 Factory-Pack-kandidaten zijn gemeten en groen (alle negen albedo-gains normaliseren netjes op 1.00), dus plaatsen kan. Maar de werkorde zegt dat accepts naar repo-tracked /Game/Art/Imported migreren, en deze meshes dragen 4K-textures. De vorige migratieronde was 2,4 MB; deze wordt een veelvoud daarvan. Dat is jouw afweging, niet de mijne — jij let op schijfruimte.", stappen: [
+      "Optie A: ja, migreren — het district krijgt echte kit-geometrie en die reist mee naar een andere machine",
+      "Optie B: nee, laat de packs machine-lokaal — dan laadt de builder ze via hun eigen pad en degradeert een andere machine netjes naar graybox",
+      "Optie C: alleen de lichte modulaire stukken (SM_wall_2/3 zijn 8 en 16 driehoeken) en de zware hero-props lokaal laten",
+      "Zeg gewoon 'kit: A', 'kit: B' of 'kit: C'"
+    ] },
+    // Civilian/worker-pack: overgenomen door de agent — 11 CC0-bodies binnen (zie takenlijst).
+    // De losse 13.2-playtest-regel is hier weg: die zit nu in de speel-actie hierboven,
+    // want de testgids levert R3 en 13.2 in dezelfde sessie.
   ],
 
   // Assets-overzicht — wat is binnengehaald, zelf gemaakt, en wat nog te doen. Dev-sessie houdt dit actueel.
