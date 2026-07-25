@@ -228,13 +228,23 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	// het oppervlak waar hij op staat?
 	if (Harness.Body->GetMesh() != nullptr)
 	{
-		// Eerst laten landen. EnterMissionMode zet de pawn 100 cm boven het
-		// insertiepunt neer, dus wie meteen meet, meet een vallend personage — de
-		// eerste ronde las 160,86 cm en dat leek een defect.
+		// Eerst laten landen. EnterMissionMode zet de pawn boven het insertiepunt
+		// neer, dus wie meteen meet, meet een vallend personage — de eerste ronde
+		// las 160,86 cm en dat leek een defect.
+		//
+		// Meteen vastleggen HOE VER en HOE LANG hij valt, want dat is de eerste
+		// halve seconde van elke missie en die is niet van de speler. Geen assert:
+		// er is nog geen norm voor, en een drempel verzinnen zou net zo'n
+		// ongefundeerd getal zijn als de 0.75 strafe-ratio die vannacht sneuvelde.
+		// Eerst het getal op tafel.
+		const double InsertionZ = Harness.Location().Z;
+		const double InsertionStart = Harness.ElapsedSeconds;
 		Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 3.0, [&Harness]()
 		{
 			return Harness.Body->GetCharacterMovement()->IsMovingOnGround() && Harness.SpeedCm() < 1.0f;
 		});
+		Report(*this, TEXT("val bij insertie"), InsertionZ - Harness.Location().Z, TEXT("cm"), TEXT("nog geen norm — dit is de eerste halve seconde van elke missie"));
+		Report(*this, TEXT("tijd tot de speler staat"), Harness.ElapsedSeconds - InsertionStart, TEXT("s"), TEXT("zolang is de besturing niet van hem"));
 		FHitResult Ground;
 		FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseFootCheck), false, Harness.Body);
 		const FVector From = Harness.Location();
