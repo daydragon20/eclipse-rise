@@ -72,7 +72,25 @@ Dat maakt de frame-probe (`Tools/measure_frame_values.py`, §4) meteen zijn eige
 rechtvaardiging: hij ving zowel de oorspronkelijke vloer-omkering als mijn eigen
 verkeerde conclusie.
 
-## 1e. Stap 7 (waardeplafond) GELAND en gemeten — shots 00105-00111
+## 1f. Stap 4 + 7 AFGEROND — beide op doel (shots 00119-00125)
+
+| meting (cam 7, identieke vakken) | 00104 | 00125 | doel |
+|---|---|---|---|
+| pool-kern | 0.2976 | **0.1151** | 0.10-0.12 ✅ |
+| barrière | 0.2909 | **0.1138** | ≤0.15 ✅ |
+| vloer | 0.0482 | 0.0489 | ongemoeid ✅ |
+
+De barrière staat nu op **0.99× de pool-kern** in plaats van 2.25× erboven. De regel
+"niets niet-emissief boven de pool" is daarmee gehaald mét marge, en de pool zit weer
+op de ontworpen verhouding tot zijn eigen vloer.
+
+**Nog open en bewust apart:** de pool composeert nog *over* de ondergrond in plaats
+van er *in* te vermenigvuldigen. Het lagere niveau maakt de baanmarkering-inversie
+kleiner, niet onmogelijk — die compositing-wijziging is een eigen stap, net als
+bloom/halo (gemeten afwezig), de contactschaduwen op alle massaklassen, en de grijze
+vorken.
+
+## 1e. Stap 7 (waardeplafond) eerste bisectiestap — shots 00105-00111
 
 Uitgevoerd in de volgorde die §1d voorschrijft, met de probe als scheidsrechter.
 

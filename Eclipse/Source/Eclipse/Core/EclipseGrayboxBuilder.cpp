@@ -657,8 +657,23 @@ void BuildDistrict(UWorld& World)
 		// A flat pool renders its MID band (horizontals sit at ndl 0.423), so the
 		// composite over the asphalt at peak opacity 0.70 lands at 2.18x the
 		// floor: a pool that reads at command distance without a hot core.
+		// Dressing-iteratie 3, step 4 — RE-DERIVED on measurement. The derivation
+		// above still holds as a method, but its inputs moved: the floor dropped two
+		// value steps in step 2 while these absolute values stayed, so the pool
+		// drifted to 6.25x its own floor (measured core 0.2907 over floor 0.0465)
+		// where the design says 2.18x. The second art-review pinned that from three
+		// independent directions: pool-over-bulb must fall from 40% to 14-16%; the
+		// lane marking inside the pool must keep >=2x its asphalt (it had INVERTED
+		// to 0.79x, so the yellow line read DARKER than the road it is painted on);
+		// and 2.18 x floor 0.0465 = 0.101. All three land on a frame target of
+		// 0.10-0.12 lum, i.e. authored x0.35-0.40. The Glow hue factor (x0.398), the
+		// shade/lit ratio and opacity 0.70 are unchanged — only the level moves.
+		// STILL OPEN after this: the pool composites OVER the ground instead of
+		// multiplying INTO it, which is why it can overwrite the lane marking's
+		// hierarchy at all. Lowering the level makes the inversion smaller, not
+		// impossible; the compositing change is its own step.
 		const FPaletteDef& FloorPalette = PaletteForLabel(TEXT("Floor"));
-		PoolMid = MakeGroundDecalMid(FLinearColor(0.876f, 0.398f, 0.119f), FLinearColor(0.296f, 0.135f, 0.040f), PoolMask, 0.70f, &FloorPalette);
+		PoolMid = MakeGroundDecalMid(FLinearColor(0.333f, 0.151f, 0.045f), FLinearColor(0.112f, 0.051f, 0.015f), PoolMask, 0.70f, &FloorPalette);
 		// Blob shadow: the floor tint at x0.4 — luminance only, no hue shift
 		// (spec). Peak opacity 0.85 puts the core at ~0.49x the asphalt, dark
 		// enough to ground a mass, far off the "silhouette black" the boulder
@@ -725,7 +740,12 @@ void BuildDistrict(UWorld& World)
 			// core, i.e. the brightest non-emissive thing in the district and
 			// brighter than the light itself. Same method as Wall_: authored x0.35
 			// as the starting point, then bisect on the measured frame value.
-			{ TEXT("Prop_Barrier"), TEXT("/Game/Art/Props/concrete_road_barrier.concrete_road_barrier"), TEXT("/Game/Art/Textures/T_concrete_road_barrier_diff.T_concrete_road_barrier_diff"), 6.7f, FLinearColor(0.091f, 0.095f, 0.105f), FLinearColor(0.030f, 0.032f, 0.049f) },
+			// Second bisection step: x0.35 landed the face at 0.2909 in frame where
+			// the target is <=0.15, so halve again. The mapping is measured
+			// non-linear (authored 0.2701 -> 0.654 = 2.42x; authored 0.0945 ->
+			// 0.2909 = 3.08x — the ratio RISES as the value falls), which is exactly
+			// why this is bisected against the probe instead of computed.
+			{ TEXT("Prop_Barrier"), TEXT("/Game/Art/Props/concrete_road_barrier.concrete_road_barrier"), TEXT("/Game/Art/Textures/T_concrete_road_barrier_diff.T_concrete_road_barrier_diff"), 6.7f, FLinearColor(0.046f, 0.048f, 0.053f), FLinearColor(0.015f, 0.016f, 0.025f) },
 			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.080f, 0.280f, 0.300f), FLinearColor(0.030f, 0.100f, 0.150f) },
 		};
 
