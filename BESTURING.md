@@ -1,6 +1,6 @@
 # ECLIPSE — besturing, per actie geverifieerd
 
-*Bijgewerkt 2026-07-25. Deze lijst is uit de code gelezen, niet uit het geheugen:
+*Bijgewerkt 2026-07-26. Deze lijst is uit de code gelezen, niet uit het geheugen:
 elke rij is een `MapKey`-regel plus een `BindAction`-regel in
 `Eclipse/Source/Eclipse/Characters/EclipsePlayerController.cpp`. Staat er "ja" in
 de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
@@ -16,7 +16,7 @@ de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
 | Sprint | Shift (**vasthouden**) | L3 (**togglen**) | ja — `HandleSprintHold` / `HandleSprintToggle` |
 | Hurken | Ctrl | B | ja — `HandleCrouch` |
 | Springen | Spatie | A | ja — `HandleJump` |
-| 1e/3e persoon | C | R3 (rechterstick indrukken) | ja — `HandleToggleView` |
+| 1e/3e persoon | C | **geen** — R3 is er bewust af | ja — `HandleToggleView` (alleen op C) |
 
 ## Command Mode (wereld naar 30%)
 
