@@ -140,6 +140,10 @@ private:
 	float AimAssistRange = 5000.0f;
 	bool bInvertLookY = false;
 
+	/** Welke acties al een gamepad-actuatie hebben gelogd — één regel per actie,
+	 *  zodat het log een diagnose is en geen spam. */
+	TSet<FString> SeenGamepadActions;
+
 	// Command Mode inputs (SPEC-P2-02 Stage A; provisional debug bindings —
 	// the Enhanced Input context stack is a SPEC-P2-07 seam).
 	UPROPERTY()

@@ -147,6 +147,23 @@ void AEclipsePlayerController::EnterMissionMode()
 	// this line the owner's "F3 does nothing" was unanswerable from a log: every
 	// debug key silently no-ops when the widget is absent, so a missing HUD and a
 	// broken key look identical from the outside.
+	// Owner-blokkade 2026-07-25: geen enkele controller-knop leek aan te komen, en
+	// "de mapping klopt" en "het apparaat levert niets" zien er van buitenaf
+	// identiek uit. Dit zegt bij missiestart plat wat de engine ziet, zodat de
+	// vraag "ligt het aan mij of aan de game" beantwoordbaar is zonder te gokken.
+	if (const UInputDeviceSubsystem* Devices = UInputDeviceSubsystem::Get())
+	{
+		const FHardwareDeviceIdentifier Hardware = Devices->GetMostRecentlyUsedHardwareDevice(GetPlatformUserId());
+		UE_LOG(LogEclipse, Display, TEXT("Input: meest recent gebruikte apparaat = '%s' (input class '%s', type %d). Gamepad = %s."),
+			*Hardware.HardwareDeviceIdentifier.ToString(), *Hardware.InputClassName.ToString(),
+			static_cast<int32>(Hardware.PrimaryDeviceType),
+			Hardware.PrimaryDeviceType == EHardwareDevicePrimaryType::Gamepad ? TEXT("JA") : TEXT("nee"));
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Input: geen UInputDeviceSubsystem — apparaatdetectie onbeschikbaar."));
+	}
+
 	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 test guide, H playtest)."),
 		MissionHud == nullptr
 			? (UEclipseMissionHudWidget::IsDebugHudAllowed()
@@ -260,9 +277,14 @@ void AEclipsePlayerController::SetupInputComponent()
 	MapKey(FireAction, EKeys::Gamepad_RightTrigger);
 	MapKey(SprintAction, EKeys::Gamepad_LeftThumbstick);
 	MapKey(CrouchAction, EKeys::Gamepad_FaceButton_Right);
-	// R3 was free (L3 carries sprint), so the pad gets the owner's first choice
-	// and no D-pad fallback is needed.
-	MapKey(ToggleViewAction, EKeys::Gamepad_RightThumbstick);
+	// R3 is er BEWUST af (owner playtest 2026-07-25: "gaat bij mij constant per
+	// ongeluk af, want het is de stick waarmee ik richt"). Dat is geen smaak maar
+	// een ontwerpfout van mijn kant: een knop die je perspectief omgooit hoort niet
+	// op de stick die je de hele tijd vasthoudt. Elke andere pad-knop draagt al iets
+	// (A springen, B hurken, X soldaat-pick, Y stance, LB Command Mode, RB volgende,
+	// LT mikken, RT vuren, L3 sprint, View gids, Menu bevestigen), dus er is geen
+	// vrije plek — en een view-swap is geen gevechtsactie, dus hij verliest die
+	// afweging terecht. Toetsenbord houdt C.
 
 	const FKey OrderKeys[] = { EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four };
 	// D-pad mirrors the 1-4 order keys in reading order: up, right, down, left.
@@ -318,6 +340,42 @@ void AEclipsePlayerController::SetupInputComponent()
 	Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &AEclipsePlayerController::HandleSprint);
 	Input->BindAction(CrouchAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleCrouch);
 	Input->BindAction(ToggleViewAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleToggleView);
+
+	// Eén logregel per actie-naam, de EERSTE keer dat hij vanaf een gamepad
+	// actueert. Dat scheidt de drie mogelijke oorzaken van "geen enkele knop doet
+	// iets": komt er geen XInput binnen (dan blijft dit stil), bereikt het de
+	// mapping niet (ook stil, maar de apparaatregel hierboven zegt dan wel
+	// "Gamepad = JA"), of komt het wél aan en doet de handler niets (dan staat er
+	// een regel en ligt het aan de handler). Zonder dit onderscheid is elke
+	// diagnose een gok.
+	{
+		const TPair<UInputAction*, const TCHAR*> Watched[] = {
+			{ MoveAction, TEXT("Move") },       { LookAction, TEXT("Look") },
+			{ FireAction, TEXT("Fire") },       { SprintAction, TEXT("Sprint") },
+			{ CrouchAction, TEXT("Crouch") },   { ToggleViewAction, TEXT("ToggleView") },
+			{ JumpAction, TEXT("Jump") },       { AimAction, TEXT("Aim") },
+			{ CommandHoldAction, TEXT("CommandHold") },
+			{ SelectNextAction, TEXT("SelectNext") }, { SelectPrevAction, TEXT("SelectPrev") },
+			{ DirectPickAction, TEXT("DirectPick") }, { StanceToggleAction, TEXT("StanceToggle") },
+		};
+		for (const TPair<UInputAction*, const TCHAR*>& Row : Watched)
+		{
+			if (Row.Key == nullptr)
+			{
+				continue;
+			}
+			const FString ActionName = Row.Value;
+			Input->BindActionValueLambda(Row.Key, ETriggerEvent::Started, [this, ActionName](const FInputActionValue&)
+			{
+				if (!IsUsingGamepadLook() || SeenGamepadActions.Contains(ActionName))
+				{
+					return;
+				}
+				SeenGamepadActions.Add(ActionName);
+				UE_LOG(LogEclipse, Display, TEXT("Input: gamepad bereikte actie '%s' (eerste keer)."), *ActionName);
+			});
+		}
+	}
 
 	Input->BindActionValueLambda(OrderActions[0], ETriggerEvent::Started, [this](const FInputActionValue&) { IssueSquadOrder(EEclipseSquadOrder::MoveTo); });
 	Input->BindActionValueLambda(OrderActions[1], ETriggerEvent::Started, [this](const FInputActionValue&) { IssueSquadOrder(EEclipseSquadOrder::FocusTarget); });

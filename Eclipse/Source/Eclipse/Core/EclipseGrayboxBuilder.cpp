@@ -634,7 +634,14 @@ void BuildDistrict(UWorld& World)
 		// a palette entry's MEASURED albedo — the pool borrows the floor's own
 		// asphalt so a light pool reads as lit asphalt instead of a painted disc,
 		// with the same primary/fallback/flat degradation chain as the blocks.
-		auto MakeGroundDecalMid = [ToonDecalMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade, UTexture* Mask, float OpacityScale, const FPaletteDef* GrainSource) -> UMaterialInstanceDynamic*
+		//
+		// MixOverride exists because that borrowing was doing two jobs at once. The
+		// pool wants the floor's TEXTURE (same asphalt, same tile phase); it does
+		// not necessarily want the floor's MIX. When the floor's mix dropped from
+		// 0.50 to 0.20 to kill its photographic grain (par. 1i), the pools silently
+		// flattened with it — one knob, two intentions, and the second one moved by
+		// accident. Negative = follow the palette entry, as before.
+		auto MakeGroundDecalMid = [ToonDecalMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade, UTexture* Mask, float OpacityScale, const FPaletteDef* GrainSource, float MixOverride = -1.0f) -> UMaterialInstanceDynamic*
 		{
 			if (ToonDecalMaterial == nullptr || Mask == nullptr)
 			{
@@ -665,7 +672,8 @@ void BuildDistrict(UWorld& World)
 					Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Albedo);
 					Mid->SetScalarParameterValue(TEXT("TexWorldScale"), GrainSource->TexScale);
 					Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Gain);
-					Mid->SetScalarParameterValue(TEXT("AlbedoMix"), GrainSource->TexMix);
+					Mid->SetScalarParameterValue(TEXT("AlbedoMix"),
+						MixOverride >= 0.0f ? MixOverride : GrainSource->TexMix);
 				}
 				else
 				{
@@ -705,7 +713,11 @@ void BuildDistrict(UWorld& World)
 		// hierarchy at all. Lowering the level makes the inversion smaller, not
 		// impossible; the compositing change is its own step.
 		const FPaletteDef& FloorPalette = PaletteForLabel(TEXT("Floor"));
-		PoolMid = MakeGroundDecalMid(FLinearColor(0.333f, 0.151f, 0.045f), FLinearColor(0.112f, 0.051f, 0.015f), PoolMask, 0.70f, &FloorPalette);
+		// Mix 0.50 expliciet: dat is de waarde waarop de pool op zijn gemeten doel
+		// (0.1151 kern) is gebisecteerd, en hij hoort niet mee te bewegen als de
+		// vloer zijn eigen korrel bijstelt. De TEXTUUR blijft geleend — zelfde
+		// asfalt, zelfde tegelfase — alleen de mix is nu van de pool zelf.
+		PoolMid = MakeGroundDecalMid(FLinearColor(0.333f, 0.151f, 0.045f), FLinearColor(0.112f, 0.051f, 0.015f), PoolMask, 0.70f, &FloorPalette, 0.50f);
 		// Blob shadow: the floor tint at x0.4 — luminance only, no hue shift
 		// (spec). Peak opacity 0.85 puts the core at ~0.49x the asphalt, dark
 		// enough to ground a mass, far off the "silhouette black" the boulder
@@ -729,6 +741,18 @@ void BuildDistrict(UWorld& World)
 		// plus the skirt still being derived from footprint instead of height, which
 		// is par. 5's own explanation for why no container blob was findable in 00065
 		// and is its own measured step.
+		// VERSE STENCIL-METING op de rustiger vloer (shots 00236 stencil -> 00229
+		// echt): drie plekken op KAAL asfalt geven binnen 0.0303 / ring 0.0320 =
+		// 0.95x. De contactschaduw is daar dus vrijwel afwezig, en dat bevestigt de
+		// art-review: de eerdere 0.62x werd volledig gedragen door lamppaalvoeten
+		// die in een lichtplek staan. Het rustiger maken van de vloer maakt de blob
+		// beter ZICHTBAAR ten opzichte van de ruis, maar verandert zijn contrast
+		// niet — een stap van 5% blijft een stap van 5%.
+		// De oorzaak zit in de compositing, niet in dit getal: de blob ligt met
+		// opacity 0.85 OVER de grond met een eigen waarde vlak bij die van de vloer,
+		// dus tegen donker asfalt landt hij bijna op hetzelfde niveau. De
+		// modulate-variant uit par. 1h is daarvoor de fix, en die moet samen met de
+		// sorteervolgorde van de pools gebeuren — een eigen stap, niet nog een tint.
 		BlobMid = MakeGroundDecalMid(FloorPalette.Lit * 0.775f, FloorPalette.Shade * 0.775f, BlobMask, 0.85f, nullptr);
 	}
 
