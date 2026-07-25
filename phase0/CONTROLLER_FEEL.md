@@ -33,13 +33,22 @@ hieronder.
 
 ## Twee dingen die ik NIET heb gebouwd, en waarom
 
-**Ramp-up (look-acceleration).** Halo en Destiny hebben het allebei: bij ~98% stick-
-uitslag schiet de draaisnelheid omhoog (Halo klassiek ~2.5×, Infinite ~2.3×, en
-Destiny haalt er 720°/s mee). Dat is precies waarom die games een lage basissnelheid
-kunnen combineren met snel omdraaien. **Maar geen enkele bron noemt de ramp-tijd in
-seconden** — de onderzoeker markeerde dat expliciet als het grootste gat. Ik bouw
-liever niets dan een verzonnen 0.2s, dus dit staat open met een gemeten doel: eerst
-kijken of jij het mist bij 160°/s.
+**Ramp-up (look-acceleration): BESLIST OP 0, en dat blijft zo.** Halo en Destiny
+hebben het allebei — bij bijna volle stick-uitslag schiet de draaisnelheid omhoog
+(Halo klassiek ~2.5×, Infinite ~2.3×, Destiny tot 720°/s) — en er is inmiddels ook
+een hard getal: CoD's `aim_accel_turnrate_lerp` staat op **1200 °/s²**, wat neerkomt
+op **0,217 s** om de hip-yaw-cap van 260°/s te halen.
+
+Toch bouwen we het niet, want de owner koos expliciet ramp 0: **"direct, zoals
+vrijwel elke pro"**, en de Liquipedia-data steunt dat — Turning Ramp Time staat bij
+vrijwel elke Apex-pro op 0%. De ramp bestaat om plotselinge zwaaien te dempen, niet
+om fijn richten te helpen; sterker, hij scháádt fijn richten omdat elke micro-
+correctie onder zijn eindsnelheid begint. Bij Halo's 0,8-1,0 s rapporteerden spelers
+letterlijk "sluggish… disconnect between controls and character".
+
+**Dit staat hier zodat het geen open voorstel blijft dat elke ronde terugkomt.** Het
+getal is gevonden, de beslissing is genomen, en de reden is genoteerd. Heropenen kan
+alleen op een speelbevinding ("ik kan niet snel genoeg omdraaien"), niet op de bron.
 
 **Aim-assist.** De twee vormen zijn magnetisme (het richtkruis wordt naar een doel
 getrokken) en target-slowdown (de stick wordt trager over een doel). Voor een
