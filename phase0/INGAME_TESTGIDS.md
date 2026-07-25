@@ -35,6 +35,16 @@ bedoeld is om fouten te vinden, is dat het verkeerde faalgedrag.
 zodra A bewijst dat de detectie per control betrouwbaar is. Dan krijg je de strenge
 variant zonder het risico van een dode start.
 
+### BESLOTEN: A (owner, 2026-07-25)
+
+Detecteren en aftikken. Alle controls blijven de hele tijd werken; de gids vraagt,
+merkt op, vinkt af en gaat door. **Geen input-vergrendeling**, dus je kunt in geen
+enkele omstandigheid vast komen te zitten in je eigen game — en dat is precies wat
+een gids moet garanderen die bedoeld is om fouten te vínden.
+
+B blijft als latere optie open (`Eclipse.Guide.Strict`), maar alleen nadat A per
+control heeft aangetoond dat de detectie betrouwbaar is. Bouw hem niet op verwachting.
+
 ## 2. Vorm
 
 Eén paneel, gestapelde stappen, altijd zichtbaar tijdens een gids-sessie:

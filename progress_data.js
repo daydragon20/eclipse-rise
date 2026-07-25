@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd â€” daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-25 17:35",
+  bijgewerkt: "2026-07-25 17:40",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) Â· 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -19,6 +19,7 @@ window.PROGRESS_DATA = {
   // Wat de AI al van Nathan heeft ontvangen Ã©n verwerkt/nagekeken â€” zodat hij ziet dat zijn acties zijn aangekomen.
   // Dev-sessie: zodra je een owner-actie verifieert, verplaats hem van ownerActies naar hier met de tijd. Nieuwste bovenaan.
   jijGedaan: [
+    { wat: "Keuze gemaakt voor de testgids: A (detecteren en aftikken). Vastgelegd in phase0/INGAME_TESTGIDS.md. Dat betekent: alle controls blijven altijd werken, de gids vraagt iets, merkt dat je het deed en vinkt af — je kunt dus in geen enkele omstandigheid vastlopen in je eigen game. De strenge variant B (hard vergrendelen) blijft open als latere schakelaar, maar pas nadat A per control heeft bewezen dat de detectie betrouwbaar is; niet bouwen op verwachting.", tijd: "2026-07-25 17:40" },
     { wat: "Editor gesloten â€” geverifieerd: nul UnrealEditor-processen, build-slot vrij. Meteen benut: de openstaande codewijziging is geland, het wave-2-migratiescript is gedraaid (M1.1 heeft nu zijn zero-casualty-bonus), en er is een echte bug gevonden die je eerste schone build zou hebben gebroken.", tijd: "2026-07-25 17:15" },
     { wat: "Old West uit de cache verwijderd â€” geverifieerd: geen Old West-map meer te vinden en de VaultCache bestaat niet meer. Je hebt mÃ©Ã©r opgeruimd dan gevraagd: vrije ruimte op C: ging van ~22 GB naar 172,6 GB. Nagekeken of er niets nodig is meegegaan â€” de asfalt-albedo die de districtsvloer gebruikt, de 904 MetaHuman-assets, de 11 civilians, de curatie-accepts en de generated meshes staan er allemaal nog.", tijd: "2026-07-25 16:45" },
     { wat: "Character-pack beoordeeld en AFGEWEZEN op jouw verzoek â€” je twijfel was juist. LPCharacters_FREE is niet alleen stilistisch mis (low-poly is expliciet verworpen in het stijlkader; Borderlands is hoog detail mÃ©t inkomtrek), maar heeft ook vijf LOSSE skeletons voor vijf figuren, dus geen gedeelde animaties, en maar zes takes waarvan Dance en Victory. De 11 CC0-civilians die al binnen zijn delen Ã©Ã©n armature per gender-lijn met 24 takes inclusief Interact en Wave. Het pack staat in Eclipse/Saved/RejectedAssets met de reden erbij â€” niets verwijderd, terugzetten is Ã©Ã©n handeling.", tijd: "2026-07-25 16:45" },
@@ -35,11 +36,6 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen â€” apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
-    { titel: "Eén keuze voor mij: mag de testgids je controls vergrendelen?", prio: "gauw", waarom: "je vroeg een in-game gids die elke control eerst laat uittesten 'voordat het echt vrij wordt'. Dat kan op twee manieren en het verschil is belangrijk. A) Detecteren en aftikken: de gids vraagt iets, merkt dat je het deed, vinkt af — alles blijft altijd werken, je kunt nooit vastlopen. B) Hard vergrendelen tot de stap gehaald is: letterlijk wat je vroeg, maar als een detectie faalt sta je stil in je eigen game en is een console-commando de enige uitweg. In een gids die juist bedoeld is om fouten te vínden vind ik dat het verkeerde faalgedrag. Mijn voorstel: eerst A, en B erbij als schakelaar zodra A bewijst dat de detectie per control betrouwbaar is.", stappen: [
-      "Zeg 'A' (veilig, mijn advies) of 'B' (streng) — of 'A met B erbij'",
-      "Bij geen antwoord bouw ik A, want daarmee kun je niet vastlopen",
-      "Volledig ontwerp staat in phase0/INGAME_TESTGIDS.md"
-    ] },
     { titel: "Vier packs: klik de tweede stap ('Add to Project'), niet alleen Download", prio: "gauw", afgekeurd: "Nog niet gelukt, en ik denk dat ik weet waarom. Ik heb goed gezocht: niet in Eclipse/Content (nieuwste map is Sci-Fi Hallway van 16:42), niet in de engine-plugins (nieuwste zijn van 23-07), niet in de Plugins-map van het project. De Launcher was wÃ©l actief om 17:12, dus je hebt iets geklikt. Fab heeft twee stappen: 'Download' zet een pack in je bibliotheek, en pas 'Add to Project' kopieert het naar Eclipse. Vermoedelijk is die tweede stap niet gebeurd (of nog niet klaar).", waarom: "Sci-Fi Light Pack is de belangrijkste van de vier: de art-review vraagt om zichtbare lichtbronnen, en op een onverlicht district zijn dat emissieve fixtures. Footsteps en muzzle flash zijn gameplay-feedback en blokkeren de kit-pass niet.", stappen: [
       "Fab â†’ My Library â†’ zoek Sci-Fi Light Pack",
       "Klik 'Add to Project' (NIET alleen Download) â†’ kies Eclipse",
@@ -327,4 +323,5 @@ window.PROGRESS_DATA = {
     ]}
   ]
 };
+
 
