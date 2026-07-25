@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/EclipseEventBusSubsystem.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UObject/ObjectKey.h"
@@ -39,6 +40,14 @@ struct FEclipseMissionOfferView
  * against campaign state and turns a player's pick into
  * Event.Strategy.MissionSelected. The board itself never mutates state —
  * region flips arrive exclusively through CampaignState commits (GDD 14.3.3).
+ *
+ * SPEC-P2-05: this subsystem is also the liberation trigger — the single
+ * writer of region flips from authored missions (locked decision 2). It
+ * consumes Event.Mission.Completed, resolves the DT_LiberationInstances row
+ * through the pure core (EclipseLiberationLogic), and proposes exactly one
+ * transaction of existing SetRegionOwner mutations; the campaign commit emits
+ * the RegionControlChanged facts. Facts, not commands: the listener never
+ * mutates on the bus (GDD 14.3.4).
  */
 UCLASS()
 class ECLIPSE_API UEclipseStrategySubsystem : public UGameInstanceSubsystem
@@ -84,6 +93,35 @@ private:
 
 	/** Story tables already taken through the loud validation pass — keyed per table object, so a fresh table re-validates (not once per process). */
 	mutable TSet<FObjectKey> ValidatedStoryTables;
+
+	/**
+	 * The liberation trigger (SPEC-P2-05 build step 3): on a mission-completion
+	 * fact, resolve every triggered DT_LiberationInstances row through the pure
+	 * core and commit the one resulting transaction. Obligations from the
+	 * EclipseLiberationLogic.h header-doc: missing table/no-triggered-row = no
+	 * flip + one logged warning, never a throw; an empty resolution is never
+	 * committed (CommitTransaction rejects empty transactions); a non-empty
+	 * dropped-id report warns once per resolution.
+	 */
+	void OnMissionCompleted(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/**
+	 * The campaign's LiberationInstances table when usable (GetValidatedStoryTable
+	 * pattern): wrong row struct warns once per table and disables liberations;
+	 * missing table warns once per subsystem lifetime. Row-content health
+	 * (duplicate triggers, unknown region ids, empty sets) is the ValidateData
+	 * commandlet's job — runtime only guards what it must to iterate safely.
+	 */
+	const UDataTable* GetValidatedLiberationTable(const UEclipseCampaignSubsystem& Campaign) const;
+
+	/** Liberation tables already struct-checked, keyed per table object (see ValidatedStoryTables). */
+	mutable TSet<FObjectKey> ValidatedLiberationTables;
+
+	/** One-shot 14.3.5 warnings: missing table once per lifetime; no-row/gate-closed once per mission id. */
+	mutable bool bWarnedMissingLiberationTable = false;
+	TSet<FName> WarnedUntriggeredLiberationMissionIds;
+
+	FEclipseEventSubscriptionHandle MissionCompletedHandle;
 
 	IConsoleObject* FlipRegionCommand = nullptr;
 };

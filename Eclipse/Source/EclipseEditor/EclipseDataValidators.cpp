@@ -4,7 +4,9 @@
 #include "Characters/EclipseCharacterTypes.h"
 #include "Economy/EclipseEconomyDataAsset.h"
 #include "Engine/DataTable.h"
+#include "Quests/EclipseStoryTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
+#include "Strategy/EclipseLiberationTypes.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "Strategy/EclipseStrategyLogic.h"
 
@@ -210,6 +212,144 @@ int32 ValidateClassDefTables(TArray<FString>& OutErrors, int32& OutAssetsChecked
 				if (!Row.BodyDefOverride.IsNone() && (BodyDefs == nullptr || BodyDefs->FindRowUnchecked(Row.BodyDefOverride) == nullptr))
 				{
 					OutErrors.Add(FString::Printf(TEXT("%s: class '%s' body row '%s' is not in the setup's BodyDefs table"), *AssetData.AssetName.ToString(), *RowName.ToString(), *Row.BodyDefOverride.ToString()));
+				}
+			});
+	}
+
+	return OutErrors.Num() - InitialErrors;
+}
+
+int32 ValidateLiberationTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
+{
+	const int32 InitialErrors = OutErrors.Num();
+	OutAssetsChecked = 0;
+
+	// Intra-row sanity on every liberation-shaped table, wired into a setup or
+	// not (the ValidateClassDefTables pattern): runtime degrades this damage
+	// silently-but-warned (GDD 14.3.5) — CI is where it fails the build.
+	// NOTE: NewOwner is a plain enum with a Player default — an "empty owner"
+	// cannot exist by construction; a wrong-shaped row is caught by the
+	// row-struct checks below.
+	for (const FAssetData& AssetData : FindAssetsOfClass(UDataTable::StaticClass()))
+	{
+		const UDataTable* Table = Cast<UDataTable>(AssetData.GetAsset());
+		if (Table == nullptr || Table->GetRowStruct() != FEclipseLiberationRow::StaticStruct())
+		{
+			continue;
+		}
+		++OutAssetsChecked;
+
+		TSet<FName> SeenTriggers;
+		Table->ForeachRow<FEclipseLiberationRow>(TEXT("ValidateLiberation"),
+			[&OutErrors, &AssetData, &SeenTriggers](const FName& RowName, const FEclipseLiberationRow& Row)
+			{
+				if (Row.TriggerMissionId.IsNone())
+				{
+					OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' has no TriggerMissionId — it can never fire (SPEC-P2-05 decision 2)"), *AssetData.AssetName.ToString(), *RowName.ToString()));
+				}
+				else
+				{
+					bool bAlreadySeen = false;
+					SeenTriggers.Add(Row.TriggerMissionId, &bAlreadySeen);
+					if (bAlreadySeen)
+					{
+						OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' duplicates TriggerMissionId '%s' — one writer per mission family (SPEC-P2-05 decision 2)"), *AssetData.AssetName.ToString(), *RowName.ToString(), *Row.TriggerMissionId.ToString()));
+					}
+				}
+
+				if (Row.RegionIds.IsEmpty())
+				{
+					OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' has an empty region set — a liberation that frees nothing"), *AssetData.AssetName.ToString(), *RowName.ToString()));
+				}
+				TSet<FName> SeenRegions;
+				for (const FName& RegionId : Row.RegionIds)
+				{
+					bool bRegionSeen = false;
+					SeenRegions.Add(RegionId, &bRegionSeen);
+					if (bRegionSeen)
+					{
+						OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' repeats region id '%s' — resolution drops the repeat at runtime (GDD 14.3.5)"), *AssetData.AssetName.ToString(), *RowName.ToString(), *RegionId.ToString()));
+					}
+				}
+			});
+	}
+
+	// Cross-refs resolve against the setup the table is wired into: a row region
+	// id outside the region graph is dropped at runtime with a warning
+	// (GDD 14.3.5) — legal in play, a defect in data.
+	for (const FAssetData& AssetData : FindAssetsOfClass(UEclipseCampaignSetupAsset::StaticClass()))
+	{
+		const UEclipseCampaignSetupAsset* Setup = Cast<UEclipseCampaignSetupAsset>(AssetData.GetAsset());
+		if (Setup == nullptr)
+		{
+			continue;
+		}
+
+		const UDataTable* Liberations = Setup->LiberationInstances.LoadSynchronous();
+		if (Liberations == nullptr)
+		{
+			// Missing table = no liberations, a legal pre-content state (GDD 14.3.5).
+			continue;
+		}
+		++OutAssetsChecked;
+		if (Liberations->GetRowStruct() != FEclipseLiberationRow::StaticStruct())
+		{
+			OutErrors.Add(FString::Printf(TEXT("%s: LiberationInstances table '%s' has the wrong row struct"), *AssetData.AssetName.ToString(), *Liberations->GetName()));
+			continue;
+		}
+
+		// The two data couplings a liberation silently depends on (review
+		// finding): the row can only ever fire if some story row (a) names the
+		// same mission id and (b) commits the very beat this row gates on. Both
+		// hold today only because one author wrote both tables in one sitting;
+		// nothing enforced it, so a rename on either side produced a green suite,
+		// a green validator and a dead feature.
+		const UDataTable* StoryMissions = Setup->StoryMissions.LoadSynchronous();
+		const bool bStoryTableUsable = StoryMissions != nullptr && StoryMissions->GetRowStruct() == FEclipseStoryMissionRow::StaticStruct();
+		TSet<FName> StoryMissionIds;
+		TSet<FGameplayTag> StoryCompletionBeats;
+		if (bStoryTableUsable)
+		{
+			StoryMissions->ForeachRow<FEclipseStoryMissionRow>(TEXT("CollectStoryCouplings"),
+				[&StoryMissionIds, &StoryCompletionBeats](const FName&, const FEclipseStoryMissionRow& Row)
+				{
+					StoryMissionIds.Add(Row.MissionId);
+					if (Row.CompletionBeatTag.IsValid())
+					{
+						StoryCompletionBeats.Add(Row.CompletionBeatTag);
+					}
+				});
+		}
+
+		const UEclipseRegionGraphAsset* Graph = Setup->RegionGraph.LoadSynchronous();
+		Liberations->ForeachRow<FEclipseLiberationRow>(TEXT("ValidateLiberationRefs"),
+			[&OutErrors, &AssetData, Graph, bStoryTableUsable, &StoryMissionIds, &StoryCompletionBeats](const FName& RowName, const FEclipseLiberationRow& Row)
+			{
+				for (const FName& RegionId : Row.RegionIds)
+				{
+					const bool bKnown = Graph != nullptr && Graph->Regions.ContainsByPredicate(
+						[&RegionId](const FEclipseRegionDefinition& D) { return D.RegionId == RegionId; });
+					if (!bKnown)
+					{
+						OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' region id '%s' is not in the setup's region graph"), *AssetData.AssetName.ToString(), *RowName.ToString(), *RegionId.ToString()));
+					}
+				}
+
+				// Only meaningful once a story table exists: before that, an
+				// unauthored trigger mission is the normal pre-content state.
+				if (!bStoryTableUsable)
+				{
+					return;
+				}
+				if (!Row.TriggerMissionId.IsNone() && !StoryMissionIds.Contains(Row.TriggerMissionId))
+				{
+					OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' triggers on mission '%s', which no DT_StoryMissions row authors — the row can never fire"),
+						*AssetData.AssetName.ToString(), *RowName.ToString(), *Row.TriggerMissionId.ToString()));
+				}
+				if (Row.RequiredBeatTag.IsValid() && !StoryCompletionBeats.Contains(Row.RequiredBeatTag))
+				{
+					OutErrors.Add(FString::Printf(TEXT("%s: liberation row '%s' gates on beat '%s', which no story row commits as its CompletionBeatTag — the gate can never open"),
+						*AssetData.AssetName.ToString(), *RowName.ToString(), *Row.RequiredBeatTag.ToString()));
 				}
 			});
 	}

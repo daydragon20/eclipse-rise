@@ -99,6 +99,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> StoryMissions;
 
+	/**
+	 * Rows: FEclipseLiberationRow — authored-mission liberation instances
+	 * (SPEC-P2-05 locked decision 5: the instance is data, not code; the slice
+	 * ships exactly one row — Foothold on M1.3). Missing = no liberations + one
+	 * logged warning, never a crash — the mission still completes and the
+	 * campaign still runs (GDD 14.3.5).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> LiberationInstances;
+
 	/** The Hollow Point slot-graph (SPEC-P2-03); missing = build orders reject with a logged warning, the loop never gates (GDD 14.3.5). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipseBaseLayoutAsset> BaseLayout;
