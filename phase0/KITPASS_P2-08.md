@@ -54,6 +54,44 @@ een bush op 52k tris — het district is geen tuin).
    `/Game/Art/Imported` met een regel in SOURCES.md. De packs zelf blijven
    machine-lokaal en untracked; commit die 6,2 GB niet.
 
+## 2a. Werkorde stap 3 UITGEVOERD — de kandidaten zijn gemeten (2026-07-25)
+
+`Tools/inspect_kit_candidates.py` (report-and-export only) heeft alle 12 kandidaten
+opgezocht, hun slots uitgelezen en elke base-colour geëxporteerd; de gains zijn
+daarna gemeten met `measure_albedo_gain.py`. **Alle 12 gevonden, en de
+driehoek/slot-getallen bevestigen §1 exact** (SM_Controller_1 7654/7, SM_Tank 5666/4,
+SM_barrel_2 17128/4, SM_wall_2 8/2, SM_wall_3 16/2).
+
+| Albedo | lin. mean | gain (1/mean) | geklemd | eff. multiplier |
+|---|---|---|---|---|
+| Plaster002_4K | 0.6708 | 1.49 | 0.0% | 1.00 |
+| Wood034_4K | 0.3882 | 2.58 | 0.0% | 1.00 |
+| Concrete008_4K | 0.3540 | 2.82 | 0.0% | 1.00 |
+| Planks001_4K | 0.2776 | 3.60 | 0.0% | 1.00 |
+| Metal032_4K | 0.2417 | 4.14 | 0.0% | 1.00 |
+| Gravel022_4K | 0.2105 | 4.75 | 1.3% | 1.00 |
+| Concrete030_4K | 0.1182 | 8.46 | 0.0% | 1.00 |
+| Fabric012_4K | 0.0422 | 23.70 | 0.0% | 1.00 |
+| Metal029_4K | 0.0154 | 65.11 | 0.0% | 1.00 |
+
+**Uitkomst: alle negen zijn bruikbaar.** De effectieve gemiddelde multiplier is voor
+elke textuur 1.00, en hooguit 1,3% van de pixels loopt tegen de 2.5-clamp. Texturing
+hermetert de auto-exposure dus niet — de eis uit 15.5 waarop de vloer eerder omviel.
+
+**Twee eigen fouten die deze meting opleverde, allebei het noteren waard:**
+
+1. Mijn eerste kleurfilter matchte `_d` en exporteerde daardoor 11
+   **displacement-maps als albedo**. Een gain gemeten op een hoogtekaart is een getal
+   dat er geloofwaardig uitziet en nergens op slaat. Er staat nu een expliciete
+   uitsluitlijst (displacement/normal/roughness/AO/height/...) in het script.
+2. Ik vlagde eerst elke gain boven 2.5 als "boven de clamp". Dat is een
+   categoriefout: **de 2.5-clamp zit op de per-pixel multiplier (albedo × gain), niet
+   op de gain zelf** — de vloer draait al jaren op 12.41. Het getal dat wél beslist is
+   de geklemde fractie plus de effectieve multiplier, en die staan nu in de tabel.
+
+Metal029 met gain 65 is dus geen alarm maar een simpel feit: het is een zeer donkere
+textuur, en 65 × 0.0154 = 1.00 zoals bedoeld.
+
 ## 3. Wat dit oplost uit de art-review
 
 - **Machine-faces onleesbaar** → `SM_Controller_1` (7 slots) op de bank-voorkant.
