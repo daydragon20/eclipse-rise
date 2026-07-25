@@ -1231,32 +1231,38 @@ void BuildDistrict(UWorld& World)
 		// pair's sixth pole hand-placed 60 lines further down next to the cable.
 		// One list means a pool can never end up without its lamp, and moving a
 		// lamp moves its light (dressing-iteratie 2, spec step 2).
-		// Dressing-iteratie 3, step 3 — OPEN, with one hypothesis falsified here.
-		// The art-review measured every lamp head at 0.038-0.10 linear while its
-		// own pool reads 0.3867: the bulb is ~4x DARKER than the light it casts,
-		// which is the strongest remaining reason a pool reads as a painted disc.
-		// TRIED AND REVERTED (2026-07-25): a cross-billboard (this same plane a
-		// second time at Yaw+90), on the review's theory that the single plane sits
-		// edge-on to the banked cameras. Built, shot and measured: the brightest
-		// pixel in cam 7 did not move (225.3 -> 215.6, and it is the neutral white
-		// barrier both times, not the lamp), and an image diff against the previous
-		// cam-7 shot found only scattered grain — no new bright cluster anywhere.
-		// So orientation is NOT the cause, and doubling the actor count for zero
-		// measured gain is a 12.4 cost with no benefit.
-		// STRONGER HYPOTHESIS for the next attempt, from reading this call: the
-		// glow plane is spawned at Z = 0 — ground level — while the bulb it
-		// represents hangs ~0.6-0.9 m along the arm at pole height. Unless
-		// GlowPlane.GlowPlane bakes that height into its own geometry, the emissive
-		// quad is lying in the street *inside the pool*, which would explain both
-		// the dark head and part of why the pool reads flat. Verify the mesh's
-		// authored pivot/extent first (Tools/blender/gen_street_props.py), then
-		// place it at the head, before touching orientation or brightness.
-		// EmissiveScale is already 10 on the unlit master with a >1 Glow tint
-		// (2.2,1.0,0.3), so brightness is almost certainly not the missing piece.
+		// Dressing-iteratie 3, step 3 — make the SOURCE visible. The art-review
+		// measured every lamp head at 0.038-0.10 linear while its own pool reads
+		// 0.3867: the bulb is ~4x DARKER than the light it casts, which is the
+		// strongest remaining reason a pool reads as a painted disc rather than
+		// sodium light. Two wrong diagnoses were tried first, both measured and
+		// reverted, so the cause is now known rather than guessed:
+		//   1. "the plane sits edge-on because it carries the lamp's yaw" — a
+		//      cross-billboard at Yaw+90 changed nothing (brightest pixel in cam 7
+		//      went 225.3 -> 215.6, and in both shots that pixel is the neutral
+		//      white barrier, not the lamp; an image diff found no new bright
+		//      cluster). Reverted: double the actors, zero gain (12.4).
+		//   2. "the glow is spawned at Z = 0" — false: gen_street_props.py authors
+		//      GlowPlane at (head_x, 0, cap_z - 0.13), i.e. the height IS baked in.
+		// The ACTUAL cause, from that same script: the plane is HORIZONTAL and
+		// rotated pi about X so it faces straight DOWN into the pool. A horizontal
+		// quad is edge-on to every eye-level camera no matter its yaw — which is
+		// exactly why rotating it did nothing — and what little a camera does catch
+		// is its culled back face. The lamp therefore has no side-visible source.
+		// Fix: a small emissive bulb block in the hood mouth, on the existing Glow
+		// palette (2.2,1.0,0.3 — the same entry the window strips use), sized to the
+		// 0.8 m hood and placed at the measured head offset rotated into the post's
+		// yaw. Visible from every angle, one actor per lamp, no new mesh and no
+		// Blender re-run. The downward plane stays: it is the light leaving the hood.
+		constexpr float LampHeadLocalX = 122.6f; // head_x = top.x + 0.60 m, in cm
+		constexpr float LampHeadLocalZ = 436.6f; // cap_z - 0.13 m, the glow plane's own height
 		for (const FLampPostDef& Post : LampPosts)
 		{
 			SpawnGen(Lamp, MetalMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
 			SpawnGen(LampGlow, GenGlowMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
+
+			const FVector HeadOffset = FRotator(0.0f, Post.Yaw, 0.0f).RotateVector(FVector(LampHeadLocalX, 0.0f, LampHeadLocalZ));
+			SpawnBlock(TEXT("Glow"), FVector(Post.X, Post.Y, 0.0f) + HeadOffset, FVector(0.45f, 0.28f, 0.14f), Post.Yaw);
 		}
 		const struct { FVector Loc; float Yaw; } Boards[] = {
 			{ FVector(-8300, 500, 0), 100.0f }, { FVector(-3800, -950, 0), 30.0f }, { FVector(6300, 1200, 0), 250.0f },

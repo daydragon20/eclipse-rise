@@ -28,7 +28,7 @@ iteratie 2 zoveel losse verbeteringen kon landen met zo weinig leeswinst.
 |---|---|---|---|
 | 1 | **Pin de metering** | waarde | `AutoExposureBias -0.7 → -1.55` (Δ = −log2(1.79) = −0.84 EV) in `EclipseGrayboxBuilder.cpp` ~r1949, of `AutoExposureMinBrightness == MaxBrightness`. **Verificatie: hershoot alleen cam 7 en meet de vloer terug op 0.1198 ±0.01 lineair.** Niet blind district-breed doorvoeren — passes 20-27 waarschuwen daar terecht voor. Bijeffect: BldgA (0.560) en Cover (0.850) clippen niet meer, dus oxide stopt met naar zalm desatureren. |
 | 2 | **Vloer twee stappen omlaag** | waarde | `Floor` Lit ×0.518 (=0.72²) → `(0.086,0.093,0.108)`; Shade → `(0.028,0.031,0.049)`. Mid 0.1198 → 0.0621, in frame ~1.9× de horizonlucht = schemerasfalt. `Wall_` blijft staan, zodat de grond/muur-stap eindelijk bestaat. TexGain 12.41/16.8 NIET aanraken. |
-| 3 | **Zet de lamp aan** | **OPEN — zie §1b** | De kop meet 0.0997 lin terwijl zijn pool 0.3867 is: de bron is **3.9× donkerder dan zijn eigen licht**. Dit blijft de grootste leeswinst. De oriëntatie-theorie (kruis-billboard) is geprobeerd en **weerlegd**; de werkende hypothese is nu de Z-plaatsing. |
+| 3 | **Zet de lamp aan** | **GELAND — zie §1c** | Emissieve bulb in de hoedmond op het Glow-palet; de lamp is nu het helderste object in cam 7 (rgb 255,238,44). Twee diagnoses onderweg weerlegd, zie §1b. |
 | 4 | **Pool: 3 → 5 waardestappen** | derivatie | `PoolMid = 0.0621/0.72^5 = 0.3209` — exact dezelfde schermwaarde als nu, op de nieuwe donkere vloer. Lit `(0.876,0.398,0.119)`, opacity 0.70 en de Glow-hue-factor ×0.398 blijven allemaal geldig; alleen de comment-derivatie ("three banked value steps") moet mee. |
 | 5 | **Blob herrekenen** | waarde | Op een vloer van 0.0621 zou de huidige ×0.4 bij opacity 0.85 uitkomen op 0.0304 — ónder de horizonlucht = silhouet-zwart, precies het defect waarvoor de boulder-stain al geflagd werd. Hou de kern op ~0.62×: vloertint **×0.55** bij opacity 0.85 → `BlobMid` Lit `(0.047,0.051,0.059)`, Shade `(0.015,0.017,0.027)`. **En: leid de skirt af van de HOOGTE, niet de footprint** — `footprint×1.25` geeft 76 units onder een 260 hoge container en verdwijnt vanaf ooghoogte (daarom was in 00065 geen enkele container-blob vindbaar). Voorstel `skirt = 0.35 × hoogte`. |
 | 6 | **Grounding-dekking** | nieuw, klein | Blobs komen nu uit 4 plekken (rubble, machine-bodies, containers, bunker) = ~10% van de massa's; in het overzichtsframe zweeft de rest. `SpawnGroundDecal` toevoegen voor `CoverPoints[]`, de prop-tabel (vaten/kratten/barrières), lamppaal-voeten (~120-unit blob) en de poortpilaren. Patroon staat er al. |
@@ -72,7 +72,26 @@ Dat maakt de frame-probe (`Tools/measure_frame_values.py`, §4) meteen zijn eige
 rechtvaardiging: hij ving zowel de oorspronkelijke vloer-omkering als mijn eigen
 verkeerde conclusie.
 
-## 1b. Stap 3 (de lamp): oriëntatie-theorie WEERLEGD, nieuwe hypothese = de Z-plaatsing
+## 1c. Stap 3 GELAND — en stap 4 heeft nu een gemeten doel
+
+**De bulb werkt.** De helderste pixel in cam 7 was in elke eerdere ronde de
+neutrale witte barrière (rgb ~226,225,226). Nu is het de lamp: **rgb (255,238,44)**
+op kophoogte, met 8,3% geclipte pixels in het bulb-vlak — sodium-oranje, rood
+geklipt, dus bloom 0.45 heeft eindelijk iets om een halo van te maken. De bron van
+het enige licht in het district is zichtbaar.
+
+**Direct gevolg, gemeten in dezelfde shot: de pool moet mee.** De pool-MID hield
+zijn absolute waarden terwijl de vloer twee stappen zakte, dus de verhouding liep
+op van de ontworpen 2,18× naar **3,68×** (pool-kern 0.1781 ÷ vloer 0.0484). De pool
+is nu relatief te heet ten opzichte van zijn eigen vloer. Dat is stap 4, en het is
+nu een getal in plaats van een gevoel: **×0,59 om 2,18× te herstellen** — maar leg
+eerst vast of 2,18× nog het juiste doel is nu er een *zichtbare* bron boven hangt,
+want dat was de aanname waaronder die ratio is gekozen.
+
+Ook nog steeds open en nu ook gemeten: de barrière staat op 0.3203 = **1,8× de
+pool-kern** (stap 7, waardeplafond op niet-lichtgevende dressing).
+
+## 1b. Stap 3: twee weerlegde diagnoses onderweg (bewaard zodat niemand ze herhaalt)
 
 De review dacht dat de `GlowPlane` vanaf de gebankte camera's op zijn kant staat,
 omdat hij op de lamp-yaw wordt gespawnd. Dat is gebouwd als kruis-billboard
