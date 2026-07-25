@@ -2,6 +2,7 @@
 
 #include "AI/EclipseEnemyController.h"
 #include "AI/EclipseSquadmateController.h"
+#include "Base/EclipsePrepSubsystem.h"
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipseClassLogic.h"
@@ -25,6 +26,7 @@
 #include "Squad/EclipseSquadTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
+#include "Strategy/EclipseStrategySubsystem.h"
 
 namespace
 {
@@ -104,8 +106,48 @@ void AEclipseGameMode::StartPlay()
 
 #if !UE_BUILD_SHIPPING
 	SetupShotRig();
+	StartMissionFromCommandLine();
 #endif
 }
+
+#if !UE_BUILD_SHIPPING
+void AEclipseGameMode::StartMissionFromCommandLine()
+{
+	// Playtest finding 13.2 (owner, 2026-07-25): the feel-gauntlet has to run dozens
+	// of times, and clicking through the base hub every time costs minutes and
+	// pollutes the measurement. -EclipseStartMission=<RegionId> lands straight in a
+	// mission. Same family as -EclipseShot: a debug entry point, not a new system —
+	// it drives the SAME seam the hub uses (SelectMission -> AutoLaunch), so a bug in
+	// the real path cannot hide behind the shortcut.
+	FString RegionId;
+	if (!FParse::Value(FCommandLine::Get(), TEXT("EclipseStartMission="), RegionId) || RegionId.IsEmpty())
+	{
+		return;
+	}
+
+	UGameInstance* GameInstance = GetGameInstance();
+	UEclipseStrategySubsystem* Strategy = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipseStrategySubsystem>() : nullptr;
+	UEclipsePrepSubsystem* Prep = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipsePrepSubsystem>() : nullptr;
+	if (Strategy == nullptr || Prep == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("-EclipseStartMission: strategy/prep subsystem unavailable — starting in the hub instead (GDD 14.3.5)."));
+		return;
+	}
+
+	FString Error;
+	if (!Strategy->SelectMission(FName(*RegionId), Error))
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("-EclipseStartMission=%s: %s — starting in the hub instead. Use a region id from the campaign graph (e.g. TransitCheckpoint)."), *RegionId, *Error);
+		return;
+	}
+	if (!Prep->AutoLaunch(Error))
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("-EclipseStartMission=%s: selected, but launch failed: %s — starting in the hub instead."), *RegionId, *Error);
+		return;
+	}
+	UE_LOG(LogEclipse, Display, TEXT("-EclipseStartMission=%s: mission running, hub skipped."), *RegionId);
+}
+#endif
 
 #if !UE_BUILD_SHIPPING
 void AEclipseGameMode::SetupShotRig()

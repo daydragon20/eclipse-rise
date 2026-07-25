@@ -36,6 +36,13 @@ void UEclipseSquadSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 							*Entry.SoldierId.ToString(), static_cast<int32>(Controller->GetCurrentOrder()));
 					}
 				}
+
+				// R3 criterion 1 read-out, so the number survives a session where
+				// nobody had the debug HUD open (feel-gauntlet telemetry).
+				UE_LOG(LogEclipse, Display, TEXT("  round trip: %d/%d answers <= %.2f s wall clock (worst %.3f s, avg %.3f s)"),
+					OrderRoundTrip.WithinBarCount, OrderRoundTrip.SampleCount,
+					EclipseSquadOrderLogic::FEclipseOrderRoundTripStats::BarSeconds,
+					OrderRoundTrip.WorstSeconds, OrderRoundTrip.GetAverageSeconds());
 			}),
 			ECVF_Default);
 	}
@@ -271,6 +278,10 @@ bool UEclipseSquadSubsystem::IsRegisteredSquadmate(const FGuid& SoldierId) const
 void UEclipseSquadSubsystem::UnregisterAll()
 {
 	Squadmates.Reset();
+
+	// The round-trip tally is run-scoped: mission teardown calls this, so the
+	// next run's gauntlet numbers never inherit the previous run's worst case.
+	OrderRoundTrip.Reset();
 }
 
 TArray<FString> UEclipseSquadSubsystem::GetOrderStateLines() const
@@ -300,6 +311,13 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 		return false;
 	}
 
+	// R3 criterion 1 (the ≤1 s answer bar, GDD 8.4): stamped on the WALL clock —
+	// Command Mode dilates the world to 0.30, and a game-time stamp would flatter
+	// the measurement by the dilation factor (SPEC-P2-02 locked decision 2).
+	// Unknown-id early-outs above never reach this: they are caller bugs, not
+	// orders, and must not enter the tally as free successes.
+	const double IssuedWallSeconds = EclipseSquadOrderLogic::NowWallSeconds();
+
 	BroadcastOrderEvent(EclipseTags::Event_Squad_OrderIssued, SoldierId, Order, FString(), EEclipseOrderRefusalReason::None);
 
 	const EclipseSquadOrderLogic::FEclipseOrderDecision Decision = Controller->ExecuteOrder(Order, TargetLocation, TargetActor, Stance);
@@ -324,6 +342,11 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 			Row != nullptr ? Row->RefusalLines : TArray<FString>(), SoldierId, static_cast<uint32>(Order) + 100u);
 		BroadcastOrderEvent(EclipseTags::Event_Squad_OrderRefused, SoldierId, Order, Bark, Decision.Reason);
 	}
+
+	// Measured after the answer broadcast, not after the decision: the criterion
+	// is "the tester hears an answer", and the bark rides that broadcast. Both
+	// branches pass through here — a refusal is an answer (GDD 8.4).
+	OrderRoundTrip.NoteRoundTrip(EclipseSquadOrderLogic::NowWallSeconds() - IssuedWallSeconds);
 	return true;
 }
 

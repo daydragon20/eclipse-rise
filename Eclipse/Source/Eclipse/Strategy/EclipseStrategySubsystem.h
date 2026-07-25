@@ -124,4 +124,7 @@ private:
 	FEclipseEventSubscriptionHandle MissionCompletedHandle;
 
 	IConsoleObject* FlipRegionCommand = nullptr;
+
+	/** Debug surface for SelectMission (14.5): the fast test route's missing link. */
+	IConsoleObject* SelectMissionCommand = nullptr;
 };

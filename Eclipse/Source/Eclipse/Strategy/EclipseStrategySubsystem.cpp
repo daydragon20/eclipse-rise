@@ -72,6 +72,32 @@ void UEclipseStrategySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}),
 			ECVF_Default);
 	}
+
+	// The missing link in the test route (phase0/TESTROUTE_OBJECTIVES.md): SelectMission
+	// existed in C++ but had no console surface, so a fast run still needed a click on
+	// the map screen before Eclipse.Prep.AutoLaunch could do anything. Same shape as
+	// FlipRegion above — no new system, just the existing function exposed in the
+	// debug layer (GDD 14.5). Pairs with -EclipseStartMission for a boot-time start.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.Strategy.SelectMission")) == nullptr)
+	{
+		SelectMissionCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.Strategy.SelectMission"),
+			TEXT("Usage: Eclipse.Strategy.SelectMission <RegionId> — pick that region's offer (then Eclipse.Prep.AutoLaunch to run it)."),
+			FConsoleCommandWithArgsDelegate::CreateWeakLambda(this, [this](const TArray<FString>& Args)
+			{
+				if (Args.Num() != 1)
+				{
+					UE_LOG(LogEclipse, Error, TEXT("Usage: Eclipse.Strategy.SelectMission <RegionId>"));
+					return;
+				}
+				FString Error;
+				if (!SelectMission(FName(*Args[0]), Error))
+				{
+					UE_LOG(LogEclipse, Error, TEXT("SelectMission '%s': %s"), *Args[0], *Error);
+				}
+			}),
+			ECVF_Default);
+	}
 #endif
 }
 
@@ -87,6 +113,11 @@ void UEclipseStrategySubsystem::Deinitialize()
 	{
 		IConsoleManager::Get().UnregisterConsoleObject(FlipRegionCommand);
 		FlipRegionCommand = nullptr;
+	}
+	if (SelectMissionCommand != nullptr)
+	{
+		IConsoleManager::Get().UnregisterConsoleObject(SelectMissionCommand);
+		SelectMissionCommand = nullptr;
 	}
 #endif
 

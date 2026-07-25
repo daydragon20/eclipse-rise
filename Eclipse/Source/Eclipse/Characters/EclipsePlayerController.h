@@ -107,4 +107,13 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> StanceToggleAction;
+
+	/**
+	 * Debug-overlay bindings (F2/H/F4-F8 + the playtest row keys), built from one
+	 * table in SetupInputComponent. They only ever call into the mission HUD; with
+	 * no HUD mounted (base mode, -EclipseShot) they do nothing at all, and the
+	 * panels themselves ignore their keys while closed.
+	 */
+	UPROPERTY()
+	TArray<TObjectPtr<UInputAction>> DebugOverlayActions;
 };

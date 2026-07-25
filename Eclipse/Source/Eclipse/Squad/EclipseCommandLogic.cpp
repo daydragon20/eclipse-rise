@@ -28,6 +28,39 @@ float DesiredDilation(const FEclipseCommandModeState& State, float DilationFacto
 	return State.bHeld ? DilationFactor : 1.0f;
 }
 
+void FEclipseEncounterBeatTally::NoteModeEntered(double NowWallSeconds, double IdleGapSeconds)
+{
+	// Only an entry can trigger the idle rule, so the beat it closes always had
+	// at least one entry — the automatic path never invents an empty beat.
+	if (EntriesThisBeat > 0 && IdleGapSeconds > 0.0 && (NowWallSeconds - LastEntryWallSeconds) > IdleGapSeconds)
+	{
+		BeginNextBeat(/*bCountEmptyBeat*/ false);
+	}
+	LastEntryWallSeconds = NowWallSeconds;
+	++EntriesThisBeat;
+}
+
+void FEclipseEncounterBeatTally::BeginNextBeat(bool bCountEmptyBeat)
+{
+	if (EntriesThisBeat <= 0 && !bCountEmptyBeat)
+	{
+		return; // nothing to close; a phase boundary is not evidence a fight happened
+	}
+	ClosedBeatEntries += EntriesThisBeat;
+	++ClosedBeatCount;
+	EntriesThisBeat = 0;
+}
+
+void FEclipseEncounterBeatTally::Reset()
+{
+	*this = FEclipseEncounterBeatTally();
+}
+
+float FEclipseEncounterBeatTally::GetAverageEntriesPerBeat() const
+{
+	return ClosedBeatCount > 0 ? static_cast<float>(ClosedBeatEntries) / static_cast<float>(ClosedBeatCount) : 0.0f;
+}
+
 FGuid CycleSelection(const TArray<FGuid>& AliveSoldiers, const FGuid& Current, int32 Direction)
 {
 	if (AliveSoldiers.IsEmpty())

@@ -105,7 +105,9 @@ void AEclipsePlayerController::EnterMissionMode()
 	{
 		BaseHub->RemoveFromParent();
 	}
-	if (MissionHud == nullptr)
+	// A -EclipseShot review round gets NO debug HUD at all (15.8/15.9): the whole
+	// widget is skipped here, not just hidden, so no fact can put text in a still.
+	if (MissionHud == nullptr && UEclipseMissionHudWidget::IsDebugHudAllowed())
 	{
 		MissionHud = CreateWidget<UEclipseMissionHudWidget>(this, UEclipseMissionHudWidget::StaticClass());
 	}
@@ -257,6 +259,47 @@ void AEclipsePlayerController::SetupInputComponent()
 	Input->BindActionValueLambda(SelectPrevAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(-1); } });
 	Input->BindActionValueLambda(DirectPickAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->PickSoldierUnderReticle(); } });
 	Input->BindActionValueLambda(StanceToggleAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->ToggleHeldStance(); } });
+
+	// Debug overlay (feel gauntlet, SPEC-P2-02 R3). Function keys and 6-0 only:
+	// every gameplay binding above stays untouched, and F1 is the engine's. The
+	// handlers route into the one HUD widget — there is no second overlay.
+	struct FDebugOverlayBinding
+	{
+		FKey Key;
+		void (*Invoke)(UEclipseMissionHudWidget&);
+	};
+	const FDebugOverlayBinding DebugBindings[] = {
+		{ EKeys::F2, [](UEclipseMissionHudWidget& Hud) { Hud.ToggleControlsPanel(); } },
+		{ EKeys::H,  [](UEclipseMissionHudWidget& Hud) { Hud.TogglePlaytestPanel(); } },
+		{ EKeys::F4, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ true); } },
+		{ EKeys::F5, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ false); } },
+		{ EKeys::F6, [](UEclipseMissionHudWidget& Hud) { Hud.CycleComfortAnswer(); } },
+		{ EKeys::F7, [](UEclipseMissionHudWidget& Hud) { Hud.CycleConfidenceAnswer(); } },
+		{ EKeys::F8, [](UEclipseMissionHudWidget& Hud) { Hud.MarkEncounterBeat(); } },
+		{ EKeys::Six,   [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(0); } },
+		{ EKeys::Seven, [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(1); } },
+		{ EKeys::Eight, [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(2); } },
+		{ EKeys::Nine,  [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(3); } },
+		{ EKeys::Zero,  [](UEclipseMissionHudWidget& Hud) { Hud.CyclePlaytestAnswer(4); } }
+	};
+
+	DebugOverlayActions.SetNum(static_cast<int32>(UE_ARRAY_COUNT(DebugBindings)));
+	for (int32 Index = 0; Index < DebugOverlayActions.Num(); ++Index)
+	{
+		DebugOverlayActions[Index] = MakeAction(EInputActionValueType::Boolean);
+		MapKey(DebugOverlayActions[Index], DebugBindings[Index].Key);
+
+		void (*Invoke)(UEclipseMissionHudWidget&) = DebugBindings[Index].Invoke;
+		Input->BindActionValueLambda(DebugOverlayActions[Index], ETriggerEvent::Started, [this, Invoke](const FInputActionValue&)
+		{
+			// Mounted HUD only: at the base the widget is torn down, and pressing a
+			// gauntlet key there must not quietly edit the next run's numbers.
+			if (MissionHud != nullptr && MissionHud->IsInViewport())
+			{
+				Invoke(*MissionHud);
+			}
+		});
+	}
 }
 
 void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)

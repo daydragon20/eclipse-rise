@@ -59,6 +59,28 @@ public:
 	/** Debug-HUD lines (14.5 step 4): state, dilation, selection, provisional bindings. */
 	TArray<FString> GetDebugLines() const;
 
+	/**
+	 * R3 criterion 5 (usage pull) read-out, kept apart from GetDebugLines so the
+	 * HUD's Command section and the gauntlet panel each draw their own thing once
+	 * — the console dump prints both.
+	 */
+	TArray<FString> GetGauntletUsageLines() const;
+
+	/** Entries in the running encounter beat (gauntlet panel reads, never writes). */
+	int32 GetCommandEntriesThisBeat() const { return BeatTally.EntriesThisBeat; }
+
+	/** Closed encounter beats; the average is judged over these only. */
+	int32 GetObservedEncounterBeatCount() const { return BeatTally.ClosedBeatCount; }
+
+	float GetAverageEntriesPerBeat() const { return BeatTally.GetAverageEntriesPerBeat(); }
+
+	/**
+	 * Close the running encounter beat (overlay's beat key). bCountEmptyBeat
+	 * records a beat the tester says happened even with zero entries — the
+	 * measurement that actually fails criterion 5.
+	 */
+	void BeginNextEncounterBeat(bool bCountEmptyBeat);
+
 private:
 	void ExitMode(EclipseCommandLogic::EEclipseCommandSignal Signal);
 	void ApplyDesiredDilation();
@@ -76,6 +98,10 @@ private:
 	TSoftObjectPtr<UEclipseCommandModeTuningAsset> Tuning;
 
 	EclipseCommandLogic::FEclipseCommandModeState State;
+
+	/** Usage-pull tally per encounter beat (R3 criterion 5); reset by Event.Mission.Started. */
+	EclipseCommandLogic::FEclipseEncounterBeatTally BeatTally;
+
 	EEclipseSquadStance HeldStance = EEclipseSquadStance::Ready;
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
 	IConsoleObject* DumpCommand = nullptr;

@@ -49,6 +49,42 @@ namespace EclipseCommandLogic
 	ECLIPSE_API float DesiredDilation(const FEclipseCommandModeState& State, float DilationFactor);
 
 	/**
+	 * Usage-pull tally for R3 criterion 5 ("an unused mode is a failed mode"):
+	 * how often the tester enters Command Mode per encounter beat. Fed by the
+	 * existing ModeEntered path — no new counter in the widget, no second source
+	 * of truth (the component owns the state, the HUD consumes it).
+	 *
+	 * Beat segmentation, honest about being a proxy: a beat closes on an explicit
+	 * tester mark, on the alarm sub-phase (the site going loud starts a new
+	 * encounter), or when an entry arrives after a long idle gap. A fight the
+	 * tester never opened the mode in leaves no fact behind and is therefore
+	 * invisible to the automatic count — which is exactly why criterion 5 keeps
+	 * its manual mark: marking an empty beat records the 0 that fails the bar.
+	 */
+	struct ECLIPSE_API FEclipseEncounterBeatTally
+	{
+		int32 EntriesThisBeat = 0;
+
+		/** Entries and beats already closed; the average is judged over these only. */
+		int32 ClosedBeatEntries = 0;
+		int32 ClosedBeatCount = 0;
+
+		/** Wall-clock stamp of the last entry (idle-gap segmentation runs on real seconds, like every feel measurement here). */
+		double LastEntryWallSeconds = 0.0;
+
+		/** An entry happened: closes the previous beat first when the idle gap says the fight was over. */
+		void NoteModeEntered(double NowWallSeconds, double IdleGapSeconds);
+
+		/** Close the running beat. bCountEmptyBeat records a beat with zero entries — true only for an explicit tester mark, which asserts the beat happened. */
+		void BeginNextBeat(bool bCountEmptyBeat);
+
+		void Reset();
+
+		/** Entries per closed beat; 0 while nothing has closed yet (the criterion reads that as "not measured"). */
+		float GetAverageEntriesPerBeat() const;
+	};
+
+	/**
 	 * Cycle selection over the alive roster (locked decision 4): no selection
 	 * steps onto the first (next) or last (prev) soldier; stepping wraps; an id
 	 * that is no longer in the list (died mid-hold) restarts from the edge.

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Squad/EclipseSquadOrderLogic.h"
 #include "Squad/EclipseSquadTypes.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "EclipseSquadSubsystem.generated.h"
@@ -64,6 +65,18 @@ public:
 	/** Per-squadmate "id: order" lines for the mission HUD (SPEC-P1-06 order-state widget). */
 	TArray<FString> GetOrderStateLines() const;
 
+	/**
+	 * Wall-clock order round-trip tally (R3 criterion 1 of the Stage A feel
+	 * gauntlet). It lives here because both halves of the round trip fall in
+	 * IssueOrder — the issue and the ack/refusal that answers it — so no consumer
+	 * has to guess which broadcast belongs to which order, and no consumer can
+	 * accidentally time it on the dilated clock. The debug HUD only reads it.
+	 */
+	const EclipseSquadOrderLogic::FEclipseOrderRoundTripStats& GetOrderRoundTripStats() const { return OrderRoundTrip; }
+
+	/** Clear the tally (run-scoped; called by UnregisterAll and the console). */
+	void ResetOrderRoundTripStats() { OrderRoundTrip.Reset(); }
+
 	/** Active squad tuning asset (cover/acceptance/timeout data); null degrades to code defaults (GDD 14.3.5). */
 	const UEclipseSquadTuningAsset* ResolveTuning() const;
 
@@ -83,5 +96,9 @@ private:
 	float WidestTriageWindowSeconds() const;
 
 	TArray<FSquadmateEntry> Squadmates;
+
+	/** R3 criterion 1 tally, reset per run (UnregisterAll runs at mission teardown). */
+	EclipseSquadOrderLogic::FEclipseOrderRoundTripStats OrderRoundTrip;
+
 	IConsoleObject* DumpCommand = nullptr;
 };

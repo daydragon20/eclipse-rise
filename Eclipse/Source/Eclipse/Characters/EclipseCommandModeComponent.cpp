@@ -9,8 +9,20 @@
 #include "GameFramework/WorldSettings.h"
 #include "HAL/IConsoleManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Quests/EclipseMissionLogic.h"
 #include "Squad/EclipseCommandModeTuning.h"
 #include "Squad/EclipseSquadSubsystem.h"
+
+namespace
+{
+	// Debug tooling, not balance data, so a CVar is the right home (same call as
+	// Eclipse.Events.HistorySize; GDD 14.2 reserves DataAssets for balance).
+	TAutoConsoleVariable<float> CVarEclipseGauntletBeatIdleGapSeconds(
+		TEXT("Eclipse.Gauntlet.BeatIdleGapSeconds"),
+		45.0f,
+		TEXT("Wall-clock quiet time after which the next Command Mode entry counts as a new encounter beat (R3 criterion 5). 0 disables the automatic split."),
+		ECVF_Default);
+}
 
 UEclipseCommandModeComponent::UEclipseCommandModeComponent()
 {
@@ -40,6 +52,10 @@ void UEclipseCommandModeComponent::BeginPlay()
 		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
 		{
 			for (const FString& Line : GetDebugLines())
+			{
+				UE_LOG(LogEclipse, Display, TEXT("[CMD] %s"), *Line);
+			}
+			for (const FString& Line : GetGauntletUsageLines())
 			{
 				UE_LOG(LogEclipse, Display, TEXT("[CMD] %s"), *Line);
 			}
@@ -85,10 +101,21 @@ void UEclipseCommandModeComponent::OnHoldPressed()
 	{
 		return;
 	}
-	State = EclipseCommandLogic::ApplySignal(State, EclipseCommandLogic::EEclipseCommandSignal::HoldPressed, FPlatformTime::Seconds());
+	const double NowWallSeconds = FPlatformTime::Seconds();
+	State = EclipseCommandLogic::ApplySignal(State, EclipseCommandLogic::EEclipseCommandSignal::HoldPressed, NowWallSeconds);
+
+	// R3 criterion 5 telemetry rides the existing entry — the component already
+	// owns ModeEntered/Exited, so the counter belongs here and not in the HUD.
+	BeatTally.NoteModeEntered(NowWallSeconds, CVarEclipseGauntletBeatIdleGapSeconds.GetValueOnGameThread());
+
 	ApplyDesiredDilation();
 	SetComponentTickEnabled(true);
 	BroadcastMode(/*bEntered*/ true);
+}
+
+void UEclipseCommandModeComponent::BeginNextEncounterBeat(bool bCountEmptyBeat)
+{
+	BeatTally.BeginNextBeat(bCountEmptyBeat);
 }
 
 void UEclipseCommandModeComponent::OnHoldReleased()
@@ -175,11 +202,30 @@ const UEclipseCommandModeTuningAsset* UEclipseCommandModeComponent::ResolveTunin
 	return nullptr;
 }
 
-void UEclipseCommandModeComponent::OnMissionEvent(FGameplayTag EventTag, const FInstancedStruct& /*Payload*/)
+void UEclipseCommandModeComponent::OnMissionEvent(FGameplayTag EventTag, const FInstancedStruct& Payload)
 {
 	if (EventTag == EclipseTags::Event_Mission_Completed || EventTag == EclipseTags::Event_Mission_Failed)
 	{
 		ExitMode(EclipseCommandLogic::EEclipseCommandSignal::MissionEnded);
+		return;
+	}
+
+	if (EventTag == EclipseTags::Event_Mission_Started)
+	{
+		BeatTally.Reset(); // usage pull is per run, like the round-trip tally
+		return;
+	}
+
+	// The site going loud opens a new encounter beat (SPEC-P2-04: alarm travels as
+	// a named sub-phase, never its own event). The approach before it may not have
+	// been a fight at all, so an empty pre-alarm window is not recorded as a beat.
+	if (EventTag == EclipseTags::Event_Mission_PhaseChanged)
+	{
+		const FEclipseMissionEventPayload* Mission = Payload.GetPtr<FEclipseMissionEventPayload>();
+		if (Mission != nullptr && Mission->bAuthoredSubPhase && Mission->PhaseName == EclipseMissionLogic::AlarmSubPhaseName)
+		{
+			BeatTally.BeginNextBeat(/*bCountEmptyBeat*/ false);
+		}
 	}
 }
 
@@ -268,5 +314,13 @@ TArray<FString> UEclipseCommandModeComponent::GetDebugLines() const
 			: TEXT("ALL"),
 		HeldStance == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready")));
 	Lines.Add(TEXT("  Tab/RB next · scroll/LT prev · E/X pick · Y stance · 1-4/D-pad order"));
+	return Lines;
+}
+
+TArray<FString> UEclipseCommandModeComponent::GetGauntletUsageLines() const
+{
+	TArray<FString> Lines;
+	Lines.Add(FString::Printf(TEXT("usage pull: %d entries this beat, avg %.1f over %d closed beats"),
+		BeatTally.EntriesThisBeat, BeatTally.GetAverageEntriesPerBeat(), BeatTally.ClosedBeatCount));
 	return Lines;
 }

@@ -94,6 +94,15 @@ public:
 	const TSet<FGuid>& GetStabilizedSoldierIds() const { return StabilizedSoldiers; }
 
 	/**
+	 * Zero-casualty latch of the active run: did ANY soldier go down, stabilized
+	 * or not (SPEC-P2-04 amendment — a save changes the resolution, never the
+	 * fact). The counterpart of IsAlarmRaised, exposed so in-mission UI can show
+	 * a completed optional as already void *during* the run instead of surprising
+	 * the player with it at debrief.
+	 */
+	bool HasAnyCasualtyThisRun() const { return !DownedSoldiers.IsEmpty(); }
+
+	/**
 	 * End the mission and commit consequences (GDD 14.3.3). bSuccess=false is
 	 * fail-forward (GDD 11.4): casualties and salvage intel still commit.
 	 */

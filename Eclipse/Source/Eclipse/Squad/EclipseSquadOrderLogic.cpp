@@ -1,7 +1,33 @@
 #include "Squad/EclipseSquadOrderLogic.h"
 
+#include "HAL/PlatformTime.h"
+
 namespace EclipseSquadOrderLogic
 {
+
+double NowWallSeconds()
+{
+	return FPlatformTime::Seconds();
+}
+
+void FEclipseOrderRoundTripStats::NoteRoundTrip(double Seconds)
+{
+	const double Clamped = FMath::Max(0.0, Seconds);
+	++SampleCount;
+	WithinBarCount += Clamped <= BarSeconds ? 1 : 0;
+	WorstSeconds = FMath::Max(WorstSeconds, Clamped);
+	TotalSeconds += Clamped;
+}
+
+void FEclipseOrderRoundTripStats::Reset()
+{
+	*this = FEclipseOrderRoundTripStats();
+}
+
+double FEclipseOrderRoundTripStats::GetAverageSeconds() const
+{
+	return SampleCount > 0 ? TotalSeconds / SampleCount : 0.0;
+}
 
 FEclipseOrderDecision DecideOrder(EEclipseSquadOrder Order, const FEclipseOrderWorldFacts& Facts)
 {

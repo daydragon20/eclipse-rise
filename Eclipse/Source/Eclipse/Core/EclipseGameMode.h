@@ -47,6 +47,15 @@ private:
 	void AdvanceShotRig();
 	FTimerHandle ShotRigTimer;
 	int32 ShotRigStep = 0;
+
+	/**
+	 * Playtest shortcut (13.2 owner finding): -EclipseStartMission=<RegionId>
+	 * selects that region's offer and auto-launches, so a feel-gauntlet run does
+	 * not start with hub clicks. Drives the same SelectMission -> AutoLaunch seam
+	 * the hub uses, so it cannot mask a bug in the real path; every failure falls
+	 * back to a normal hub start with a loud reason (GDD 14.3.5).
+	 */
+	void StartMissionFromCommandLine();
 #endif
 
 	/** Actors spawned for the active mission (squad + enemies), destroyed at teardown. */
