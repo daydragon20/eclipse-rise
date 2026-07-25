@@ -67,7 +67,17 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 
   Opgelost met een gewone box-component op de volume: die telt wél mee in de bounding box die het navigatiesysteem uitleest, kost niets en heeft geen editor-code nodig. **Gemeten in een echte `-game`-run: grens 0×0×0 → 28000 × 28000 × 4000 uu, en vijf seconden na missiestart ligt er navmesh onder de speler (was: nooit).** Bij missiestart zelf staat er nog "nee", en dat hoort — Recast bouwt asynchroon.
 
-  **Wat nog open staat:** in het testharnas weigert de squad zijn orders nog steeds, óók nu er navmesh is. Dat is óf een artefact van die wereld óf een tweede oorzaak in het orderpad; de echte run kon het niet uitwijzen omdat daar niemand een order geeft. Dat is de eerstvolgende stap, en ook die is nu goedkoop — de speelronde meet de navmesh-stand en telt de weigeringen in dezelfde run.
+  **Wat nog open staat, en waar de jacht precies eindigde.** De squad weigert in het harnas nog steeds, óók nu er navmesh is. Ik heb drie hypotheses gemeten en alle drie sneuvelden:
+
+  | Hypothese | Meting | Uitkomst |
+  |---|---|---|
+  | De squad valt nog en kan daarom niet paden | tijd tot de squad staat | **0,000 s** — ze stonden al |
+  | Het orderdoel ligt buiten de navmesh | doel projecteren | **ligt erop**, en alle 3 de soldaten ook |
+  | Het gekozen DEKKINGSpunt ligt achter geometrie, buiten de mesh | punt op de mesh projecteren met terugval | **nog steeds drie weigeringen** |
+
+  Daarmee staat vast dat `MoveToLocation` zélf faalt terwijl vertrekpunt én doel op de navmesh liggen. De volgende verdachte is dus niet de geometrie maar de opzet van het pad-volgen: de nav-agent van de squadpawn tegenover de geregistreerde nav data, of de pathfollowing-component van de AI-controller. Dat is waar de volgende sessie moet beginnen, en drie doodlopende sporen liggen al achter de rug.
+
+  De dekkingspunt-projectie is blijven staan: hij loste dit niet op, maar hij is op eigen merites juist. Een dekkingspunt dat buiten de navmesh valt hoort terug te vallen op het bevolen punt — dat is precies het principe dat in de functie zelf staat: *het order naar de letter uitvoeren wint van het optimaliseren van de geest*.
 
 ## 3. Beslissingen die ik zelf genomen heb, en waarop
 

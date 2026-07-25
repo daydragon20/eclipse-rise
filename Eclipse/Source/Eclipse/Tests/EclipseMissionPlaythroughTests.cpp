@@ -321,10 +321,72 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		Report(*this, TEXT("navmesh onder de speler na (wandklok)"), NavReadyAfter, TEXT("s"), TEXT(">= 0 = er ligt navmesh; -1 = geen binnen 5 s"));
 	}
 
+	// Wachten tot de squad STAAT. SpawnBodyNear zet elk lichaam 100 cm boven de
+	// grond neer, dus vlak na de insertie hangen ze in de lucht — en een AI die
+	// valt kan geen pad aanvragen. Als je dán een order geeft, weigert hij terecht
+	// met "no route", en dat leest als een kapotte squad terwijl het timing is.
+	{
+		const double SquadStart = Harness.ElapsedSeconds;
+		int32 Standing = 0;
+		const int32 MaxSteps = FMath::RoundToInt(5.0f / Options.StepSeconds);
+		for (int32 I = 0; I < MaxSteps; ++I)
+		{
+			Standing = 0;
+			int32 Total = 0;
+			for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+			{
+				AEclipseCharacter* Body = *It;
+				if (Body == nullptr || Body == Harness.Body || !Body->IsPlayerSide())
+				{
+					continue;
+				}
+				++Total;
+				if (Body->GetCharacterMovement()->IsMovingOnGround())
+				{
+					++Standing;
+				}
+			}
+			if (Total > 0 && Standing == Total)
+			{
+				break;
+			}
+			Harness.Step();
+		}
+		Report(*this, TEXT("tijd tot de squad staat"), Harness.ElapsedSeconds - SquadStart, TEXT("s"),
+			TEXT("zolang kan hij geen enkele order aannemen"));
+	}
+
 	if (UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>())
 	{
 		Watch.Issued = 1;
-		Squad->IssueOrderToAll(EEclipseSquadOrder::MoveTo, Harness.Location() + FVector(600.0f, 0.0f, 0.0f), nullptr);
+		const FVector OrderTarget = Harness.Location() + FVector(600.0f, 0.0f, 0.0f);
+		// Ligt het DOEL op de navmesh, en liggen de soldaten er zelf op? Weigert de
+		// squad terwijl beide "ja" zeggen, dan zit de oorzaak in het orderpad; zegt
+		// een van beide "nee", dan is de weigering terecht en is het dekking.
+		if (UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(Harness.World))
+		{
+			FNavLocation Projected;
+			const bool bTargetOnMesh = Nav->ProjectPointToNavigation(OrderTarget, Projected, FVector(500.0f, 500.0f, 500.0f));
+			int32 OnMesh = 0;
+			int32 Soldiers = 0;
+			for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+			{
+				AEclipseCharacter* Body = *It;
+				if (Body == nullptr || Body == Harness.Body || !Body->IsPlayerSide())
+				{
+					continue;
+				}
+				++Soldiers;
+				FNavLocation SoldierSpot;
+				if (Nav->ProjectPointToNavigation(Body->GetActorLocation(), SoldierSpot, FVector(500.0f, 500.0f, 500.0f)))
+				{
+					++OnMesh;
+				}
+			}
+			AddInfo(FString::Printf(TEXT("speelronde: orderdoel op navmesh = %s · soldaten op navmesh = %d van %d"),
+				bTargetOnMesh ? TEXT("JA") : TEXT("NEE"), OnMesh, Soldiers));
+		}
+		Squad->IssueOrderToAll(EEclipseSquadOrder::MoveTo, OrderTarget, nullptr);
 		Harness.Idle(0.5f);
 		const int32 Answers = Watch.Acknowledged + Watch.Refused;
 		Report(*this, TEXT("orders gegeven"), Watch.Issued, TEXT(""));

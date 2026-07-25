@@ -187,6 +187,29 @@ FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& Ordered
 			BestPoint = Sample;
 		}
 	}
+
+	// Het gekozen punt op de NAVMESH projecteren, en anders terugvallen op het
+	// bevolen punt. Dekking ligt per definitie ACHTER geometrie, dus een
+	// ring-sample die goed scoort landt geregeld in of achter een muur — buiten de
+	// navmesh. MoveToLocation faalt daar, en het order eindigt als een NoRoute-
+	// weigering: de soldaat zegt "that path's blocked" terwijl het bevolen punt
+	// prima bereikbaar was en alleen zijn eigen dekkingskeuze dat niet was.
+	//
+	// Gemeten met de speelronde (2026-07-26): navmesh aanwezig, het orderdoel op de
+	// mesh, alle drie de soldaten op de mesh — en toch drie weigeringen. Daarmee
+	// bleef dit als enige kandidaat over.
+	//
+	// De terugval is precies wat het commentaar hierboven zelf als principe noemt:
+	// het order naar de LETTER uitvoeren wint van het optimaliseren van de geest.
+	if (const UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World))
+	{
+		FNavLocation Projected;
+		if (Nav->ProjectPointToNavigation(BestPoint, Projected, FVector(RingRadius, RingRadius, 200.0f)))
+		{
+			return Projected.Location;
+		}
+		return OrderedLocation;
+	}
 	return BestPoint;
 }
 
