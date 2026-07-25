@@ -211,6 +211,25 @@ SPEC-P2-08 start signal ("04 — spaces locked"). Length target 20–40 min each
   loadout unlock tags — empty for M1.1–M1.3).
 - `FEclipseObjectiveDef` gains `bRequiresNoAlarm (bool)` (ghost optionals) and
   `OptionalRewardCredits/Materials/Intel (int32)` — read only when `bOptional`.
+- **Amendement (2026-07-25, cyclus N+1 — besloten in `phase0/CYCLUS_N1_PLAN.md`):**
+  `FEclipseObjectiveDef` gains `bRequiresNoCasualties (bool)`, also read only
+  when `bOptional`. Decision 5 forbids new objective *verbs*, not condition
+  flags — `bRequiresNoAlarm` is the precedent — and this one unblocks M1.1's
+  zero-casualty optional (+20 M) and M1.4's "no soldier downed" (+15 M).
+  **Semantics = a latch over the whole run: "nobody ever went down."** A soldier
+  who went down and was stabilised inside the window still counts as downed
+  (M1.4's strictest reading governs M1.1 too). As built, that latch already
+  exists and needs no new runtime state: `TryStabilizeSoldier` only adds to the
+  separate `StabilizedSoldiers` set and never removes the entry from
+  `DownedSoldiers`, so `!FEclipseMissionOutcome.DownedSoldierIds.IsEmpty()` *is*
+  "somebody went down at some point", reset by `StartMission`. Two tests pin
+  that as-built behaviour, so a future "stabilise clears the down" change fails
+  loudly instead of silently paying the bonus. Optional payouts compose as
+  `AdjustResource` mutations with Reason `"OptionalObjective"` inside the *same*
+  atomic debrief transaction as rewards/beat/day tick, on wins only (fail-forward
+  salvages intel, never stretch bonuses); a satisfied-but-voided optional stays
+  visible through `FEclipseMissionOutcome.MissedOptionalObjectiveIds` rather than
+  vanishing.
 - `DA_CampaignSetup` gains `RecapCards (TArray<FEclipseRecapCard>: still ref +
   FText lines)` (decision 1).
 - Missing anything → logged warning + graceful default (14.3.5): missing story

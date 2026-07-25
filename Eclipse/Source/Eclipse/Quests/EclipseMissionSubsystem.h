@@ -53,6 +53,20 @@ public:
 	/** Completed objective ids (HUD tick marks). */
 	const TArray<FName>& GetCompletedObjectiveIds() const { return CompletedObjectiveIds; }
 
+	/**
+	 * The site went loud (SPEC-P2-04; called by enemy alert code, StateTree
+	 * tasks later, or the debug console). Latched per run and idempotent: only
+	 * the FIRST alarm broadcasts PhaseChanged(PhaseName="Alarm",
+	 * bAuthoredSubPhase=true) — alarm is a named sub-phase, never its own
+	 * event, and never mission failure (GDD 11.4): it voids the ghost
+	 * optionals at debrief. Reset by StartMission.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
+	void NotifyAlarmRaised();
+
+	/** Alarm latch of the active run (debrief compose input; reset by StartMission). */
+	bool IsAlarmRaised() const { return bAlarmRaised; }
+
 	/** A squadmate went down in the field (SPEC-P1-06 wiring; resolution happens at debrief). */
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
 	void NotifySoldierDowned(const FGuid& SoldierId, FName Cause);
@@ -90,6 +104,10 @@ private:
 	void OnMissionSelected(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnLaunchRequested(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void BroadcastMissionEvent(const FGameplayTag& Tag, FName ObjectiveId, bool bSuccess);
+
+	/** Emit Event.Mission.PhaseChanged (SPEC-P2-04): outer phases false, named sub-phases (Alarm) true. */
+	void BroadcastPhaseChanged(FName PhaseName, bool bAuthoredSubPhase);
+
 	void ResetRuntime();
 	void RegisterConsoleCommands();
 	void UnregisterConsoleCommands();
@@ -116,6 +134,9 @@ private:
 
 	/** Downs converted to survivable wounds by a stabilize inside the window. */
 	TSet<FGuid> StabilizedSoldiers;
+
+	/** Run-scoped alarm latch (SPEC-P2-04): set once by NotifyAlarmRaised, reset by StartMission. */
+	bool bAlarmRaised = false;
 
 	bool bProgressRegionOnSuccess = true;
 

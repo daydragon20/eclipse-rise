@@ -27,9 +27,10 @@ namespace EclipseTags
 	// Preparation (SPEC-P1-08)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Prep_MissionLaunchRequested)
 
-	// Mission (SPEC-P1-05)
+	// Mission (SPEC-P1-05; SPEC-P2-04 phase surface)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_Started)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_ObjectiveCompleted)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_PhaseChanged)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_Completed)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Mission_Failed)
 

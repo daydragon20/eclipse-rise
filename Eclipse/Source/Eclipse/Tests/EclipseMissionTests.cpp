@@ -14,11 +14,13 @@
 #include "Quests/EclipseMissionLogic.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Quests/EclipseStoryTypes.h"
+#include "Squad/EclipseRosterTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "Strategy/EclipseStrategySubsystem.h"
 #include "StructUtils/InstancedStruct.h"
+#include "UObject/Package.h"
 
 namespace EclipseMissionTest
 {
@@ -35,6 +37,67 @@ namespace EclipseMissionTest
 		FEclipseObjectiveDef& Exfil = Objectives.AddDefaulted_GetRef();
 		Exfil.ObjectiveId = TEXT("Obj_Exfil");
 		return Objectives;
+	}
+
+	/**
+	 * In-memory mission asset at the exact /Game path ResolveMissionSpec loads,
+	 * so subsystem tests can author optionals (conditions/rewards) without a
+	 * cooked asset — TryLoad finds the in-memory object first. Reuses the
+	 * object across reruns in one session (RF_Standalone outlives the test).
+	 */
+	UEclipseMissionAsset* MakeMissionAsset(const TCHAR* TemplateId)
+	{
+		// Drill ids only. These packages live at real content paths with
+		// RF_Standalone, so passing a SHIPPED id here would shadow the authored
+		// .uasset for the rest of the process — the M1.1 Gauntlet would then
+		// silently grade this fixture instead of the data on disk. Today's ids
+		// (MT_AlarmDrill/MT_MedicDrill) are safe; this check keeps them that way.
+		checkf(!FString(TemplateId).StartsWith(TEXT("MT_M1")) || FString(TemplateId).EndsWith(TEXT("Drill")),
+			TEXT("MakeMissionAsset: '%s' collides with an authored mission id — pick a *Drill id so the shipped asset stays the thing under test."), TemplateId);
+
+		const FString PackagePath = FString::Printf(TEXT("/Game/Data/Missions/%s"), TemplateId);
+		UPackage* Package = CreatePackage(*PackagePath);
+		UEclipseMissionAsset* Asset = FindObject<UEclipseMissionAsset>(Package, TemplateId);
+		if (Asset == nullptr)
+		{
+			Asset = NewObject<UEclipseMissionAsset>(Package, FName(TemplateId), RF_Public | RF_Standalone);
+		}
+		Asset->TemplateId = FName(TemplateId);
+		Asset->Objectives.Reset();
+		Asset->bProgressRegionOnSuccess = true;
+		return Asset;
+	}
+
+	/** Two-region drill board: player home "Underworks" + one Dominion Checkpoint whose offer launches TemplateId. */
+	UEclipseCampaignSetupAsset* MakeDrillSetup(const TCHAR* RegionId, const TCHAR* TemplateId, int32 RewardCredits)
+	{
+		UEclipseRegionGraphAsset* Graph = NewObject<UEclipseRegionGraphAsset>();
+		FEclipseRegionDefinition& Home = Graph->Regions.AddDefaulted_GetRef();
+		Home.RegionId = TEXT("Underworks");
+		Home.RegionType = EEclipseRegionType::Industrial;
+		Home.StartingOwner = EEclipseRegionOwner::Player;
+		Home.ConnectedRegionIds = { FName(RegionId) };
+
+		FEclipseRegionDefinition& Target = Graph->Regions.AddDefaulted_GetRef();
+		Target.RegionId = FName(RegionId);
+		Target.RegionType = EEclipseRegionType::Checkpoint;
+		Target.StartingOwner = EEclipseRegionOwner::Dominion;
+		Target.ConnectedRegionIds = { TEXT("Underworks") };
+
+		UDataTable* Offers = NewObject<UDataTable>();
+		Offers->RowStruct = FEclipseMissionOfferRow::StaticStruct();
+		FEclipseMissionOfferRow OfferRow;
+		OfferRow.RegionType = EEclipseRegionType::Checkpoint;
+		OfferRow.TemplateId = FName(TemplateId);
+		OfferRow.RewardCredits = RewardCredits;
+		Offers->AddRow(TEXT("Offer_Drill"), OfferRow);
+		Graph->MissionOffers = Offers;
+
+		UEclipseCampaignSetupAsset* Setup = NewObject<UEclipseCampaignSetupAsset>();
+		Setup->StartingDay = 1;
+		Setup->StartingRosterSize = 2;
+		Setup->RegionGraph = Graph;
+		return Setup;
 	}
 }
 
@@ -318,6 +381,385 @@ bool FEclipseMissionDebriefBeatTest::RunTest(const FString& Parameters)
 		false);
 	TestEqual(TEXT("A beatless mission composes no beat"), CountBeatMutations(Generic), 0);
 
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionOptionalTruthTableTest,
+	"Eclipse.Quests.Mission.OptionalObjectiveTruthTable",
+	EclipseMissionTest::TestFlags)
+
+bool FEclipseMissionOptionalTruthTableTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04 ghost/zero-casualty truth table over the pure evaluation:
+	// alarm-latch x casualty-latch against every condition shape. Latch
+	// semantics are the contract — "did it EVER happen this run".
+	TArray<FEclipseObjectiveDef> Objectives;
+	auto AddOptional = [&Objectives](const TCHAR* Id, bool bNoAlarm, bool bNoCasualties)
+	{
+		FEclipseObjectiveDef& Objective = Objectives.AddDefaulted_GetRef();
+		Objective.ObjectiveId = Id;
+		Objective.bOptional = true;
+		Objective.bRequiresNoAlarm = bNoAlarm;
+		Objective.bRequiresNoCasualties = bNoCasualties;
+		Objective.OptionalRewardCredits = 10;
+	};
+	AddOptional(TEXT("Opt_Ghost"), true, false);
+	AddOptional(TEXT("Opt_NoCas"), false, true);
+	AddOptional(TEXT("Opt_Both"), true, true);
+	AddOptional(TEXT("Opt_Plain"), false, false);
+	AddOptional(TEXT("Opt_NotDone"), false, false);
+
+	// Mandatory decoy with conditions/rewards set: never read (bOptional gate),
+	// never paid, never "missed" — and alarm never fails the mission (GDD 11.4).
+	FEclipseObjectiveDef& Mandatory = Objectives.AddDefaulted_GetRef();
+	Mandatory.ObjectiveId = TEXT("Obj_Primary");
+	Mandatory.bRequiresNoAlarm = true;
+	Mandatory.OptionalRewardCredits = 99;
+
+	const TArray<FName> Completed = { TEXT("Opt_Ghost"), TEXT("Opt_NoCas"), TEXT("Opt_Both"), TEXT("Opt_Plain"), TEXT("Obj_Primary") };
+
+	auto PaidNames = [](const TArray<FEclipseObjectiveDef>& Paid)
+	{
+		TArray<FName> Names;
+		for (const FEclipseObjectiveDef& Objective : Paid)
+		{
+			Names.Add(Objective.ObjectiveId);
+		}
+		return Names;
+	};
+
+	TArray<FEclipseObjectiveDef> Paid;
+	TArray<FName> Missed;
+	using namespace EclipseMissionLogic;
+
+	EvaluateOptionalObjectives(Objectives, Completed, /*alarm*/ false, /*downed*/ false, Paid, Missed);
+	TestEqual(TEXT("Quiet+clean pays every completed optional"), Paid.Num(), 4);
+	TestEqual(TEXT("Quiet+clean misses nothing"), Missed.Num(), 0);
+
+	EvaluateOptionalObjectives(Objectives, Completed, /*alarm*/ true, /*downed*/ false, Paid, Missed);
+	TestEqual(TEXT("Alarm voids exactly the no-alarm conditions"), Missed, TArray<FName>({ TEXT("Opt_Ghost"), TEXT("Opt_Both") }));
+	TestEqual(TEXT("Alarm still pays the rest"), PaidNames(Paid), TArray<FName>({ TEXT("Opt_NoCas"), TEXT("Opt_Plain") }));
+
+	EvaluateOptionalObjectives(Objectives, Completed, /*alarm*/ false, /*downed*/ true, Paid, Missed);
+	TestEqual(TEXT("A down voids exactly the zero-casualty conditions"), Missed, TArray<FName>({ TEXT("Opt_NoCas"), TEXT("Opt_Both") }));
+	TestEqual(TEXT("A down still pays the rest"), PaidNames(Paid), TArray<FName>({ TEXT("Opt_Ghost"), TEXT("Opt_Plain") }));
+
+	EvaluateOptionalObjectives(Objectives, Completed, /*alarm*/ true, /*downed*/ true, Paid, Missed);
+	TestEqual(TEXT("Both latches leave only the unconditional optional"), PaidNames(Paid), TArray<FName>({ TEXT("Opt_Plain") }));
+	TestEqual(TEXT("Both latches miss all three conditioned optionals"), Missed.Num(), 3);
+
+	TestFalse(TEXT("An uncompleted optional is absent, not 'missed'"), Missed.Contains(FName(TEXT("Opt_NotDone"))));
+	TestFalse(TEXT("A mandatory objective never pays optional rewards"), PaidNames(Paid).Contains(FName(TEXT("Obj_Primary"))));
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionOptionalRewardCompositionTest,
+	"Eclipse.Quests.Mission.OptionalRewardsAtomicComposition",
+	EclipseMissionTest::TestFlags)
+
+bool FEclipseMissionOptionalRewardCompositionTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04: optional payouts are AdjustResource mutations (Reason
+	// "OptionalObjective") inside the SAME debrief transaction — one commit
+	// moves base reward and stretch bonus together, or neither.
+	TArray<FEclipseObjectiveDef> Objectives;
+	FEclipseObjectiveDef& Ghost = Objectives.AddDefaulted_GetRef();
+	Ghost.ObjectiveId = TEXT("Opt_Ghost");
+	Ghost.bOptional = true;
+	Ghost.bRequiresNoAlarm = true;
+	Ghost.OptionalRewardCredits = 25;
+	FEclipseObjectiveDef& NoCas = Objectives.AddDefaulted_GetRef();
+	NoCas.ObjectiveId = TEXT("Opt_NoCas");
+	NoCas.bOptional = true;
+	NoCas.bRequiresNoCasualties = true;
+	NoCas.OptionalRewardIntel = 10;
+	FEclipseObjectiveDef& Plain = Objectives.AddDefaulted_GetRef();
+	Plain.ObjectiveId = TEXT("Opt_Plain");
+	Plain.bOptional = true;
+	Plain.OptionalRewardMaterials = 20;
+	FEclipseObjectiveDef& Primary = Objectives.AddDefaulted_GetRef();
+	Primary.ObjectiveId = TEXT("Obj_Primary");
+
+	FEclipseMissionRewards Rewards;
+	Rewards.Credits = 50;
+
+	auto CountOptionalMutations = [](const FEclipseCampaignTransaction& Transaction)
+	{
+		int32 Count = 0;
+		for (const FEclipseCampaignMutation& Mutation : Transaction.Mutations)
+		{
+			if (Mutation.Type == EEclipseCampaignMutationType::AdjustResource && Mutation.Reason == FName(TEXT("OptionalObjective")))
+			{
+				++Count;
+			}
+		}
+		return Count;
+	};
+
+	auto Compose = [&](const FEclipseMissionOutcome& Outcome, const TArray<FEclipseResolvedCasualty>& Casualties, const FEclipseCampaignState& State)
+	{
+		return EclipseMissionLogic::ComposeConsequences(
+			Outcome, Rewards, Casualties, State,
+			EclipseTags::Resource_Credits.GetTag(), EclipseTags::Resource_Materials.GetTag(), EclipseTags::Resource_Intel.GetTag(),
+			/*bProgressRegionOnSuccess*/ false, FGameplayTag(), Objectives);
+	};
+
+	FEclipseMissionOutcome Outcome;
+	Outcome.bSuccess = true;
+	Outcome.CompletedObjectiveIds = { TEXT("Obj_Primary"), TEXT("Opt_Ghost"), TEXT("Opt_NoCas"), TEXT("Opt_Plain") };
+
+	// Quiet + clean win: all three optionals pay, atomically with the base reward.
+	{
+		FEclipseCampaignState State;
+		FEclipseCampaignTransaction Transaction = Compose(Outcome, {}, State);
+		TestEqual(TEXT("Three optional payouts composed"), CountOptionalMutations(Transaction), 3);
+		TArray<FEclipseAppliedMutation> Applied;
+		FString Error;
+		TestTrue(TEXT("One commit carries base + optionals"), EclipseCampaignLogic::CommitTransaction(State, Transaction, Applied, Error));
+		TestEqual(TEXT("Credits = base + ghost bonus"), State.GetBalance(EclipseTags::Resource_Credits.GetTag()), 75);
+		TestEqual(TEXT("Materials = unconditional bonus"), State.GetBalance(EclipseTags::Resource_Materials.GetTag()), 20);
+		TestEqual(TEXT("Intel = zero-casualty bonus"), State.GetBalance(EclipseTags::Resource_Intel.GetTag()), 10);
+	}
+
+	// Alarm latch: the ghost bonus vanishes from the wallet, the rest stands.
+	{
+		FEclipseCampaignState State;
+		FEclipseMissionOutcome Loud = Outcome;
+		Loud.bAlarmRaised = true;
+		FEclipseCampaignTransaction Transaction = Compose(Loud, {}, State);
+		TestEqual(TEXT("Alarm drops one payout"), CountOptionalMutations(Transaction), 2);
+		TArray<FEclipseAppliedMutation> Applied;
+		FString Error;
+		TestTrue(TEXT("Loud debrief commits"), EclipseCampaignLogic::CommitTransaction(State, Transaction, Applied, Error));
+		TestEqual(TEXT("Credits = base only (ghost voided)"), State.GetBalance(EclipseTags::Resource_Credits.GetTag()), 50);
+		TestEqual(TEXT("Materials unaffected by alarm"), State.GetBalance(EclipseTags::Resource_Materials.GetTag()), 20);
+	}
+
+	// Downed -> stabilized (the amendment's edge): the soldier comes home
+	// WOUNDED, but DownedSoldierIds still lists them — zero-casualty is lost,
+	// the ghost bonus is not.
+	{
+		FEclipseCampaignState State;
+		FEclipseSoldierRecord& Soldier = State.Roster.AddDefaulted_GetRef();
+		Soldier.SoldierId = FGuid(7, 7, 7, 1);
+		Soldier.Name = TEXT("Juno Hale");
+
+		FEclipseMissionOutcome Bloodied = Outcome;
+		Bloodied.DownedSoldierIds = { Soldier.SoldierId };
+		FEclipseResolvedCasualty Stabilized;
+		Stabilized.SoldierId = Soldier.SoldierId;
+		Stabilized.Cause = TEXT("Gunfire");
+		Stabilized.bDead = false;
+		Stabilized.DaysOut = 5;
+
+		FEclipseCampaignTransaction Transaction = Compose(Bloodied, { Stabilized }, State);
+		TestEqual(TEXT("Stabilized down still drops the zero-casualty payout"), CountOptionalMutations(Transaction), 2);
+		TArray<FEclipseAppliedMutation> Applied;
+		FString Error;
+		TestTrue(TEXT("Bloodied debrief commits"), EclipseCampaignLogic::CommitTransaction(State, Transaction, Applied, Error));
+		TestEqual(TEXT("Intel = 0: 'ever went down' is the latch, the save changes only the resolution"), State.GetBalance(EclipseTags::Resource_Intel.GetTag()), 0);
+		TestEqual(TEXT("Ghost bonus survives a quiet-but-bloody run"), State.GetBalance(EclipseTags::Resource_Credits.GetTag()), 75);
+		TestTrue(TEXT("The soldier lives, wounded"), State.FindSoldier(Soldier.SoldierId)->Status == EEclipseSoldierStatus::Wounded);
+	}
+
+	// Loss: stretch bonuses never pay on fail-forward, even quiet and clean.
+	{
+		FEclipseCampaignState State;
+		FEclipseMissionOutcome Loss = Outcome;
+		Loss.bSuccess = false;
+		FEclipseCampaignTransaction Transaction = Compose(Loss, {}, State);
+		TestEqual(TEXT("Loss composes zero optional payouts (GDD 11.4: salvage, not bonuses)"), CountOptionalMutations(Transaction), 0);
+	}
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionAlarmPhaseFlowTest,
+	"Eclipse.Quests.Mission.AlarmLatchAndPhaseChangedFlow",
+	EclipseMissionTest::TestFlags)
+
+bool FEclipseMissionAlarmPhaseFlowTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04 emission path: every outer transition broadcasts
+	// Event.Mission.PhaseChanged(bAuthoredSubPhase=false); the alarm travels as
+	// the named sub-phase — idempotent, latched, reset by StartMission.
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	UEclipseMissionAsset* Asset = EclipseMissionTest::MakeMissionAsset(TEXT("MT_AlarmDrill"));
+	{
+		FEclipseObjectiveDef& Primary = Asset->Objectives.AddDefaulted_GetRef();
+		Primary.ObjectiveId = TEXT("Obj_Primary");
+		FEclipseObjectiveDef& Ghost = Asset->Objectives.AddDefaulted_GetRef();
+		Ghost.ObjectiveId = TEXT("Obj_Ghost");
+		Ghost.bOptional = true;
+		Ghost.bRequiresNoAlarm = true;
+		Ghost.OptionalRewardCredits = 25;
+	}
+	Campaign->StartNewCampaign(EclipseMissionTest::MakeDrillSetup(TEXT("DrillYard"), TEXT("MT_AlarmDrill"), 50));
+
+	struct FPhaseRecord
+	{
+		FName PhaseName;
+		bool bAuthoredSubPhase = false;
+	};
+	TArray<FPhaseRecord> PhaseEvents;
+	FEclipseEventSubscriptionHandle PhaseHandle = Bus->Subscribe(
+		EclipseTags::Event_Mission_PhaseChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&PhaseEvents](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseMissionEventPayload* MissionPayload = Payload.GetPtr<FEclipseMissionEventPayload>())
+			{
+				PhaseEvents.Add({ MissionPayload->PhaseName, MissionPayload->bAuthoredSubPhase });
+			}
+		}));
+
+	// Alarm with no run: no latch, no broadcast (alert sources outlive missions).
+	Mission->NotifyAlarmRaised();
+	TestFalse(TEXT("No latch outside a run"), Mission->IsAlarmRaised());
+	TestEqual(TEXT("No broadcast outside a run"), PhaseEvents.Num(), 0);
+
+	FString Error;
+	TestTrue(TEXT("Mission selected"), Strategy->SelectMission(TEXT("DrillYard"), Error));
+	TArray<FGuid> Squad;
+	for (const FEclipseSoldierRecord& Soldier : Campaign->GetState().Roster)
+	{
+		Squad.Add(Soldier.SoldierId);
+	}
+	TestTrue(TEXT("Mission starts"), Mission->StartMission(Squad, Error));
+
+	TestEqual(TEXT("Start broadcasts the two opening phases"), PhaseEvents.Num(), 2);
+	if (PhaseEvents.Num() == 2)
+	{
+		TestEqual(TEXT("First phase is Insertion"), PhaseEvents[0].PhaseName, FName(TEXT("Insertion")));
+		TestFalse(TEXT("Insertion is an outer phase"), PhaseEvents[0].bAuthoredSubPhase);
+		TestEqual(TEXT("Second phase is Objectives"), PhaseEvents[1].PhaseName, FName(TEXT("Objectives")));
+	}
+
+	// First alarm: latch + the named sub-phase. Second alarm: silence.
+	Mission->NotifyAlarmRaised();
+	TestTrue(TEXT("Alarm latched"), Mission->IsAlarmRaised());
+	TestEqual(TEXT("Alarm broadcast as a sub-phase"), PhaseEvents.Num(), 3);
+	if (PhaseEvents.Num() == 3)
+	{
+		TestEqual(TEXT("Alarm rides the canonical name"), PhaseEvents[2].PhaseName, EclipseMissionLogic::AlarmSubPhaseName);
+		TestTrue(TEXT("Alarm is an authored sub-phase"), PhaseEvents[2].bAuthoredSubPhase);
+	}
+	Mission->NotifyAlarmRaised();
+	TestEqual(TEXT("Second alarm never re-broadcasts (idempotent)"), PhaseEvents.Num(), 3);
+
+	// Complete the ghost optional under alarm (field completion stands; the
+	// debrief verdict is where it is lost), then the mandatory set.
+	TestTrue(TEXT("Ghost optional completes in the field"), Mission->CompleteObjective(TEXT("Obj_Ghost"), Error));
+	TestEqual(TEXT("An optional completion changes no phase"), PhaseEvents.Num(), 3);
+	TestTrue(TEXT("Primary completes"), Mission->CompleteObjective(TEXT("Obj_Primary"), Error));
+	TestEqual(TEXT("Mandatory set opens Extraction"), PhaseEvents.Num(), 4);
+	if (PhaseEvents.Num() == 4)
+	{
+		TestEqual(TEXT("Extraction broadcast"), PhaseEvents[3].PhaseName, FName(TEXT("Extraction")));
+	}
+
+	TestTrue(TEXT("Debrief resolves"), Mission->ResolveDebrief(true, Error));
+	TestEqual(TEXT("Debrief broadcast"), PhaseEvents.Num(), 5);
+	if (PhaseEvents.Num() == 5)
+	{
+		TestEqual(TEXT("Debrief is the last outer phase"), PhaseEvents[4].PhaseName, FName(TEXT("Debrief")));
+		TestFalse(TEXT("Debrief is an outer phase"), PhaseEvents[4].bAuthoredSubPhase);
+	}
+
+	// The ghost optional was completed but the alarm voids it: base reward
+	// only, and the outcome shows the miss.
+	TestEqual(TEXT("Wallet holds base reward only (ghost voided)"), Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()), 50);
+	TestTrue(TEXT("Outcome carries the alarm latch"), Mission->GetLastOutcome().bAlarmRaised);
+	TestEqual(TEXT("Voided optional is visible as missed"), Mission->GetLastOutcome().MissedOptionalObjectiveIds, TArray<FName>({ TEXT("Obj_Ghost") }));
+	TestTrue(TEXT("Field completion still on record"), Mission->GetLastOutcome().CompletedObjectiveIds.Contains(FName(TEXT("Obj_Ghost"))));
+
+	// StartMission resets the latch (run-scoped, never campaign-scoped).
+	TestTrue(TEXT("Second selection"), Strategy->SelectMission(TEXT("DrillYard"), Error));
+	TestTrue(TEXT("Second mission starts"), Mission->StartMission(Squad, Error));
+	TestFalse(TEXT("Alarm latch reset by StartMission"), Mission->IsAlarmRaised());
+	TestEqual(TEXT("Second start broadcasts its own opening phases"), PhaseEvents.Num(), 7);
+
+	Bus->Unsubscribe(PhaseHandle);
+	GameInstance->Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionZeroCasualtyLatchTest,
+	"Eclipse.Quests.Mission.ZeroCasualtyLatchSurvivesStabilize",
+	EclipseMissionTest::TestFlags)
+
+bool FEclipseMissionZeroCasualtyLatchTest::RunTest(const FString& Parameters)
+{
+	// The amendment's decisive case end-to-end (SPEC-P2-04): a soldier goes
+	// down, the Medic window saves them — they come home Wounded, but the
+	// zero-casualty optional is still lost, because DownedSoldierIds retains
+	// stabilized soldiers ("niemand ging OOIT neer"). A clean second run pays.
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	UEclipseMissionAsset* Asset = EclipseMissionTest::MakeMissionAsset(TEXT("MT_MedicDrill"));
+	{
+		FEclipseObjectiveDef& Primary = Asset->Objectives.AddDefaulted_GetRef();
+		Primary.ObjectiveId = TEXT("Obj_Primary");
+		FEclipseObjectiveDef& Untouched = Asset->Objectives.AddDefaulted_GetRef();
+		Untouched.ObjectiveId = TEXT("Obj_Untouchable");
+		Untouched.bOptional = true;
+		Untouched.bRequiresNoCasualties = true;
+		Untouched.OptionalRewardMaterials = 20;
+	}
+
+	UEclipseRosterTuningAsset* RosterTuning = NewObject<UEclipseRosterTuningAsset>();
+	RosterTuning->WoundedDaysOut = 5;
+	UEclipseCampaignSetupAsset* Setup = EclipseMissionTest::MakeDrillSetup(TEXT("MedYard"), TEXT("MT_MedicDrill"), 40);
+	Setup->RosterTuning = RosterTuning;
+	Campaign->StartNewCampaign(Setup);
+
+	FString Error;
+	TestTrue(TEXT("Mission selected"), Strategy->SelectMission(TEXT("MedYard"), Error));
+	TArray<FGuid> Squad;
+	for (const FEclipseSoldierRecord& Soldier : Campaign->GetState().Roster)
+	{
+		Squad.Add(Soldier.SoldierId);
+	}
+	TestTrue(TEXT("Mission starts"), Mission->StartMission(Squad, Error));
+
+	// Down at t=10, stabilized at t=12 inside an 8s window: the save lands.
+	Mission->NotifySoldierDownedAt(Squad[0], TEXT("Gunfire"), 10.0);
+	TestTrue(TEXT("Stabilize inside the window succeeds"), Mission->TryStabilizeSoldier(Squad[0], 8.0f, 12.0));
+
+	TestTrue(TEXT("Zero-casualty optional completes in the field"), Mission->CompleteObjective(TEXT("Obj_Untouchable"), Error));
+	TestTrue(TEXT("Primary completes"), Mission->CompleteObjective(TEXT("Obj_Primary"), Error));
+	TestTrue(TEXT("Debrief resolves"), Mission->ResolveDebrief(true, Error));
+
+	TestTrue(TEXT("Stabilized soldier comes home Wounded, not dead"),
+		Campaign->GetState().FindSoldier(Squad[0])->Status == EEclipseSoldierStatus::Wounded);
+	TestTrue(TEXT("DownedSoldierIds retains the stabilized soldier (the as-built latch)"),
+		Mission->GetLastOutcome().DownedSoldierIds.Contains(Squad[0]));
+	TestEqual(TEXT("Zero-casualty bonus withheld: he WENT DOWN, the save is not an eraser"),
+		Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag()), 0);
+	TestEqual(TEXT("Voided optional visible as missed"),
+		Mission->GetLastOutcome().MissedOptionalObjectiveIds, TArray<FName>({ TEXT("Obj_Untouchable") }));
+	TestEqual(TEXT("Base reward unaffected"), Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()), 40);
+
+	// Clean second run: the latch was run-scoped, the bonus pays.
+	TestTrue(TEXT("Second selection"), Strategy->SelectMission(TEXT("MedYard"), Error));
+	TestTrue(TEXT("Second mission starts"), Mission->StartMission(Squad, Error));
+	TestTrue(TEXT("Optional completes again"), Mission->CompleteObjective(TEXT("Obj_Untouchable"), Error));
+	TestTrue(TEXT("Primary completes again"), Mission->CompleteObjective(TEXT("Obj_Primary"), Error));
+	TestTrue(TEXT("Second debrief resolves"), Mission->ResolveDebrief(true, Error));
+	TestEqual(TEXT("Clean run pays the zero-casualty bonus"), Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag()), 20);
+	TestEqual(TEXT("No misses on the clean run"), Mission->GetLastOutcome().MissedOptionalObjectiveIds.Num(), 0);
+
+	GameInstance->Shutdown();
 	return true;
 }
 

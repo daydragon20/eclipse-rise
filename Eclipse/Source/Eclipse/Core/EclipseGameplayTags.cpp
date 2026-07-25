@@ -17,6 +17,7 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Mission_Started, "Event.Mission.Started", "Mission runtime entered play (SPEC-P1-05).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Mission_ObjectiveCompleted, "Event.Mission.ObjectiveCompleted", "An objective primitive reported completion (SPEC-P1-05).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Mission_PhaseChanged, "Event.Mission.PhaseChanged", "Mission runtime entered a phase (SPEC-P2-04): outer loop phases (GDD 11.1) carry bAuthoredSubPhase=false; named sub-phases like \"Alarm\" carry true. Alarm travels HERE — it is a sub-phase fact, never its own event and never mission failure (GDD 11.4).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Mission_Completed, "Event.Mission.Completed", "Mission ended in success; consequences arrive separately as commit events (GDD 14.3.3).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Mission_Failed, "Event.Mission.Failed", "Mission ended in failure; fail-forward consequences still commit (GDD 11.4).")
 

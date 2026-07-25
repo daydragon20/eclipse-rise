@@ -147,12 +147,14 @@ bool UEclipseMissionSubsystem::StartMission(const TArray<FGuid>& SquadSoldierIds
 
 	Phase = EEclipseMissionPhase::Insertion;
 	BroadcastMissionEvent(EclipseTags::Event_Mission_Started, NAME_None, false);
+	BroadcastPhaseChanged(EclipseMissionLogic::GetPhaseName(Phase), /*bAuthoredSubPhase*/ false);
 
 	// No level actors drive insertion yet: advance immediately so the loop is
 	// playable headless. The graybox insertion trigger takes over this
 	// transition when the district level lands.
 	check(EclipseMissionLogic::CanAdvancePhase(EEclipseMissionPhase::Insertion, EEclipseMissionPhase::Objectives));
 	Phase = EEclipseMissionPhase::Objectives;
+	BroadcastPhaseChanged(EclipseMissionLogic::GetPhaseName(Phase), /*bAuthoredSubPhase*/ false);
 
 	UE_LOG(LogEclipse, Display, TEXT("Mission '%s' started at region '%s' (%d objectives, %d squad)."),
 		*PendingTemplateId.ToString(), *PendingRegionId.ToString(), ActiveObjectives.Num(), DeployedSoldierIds.Num());
@@ -188,6 +190,7 @@ bool UEclipseMissionSubsystem::CompleteObjective(FName ObjectiveId, FString& Out
 	{
 		Phase = EEclipseMissionPhase::Extraction;
 		UE_LOG(LogEclipse, Display, TEXT("All mandatory objectives complete — extraction is open."));
+		BroadcastPhaseChanged(EclipseMissionLogic::GetPhaseName(Phase), /*bAuthoredSubPhase*/ false);
 	}
 	return true;
 }
@@ -215,6 +218,22 @@ void UEclipseMissionSubsystem::CompleteObjectiveByTarget(FName TargetId)
 			UE_LOG(LogEclipse, Warning, TEXT("Extraction debrief rejected: %s"), *Error);
 		}
 	}
+}
+
+void UEclipseMissionSubsystem::NotifyAlarmRaised()
+{
+	if (Phase == EEclipseMissionPhase::None || Phase == EEclipseMissionPhase::Finished)
+	{
+		return; // no run to alarm — alert sources outlive missions, mirroring NotifySoldierDowned
+	}
+	if (bAlarmRaised)
+	{
+		return; // latched: the site is already loud — a second horn is not a new fact (idempotent by spec)
+	}
+
+	bAlarmRaised = true;
+	UE_LOG(LogEclipse, Display, TEXT("Mission: alarm raised — ghost optionals are lost, the mission is not (GDD 11.4)."));
+	BroadcastPhaseChanged(EclipseMissionLogic::AlarmSubPhaseName, /*bAuthoredSubPhase*/ true);
 }
 
 void UEclipseMissionSubsystem::NotifySoldierDowned(const FGuid& SoldierId, FName Cause)
@@ -283,6 +302,7 @@ bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
 	}
 
 	Phase = EEclipseMissionPhase::Debrief;
+	BroadcastPhaseChanged(EclipseMissionLogic::GetPhaseName(Phase), /*bAuthoredSubPhase*/ false);
 
 	UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
 	if (Campaign == nullptr)
@@ -298,6 +318,15 @@ bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
 	LastOutcome.CompletedObjectiveIds = CompletedObjectiveIds;
 	LastOutcome.DeployedSoldierIds = DeployedSoldierIds;
 	DownedSoldiers.GenerateKeyArray(LastOutcome.DownedSoldierIds);
+	LastOutcome.bAlarmRaised = bAlarmRaised;
+
+	// Voided optionals stay visible as "missed" (SPEC-P2-04) via the same pure
+	// evaluation the payout uses, so debrief UI and wallet can never disagree.
+	// DownedSoldierIds retains stabilized soldiers by design — the zero-
+	// casualty latch reads "ever went down", the save only changes resolution.
+	TArray<FEclipseObjectiveDef> PaidOptionals;
+	EclipseMissionLogic::EvaluateOptionalObjectives(ActiveObjectives, CompletedObjectiveIds,
+		bAlarmRaised, !LastOutcome.DownedSoldierIds.IsEmpty(), PaidOptionals, LastOutcome.MissedOptionalObjectiveIds);
 
 	// Casualty resolution policy (SPEC-P1-07): downed on a won mission comes home
 	// Wounded (days from data); downed on a failed mission is dead — the
@@ -351,7 +380,8 @@ bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
 		EclipseTags::Resource_Materials.GetTag(),
 		EclipseTags::Resource_Intel.GetTag(),
 		bProgressRegionOnSuccess,
-		CompletionBeat);
+		CompletionBeat,
+		ActiveObjectives);
 
 	if (!Consequences.Mutations.IsEmpty())
 	{
@@ -386,6 +416,21 @@ void UEclipseMissionSubsystem::BroadcastMissionEvent(const FGameplayTag& Tag, FN
 	Bus->Broadcast(Tag, FInstancedStruct::Make(Payload));
 }
 
+void UEclipseMissionSubsystem::BroadcastPhaseChanged(FName PhaseName, bool bAuthoredSubPhase)
+{
+	UEclipseEventBusSubsystem* Bus = GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (Bus == nullptr)
+	{
+		return;
+	}
+
+	FEclipseMissionEventPayload Payload;
+	Payload.MissionId = PendingTemplateId;
+	Payload.PhaseName = PhaseName;
+	Payload.bAuthoredSubPhase = bAuthoredSubPhase;
+	Bus->Broadcast(EclipseTags::Event_Mission_PhaseChanged, FInstancedStruct::Make(Payload));
+}
+
 void UEclipseMissionSubsystem::ResetRuntime()
 {
 	ActiveObjectives.Reset();
@@ -394,6 +439,7 @@ void UEclipseMissionSubsystem::ResetRuntime()
 	DownedSoldiers.Reset();
 	DownedAtSeconds.Reset();
 	StabilizedSoldiers.Reset();
+	bAlarmRaised = false;
 	bProgressRegionOnSuccess = true;
 	Phase = EEclipseMissionPhase::None;
 }
@@ -417,6 +463,15 @@ void UEclipseMissionSubsystem::RegisterConsoleCommands()
 			{
 				UE_LOG(LogEclipse, Error, TEXT("CompleteObjective: %s"), Args.Num() == 1 ? *Error : TEXT("usage: <ObjectiveId>"));
 			}
+		}),
+		ECVF_Default));
+
+	ConsoleCommands.Add(Console.RegisterConsoleCommand(
+		TEXT("Eclipse.Mission.RaiseAlarm"),
+		TEXT("Usage: Eclipse.Mission.RaiseAlarm — trip the run's alarm latch (SPEC-P2-04; idempotent, Gauntlet surface until enemy alert code lands)."),
+		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+		{
+			NotifyAlarmRaised();
 		}),
 		ECVF_Default));
 

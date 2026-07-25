@@ -34,11 +34,38 @@ struct FEclipseResolvedCasualty
 
 namespace EclipseMissionLogic
 {
+	/**
+	 * Canonical PhaseName of the alarm sub-phase (SPEC-P2-04): the fact "alarm"
+	 * travels as Event.Mission.PhaseChanged(PhaseName=Alarm, bAuthoredSubPhase=
+	 * true) — one constant so emitter, consumers and tests can never drift.
+	 */
+	inline const FName AlarmSubPhaseName = FName(TEXT("Alarm"));
+
 	/** Legal phase progression of the universal loop (GDD 11.1); Debrief is terminal-adjacent. */
 	ECLIPSE_API bool CanAdvancePhase(EEclipseMissionPhase From, EEclipseMissionPhase To);
 
+	/** Canonical payload name of an outer loop phase (PhaseChanged emission); None/Finished map to NAME_None — they are runtime rest states, not broadcast phases. */
+	ECLIPSE_API FName GetPhaseName(EEclipseMissionPhase Phase);
+
 	/** All mandatory objectives complete? (Optionals never gate success — GDD 11.4.) */
 	ECLIPSE_API bool AreMandatoryObjectivesComplete(const TArray<FEclipseObjectiveDef>& Objectives, const TArray<FName>& CompletedIds);
+
+	/**
+	 * Split the run's completed optionals into paid vs voided (SPEC-P2-04).
+	 * Latch semantics: both bools mean "did it EVER happen this run" — a
+	 * stabilized soldier still went down, so zero-casualty stays lost (M1.4's
+	 * strictest reading), and a silenced alarm stays raised. Voided optionals
+	 * surface as "missed" in the debrief; the wallet never sees them. One
+	 * function feeds both the payout (ComposeConsequences) and the outcome's
+	 * MissedOptionalObjectiveIds so UI and wallet cannot disagree.
+	 */
+	ECLIPSE_API void EvaluateOptionalObjectives(
+		const TArray<FEclipseObjectiveDef>& Objectives,
+		const TArray<FName>& CompletedIds,
+		bool bAlarmRaised,
+		bool bAnySoldierDowned,
+		TArray<FEclipseObjectiveDef>& OutPaid,
+		TArray<FName>& OutMissedIds);
 
 	/**
 	 * Compose the debrief transaction (GDD 14.3.3: ground gameplay proposes,
@@ -49,6 +76,13 @@ namespace EclipseMissionLogic
 	 * (SPEC-P2-04 decision 12) — never on loss, and skipped when the flag is
 	 * already set, because SetStoryFlag rejects duplicates atomically and a
 	 * rejected debrief would drop the whole consequence set.
+	 *
+	 * Optional stretch payouts (SPEC-P2-04): completed optionals that survive
+	 * EvaluateOptionalObjectives compose AdjustResource mutations (Reason
+	 * "OptionalObjective") into the SAME atomic transaction — success only,
+	 * like the base reward: fail-forward salvages intel, it never pays
+	 * stretch bonuses. The run's latches ride the Outcome parameter
+	 * (bAlarmRaised + DownedSoldierIds, which retains stabilized soldiers).
 	 */
 	ECLIPSE_API FEclipseCampaignTransaction ComposeConsequences(
 		const FEclipseMissionOutcome& Outcome,
@@ -59,5 +93,6 @@ namespace EclipseMissionLogic
 		const FGameplayTag& MaterialsTag,
 		const FGameplayTag& IntelTag,
 		bool bProgressRegionOnSuccess,
-		const FGameplayTag& CompletionBeatTag = FGameplayTag());
+		const FGameplayTag& CompletionBeatTag = FGameplayTag(),
+		const TArray<FEclipseObjectiveDef>& Objectives = TArray<FEclipseObjectiveDef>());
 }

@@ -19,6 +19,18 @@ bool CanAdvancePhase(EEclipseMissionPhase From, EEclipseMissionPhase To)
 	}
 }
 
+FName GetPhaseName(EEclipseMissionPhase Phase)
+{
+	switch (Phase)
+	{
+	case EEclipseMissionPhase::Insertion:  return FName(TEXT("Insertion"));
+	case EEclipseMissionPhase::Objectives: return FName(TEXT("Objectives"));
+	case EEclipseMissionPhase::Extraction: return FName(TEXT("Extraction"));
+	case EEclipseMissionPhase::Debrief:    return FName(TEXT("Debrief"));
+	default:                               return NAME_None; // None/Finished: rest states, never broadcast
+	}
+}
+
 bool AreMandatoryObjectivesComplete(const TArray<FEclipseObjectiveDef>& Objectives, const TArray<FName>& CompletedIds)
 {
 	for (const FEclipseObjectiveDef& Objective : Objectives)
@@ -31,6 +43,39 @@ bool AreMandatoryObjectivesComplete(const TArray<FEclipseObjectiveDef>& Objectiv
 	return true;
 }
 
+void EvaluateOptionalObjectives(
+	const TArray<FEclipseObjectiveDef>& Objectives,
+	const TArray<FName>& CompletedIds,
+	bool bAlarmRaised,
+	bool bAnySoldierDowned,
+	TArray<FEclipseObjectiveDef>& OutPaid,
+	TArray<FName>& OutMissedIds)
+{
+	OutPaid.Reset();
+	OutMissedIds.Reset();
+	for (const FEclipseObjectiveDef& Objective : Objectives)
+	{
+		// Conditions and rewards are read only on optionals (SPEC-P2-04): a
+		// mandatory objective can never pay a stretch bonus, and alarm never
+		// fails a mission (GDD 11.4) — the void below is the whole price.
+		if (!Objective.bOptional || !CompletedIds.Contains(Objective.ObjectiveId))
+		{
+			continue; // an optional never attempted is simply absent — not "missed"
+		}
+
+		const bool bVoided = (Objective.bRequiresNoAlarm && bAlarmRaised)
+			|| (Objective.bRequiresNoCasualties && bAnySoldierDowned);
+		if (bVoided)
+		{
+			OutMissedIds.Add(Objective.ObjectiveId);
+		}
+		else
+		{
+			OutPaid.Add(Objective);
+		}
+	}
+}
+
 FEclipseCampaignTransaction ComposeConsequences(
 	const FEclipseMissionOutcome& Outcome,
 	const FEclipseMissionRewards& Rewards,
@@ -40,7 +85,8 @@ FEclipseCampaignTransaction ComposeConsequences(
 	const FGameplayTag& MaterialsTag,
 	const FGameplayTag& IntelTag,
 	bool bProgressRegionOnSuccess,
-	const FGameplayTag& CompletionBeatTag)
+	const FGameplayTag& CompletionBeatTag,
+	const TArray<FEclipseObjectiveDef>& Objectives)
 {
 	FEclipseCampaignTransaction Transaction;
 	Transaction.Source = TEXT("MissionDebrief");
@@ -84,6 +130,25 @@ FEclipseCampaignTransaction ComposeConsequences(
 		// Fail-forward (GDD 11.4): the field always teaches something — a failed
 		// op still brings home partial intel, never a retry wall.
 		AddReward(IntelTag, Rewards.Intel / 2, TEXT("MissionIntel_Salvaged"));
+	}
+
+	// Optional stretch payouts ride the same atomic debrief (SPEC-P2-04) — the
+	// same pattern as the completion beat below: one transaction, or nothing.
+	// Success-gated like the base reward; the latches arrive on the outcome
+	// (bAlarmRaised + DownedSoldierIds, which retains stabilized soldiers —
+	// "ever went down" is the fact, the save only changes the resolution).
+	if (Outcome.bSuccess)
+	{
+		TArray<FEclipseObjectiveDef> PaidOptionals;
+		TArray<FName> MissedOptionalIds;
+		EvaluateOptionalObjectives(Objectives, Outcome.CompletedObjectiveIds,
+			Outcome.bAlarmRaised, !Outcome.DownedSoldierIds.IsEmpty(), PaidOptionals, MissedOptionalIds);
+		for (const FEclipseObjectiveDef& Optional : PaidOptionals)
+		{
+			AddReward(CreditsTag, Optional.OptionalRewardCredits, TEXT("OptionalObjective"));
+			AddReward(MaterialsTag, Optional.OptionalRewardMaterials, TEXT("OptionalObjective"));
+			AddReward(IntelTag, Optional.OptionalRewardIntel, TEXT("OptionalObjective"));
+		}
 	}
 
 	// The story completion beat is one atomic fact with the rest of the debrief

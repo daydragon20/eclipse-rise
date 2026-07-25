@@ -54,6 +54,32 @@ struct FEclipseObjectiveDef
 	/** World site / target this objective binds to (level data tag; SPEC-P1-05 graybox sites). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission")
 	FName TargetId;
+
+	/**
+	 * Ghost condition (SPEC-P2-04): the completed optional is voided at debrief
+	 * if the alarm was EVER raised this run. Alarm never fails the mission
+	 * (GDD 11.4) — it costs exactly the optionals that demanded silence.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission", meta = (EditCondition = "bOptional"))
+	bool bRequiresNoAlarm = false;
+
+	/**
+	 * Zero-casualty condition (SPEC-P2-04 amendment): voided if any soldier
+	 * EVER went down this run. Latch semantics — a stabilized save still went
+	 * down (M1.4's strictest "no soldier downed" reading applies everywhere).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission", meta = (EditCondition = "bOptional"))
+	bool bRequiresNoCasualties = false;
+
+	/** Stretch payout, composed as AdjustResource (Reason "OptionalObjective") in the same debrief transaction. Read only when bOptional. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission", meta = (ClampMin = 0, EditCondition = "bOptional"))
+	int32 OptionalRewardCredits = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission", meta = (ClampMin = 0, EditCondition = "bOptional"))
+	int32 OptionalRewardMaterials = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission", meta = (ClampMin = 0, EditCondition = "bOptional"))
+	int32 OptionalRewardIntel = 0;
 };
 
 /** One enemy spawn batch (consumed by the graybox level wiring). */
@@ -124,10 +150,23 @@ struct FEclipseMissionOutcome
 	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Mission")
 	TArray<FName> CompletedObjectiveIds;
 
-	/** Soldiers who went down in-mission; dead/wounded resolution is P1-07 policy at debrief. */
+	/**
+	 * Soldiers who went down in-mission; dead/wounded resolution is P1-07 policy
+	 * at debrief. Stabilized soldiers stay listed — this array IS the
+	 * zero-casualty latch ("ever went down"), a save changes the resolution,
+	 * never the fact (SPEC-P2-04 amendment).
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Mission")
 	TArray<FGuid> DownedSoldierIds;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Mission")
 	TArray<FGuid> DeployedSoldierIds;
+
+	/** Alarm latch of the run (SPEC-P2-04): did the site EVER go loud? Voids bRequiresNoAlarm optionals at compose; never fails the mission (GDD 11.4). */
+	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Mission")
+	bool bAlarmRaised = false;
+
+	/** Optionals completed in the field but voided at debrief by their conditions (ghost/zero-casualty): visible as "missed", never paid. */
+	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Mission")
+	TArray<FName> MissedOptionalObjectiveIds;
 };

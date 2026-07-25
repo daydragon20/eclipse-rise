@@ -124,6 +124,14 @@ struct FEclipseMissionEventPayload
 	/** Overall result (Completed/Failed). Detailed results struct lands with SPEC-P1-05. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	bool bSuccess = false;
+
+	/** Phase just entered (PhaseChanged only): an outer loop phase name (GDD 11.1) or a named sub-phase like "Alarm" (SPEC-P2-04). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName PhaseName;
+
+	/** PhaseChanged only: false = outer loop phase from the mission subsystem; true = authored sub-phase (alarm now, StateTree tasks later). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bAuthoredSubPhase = false;
 };
 
 /** Event.Squad.* — order/soldier facts in-mission (SPEC-P1-06). */
