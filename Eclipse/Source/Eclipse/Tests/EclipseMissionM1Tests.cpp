@@ -13,6 +13,8 @@
 
 #include "Base/EclipsePrepSubsystem.h"
 #include "Base/EclipsePrepTypes.h"
+#include "Core/EclipseEventBusSubsystem.h"
+#include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/DataTable.h"
 #include "Engine/Engine.h"
@@ -24,6 +26,7 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "Strategy/EclipseStrategySubsystem.h"
+#include "StructUtils/InstancedStruct.h"
 #include "UObject/Package.h"
 
 namespace EclipseMissionM1Test
@@ -148,6 +151,225 @@ bool FEclipseMissionM11SkeletonTest::RunTest(const FString& Parameters)
 	// or replaced in-place by this test.
 	M11->ClearFlags(RF_Public | RF_Standalone);
 	MissionPackage->ClearFlags(RF_Public | RF_Standalone);
+	GameInstance->Shutdown();
+	return true;
+}
+
+// SPEC-P2-04 step-2 closure — the functional Gauntlet on the SHIPPED content
+// chain: DA_CampaignSetup -> DT_StoryMissions pin (TransitCheckpoint) ->
+// MT_M11.uasset. The skeleton test above proves the runtime with an in-memory
+// asset; these two prove the data on disk — red here means the commandlet
+// materialised the wrong thing (or the link broke), not that the runtime broke.
+// Reward asserts read the commit's own Event.Economy.ResourcesChanged facts
+// (Reason "MissionReward") instead of wallet deltas: the real setup carries a
+// base layout + econ data, so the debrief's day tick may legitimately add
+// facility/region income on top — balance math would couple this test to
+// tuning numbers that are allowed to change.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionM11ShippedDataGauntletTest,
+	"Eclipse.Missions.M11GauntletOnShippedData",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseMissionM11ShippedDataGauntletTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Shipped DA_CampaignSetup missing - run Tools/create_phase1_content.py + Tools/setup_story_missions.py first."));
+		return false;
+	}
+	// Soft slot: IsNull() checks the authored link; the resolver LoadSynchronous's
+	// it on first use (asserting != nullptr here would test load timing, not data).
+	TestFalse(TEXT("Story table linked on the shipped setup"), Setup->StoryMissions.IsNull());
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+
+	// The pin surfaces on the shipped board: TransitCheckpoint is
+	// adjacency-legal from Underworks at campaign start, and the story row must
+	// beat the generic checkpoint offer with the row's own reward band.
+	FEclipseMissionOfferView PinnedOffer;
+	TestTrue(TEXT("Offer resolves for TransitCheckpoint"), Strategy->TryGetOffer(TEXT("TransitCheckpoint"), PinnedOffer));
+	TestEqual(TEXT("Pin wins over the region offer (shipped chain)"), PinnedOffer.TemplateId, FName(TEXT("MT_M11")));
+	TestEqual(TEXT("Row credits on the offer (decision 10 band)"), PinnedOffer.RewardCredits, 50);
+	TestEqual(TEXT("Row materials on the offer"), PinnedOffer.RewardMaterials, 25);
+
+	// Collect the debrief's own reward facts off the bus.
+	TArray<FEclipseEconomyEventPayload> RewardFacts;
+	FEclipseEventSubscriptionHandle EconomyHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&RewardFacts](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseEconomyEventPayload* Economy = Payload.GetPtr<FEclipseEconomyEventPayload>();
+				Economy != nullptr && Economy->Reason == TEXT("MissionReward"))
+			{
+				RewardFacts.Add(*Economy);
+			}
+		}));
+
+	FString Error;
+	TestTrue(TEXT("M1.1 selected on the shipped board"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error));
+	TestTrue(TEXT("AutoLaunch on shipped prep data"), Prep->AutoLaunch(Error));
+	TestTrue(TEXT("Mission running"), Mission->GetPhase() == EEclipseMissionPhase::Objectives);
+
+	// The disk asset resolved (not the synthesized fallback, not the skeleton).
+	const TArray<FEclipseObjectiveDef>& Active = Mission->GetActiveObjectives();
+	TestEqual(TEXT("Authored objective count"), Active.Num(), 2);
+	if (Active.Num() == 2)
+	{
+		TestTrue(TEXT("Authored ambush objective from MT_M11.uasset"),
+			Active[0].ObjectiveId == TEXT("Obj_M11_PatrolLeader") && Active[0].Type == EEclipseObjectiveType::DestroyTarget);
+		TestTrue(TEXT("Authored exfil objective from MT_M11.uasset"),
+			Active[1].ObjectiveId == TEXT("Obj_M11_Exfil") && Active[1].Type == EEclipseObjectiveType::ExtractSquad);
+	}
+
+	// Guarded: shipped-data drift (a renamed/removed region) must fail this test
+	// with a readable message, not crash the whole automation run on a null deref.
+	const FEclipseRegionState* RegionBefore = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint"));
+	if (RegionBefore == nullptr)
+	{
+		AddError(TEXT("Shipped region graph has no TransitCheckpoint - the M1.1 pin targets a region that no longer exists."));
+		GameInstance->Shutdown();
+		return false;
+	}
+	const int32 DayBefore = Campaign->GetState().Day;
+	const EEclipseRegionOwner OwnerBefore = RegionBefore->Owner;
+
+	TestTrue(TEXT("Ambush completes"), Mission->CompleteObjective(TEXT("Obj_M11_PatrolLeader"), Error));
+	TestTrue(TEXT("Exfil completes"), Mission->CompleteObjective(TEXT("Obj_M11_Exfil"), Error));
+	TestTrue(TEXT("Debrief commits"), Mission->ResolveDebrief(true, Error));
+
+	// Rewards == the row, as commit facts (exactly two, nothing more).
+	TestEqual(TEXT("Exactly two MissionReward facts"), RewardFacts.Num(), 2);
+	int32 CreditsRewarded = 0;
+	int32 MaterialsRewarded = 0;
+	for (const FEclipseEconomyEventPayload& Fact : RewardFacts)
+	{
+		if (Fact.ResourceType == EclipseTags::Resource_Credits.GetTag()) { CreditsRewarded += Fact.Delta; }
+		if (Fact.ResourceType == EclipseTags::Resource_Materials.GetTag()) { MaterialsRewarded += Fact.Delta; }
+	}
+	TestEqual(TEXT("Row credits committed"), CreditsRewarded, 50);
+	TestEqual(TEXT("Row materials committed"), MaterialsRewarded, 25);
+
+	TestEqual(TEXT("Clock advanced exactly one day"), Campaign->GetState().Day, DayBefore + 1);
+	TestTrue(TEXT("Completion beat committed"),
+		Campaign->GetState().StoryFlags.Contains(EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag()));
+	if (const FEclipseRegionState* RegionAfter = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint")))
+	{
+		TestTrue(TEXT("Region untouched (decision 6: M1.1 flips nothing)"), RegionAfter->Owner == OwnerBefore);
+	}
+	else
+	{
+		AddError(TEXT("TransitCheckpoint disappeared from state across the debrief."));
+	}
+
+	// The pin retires on the committed beat. Asserting only "not MT_M11" would
+	// also pass if the board went silent entirely, so pin down the positive
+	// half too: the checkpoint must still offer something, and that something is
+	// the generic region offer.
+	FEclipseMissionOfferView AfterOffer;
+	const bool bStillOffered = Strategy->TryGetOffer(TEXT("TransitCheckpoint"), AfterOffer);
+	TestTrue(TEXT("Board still offers the checkpoint after the beat (retire != go silent)"), bStillOffered);
+	TestNotEqual(TEXT("Pin retired after the beat"), AfterOffer.TemplateId, FName(TEXT("MT_M11")));
+
+	Bus->Unsubscribe(EconomyHandle);
+	GameInstance->Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionM11LossKeepsStoryColdTest,
+	"Eclipse.Missions.M11LossKeepsStoryCold",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseMissionM11LossKeepsStoryColdTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Shipped DA_CampaignSetup missing - run Tools/create_phase1_content.py + Tools/setup_story_missions.py first."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+
+	int32 MissionRewardFacts = 0;
+	FEclipseEventSubscriptionHandle EconomyHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&MissionRewardFacts](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseEconomyEventPayload* Economy = Payload.GetPtr<FEclipseEconomyEventPayload>();
+				Economy != nullptr && Economy->Reason == TEXT("MissionReward"))
+			{
+				++MissionRewardFacts;
+			}
+		}));
+
+	FString Error;
+	TestTrue(TEXT("M1.1 selected"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error));
+	TestTrue(TEXT("AutoLaunch"), Prep->AutoLaunch(Error));
+
+	// Establish WHICH mission is running before asserting anything about the
+	// loss. Without this, every assert below ("no beat", "no rewards", "region
+	// untouched") is also satisfied by any other losing mission on this board —
+	// the test would stay green while the M1.1 pin was silently broken.
+	FEclipseMissionOfferView RunningOffer;
+	TestTrue(TEXT("Offer resolves for the launched region"), Strategy->TryGetOffer(TEXT("TransitCheckpoint"), RunningOffer));
+	TestEqual(TEXT("The mission under test IS M1.1"), RunningOffer.TemplateId, FName(TEXT("MT_M11")));
+	const TArray<FEclipseObjectiveDef>& LossActive = Mission->GetActiveObjectives();
+	TestEqual(TEXT("Authored M1.1 objectives active (not the synthesized fallback)"), LossActive.Num(), 2);
+	if (LossActive.Num() == 2)
+	{
+		TestTrue(TEXT("Running the authored M1.1 asset"),
+			LossActive[0].ObjectiveId == TEXT("Obj_M11_PatrolLeader") && LossActive[1].ObjectiveId == TEXT("Obj_M11_Exfil"));
+	}
+
+	const FEclipseRegionState* RegionBefore = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint"));
+	if (RegionBefore == nullptr)
+	{
+		AddError(TEXT("Shipped region graph has no TransitCheckpoint - the M1.1 pin targets a region that no longer exists."));
+		GameInstance->Shutdown();
+		return false;
+	}
+	const int32 DayBefore = Campaign->GetState().Day;
+	const EEclipseRegionOwner OwnerBefore = RegionBefore->Owner;
+
+	// Field abort straight from Objectives = the legal fail-forward path.
+	TestTrue(TEXT("Loss debrief commits (fail-forward)"), Mission->ResolveDebrief(false, Error));
+
+	TestEqual(TEXT("No mission rewards on loss"), MissionRewardFacts, 0);
+	TestFalse(TEXT("Loss commits no story beat (GDD 11.4: retry, not progress)"),
+		Campaign->GetState().StoryFlags.Contains(EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag()));
+	TestEqual(TEXT("Loss still costs the day (P2-03 locked decision 4)"), Campaign->GetState().Day, DayBefore + 1);
+	if (const FEclipseRegionState* RegionAfter = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint")))
+	{
+		TestTrue(TEXT("Region untouched on loss"), RegionAfter->Owner == OwnerBefore);
+	}
+	else
+	{
+		AddError(TEXT("TransitCheckpoint disappeared from state across the loss debrief."));
+	}
+
+	// The pin survives a loss: the story mission must be offered again.
+	FEclipseMissionOfferView RetryOffer;
+	TestTrue(TEXT("Offer still resolves after loss"), Strategy->TryGetOffer(TEXT("TransitCheckpoint"), RetryOffer));
+	TestEqual(TEXT("Pin still M1.1 (retry wall never, story loss never advances)"), RetryOffer.TemplateId, FName(TEXT("MT_M11")));
+
+	Bus->Unsubscribe(EconomyHandle);
 	GameInstance->Shutdown();
 	return true;
 }
