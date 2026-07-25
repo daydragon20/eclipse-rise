@@ -223,6 +223,26 @@ dus bovenop het personage (0 cm op élke hoogte), en daarna mat ik de EINDhoogte
 in plaats van de hoogste stand — het personage stapte over het blokje van 20 cm
 heen en er aan de andere kant weer af, dus de eindhoogte was gewoon de vloer.
 
+### CAM-07b — de camera remt af tegen de pitch-limiet
+
+Nesky's camerafout **#47**: *"maintaining pitch speed until hitting the pitch
+limit"*. De camera hoort tégen de klem aan af te remmen, niet er met volle
+snelheid tegenaan te slaan. Kost bijna niets, en het verschil tussen "de camera
+stopt" en "de camera knalt tegen een muur" is direct voelbaar.
+
+De demping loopt naar een **bodem** (15%) en niet naar nul: bij nul wordt de
+limiet asymptotisch benaderd en dus nooit gehaald, en een camera die net niet
+omhoog wil kijken is een erger defect dan de klap.
+
+**Gemeten:** 180 gr/s midden in het bereik tegen **52,8 gr/s** op twee graden van
+de limiet, en de limiet wordt nog steeds exact bereikt (70,00°).
+
+*Voetnoot bij de meting, want de eerste versie was waardeloos:* die mat de
+kijksnelheid terwijl de camera al ÓP de klem stond en las 0 gr/s. Dat is trivial
+waar — ook zonder demping — dus die assert zou ook geslaagd zijn als de wijziging
+er niet was. Nu wordt er binnen de dempband gemeten. Een zwakke assert is erger
+dan geen assert: hij geeft dekking die er niet is.
+
 ### Drie plekken waar de documentatie niet klopte met de code
 
 De audit vindt niet alleen verkeerde waarden maar ook verkeerde *beschrijvingen*,

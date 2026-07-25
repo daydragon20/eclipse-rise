@@ -475,6 +475,48 @@ bool FEclipseFeelLayer2LookTest::RunTest(const FString& Parameters)
 	Harness.Controller->SetControlRotation(FRotator::ZeroRotator);
 	Harness.Idle(0.05f);
 
+	// --- 5c. de camera remt af tegen de pitch-limiet (CAM-07b) --------------
+	// Nesky's fout #47: "maintaining pitch speed until hitting the pitch limit".
+	// Het verschil tussen "de camera stopt" en "de camera knalt tegen een muur" is
+	// direct voelbaar. Gemeten als: hoeveel graden per seconde haalt hij midden in
+	// het bereik, en hoeveel in de laatste graden vóór de klem?
+	{
+		Harness.Controller->SetControlRotation(FRotator::ZeroRotator);
+		Harness.Idle(0.05f);
+		// Midden in het bereik: 0.2 s omhoog vanaf 0 komt niet in de dempband.
+		const double MidStart = Harness.Controller->GetControlRotation().Pitch;
+		Harness.HoldFor(TEXT("Look"), FVector2D(0.0f, 1.0f), 0.20);
+		const double MidRate = FMath::Abs(FMath::FindDeltaAngleDegrees(MidStart,
+			Harness.Controller->GetControlRotation().Pitch)) / 0.20;
+
+		// BINNEN de dempband meten, niet ERÓP. Twee graden onder de limiet is nog
+		// 1,7 graden bewegingsruimte in 0,03 s, dus de meting verzadigt niet.
+		// De eerste versie mat de snelheid terwijl de camera al op de klem stond en
+		// las dus 0 gr/s — dat is trivial waar, ook zónder demping, en een assert
+		// die zonder de wijziging ook zou slagen bewijst niets.
+		Harness.Controller->SetControlRotation(FRotator(Harness.Tuning->ViewPitchMax - 2.0f, 0.0f, 0.0f));
+		Harness.Idle(0.05f);
+		const double NearStart = Harness.Controller->GetControlRotation().Pitch;
+		Harness.HoldFor(TEXT("Look"), FVector2D(0.0f, 1.0f), 0.03);
+		const double NearRate = FMath::Abs(FMath::FindDeltaAngleDegrees(NearStart,
+			Harness.Controller->GetControlRotation().Pitch)) / 0.03;
+
+		// En daarna doorduwen: de limiet moet ECHT haalbaar blijven.
+		Harness.HoldFor(TEXT("Look"), FVector2D(0.0f, 1.0f), 3.0);
+		const double Reached = FRotator::NormalizeAxis(Harness.Controller->GetControlRotation().Pitch);
+
+		Report(*this, TEXT("kantelsnelheid midden in het bereik"), MidRate, TEXT("gr/s"));
+		Report(*this, TEXT("kantelsnelheid 2 gr voor de limiet"), NearRate, TEXT("gr/s"), TEXT("fors lager dan midden in het bereik, maar NIET nul"));
+		Report(*this, TEXT("bereikte pitch"), Reached, TEXT("gr"), *FString::Printf(TEXT("ViewPitchMax = %.0f"), Harness.Tuning->ViewPitchMax));
+		TestTrue(FString::Printf(TEXT("laag 2: de limiet is ECHT bereikbaar (%.2f van %.0f gr)"), Reached, Harness.Tuning->ViewPitchMax),
+			Reached >= Harness.Tuning->ViewPitchMax - 1.0f);
+		TestTrue(FString::Printf(TEXT("laag 2: de camera remt af binnen de dempband (%.0f -> %.0f gr/s)"), MidRate, NearRate),
+			NearRate < MidRate * 0.6);
+		TestTrue(FString::Printf(TEXT("laag 2: maar hij staat niet stil in de band (%.0f gr/s)"), NearRate), NearRate > 1.0);
+		Harness.Controller->SetControlRotation(FRotator::ZeroRotator);
+		Harness.Idle(0.05f);
+	}
+
 	// --- 6. een stick op 0,05 mag NIETS doen --------------------------------
 	// De owner-meting in phase0/controller_kalibratie.json: zijn linkerstick rust
 	// op LY = -0.048. Drift mag het personage niet laten lopen en de camera niet

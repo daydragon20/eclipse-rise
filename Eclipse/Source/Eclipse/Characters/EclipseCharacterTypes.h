@@ -421,6 +421,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 89))
 	float ViewPitchMax = 70.0f;
 
+	/**
+	 * Over hoeveel graden vóór de pitch-limiet het kijken afremt (CAM-07b).
+	 *
+	 * Nesky's camerafout #47 is "maintaining pitch speed until hitting the pitch
+	 * limit": de camera moet tégen de klem aan afremmen, niet er met volle
+	 * snelheid tegenaan slaan. Het verschil tussen "de camera stopt" en "de camera
+	 * knalt tegen een muur" is direct voelbaar en kost bijna niets.
+	 *
+	 * De demping loopt naar een BODEM (PitchDampFloor) en niet naar nul: bij nul
+	 * wordt de limiet asymptotisch benaderd en dus nooit gehaald, en een camera
+	 * die net niet omhoog wil kijken is een erger defect dan de klap.
+	 * [OFFICIEEL] John Nesky, "50 Game Camera Mistakes", GDC 2014.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 45))
+	float PitchDampBandDegrees = 10.0f;
+
+	/** Hoeveel kijksnelheid er ín de dempband minimaal overblijft, zodat de
+	 *  limiet bereikbaar blijft. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0.05, ClampMax = 1.0))
+	float PitchDampFloor = 0.15f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Attributes", meta = (ClampMin = 1))
 	float MaxHealth = 100.0f;
 };

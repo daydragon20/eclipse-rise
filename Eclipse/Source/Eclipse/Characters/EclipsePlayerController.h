@@ -90,6 +90,11 @@ private:
 	/** 1.0 = untouched. Below 1.0 while the reticle sits on a hostile. */
 	float ComputeAimAssistScale() const;
 
+	/** Rem het kijken af vlak vóór de pitch-limiet (CAM-07b, Nesky #47). Werkt op
+	 *  de invoer, niet op de klem: klemmen doet de camera manager al, maar die
+	 *  laat je er met volle snelheid tegenaan lopen. */
+	float DampPitchNearLimit(float PitchDelta) const;
+
 public:
 	/** The live look values as one line, for the test guide's header. Reads the
 	 *  same members the handler uses, so it cannot advertise a stale number. */
@@ -200,6 +205,8 @@ private:
 	float AimAssistFloor = 0.45f;
 	float AimAssistConeDegrees = 4.0f;
 	float AimAssistRange = 5000.0f;
+	float PitchDampBandDegrees = 10.0f;
+	float PitchDampFloor = 0.15f;
 	bool bInvertLookY = false;
 
 	/** Welke acties al een gamepad-actuatie hebben gelogd — één regel per actie,

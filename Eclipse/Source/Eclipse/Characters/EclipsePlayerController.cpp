@@ -803,7 +803,7 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 		// was -2.5, dus de min hier compenseerde een verborgen omkering. Netto
 		// richting blijft exact gelijk aan wat er verscheept werd; alleen de factor
 		// 2.5 is weg en de tuning betekent nu wat er staat.
-		AddPitchInput(Direction.Y * Curved * StickPitchSpeed * AdsScale * DeltaSeconds * InvertY);
+		AddPitchInput(DampPitchNearLimit(Direction.Y * Curved * StickPitchSpeed * AdsScale * DeltaSeconds * InvertY));
 		return;
 	}
 
@@ -817,7 +817,7 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 	// was -2.5). MouseLookScale staat op 2.5 zodat de muis exact even snel blijft
 	// als voorheen — bij de muis is het getal een kale schaal zonder eenheid, dus
 	// daar is de eerlijke keuze "gedrag ongewijzigd", niet "getal mooier".
-	AddPitchInput(Axis.Y * MouseLookScale * MouseAds * InvertY);
+	AddPitchInput(DampPitchNearLimit(Axis.Y * MouseLookScale * MouseAds * InvertY));
 }
 
 bool AEclipsePlayerController::IsUsingGamepadLook() const
@@ -1028,6 +1028,27 @@ float AEclipsePlayerController::ComputeAimAssistScale() const
 	return 1.0f;
 }
 
+float AEclipsePlayerController::DampPitchNearLimit(float PitchDelta) const
+{
+	if (PlayerCameraManager == nullptr || PitchDampBandDegrees <= KINDA_SMALL_NUMBER || FMath::IsNearlyZero(PitchDelta))
+	{
+		return PitchDelta;
+	}
+
+	// NormalizeAxis, want een control rotation draagt pitch als 0..360: -10 graden
+	// staat er als 350, en rechtstreeks vergelijken met een limiet van -70 geeft
+	// dan onzin.
+	const float Current = FRotator::NormalizeAxis(GetControlRotation().Pitch);
+	const float Limit = PitchDelta > 0.0f ? PlayerCameraManager->ViewPitchMax : PlayerCameraManager->ViewPitchMin;
+	const float Remaining = FMath::Abs(Limit - Current);
+	if (Remaining >= PitchDampBandDegrees)
+	{
+		return PitchDelta;
+	}
+	// Naar een bodem en niet naar nul: bij nul wordt de limiet nooit gehaald.
+	return PitchDelta * FMath::Lerp(FMath::Clamp(PitchDampFloor, 0.05f, 1.0f), 1.0f, Remaining / PitchDampBandDegrees);
+}
+
 FString AEclipsePlayerController::DescribeLookTuning() const
 {
 	// Seconds per full turn is the criterion the owner asked to judge against —
@@ -1072,6 +1093,8 @@ void AEclipsePlayerController::ApplyLookTuning()
 	AimAssistFloor = Tuning->AimAssistFloor;
 	AimAssistConeDegrees = Tuning->AimAssistConeDegrees;
 	AimAssistRange = Tuning->AimAssistRange;
+	PitchDampBandDegrees = Tuning->PitchDampBandDegrees;
+	PitchDampFloor = Tuning->PitchDampFloor;
 	bInvertLookY = Tuning->bInvertLookY;
 
 	// Pitch limits live on the camera manager, not on the look handler: clamping
