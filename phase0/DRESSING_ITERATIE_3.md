@@ -307,6 +307,35 @@ Meten voordat er iets verandert: eerst de mid-band apart authoren (nu is hij een
 afgeleide van twee getallen die ik voor andere redenen bijstel), zodat de knop die
 aan het zichtbare vlak zit ook echt die knop is.
 
+## 1k. Cyaan: de vervolgstap is één stencil-ronde, en zo doe je hem (2026-07-25 21:25)
+
+**Stand:** drie kleurhypotheses gesneuveld, en de stencil legde uit waarom — het
+meetvak (900-1250, 470-560 in cam 3) dat drie ronden lang "de BldgB-wand" heette is
+voor **95% een ander oppervlak**. BldgB schildert 93.408 pixels in dat frame, maar
+maar 1.490 van de 31.500 in dát vak. Niet drie foute kleurideeën dus, maar één foute
+aanname over welk object er in beeld staat, die onder alle drie zat.
+
+**De vervolgstap is mechanisch en kost één build + één shotronde per kandidaat:**
+
+1. Zet in `EclipseGrayboxBuilder.cpp` de Lit én Shade van één paletingang op
+   `FLinearColor(1,0,1)`. Doe dat met een bestand-gebaseerd Python-script of met de
+   Edit-tool — een `python -c` met aanhalingstekens erin sneuvelt op
+   PowerShell-quoting (twee keer meegemaakt).
+2. Bouwen, `-EclipseShot` draaien, en in cam 3 tellen hoeveel magenta er in het
+   meetvak (900-1250, 470-560) valt. De ingang die dat vak vult, is de ingang die
+   het cyaan schildert.
+3. Terugzetten, groene bar, en pas dan aan die ingang draaien.
+
+**Kandidaten, in volgorde van waarschijnlijkheid:** `Wall_` (perimeterbeton, groot
+en dichtbij in cam 3), `BldgA`, `Skyline`, en de container-MIDs uit de dressing-pass
+(die lopen niet via `PaletteForLabel` maar via `MakeDressMid`, dus die vragen een
+aparte stencil op `GraphiteLit`).
+
+**Waarschuwing voor wie dit oppakt:** meet ALTIJD eerst met de stencil welk vlak bij
+welke ingang hoort voordat je een tint bijstelt. Deze iteratie heeft drie build- en
+shotrondes gekost aan tints die het gemeten vlak niet eens raakten, en dat was in
+alle drie de gevallen binnen één stencil-ronde te zien geweest.
+
 - Geparkeerd: **liners** (op geen enkele camera-afstand leesbaar als defect) en
   **FogDensity** (met de grond op 0.03-0.06 is er niets om op te tillen; pas
   hertesten nadat het plafond zakt).
