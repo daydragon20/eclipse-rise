@@ -42,6 +42,12 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Cyaan: de bron is gevonden, maar de uitweg is jouw keuze (waarde of grade)", prio: "gauw", waarom: "Twee van mijn hypotheses zijn door meting gesneuveld, dus ik gok niet nog een keer. Een ruimtelijke clustering wijst één object aan: de grote gegolfde wand van BldgB, de warehouse. En het mechanisme is nu duidelijk — de grade werkt om de luminantie heen en versterkt verzadiging het HARDST bij lage waarden. Geauthord staat die wand op verzadiging 0,27; in het frame meet hij 0,99. Bij deze waarde bestaat er dus geen geauthorde tint die als worker-teal leest én onder de grens blijft. Beide uitwegen zijn een ontwerpbeslissing, geen tweak, en allebei raken ze meer dan dit ene vlak.", stappen: [
+      "Optie A: BldgB in WAARDE omhoog, zodat de tint uit de versterkingszone komt. Botst met de plafondregel (niets niet-emissief boven de lichtplek) en het is een groot oppervlak — dus dit verandert het hele frame, niet alleen de wand",
+      "Optie B: ColorSaturation (1,38) omlaag voor deze familie. Dat is jouw Borderlands-punch uit de kalibratieronde van 23-07 en hij raakt tien andere kleurfamilies",
+      "Optie C: accepteer de teal zoals hij is en haal hem van de blokkerende lijst — het is een stijloordeel, en jij bent de stijl-eigenaar",
+      "Zeg 'cyaan: A', 'cyaan: B' of 'cyaan: C'"
+    ] },
     { titel: "CONTROLLER: plak me de 'Input:'-regels uit het log — dan weet ik waar het vastzit", prio: "nu", waarom: "Je meldt dat geen enkele controller-knop werkt. Dat kan ik niet vanaf hier reproduceren (jouw pad zit aan jouw machine), dus ik heb het afleesbaar gemaakt in plaats van te gokken. Er staan nu twee soorten logregels in, en samen scheiden ze de drie mogelijke oorzaken uit elkaar.", stappen: [
       "Start de game, druk een stuk of vijf knoppen op de controller (ook de sticks), sluit af",
       "Open Eclipse/Saved/Logs/Eclipse.log en plak hier elke regel die met 'Input:' begint",
