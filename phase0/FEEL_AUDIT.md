@@ -83,6 +83,29 @@ De hele LOCOMOTIE- en SPRONG-kolom plus de pitch-limiet staan in de geparkeerde
 patch, met per waarde de engine-default en de herkomst in de code. Ze wachten op een
 vrij build-slot.
 
+## INPUT — hold versus toggle (owner-eis 2026-07-25)
+
+| Item | Status | Nu | Wordt | Reden |
+|---|---|---|---|---|
+| Sprint op L3 | **AFWIJKEND** | hold: `SprintAction` op `Gamepad_LeftThumbstick`, gebonden op Triggered + Completed | **toggle** | Een stick ingedrukt houden terwijl je er tegelijk mee stuurt is onhandig, en het is niet de conventie |
+| Sprint op Shift | OK | hold | hold | Op toetsenbord is hold juist wél de conventie |
+
+**Gewenst gedrag van de toggle**, zoals Borderlands / Gears / The Division: één klik op
+L3 start sprint, en die blijft aan tot de speler (a) ophoudt met vooruit duwen, (b)
+mikt, (c) vuurt, of (d) nogmaals L3 drukt.
+
+**Twee devices mogen verschillen en dat is hier het punt.** De neiging om beide
+invoerapparaten hetzelfde te laten doen is precies wat dit item fout maakt: een
+sprintknop die je moet vasthouden botst op een pad met de stick waarmee je stuurt, en
+op een toetsenbord botst een toggle met de gewoonte van elke shooter. Gelijktrekken zou
+één van beide slechter maken.
+
+**Bredere opdracht die hierbij hoort:** loop alle bindings na op acties waar hold en
+toggle door elkaar lopen, en breng ze in lijn met wat per device logisch is. Kandidaten
+om te controleren: mikken (nu hold op beide), Command Mode (hold — dat moet zo blijven,
+de tijddilatatie hangt eraan), stance (nu toggle op de pad, hold-bij-het-geven op
+toetsenbord — die asymmetrie is mogelijk al correct maar is nooit expliciet besloten).
+
 ## Twee overdraagbare lessen uit The Division (onderzoek 2026-07-25)
 
 **1. Aim-assist: los snap-misbruik op met een COOLDOWN, niet met minder sterkte.**
