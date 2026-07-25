@@ -140,7 +140,19 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
-## LAATSTE STAND (2026-07-24 — P2-01 GELAND)
+## LAATSTE STAND (2026-07-25 ~13:15 — CYCLUS 5 GELAND: de vijf wacht-changesets)
+
+**Trigger:** Nathan sloot de editor om 13:06 (Live-Coding-buildlock weg, memory eclipse-editor-buildlock) — de voorbereide landing rolde daarna in één run. **Unie-bar vóór de commits: build ✓ (-NoUba, 69 s) · tests 68/68 (50 schoon + 18 met bekende fixture-warnings, 0 fail) · EclipseValidateData 3 validators/0 fouten · catalog 28/28.** Alle vijf changesets hadden vóóraf review-GO (2 verse reviews, 1 herkeur, art-review, planner ×2).
+
+1. **`6ac96c1` [Strategy]** — P2-04 stap 2: ResolveOfferForRegion als het ene offer-pad, 5 native Story.Beat.*-tags, per-tabel-validatiepass (luid, 1× per tabel), map her-rendert op BeatReached. (De StaffAssigned-comment-hunk reed bewust hier mee.)
+2. **`6b08bb2` [Art]** — 15.8-dressingronde 1 op de Imported-accepts; magenta-container → mix 0.45; iteratie-2-spec staat in `phase0/DRESSING_ITERATIE_2.md` (kerninzicht: district is unlit → licht via luminantie-decals).
+3. **`173d4ec` [Quests]** — completion-beat atomair in de debrief-transactie (skip-if-set load-bearing); verlies committeert nooit story-voortgang.
+4. **`d503651` [Base]** — P2-03 stap 4-5A: casualty-releases, muster-gate, mutatie-laag-cap + 3 tests; catalog-rij eerlijk.
+5. **`9be3786` [Strategy]** — P2-05 pure core: monotone liberation-resolve + beat-gate + 6 tests (veldnamen spec-conform na review-B1).
+
+**Direct hierna (zelfde sessie):** commandlet-rij in de vrije slot — `setup_story_missions.py` (MT_M11 + DT_StoryMissions + DA_CampaignSetup, daarna her-bar + [Quests]-datacommit) → `inventory_metahumans_wave2.py` (report-only MH-probe → aftekening Nathans MetaHuman-taak) → `import_modular_civilians.py` (11 CC0-civilians + SOURCES.md + [Art]-datacommit). **Cyclus N+1 staat gepland in `phase0/CYCLUS_N1_PLAN.md`** (main M1.1-Gauntlet eerst, dan 4 element-builders per fence-matrix; wave 2 = optional-schema, recap-materialisatie + cold-reader, civilian-wiring; M1.2 = N+2, gated op cold-reader 4/4). Taak-4-spec: `phase0/TAAK4_STORY_SURFACE.md`; recap-copy: `phase0/RECAP_CARDS_M1.md`.
+
+## VORIGE STAND (2026-07-24 — P2-01 GELAND)
 
 **Waar gestopt:** Phase 2 "Thirteen Bullets" is de actieve milestone (owner-instructie 23-07; de 13.2-playtest van Phase 1 blijft een staande owner-actie). **SPEC-P2-01 (Squad van 4 + eerste 3 classes: Assault/Medic/Sniper) is geland en gepusht** na een volle groene bar én een onafhankelijke code-review (verdict GO, 0 blockers).
 
