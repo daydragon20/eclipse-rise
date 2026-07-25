@@ -67,8 +67,13 @@ else:
     # Type blijft de default: de vlag doet het werk, niet een nieuw verb (decision 5
     # verbiedt nieuwe objective-verbs; conditie-vlaggen zijn juist het precedent).
     optional.set_editor_property("description", unreal.Text("Bring everyone home standing"))
-    optional.set_editor_property("b_optional", True)
-    optional.set_editor_property("b_requires_no_casualties", True)
+    # LET OP de naamgeving: UE strípt de b-prefix van een bool-UPROPERTY en
+    # snake_cases de rest, dus bOptional -> "optional" (NIET "b_optional") en
+    # bRequiresNoCasualties -> "requires_no_casualties". Zelfde patroon als
+    # setup_story_missions.py, dat bProgressRegionOnSuccess zet als
+    # "progress_region_on_success". Eerste run hierop gefaald; dit is de correctie.
+    optional.set_editor_property("optional", True)
+    optional.set_editor_property("requires_no_casualties", True)
     optional.set_editor_property("optional_reward_materials", REWARD_MATERIALS)
 
     objectives.append(optional)

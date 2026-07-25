@@ -56,8 +56,17 @@ namespace
 	 */
 	const FRotator VaultKeyLight(-55.0f, 130.0f, 0.0f);
 
-	/** Same unlit-emissive luminance calibration as the district (see EclipseGrayboxBuilder). */
-	constexpr float ToonEmissiveScale = 10.0f;
+	/**
+	 * Same unlit-emissive luminance calibration as the district (see
+	 * EclipseGrayboxBuilder). Deliberately NOT called ToonEmissiveScale: the
+	 * district file has a constant by that exact name in ITS anonymous namespace,
+	 * and UBT's unity build concatenates translation units — the two namespaces
+	 * then merge and the differing storage class (const vs constexpr) is a hard
+	 * redefinition error. It only surfaced when the adaptive-unity working set
+	 * happened to pair these two files, which is why it landed on a green bar and
+	 * would have broken the first clean/CI build instead.
+	 */
+	constexpr float VaultToonEmissiveScale = 10.0f;
 
 	/**
 	 * Vault palette - cel tones in the established 15.5 hue families (cold
@@ -327,7 +336,7 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 				Mid->SetVectorParameterValue(TEXT("LitColor"), Entry.Lit);
 				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Entry.Shade);
 				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(VaultKeyLight.Vector(), 0.0f)));
-				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), VaultToonEmissiveScale);
 			}
 			else
 			{

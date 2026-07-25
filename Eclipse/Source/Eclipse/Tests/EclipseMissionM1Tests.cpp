@@ -220,14 +220,27 @@ bool FEclipseMissionM11ShippedDataGauntletTest::RunTest(const FString& Parameter
 	TestTrue(TEXT("Mission running"), Mission->GetPhase() == EEclipseMissionPhase::Objectives);
 
 	// The disk asset resolved (not the synthesized fallback, not the skeleton).
+	// Asserting a bare count of 2 was too coarse and broke the moment wave 2
+	// authored the optional; what the spec actually promises is a two-objective
+	// MANDATORY set plus the zero-casualty stretch goal. Pinning that instead
+	// makes this Gauntlet prove the wave-2 data landed as well.
 	const TArray<FEclipseObjectiveDef>& Active = Mission->GetActiveObjectives();
-	TestEqual(TEXT("Authored objective count"), Active.Num(), 2);
-	if (Active.Num() == 2)
+	TestEqual(TEXT("Authored objective count (2 mandatory + 1 optional)"), Active.Num(), 3);
+	if (Active.Num() == 3)
 	{
 		TestTrue(TEXT("Authored ambush objective from MT_M11.uasset"),
 			Active[0].ObjectiveId == TEXT("Obj_M11_PatrolLeader") && Active[0].Type == EEclipseObjectiveType::DestroyTarget);
 		TestTrue(TEXT("Authored exfil objective from MT_M11.uasset"),
 			Active[1].ObjectiveId == TEXT("Obj_M11_Exfil") && Active[1].Type == EEclipseObjectiveType::ExtractSquad);
+		TestFalse(TEXT("Ambush is mandatory"), Active[0].bOptional);
+		TestFalse(TEXT("Exfil is mandatory"), Active[1].bOptional);
+
+		// The wave-2 stretch goal, authored by Tools/migrate_m11_optional.py.
+		const FEclipseObjectiveDef& Stretch = Active[2];
+		TestEqual(TEXT("Third objective is the zero-casualty stretch goal"), Stretch.ObjectiveId, FName(TEXT("Obj_M11_NoCasualties")));
+		TestTrue(TEXT("Stretch goal is optional"), Stretch.bOptional);
+		TestTrue(TEXT("Stretch goal carries the no-casualties latch condition"), Stretch.bRequiresNoCasualties);
+		TestEqual(TEXT("Stretch payout is the spec's +20 Materials"), Stretch.OptionalRewardMaterials, 20);
 	}
 
 	// Guarded: shipped-data drift (a renamed/removed region) must fail this test
@@ -331,11 +344,12 @@ bool FEclipseMissionM11LossKeepsStoryColdTest::RunTest(const FString& Parameters
 	TestTrue(TEXT("Offer resolves for the launched region"), Strategy->TryGetOffer(TEXT("TransitCheckpoint"), RunningOffer));
 	TestEqual(TEXT("The mission under test IS M1.1"), RunningOffer.TemplateId, FName(TEXT("MT_M11")));
 	const TArray<FEclipseObjectiveDef>& LossActive = Mission->GetActiveObjectives();
-	TestEqual(TEXT("Authored M1.1 objectives active (not the synthesized fallback)"), LossActive.Num(), 2);
-	if (LossActive.Num() == 2)
+	TestEqual(TEXT("Authored M1.1 objectives active (not the synthesized fallback)"), LossActive.Num(), 3);
+	if (LossActive.Num() == 3)
 	{
 		TestTrue(TEXT("Running the authored M1.1 asset"),
 			LossActive[0].ObjectiveId == TEXT("Obj_M11_PatrolLeader") && LossActive[1].ObjectiveId == TEXT("Obj_M11_Exfil"));
+		TestEqual(TEXT("Stretch goal present on the loss path too"), LossActive[2].ObjectiveId, FName(TEXT("Obj_M11_NoCasualties")));
 	}
 
 	const FEclipseRegionState* RegionBefore = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint"));
