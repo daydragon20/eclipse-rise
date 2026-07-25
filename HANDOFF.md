@@ -5,7 +5,9 @@
 
 # OCHTENDRAPPORT — nacht 25→26 juli 2026
 
-**Bar bij elke commit: build ✓ (-NoUba) · tests 109/109 (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Negentien commits, alle negentien gepusht: `f1049e9` (harnas + S1/S2/S3) · `2dc235d` (speelronde) · `f3c5211` (feel-audit fase 3) · `1bbce20` (dit rapport) · `c7274b3` (sprong-vergevingsvensters) · `46ffe9b` + `08eef5f` (navigatiegrenzen) · `393331f` (traversal) · `9c95d3b` (rapport-sync) · `79daac5` (drie documentatiefouten) · `6ed97dc` (pitch-demping) · `75c35bf` (F9 geeft ook de bewegingswaarden) · `41296e7` + `14f219b` (BESTURING tegen de code gelegd) · `af8e4c5` (de gids leerde nog de oude sprint) · `8129967` + `ea34e6d` (twee bewakers op de beschrijvingen).
+**Bar bij elke commit: build ✓ (-NoUba) · tests **110/110** (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Alles tussen `26edd65` en `HEAD` is van deze nacht, alles gepusht. De inhoudelijke commits: `f1049e9` (harnas + S1/S2/S3) · `2dc235d` (speelronde) · `f3c5211` (feel-audit fase 3) · `1bbce20` (dit rapport) · `c7274b3` (sprong-vergevingsvensters) · `46ffe9b` + `08eef5f` (navigatiegrenzen) · `393331f` (traversal) · `9c95d3b` (rapport-sync) · `79daac5` (drie documentatiefouten) · `6ed97dc` (pitch-demping) · `75c35bf` (F9 geeft ook de bewegingswaarden) · `41296e7` + `14f219b` (BESTURING tegen de code gelegd) · `af8e4c5` (de gids leerde nog de oude sprint) · `8129967` + `ea34e6d` + `25c76d3` (drie bewakers op de beschrijvingen).
+
+*Deze regel is één keer verouderd geraakt tijdens de nacht — hij stond op 109 tests en negentien commits terwijl het er 110 en meer waren. Gecorrigeerd, en de commitlijst noemt nu een bereik in plaats van een telling, want een telling die met elke commit verandert gaat per definitie liegen. Precies het patroon dat hieronder zes keer beschreven staat, en het trof dus ook dit rapport.*
 
 ## 1. Wat is af en gemeten — met de getallen
 
