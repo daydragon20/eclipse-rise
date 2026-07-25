@@ -34,6 +34,11 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Editor sluiten zodra je klaar bent met de pack-downloads", prio: "gauw", waarom: "je editor staat open sinds 16:27 (Live Coding), en die blokkeert mijn builds — er ligt één codewijziging klaar die ik daarom niet kan verifiëren: het weghalen van een emissieve plaat die plat in de straat lag (de art-review vond hem als letterlijke sticker aan de lampvoet). Geen haast: maak je downloads eerst af.", stappen: [
+      "Laat Factory Pack / IBuilding 49 / UNIBLOCKS eerst klaar downloaden",
+      "Sluit Unreal (gewoon afsluiten; alleen Save All als hij erom vraagt)",
+      "Meer hoeft niet — ik zie het vanzelf en pak de rij dan op"
+    ] },
     { titel: "Feel-gauntlet Command Mode (~20 min) — het R3-verdict", prio: "nu", waarom: "beslist of Stage B (nieuwe orders/camera/UI) mag starten; expres op de lelijke build. Je mag de editor hiervoor gewoon weer openen — de landing draait nu eerst; alleen als de agent later opnieuw moet bouwen vraagt hij je nog eens te sluiten", stappen: [
       "Open phase0/FEEL_GAUNTLET_P2-02.md (het draaiboek met besturing + meetcriteria)",
       "Speel in PIE: houd Q (of LB op de pad) — wereld vertraagt naar 30%; geef orders met 1-4/D-pad; kies soldaten met Tab/RB of E/X",

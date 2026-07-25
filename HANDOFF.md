@@ -140,6 +140,23 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
+## ÉÉN ONGECOMMITTE WIJZIGING (2026-07-25 16:45) — alleen relevant bij een crash
+
+`Eclipse/Source/Eclipse/Core/EclipseGrayboxBuilder.cpp` bevat één niet-gecommitte
+wijziging: de `SpawnGen(LampGlow, ...)`-aanroep is verwijderd. Reden staat in het
+commentaar ter plekke: de tweede art-review vond die emissieve plaat als een
+letterlijke sticker plat in de straat aan de mastvoet (shot 00092, (1105,628)-
+(1215,655), 0.2745 lum, hue 34.8°, harde zilveren rand + ink-outline). Mijn eerdere
+afwijzing van die hypothese was fout — ik vertrouwde de authored transform in
+`gen_street_props.py` in plaats van te controleren wat er na export/import
+overblijft.
+
+**Niet gecommit omdat de bar niet gedraaid kon worden:** de owner-editor staat open
+sinds 16:27 (Live Coding blokkeert UBT, exit 6 — memory `eclipse-editor-buildlock`).
+Zodra het build-slot vrij is: build → suite (verwacht 85/85) → shotronde →
+committen. De emissieve bulb die de bron zichtbaar maakt is al geland (`865a77b`),
+dus het district houdt zijn lichtbron ook zonder deze wijziging.
+
 ## LAATSTE STAND (2026-07-25 ~15:30 — CYCLUS 6 GELAND: vier bouwsporen + review-ronde)
 
 **Bar bij de commits: build ✓ (-NoUba) · tests 85/85 (0 fail; 55 schoon + 30 met bekende fixture-warnings) · EclipseValidateData 4 validators/0 fouten · catalog 29/29.** Bar is bewust twee keer gedraaid: de tweede run dekt exact de gecommitte boom (een test-helper-guard landde ná de eerste build, dus die eerste run dekte hem niet).
