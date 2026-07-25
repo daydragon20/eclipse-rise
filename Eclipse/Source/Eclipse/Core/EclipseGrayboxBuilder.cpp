@@ -135,7 +135,20 @@ namespace
 		// once step 1 pins the key. Wall_ stays put, so the ground/wall value step
 		// finally exists on screen (the review measured band and floor at an
 		// identical 0.1237 in the overview frame). Measured gains untouched.
-		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — anchored under the SKY, never crushed
+		// Dressing-iteratie 3, de blokkerende stijlovertreding. De art-review waardeerde
+		// de vloer op naar BLOKKEREND onder de EEN-STIJL-WET: hij is rauw fotorealisme
+		// in een cel/ink-frame en hij is 60-80% van elk frame. Gemeten op shot 00209,
+		// drie schone asfaltvakken: sd/gem 29,0% / 29,0% / 30,1% eigen korrel. Dat is
+		// niet alleen een stijlbreuk maar ook de reden dat contactschaduwen er niet in
+		// leesbaar zijn: een blob van 0,62x is een dip van 38% op een oppervlak dat
+		// zelf 30% ruist, oftewel een 1-sigma-signaal.
+		// De textuur levert via de toon-master alleen LUMINANTIE, dus de mix is precies
+		// de knop die bepaalt hoeveel fotografische korrel er doorkomt. Doel uit de
+		// review: sd/gem onder ~12%, de waarde die het overzichtsframe al haalt.
+		// 0.50 -> 0.20 omdat de korrel lineair met de mix hoort te schalen (0.12/0.60),
+		// maar dat is een voorspelling: de mapping loopt door de tonemapper, dus dit
+		// wordt gemeten en zo nodig gebisecteerd - niet uitgerekend en geloofd.
+		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.20f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — anchored under the SKY, never crushed
 		// Dressing-iteratie 3, step 7 (nu prioriteit 1) — THE VALUE CEILING.
 		// The metering pin of step 1 only moved the FLOOR: everything above ~0.25
 		// lum sits on the tonemapper shoulder, so it returned just 20-45% of the
