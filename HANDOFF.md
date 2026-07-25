@@ -41,7 +41,7 @@
 
 ## 2. Wat is niet gelukt, en waarom
 
-- **Niets is mislukt**, maar vier audit-items zijn bewust níét gebouwd omdat het bouwopdrachten zijn en geen tuningrondes: turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip), de sprint-camerastack (CAM-11), camera-shake/recoil/hitmarkers (§8 FEEDBACK bestaat volledig niet), en coyote time + sprong-inputbuffer (JMP-07/08). Zie §4 voor mijn aanbeveling per stuk.
+- **Niets is mislukt**, maar drie audit-items zijn bewust níét gebouwd omdat het bouwopdrachten zijn en geen tuningrondes: turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip), de sprint-camerastack (CAM-11), en camera-shake/recoil/hitmarkers (§8 FEEDBACK bestaat volledig niet). Zie §4 voor mijn aanbeveling per stuk.
 - **De squad weigert bij insertie alle drie de MoveTo-orders**, met reden `NoRoute` en met barks ("No route, boss.", "Can't get there from here.", "That path's blocked."). Systeemtechnisch is dat precies goed — elke order krijgt exact één antwoord en de weigering is beredeneerd, nooit stil — maar het betekent dat er op dat moment geen navmesh-pad is. Voor jou leest dat als een squad die bij aankomst niets doet. Ik heb het niet gefixt omdat het een eigen onderzoek is (navmesh-generatie rond invokers) en het buiten de opdracht van vannacht viel.
 
 ## 3. Beslissingen die ik zelf genomen heb, en waarop
@@ -66,7 +66,7 @@
 | 3 | **Command Mode trekt de camera 73% terug (300→520), maar `DA_CommandModeTuning` zegt 15% en de GDD 4.1.1 ook.** Eén waarheid kiezen. | **Houd de 73% en corrigeer de GDD-regel** via change management. 520 is bewust geauthord om het veld te lezen; 15% (=345) is nooit gespeeld. Maar dit is smaak, dus jouw call. |
 | 4 | **De squad weigert bij insertie elke order met `NoRoute`.** Wil je dat ik dat uitzoek? | **Ja.** Het gedrag is correct maar het leest als een dode squad. Waarschijnlijk navmesh-generatie rond de invokers; een avond werk, met de speelronde als bewijs. |
 | 5 | **Hurken ook als hold aanbieden, als optie naast de toggle?** | **Ja, maar later** — het vraagt een instellingenmenu, en dat is SPEC-P2-07. |
-| 6 | **Coyote time (110 ms) + sprong-inputbuffer (150 ms) bouwen?** | **Ja.** De referentie noemt het "de goedkoopste feel-winst die er is" en het harnas kan het meten. Ik heb het niet gedaan omdat het de sprongtiming raakt die je net getest hebt. |
+| 6 | ~~Coyote time + sprong-inputbuffer bouwen?~~ **Gedaan** — 110 ms en 150 ms, beide gemeten en gepind. Ze voegen alleen vergeving toe: een sprong die eerst mislukte lukt nu, nooit andersom. | Niets te beslissen; speel het en zeg of het te toegeeflijk voelt. |
 | 7 | **Turn-in-place bouwen** (nu blijft je rug bevroren staan als je alleen de camera draait)? | **Ja, maar het vraagt een draai-animatie.** Zonder animatie krijg je voetslip, en dan ruil je het ene zichtbare defect voor het andere. |
 | 8 | **Camera-shake, recoil, hitmarkers, sprint-camerastack** — §8 FEEDBACK bestaat volledig niet. | **Na de vorige punten.** Dit is de grootste feel-winst die er nog ligt (Gears koopt met 1,2× sprint méér snelheidsgevoel dan wij met 1,55×), maar het is een bouwopdracht van meerdere sessies. |
 

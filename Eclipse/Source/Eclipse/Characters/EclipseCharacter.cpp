@@ -150,6 +150,8 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 		Directional->StrafeSpeedRatio = Tuning->StrafeSpeedRatio;
 		Directional->BackwardSpeedRatio = Tuning->BackwardSpeedRatio;
 	}
+	CoyoteTimeSeconds = Tuning->CoyoteTimeSeconds;
+	JumpInputBufferSeconds = Tuning->JumpInputBufferSeconds;
 
 	// VERIFICATIE, en die is er gekomen na een terechte owner-melding: "niets is
 	// veranderd in de game". Een opgeslagen DataAsset wint van een C++-default voor
@@ -189,6 +191,8 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 		WarnIfStale(TEXT("GroundFriction"), Tuning->GroundFriction, Defaults->GroundFriction);
 		WarnIfStale(TEXT("BackwardSpeedRatio"), Tuning->BackwardSpeedRatio, Defaults->BackwardSpeedRatio);
 		WarnIfStale(TEXT("CameraProbeSize"), Tuning->CameraProbeSize, Defaults->CameraProbeSize);
+		WarnIfStale(TEXT("CoyoteTimeSeconds"), Tuning->CoyoteTimeSeconds, Defaults->CoyoteTimeSeconds);
+		WarnIfStale(TEXT("JumpInputBufferSeconds"), Tuning->JumpInputBufferSeconds, Defaults->JumpInputBufferSeconds);
 		WarnIfStale(TEXT("ViewPitchMin"), Tuning->ViewPitchMin, Defaults->ViewPitchMin);
 		WarnIfStale(TEXT("StickDeadzone"), Tuning->StickDeadzone, Defaults->StickDeadzone);
 		WarnIfStale(TEXT("StickYawSpeed"), Tuning->StickYawSpeed, Defaults->StickYawSpeed);
@@ -571,6 +575,93 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 
 	UE_LOG(LogEclipse, Warning, TEXT("%s: no idle take at all for %s — the mesh draws its ref pose (GDD 14.3.5)."),
 		*GetName(), *BodyDef.Mesh.ToString());
+}
+
+void AEclipseCharacter::RequestJump()
+{
+	Jump();
+	// Al in de lucht? Dan is dit een druk VÓÓR de landing. Onthouden, en bij het
+	// raken van de grond alsnog uitvoeren (JMP-08). Zonder dit moet de speler op
+	// precies de landingsframe drukken en is elke druk daarvoor gewoon weg.
+	const UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (Movement != nullptr && Movement->IsFalling() && GetWorld() != nullptr)
+	{
+		JumpPressedWhileFallingAtSeconds = GetWorld()->GetTimeSeconds();
+	}
+}
+
+void AEclipseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PrevCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PrevCustomMode);
+
+	// Het moment waarop we de grond verlieten ZONDER te springen is het enige dat
+	// coyote time nodig heeft. bWasJumping onderscheidt de twee: wie sprong heeft
+	// zijn sprong al gehad en verdient geen tweede.
+	const UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (Movement != nullptr && Movement->IsFalling() && PrevMovementMode == MOVE_Walking && GetWorld() != nullptr)
+	{
+		LeftGroundAtSeconds = bWasJumping ? -1.0 : GetWorld()->GetTimeSeconds();
+	}
+
+	// Landing helemaal rond (Super heeft ResetJumpState al gedaan): nu mag de
+	// gebufferde sprong alsnog af.
+	if (bBufferedJumpPending && Movement != nullptr && !Movement->IsFalling())
+	{
+		bBufferedJumpPending = false;
+		Jump();
+	}
+}
+
+void AEclipseCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	LeftGroundAtSeconds = -1.0;
+
+	if (JumpPressedWhileFallingAtSeconds < 0.0 || GetWorld() == nullptr)
+	{
+		return;
+	}
+	const double Age = GetWorld()->GetTimeSeconds() - JumpPressedWhileFallingAtSeconds;
+	JumpPressedWhileFallingAtSeconds = -1.0;
+	// NIET hier Jump() aanroepen, en dat is geen stijlkeuze: Landed() draait
+	// binnen ProcessLanded, en daarna zet ACharacter::OnMovementModeChanged nog
+	// ResetJumpState() — die wist bPressedJump weer. De gebufferde sprong zou dus
+	// stil verdwijnen. Onthouden en pas afvuren als de landing helemaal rond is.
+	bBufferedJumpPending = Age <= JumpInputBufferSeconds;
+}
+
+bool AEclipseCharacter::CanJumpInternal_Implementation() const
+{
+	if (Super::CanJumpInternal_Implementation())
+	{
+		return true;
+	}
+
+	// Coyote time (JMP-07). UE zegt hier expliciet nee: JumpIsAllowedInternal eist
+	// JumpCurrentCount + 1 < JumpMaxCount zodra je valt, en met JumpMaxCount = 1
+	// is dat altijd onwaar. Wie een fractie te laat drukt na van een rand te
+	// lopen, krijgt dus geen sprong maar een val — terwijl hij op het scherm nog
+	// op de rand leek te staan.
+	const UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (Movement == nullptr || !Movement->IsFalling() || bIsCrouched
+		|| LeftGroundAtSeconds < 0.0 || GetWorld() == nullptr)
+	{
+		return false;
+	}
+
+	// JumpCurrentCountPreJump en niet JumpCurrentCount, en dat is precies het
+	// verschil tussen werken en niet werken: ACharacter::CheckJumpInput hoogt de
+	// teller op VOORDAT het CanJump() vraagt ("if this is the first jump and we're
+	// already falling, then increment the JumpCount to compensate"). Deze
+	// override zag dus altijd 1 waar 0 stond, en weigerde elke coyote-sprong.
+	// Gevonden door de meting: binnen het venster faalde hij, buiten het venster
+	// gedroeg hij zich correct — dat patroon past bij geen enkele tijdsfout.
+	const int32 CountBeforeThisPress = FMath::Min(JumpCurrentCount, JumpCurrentCountPreJump);
+	if (CountBeforeThisPress != 0)
+	{
+		return false;
+	}
+	return (GetWorld()->GetTimeSeconds() - LeftGroundAtSeconds) <= CoyoteTimeSeconds;
 }
 
 void AEclipseCharacter::InitializeHealth(float MaxHealth)

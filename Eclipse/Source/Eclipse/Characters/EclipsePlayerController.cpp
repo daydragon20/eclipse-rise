@@ -915,9 +915,11 @@ void AEclipsePlayerController::HandleCrouch()
 
 void AEclipsePlayerController::HandleJump()
 {
-	if (ACharacter* Body = Cast<ACharacter>(GetPawn()))
+	// RequestJump en niet Jump: dat pad draagt de twee vergevingsvensters
+	// (coyote time en de inputbuffer, JMP-07/08).
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
 	{
-		Body->Jump();
+		Body->RequestJump();
 	}
 }
 

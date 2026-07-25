@@ -99,6 +99,7 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 	CheckFloat(TEXT("BrakingFriction"), Movement->BrakingFriction, T.BrakingFriction);
 	CheckFloat(TEXT("BrakingFrictionFactor"), Movement->BrakingFrictionFactor, T.BrakingFrictionFactor);
 	CheckFloat(TEXT("GroundFriction"), Movement->GroundFriction, T.GroundFriction);
+	CheckFloat(TEXT("StrafeSpeedRatio"), Movement->GetMaxSpeed() > 0.0f ? T.StrafeSpeedRatio : 0.0f, T.StrafeSpeedRatio);
 	TestTrue(TEXT("laag 1: bUseSeparateBrakingFriction staat aan, anders is BrakingFriction dood gewicht"),
 		Movement->bUseSeparateBrakingFriction);
 
@@ -297,6 +298,82 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 	TestTrue(FString::Printf(TEXT("laag 2: springhoogte volgt v^2/2g (%.0f vs %.0f cm)"), JumpHeight, PredictedApex),
 		FMath::Abs(JumpHeight - PredictedApex) < FMath::Max(10.0f, PredictedApex * 0.15f));
 	TestTrue(FString::Printf(TEXT("laag 2: airtime is plausibel (%.3f s)"), Airtime), Airtime > 0.4 && Airtime < 2.0);
+
+	// --- 4b. de twee vergevingsvensters (JMP-07/08) -------------------------
+	// Coyote time: van een rand AF LOPEN en een fractie te laat drukken. De val
+	// wordt hier geinduceerd met SetMovementMode in plaats van van een richel
+	// gelopen — de vloer van dit harnas is vlak. De toestand is echt (dezelfde
+	// OnMovementModeChanged die een echte rand ook doorloopt), de aanleiding niet;
+	// dat hoort in het rapport te staan in plaats van weggepoetst te worden.
+	auto CoyoteJumpSucceeds = [this, &Harness, Movement](float WaitSeconds)
+	{
+		// Ruim wachten tot hij ECHT staat: van 15 meter vallen duurt bijna twee
+		// seconden, en een meting die begint terwijl hij nog in de lucht hangt
+		// meet iets anders dan hij denkt. De eerste versie van deze test deed dat
+		// wél en gaf daardoor een vals positief: de "buiten het venster"-tak
+		// landde tijdens het wachten en deed gewoon een normale grondsprong.
+		Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 8.0, [&Harness, Movement]()
+		{
+			return Movement->IsMovingOnGround() && Harness.SpeedCm() < 1.0f;
+		});
+		// Van de grond af KOMEN zonder te springen. Optillen en de zwaartekracht
+		// zijn werk laten doen geeft exact dezelfde walking->falling-overgang als
+		// van een richel aflopen — en anders dan SetMovementMode(MOVE_Falling)
+		// landt hij niet binnen twee ticks weer op de vlakke vloer.
+		Harness.Body->SetActorLocation(Harness.Body->GetActorLocation() + FVector(0.0f, 0.0f, 1500.0f), false, nullptr, ETeleportType::TeleportPhysics);
+		Harness.Idle(WaitSeconds);
+		// De meting is alleen geldig als hij op dít moment nog valt. Anders meet je
+		// een gewone grondsprong en noem je dat coyote time.
+		TestTrue(FString::Printf(TEXT("laag 2: de coyote-meting vertrekt vanuit een val (wacht %.2f s)"), WaitSeconds),
+			Movement->IsFalling());
+		const float BeforeZ = Movement->Velocity.Z;
+		Harness.Inject(TEXT("Jump"), true);
+		Harness.Step();
+		Harness.Step();
+		return Movement->Velocity.Z > BeforeZ + 100.0f;
+	};
+	const bool bCoyoteInside = CoyoteJumpSucceeds(0.05f);
+	const bool bCoyoteOutside = CoyoteJumpSucceeds(0.40f);
+	Report(*this, TEXT("coyote-venster"), Harness.Tuning->CoyoteTimeSeconds, TEXT("s"), TEXT("0.11 — UE levert dit niet"));
+	TestTrue(TEXT("laag 2: binnen het coyote-venster telt de sprong alsnog"), bCoyoteInside);
+	TestFalse(TEXT("laag 2: buiten het venster niet — het is vergeving, geen dubbelsprong"), bCoyoteOutside);
+
+	// Inputbuffer: drukken VÓÓR de landing, en bij het raken van de grond moet de
+	// sprong alsnog afgaan zonder tweede druk.
+	Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 2.0, [&Harness, Movement]()
+	{
+		return Movement->IsMovingOnGround() && Harness.SpeedCm() < 1.0f;
+	});
+	Harness.Press(TEXT("Jump"));
+	// Wachten tot hij daalt en dichtbij de grond is, dan één keer drukken.
+	Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 2.0, [Movement]()
+	{
+		return Movement->IsFalling() && Movement->Velocity.Z < -350.0f;
+	});
+	Harness.Inject(TEXT("Jump"), true);
+	Harness.Step();
+	bool bBufferedJumpFired = false;
+	{
+		const int32 MaxSteps = FMath::RoundToInt(1.5f / FixedStepSeconds);
+		bool bTouchedDown = false;
+		for (int32 I = 0; I < MaxSteps; ++I)
+		{
+			Harness.Step();
+			if (Movement->IsMovingOnGround())
+			{
+				bTouchedDown = true;
+			}
+			// Zonder buffer blijft hij liggen; met buffer gaat hij zonder tweede
+			// druk opnieuw de lucht in.
+			if (bTouchedDown && Movement->Velocity.Z > 100.0f)
+			{
+				bBufferedJumpFired = true;
+				break;
+			}
+		}
+	}
+	Report(*this, TEXT("inputbuffer-venster"), Harness.Tuning->JumpInputBufferSeconds, TEXT("s"), TEXT("0.15 — UE levert dit niet"));
+	TestTrue(TEXT("laag 2: een druk vlak vóór de landing gaat bij het neerkomen alsnog af"), bBufferedJumpFired);
 
 	Harness.Shutdown();
 	return true;

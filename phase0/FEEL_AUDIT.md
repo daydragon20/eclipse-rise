@@ -93,8 +93,8 @@ en meet over tijd. Dit zijn de getallen, niet de verwachtingen:
 | Meting | Gemeten | Referentie | Status |
 |---|---|---|---|
 | Tijd tot topsnelheid (rennen) | **0,300 s** | 420 / 1400 = 0,300 s | OK |
-| Stoptijd vanaf rennen | **0,083 s** | Bijlage B: 0,083 s | OK (maar zie LOC-03: dit is arcade-kort) |
-| Glijafstand vanaf rennen | **12,0 cm** | Bijlage B: 13 cm | OK |
+| Stoptijd vanaf rennen | **0,083 s** | Bijlage B: 0,083 s | arcade-kort — **in fase 3 hieronder gewijzigd naar 0,150 s** |
+| Glijafstand vanaf rennen | **12,0 cm** | Bijlage B: 13 cm | idem — **fase 3: 26,6 cm** |
 | 180-omkering (snelheid weer op top) | **0,400 s** | — | OK |
 | 180-omkering: lichaam gedraaid | **180 gr** | RotationRate 500 gr/s | OK |
 | Springhoogte | **127,5 cm** | v²/2g = 128 cm | OK |
@@ -181,12 +181,27 @@ hapering midden in een bocht. Dezelfde regel geldt voor speler, squad én vijand
 (GDD 8.3: dezelfde wapens, dezelfde regels); de speelronde bewijst dat de AI er
 niet door breekt.
 
+**De twee sprong-vergevingsvensters (JMP-07/08) zijn er ook.** Ze bestaan in UE
+geen van beide, en allebei repareren ze een moment waarop de speler het goede
+deed en de game nee zei — dat heet dan "de besturing reageert niet".
+
+| Venster | Waarde | Wat het repareert |
+|---|---|---|
+| Coyote time | **110 ms** | Van een rand aflopen en een fractie te laat drukken. `ACharacter::JumpIsAllowedInternal` eist `JumpCurrentCount + 1 < JumpMaxCount` zodra je valt, en met `JumpMaxCount = 1` is dat altijd onwaar — je krijgt geen sprong maar een val. |
+| Sprong-inputbuffer | **150 ms** | Drukken vlak vóór de landing. Zonder buffer moet je op precies de landingsframe drukken; elke druk daarvoor is weg. |
+
+Twee valkuilen die de meting blootlegde en die in de code staan omdat ze
+niet-vanzelfsprekend zijn: (1) `CheckJumpInput` hoogt `JumpCurrentCount` op
+**vóórdat** het `CanJump()` vraagt, dus een coyote-check op die teller ziet altijd
+1 waar 0 staat — vandaar `JumpCurrentCountPreJump`; (2) `Landed()` draait binnen
+`ProcessLanded`, en `OnMovementModeChanged` zet daarna nog `ResetJumpState()`, die
+`bPressedJump` weer wist — een gebufferde sprong die je in `Landed()` afvuurt,
+verdwijnt dus stil.
+
 **Nog niet gedaan, met reden** — dit zijn bouwopdrachten, geen tuningrondes:
 turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip),
 sprint-camerastack (CAM-11), camera-shake en recoil/hitmarkers (§8 FEEDBACK
-bestaat volledig niet), coyote time + sprong-inputbuffer (JMP-07/08 — klein, maar
-het raakt de sprongtiming die de owner net getest heeft). Ze staan met een
-aanbeveling in HANDOFF.md.
+bestaat volledig niet). Ze staan met een aanbeveling in HANDOFF.md.
 
 ## INPUT — hold versus toggle (owner-eis 2026-07-25)
 

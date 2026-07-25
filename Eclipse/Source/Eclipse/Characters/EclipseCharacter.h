@@ -164,6 +164,17 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	/**
+	 * De sprongknop, met de twee vergevingsvensters eromheen (JMP-07/08). De
+	 * controller roept DIT aan en niet ACharacter::Jump, want een druk die net te
+	 * laat of net te vroeg komt hoort niet verloren te gaan.
+	 */
+	void RequestJump();
+
+	virtual void Landed(const FHitResult& Hit) override;
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PrevCustomMode = 0) override;
+	virtual bool CanJumpInternal_Implementation() const override;
+
 private:
 	void HandleHealthChanged(const struct FOnAttributeChangeData& Data);
 
@@ -205,6 +216,14 @@ private:
 	bool bCommandModeCamera = false;
 	bool bAiming = false;
 	bool bCameraLagSuspended = false;
+
+	// Sprong-vergevingsvensters (JMP-07/08). Wereldtijd in seconden; < 0 = leeg.
+	float CoyoteTimeSeconds = 0.11f;
+	float JumpInputBufferSeconds = 0.15f;
+	double LeftGroundAtSeconds = -1.0;
+	double JumpPressedWhileFallingAtSeconds = -1.0;
+	/** Gebufferde sprong die bij het NEERKOMEN nog moet afgaan. Zie Landed(). */
+	bool bBufferedJumpPending = false;
 	/** Lag speed as tuned, so suspending and restoring is lossless. */
 	float TunedCameraLagSpeed = 12.0f;
 	float ThirdPersonArmLength = 300.0f;

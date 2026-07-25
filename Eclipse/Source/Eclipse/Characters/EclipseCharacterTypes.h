@@ -116,6 +116,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0.1, ClampMax = 1.0))
 	float BackwardSpeedRatio = 0.85f;
 
+	// ---- Feel-audit fase 3, gebied SPRONG: de twee vergevingsvensters --------
+	// Allebei bestaan ze in UE NIET, en allebei repareren ze een moment waarop de
+	// speler het goede deed en de game nee zei. Dat is de goedkoopste feel-winst
+	// die er is: niemand merkt ze op als ze er zijn, iedereen voelt ze als ze
+	// ontbreken — en dan heet het "de besturing reageert niet".
+
+	/**
+	 * Coyote time: hoe lang na het van een rand AF LOPEN een sprongdruk alsnog
+	 * telt. UE staat dit expliciet niet toe (ACharacter::JumpIsAllowedInternal
+	 * eist JumpCurrentCount + 1 < JumpMaxCount zodra je valt, en met JumpMaxCount
+	 * = 1 is dat altijd onwaar), dus een speler die een fractie te laat drukt
+	 * krijgt geen sprong maar een val — terwijl hij op het scherm nog op de rand
+	 * leek te staan. 110 ms is net genoeg om de menselijke reactiemarge te dekken
+	 * en te kort om als zweven te lezen. [REDENERING op vakconventie; UE levert
+	 * het niet, zie FEEL_REFERENTIE.md JMP-07.]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0, ClampMax = 0.5))
+	float CoyoteTimeSeconds = 0.11f;
+
+	/**
+	 * Sprong-inputbuffer: hoe lang VÓÓR de landing een sprongdruk bewaard blijft
+	 * en bij het raken van de grond alsnog uitgevoerd wordt. Zonder buffer moet
+	 * de speler op de frame van de landing drukken, en elke druk daarvoor is
+	 * gewoon weg. 150 ms. [REDENERING op vakconventie; JMP-08.]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0, ClampMax = 0.5))
+	float JumpInputBufferSeconds = 0.15f;
+
 	/**
 	 * Graden/s waarmee het lichaam naar zijn looprichting draait. Engine-default
 	 * 360, TP-template 500. Op 360 kost een omkering een halve seconde draaien
