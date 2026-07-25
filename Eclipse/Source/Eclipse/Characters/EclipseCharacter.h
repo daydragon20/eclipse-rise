@@ -7,8 +7,10 @@
 
 class AEclipseCharacter;
 class UAbilitySystemComponent;
+class UCameraComponent;
 class UEclipseCharacterTuningAsset;
 class UEclipseHealthAttributeSet;
+class USpringArmComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEclipseCharacterDownedDelegate, AEclipseCharacter* /*Character*/, FName /*Cause*/);
 
@@ -73,8 +75,40 @@ public:
 	/** Fired once when health reaches zero; mission/squad wiring listens (SPEC-P1-06/07 pipeline). */
 	FEclipseCharacterDownedDelegate OnDowned;
 
+	/**
+	 * First/third-person toggle (owner request 2026-07-25, C on keyboard / R3 on
+	 * the pad). Blends the boom and the FOV over ViewToggleBlendTime rather than
+	 * cutting — a hard swap between 300 and 0 units is nauseating. In first person
+	 * the own mesh is hidden so the player is not inside their own skull.
+	 */
+	void SetFirstPerson(bool bNewFirstPerson);
+	bool IsFirstPerson() const { return bFirstPerson; }
+
+	/**
+	 * Command Mode framing: pull back and look down while the hold lasts, so the
+	 * player reads the field. Not a mode — SPEC-P2-07 owns the input contexts —
+	 * just the same two numbers going somewhere else for the duration.
+	 */
+	void SetCommandModeCamera(bool bActive);
+
+	UCameraComponent* GetViewCamera() const { return ViewCamera; }
+
+	virtual void Tick(float DeltaSeconds) override;
+
 private:
 	void HandleHealthChanged(const struct FOnAttributeChangeData& Data);
+
+	/** Where the boom/FOV should be right now, given view mode + command mode. */
+	void RefreshCameraTargets();
+	/** Ticking is switched on only while a blend is running (GDD 12.4: no idle
+	 *  per-frame work). This is the one place that decides that. */
+	void UpdateCameraBlend(float DeltaSeconds);
+
+	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Camera")
+	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Camera")
+	TObjectPtr<UCameraComponent> ViewCamera;
 
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
@@ -85,4 +119,20 @@ private:
 	FGuid SoldierId;
 	FName LastDamageCause;
 	bool bDowned = false;
+
+	// Camera state. Defaults mirror the tuning asset's defaults so a pawn that
+	// never receives tuning still frames correctly instead of sitting at 0.
+	bool bFirstPerson = false;
+	bool bCommandModeCamera = false;
+	float ThirdPersonArmLength = 300.0f;
+	float CommandModeArmLength = 520.0f;
+	float CommandModeCameraRise = 120.0f;
+	/** Socket offset Z as authored, so the Command Mode rise has a zero to
+	 *  return to instead of accumulating every time the hold ends. */
+	float BaseSocketOffsetZ = 65.0f;
+	float FirstPersonFOV = 90.0f;
+	float ThirdPersonFOV = 80.0f;
+	float ViewToggleBlendTime = 0.2f;
+	float TargetArmLength = 300.0f;
+	float TargetFOV = 80.0f;
 };

@@ -44,6 +44,12 @@ private:
 	void HandleFire();
 	void HandleSprint(const struct FInputActionValue& Value);
 	void HandleCrouch();
+	/** C / R3: swap first and third person on the pawn (owner request 2026-07-25). */
+	void HandleToggleView();
+	/** Which device the look axis should be read as — mouse raw, stick curved. */
+	bool IsUsingGamepadLook() const;
+	/** Push the tuning asset's look/pitch numbers onto this controller. */
+	void ApplyLookTuning();
 	void IssueSquadOrder(EEclipseSquadOrder Order);
 
 	/** Boot a fresh campaign from data if none is running (SPEC-P1-08 live loop). */
@@ -88,8 +94,22 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInputAction> CrouchAction;
 
+	/** One action on the EXISTING contract, not a new mode: SPEC-P2-07 owns the
+	 *  Enhanced Input context stacks and this must not pre-empt it. */
+	UPROPERTY()
+	TObjectPtr<UInputAction> ToggleViewAction;
+
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> OrderActions;
+
+	// Look feel, pushed from DA_CharacterTuning at possession (GDD 14.2 — feel
+	// numbers are data). Defaults mirror the asset so an untuned boot still aims.
+	float StickYawSpeed = 160.0f;
+	float StickPitchSpeed = 110.0f;
+	float StickDeadzone = 0.18f;
+	float StickResponseExponent = 2.0f;
+	float MouseLookScale = 1.0f;
+	bool bInvertLookY = false;
 
 	// Command Mode inputs (SPEC-P2-02 Stage A; provisional debug bindings —
 	// the Enhanced Input context stack is a SPEC-P2-07 seam).

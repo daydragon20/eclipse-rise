@@ -36,9 +36,96 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
 	float CrouchSpeed = 150.0f;
 
-	/** Feel target: FOV 90, over-shoulder. */
+	/**
+	 * First-person FOV. This field predates the camera itself: it sat here unused
+	 * because AEclipseCharacter had no camera at all and the engine fell back to
+	 * the pawn's own view point (owner playtest 2026-07-25 — "ik kijk vanuit het
+	 * lichaam of vanaf de voeten"). It now drives the first-person half of the
+	 * C toggle, where 90 is the right number; third person wants less.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 30, ClampMax = 140))
 	float CameraFOV = 90.0f;
+
+	/** Over-the-shoulder FOV. Narrower than first person so the shoulder framing
+	 *  does not fisheye and distant targets keep their pixels (owner spec). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 30, ClampMax = 140))
+	float ThirdPersonFOV = 80.0f;
+
+	/** Boom length in third person: hip-to-shoulder distance that still reads at
+	 *  command range. 0 is first person — the toggle lerps between the two. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
+	float ThirdPersonArmLength = 300.0f;
+
+	/** Over-the-shoulder offset in BOOM space (X forward, Y right, Z up), so it
+	 *  stays over the same shoulder as the camera swings around. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera")
+	FVector CameraSocketOffset = FVector(0.0f, 55.0f, 65.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
+	float CameraLagSpeed = 12.0f;
+
+	/** The boom's collision probe: the camera may never pass through a wall. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 1))
+	float CameraProbeSize = 12.0f;
+
+	/** Seconds for the first/third-person swap. Hard-cutting is nauseating; this
+	 *  is short enough to feel instant and long enough to keep the horizon. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
+	float ViewToggleBlendTime = 0.2f;
+
+	/**
+	 * Command Mode framing (GDD 14.5 debug-grade): during the hold the boom pulls
+	 * back and rises so the player reads the field instead of a shoulder. No new
+	 * mode — SPEC-P2-07 owns the input contexts; this only lerps two numbers.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
+	float CommandModeArmLength = 520.0f;
+
+	/**
+	 * How far the camera RISES during the hold, in units, on top of the boom
+	 * pulling back. Deliberately height and not pitch: the boom runs on
+	 * bUsePawnControlRotation, so pitch belongs to the player's stick, and a
+	 * camera that tilts itself while the player is aiming fights the person
+	 * holding the controller. Raising the eye line reads as "overseeing the
+	 * field" without taking the aim away.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
+	float CommandModeCameraRise = 120.0f;
+
+	/** Degrees per second at full stick deflection, yaw and pitch separately —
+	 *  they are not the same task and never want the same speed. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
+	float StickYawSpeed = 160.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
+	float StickPitchSpeed = 110.0f;
+
+	/** Stick drift must never move the camera on its own. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 0.9))
+	float StickDeadzone = 0.18f;
+
+	/**
+	 * Response curve exponent for stick look, sign-preserving. Linear stick look
+	 * is the difference between aiming and wrestling: small deflections must stay
+	 * small so fine aim is possible, while full deflection keeps full speed. 2.0
+	 * is the console-shooter default.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 1, ClampMax = 4))
+	float StickResponseExponent = 2.0f;
+
+	/** Mouse look stays raw — a mouse has no deadzone and no drift, and curving
+	 *  it breaks muscle memory. Only the scale is tunable. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
+	float MouseLookScale = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look")
+	bool bInvertLookY = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = -89, ClampMax = 0))
+	float ViewPitchMin = -70.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 89))
+	float ViewPitchMax = 70.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Attributes", meta = (ClampMin = 1))
 	float MaxHealth = 100.0f;

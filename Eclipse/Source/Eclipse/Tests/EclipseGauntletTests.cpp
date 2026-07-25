@@ -319,7 +319,7 @@ bool FEclipseGauntletPanelContentTest::RunTest(const FString& Parameters)
 	// blank cell is worse than no table (the row that lies is the row nobody
 	// checks against the bindings).
 	const TArray<FEclipseControlRow> Rows = GetControlRows();
-	TestEqual(TEXT("Eleven documented actions"), Rows.Num(), 11);
+	TestEqual(TEXT("Twelve documented actions"), Rows.Num(), 12);
 	for (const FEclipseControlRow& Row : Rows)
 	{
 		TestTrue(TEXT("Row names its action"), Row.Action != nullptr && FCString::Strlen(Row.Action) > 0);

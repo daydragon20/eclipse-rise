@@ -37,7 +37,9 @@ bool FEclipseGuideStepListTest::RunTest(const FString& Parameters)
 
 	const TArray<FEclipseGuideStep> Steps = GetGuideSteps();
 	TestEqual(TEXT("Eleven controls, four systems and five questions"), Steps.Num(), GuideStepCount);
-	TestEqual(TEXT("The list is twenty steps long"), GuideStepCount, 20);
+	// 12 controls since the camera landed (the first/third-person toggle is a
+	// control the guide has to teach like any other), 4 systems, 5 questions.
+	TestEqual(TEXT("The list is twenty-one steps long"), GuideStepCount, 21);
 
 	// The guide's promise is not "press this key" but "press this key AND here is
 	// what proves it worked". A step missing either device column or its
@@ -102,7 +104,7 @@ bool FEclipseGuideStepListTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Step 1 is deel 1"), GetPartOfStep(0) == EEclipseGuidePart::Controls);
 	TestTrue(TEXT("Step 12 is deel 2"), GetPartOfStep(ControlStepCount) == EEclipseGuidePart::Systems);
 	TestTrue(TEXT("Step 16 is deel 3"), GetPartOfStep(ControlStepCount + SystemStepCount) == EEclipseGuidePart::Questions);
-	TestEqual(TEXT("The last control is 11th of its part"), GetIndexWithinPart(ControlStepCount - 1), ControlStepCount - 1);
+	TestEqual(TEXT("The last control is last of its part"), GetIndexWithinPart(ControlStepCount - 1), ControlStepCount - 1);
 	TestEqual(TEXT("The first system step restarts the count"), GetIndexWithinPart(ControlStepCount), 0);
 	TestEqual(TEXT("The first question restarts the count"), GetIndexWithinPart(ControlStepCount + SystemStepCount), 0);
 	TestEqual(TEXT("Deel 1 counts eleven"), GetPartStepCount(EEclipseGuidePart::Controls), ControlStepCount);
@@ -212,7 +214,7 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		// them afterwards, so a drifting line count would write into thin air.
 		TestEqual(TEXT("Header + twenty steps + tally"), Lines.Num(), GuidePanelLineCount);
 
-		TestTrue(TEXT("The header counts within its part"), Lines[0].Contains(TEXT("stap 1/11")));
+		TestTrue(TEXT("The header counts within its part"), Lines[0].Contains(TEXT("stap 1/12")));
 		TestTrue(TEXT("The header names the part"), Lines[0].Contains(TEXT("deel 1: controls")));
 		TestTrue(TEXT("The header names the hide key"), Lines[0].Contains(TEXT("[F3]")));
 		TestTrue(TEXT("In deel 1, N is a skip"), Lines[0].Contains(TEXT("[N] sla over")));
@@ -232,7 +234,7 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		TestFalse(TEXT("A future step does not shout its expectation"), Lines[2].Contains(Steps[1].Expectation));
 		TestFalse(TEXT("A future step is not marked active"), Lines[2].StartsWith(TEXT(">>")));
 
-		TestTrue(TEXT("The tally line closes the panel"), Lines.Last().Contains(TEXT("nog open 20")));
+		TestTrue(TEXT("The tally line closes the panel"), Lines.Last().Contains(TEXT("nog open 21")));
 	}
 
 	// A settled step collapses to marker + label + how it was settled.
@@ -243,7 +245,7 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		TestTrue(TEXT("A settled step says it was detected"), Lines[1].Contains(TEXT("gedetecteerd")));
 		TestFalse(TEXT("A settled step folds its expectation away"), Lines[1].Contains(Steps[0].Expectation));
 		TestTrue(TEXT("The next step became active"), Lines[2].StartsWith(TEXT(">>")));
-		TestTrue(TEXT("The header follows along"), Lines[0].Contains(TEXT("stap 2/11")));
+		TestTrue(TEXT("The header follows along"), Lines[0].Contains(TEXT("stap 2/12")));
 		TestTrue(TEXT("The tally counts the detection"), Lines.Last().Contains(TEXT("gedetecteerd 1")));
 	}
 
@@ -306,7 +308,7 @@ bool FEclipseGuideSummaryTest::RunTest(const FString& Parameters)
 		const TArray<FString> Block = ComposeGuideSummaryBlock(Fresh);
 		TestEqual(TEXT("Title + three part headers + twenty steps + tally"), Block.Num(), GuideStepCount + 5);
 		TestTrue(TEXT("The block names the variant it was built as"), Block[0].Contains(TEXT("variant A")));
-		TestTrue(TEXT("Everything is open"), Block.Last().Contains(TEXT("20 nog open")));
+		TestTrue(TEXT("Everything is open"), Block.Last().Contains(TEXT("21 nog open")));
 		TestTrue(TEXT("An untouched step claims nothing"), Block[2].Contains(TEXT("nog open")));
 	}
 

@@ -3,8 +3,11 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/EclipseHealthAttributeSet.h"
 #include "Animation/AnimSequence.h"
+#include "Camera/CameraComponent.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Eclipse.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -54,6 +57,35 @@ AEclipseCharacter::AEclipseCharacter()
 	// where nobody walks (GDD 12.4 budget thinking).
 	CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));
 
+	// Third-person camera (owner playtest 2026-07-25). There was no camera layer at
+	// all before this: no spring arm, no camera component, so the engine fell back
+	// to the pawn's own view point and the player looked out of the body. For a
+	// third-person action game (GDD 01 / 15.1) that is a hole, and it blocked the
+	// R3 verdict outright — targeting readability and comfort cannot be judged
+	// through a camera that does not exist.
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetCapsuleComponent());
+	CameraBoom->TargetArmLength = ThirdPersonArmLength;
+	CameraBoom->SocketOffset = FVector(0.0f, 55.0f, 65.0f);
+	// The boom follows where the player LOOKS; the camera then just rides its end.
+	// Both true would double-apply control rotation and the view would swing twice
+	// as fast as the stick.
+	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bEnableCameraLag = true;
+	CameraBoom->CameraLagSpeed = 12.0f;
+	CameraBoom->bDoCollisionTest = true;
+	CameraBoom->ProbeSize = 12.0f;
+
+	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
+	ViewCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	ViewCamera->bUsePawnControlRotation = false;
+	ViewCamera->SetFieldOfView(ThirdPersonFOV);
+
+	// The body must NOT turn with the camera, or walking reads as skating: the
+	// character faces where it moves, the camera looks where the player aims.
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	// Crouch is a designed control, not an engine extra (GDD 04_core_gameplay:
 	// "Crouch = stealth default"), and ApplyTuning already feeds it a speed from
@@ -85,6 +117,132 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	GetCharacterMovement()->MaxWalkSpeed = Tuning->RunSpeed;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = Tuning->CrouchSpeed;
 	InitializeHealth(Tuning->MaxHealth);
+
+	// Camera framing is data, like every other feel number (GDD 14.2). The
+	// constructor's values are the same defaults, so an untuned pawn still frames
+	// correctly rather than collapsing to a zero-length boom.
+	ThirdPersonArmLength = Tuning->ThirdPersonArmLength;
+	CommandModeArmLength = Tuning->CommandModeArmLength;
+	CommandModeCameraRise = Tuning->CommandModeCameraRise;
+	BaseSocketOffsetZ = Tuning->CameraSocketOffset.Z;
+	FirstPersonFOV = Tuning->CameraFOV;
+	ThirdPersonFOV = Tuning->ThirdPersonFOV;
+	ViewToggleBlendTime = Tuning->ViewToggleBlendTime;
+	if (CameraBoom != nullptr)
+	{
+		CameraBoom->SocketOffset = Tuning->CameraSocketOffset;
+		CameraBoom->CameraLagSpeed = Tuning->CameraLagSpeed;
+		CameraBoom->bEnableCameraLag = Tuning->CameraLagSpeed > 0.0f;
+		CameraBoom->ProbeSize = Tuning->CameraProbeSize;
+	}
+	RefreshCameraTargets();
+	// Land on the target immediately here: tuning arrives at spawn, and blending
+	// in from the constructor defaults would show as a lurch on the first frame.
+	if (CameraBoom != nullptr)
+	{
+		CameraBoom->TargetArmLength = TargetArmLength;
+	}
+	if (ViewCamera != nullptr)
+	{
+		ViewCamera->SetFieldOfView(TargetFOV);
+	}
+}
+
+void AEclipseCharacter::SetFirstPerson(bool bNewFirstPerson)
+{
+	if (bFirstPerson == bNewFirstPerson)
+	{
+		return;
+	}
+	bFirstPerson = bNewFirstPerson;
+	// Hide the own body in first person, or the view sits inside the skull. The
+	// owner-only flag keeps the mesh visible to everyone else and in shadows.
+	if (USkeletalMeshComponent* Body = GetMesh())
+	{
+		Body->SetOwnerNoSee(bFirstPerson);
+	}
+	RefreshCameraTargets();
+}
+
+void AEclipseCharacter::SetCommandModeCamera(bool bActive)
+{
+	if (bCommandModeCamera == bActive)
+	{
+		return;
+	}
+	bCommandModeCamera = bActive;
+	RefreshCameraTargets();
+}
+
+void AEclipseCharacter::RefreshCameraTargets()
+{
+	// Command Mode wins over the view toggle: pulling back to read the field is
+	// the whole point of the hold, and doing that from inside the head is not a
+	// reading position.
+	if (bCommandModeCamera)
+	{
+		TargetArmLength = CommandModeArmLength;
+		TargetFOV = ThirdPersonFOV;
+	}
+	else
+	{
+		TargetArmLength = bFirstPerson ? 0.0f : ThirdPersonArmLength;
+		TargetFOV = bFirstPerson ? FirstPersonFOV : ThirdPersonFOV;
+	}
+
+	const bool bNeedsBlend =
+		(CameraBoom != nullptr && !FMath::IsNearlyEqual(CameraBoom->TargetArmLength, TargetArmLength, 0.5f))
+		|| (ViewCamera != nullptr && !FMath::IsNearlyEqual(ViewCamera->FieldOfView, TargetFOV, 0.1f));
+	// Tick exists only for the duration of a blend (GDD 12.4). A camera that
+	// costs a tick every frame forever, to move twice a minute, is not free at
+	// four squadmates plus enemies sharing this class.
+	SetActorTickEnabled(bNeedsBlend);
+}
+
+void AEclipseCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	UpdateCameraBlend(DeltaSeconds);
+}
+
+void AEclipseCharacter::UpdateCameraBlend(float DeltaSeconds)
+{
+	if (CameraBoom == nullptr || ViewCamera == nullptr)
+	{
+		SetActorTickEnabled(false);
+		return;
+	}
+
+	// Constant-rate blend over ViewToggleBlendTime rather than an exponential
+	// ease: the toggle must always take the same time, so the player learns it.
+	const float ArmRate = ViewToggleBlendTime > KINDA_SMALL_NUMBER
+		? FMath::Max(ThirdPersonArmLength, CommandModeArmLength) / ViewToggleBlendTime
+		: BIG_NUMBER;
+	const float FovRate = ViewToggleBlendTime > KINDA_SMALL_NUMBER
+		? FMath::Abs(FirstPersonFOV - ThirdPersonFOV) / ViewToggleBlendTime
+		: BIG_NUMBER;
+
+	CameraBoom->TargetArmLength = FMath::FInterpConstantTo(
+		CameraBoom->TargetArmLength, TargetArmLength, DeltaSeconds, ArmRate);
+	ViewCamera->SetFieldOfView(FMath::FInterpConstantTo(
+		ViewCamera->FieldOfView, TargetFOV, DeltaSeconds, FMath::Max(FovRate, 1.0f)));
+
+	// Command Mode also raises the eye line. Height, not pitch: the boom runs on
+	// pawn control rotation, so pitch is the player's stick — a camera that tilts
+	// itself mid-aim fights the person holding the controller.
+	const float TargetRise = bCommandModeCamera ? CommandModeCameraRise : 0.0f;
+	const float RiseRate = ViewToggleBlendTime > KINDA_SMALL_NUMBER
+		? FMath::Max(CommandModeCameraRise, 1.0f) / ViewToggleBlendTime : BIG_NUMBER;
+	FVector Offset = CameraBoom->SocketOffset;
+	Offset.Z = FMath::FInterpConstantTo(Offset.Z, BaseSocketOffsetZ + TargetRise, DeltaSeconds, RiseRate);
+	CameraBoom->SocketOffset = Offset;
+
+	if (FMath::IsNearlyEqual(CameraBoom->TargetArmLength, TargetArmLength, 0.5f)
+		&& FMath::IsNearlyEqual(ViewCamera->FieldOfView, TargetFOV, 0.1f)
+		&& FMath::IsNearlyEqual(Offset.Z, BaseSocketOffsetZ + TargetRise, 0.5f))
+	{
+		SetActorTickEnabled(false);
+	}
 }
 
 void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)

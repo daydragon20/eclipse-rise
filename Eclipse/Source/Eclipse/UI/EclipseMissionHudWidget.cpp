@@ -159,6 +159,25 @@ void UEclipseMissionHudWidget::NativeConstruct()
 			[this](FPlatformUserId, FInputDeviceId) { RefreshDeviceHighlight(); });
 	}
 
+	// The guide CVar is also honoured LIVE, not only at mount. Reading it once
+	// here loses the common case: -ExecCmds fires after the world is up, and with
+	// -EclipseStartMission the mission (and this HUD) already exist by then — so
+	// `-ExecCmds="Eclipse.Guide.Overlay 1"` set the variable and nothing opened,
+	// which is exactly what the owner hit on 2026-07-25. A change sink makes the
+	// order irrelevant, and it is the same event-driven shape as the device
+	// listener above rather than a poll.
+	if (IConsoleVariable* GuideVar = IConsoleManager::Get().FindConsoleVariable(TEXT("Eclipse.Guide.Overlay")))
+	{
+		GuideVar->SetOnChangedCallback(FConsoleVariableDelegate::CreateWeakLambda(this,
+			[this](IConsoleVariable* Changed)
+			{
+				bGuideVisible = Changed->GetInt() > 0;
+				ApplyPanelVisibility();
+				RefreshGuideRows(/*bForce*/ true);
+				Rebuild();
+			}));
+	}
+
 	ApplyPanelVisibility();
 	RefreshDeviceHighlight();
 	RefreshPlaytestRows();
@@ -190,6 +209,13 @@ void UEclipseMissionHudWidget::NativeDestruct()
 			Devices->OnInputHardwareDeviceChangedNative.Remove(DeviceChangedHandle);
 		}
 		DeviceChangedHandle.Reset();
+	}
+
+	// Drop the sink with the widget: the CVar outlives this HUD, and a callback
+	// pointing at a torn-down widget is a crash waiting for the next mission.
+	if (IConsoleVariable* GuideVar = IConsoleManager::Get().FindConsoleVariable(TEXT("Eclipse.Guide.Overlay")))
+	{
+		GuideVar->SetOnChangedCallback(FConsoleVariableDelegate());
 	}
 
 	if (SummaryCommand != nullptr)

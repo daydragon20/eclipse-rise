@@ -28,6 +28,8 @@ namespace EclipseTestGuide
 			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s zolang je hem vasthoudt, en terug bij loslaten") },
 			{ EEclipseGuideSignal::Crouch,
 			  TEXT("je zakt en gaat naar 150 cm/s. Deze toets was tot vandaag dood (bCanCrouch stond uit) — dus juist hier: gebeurt er niets, zeg het") },
+			{ EEclipseGuideSignal::ToggleView,
+			  TEXT("de camera schuift in ~0,2s naar je ogen en terug naar over-de-schouder; in 1e persoon zie je je eigen lichaam niet meer") },
 			{ EEclipseGuideSignal::CommandMode,
 			  TEXT("de wereld vertraagt naar 30%; de HUD toont 'COMMAND MODE  x0.30' en loslaten zet hem exact terug op 1.0") },
 			{ EEclipseGuideSignal::SelectNext,

@@ -171,6 +171,7 @@ namespace EclipseGauntletOverlay
 			{ TEXT("Vuren"),        TEXT("LMB"),               TEXT("RT") },
 			{ TEXT("Sprint"),       TEXT("Shift"),             TEXT("L3") },
 			{ TEXT("Hurken"),       TEXT("Ctrl"),              TEXT("B") },
+			{ TEXT("1e/3e persoon"),TEXT("C"),                 TEXT("R3") },
 			{ TEXT("Command Mode"), TEXT("Q vasthouden"),      TEXT("LB vasthouden") },
 			{ TEXT("Volgende"),     TEXT("Tab of scroll op"),  TEXT("RB") },
 			{ TEXT("Vorige"),       TEXT("scroll neer"),       TEXT("LT") },
