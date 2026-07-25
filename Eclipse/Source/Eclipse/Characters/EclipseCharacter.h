@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AbilitySystemInterface.h"
+#include "Characters/EclipseLocomotionTypes.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EclipseCharacter.generated.h"
@@ -10,6 +11,8 @@ class UAbilitySystemComponent;
 class UCameraComponent;
 class UEclipseCharacterTuningAsset;
 class UEclipseHealthAttributeSet;
+class USkeletalMesh;
+class USkeletalMeshComponent;
 class USpringArmComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEclipseCharacterDownedDelegate, AEclipseCharacter* /*Character*/, FName /*Cause*/);
@@ -35,12 +38,19 @@ public:
 	void ApplyTuning(const UEclipseCharacterTuningAsset* Tuning);
 
 	/**
-	 * Dress this body from a DT_BodyDefs row (step-2 character pipeline): mesh +
-	 * looping idle. Missing assets degrade to the capsule silently-but-logged
-	 * (GDD 14.3.5). PLACEHOLDER(GDD 15.7): single-node idle until the SPEC-P2-01
-	 * locomotion ABP tier — moving bodies slide, and that is accepted at this tier.
+	 * Dress this body from a DT_BodyDefs row (step-2 character pipeline): mesh,
+	 * toon restyle and locomotion clips. Missing assets degrade to the capsule
+	 * silently-but-logged (GDD 14.3.5).
 	 */
 	void ApplyBodyDef(const struct FEclipseBodyDefRow& BodyDef);
+
+	/**
+	 * The clips this body resolved, for its anim instance to pull on init. The
+	 * character owns them, not the anim instance: the mesh re-creates its anim
+	 * instance on every SetSkeletalMesh and on LOD changes, and the body must
+	 * still know what it can play afterwards.
+	 */
+	const FEclipseLocomotionSet& GetLocomotionSet() const { return LocomotionSet; }
 
 	/** Direct health init for archetype-driven spawns (enemies from DT_EnemyArchetypes). */
 	void InitializeHealth(float MaxHealth);
@@ -105,6 +115,10 @@ public:
 private:
 	void HandleHealthChanged(const struct FOnAttributeChangeData& Data);
 
+	/** Animation half of ApplyBodyDef: resolve the row's takes against the mesh's
+	 *  own skeleton and pick a rung of the locomotion ladder (GDD 14.3.5). */
+	void ApplyBodyDefAnimation(const struct FEclipseBodyDefRow& BodyDef, const USkeletalMesh* BodyMesh, USkeletalMeshComponent& MeshComponent);
+
 	/** Where the boom/FOV should be right now, given view mode + command mode. */
 	void RefreshCameraTargets();
 	/** Ticking is switched on only while a blend is running (GDD 12.4: no idle
@@ -122,6 +136,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UEclipseHealthAttributeSet> HealthAttributes;
+
+	/** Resolved + skeleton-checked locomotion takes for the body currently worn.
+	 *  UPROPERTY because it is the only strong reference keeping those clips
+	 *  alive; the anim instance's copies are deliberately raw. */
+	UPROPERTY(Transient)
+	FEclipseLocomotionSet LocomotionSet;
 
 	FGuid SoldierId;
 	FName LastDamageCause;

@@ -3,7 +3,9 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/EclipseHealthAttributeSet.h"
 #include "Animation/AnimSequence.h"
+#include "Animation/Skeleton.h"
 #include "Camera/CameraComponent.h"
+#include "Characters/EclipseAnimInstance.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -279,11 +281,7 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 	MeshComponent->SetRelativeRotation(FRotator(0.0f, BodyDef.MeshYaw, 0.0f));
 	MeshComponent->SetRelativeScale3D(FVector(BodyDef.MeshScale));
 
-	if (UAnimSequence* Idle = BodyDef.IdleAnim.LoadSynchronous())
-	{
-		MeshComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-		MeshComponent->PlayAnimation(Idle, /*bLooping*/ true);
-	}
+	ApplyBodyDefAnimation(BodyDef, BodyMesh, *MeshComponent);
 
 	// Toon restyle (15.5 asset policy): every slot re-dressed with the cel
 	// master; the pack's own base texture stays as luminance detail, the
@@ -322,6 +320,83 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 			MeshComponent->SetMaterial(SlotIndex, Mid);
 		}
 	}
+}
+
+void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef, const USkeletalMesh* BodyMesh, USkeletalMeshComponent& MeshComponent)
+{
+	// Until 2026-07-25 this was four lines: single-node mode plus a looping idle.
+	// Every body in the game therefore slid across the district in a standing
+	// pose — player, squad and every enemy — which is the defect this block
+	// closes (GDD 14.5 debug-grade locomotion).
+	const USkeleton* MeshSkeleton = BodyMesh != nullptr ? BodyMesh->GetSkeleton() : nullptr;
+
+	// Resolution happens HERE and not in the anim instance because this is the
+	// one place that knows which mesh the body just put on. The packs behind
+	// DT_BodyDefs share the UE4-Mannequin skeleton FAMILY but each ships its own
+	// USkeleton asset, and a clip evaluated against a foreign skeleton does not
+	// throw — it produces a mangled pose. So a mismatch is rejected loudly and
+	// the body drops one rung instead of being quietly broken (GDD 14.3.5).
+	auto ResolveClip = [this, MeshSkeleton](const TSoftObjectPtr<UAnimSequence>& SoftClip, const TCHAR* SlotName) -> UAnimSequence*
+	{
+		if (SoftClip.IsNull())
+		{
+			return nullptr;
+		}
+		UAnimSequence* Clip = SoftClip.LoadSynchronous();
+		if (Clip == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("%s: %s take %s did not load — locomotion drops a rung (GDD 14.3.5)."),
+				*GetName(), SlotName, *SoftClip.ToString());
+			return nullptr;
+		}
+		if (!EclipseLocomotion::IsUsableOn(Clip->GetSkeleton(), MeshSkeleton))
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("%s: %s take %s is authored for skeleton %s but this body wears %s — REJECTED, locomotion drops a rung (GDD 14.3.5)."),
+				*GetName(), SlotName, *Clip->GetName(),
+				*GetPathNameSafe(Clip->GetSkeleton()), *GetPathNameSafe(MeshSkeleton));
+			return nullptr;
+		}
+		return Clip;
+	};
+
+	LocomotionSet = FEclipseLocomotionSet();
+	LocomotionSet.Idle = ResolveClip(BodyDef.IdleAnim, TEXT("idle"));
+	LocomotionSet.Walk = ResolveClip(BodyDef.WalkAnim, TEXT("walk"));
+	LocomotionSet.Run = ResolveClip(BodyDef.RunAnim, TEXT("run"));
+	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
+
+	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();
+	if (Tier >= EEclipseLocomotionTier::OneGait)
+	{
+		MeshComponent.SetAnimInstanceClass(UEclipseAnimInstance::StaticClass());
+		if (UEclipseAnimInstance* Locomotion = Cast<UEclipseAnimInstance>(MeshComponent.GetAnimInstance()))
+		{
+			// SetAnimInstanceClass is a no-op when the class is already set, and
+			// the SetSkeletalMesh above re-created the instance anyway — so push
+			// the set explicitly rather than trusting either path.
+			Locomotion->SetLocomotionSet(LocomotionSet);
+			return;
+		}
+		UE_LOG(LogEclipse, Warning,
+			TEXT("%s: the locomotion anim instance did not spawn — single-node idle stands in (GDD 14.3.5)."), *GetName());
+	}
+
+	if (LocomotionSet.Idle != nullptr)
+	{
+		if (Tier == EEclipseLocomotionTier::IdleOnly)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("%s: no walk or run take resolved on this skeleton — single-node idle stands in and this body WILL slide (GDD 14.3.5)."),
+				*GetName());
+		}
+		MeshComponent.SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		MeshComponent.PlayAnimation(LocomotionSet.Idle, /*bLooping*/ true);
+		return;
+	}
+
+	UE_LOG(LogEclipse, Warning, TEXT("%s: no usable idle take for %s — the mesh draws its ref pose (GDD 14.3.5)."),
+		*GetName(), *BodyDef.Mesh.ToString());
 }
 
 void AEclipseCharacter::InitializeHealth(float MaxHealth)
