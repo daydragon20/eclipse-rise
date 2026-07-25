@@ -5,6 +5,16 @@ op één uitzondering na is elke rij een `MapKey`-regel plus een `BindAction`-re
 in `Eclipse/Source/Eclipse/Characters/EclipsePlayerController.cpp`. Staat er "ja"
 in de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
 
+*Sinds 26-07 is dit **geen erewoord meer maar een test**. Drie bewakers draaien mee
+in de suite: de F2-controletabel mag geen binding claimen die niet bestaat
+(`Eclipse.Feel.Input.ControlTableClaimsOnlyBindingsThatExist`), de getallen in de
+testgids moeten die van `DA_CharacterTuning` zijn
+(`...GuideNumbersStillMatchTheTuning`), en elk console-commando uit de tabel
+onderaan moet echt bestaan (`...DocumentedConsoleCommandsExist`). Alle drie zijn
+gefalsifieerd voordat ze groen bleven staan. **Voeg je hier een rij toe, dan hoort
+de bijbehorende claim in die tests mee te landen** — de eerste test telt de rijen,
+dus hij valt vanzelf als je het vergeet.*
+
 *De uitzondering is **stance op toetsenbord**: LeftAlt is géén Enhanced-Input-actie
 en heeft dus geen mapping en geen handler — `IssueSquadOrder` vraagt op het moment
 van geven of de toets neer is. Dat werkt, maar het staat buiten het
