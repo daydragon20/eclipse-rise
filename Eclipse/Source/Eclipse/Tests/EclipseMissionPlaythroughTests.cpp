@@ -463,6 +463,41 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		// de squad hier alle drie de orders; dat was geen ontwerpkeuze maar een
 		// gevolg van de spawnpositie 93 meter verderop.
 		TestEqual(TEXT("speelronde: een haalbare order wordt aangenomen, niet geweigerd"), Watch.Refused, 0);
+
+		// EN BEWEGEN ZE OOK. Een ack zonder beweging is precies de stille fout waar
+		// "orders zijn beloftes" (GDD 8.4) voor bestaat: het antwoord klopt, het
+		// gedrag niet, en niets in de suite zou dat merken. Tot vannacht kon deze
+		// meting niet eens bestaan — de squad weigerde alles.
+		TMap<AEclipseCharacter*, float> DistanceBefore;
+		for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+		{
+			AEclipseCharacter* Soldier = *It;
+			if (Soldier != nullptr && Soldier != Harness.Body && Soldier->IsPlayerSide())
+			{
+				DistanceBefore.Add(Soldier, FVector::Dist2D(Soldier->GetActorLocation(), OrderTarget));
+			}
+		}
+		Harness.Idle(2.5f);
+		int32 Approached = 0;
+		float BestGain = 0.0f;
+		for (const TPair<AEclipseCharacter*, float>& Pair : DistanceBefore)
+		{
+			if (Pair.Key == nullptr)
+			{
+				continue;
+			}
+			const float Gain = Pair.Value - static_cast<float>(FVector::Dist2D(Pair.Key->GetActorLocation(), OrderTarget));
+			BestGain = FMath::Max(BestGain, Gain);
+			if (Gain > 25.0f)
+			{
+				++Approached;
+			}
+		}
+		Report(*this, TEXT("soldaten die na de order dichterbij kwamen"), Approached, TEXT(""),
+			*FString::Printf(TEXT("van %d — een ack zonder beweging is een stille fout"), DistanceBefore.Num()));
+		Report(*this, TEXT("grootste toenadering in 2,5 s"), BestGain, TEXT("cm"));
+		TestTrue(FString::Printf(TEXT("speelronde: de squad VOERT de order ook uit (%d van %d bewoog, beste %.0f cm)"),
+				Approached, DistanceBefore.Num(), BestGain), Approached > 0);
 		Report(*this, TEXT("order-round-trip, slechtste"), Squad->GetOrderRoundTripStats().WorstSeconds, TEXT("s"), TEXT("< 1 s (R3-criterium 1)"));
 	}
 
