@@ -16,6 +16,7 @@
 #include "Engine/GameInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerStart.h"
 #include "Engine/TargetPoint.h"
 #include "EngineUtils.h"
 #include "Misc/CommandLine.h"
@@ -392,7 +393,31 @@ void AEclipseGameMode::SpawnMissionActors()
 	}
 
 	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController() != nullptr ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr;
-	const FVector PlayerLocation = PlayerPawn != nullptr ? PlayerPawn->GetActorLocation() : FVector::ZeroVector;
+
+	// De squad spawnt rond het INSERTIEPUNT, niet rond waar de pawn toevallig
+	// staat. Dat verschil is 93 meter, en het was de oorzaak van "mijn squad doet
+	// niets": zowel deze game mode als de player controller luistert naar
+	// Event.Mission.Started, en de controller is degene die de speler naar
+	// Entry_Main verplaatst. Wie het eerst aan de beurt is, bepaalt dus waar de
+	// squad landt — en in de gemeten praktijk stond hij nog op zijn oude plek,
+	// dus spawnde de squad daar en niet bij de speler.
+	//
+	// Gemeten met de speelronde (2026-07-26): verste squadmate 9282 cm van de
+	// speler. Elke MoveTo-order leverde daardoor een gedeeltelijk pad op, en een
+	// gedeeltelijk pad telt in de beslistabel als GEEN pad — dus weigerde de squad
+	// alles met "no route". Drie symptomen, één oorzaak.
+	//
+	// Het insertiepunt zelf uitlezen haalt de volgorde-afhankelijkheid weg: dan
+	// maakt het niet meer uit wie van de twee luisteraars het eerst is.
+	FVector PlayerLocation = PlayerPawn != nullptr ? PlayerPawn->GetActorLocation() : FVector::ZeroVector;
+	for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
+	{
+		if (It->ActorHasTag(TEXT("Entry_Main")))
+		{
+			PlayerLocation = It->GetActorLocation();
+			break;
+		}
+	}
 
 	// Ground data resolved from the campaign setup (GDD 14.2: the numbers live in
 	// DA_CharacterTuning / DT_Weapons / DT_EnemyArchetypes, not in code defaults).

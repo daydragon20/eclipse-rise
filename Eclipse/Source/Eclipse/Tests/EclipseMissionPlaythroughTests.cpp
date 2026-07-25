@@ -355,6 +355,29 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		}
 		Report(*this, TEXT("tijd tot de squad staat"), Harness.ElapsedSeconds - SquadStart, TEXT("s"),
 			TEXT("zolang kan hij geen enkele order aannemen"));
+
+		// WAAR staat de squad eigenlijk? Ze horen naast je te staan. De
+		// gedeeltelijk-pad-meting suggereerde iets anders: 48% afgelegd met nog
+		// 4448 cm te gaan naar een punt dat 600 cm van de SPELER lag — dan staat de
+		// soldaat dus kilometers verderop.
+		float FarthestSquadmate = 0.0f;
+		for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+		{
+			const AEclipseCharacter* Soldier = *It;
+			if (Soldier != nullptr && Soldier != Harness.Body && Soldier->IsPlayerSide())
+			{
+				FarthestSquadmate = FMath::Max(FarthestSquadmate,
+					static_cast<float>(FVector::Dist2D(Soldier->GetActorLocation(), Harness.Location())));
+			}
+		}
+		Report(*this, TEXT("verste squadmate van de speler"), FarthestSquadmate, TEXT("cm"),
+			TEXT("een paar honderd — ze horen naast je te staan bij insertie"));
+		// Was 9282 cm: de game mode las de positie van de pawn vóórdat de
+		// controller hem naar Entry_Main verplaatste. Vastgepind, want dit is een
+		// VOLGORDE-bug tussen twee luisteraars op hetzelfde event, en die soort
+		// sluipt terug zodra iemand een derde luisteraar toevoegt.
+		TestTrue(FString::Printf(TEXT("speelronde: de squad staat NAAST je bij insertie (%.0f cm)"), FarthestSquadmate),
+			FarthestSquadmate < 1500.0f);
 	}
 
 	if (UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>())
@@ -409,6 +432,23 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 					AgentData != nullptr ? *AgentData->GetName() : TEXT("GEEN"),
 					Path.IsSuccessful() ? TEXT("pad gevonden") : TEXT("GEEN pad"),
 					Path.IsPartial() ? TEXT(" (gedeeltelijk)") : TEXT("")));
+
+				// HOE VER komt hij met dat gedeeltelijke pad? Dat getal is wat de
+				// A/B-keuze in HANDOFF §4b onderbouwt: haalt hij 95% van de weg,
+				// dan is weigeren onzin; haalt hij 10%, dan is "no route" eerlijk.
+				// Zonder dit is die keuze smaak tegen smaak.
+				if (Path.IsSuccessful() && Path.Path.IsValid() && Path.Path->GetPathPoints().Num() > 0)
+				{
+					const FVector Start = Soldier->GetNavAgentLocation();
+					const FVector Reached = Path.Path->GetPathPoints().Last().Location;
+					const float Ordered = FVector::Dist2D(Start, OrderTarget);
+					const float Covered = FVector::Dist2D(Start, Reached);
+					Report(*this, TEXT("gedeeltelijk pad: afgelegd van het bevolen punt"),
+						Ordered > KINDA_SMALL_NUMBER ? (Covered / Ordered) * 100.0f : 0.0f, TEXT("%"),
+						TEXT("hoog = weigeren is onzin; laag = 'no route' is eerlijk (HANDOFF 4b)"));
+					Report(*this, TEXT("gedeeltelijk pad: resterende afstand tot het doel"),
+						FVector::Dist2D(Reached, OrderTarget), TEXT("cm"));
+				}
 				break; // één soldaat is genoeg om dit te beantwoorden
 			}
 		}
@@ -419,6 +459,10 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		Report(*this, TEXT("antwoorden terug (ack + weigering)"), Answers, TEXT(""), TEXT("nooit 0 — stilte is de fout"));
 		TestTrue(FString::Printf(TEXT("speelronde: de order kreeg antwoord (%d ack, %d geweigerd)"),
 				Watch.Acknowledged, Watch.Refused), Answers > 0);
+		// En hij wordt AANGENOMEN, niet alleen beantwoord. Tot 2026-07-26 weigerde
+		// de squad hier alle drie de orders; dat was geen ontwerpkeuze maar een
+		// gevolg van de spawnpositie 93 meter verderop.
+		TestEqual(TEXT("speelronde: een haalbare order wordt aangenomen, niet geweigerd"), Watch.Refused, 0);
 		Report(*this, TEXT("order-round-trip, slechtste"), Squad->GetOrderRoundTripStats().WorstSeconds, TEXT("s"), TEXT("< 1 s (R3-criterium 1)"));
 	}
 
