@@ -139,6 +139,10 @@ void AEclipsePlayerController::DumpFeelState() const
 		*Body->DescribeFeelState(),
 		bSprinting ? (bSprintLatched ? TEXT("AAN (L3-latch)") : TEXT("AAN (hold)")) : TEXT("uit"));
 	UE_LOG(LogEclipse, Display, TEXT("Feel: %s"), *Line);
+	// Tweede regel: de bewegingswaarden zoals ze op het component staan. Eén toets
+	// hoort alles te geven wat er tijdens het spelen kan afwijken.
+	UE_LOG(LogEclipse, Display, TEXT("Feel: %s"), *Body->DescribeMovementState());
+	UE_LOG(LogEclipse, Display, TEXT("Feel: %s"), *DescribeLookTuning());
 	// Ook op het scherm: wie de meting doet, speelt op dat moment — die leest geen
 	// logbestand terwijl hij loopt (dat is precies waarom S3 een symptoom werd).
 	if (GEngine != nullptr)

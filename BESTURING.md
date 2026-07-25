@@ -131,7 +131,7 @@ handler, geen mapping. Ze staan hier zodat de lijst compleet is en niemand ze zo
 | `-EclipseShot` | vaste-camera reviewronde; onderdrukt bewust ALLE debug-UI |
 | `Eclipse.Look.InvertY 0/1` | Y-as van het kijken forceren (-1 = volg de tuning) |
 | `Eclipse.Command.Dump` | Command Mode-metingen naar de console |
-| `Eclipse.Feel.Dump` | snelheid, mesh-schaal, boomlengte, camera-afstand, FOV en schijnbare grootte — ook op **F9**, en ook op het scherm |
+| `Eclipse.Feel.Dump` | **drie regels op F9**: (1) snelheid, mesh-schaal, boomlengte, camera-afstand, FOV en schijnbare grootte; (2) de bewegingswaarden zoals ze op het component staan — loopsnelheid, aanloop, rem, draaisnelheid, grondwrijving, zijwaarts/achteruit, stap-hoogte, sprong; (3) de kijkwaarden. Ook op het scherm |
 | `Eclipse.Input.ForceGamepad 0/1` | invoer als muis (0) of als stick (1) behandelen; -1 = autodetectie |
 
 ## Welke config-map een toetsbinding leest (feel-audit S3)

@@ -151,6 +151,12 @@ public:
 	 *  van geraden. Uitgelezen door Eclipse.Feel.Dump. */
 	FString DescribeFeelState() const;
 
+	/** De bewegingswaarden zoals ze NU op het component staan — niet zoals ze in
+	 *  het asset bedoeld waren. Tweede regel van de F9-dump, zodat de owner met
+	 *  één toets ziet wat er werkelijk draait (feel-audit, laag 1 aan de
+	 *  speelkant). */
+	FString DescribeMovementState() const;
+
 	/** Dezelfde meting als DescribeFeelState, maar als getallen — het harnas moet
 	 *  erop kunnen asserten en niet op een tekstregel hoeven te parsen. */
 	FEclipseFeelSample SampleFeelState() const;

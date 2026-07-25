@@ -342,6 +342,27 @@ FString AEclipseCharacter::DescribeFeelState() const
 		bFirstPerson ? TEXT("1e") : (bCommandModeCamera ? TEXT("command") : TEXT("3e")));
 }
 
+FString AEclipseCharacter::DescribeMovementState() const
+{
+	// Uitgelezen van het COMPONENT, niet uit het asset: het verschil tussen die
+	// twee is precies het defect dat de owner een testronde kostte.
+	const UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (Movement == nullptr)
+	{
+		return TEXT("(geen bewegingscomponent)");
+	}
+	const UEclipseCharacterMovementComponent* Directional = Cast<UEclipseCharacterMovementComponent>(Movement);
+	return FString::Printf(
+		TEXT("loop %.0f · accel %.0f (%.2f s aanloop) · rem %.1fx%.1f/%.0f · draai %.0f gr/s · grondwrijving %.0f · zijwaarts %.2f / achteruit %.2f · stap %.0f · sprong %.0f (lucht %.2f)"),
+		Movement->MaxWalkSpeed, Movement->MaxAcceleration,
+		Movement->MaxAcceleration > KINDA_SMALL_NUMBER ? Movement->MaxWalkSpeed / Movement->MaxAcceleration : 0.0f,
+		Movement->BrakingFriction, Movement->BrakingFrictionFactor, Movement->BrakingDecelerationWalking,
+		Movement->RotationRate.Yaw, Movement->GroundFriction,
+		Directional != nullptr ? Directional->StrafeSpeedRatio : 1.0f,
+		Directional != nullptr ? Directional->BackwardSpeedRatio : 1.0f,
+		Movement->MaxStepHeight, Movement->JumpZVelocity, Movement->AirControl);
+}
+
 void AEclipseCharacter::SetCameraLagSuspended(bool bSuspended)
 {
 	if (bCameraLagSuspended == bSuspended || CameraBoom == nullptr)
