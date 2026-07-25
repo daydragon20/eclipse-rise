@@ -27,7 +27,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Sprint,
 			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s zolang je hem vasthoudt, en terug bij loslaten") },
 			{ EEclipseGuideSignal::Crouch,
-			  TEXT("je zakt en gaat naar 150 cm/s. LET OP: bCanCrouch staat nergens in het project aan — gebeurt er niets, dan is dat de vondst") },
+			  TEXT("je zakt en gaat naar 150 cm/s. Deze toets was tot vandaag dood (bCanCrouch stond uit) — dus juist hier: gebeurt er niets, zeg het") },
 			{ EEclipseGuideSignal::CommandMode,
 			  TEXT("de wereld vertraagt naar 30%; de HUD toont 'COMMAND MODE  x0.30' en loslaten zet hem exact terug op 1.0") },
 			{ EEclipseGuideSignal::SelectNext,

@@ -55,6 +55,14 @@ AEclipseCharacter::AEclipseCharacter()
 	CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	// Crouch is a designed control, not an engine extra (GDD 04_core_gameplay:
+	// "Crouch = stealth default"), and ApplyTuning already feeds it a speed from
+	// DA_CharacterTuning. But FNavAgentProperties::bCanCrouch defaults to FALSE,
+	// so ACharacter::Crouch() silently did nothing and Ctrl / pad-B was a dead key
+	// — the tuning knob was being applied to a capability that was switched off.
+	// Found by the in-game test guide while writing the crouch step's expectation,
+	// which is exactly what that guide exists for.
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 }
 
 void AEclipseCharacter::PostInitializeComponents()
