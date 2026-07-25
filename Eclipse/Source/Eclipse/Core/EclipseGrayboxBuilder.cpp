@@ -1259,8 +1259,18 @@ void BuildDistrict(UWorld& World)
 		for (const FLampPostDef& Post : LampPosts)
 		{
 			SpawnGen(Lamp, MetalMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
-			SpawnGen(LampGlow, GenGlowMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
-
+			// The GlowPlane spawn is GONE, and the review that killed it also
+			// proved my earlier revert wrong. I had dismissed "the glow sits at
+			// Z=0" because gen_street_props.py authors it at (head_x, 0,
+			// cap_z-0.13) — but authored height is not shipped height: the
+			// art-review found the quad lying flat in the street at the mast foot
+			// in shot 00092 (1105,628)-(1215,655), 0.2745 lum, hue 34.8, with a
+			// hard silver edge and an ink outline around it. A literal sticker in
+			// the road. Lesson: verify what survives export/import, never trust the
+			// authoring script's local transform.
+			// Not re-placed at the head either: the emissive bulb below already is
+			// the visible source, and the pool decal already is the light on the
+			// ground, so a third element would only risk double-placement.
 			const FVector HeadOffset = FRotator(0.0f, Post.Yaw, 0.0f).RotateVector(FVector(LampHeadLocalX, 0.0f, LampHeadLocalZ));
 			SpawnBlock(TEXT("Glow"), FVector(Post.X, Post.Y, 0.0f) + HeadOffset, FVector(0.45f, 0.28f, 0.14f), Post.Yaw);
 		}
