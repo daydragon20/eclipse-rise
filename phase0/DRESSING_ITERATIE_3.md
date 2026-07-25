@@ -32,7 +32,7 @@ iteratie 2 zoveel losse verbeteringen kon landen met zo weinig leeswinst.
 | 4 | **Pool: 3 → 5 waardestappen** | derivatie | `PoolMid = 0.0621/0.72^5 = 0.3209` — exact dezelfde schermwaarde als nu, op de nieuwe donkere vloer. Lit `(0.876,0.398,0.119)`, opacity 0.70 en de Glow-hue-factor ×0.398 blijven allemaal geldig; alleen de comment-derivatie ("three banked value steps") moet mee. |
 | 5 | **Blob herrekenen** | waarde | Op een vloer van 0.0621 zou de huidige ×0.4 bij opacity 0.85 uitkomen op 0.0304 — ónder de horizonlucht = silhouet-zwart, precies het defect waarvoor de boulder-stain al geflagd werd. Hou de kern op ~0.62×: vloertint **×0.55** bij opacity 0.85 → `BlobMid` Lit `(0.047,0.051,0.059)`, Shade `(0.015,0.017,0.027)`. **En: leid de skirt af van de HOOGTE, niet de footprint** — `footprint×1.25` geeft 76 units onder een 260 hoge container en verdwijnt vanaf ooghoogte (daarom was in 00065 geen enkele container-blob vindbaar). Voorstel `skirt = 0.35 × hoogte`. |
 | 6 | **Grounding-dekking** | nieuw, klein | Blobs komen nu uit 4 plekken (rubble, machine-bodies, containers, bunker) = ~10% van de massa's; in het overzichtsframe zweeft de rest. `SpawnGroundDecal` toevoegen voor `CoverPoints[]`, de prop-tabel (vaten/kratten/barrières), lamppaal-voeten (~120-unit blob) en de poortpilaren. Patroon staat er al. |
-| 7 | **Waardeplafond op dressing** | waarde + regel | **Te bankken regel: niets dat geen lichtbron is mag boven de pool-kernwaarde uitkomen.** Nu: `Prop_Barrier (0.26,0.27,0.30)` meet 0.7269 = **1.88× de pool-kern** → ×0.518 → `(0.135,0.140,0.155)`; tread-pad en hazardpad één stap onder de pool. |
+| 7 | **Waardeplafond op dressing** | **GROTENDEELS GELAND — zie §1e** | **Te bankken regel: niets dat geen lichtbron is mag boven de pool-kernwaarde uitkomen.** Nu: `Prop_Barrier (0.26,0.27,0.30)` meet 0.7269 = **1.88× de pool-kern** → ×0.518 → `(0.135,0.140,0.155)`; tread-pad en hazardpad één stap onder de pool. |
 | 8 | **Magenta/violet echt oplossen** | waarde | **De vorige hypothese was fout.** Mix 0.75→0.45 was de verkeerde variabele: `OxideShade (0.200,0.045,0.085)` is zélf authored op hue 344.5° met B ≈ 1.9× G, en `ColorSaturation 1.38` schreeuwt dat uit. Gemeten containerzijde: **hue 336.6°, sat 0.77-0.81** op drie losse patches. **Regel voor Kessara: elke donkere/shade-tint houdt B ≤ G.** `OxideShade → (0.200,0.062,0.038)` = hue 9.3° (BldgA deelt deze shade). `RubbleLit (0.095,0.084,0.101)` = hue 279° violet → `(0.098,0.088,0.078)`. Vat-tint idem. |
 | 9 | ~~**Luchtperspectief via FogDensity**~~ | **GEPROBEERD EN VERWORPEN** | `FogDensity 0.006 → 0.02` is uitgevoerd, gemeten en teruggedraaid. Zie §1a. |
 | 10 | **Outline-discipline** | nieuw (PP) | (a) grondvlakke dressing (pads, ramps, decals) uit de inkpass — anders wordt elk pad een omlijnde sticker (tread-pad 00064 meet 0.408 = helderder dan de pool-kern, mét gesloten outline = glasplaat); (b) lijndikte laten afnemen met afstand, want nu is elke prop op overzichtsafstand een dikomlijnde vorm op een vlakke plaat; (c) getrapte inklijnen nakijken (TSR-kwaliteit). |
@@ -71,6 +71,35 @@ volgende rondes: **meet nooit een oppervlak in een band waar iets anders in staa
 Dat maakt de frame-probe (`Tools/measure_frame_values.py`, §4) meteen zijn eigen
 rechtvaardiging: hij ving zowel de oorspronkelijke vloer-omkering als mijn eigen
 verkeerde conclusie.
+
+## 1e. Stap 7 (waardeplafond) GELAND en gemeten — shots 00105-00111
+
+Uitgevoerd in de volgorde die §1d voorschrijft, met de probe als scheidsrechter.
+
+| meting | vóór | ná | doel |
+|---|---|---|---|
+| barrière-vlak (box 470,640,600,700) | 0.6542 | **0.2909** | ≤0.15 |
+| barrière ÷ pool-kern | 2.25× | **0.98×** | <1 |
+| perimeterband ÷ vloer (cam 5) | 2.6× | **1.50×** | net boven de vloer |
+| vloer | 0.0465 | 0.0482 | ongemoeid |
+
+**De inversie is weg:** niets niet-emissief staat nog boven de pool. De barrière zit
+op 0.2909 waar het doel ≤0.15 was, dus daar is **nog één bisectiestap te gaan** —
+maar de mapping werd onderweg gemeten als niet-lineair (authored 0.2701 → frame
+0.654 = 2.42×; authored 0.0945 → frame 0.2909 = 3.08×, dus de ratio stíjgt als de
+waarde zakt). Reken die stap dus niet uit, bisecteer hem.
+
+**Wall_ is onderweg gecorrigeerd, en dat is leerzaam.** ×0.35 (het startpunt van de
+barrière) overshootte hier: de band zakte van 0.0942 naar 0.0245 en werd daarmee
+**donkerder dan zijn eigen grond** (0.67× de vloer) — de omgekeerde fout. Eén
+waardestap (×0.72) landt op 1.50× de vloer: een zachte, onmiskenbare stap boven de
+grond, wat "waardescheiding" eigenlijk vroeg.
+
+**Methodologische winst die groter is dan de fix:** de band is gevonden met een
+verticale scan naar de helderste rij, niet met een gegokt meetvak. Dat was nodig
+omdat een gegokt vak eerst 0.076 gaf terwijl de review 0.238-0.356 mat — een factor
+3-4 ernaast, en precies het type fout dat deze ronde al twee terugdraaiingen kostte.
+**Regel: localiseer een oppervlak met een scan voordat je het meet.**
 
 ## 1d. Herziene ladder na de tweede art-review (shots 00092-00097) — LEES DIT EERST
 

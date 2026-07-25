@@ -136,7 +136,35 @@ namespace
 		// finally exists on screen (the review measured band and floor at an
 		// identical 0.1237 in the overview frame). Measured gains untouched.
 		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — anchored under the SKY, never crushed
-		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
+		// Dressing-iteratie 3, step 7 (nu prioriteit 1) — THE VALUE CEILING.
+		// The metering pin of step 1 only moved the FLOOR: everything above ~0.25
+		// lum sits on the tonemapper shoulder, so it returned just 20-45% of the
+		// expected drop. Measured across the same boxes: floor /4.21 but barrier
+		// /1.11, so barrier-over-floor went from 3.72x to 14.1x — the ceiling did
+		// not come down with the floor, and dressing now stands FURTHER from its
+		// ground than before the fix. The bottom half of the frame is bimodal with
+		// an empty midband (mid-tones 66.5% -> 9.3% in cam 7, 2.0% in cam 4), and
+		// an empty midband IS "stickers on a plate", numerically: no object shares
+		// a value with the ground it stands on.
+		// Wall_ is the biggest single offender by area — 4.1-4.8x the floor as an
+		// unbroken band across every frame, right on the horizon. Iteration 2's
+		// "Wall_ stays put" was the wrong call in hindsight.
+		// Rule being banked: nothing that is not a light source may exceed the pool
+		// core in frame. Method per the review: authored->frame is NON-linear
+		// (~2.5x at this level, ~0.8x at floor level), so do NOT compute a factor —
+		// start at authored x0.35 and bisect with Tools/measure_frame_values.py
+		// against a frame target of <=0.15 lum in box (470,640,600,700).
+		// BISECTED on measurement, not computed: x0.35 (the barrier's starting
+		// point) overshot HERE. A located vertical scan of cam 5 — found by
+		// scanning for the brightest row instead of guessing a box, the mistake
+		// that cost two reverts earlier — put the band at 0.0942 before and 0.0245
+		// after, i.e. /3.8, which left the wall DARKER than its own ground (0.67x
+		// the floor). That is the inverted failure. One value step (x0.72) instead
+		// lands ~1.4x the floor: a gentle, unmistakable step ABOVE the ground,
+		// which is what "value separation" was asking for. Wall_ carries a huge
+		// area, so it sets the frame's whole midband — it belongs just above the
+		// floor, nowhere near the pool.
+		{ TEXT("Wall_"),  FLinearColor(0.166f, 0.180f, 0.209f), FLinearColor(0.054f, 0.059f, 0.094f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
 		// Dominion post: oxide red, shade to maroon-purple (variation is
 		// luminance-only, hue stays palette). West-facade banding (15.8 look-ronde
 		// A/B, cam 1): under the -25/55 sun west faces sit at ndl +0.52 and land
@@ -692,7 +720,12 @@ void BuildDistrict(UWorld& World)
 		struct FPropDef { const TCHAR* Label; const TCHAR* MeshPath; const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; };
 		const FPropDef Props[] = {
 			{ TEXT("Prop_Barrel"), TEXT("/Game/Art/Props/Barrel_01.Barrel_01"), TEXT("/Game/Art/Textures/T_Barrel_01_diff.T_Barrel_01_diff"), 17.6f, FLinearColor(0.160f, 0.100f, 0.070f), FLinearColor(0.055f, 0.042f, 0.062f) },
-			{ TEXT("Prop_Barrier"), TEXT("/Game/Art/Props/concrete_road_barrier.concrete_road_barrier"), TEXT("/Game/Art/Textures/T_concrete_road_barrier_diff.T_concrete_road_barrier_diff"), 6.7f, FLinearColor(0.26f, 0.27f, 0.30f), FLinearColor(0.085f, 0.090f, 0.140f) },
+			// Value ceiling, offender #2 by excess (iteratie 3 step 7): this face
+			// measured 0.6542 lum in frame = 14.1x the floor and 2.25x the pool
+			// core, i.e. the brightest non-emissive thing in the district and
+			// brighter than the light itself. Same method as Wall_: authored x0.35
+			// as the starting point, then bisect on the measured frame value.
+			{ TEXT("Prop_Barrier"), TEXT("/Game/Art/Props/concrete_road_barrier.concrete_road_barrier"), TEXT("/Game/Art/Textures/T_concrete_road_barrier_diff.T_concrete_road_barrier_diff"), 6.7f, FLinearColor(0.091f, 0.095f, 0.105f), FLinearColor(0.030f, 0.032f, 0.049f) },
 			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.080f, 0.280f, 0.300f), FLinearColor(0.030f, 0.100f, 0.150f) },
 		};
 
