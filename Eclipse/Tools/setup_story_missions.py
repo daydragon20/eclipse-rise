@@ -57,6 +57,15 @@ if created:
     # FEclipseObjectiveDef schema extension (OptionalReward*/bRequiresNoAlarm +
     # debrief evaluation). A stand-in typed ExtractSquad would read "achieved"
     # on every extraction — a lying HUD line ships never (14.3.6 honesty).
+    #
+    # WAVE-2 TRAP (found in review, 2026-07-25): the schema now exists
+    # (bRequiresNoCasualties + OptionalRewardMaterials landed with Taak 4), but
+    # this whole objectives block sits inside `if created:` and MT_M11 has
+    # existed on disk since d7f22e4. Re-running this script therefore does NOT
+    # add the optional — it logs "exists, untouched" and changes nothing. The
+    # create-only rule is deliberate (never clobber authored content), so the
+    # wave-2 step needs its own explicit, narrow migration that appends the
+    # optional to the existing asset instead of relying on a rerun.
     m11.set_editor_property("objectives", [ambush, exfil])
     m11.set_editor_property("insertion_point_ids", ["Entry_Main", "Entry_Sewer"])
     eal.save_loaded_asset(m11)

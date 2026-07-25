@@ -140,7 +140,23 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 
 ---
 
-## LAATSTE STAND (2026-07-25 ~13:15 — CYCLUS 5 GELAND: de vijf wacht-changesets)
+## LAATSTE STAND (2026-07-25 ~15:30 — CYCLUS 6 GELAND: vier bouwsporen + review-ronde)
+
+**Bar bij de commits: build ✓ (-NoUba) · tests 85/85 (0 fail; 55 schoon + 30 met bekende fixture-warnings) · EclipseValidateData 4 validators/0 fouten · catalog 29/29.** Bar is bewust twee keer gedraaid: de tweede run dekt exact de gecommitte boom (een test-helper-guard landde ná de eerste build, dus die eerste run dekte hem niet).
+
+1. **`e8bd5c8` [Quests]** — M1.1-Gauntlet op de geshipte keten (DA_CampaignSetup → DT_StoryMissions-pin → MT_M11.uasset), win- én verliespad. Rewards gemeten aan de commit-eigen ResourcesChanged-feiten i.p.v. wallet-delta's (de dagtick boekt legitiem extra inkomsten).
+2. **`b068212` [Strategy]** — liberation-trigger: één writer, één transactie, state-derived idempotentie + vierde ValidateData-validator + `Tools/setup_liberation_data.py`.
+3. **`67f46a6` [Quests]** — Taak-4-kern: Event.Mission.PhaseChanged, alarm als benoemde sub-fase, alarm/casualty-latch, optional-payouts atomair in de debrief-transactie. Catalog 29/29 + `bRequiresNoCasualties` als spec-amendement in SPEC-P2-04 §Data schema.
+4. **`c6cf7fe` [Base]** — walkable vault (NIEUW `Base/EclipseVaultBuilder.*`): pure `PlanSlots` + parity-Gauntlet, her-render op de bestaande Event.Base.*-feiten, gecoalesceerd op plan-hash (1 rebuild per commit, geen tick).
+5. **`966c800` [Art]** — dressing-iteratie 2: dusk-vloer, lamp-pools + blob-schaduwen als luminantie-decals (district is unlit), volledige nudge-lijst, `generate_decals.py`.
+
+**Reviewronde:** 5 lenzen over de drie complete changesets, elke blocker/major langs een tegenlezer die hem moest wéérleggen. Uitkomst: 5× GO, 13 majors weerlegd, **1 bevestigd** — EB-2's wiring-tests bouwden de twee productiefeiten zélf in hun eigen orde, dus een omgedraaide commit/broadcast in `ResolveDebrief` zou de liberation stil doden terwijl alles groen bleef. Gefixt met `Eclipse.Strategy.Liberation.WiringDebriefSeamFlipsTrio` (draait het échte debrief-pad en pint commit-voor-broadcast + beide tabel-koppelingen) plus twee nieuwe validator-checks. Verder verwerkt: twee majors op de eigen Gauntlet (verlies-test stelde niet vast wélke missie liep; vier ongeguarde region-dereferences) en een liegende logregel bij een lege liberation-resolutie.
+
+**Owner-besluit geland:** 15.7 = **B (hybride MetaHuman-shading)**. Vastgelegd in `phase0/metahuman_recipes.md`; implementatie-spec `phase0/MH_FACE_TIER_B.md` met twee vondsten: de bestaande restyle-lus is slot-blind (vervangt élk slot op index = optie A), en de body-gain 3.2 is bewust ongemeten omdat "bodies klein op het scherm zijn" — bij een dialoog-close-up valt die rechtvaardiging weg.
+
+**Eerstvolgende stappen:** (1) commandlet-slot: `generate_decals.py` → `import_generated_decals.py` → shotronde (eerste PNG = warm-up, overslaan) → art-review op de pool/blob-vraag; (2) `setup_liberation_data.py` NIET vóór M1.3 authored is — de nieuwe validator zou dan correct melden dat de rij nooit kan vuren; (3) wave 2: M1.1 zero-casualty-optional (LET OP: `setup_story_missions.py` schrijft objectives alleen in `if created:`, en MT_M11 bestaat al — er is een eigen migratiestap nodig, staat als comment in het script), recap-materialisatie → cold-reader (harde poort vóór M1.2), civilian-wiring; (4) menu-hub-retirement als eigen mini nu de parity groen is.
+
+## VORIGE STAND (2026-07-25 ~13:15 — CYCLUS 5: de vijf wacht-changesets)
 
 **Trigger:** Nathan sloot de editor om 13:06 (Live-Coding-buildlock weg, memory eclipse-editor-buildlock) — de voorbereide landing rolde daarna in één run. **Unie-bar vóór de commits: build ✓ (-NoUba, 69 s) · tests 68/68 (50 schoon + 18 met bekende fixture-warnings, 0 fail) · EclipseValidateData 3 validators/0 fouten · catalog 28/28.** Alle vijf changesets hadden vóóraf review-GO (2 verse reviews, 1 herkeur, art-review, planner ×2).
 

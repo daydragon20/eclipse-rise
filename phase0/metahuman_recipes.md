@@ -64,6 +64,15 @@ De eerste MetaHuman (SentinelC, provisioneel Kaya-slot) draagt fotoreële baked-
 
 **Aanbeveling: B**, te valideren met één vaste-camera shotronde (15.8) op het Kaya-slot zodra de gezichts-tier rendert. Keuze is aan art-reviewer/owner; tot die tijd blijft de koppeling data-only (geen runtime-consument van `MetaHumanMesh`, dus niets rendert nog fotoreëel in-game).
 
+### BESLOTEN: B — hybride (owner Nathan, 2026-07-25)
+
+Daarmee is dit punt gesloten en is de gezichts-tier bouwbaar. Wat B concreet vastlegt:
+
+- **Door de toon-master:** huid (face + body), teeth. Zelfde weg als `DT_BodyDefs.bToonRestyle` — basistextuur wordt luminantie-detail, de factie-tint bepaalt de hue (15.5: palet is de enige kleur-autoriteit).
+- **Eigen shader behouden, mét exposure-compensatie naar de toon-tier:** ogen (`MI_EyeL/R_Baked`), lacrimal, grooms. Reden om ze uit te zonderen: in dialoog-close-ups is de ooglichtjes-respons het verschil tussen een karakterkop en een masker.
+- **Verplichte tegenprestatie:** omdat er nu twee shading-families op één gezicht zitten, is **één 15.8-shotronde op de vaste camera's een harde poort** vóór de gezichts-tier als "af" telt — de art-reviewer beoordeelt specifiek de naad huid↔oog en of het hoofd op dezelfde exposure-tier leest als het (unlit) district. Faalt die ronde, dan is A de terugvaloptie (niet C).
+- Volgorde: de restyle-keten hangt achter de MetaHuman-assembly-run (`/Game/MetaHumans` is nog leeg; de wave-2-probe van 25-07 vond Frey/Hannah/Mason/Advika + garderobe + grooms wél binnen). Zolang een `MH_*` ontbreekt draait het slot op de fallback-body — niets blokkeert.
+
 ## Wat de agent daarna doet (geen actie van jou)
 - Import koppelen aan `DT_NamedCharacters` (slot per character), toon-restyle over de MetaHuman-materialen, outfit/body-combinatie met onze pack-kleding, idle/gesprekshouding, en de missie/dialoog-hooks per SPEC-P2-04.
 - Zolang een `MH_*` ontbreekt, draait het slot automatisch op de fallback-body uit `DT_BodyDefs` — niets blokkeert.
