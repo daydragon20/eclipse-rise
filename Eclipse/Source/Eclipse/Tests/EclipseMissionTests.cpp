@@ -13,6 +13,7 @@
 #include "Misc/AutomationTest.h"
 #include "Quests/EclipseMissionLogic.h"
 #include "Quests/EclipseMissionSubsystem.h"
+#include "Quests/EclipseStoryTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
@@ -176,10 +177,28 @@ bool FEclipseMissionFullLoopTest::RunTest(const FString& Parameters)
 		Graph->MissionOffers = Offers;
 	}
 
+	// Story layer on the same board: the launched template carries a completion
+	// beat, so this loop proves the debrief's real table-lookup path AND that
+	// beat + rewards + casualty + day tick land as ONE atomic commit
+	// (SPEC-P2-04 decision 12). Row rewards mirror the generic offer so the
+	// reward asserts below stay meaningful for both resolution paths.
+	UDataTable* StoryTable = NewObject<UDataTable>();
+	StoryTable->RowStruct = FEclipseStoryMissionRow::StaticStruct();
+	{
+		FEclipseStoryMissionRow StoryRow;
+		StoryRow.MissionId = TEXT("MT_Assault");
+		StoryRow.PinnedRegionId = TEXT("Checkpoint");
+		StoryRow.CompletionBeatTag = EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag();
+		StoryRow.RewardCredits = 60;
+		StoryRow.RewardIntel = 4;
+		StoryTable->AddRow(TEXT("Story_Assault"), StoryRow);
+	}
+
 	UEclipseCampaignSetupAsset* Setup = NewObject<UEclipseCampaignSetupAsset>();
 	Setup->StartingDay = 1;
 	Setup->StartingRosterSize = 2;
 	Setup->RegionGraph = Graph;
+	Setup->StoryMissions = StoryTable;
 	Campaign->StartNewCampaign(Setup);
 
 	int32 CompletedEvents = 0;
@@ -222,6 +241,9 @@ bool FEclipseMissionFullLoopTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("Fallen soldier served the fatal mission"), Campaign->GetState().FindSoldier(Squad[0])->MissionsServed, 1);
 	TestEqual(TEXT("Survivor served the mission too"), Campaign->GetState().FindSoldier(Squad[1])->MissionsServed, 1);
 	TestEqual(TEXT("Mission.Completed broadcast once"), CompletedEvents, 1);
+	TestTrue(TEXT("Completion beat committed in the same debrief transaction"),
+		Campaign->GetState().StoryFlags.Contains(EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag()));
+	TestEqual(TEXT("Debrief cost the day (P2-03 locked decision 4)"), Campaign->GetState().Day, 2);
 	TestTrue(TEXT("Runtime finished"), Mission->GetPhase() == EEclipseMissionPhase::Finished);
 
 	// 5. Second loop must be startable (the gate question is "loop #2").
@@ -229,6 +251,73 @@ bool FEclipseMissionFullLoopTest::RunTest(const FString& Parameters)
 
 	Bus->Unsubscribe(CompletedHandle);
 	GameInstance->Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionDebriefBeatTest,
+	"Eclipse.Quests.Mission.DebriefCommitsCompletionBeat",
+	EclipseMissionTest::TestFlags)
+
+bool FEclipseMissionDebriefBeatTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04 decision 12: the completion beat is one atomic fact with the
+	// debrief. Pure composition proves the four-way contract: win commits the
+	// beat, a re-completed mission skips it (SetStoryFlag's duplicate-reject
+	// would otherwise drop the whole debrief), loss never commits story
+	// progress, and a beatless (generic) mission composes nothing.
+	const FGameplayTag Beat = EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag();
+
+	auto CountBeatMutations = [&Beat](const FEclipseCampaignTransaction& Transaction)
+	{
+		int32 Count = 0;
+		for (const FEclipseCampaignMutation& Mutation : Transaction.Mutations)
+		{
+			if (Mutation.Type == EEclipseCampaignMutationType::SetStoryFlag && Mutation.StoryFlagTag == Beat)
+			{
+				++Count;
+			}
+		}
+		return Count;
+	};
+
+	FEclipseCampaignState State;
+	FEclipseMissionOutcome Outcome;
+	Outcome.bSuccess = true;
+
+	FEclipseCampaignTransaction Win = EclipseMissionLogic::ComposeConsequences(
+		Outcome, FEclipseMissionRewards(), {}, State,
+		EclipseTags::Resource_Credits.GetTag(), EclipseTags::Resource_Materials.GetTag(), EclipseTags::Resource_Intel.GetTag(),
+		/*bProgressRegionOnSuccess*/ false, Beat);
+	TestEqual(TEXT("Win commits the completion beat"), CountBeatMutations(Win), 1);
+
+	TArray<FEclipseAppliedMutation> Applied;
+	FString Error;
+	TestTrue(TEXT("Beat debrief commits"), EclipseCampaignLogic::CommitTransaction(State, Win, Applied, Error));
+	TestTrue(TEXT("StoryFlags carry the beat"), State.StoryFlags.Contains(Beat));
+
+	// Re-completion against the committed state: no beat mutation, and the
+	// debrief still commits whole — the duplicate-reject is never hit.
+	FEclipseCampaignTransaction Again = EclipseMissionLogic::ComposeConsequences(
+		Outcome, FEclipseMissionRewards(), {}, State,
+		EclipseTags::Resource_Credits.GetTag(), EclipseTags::Resource_Materials.GetTag(), EclipseTags::Resource_Intel.GetTag(),
+		false, Beat);
+	TestEqual(TEXT("Re-completion skips the already-set beat"), CountBeatMutations(Again), 0);
+	TestTrue(TEXT("Second debrief still commits whole"), EclipseCampaignLogic::CommitTransaction(State, Again, Applied, Error));
+
+	Outcome.bSuccess = false;
+	FEclipseCampaignTransaction Loss = EclipseMissionLogic::ComposeConsequences(
+		Outcome, FEclipseMissionRewards(), {}, State,
+		EclipseTags::Resource_Credits.GetTag(), EclipseTags::Resource_Materials.GetTag(), EclipseTags::Resource_Intel.GetTag(),
+		false, Beat);
+	TestEqual(TEXT("Loss never composes story progress (GDD 11.4)"), CountBeatMutations(Loss), 0);
+
+	Outcome.bSuccess = true;
+	FEclipseCampaignTransaction Generic = EclipseMissionLogic::ComposeConsequences(
+		Outcome, FEclipseMissionRewards(), {}, State,
+		EclipseTags::Resource_Credits.GetTag(), EclipseTags::Resource_Materials.GetTag(), EclipseTags::Resource_Intel.GetTag(),
+		false);
+	TestEqual(TEXT("A beatless mission composes no beat"), CountBeatMutations(Generic), 0);
+
 	return true;
 }
 

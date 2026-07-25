@@ -45,6 +45,10 @@ namespace EclipseMissionLogic
 	 * the transaction commits — this is the proposal). Fail-forward (GDD 11.4):
 	 * failure still commits casualties and partial intel; it never rolls back.
 	 * Success progresses the region one step (Dominion->Contested->Player).
+	 * A valid CompletionBeatTag rides the same atomic commit on success
+	 * (SPEC-P2-04 decision 12) — never on loss, and skipped when the flag is
+	 * already set, because SetStoryFlag rejects duplicates atomically and a
+	 * rejected debrief would drop the whole consequence set.
 	 */
 	ECLIPSE_API FEclipseCampaignTransaction ComposeConsequences(
 		const FEclipseMissionOutcome& Outcome,
@@ -54,5 +58,6 @@ namespace EclipseMissionLogic
 		const FGameplayTag& CreditsTag,
 		const FGameplayTag& MaterialsTag,
 		const FGameplayTag& IntelTag,
-		bool bProgressRegionOnSuccess);
+		bool bProgressRegionOnSuccess,
+		const FGameplayTag& CompletionBeatTag = FGameplayTag());
 }

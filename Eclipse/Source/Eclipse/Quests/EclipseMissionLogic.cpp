@@ -1,5 +1,7 @@
 #include "Quests/EclipseMissionLogic.h"
 
+#include "Quests/EclipseStoryLogic.h"
+
 namespace EclipseMissionLogic
 {
 
@@ -37,7 +39,8 @@ FEclipseCampaignTransaction ComposeConsequences(
 	const FGameplayTag& CreditsTag,
 	const FGameplayTag& MaterialsTag,
 	const FGameplayTag& IntelTag,
-	bool bProgressRegionOnSuccess)
+	bool bProgressRegionOnSuccess,
+	const FGameplayTag& CompletionBeatTag)
 {
 	FEclipseCampaignTransaction Transaction;
 	Transaction.Source = TEXT("MissionDebrief");
@@ -81,6 +84,19 @@ FEclipseCampaignTransaction ComposeConsequences(
 		// Fail-forward (GDD 11.4): the field always teaches something — a failed
 		// op still brings home partial intel, never a retry wall.
 		AddReward(IntelTag, Rewards.Intel / 2, TEXT("MissionIntel_Salvaged"));
+	}
+
+	// The story completion beat is one atomic fact with the rest of the debrief
+	// (SPEC-P2-04 decision 12). Skip-if-set is load-bearing, not cosmetic:
+	// SetStoryFlag rejects duplicates atomically, so composing the beat into a
+	// re-completed mission's debrief would reject rewards, casualties and the
+	// day tick wholesale (the P2-05 no-op-reject lesson mirrored). Loss never
+	// commits a beat — fail-forward means retry, not story progress (GDD 11.4).
+	if (Outcome.bSuccess && EclipseStoryLogic::ShouldCommitBeat(FGameplayTagContainer::CreateFromArray(State.StoryFlags), CompletionBeatTag))
+	{
+		FEclipseCampaignMutation& BeatMutation = Transaction.Mutations.AddDefaulted_GetRef();
+		BeatMutation.Type = EEclipseCampaignMutationType::SetStoryFlag;
+		BeatMutation.StoryFlagTag = CompletionBeatTag;
 	}
 
 	if (Outcome.bSuccess && bProgressRegionOnSuccess)

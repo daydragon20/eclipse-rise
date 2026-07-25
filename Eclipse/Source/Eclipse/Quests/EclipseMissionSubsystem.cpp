@@ -6,6 +6,7 @@
 #include "Eclipse.h"
 #include "Engine/GameInstance.h"
 #include "HAL/IConsoleManager.h"
+#include "Quests/EclipseStoryTypes.h"
 #include "Squad/EclipseRosterLogic.h"
 #include "Squad/EclipseRosterTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
@@ -55,6 +56,16 @@ void UEclipseMissionSubsystem::OnMissionSelected(FGameplayTag EventTag, const FI
 	const FEclipseStrategyEventPayload* Strategy = Payload.GetPtr<FEclipseStrategyEventPayload>();
 	if (Strategy == nullptr)
 	{
+		return;
+	}
+
+	// A mid-mission selection must not repoint the pending offer: the debrief
+	// resolves rewards AND the story completion beat by PendingTemplateId, and
+	// beats are permanent campaign state — the wrong row would commit the
+	// wrong story fact. Selection re-opens once the runtime is at rest.
+	if (Phase != EEclipseMissionPhase::None && Phase != EEclipseMissionPhase::Finished)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Mission: selection for region '%s' ignored — a mission is in flight (GDD 14.3.5)."), *Strategy->RegionId.ToString());
 		return;
 	}
 
@@ -307,12 +318,40 @@ bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
 	const TArray<FEclipseResolvedCasualty> Casualties = EclipseRosterLogic::ResolveCasualties(
 		DownedSoldiers, Campaign->GetState(), bSuccess && RosterTuning != nullptr, WoundedDaysOut, StabilizedSoldiers);
 
+	// Story completion beat (SPEC-P2-04): a won story mission's row supplies
+	// the beat the debrief commits; generic missions simply have no row, so a
+	// miss here is the common case and stays silent — table-health warnings
+	// (wrong struct, orphan pins, empty beats) live in the strategy resolver.
+	FGameplayTag CompletionBeat;
+	if (bSuccess && Setup != nullptr)
+	{
+		const UDataTable* StoryTable = Setup->StoryMissions.LoadSynchronous();
+		if (StoryTable != nullptr && StoryTable->GetRowStruct() != nullptr &&
+			StoryTable->GetRowStruct()->IsChildOf(FEclipseStoryMissionRow::StaticStruct()))
+		{
+			// First-wins mirrors the resolver's tie rule (table order decides);
+			// the None-guard keeps a half-authored row from matching a generic
+			// offer that carries no template id.
+			bool bBeatRowFound = false;
+			StoryTable->ForeachRow<FEclipseStoryMissionRow>(TEXT("DebriefBeat"),
+				[&CompletionBeat, &bBeatRowFound, this](const FName&, const FEclipseStoryMissionRow& Row)
+				{
+					if (!bBeatRowFound && !Row.MissionId.IsNone() && Row.MissionId == PendingTemplateId)
+					{
+						CompletionBeat = Row.CompletionBeatTag;
+						bBeatRowFound = true;
+					}
+				});
+		}
+	}
+
 	const FEclipseCampaignTransaction Consequences = EclipseMissionLogic::ComposeConsequences(
 		LastOutcome, PendingRewards, Casualties, Campaign->GetState(),
 		EclipseTags::Resource_Credits.GetTag(),
 		EclipseTags::Resource_Materials.GetTag(),
 		EclipseTags::Resource_Intel.GetTag(),
-		bProgressRegionOnSuccess);
+		bProgressRegionOnSuccess,
+		CompletionBeat);
 
 	if (!Consequences.Mutations.IsEmpty())
 	{
