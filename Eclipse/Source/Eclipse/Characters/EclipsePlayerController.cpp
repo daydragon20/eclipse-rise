@@ -90,6 +90,14 @@ void AEclipsePlayerController::EnterBaseMode()
 	}
 
 	bShowMouseCursor = true;
+	// Playtest finding 13.2 (owner, 2026-07-25): the tester spent minutes pressing
+	// WASD in the hub, convinced the controls were broken, because nothing on screen
+	// said the pawn was parked and input was UI-only. The code was correct — it was
+	// unreadable. The cursor SHAPE is now the state indicator (Supreme Commander
+	// style): a hand means "you are planning, click an offer"; a crosshair means
+	// "you are in the field". Engine cursor types, so no art dependency, and it costs
+	// nothing. The base-hub header line says the same thing in words.
+	CurrentMouseCursor = EMouseCursor::Hand;
 	FInputModeUIOnly Mode;
 	Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(Mode);
@@ -116,7 +124,10 @@ void AEclipsePlayerController::EnterMissionMode()
 		MissionHud->AddToViewport(5);
 	}
 
+	// Mission mode: no cursor at all — the absence IS the signal that the pawn has
+	// your input now (the other half of the 13.2 readability fix above).
 	bShowMouseCursor = false;
+	CurrentMouseCursor = EMouseCursor::Crosshairs;
 	FInputModeGameOnly Mode;
 	SetInputMode(Mode);
 

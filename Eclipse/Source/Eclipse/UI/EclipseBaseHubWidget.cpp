@@ -170,8 +170,14 @@ void UEclipseBaseHubWidget::RefreshHeader()
 	{
 		return;
 	}
+	// Playtest finding 13.2 (owner, 2026-07-25): the old header named the place and
+	// the wallet but never said WHERE YOU ARE or WHAT TO DO NEXT, so a tester who
+	// booted straight into the hub pressed WASD for minutes and concluded the
+	// controls were broken. The pawn is parked here by design (SPEC-P1-08) — that
+	// design just has to be legible. Mode word first, then the next action; the
+	// numbers move to the back where they belong.
 	const FEclipseCampaignState& State = Campaign->GetState();
-	HeaderText->SetText(FText::FromString(FString::Printf(TEXT("HOLLOW POINT — Day %d | C %d | M %d | I %d"),
+	HeaderText->SetText(FText::FromString(FString::Printf(TEXT("BASE — Hollow Point · day %d · pick a mission below to start (walking is disabled here)  |  C %d  M %d  I %d"),
 		State.Day,
 		State.GetBalance(EclipseTags::Resource_Credits.GetTag()),
 		State.GetBalance(EclipseTags::Resource_Materials.GetTag()),

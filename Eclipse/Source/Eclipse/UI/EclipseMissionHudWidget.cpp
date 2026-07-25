@@ -218,7 +218,10 @@ void UEclipseMissionHudWidget::Rebuild()
 	{
 		const bool bAlarm = Mission->IsAlarmRaised();
 		const bool bCasualty = Mission->HasAnyCasualtyThisRun();
-		AddLine(FString::Printf(TEXT("== MISSION  [%s]%s%s =="),
+		// The mode word and the two controls that matter come FIRST (13.2 finding):
+		// a tester who boots into a run should never have to guess whether the game
+		// has his input. The base hub says the mirror image of this line.
+		AddLine(FString::Printf(TEXT("== MISSION ACTIVE  [%s]%s%s  —  WASD move · Q hold = Command Mode · F2 controls =="),
 			*UEnum::GetValueAsString(Mission->GetPhase()).RightChop(FString(TEXT("EEclipseMissionPhase::")).Len()),
 			bAlarm ? TEXT("  ALARM") : TEXT(""),
 			bCasualty ? TEXT("  CASUALTY") : TEXT("")));
