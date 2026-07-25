@@ -42,14 +42,22 @@ This dev box is a **2017 laptop: NVIDIA GTX 1050 (4 GB), i7-7700HQ, 32 GB RAM**.
 
 ---
 
-## 4. Current status (2026-07-22)
+## 4. Current status (green bar re-verified 2026-07-25 18:40)
 
-**Phase 1 — all 8 feature specs landed, independently re-reviewed (Fable 5), and the tree is green.**
+**Phase 1 landed and re-reviewed; Phase 2 specs are landing on a green bar every commit.**
 
-- Build: `EclipseEditor Win64 Development` **Succeeded** (UE 5.8).
-- Automation tests: **31/31 pass** (`Automation RunTests Eclipse`, headless `-nullrhi`; incl. 3 audio tests).
-- Data validation: **clean** (`EclipseValidateData` commandlet, 0 errors).
-- Event catalog: **19/19 in sync** (`Eclipse/Tools/check_event_catalog.py`).
+- Build: `EclipseEditor Win64 Development` **Succeeded** (UE 5.8, always `-NoUba`).
+- Automation tests: **95/95 pass** (`Automation RunTests Eclipse`, headless `-nullrhi`).
+- Data validation: **clean** (`EclipseValidateData`, 4 validators / 0 errors).
+- Event catalog: **29/29 in sync** (`Eclipse/Tools/check_event_catalog.py`).
+
+**How to play it right now** (this is what the owner tests): launch the game and press
+**F3** for the in-game test guide — 20 steps that walk you through every control, tick
+themselves off as you use them, and end with the 13.2 questions. **F2** gives the
+feel-gauntlet overlay with the five R3 criteria. Both write one shared summary block to
+`Saved/Logs`. `-EclipseStartMission=<RegionId>` (e.g. `TransitCheckpoint`) skips the hub
+and lands straight in a mission; `-EclipseShot` runs the fixed-camera review rig and
+deliberately hides all debug UI.
 - Voice pipeline: **live-verified** against the ElevenLabs PCM endpoint (8/8 lines generated + imported + assigned; re-run = 8 cache hits, 0 API calls).
 
 **Systems in place (headless-proven):** event bus · campaign state + transaction API + save v0 · deterministic economy ledger · 6-node strategy mini-map · mission runtime + debrief consequences · squad of 2 with ordered actions and *reasoned refusals* (never-silent) · roster + permadeath + memorial stub · menu base hub + preparation flow · playable graybox layer (character/GAS health, hitscan combat, enemy AI, code-built district).
@@ -59,6 +67,23 @@ The full loop is **proven headless** (test `Eclipse.Base.Prep.FullCircleSmoke`: 
 ---
 
 ## 5. What's next
+
+**Waar het nu op wacht (2026-07-25):** één speelsessie van de owner. Die levert in één
+keer twee dingen die geen enkele geautomatiseerde check kan geven: het **R3-verdict**
+over de feel van Command Mode, en het **13.2-antwoord** ("spelen testers vrijwillig een
+tweede ronde?"). De game begeleidt die sessie nu zelf via F3, dus er hoeft geen document
+naast het scherm.
+
+**Openstaand ná die sessie, in volgorde:**
+1. Dressing-iteratie 3 afmaken — pool-compositing (multiply in plaats van over),
+   bloom/halo, en de contactschaduw-rok afleiden van de HOOGTE in plaats van de
+   footprint (`phase0/DRESSING_ITERATIE_3.md` §5).
+2. Kit-pass P2-08 plaatsing — de 12 Factory-Pack-kandidaten zijn gemeten en groen
+   (`phase0/KITPASS_P2-08.md` §2a); wat nog een beslissing vraagt is of de accepts naar
+   repo-tracked `/Game/Art/Imported` migreren, want deze meshes dragen 4K-textures en
+   dat kost repo-omvang.
+3. MetaHuman gezichts-tier B implementeren (`phase0/MH_FACE_TIER_B.md`), met de
+   15.8-shotronde op de naad huid↔oog als harde poort.
 
 The **live playable loop is done** (commit `[Loop] Wire the live playable loop`): boot → menu base → launch → graybox mission with squad orders → extraction/lose → debrief → base, no console commands. The remaining Phase-1 step is the **gate question** — a human plays it and answers *"do testers voluntarily play a second loop?"* (13.2). That's the owner's call, not an automated check.
 
