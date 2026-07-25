@@ -92,6 +92,33 @@ hermetert de auto-exposure dus niet — de eis uit 15.5 waarop de vloer eerder o
 Metal029 met gain 65 is dus geen alarm maar een simpel feit: het is een zeer donkere
 textuur, en 65 × 0.0154 = 1.00 zoals bedoeld.
 
+## 2b. Owner-beslissing: A — de meshes mogen de repo in (2026-07-25)
+
+De vraag was of de kandidaten mét hun 4K-textures naar repo-tracked
+`/Game/Art/Imported` migreren of machine-lokaal blijven. **Owner koos A: migreren.**
+Daarmee reist de kit mee naar een andere machine in plaats van daar naar graybox te
+degraderen, tegen de prijs van repo-omvang.
+
+`Tools/migrate_kit_accepts.py` voert het uit, op hetzelfde duplicate→consolidate-
+patroon als de vorige pack-slim-ronde (consolidate her-richt elke referentie én laat
+een redirector achter, rename doet dat alleen "wanneer nodig"). Drie dingen doet het
+bewust anders:
+
+1. **Het migreert ook de textures**, want dat is wat A betekent — zonder textures
+   reist de geometrie kaal mee en valt het district elders alsnog terug op flat cel.
+2. **Het rapporteert de toegevoegde bytes**, per asset en als totaal, naar
+   `Saved/CurationStaging/kit_migration.json`. De beslissing is genomen op de
+   schatting "een veelvoud van 2,4 MB"; als het in de praktijk veel meer is, hoort
+   dat zichtbaar te zijn vóór een push in plaats van erna.
+3. **Materiaalslots gaan naar de toon-master.** Rauwe pack-materialen renderen nooit
+   (15.5) en elke plaatsing overschrijft de slots toch met palet-MIDs; dit knipt de
+   laatste harde afhankelijkheid naar het pack door.
+
+**Nog niet gedraaid.** De commandlet start pas als de C++-module compileert, en die
+staat op het moment van schrijven stil op een animatie-changeset die halverwege is.
+Zodra die groen is: script draaien, de gemeten omvang in dit document zetten, en dan
+pas plaatsen — warehouse-yard eerst, per §2.
+
 ## 3. Wat dit oplost uit de art-review
 
 - **Machine-faces onleesbaar** → `SM_Controller_1` (7 slots) op de bank-voorkant.
