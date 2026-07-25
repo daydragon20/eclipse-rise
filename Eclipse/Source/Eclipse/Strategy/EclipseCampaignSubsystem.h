@@ -58,12 +58,15 @@ private:
 	void EmitEventsForApplied(const TArray<FEclipseAppliedMutation>& Applied);
 
 	/**
-	 * Stamp DA_BaseTuning's construction-tick numbers onto AdvanceDay mutations
-	 * so every day-advance path (hub, debrief, console) ticks with the same
-	 * data (GDD 14.2); without a tuning asset the mutation defaults — the
-	 * SPEC-P2-03 spec values — stand (GDD 14.3.5).
+	 * Stamp DA_BaseTuning's numbers onto the mutations that consume them
+	 * (AdvanceDay's construction tick, AssignStaff's cap validation) so every
+	 * caller — hub, debrief, console — runs the same data (GDD 14.2); without
+	 * a tuning asset the mutation defaults — the SPEC-P2-03 spec values —
+	 * stand (GDD 14.3.5). Loads the asset only when the transaction actually
+	 * contains such a mutation (step-3 review finding 5): resource spends,
+	 * roster changes and story beats must not pay a synchronous asset load.
 	 */
-	void StampAdvanceDayTuning(FEclipseCampaignTransaction& Transaction) const;
+	void StampBaseTuning(FEclipseCampaignTransaction& Transaction) const;
 
 	void RegisterConsoleCommands();
 	void UnregisterConsoleCommands();

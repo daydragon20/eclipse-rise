@@ -253,7 +253,27 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 		}
 		// Unassign carries no roster requirement: a dead or wounded soldier must
 		// always be releasable from a post (GDD 14.3.5 - no stuck states).
-		return EclipseBaseLogic::ValidateStaffChange(State.BaseState, Mutation.SlotId, Mutation.SoldierId, bAssign, OutError);
+		if (!EclipseBaseLogic::ValidateStaffChange(State.BaseState, Mutation.SlotId, Mutation.SoldierId, bAssign, OutError))
+		{
+			return false;
+		}
+		if (bAssign)
+		{
+			// The staff cap is enforced HERE, in the mutation layer, with the
+			// DA_BaseTuning value stamped onto the mutation - not only in the
+			// wrapper's pre-check (step-3 review). Over-cap assignment is
+			// yield-harmless (EffectiveStaffCount clamps) but would still lock
+			// a soldier undeployable for zero effect, so any caller reaching
+			// the API past the cap is a bug worth rejecting loudly.
+			const FEclipseFacilityState* Facility = State.BaseState.FindBySlot(Mutation.SlotId);
+			if (Facility != nullptr && Facility->AssignedSoldierIds.Num() >= FMath::Max(0, Mutation.MaxStaffPerSite))
+			{
+				OutError = FString::Printf(TEXT("AssignStaff: slot '%s' is fully staffed (%d/%d)"),
+					*Mutation.SlotId.ToString(), Facility->AssignedSoldierIds.Num(), FMath::Max(0, Mutation.MaxStaffPerSite));
+				return false;
+			}
+		}
+		return true;
 	}
 	case EEclipseCampaignMutationType::SetStoryFlag:
 	{
@@ -331,6 +351,12 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 			[&Mutation](const FEclipseSoldierRecord& S) { return S.SoldierId == Mutation.SoldierId; });
 		check(Soldier != nullptr);
 		Soldier->Status = EEclipseSoldierStatus::Dead;
+		// The casualty vacates their base post in this same apply: a stale id in
+		// AssignedSoldierIds would keep earning the analyst bonus for a dead
+		// soldier (the ghost-analyst yield gap, step-3 review) and hold the
+		// slot's cap. The commit turns the releases into StaffAssigned(none)
+		// facts (SPEC-P2-03 events table).
+		Applied.StaffReleases = EclipseBaseLogic::ReleaseSoldierAssignments(State.BaseState, Mutation.SoldierId);
 		break;
 	}
 	case EEclipseCampaignMutationType::AddMemorialEntry:
@@ -365,6 +391,10 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 		check(Soldier != nullptr);
 		Soldier->Status = EEclipseSoldierStatus::Wounded;
 		Soldier->WoundedUntilDay = State.Day + Mutation.EtaDays;
+		// Same contract as KillSoldier: a wounded soldier cannot work a post
+		// (staffing requires Available - SPEC-P2-03 staffing v1), so the wound
+		// releases them; re-staffing after recovery is a new explicit order.
+		Applied.StaffReleases = EclipseBaseLogic::ReleaseSoldierAssignments(State.BaseState, Mutation.SoldierId);
 		break;
 	}
 	case EEclipseCampaignMutationType::AdvanceDay:

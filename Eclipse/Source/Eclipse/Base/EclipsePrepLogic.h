@@ -19,7 +19,7 @@ namespace EclipsePrepLogic
 		FGameplayTag RequiredUnlockTag;
 	};
 
-	/** Squad pick is legal iff exactly SquadSize distinct soldiers, all available on the current day. */
+	/** Squad pick is legal iff exactly SquadSize distinct soldiers, all available on the current day and none holding a base post (SPEC-P2-03: assigned staff are undeployable). */
 	ECLIPSE_API bool ValidateSquadPick(const FEclipseCampaignState& State, const TArray<FGuid>& SquadSoldierIds, int32 SquadSize, FString& OutError);
 
 	/** Loadout is legal iff the option exists and its unlock (if any) has been produced (SPEC-P1-03 gate). */

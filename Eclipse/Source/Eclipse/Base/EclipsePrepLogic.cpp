@@ -1,5 +1,6 @@
 #include "Base/EclipsePrepLogic.h"
 
+#include "Base/EclipseBaseLogic.h"
 #include "Squad/EclipseRosterLogic.h"
 
 namespace EclipsePrepLogic
@@ -35,6 +36,17 @@ bool ValidateSquadPick(const FEclipseCampaignState& State, const TArray<FGuid>& 
 			// The reason names the person — the tester routes around a wounded
 			// soldier because the UI can say *why* (SPEC-P1-08 DoD).
 			OutError = FString::Printf(TEXT("%s is not available (status %d)"), *Soldier->Name, static_cast<int32>(Soldier->Status));
+			return false;
+		}
+
+		// Undeployable while assigned (SPEC-P2-03 locked decision 6 — the 5.3.2
+		// staff dilemma): assignment lives in base state, the roster row stays
+		// Available, so the muster gate must read base state, not status. The
+		// rejection names person AND post — release is one explicit order away.
+		if (const FEclipseFacilityState* Post = EclipseBaseLogic::FindAssignment(State.BaseState, SoldierId))
+		{
+			OutError = FString::Printf(TEXT("%s is assigned to %s at slot '%s' — release them from the post first"),
+				*Soldier->Name, *Post->FacilityId.ToString(), *Post->SlotId.ToString());
 			return false;
 		}
 	}

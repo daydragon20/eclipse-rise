@@ -31,6 +31,13 @@ namespace EclipseBaseLogic
 	/** Caller-supplied DT_Facilities lookup; may return null for unknown ids (graceful skip, GDD 14.3.5). */
 	using FEclipseFacilityRowResolver = TFunctionRef<const FEclipseFacilityRow*(FName)>;
 
+	/** One vacated base post (KillSoldier/WoundSoldier apply) - the commit emits StaffAssigned(RoleTag none) per entry. */
+	struct FEclipseStaffRelease
+	{
+		FName SlotId;
+		FName FacilityId;
+	};
+
 	/** One completed build step - the commit turns these into Event.Base.FacilityBuilt/Upgraded in the same commit. */
 	struct FEclipseFacilityCompletion
 	{
@@ -128,13 +135,29 @@ namespace EclipseBaseLogic
 	 * site an analyst - the role is positional) and the soldier may hold only
 	 * one base job. Unassign: the soldier must actually be assigned there.
 	 * Roster-level checks (soldier exists, is Available) and the tuning cap
-	 * (MaxCrewPerSite) belong to the callers that hold that data; assignment
+	 * (MaxCrewPerSite) belong to the callers that hold that data - the mutation
+	 * layer enforces the cap with the value stamped onto the AssignStaff
+	 * mutation (step-3 review), the wrapper pre-checks it for UX; assignment
 	 * beyond the cap stays harmless (EffectiveStaffCount clamps every effect).
 	 */
 	ECLIPSE_API bool ValidateStaffChange(const FEclipseBaseState& BaseState, FName SlotId, const FGuid& SoldierId, bool bAssign, FString& OutError);
 
 	/** Apply a validated staff change; returns the touched facility (null only on unvalidated input). */
 	ECLIPSE_API FEclipseFacilityState* ApplyStaffChange(FEclipseBaseState& BaseState, FName SlotId, const FGuid& SoldierId, bool bAssign);
+
+	/** The facility currently holding this soldier's one base job, or null. Muster reads this: assigned = undeployable (SPEC-P2-03 staffing v1). */
+	ECLIPSE_API const FEclipseFacilityState* FindAssignment(const FEclipseBaseState& BaseState, const FGuid& SoldierId);
+
+	/**
+	 * Strip a soldier from every AssignedSoldierIds list (KillSoldier/
+	 * WoundSoldier apply): a casualty vacates their post in the same mutation,
+	 * so a dead analyst can never keep earning the bonus (the ghost-analyst
+	 * yield gap - step-3 review) and the vacated slot is immediately
+	 * re-staffable. Returns the vacated posts for the commit's
+	 * StaffAssigned(RoleTag none) facts. Sweeps all facilities defensively
+	 * even though validation enforces one job per soldier.
+	 */
+	ECLIPSE_API TArray<FEclipseStaffRelease> ReleaseSoldierAssignments(FEclipseBaseState& BaseState, const FGuid& SoldierId);
 
 	/**
 	 * Daily facility output (operational levels only; sites still building their

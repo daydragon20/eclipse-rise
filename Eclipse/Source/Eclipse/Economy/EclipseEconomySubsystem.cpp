@@ -96,6 +96,15 @@ FEclipseEconomyTickParams UEclipseEconomySubsystem::ResolveTickParams() const
 
 	// Facility output rides the same tick as region yields (SPEC-P2-03: one
 	// deterministic tick); the base wrapper owns the base-data resolution.
+	//
+	// Day-N contract (SPEC-P2-03 econ check — the nightly soak leans on it):
+	// the day tick runs downstream of Event.Campaign.DayAdvanced, i.e. AFTER
+	// the AdvanceDay commit already applied the construction tick. A facility
+	// completing on day N is therefore operational HERE and yields on day N,
+	// not N+1 — the Intel-opening path prices the IC's build days on exactly
+	// this (an IC finishing d12 funds d12's stream). Resolving these yields
+	// before the campaign commit would silently ship every completion's first
+	// yield a day late; keep this read after the day-advance commit.
 	if (const UEclipseBaseSubsystem* Base = GetGameInstance()->GetSubsystem<UEclipseBaseSubsystem>())
 	{
 		Params.FacilityYields = Base->ComputeTodaysFacilityYields();

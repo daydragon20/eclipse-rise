@@ -261,13 +261,10 @@ bool ValidateStaffChange(const FEclipseBaseState& BaseState, FName SlotId, const
 	{
 		// One person, one job (SPEC-P2-03 staffing v1: assignment makes the
 		// soldier undeployable - a double booking would double-spend them).
-		for (const FEclipseFacilityState& Other : BaseState.Facilities)
+		if (const FEclipseFacilityState* Other = FindAssignment(BaseState, SoldierId))
 		{
-			if (Other.AssignedSoldierIds.Contains(SoldierId))
-			{
-				OutError = FString::Printf(TEXT("Staff: soldier %s is already assigned at slot '%s'"), *SoldierId.ToString(), *Other.SlotId.ToString());
-				return false;
-			}
+			OutError = FString::Printf(TEXT("Staff: soldier %s is already assigned at slot '%s'"), *SoldierId.ToString(), *Other->SlotId.ToString());
+			return false;
 		}
 	}
 	else if (!Facility->AssignedSoldierIds.Contains(SoldierId))
@@ -294,6 +291,35 @@ FEclipseFacilityState* ApplyStaffChange(FEclipseBaseState& BaseState, FName Slot
 		Facility->AssignedSoldierIds.Remove(SoldierId);
 	}
 	return Facility;
+}
+
+const FEclipseFacilityState* FindAssignment(const FEclipseBaseState& BaseState, const FGuid& SoldierId)
+{
+	if (!SoldierId.IsValid())
+	{
+		return nullptr;
+	}
+	return BaseState.Facilities.FindByPredicate(
+		[&SoldierId](const FEclipseFacilityState& Facility) { return Facility.AssignedSoldierIds.Contains(SoldierId); });
+}
+
+TArray<FEclipseStaffRelease> ReleaseSoldierAssignments(FEclipseBaseState& BaseState, const FGuid& SoldierId)
+{
+	TArray<FEclipseStaffRelease> Releases;
+	if (!SoldierId.IsValid())
+	{
+		return Releases;
+	}
+	for (FEclipseFacilityState& Facility : BaseState.Facilities)
+	{
+		if (Facility.AssignedSoldierIds.Remove(SoldierId) > 0)
+		{
+			FEclipseStaffRelease& Release = Releases.AddDefaulted_GetRef();
+			Release.SlotId = Facility.SlotId;
+			Release.FacilityId = Facility.FacilityId;
+		}
+	}
+	return Releases;
 }
 
 FEclipseFacilityYieldParams ComputeFacilityYields(const FEclipseBaseState& BaseState, const FEclipseBaseTuningParams& Tuning, FEclipseFacilityRowResolver FindFacilityRow)

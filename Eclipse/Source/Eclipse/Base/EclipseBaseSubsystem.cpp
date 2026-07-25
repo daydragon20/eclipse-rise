@@ -246,8 +246,10 @@ bool UEclipseBaseSubsystem::TryAssignStaff(FName SlotId, const FGuid& SoldierId,
 	const FEclipseFacilityState* Facility = State.BaseState.FindBySlot(SlotId);
 	const EclipseBaseLogic::FEclipseBaseTuningParams Tuning = ResolveTuningParams();
 
-	// The cap is data (DA_BaseTuning.MaxCrewPerSite) and lives at this layer —
-	// over-assignment past the cap would lock a soldier for zero effect.
+	// The cap is data (DA_BaseTuning.MaxCrewPerSite). This is the friendly
+	// pre-check; the hard gate is the mutation-layer validation running on the
+	// stamped cap inside the commit (step-3 review) — over-assignment past the
+	// cap would lock a soldier for zero effect.
 	if (Facility != nullptr && Facility->AssignedSoldierIds.Num() >= FMath::Max(0, Tuning.MaxCrewPerSite))
 	{
 		OutError = FString::Printf(TEXT("Staff: slot '%s' is fully staffed (%d)"), *SlotId.ToString(), Facility->AssignedSoldierIds.Num());

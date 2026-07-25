@@ -82,6 +82,24 @@ bool FEclipsePrepValidationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Recovered soldier pickable"),
 		EclipsePrepLogic::ValidateSquadPick(State, { Ready.SoldierId, Wounded.SoldierId }, 2, Error));
 
+	// Undeployable while assigned (SPEC-P2-03 staffing v1, step-3 review
+	// finding 2): a base post blocks the muster even though the roster row
+	// stays Available — the gate reads base state, not soldier status.
+	FEclipseFacilityState& Post = State.BaseState.Facilities.AddDefaulted_GetRef();
+	Post.SlotId = TEXT("Slot_D");
+	Post.FacilityId = TEXT("IntelligenceCenter");
+	Post.Level = 1;
+	Post.AssignedSoldierIds.Add(Second.SoldierId);
+	TestFalse(TEXT("Assigned soldier unpickable (undeployable while assigned)"),
+		EclipsePrepLogic::ValidateSquadPick(State, { Ready.SoldierId, Second.SoldierId }, 2, Error));
+	TestTrue(TEXT("Rejection names the person"), Error.Contains(TEXT("Second Ready")));
+	TestTrue(TEXT("Rejection names the post"), Error.Contains(TEXT("IntelligenceCenter")));
+
+	// Released from the post: deployable again, no residue.
+	Post.AssignedSoldierIds.Reset();
+	TestTrue(TEXT("Released soldier pickable again"),
+		EclipsePrepLogic::ValidateSquadPick(State, { Ready.SoldierId, Second.SoldierId }, 2, Error));
+
 	// Loadout gating (SPEC-P1-03 production gate).
 	const TArray<EclipsePrepLogic::FEclipseLoadoutOption> Loadouts = EclipsePrepTest::MakeLoadouts();
 	TestTrue(TEXT("Base loadout always legal"),

@@ -119,11 +119,13 @@ struct FEclipseCampaignMutation
 	FGameplayTag StaffRoleTag;
 
 	/**
-	 * AdvanceDay: construction-tick tuning (DA_BaseTuning), stamped onto the
-	 * mutation by the campaign subsystem at commit time so every day - hub,
-	 * debrief, console - ticks with the same data-driven numbers (GDD 14.2).
-	 * Defaults are the SPEC-P2-03 spec values, so headless tests and setups
-	 * without a tuning asset behave to spec (GDD 14.3.5).
+	 * AdvanceDay (construction tick) / AssignStaff (cap validation):
+	 * DA_BaseTuning values, stamped onto the mutation by the campaign subsystem
+	 * at commit time so every caller - hub, debrief, console - runs the same
+	 * data-driven numbers (GDD 14.2). Defaults are the SPEC-P2-03 spec values,
+	 * so headless tests and setups without a tuning asset behave to spec
+	 * (GDD 14.3.5). CrewDayReduction is consumed by AdvanceDay only;
+	 * MaxStaffPerSite by both.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	int32 CrewDayReduction = 1;
@@ -170,6 +172,9 @@ struct FEclipseAppliedMutation
 
 	/** AssignStaff: the facility occupying the slot at apply time (the mutation itself only names the slot). */
 	FName StaffedFacilityId;
+
+	/** KillSoldier / WoundSoldier: base posts the casualty vacated in this apply - the commit emits StaffAssigned(RoleTag none) per entry (SPEC-P2-03). */
+	TArray<EclipseBaseLogic::FEclipseStaffRelease> StaffReleases;
 };
 
 namespace EclipseCampaignLogic

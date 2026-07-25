@@ -465,7 +465,7 @@ void UEclipseCampaignSubsystem::StartNewCampaign(const UEclipseCampaignSetupAsse
 bool UEclipseCampaignSubsystem::CommitTransaction(const FEclipseCampaignTransaction& Transaction, FString& OutError)
 {
 	FEclipseCampaignTransaction Stamped = Transaction;
-	StampAdvanceDayTuning(Stamped);
+	StampBaseTuning(Stamped);
 
 	TArray<FEclipseAppliedMutation> Applied;
 	if (!EclipseCampaignLogic::CommitTransaction(State, Stamped, Applied, OutError))
@@ -478,8 +478,21 @@ bool UEclipseCampaignSubsystem::CommitTransaction(const FEclipseCampaignTransact
 	return true;
 }
 
-void UEclipseCampaignSubsystem::StampAdvanceDayTuning(FEclipseCampaignTransaction& Transaction) const
+void UEclipseCampaignSubsystem::StampBaseTuning(FEclipseCampaignTransaction& Transaction) const
 {
+	// Only these two mutation types read the tuning fields; every other
+	// transaction returns before the LoadSynchronous below (step-3 review
+	// finding 5: no asset load on hot non-day commits).
+	const auto ConsumesBaseTuning = [](const FEclipseCampaignMutation& Mutation)
+	{
+		return Mutation.Type == EEclipseCampaignMutationType::AdvanceDay
+			|| Mutation.Type == EEclipseCampaignMutationType::AssignStaff;
+	};
+	if (!Transaction.Mutations.ContainsByPredicate(ConsumesBaseTuning))
+	{
+		return;
+	}
+
 	const UEclipseBaseTuningAsset* Tuning = ActiveSetup != nullptr ? ActiveSetup->BaseTuning.LoadSynchronous() : nullptr;
 	if (Tuning == nullptr)
 	{
@@ -487,7 +500,7 @@ void UEclipseCampaignSubsystem::StampAdvanceDayTuning(FEclipseCampaignTransactio
 	}
 	for (FEclipseCampaignMutation& Mutation : Transaction.Mutations)
 	{
-		if (Mutation.Type == EEclipseCampaignMutationType::AdvanceDay)
+		if (ConsumesBaseTuning(Mutation))
 		{
 			Mutation.CrewDayReduction = Tuning->CrewDayReduction;
 			Mutation.MaxStaffPerSite = Tuning->MaxCrewPerSite;
@@ -510,6 +523,23 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 		UE_LOG(LogEclipse, Warning, TEXT("Campaign commit applied but no event bus is available — facts not broadcast."));
 		return;
 	}
+
+	// Base posts vacated inside a commit (casualty strip in KillSoldier/
+	// WoundSoldier) become StaffAssigned(RoleTag none) facts in that same
+	// commit, so the muster board and vault idlers never show a ghost analyst
+	// (SPEC-P2-03 events table: none = unassign).
+	auto BroadcastStaffReleases = [Bus](const FEclipseAppliedMutation& Record)
+	{
+		for (const EclipseBaseLogic::FEclipseStaffRelease& Release : Record.StaffReleases)
+		{
+			FEclipseBaseEventPayload Payload;
+			Payload.SlotId = Release.SlotId;
+			Payload.FacilityId = Release.FacilityId;
+			Payload.SoldierId = Record.Mutation.SoldierId;
+			// RoleTag stays empty: "none = unassign" (SPEC-P2-03 events table).
+			Bus->Broadcast(EclipseTags::Event_Base_StaffAssigned, FInstancedStruct::Make(Payload));
+		}
+	};
 
 	// Build steps completed inside a commit (day tick or rush) become facts in
 	// that same commit (SPEC-P2-03 clock rules), including the staff release
@@ -581,6 +611,7 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			Payload.Cause = Mutation.Cause;
 			Payload.Day = Record.DayAfter;
 			Bus->Broadcast(EclipseTags::Event_Roster_SoldierDied, FInstancedStruct::Make(Payload));
+			BroadcastStaffReleases(Record);
 			break;
 		}
 		case EEclipseCampaignMutationType::AddMemorialEntry:
@@ -600,6 +631,7 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			Payload.Day = Record.DayAfter;
 			Payload.DaysOut = Mutation.EtaDays;
 			Bus->Broadcast(EclipseTags::Event_Roster_SoldierWounded, FInstancedStruct::Make(Payload));
+			BroadcastStaffReleases(Record);
 			break;
 		}
 		case EEclipseCampaignMutationType::QueueProduction:

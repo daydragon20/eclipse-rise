@@ -64,6 +64,16 @@ bool BuildDayTick(const FEclipseCampaignState& State, const FEclipseEconomyTickP
 	for (const FGameplayTag& Key : FacilityKeys)
 	{
 		const int32 Amount = Params.FacilityYields.YieldPerDay[Key];
+		// Amount > 0 is a deliberate drop-filter, not an oversight: no slice
+		// facility yields negatively — upkeep is explicitly out of Phase 2
+		// (SPEC-P2-03 locked decision 5, no Energy) — so a negative row is bad
+		// data. Clamped into the tick it could drive a balance below zero,
+		// which AdjustResource validation rejects, and one bad row would then
+		// veto the ENTIRE atomic day tick (wages, decay, completions). Bad
+		// data degrades to a skipped line, never a blocked day (GDD 14.3.5);
+		// the Max(0, ...) on the wage-clamp base below is the same reading.
+		// When Phase 3 lands real upkeep, it enters as its own clamped
+		// mutation with its own reason, not through this yield stream.
 		if (Amount > 0)
 		{
 			FEclipseCampaignMutation& Mutation = OutTransaction.Mutations.AddDefaulted_GetRef();

@@ -5,6 +5,9 @@
 // days, instant completion), facility yields incl. the IC analyst bonus, and
 // the seeded spec start state (Command Center pre-built at L1). Pure logic:
 // deterministic, no engine actors, tables built in-memory like EclipseClassTests.
+// Step 4-5 (anchored step-3 review findings) adds the casualty staff-release
+// (no ghost analyst), the mutation-layer staff cap, and the day-N-completion-
+// yields-on-day-N pin the nightly soak leans on.
 
 #if WITH_DEV_AUTOMATION_TESTS
 
@@ -12,12 +15,14 @@
 #include "Base/EclipseBaseSubsystem.h"
 #include "Base/EclipseBaseTypes.h"
 #include "Core/EclipseGameplayTags.h"
+#include "Economy/EclipseEconomyLogic.h"
 #include "Engine/DataTable.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 #include "Misc/AutomationTest.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
+#include "Strategy/EclipseCampaignTransaction.h"
 #include "Strategy/EclipseCampaignTypes.h"
 
 namespace EclipseBaseTest
@@ -592,6 +597,247 @@ bool FEclipseBaseFacilityYieldTest::RunTest(const FString& Parameters)
 	Orphan.FacilityId = TEXT("Medbay"); // the rejected variant - no row in the slice table
 	Orphan.Level = 1;
 	TestEqual(TEXT("Orphaned facility is skipped gracefully"), ComputeFacilityYields(Base, Tuning, Resolver).YieldPerDay.FindRef(Intel), 3);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBaseCasualtyReleasesPostTest,
+	"Eclipse.Base.CasualtyReleasesBasePost",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseBaseCasualtyReleasesPostTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseBaseLogic;
+
+	// Step-3 review finding 1 (the ghost-analyst yield gap): KillSoldier and
+	// WoundSoldier strip the casualty from AssignedSoldierIds inside the same
+	// apply, so a dead analyst can never keep earning the IC bonus and the
+	// vacated post is immediately re-staffable. Headless through the real
+	// transaction API - the muster board and yields read the state this commits.
+	UDataTable* Facilities = EclipseBaseTest::MakeFacilitiesTable();
+	const FEclipseBaseTuningParams Tuning = EclipseBaseTest::MakeTuning();
+	const FGameplayTag Intel = EclipseTags::Resource_Intel.GetTag();
+	const auto Resolver = [Facilities](FName FacilityId) { return EclipseBaseTest::FindRow(Facilities, FacilityId); };
+
+	FEclipseCampaignState State;
+	FEclipseSoldierRecord& Analyst = State.Roster.AddDefaulted_GetRef();
+	Analyst.SoldierId = FGuid(3, 0, 0, 1);
+	Analyst.Name = TEXT("Analyst Reyes");
+	FEclipseSoldierRecord& Crew = State.Roster.AddDefaulted_GetRef();
+	Crew.SoldierId = FGuid(3, 0, 0, 2);
+	Crew.Name = TEXT("Crew Dalen");
+	// Guid value copies: the roster array may reallocate on any later add —
+	// the facility-array lesson below applies to the roster references too.
+	const FGuid AnalystId = Analyst.SoldierId;
+	const FGuid CrewId = Crew.SoldierId;
+
+	// Operational IC with the analyst on post; Barracks under construction with
+	// the crew on site. (Re-fetch by slot after every structural change - the
+	// facility array may reallocate.)
+	const FEclipseFacilityLevelData* IntelL1 = GetLevelData(EclipseBaseTest::FindRow(Facilities, TEXT("IntelligenceCenter")), 1);
+	ApplyRush(StartConstruction(State.BaseState, TEXT("Slot_D"), TEXT("IntelligenceCenter"), *IntelL1));
+	const FEclipseFacilityLevelData* BarracksL1 = GetLevelData(EclipseBaseTest::FindRow(Facilities, TEXT("Barracks")), 1);
+	StartConstruction(State.BaseState, TEXT("Slot_B"), TEXT("Barracks"), *BarracksL1);
+	State.BaseState.FindBySlot(TEXT("Slot_D"))->AssignedSoldierIds.Add(AnalystId);
+	State.BaseState.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Add(CrewId);
+
+	TestEqual(TEXT("Live analyst: 2 + 1 Intel"), ComputeFacilityYields(State.BaseState, Tuning, Resolver).YieldPerDay.FindRef(Intel), 3);
+
+	// KIA: the commit strips the analyst and records the release for the
+	// StaffAssigned(none) fact.
+	FEclipseCampaignTransaction Kill;
+	Kill.Source = TEXT("Test");
+	FEclipseCampaignMutation& KillMutation = Kill.Mutations.AddDefaulted_GetRef();
+	KillMutation.Type = EEclipseCampaignMutationType::KillSoldier;
+	KillMutation.SoldierId = AnalystId;
+	KillMutation.Cause = TEXT("TestKIA");
+
+	TArray<FEclipseAppliedMutation> Applied;
+	FString Error;
+	TestTrue(TEXT("Kill commits"), EclipseCampaignLogic::CommitTransaction(State, Kill, Applied, Error));
+	TestEqual(TEXT("IC post vacated"), State.BaseState.FindBySlot(TEXT("Slot_D"))->AssignedSoldierIds.Num(), 0);
+	TestEqual(TEXT("One release recorded"), Applied.Num() == 1 ? Applied[0].StaffReleases.Num() : -1, 1);
+	if (Applied.Num() == 1 && Applied[0].StaffReleases.Num() == 1)
+	{
+		TestEqual(TEXT("Release names the slot"), Applied[0].StaffReleases[0].SlotId, FName(TEXT("Slot_D")));
+		TestEqual(TEXT("Release names the facility"), Applied[0].StaffReleases[0].FacilityId, FName(TEXT("IntelligenceCenter")));
+	}
+
+	// The gap this test exists for: a dead analyst yields no IC bonus.
+	TestEqual(TEXT("Dead analyst earns nothing: back to +2"), ComputeFacilityYields(State.BaseState, Tuning, Resolver).YieldPerDay.FindRef(Intel), 2);
+
+	// Wounded crew: same strip, same release record.
+	FEclipseCampaignTransaction Wound;
+	Wound.Source = TEXT("Test");
+	FEclipseCampaignMutation& WoundMutation = Wound.Mutations.AddDefaulted_GetRef();
+	WoundMutation.Type = EEclipseCampaignMutationType::WoundSoldier;
+	WoundMutation.SoldierId = CrewId;
+	WoundMutation.Cause = TEXT("TestShrapnel");
+	WoundMutation.EtaDays = 5;
+
+	TestTrue(TEXT("Wound commits"), EclipseCampaignLogic::CommitTransaction(State, Wound, Applied, Error));
+	TestEqual(TEXT("Building site vacated"), State.BaseState.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Num(), 0);
+	TestEqual(TEXT("Wound release recorded"), Applied.Num() == 1 ? Applied[0].StaffReleases.Num() : -1, 1);
+
+	// An unassigned casualty releases nothing (no spurious facts).
+	FEclipseSoldierRecord& Bystander = State.Roster.AddDefaulted_GetRef();
+	Bystander.SoldierId = FGuid(3, 0, 0, 3);
+	Bystander.Name = TEXT("Bystander Voss");
+	FEclipseCampaignTransaction KillBystander;
+	KillBystander.Source = TEXT("Test");
+	FEclipseCampaignMutation& KillBystanderMutation = KillBystander.Mutations.AddDefaulted_GetRef();
+	KillBystanderMutation.Type = EEclipseCampaignMutationType::KillSoldier;
+	KillBystanderMutation.SoldierId = Bystander.SoldierId;
+	TestTrue(TEXT("Unassigned kill commits"), EclipseCampaignLogic::CommitTransaction(State, KillBystander, Applied, Error));
+	TestEqual(TEXT("No release recorded"), Applied.Num() == 1 ? Applied[0].StaffReleases.Num() : -1, 0);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBaseStaffCapMutationLayerTest,
+	"Eclipse.Base.StaffCapInMutationLayer",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseBaseStaffCapMutationLayerTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseBaseLogic;
+
+	// Step-3 review finding 3: the staff cap holds in the mutation layer itself
+	// (MaxStaffPerSite rides the mutation; default = the SPEC-P2-03 spec value 1,
+	// stamped from DA_BaseTuning by the subsystem), not only in the wrapper's
+	// pre-check. An over-cap transaction rejects as a full no-op.
+	UDataTable* Facilities = EclipseBaseTest::MakeFacilitiesTable();
+
+	FEclipseCampaignState State;
+	FEclipseSoldierRecord& SoldierA = State.Roster.AddDefaulted_GetRef();
+	SoldierA.SoldierId = FGuid(4, 0, 0, 1);
+	SoldierA.Name = TEXT("First Pick");
+	FEclipseSoldierRecord& SoldierB = State.Roster.AddDefaulted_GetRef();
+	SoldierB.SoldierId = FGuid(4, 0, 0, 2);
+	SoldierB.Name = TEXT("Second Pick");
+	// Guid value copies — roster references dangle on a later reallocation.
+	const FGuid SoldierAId = SoldierA.SoldierId;
+	const FGuid SoldierBId = SoldierB.SoldierId;
+
+	const FEclipseFacilityLevelData* BarracksL1 = GetLevelData(EclipseBaseTest::FindRow(Facilities, TEXT("Barracks")), 1);
+	StartConstruction(State.BaseState, TEXT("Slot_B"), TEXT("Barracks"), *BarracksL1);
+
+	const auto MakeAssign = [](const FGuid& SoldierId)
+	{
+		FEclipseCampaignMutation Mutation;
+		Mutation.Type = EEclipseCampaignMutationType::AssignStaff;
+		Mutation.SlotId = TEXT("Slot_B");
+		Mutation.SoldierId = SoldierId;
+		Mutation.StaffRoleTag = EclipseTags::Base_Staff_Crew.GetTag();
+		return Mutation;
+	};
+
+	TArray<FEclipseAppliedMutation> Applied;
+	FString Error;
+
+	// First assignment fills the site to the spec cap of 1.
+	FEclipseCampaignTransaction AssignFirst;
+	AssignFirst.Source = TEXT("Test");
+	AssignFirst.Mutations.Add(MakeAssign(SoldierAId));
+	TestTrue(TEXT("First assignment commits"), EclipseCampaignLogic::CommitTransaction(State, AssignFirst, Applied, Error));
+	TestEqual(TEXT("Site staffed to cap"), State.BaseState.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Num(), 1);
+
+	// Second assignment: the mutation layer rejects, state untouched (no-op).
+	const uint32 HashBefore = State.ComputeStateHash();
+	FEclipseCampaignTransaction AssignSecond;
+	AssignSecond.Source = TEXT("Test");
+	AssignSecond.Mutations.Add(MakeAssign(SoldierBId));
+	TestFalse(TEXT("Over-cap assignment rejects in the mutation layer"), EclipseCampaignLogic::CommitTransaction(State, AssignSecond, Applied, Error));
+	TestTrue(TEXT("Error says fully staffed"), Error.Contains(TEXT("fully staffed")));
+	TestEqual(TEXT("Staff count unchanged"), State.BaseState.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Num(), 1);
+	TestEqual(TEXT("Rejection was a full no-op (hash)"), State.ComputeStateHash(), HashBefore);
+
+	// Atomicity: two assigns in ONE transaction also reject whole - the second
+	// mutation validates against the scratch state the first already filled.
+	FEclipseCampaignState FreshState;
+	FreshState.Roster = State.Roster;
+	StartConstruction(FreshState.BaseState, TEXT("Slot_B"), TEXT("Barracks"), *BarracksL1);
+	FEclipseCampaignTransaction AssignBoth;
+	AssignBoth.Source = TEXT("Test");
+	AssignBoth.Mutations.Add(MakeAssign(SoldierAId));
+	AssignBoth.Mutations.Add(MakeAssign(SoldierBId));
+	TestFalse(TEXT("Double assign in one transaction rejects atomically"), EclipseCampaignLogic::CommitTransaction(FreshState, AssignBoth, Applied, Error));
+	TestEqual(TEXT("No staff landed at all"), FreshState.BaseState.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Num(), 0);
+
+	// The cap is data: stamped at 2, the same second assignment passes.
+	FEclipseCampaignMutation RaisedCap = MakeAssign(SoldierBId);
+	RaisedCap.MaxStaffPerSite = 2;
+	FEclipseCampaignTransaction AssignRaised;
+	AssignRaised.Source = TEXT("Test");
+	AssignRaised.Mutations.Add(RaisedCap);
+	TestTrue(TEXT("Raised cap admits the second soldier (data, not code)"), EclipseCampaignLogic::CommitTransaction(State, AssignRaised, Applied, Error));
+	TestEqual(TEXT("Two staffed at cap 2"), State.BaseState.FindBySlot(TEXT("Slot_B"))->AssignedSoldierIds.Num(), 2);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBaseCompletionYieldDayTest,
+	"Eclipse.Base.CompletionYieldsOnCompletionDay",
+	EclipseBaseTest::TestFlags)
+
+bool FEclipseBaseCompletionYieldDayTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseBaseLogic;
+
+	// Step-3 review finding 4, pinned (the nightly soak's econ paths lean on
+	// it): a facility completing on day N yields on day N. Mechanism under
+	// test: the AdvanceDay apply ticks construction inside the commit, and the
+	// economy tick runs downstream of the DayAdvanced fact, resolving facility
+	// yields from the post-commit state (EclipseEconomySubsystem::
+	// ResolveTickParams documents the seam). If completion ever slid to the
+	// tick after the yield resolution, the IC's first day of income - which the
+	// Intel-opening path prices into its build days - would arrive a day late.
+	UDataTable* Facilities = EclipseBaseTest::MakeFacilitiesTable();
+	const FEclipseBaseTuningParams Tuning = EclipseBaseTest::MakeTuning();
+	const FGameplayTag Intel = EclipseTags::Resource_Intel.GetTag();
+	const auto Resolver = [Facilities](FName FacilityId) { return EclipseBaseTest::FindRow(Facilities, FacilityId); };
+
+	FEclipseCampaignState State;
+	State.Day = 11;
+	StartConstruction(State.BaseState, TEXT("Slot_D"), TEXT("IntelligenceCenter"), /*BuildDays*/ 1);
+
+	// Day 11, still building: the pre-commit state yields nothing.
+	TestEqual(TEXT("Building IC yields nothing pre-completion"), ComputeFacilityYields(State.BaseState, Tuning, Resolver).YieldPerDay.Num(), 0);
+
+	FEclipseCampaignTransaction Advance;
+	Advance.Source = TEXT("Test");
+	Advance.Mutations.AddDefaulted_GetRef().Type = EEclipseCampaignMutationType::AdvanceDay;
+
+	TArray<FEclipseAppliedMutation> Applied;
+	FString Error;
+	TestTrue(TEXT("AdvanceDay commits"), EclipseCampaignLogic::CommitTransaction(State, Advance, Applied, Error));
+	TestEqual(TEXT("Clock reads day 12"), State.Day, 12);
+	TestEqual(TEXT("Completion happened inside the day-12 commit"), Applied.Num() == 1 ? Applied[0].FacilityCompletions.Num() : -1, 1);
+	if (Applied.Num() == 1 && Applied[0].FacilityCompletions.Num() == 1)
+	{
+		TestEqual(TEXT("Completed to L1"), Applied[0].FacilityCompletions[0].NewLevel, 1);
+		TestEqual(TEXT("Completion day is the advanced day (day N)"), Applied[0].DayAfter, 12);
+	}
+
+	// What the economy tick sees on day 12 (it runs after this commit): the IC
+	// is operational and yields TODAY.
+	const FEclipseFacilityYieldParams DayNYields = ComputeFacilityYields(State.BaseState, Tuning, Resolver);
+	TestEqual(TEXT("Day-N completion yields on day N (+2 Intel)"), DayNYields.YieldPerDay.FindRef(Intel), 2);
+
+	// And the composed day tick carries it as the transparent FacilityYield
+	// ledger line (GDD 7.6) - the full seam, headless.
+	FEclipseEconomyTickParams TickParams;
+	TickParams.CreditsTag = EclipseTags::Resource_Credits.GetTag();
+	TickParams.IntelTag = Intel;
+	TickParams.FacilityYields = DayNYields;
+	FEclipseCampaignTransaction Tick;
+	TestTrue(TEXT("Day tick has work"), EclipseEconomyLogic::BuildDayTick(State, TickParams, Tick));
+	int32 FacilityIntel = 0;
+	for (const FEclipseCampaignMutation& Mutation : Tick.Mutations)
+	{
+		if (Mutation.Type == EEclipseCampaignMutationType::AdjustResource && Mutation.ResourceType == Intel && Mutation.Reason == FName(TEXT("FacilityYield")))
+		{
+			FacilityIntel += Mutation.Amount;
+		}
+	}
+	TestEqual(TEXT("FacilityYield ledger line lands the same day"), FacilityIntel, 2);
 	return true;
 }
 
