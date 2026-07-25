@@ -117,6 +117,30 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
 	float CameraLagSpeed = 12.0f;
 
+	/**
+	 * Hoe ver de camera maximaal mag achterblijven, in uu. Dit is de fix voor het
+	 * defect dat de owner meldde als "mijn personage schaalt met snelheid"
+	 * (feel-audit S1, 2026-07-25) — en het is GEMETEN, niet beredeneerd.
+	 *
+	 * De spring arm laat zijn OORSPRONG achterlopen op de pawn met een
+	 * exponentiële demper. In stationaire toestand is die achterstand exact
+	 * `snelheid / CameraLagSpeed`, dus 15 cm bij lopen (180), 35 cm bij rennen
+	 * (420) en 54 cm bij sprinten (650). Dat is de ENIGE term in de hele
+	 * camerarig die met de snelheid meebeweegt: mesh-schaal, boomlengte en FOV
+	 * staan alle drie stil (het harnas rekent ze per meting af). Gemeten aan de
+	 * hoek die de capsule bij de camera opspant: 31,50 graden stil tegen 28,84
+	 * graden rennend, oftewel het personage werd 8,4% kleiner van gaan rennen.
+	 *
+	 * De klem lost dat op zonder de lag weg te gooien, en dat is de bedoeling:
+	 * camera-lag bestaat om KLEINE, schokkerige correcties glad te strijken, niet
+	 * om een halve meter afstand te kopen. Boven ~72 cm/s (= 6 x 12) zit de lag
+	 * op zijn klem en is hij dus constant — precies wat "mag niet met de snelheid
+	 * meebewegen" betekent. Wat overblijft is 6 cm tussen stilstand en lopen,
+	 * ofwel 1,8% schijnbare grootte, en dat is onder de meetbare drempel.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
+	float CameraLagMaxDistance = 6.0f;
+
 	/** The boom's collision probe: the camera may never pass through a wall. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 1))
 	float CameraProbeSize = 12.0f;
@@ -200,10 +224,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 1, ClampMax = 4))
 	float StickResponseExponent = 2.0f;
 
-	/** Mouse look stays raw — a mouse has no deadzone and no drift, and curving
-	 *  it breaks muscle memory. Only the scale is tunable. */
+	/**
+	 * Mouse look stays raw — a mouse has no deadzone and no drift, and curving it
+	 * breaks muscle memory. Only the scale is tunable.
+	 *
+	 * 2.5 en niet 1.0 sinds 2026-07-25, en dat is een gedrag-NEUTRALE wijziging:
+	 * APlayerController vermenigvuldigde tot dan met de legacy-schaal 2.5 (zie
+	 * AEclipsePlayerController's constructor). Die schaal staat nu uit omdat hij
+	 * de stick-kijksnelheid stil 2,5x te hoog maakte; bij de muis is dit getal
+	 * een kale schaal zonder eenheid, dus daar is de eerlijke keuze het gedrag
+	 * gelijk houden in plaats van het getal.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
-	float MouseLookScale = 1.0f;
+	float MouseLookScale = 2.5f;
 
 	/**
 	 * Aim assist, target-slowdown form: the camera gets heavier while the reticle

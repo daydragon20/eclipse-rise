@@ -13,7 +13,7 @@ de handler-kolom, dan is er aantoonbaar een functie aan gebonden.*
 | Rondkijken | Muis | Rechterstick | ja — `HandleLook` |
 | Vuren | Linkermuisknop | RT | ja — `HandleFire` |
 | Mikken (ADS) | Rechtermuisknop | LT | ja — `HandleAimStart` / `HandleAimStop` |
-| Sprint | Shift | L3 (linkerstick indrukken) | ja — `HandleSprint` |
+| Sprint | Shift (**vasthouden**) | L3 (**togglen**) | ja — `HandleSprintHold` / `HandleSprintToggle` |
 | Hurken | Ctrl | B | ja — `HandleCrouch` |
 | Springen | Spatie | A | ja — `HandleJump` |
 | 1e/3e persoon | C | R3 (rechterstick indrukken) | ja — `HandleToggleView` |
@@ -43,6 +43,7 @@ toestand leest die er toch al is.
 | Gehaald / goed / ja | J | Menu-knop | ja — `ConfirmGuideStep` |
 | Sla over / niet goed / nee | N | — | ja — `SkipGuideStep` |
 | Controls-overzicht | F2 | — | ja — `ToggleControlsPanel` |
+| Feel-meting (camera/snelheid) | F9 | — | ja — `DumpFeelState` (ook `Eclipse.Feel.Dump`) |
 | 13.2-vragenpaneel | H | — | ja — `TogglePlaytestPanel` |
 | Gauntlet-metingen | F4–F8, 6–0 | — | ja — per functie |
 
@@ -50,6 +51,40 @@ De gauntlet-meettoetsen blijven bewust toetsenbord-only: dat is instrumentatie v
 de beoordelaar, geen besturing die de speler uitvoert. De gids zelf moest wél op de
 controller, anders is een controller-playtest er niet mee te doen — View en Menu
 waren de enige onbezette pad-knoppen.
+
+## Hold of toggle — de regel, en waarom hij per apparaat verschilt
+
+*Besluit 2026-07-25, na de owner-eis "sprint wordt een toggle op L3" en de
+bredere opdracht om alle bindings hierop na te lopen.*
+
+De vraag is niet "hold of toggle" maar **hoe lang de toestand duurt**, en pas
+daarna welke knop hem draagt:
+
+| Soort toestand | Toetsenbord | Controller | Waarom |
+|---|---|---|---|
+| **Momentaan** op een SCHOUDERknop (seconden, tijdens een handeling) | hold | hold | Een schouderknop houd je comfortabel vast terwijl je stuurt en richt |
+| **Momentaan** op een STICKknop | hold | **toggle** | Dezelfde stick ingedrukt houden waarmee je stuurt is onhandig; op een toetsenbord kost een pinktoets niets |
+| **Aanhoudend** (minuten, een houding) | toggle | toggle | Een houding die je een hele infiltratie aanhoudt, hoor je niet vast te houden |
+
+Elke actie langs die lat:
+
+| Actie | Duur | Knop | Toetsenbord | Controller | Uitkomst |
+|---|---|---|---|---|---|
+| **Sprint** | momentaan | L3 = stick | **hold** (Shift) | **toggle** (L3) | **GEWIJZIGD** — was hold op beide |
+| Mikken | momentaan | LT = schouder | hold | hold | Ongewijzigd, nu expliciet besloten |
+| Command Mode | momentaan | LB = schouder | hold | hold | Ongewijzigd — de tijddilatatie hángt aan de hold |
+| Stance | momentaan | Y = face | hold bij het geven | toggle | Ongewijzigd; die asymmetrie was al goed en is nu onderbouwd |
+| Hurken | **aanhoudend** | B = face | toggle | toggle | Ongewijzigd, en bewust: hurken is de stealth-default (GDD 04) en die houd je minuten aan |
+| 1e/3e persoon | aanhoudend | C | toggle | — | Ongewijzigd |
+
+**Uitstappen van de sprint-toggle** — zoals Borderlands / Gears / The Division:
+de sprint blijft aan tot je (a) ophoudt met vooruit duwen, (b) mikt, (c) vuurt,
+of (d) nogmaals L3 drukt. Schuin vooruit sturen beëindigt hem **niet** — dat is
+sturen, geen stoppen. Alle vier de uitstappen staan als losse assert in
+`Eclipse.Feel.Input.SprintHoldsOnKeyboardAndTogglesOnPad`.
+
+**Wat op de owner wacht:** hurken óók als hold aanbieden, als optie naast de
+toggle. Dat vraagt een instellingenmenu, en dat is SPEC-P2-07.
 
 ## De mapping tegen de genre-conventie (owner-vraag 2026-07-25)
 
@@ -96,3 +131,30 @@ handler, geen mapping. Ze staan hier zodat de lijst compleet is en niemand ze zo
 | `-EclipseShot` | vaste-camera reviewronde; onderdrukt bewust ALLE debug-UI |
 | `Eclipse.Look.InvertY 0/1` | Y-as van het kijken forceren (-1 = volg de tuning) |
 | `Eclipse.Command.Dump` | Command Mode-metingen naar de console |
+| `Eclipse.Feel.Dump` | snelheid, mesh-schaal, boomlengte, camera-afstand, FOV en schijnbare grootte — ook op **F9**, en ook op het scherm |
+| `Eclipse.Input.ForceGamepad 0/1` | invoer als muis (0) of als stick (1) behandelen; -1 = autodetectie |
+
+## Welke config-map een toetsbinding leest (feel-audit S3)
+
+De owner bond F9 aan `Eclipse.Feel.Dump` via `+DebugExecBindings` in
+`Saved/Config/WindowsEditor/Input.ini`, en er kwam nooit een regel in het log.
+
+**`Saved/Config/` is de GEGENEREERDE configlaag.** Die is van de engine: hij
+staat niet in de repo, hij reist niet mee naar een andere machine, en de engine
+schrijft hem bij afsluiten terug. Een regel die je daar met de hand inzet,
+overleeft dat niet betrouwbaar. De duurzame plek is
+**`Eclipse/Config/DefaultInput.ini`**, en die staat wél in de repo.
+
+Welke platformmap een run leest: de naam komt uit `FPlatformProperties`, en die
+is **`WindowsEditor` voor elke run van `UnrealEditor.exe`** — óók met `-game`,
+want de binary is de editor. Een gepackagede build leest `Windows`. Beide lezen
+`Config/DefaultInput.ini` als onderliggende laag, dus daar werkt het in alle
+gevallen.
+
+Drie dingen zijn nu geregeld, van sterk naar zwak:
+1. **F9 is een echte Enhanced-Input-binding in code** en heeft dus helemaal geen
+   configlaag nodig. Dat is het antwoord; de rest is vangnet.
+2. `+DebugExecBindings` voor F9/F10 staan in `Config/DefaultInput.ini`.
+3. Bij missiestart logt de game **hoeveel debug-bindings er werkelijk geladen
+   zijn en welke** — zodat "binding niet geladen" en "toets niet ingedrukt" niet
+   langer op elkaar lijken.

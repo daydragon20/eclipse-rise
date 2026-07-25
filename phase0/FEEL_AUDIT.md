@@ -83,6 +83,74 @@ De hele LOCOMOTIE- en SPRONG-kolom plus de pitch-limiet staan in de geparkeerde
 patch, met per waarde de engine-default en de herkomst in de code. Ze wachten op een
 vrij build-slot.
 
+## WAT HET HARNAS GEMETEN HEEFT (nacht 2026-07-25/26)
+
+De testharnas (laag 1 + laag 2, `Eclipse/Source/Eclipse/Tests/EclipseFeelHarness*`)
+draait nu mee in de suite. Laag 1 leest de daadwerkelijk toegepaste waarden van
+het movement component en de camera; laag 2 injecteert input via Enhanced Input
+en meet over tijd. Dit zijn de getallen, niet de verwachtingen:
+
+| Meting | Gemeten | Referentie | Status |
+|---|---|---|---|
+| Tijd tot topsnelheid (rennen) | **0,300 s** | 420 / 1400 = 0,300 s | OK |
+| Stoptijd vanaf rennen | **0,083 s** | Bijlage B: 0,083 s | OK (maar zie LOC-03: dit is arcade-kort) |
+| Glijafstand vanaf rennen | **12,0 cm** | Bijlage B: 13 cm | OK |
+| 180-omkering (snelheid weer op top) | **0,400 s** | — | OK |
+| 180-omkering: lichaam gedraaid | **180 gr** | RotationRate 500 gr/s | OK |
+| Springhoogte | **127,5 cm** | v²/2g = 128 cm | OK |
+| Airtime | **1,008 s** | 2v/g = 1,020 s | OK |
+| Seconden per 360 kijken | **1,500 s** (was **0,600 s**) | 360 / 240 | **WAS AFWIJKEND — gefixt** |
+| Kantelsnelheid | **+180 gr/s** (omhoog) | StickPitchSpeed 180 | OK, teken vastgepind |
+| Stick 0,05 → verplaatsing | **0,00 cm** | 0 | OK |
+| Stick 0,05 → camera-draai | **0,00 gr** | 0 | OK |
+| Stick 0,45 → verplaatsing | **144,3 cm/s** | > 0 | OK |
+
+### S1 — "personage schaalt met snelheid": OORZAAK GEVONDEN EN GEFIXT
+
+Van de vier kandidaten bewegen er drie **niet** mee met de snelheid: mesh-schaal
+(1,000), boomlengte (300,0) en FOV (80,0) zijn identiek bij stilstand, rennen en
+sprinten. Wat wél meebewoog was de **gemeten camera-tot-pawn-afstand**:
+
+| | camera→pawn | schijnbare hoogte |
+|---|---|---|
+| stilstand | 312,07 cm | 31,50 gr |
+| rennen (420) | **342,26 cm** | **28,84 gr** |
+
+Dat is **8,4% kleiner van gaan rennen**. De oorzaak is `bEnableCameraLag`: de
+spring arm laat zijn oorsprong achterlopen, en die achterstand is in stationaire
+toestand exact `snelheid / CameraLagSpeed` — 35 cm bij rennen, 54 cm bij
+sprinten. Het is de enige term in de hele camerarig die met de snelheid
+meebeweegt.
+
+**Let op de richting.** Gemeten wordt het personage KLEINER naarmate je sneller
+loopt; de owner meldde het omgekeerde. Eén defect, twee lezingen — wat vaststaat
+is de koppeling en de grootte. Het is goed mogelijk dat wat als "nagenoeg
+onzichtbaar bij langzaam lopen" gelezen werd iets anders is (kadrering, of het
+lichaam dat bij lage snelheid dichtbij en deels buiten beeld staat); dat blijft
+open tot de owner de gefixte build speelt.
+
+**Fix:** `CameraLagMaxDistance = 6` uu. De lag blijft bestaan — die is er om
+kleine schokkerige correcties glad te strijken — maar zit boven ~72 cm/s op zijn
+klem en is daarmee constant. Na de fix: rennen → sprinten **0,00%**, stilstand →
+sprinten **1,67%** (5,6 cm). Regressietest:
+`Eclipse.Feel.Camera.ApparentSizeDoesNotTrackSpeed`, drempel 2%.
+
+### Een tweede defect dat het harnas onderweg vond: kijken liep 2,5x te snel
+
+`DA_CharacterTuning` zegt 240 gr/s en het testgids-paneel toont "1,50 s per 360".
+Gemeten: **600 gr/s, 0,60 s per 360**. Oorzaak: `bEnableLegacyInputScales` stond
+aan (engine-default), waardoor `AddYawInput`/`AddPitchInput` nog vermenigvuldigen
+met `InputYawScale = 2.5` en `InputPitchScale = -2.5` uit
+`Engine/Config/BaseGame.ini`. Erger dan de factor is het teken: de pitch-schaal
+is negatief, dus de handler compenseerde een verborgen omkering en "invert Y" was
+niet te beredeneren.
+
+Uitgezet in `Config/DefaultInput.ini`; het pitch-teken zit nu in de handler.
+Netto: de kijkrichting is ongewijzigd, de kijksnelheid is 2,5x lager en gelijk
+aan wat de tuning zegt, en de muis blijft even snel (`MouseLookScale` 1,0 → 2,5,
+een kale schaal zonder eenheid). **Dit is een merkbare gedragswijziging** — als
+240 gr/s te traag blijkt, is dat één getal in `DA_CharacterTuning`.
+
 ## INPUT — hold versus toggle (owner-eis 2026-07-25)
 
 | Item | Status | Nu | Wordt | Reden |

@@ -37,11 +37,46 @@ namespace
 		-1,
 		TEXT("Y-as van het kijken: -1 = volg DA_CharacterTuning, 0 = normaal, 1 = omgekeerd."),
 		ECVF_Default);
+
+	/**
+	 * Welk apparaat de handlers moeten aannemen. Bestaat om twee redenen, en
+	 * allebei zijn ze meetbaar: (1) het feel-harnas injecteert op de actie en
+	 * raakt dus nooit echte hardware, waardoor de autodetectie altijd
+	 * "muis/toetsenbord" zegt en de hele stick-tak (deadzone, curve, graden per
+	 * seconde) ongetest zou blijven; (2) de owner kan met één regel A/B'en of een
+	 * klacht aan de stick-tak of aan de muis-tak ligt.
+	 */
+	TAutoConsoleVariable<int32> CVarEclipseForceGamepad(
+		TEXT("Eclipse.Input.ForceGamepad"),
+		-1,
+		TEXT("Behandel invoer als: -1 = autodetectie (apparaat vragen), 0 = muis/toetsenbord, 1 = gamepad."),
+		ECVF_Default);
 }
 
 AEclipsePlayerController::AEclipsePlayerController()
 {
 	CommandMode = CreateDefaultSubobject<UEclipseCommandModeComponent>(TEXT("CommandMode"));
+
+	// GEMETEN DEFECT (feel-harnas laag 2, 2026-07-25): het kijken liep op
+	// 600 gr/s terwijl DA_CharacterTuning 240 gr/s zegt en het testgids-paneel
+	// "1,50 s per 360" toont. De echte draai kostte 0,60 s.
+	//
+	// Oorzaak: APlayerController::AddYawInput/AddPitchInput vermenigvuldigen nog
+	// met de LEGACY-schalen uit Engine/Config/BaseGame.ini — InputYawScale = 2.5
+	// en InputPitchScale = -2.5 — zolang UInputSettings::bEnableLegacyInputScales
+	// aanstaat, en die staat standaard aan voor achterwaartse compatibiliteit. Die
+	// schalen stammen uit het oude input-systeem, waar een as-mapping zelf geen
+	// gevoeligheid droeg; met Enhanced Input rekent HandleLook zelf in graden per
+	// seconde, en dan is de vermenigvuldiging een tweede, onzichtbare
+	// gevoeligheidsknop bovenop de getunede.
+	//
+	// Erger dan de factor is het TEKEN: de pitch-schaal is NEGATIEF, dus de
+	// handler compenseerde onbewust een verborgen omkering, en "invert Y" was
+	// daardoor niet te redeneren maar alleen uit te proberen.
+	//
+	// De schakelaar zelf staat in Eclipse/Config/DefaultInput.ini (het is een
+	// project-instelling, geen actor-veld); HandleLook draagt het pitch-teken nu
+	// zelf. Laag 1 van het harnas bewaakt dat de instelling uit blijft staan.
 }
 
 void AEclipsePlayerController::BeginPlay()
@@ -58,17 +93,7 @@ void AEclipsePlayerController::BeginPlay()
 	FeelDumpCommand = IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("Eclipse.Feel.Dump"),
 		TEXT("Print snelheid, mesh-schaal, camera-boom, FOV en cameramodus van de speler."),
-		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
-		{
-			if (const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
-			{
-				UE_LOG(LogEclipse, Display, TEXT("Feel: %s"), *Body->DescribeFeelState());
-			}
-			else
-			{
-				UE_LOG(LogEclipse, Warning, TEXT("Feel: geen bestuurd personage."));
-			}
-		}),
+		FConsoleCommandDelegate::CreateWeakLambda(this, [this]() { DumpFeelState(); }),
 		ECVF_Default);
 
 	EnsureCampaignStarted();
@@ -101,6 +126,26 @@ void AEclipsePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void AEclipsePlayerController::DumpFeelState() const
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	if (Body == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Feel: geen bestuurd personage."));
+		return;
+	}
+	const FString Line = FString::Printf(TEXT("%s · sprint %s"),
+		*Body->DescribeFeelState(),
+		bSprinting ? (bSprintLatched ? TEXT("AAN (L3-latch)") : TEXT("AAN (hold)")) : TEXT("uit"));
+	UE_LOG(LogEclipse, Display, TEXT("Feel: %s"), *Line);
+	// Ook op het scherm: wie de meting doet, speelt op dat moment — die leest geen
+	// logbestand terwijl hij loopt (dat is precies waarom S3 een symptoom werd).
+	if (GEngine != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(/*Key*/ 90901, /*Time*/ 8.0f, FColor::Yellow, FString::Printf(TEXT("FEEL: %s"), *Line));
+	}
+}
+
 void AEclipsePlayerController::EnsureCampaignStarted()
 {
 	UEclipseCampaignSubsystem* Campaign = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>() : nullptr;
@@ -117,9 +162,14 @@ void AEclipsePlayerController::EnsureCampaignStarted()
 	Campaign->StartNewCampaign(Setup);
 }
 
+bool AEclipsePlayerController::HasGameViewport() const
+{
+	return GetWorld() != nullptr && GetWorld()->GetGameViewport() != nullptr;
+}
+
 void AEclipsePlayerController::EnterBaseMode()
 {
-	if (BaseHub == nullptr)
+	if (BaseHub == nullptr && HasGameViewport())
 	{
 		BaseHub = CreateWidget<UEclipseBaseHubWidget>(this, UEclipseBaseHubWidget::StaticClass());
 	}
@@ -131,6 +181,13 @@ void AEclipsePlayerController::EnterBaseMode()
 	{
 		BaseHub->AddToViewport(10);
 	}
+
+	// Leaving the field clears the sprint state in both its forms: a latched
+	// sprint that survived into the hub would silently start the next mission at
+	// sprint speed with nothing on screen saying so.
+	bSprintHeld = false;
+	bSprintLatched = false;
+	ApplySprintDrive();
 
 	bShowMouseCursor = true;
 	// Playtest finding 13.2 (owner, 2026-07-25): the tester spent minutes pressing
@@ -158,7 +215,7 @@ void AEclipsePlayerController::EnterMissionMode()
 	}
 	// A -EclipseShot review round gets NO debug HUD at all (15.8/15.9): the whole
 	// widget is skipped here, not just hidden, so no fact can put text in a still.
-	if (MissionHud == nullptr && UEclipseMissionHudWidget::IsDebugHudAllowed())
+	if (MissionHud == nullptr && UEclipseMissionHudWidget::IsDebugHudAllowed() && HasGameViewport())
 	{
 		MissionHud = CreateWidget<UEclipseMissionHudWidget>(this, UEclipseMissionHudWidget::StaticClass());
 	}
@@ -190,12 +247,33 @@ void AEclipsePlayerController::EnterMissionMode()
 		UE_LOG(LogEclipse, Warning, TEXT("Input: geen UInputDeviceSubsystem — apparaatdetectie onbeschikbaar."));
 	}
 
-	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 test guide, H playtest)."),
+	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 test guide, F9 feel-dump, H playtest)."),
 		MissionHud == nullptr
-			? (UEclipseMissionHudWidget::IsDebugHudAllowed()
-				? TEXT("NOT CREATED — widget construction failed")
-				: TEXT("suppressed by -EclipseShot, as designed"))
+			? (!UEclipseMissionHudWidget::IsDebugHudAllowed()
+				? TEXT("suppressed by -EclipseShot, as designed")
+				: (!HasGameViewport()
+					? TEXT("skipped — no game viewport (headless run), as designed")
+					: TEXT("NOT CREATED — widget construction failed")))
 			: (MissionHud->IsInViewport() ? TEXT("mounted") : TEXT("created but NOT in the viewport")));
+
+	// S3, feel-audit 2026-07-25: de owner bond F9 aan Eclipse.Feel.Dump via
+	// DebugExecBindings en er kwam nooit een regel in het log. "De binding is niet
+	// geladen" en "de toets is niet geraakt" zien er van buitenaf identiek uit, dus
+	// zegt de game nu plat wat de PlayerInput daadwerkelijk aan debug-bindings
+	// heeft. Merk op dat F9 sinds deze sessie ook een ECHTE Enhanced-Input-binding
+	// is (zie de debug-tabel in SetupInputComponent) — dat pad heeft geen config
+	// nodig en is daarmee het antwoord; deze regel is de diagnose voor de rest.
+	if (PlayerInput != nullptr)
+	{
+		FString Binds;
+		for (const FKeyBind& Bind : PlayerInput->DebugExecBindings)
+		{
+			Binds += FString::Printf(TEXT("%s=%s "), *Bind.Key.ToString(), *Bind.Command);
+		}
+		UE_LOG(LogEclipse, Display, TEXT("DebugExecBindings geladen: %d %s(bron: Config/DefaultInput.ini; Saved/Config is GEGENEREERD en wordt door de engine overschreven)."),
+			PlayerInput->DebugExecBindings.Num(),
+			Binds.IsEmpty() ? TEXT("") : *FString::Printf(TEXT("[%s] "), *Binds.TrimEnd()));
+	}
 
 	// Mission mode: no cursor at all — the absence IS the signal that the pawn has
 	// your input now (the other half of the 13.2 readability fix above).
@@ -250,6 +328,7 @@ void AEclipsePlayerController::SetupInputComponent()
 	LookAction = MakeAction(EInputActionValueType::Axis2D);
 	FireAction = MakeAction(EInputActionValueType::Boolean);
 	SprintAction = MakeAction(EInputActionValueType::Boolean);
+	SprintToggleAction = MakeAction(EInputActionValueType::Boolean);
 	CrouchAction = MakeAction(EInputActionValueType::Boolean);
 	ToggleViewAction = MakeAction(EInputActionValueType::Boolean);
 
@@ -301,7 +380,9 @@ void AEclipsePlayerController::SetupInputComponent()
 		StickLook.Modifiers.Add(StickYFlip);
 	}
 	MapKey(FireAction, EKeys::Gamepad_RightTrigger);
-	MapKey(SprintAction, EKeys::Gamepad_LeftThumbstick);
+	// L3 hangt aan de TOGGLE-actie, niet aan de hold-actie waar Shift op zit
+	// (feel-audit S2). Zie de device-regel bij ApplySprintDrive.
+	MapKey(SprintToggleAction, EKeys::Gamepad_LeftThumbstick);
 	MapKey(CrouchAction, EKeys::Gamepad_FaceButton_Right);
 	// R3 is er BEWUST af (owner playtest 2026-07-25: "gaat bij mij constant per
 	// ongeluk af, want het is de stick waarmee ik richt"). Dat is geen smaak maar
@@ -360,10 +441,19 @@ void AEclipsePlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleMove);
+	// Loslaten van de bewegingsstick is een EIGEN gebeurtenis en moet dat zijn:
+	// zodra de speler niets meer duwt, wordt HandleMove niet meer aangeroepen, dus
+	// zonder deze regel zou de sprint-toggle blijven hangen op de laatste waarde
+	// die hij nog zag (feel-audit S2, uitstap "ophouden met vooruit duwen").
+	Input->BindActionValueLambda(MoveAction, ETriggerEvent::Completed, [this](const FInputActionValue&)
+	{
+		CancelSprintLatch(TEXT("bewegingsstick losgelaten"));
+	});
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleLook);
 	Input->BindAction(FireAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleFire);
-	Input->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleSprint);
-	Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &AEclipsePlayerController::HandleSprint);
+	Input->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleSprintHold);
+	Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &AEclipsePlayerController::HandleSprintHold);
+	Input->BindAction(SprintToggleAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleSprintToggle);
 	Input->BindAction(CrouchAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleCrouch);
 	Input->BindAction(ToggleViewAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleToggleView);
 
@@ -377,7 +467,8 @@ void AEclipsePlayerController::SetupInputComponent()
 	{
 		const TPair<UInputAction*, const TCHAR*> Watched[] = {
 			{ MoveAction, TEXT("Move") },       { LookAction, TEXT("Look") },
-			{ FireAction, TEXT("Fire") },       { SprintAction, TEXT("Sprint") },
+			{ FireAction, TEXT("Fire") },       { SprintAction, TEXT("SprintHold") },
+			{ SprintToggleAction, TEXT("SprintToggle") },
 			{ CrouchAction, TEXT("Crouch") },   { ToggleViewAction, TEXT("ToggleView") },
 			{ JumpAction, TEXT("Jump") },       { AimAction, TEXT("Aim") },
 			{ CommandHoldAction, TEXT("CommandHold") },
@@ -508,6 +599,18 @@ void AEclipsePlayerController::SetupInputComponent()
 		});
 	}
 
+	// F9 — de feel-dump als ECHTE binding (S3). De owner bond hem via
+	// +DebugExecBindings in Saved/Config/WindowsEditor/Input.ini, en er kwam nooit
+	// een regel in het log. Saved/Config is de GEGENEREERDE configlaag: de engine
+	// bezit hem en schrijft hem bij afsluiten terug, dus een handmatig toegevoegde
+	// regel overleeft daar niet betrouwbaar. De duurzame plekken zijn (a) een
+	// binding in code — deze — die geen enkele configlaag nodig heeft, en (b)
+	// Eclipse/Config/DefaultInput.ini, die in de repo staat. Beide zijn er nu; de
+	// console-route Eclipse.Feel.Dump blijft ook gewoon werken.
+	FeelDumpAction = MakeAction(EInputActionValueType::Boolean);
+	MapKey(FeelDumpAction, EKeys::F9);
+	Input->BindActionValueLambda(FeelDumpAction, ETriggerEvent::Started, [this](const FInputActionValue&) { DumpFeelState(); });
+
 	// Test-guide detection (variant A). A SECOND delegate on the actions bound
 	// above — Enhanced Input dispatches every binding that matches an action and
 	// event, so the gameplay handler keeps running untouched, nothing is consumed
@@ -525,6 +628,7 @@ void AEclipsePlayerController::SetupInputComponent()
 		{ LookAction,          EclipseTestGuide::EEclipseGuideSignal::Look },
 		{ FireAction,          EclipseTestGuide::EEclipseGuideSignal::Fire },
 		{ SprintAction,        EclipseTestGuide::EEclipseGuideSignal::Sprint },
+		{ SprintToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Sprint },
 		{ CrouchAction,        EclipseTestGuide::EEclipseGuideSignal::Crouch },
 		{ JumpAction,          EclipseTestGuide::EEclipseGuideSignal::Jump },
 		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim },
@@ -592,9 +696,56 @@ void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)
 		Axis = (Axis / FMath::Max(Magnitude, KINDA_SMALL_NUMBER)) * Live;
 	}
 
+	// Sprint-toggle-uitstap 1 van 4: ophouden met VOORUIT duwen (feel-audit S2).
+	// Op de voorwaartse component, niet op de totale uitslag: zijwaarts sturen
+	// tijdens een sprint moet mogen, achteruit of stilstaan beëindigt hem.
+	if (bSprintLatched && Axis.Y < SprintForwardRelease)
+	{
+		CancelSprintLatch(TEXT("niet meer vooruit"));
+	}
+
 	const FRotator YawRotation(0, GetControlRotation().Yaw, 0);
 	ControlledPawn->AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X), Axis.Y);
 	ControlledPawn->AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y), Axis.X);
+}
+
+UInputAction* AEclipsePlayerController::FindInputAction(FName ActionName) const
+{
+	// Eén tabel, zodat een nieuwe actie die het harnas moet kunnen aansturen hier
+	// zichtbaar ontbreekt in plaats van stil.
+	static const TMap<FName, int32> Index = {
+		{ TEXT("Move"), 0 }, { TEXT("Look"), 1 }, { TEXT("Fire"), 2 },
+		{ TEXT("SprintHold"), 3 }, { TEXT("SprintToggle"), 4 }, { TEXT("Crouch"), 5 },
+		{ TEXT("ToggleView"), 6 }, { TEXT("Jump"), 7 }, { TEXT("Aim"), 8 },
+		{ TEXT("CommandHold"), 9 }, { TEXT("SelectNext"), 10 }, { TEXT("SelectPrev"), 11 },
+		{ TEXT("DirectPick"), 12 }, { TEXT("StanceToggle"), 13 },
+		{ TEXT("Order1"), 14 }, { TEXT("Order2"), 15 }, { TEXT("Order3"), 16 }, { TEXT("Order4"), 17 },
+	};
+	const int32* Slot = Index.Find(ActionName);
+	if (Slot == nullptr)
+	{
+		return nullptr;
+	}
+	switch (*Slot)
+	{
+	case 0:  return MoveAction;
+	case 1:  return LookAction;
+	case 2:  return FireAction;
+	case 3:  return SprintAction;
+	case 4:  return SprintToggleAction;
+	case 5:  return CrouchAction;
+	case 6:  return ToggleViewAction;
+	case 7:  return JumpAction;
+	case 8:  return AimAction;
+	case 9:  return CommandHoldAction;
+	case 10: return SelectNextAction;
+	case 11: return SelectPrevAction;
+	case 12: return DirectPickAction;
+	case 13: return StanceToggleAction;
+	default: break;
+	}
+	const int32 OrderIndex = *Slot - 14;
+	return OrderActions.IsValidIndex(OrderIndex) ? OrderActions[OrderIndex].Get() : nullptr;
 }
 
 void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
@@ -630,7 +781,11 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 		// Degrees per second, so stick look is framerate-independent — unlike the
 		// mouse path, which is already per-event.
 		AddYawInput(Direction.X * Curved * StickYawSpeed * AdsScale * DeltaSeconds);
-		AddPitchInput(-Direction.Y * Curved * StickPitchSpeed * AdsScale * DeltaSeconds * InvertY);
+		// Teken POSITIEF sinds bEnableLegacyInputScales uit staat: die legacy-schaal
+		// was -2.5, dus de min hier compenseerde een verborgen omkering. Netto
+		// richting blijft exact gelijk aan wat er verscheept werd; alleen de factor
+		// 2.5 is weg en de tuning betekent nu wat er staat.
+		AddPitchInput(Direction.Y * Curved * StickPitchSpeed * AdsScale * DeltaSeconds * InvertY);
 		return;
 	}
 
@@ -640,11 +795,22 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 	// id both ship raw with acceleration off for exactly this reason.
 	const float MouseAds = bAiming ? AdsLookMultiplier : 1.0f;
 	AddYawInput(Axis.X * MouseLookScale * MouseAds);
-	AddPitchInput(-Axis.Y * MouseLookScale * MouseAds * InvertY);
+	// Zelfde tekenwissel als op de stick-tak, om dezelfde reden (legacy-pitchschaal
+	// was -2.5). MouseLookScale staat op 2.5 zodat de muis exact even snel blijft
+	// als voorheen — bij de muis is het getal een kale schaal zonder eenheid, dus
+	// daar is de eerlijke keuze "gedrag ongewijzigd", niet "getal mooier".
+	AddPitchInput(Axis.Y * MouseLookScale * MouseAds * InvertY);
 }
 
 bool AEclipsePlayerController::IsUsingGamepadLook() const
 {
+	// Expliciete override wint (harnas + owner-A/B). -1 = niets forceren.
+	const int32 Forced = CVarEclipseForceGamepad.GetValueOnGameThread();
+	if (Forced >= 0)
+	{
+		return Forced > 0;
+	}
+
 	// Enhanced Input hands mouse and stick to the SAME action, so the device has
 	// to be asked rather than inferred from the value: a stick held halfway and a
 	// slow mouse produce identical numbers. Same source the HUD's device column
@@ -672,6 +838,12 @@ void AEclipsePlayerController::HandleToggleView()
 
 void AEclipsePlayerController::HandleFire()
 {
+	// Sprint-toggle-uitstap 3 van 4: vuren. Vóór de wapen-check, want het is de
+	// INTENTIE om te vuren die de sprint beëindigt — een pawn zonder wapen is een
+	// placeholder-toestand, geen ontwerptoestand. Idempotent, dus dat Fire aan
+	// Triggered hangt (elk frame terwijl je de trekker vasthoudt) kost niets.
+	CancelSprintLatch(TEXT("vuren"));
+
 	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
 	UEclipseHitscanWeaponComponent* Weapon = Body != nullptr ? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
 	if (Weapon == nullptr)
@@ -685,26 +857,52 @@ void AEclipsePlayerController::HandleFire()
 	Weapon->Fire(ViewLocation, ViewRotation.Vector(), TEXT("PlayerFire"));
 }
 
-void AEclipsePlayerController::HandleSprint(const FInputActionValue& Value)
+void AEclipsePlayerController::HandleSprintHold(const FInputActionValue& Value)
 {
-	// PLACEHOLDER(feel targets §2): sprint toggles run<->sprint speed; stamina
-	// only bites above Medium armor and armor lands later.
-	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
-	if (Body == nullptr)
+	// Toetsenbord (Shift). Hold is daar de conventie: een pinktoets vasthouden
+	// kost niets, en elke shooter op muis+toetsenbord doet het zo.
+	bSprintHeld = Value.Get<bool>();
+	ApplySprintDrive();
+}
+
+void AEclipsePlayerController::HandleSprintToggle()
+{
+	// Controller (L3). Toggle, want de stick waarmee je stuurt ingedrukt HOUDEN
+	// terwijl je ermee stuurt is onhandig — en het is niet de conventie
+	// (Borderlands / Gears / The Division: één klik start, en hij blijft aan).
+	bSprintLatched = !bSprintLatched;
+	UE_LOG(LogEclipse, Verbose, TEXT("Sprint: L3 zet de latch %s."), bSprintLatched ? TEXT("AAN") : TEXT("UIT"));
+	ApplySprintDrive();
+}
+
+void AEclipsePlayerController::CancelSprintLatch(const TCHAR* Reason)
+{
+	if (!bSprintLatched)
 	{
 		return;
 	}
+	bSprintLatched = false;
+	UE_LOG(LogEclipse, Verbose, TEXT("Sprint: latch uit (%s)."), Reason);
+	ApplySprintDrive();
+}
 
-	// Speeds from DA_CharacterTuning (GDD 14.2); the fallbacks mirror the locked
-	// feel targets so a missing asset degrades to the same numbers (GDD 14.3.5).
-	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
-	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;
-	const UEclipseCharacterTuningAsset* Tuning = Setup != nullptr ? Setup->CharacterTuning.LoadSynchronous() : nullptr;
-
-	const bool bSprinting = Value.Get<bool>();
-	Body->GetCharacterMovement()->MaxWalkSpeed = bSprinting
-		? (Tuning != nullptr ? Tuning->SprintSpeed : 650.0f)
-		: (Tuning != nullptr ? Tuning->RunSpeed : 420.0f);
+void AEclipsePlayerController::ApplySprintDrive()
+{
+	// PLACEHOLDER(feel targets §2): sprint switches between the run and sprint
+	// speed; stamina only bites above Medium armor and armor lands later.
+	//
+	// ÉÉN schrijver naar MaxWalkSpeed, en dat is de reden dat deze functie
+	// bestaat: met twee bronnen (hold + latch) die allebei zelf schrijven, zet de
+	// een de ander stil zodra ze elkaar overlappen. Nu is de uitkomst altijd de
+	// OR van de twee en is er geen volgorde-afhankelijkheid.
+	bSprinting = bSprintHeld || bSprintLatched;
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+	{
+		// Speeds cached from DA_CharacterTuning in ApplyLookTuning (GDD 14.2);
+		// the fallbacks mirror the locked feel targets so a missing asset lands
+		// on the same numbers (GDD 14.3.5).
+		Body->GetCharacterMovement()->MaxWalkSpeed = bSprinting ? SprintSpeedCm : RunSpeedCm;
+	}
 }
 
 void AEclipsePlayerController::HandleCrouch()
@@ -732,6 +930,9 @@ void AEclipsePlayerController::HandleAimStart()
 	{
 		return;
 	}
+	// Sprint-toggle-uitstap 2 van 4: mikken. Je kunt niet tegelijk sprinten en
+	// richten, en van de twee wint de intentie die je zojuist uitsprak.
+	CancelSprintLatch(TEXT("mikken"));
 	SetAiming(true);
 }
 
@@ -833,6 +1034,12 @@ void AEclipsePlayerController::ApplyLookTuning()
 		UE_LOG(LogEclipse, Warning, TEXT("Look tuning: no DA_CharacterTuning on the active setup — using the built-in look defaults."));
 		return;
 	}
+
+	// Sprint/run speeds cached here rather than re-read per input event: the hold
+	// handler runs on ETriggerEvent::Triggered, i.e. every frame you sprint, and
+	// it used to do a LoadSynchronous on the tuning asset each time (GDD 12.4).
+	RunSpeedCm = Tuning->RunSpeed;
+	SprintSpeedCm = Tuning->SprintSpeed;
 
 	StickYawSpeed = Tuning->StickYawSpeed;
 	StickPitchSpeed = Tuning->StickPitchSpeed;

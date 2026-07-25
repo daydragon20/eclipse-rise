@@ -33,6 +33,26 @@ public:
 	/** Aim point = camera-forward hitscan against world geometry (order target + fire direction + command-mode soldier pick). */
 	bool GetAimPoint(FVector& OutLocation, AActor*& OutActor) const;
 
+	/**
+	 * Harnas-naad (14.4 laag 2). De headless feel-harnas injecteert op DEZELFDE
+	 * UInputAction-objecten die de hardware van de speler aanstuurt — een harnas
+	 * dat zijn eigen acties bouwt bewijst niets over de verscheepte bindings.
+	 * Namen: Move, Look, Fire, SprintHold, SprintToggle, Crouch, ToggleView,
+	 * Jump, Aim, CommandHold, SelectNext, SelectPrev, DirectPick, StanceToggle,
+	 * Order1..Order4. Onbekende naam = nullptr, nooit een crash.
+	 */
+	UInputAction* FindInputAction(FName ActionName) const;
+	UInputMappingContext* GetMappingContext() const { return MappingContext; }
+
+	/**
+	 * Sprint-toestand (feel-audit S2). Twee apparaten, twee gebruiken: Shift is
+	 * een HOLD, L3 is een TOGGLE. De toggle vervalt zodra de speler ophoudt met
+	 * vooruit duwen, mikt, vuurt, of nogmaals L3 drukt — Borderlands / Gears /
+	 * The Division doen het alle drie zo.
+	 */
+	bool IsSprinting() const { return bSprinting; }
+	bool IsSprintLatched() const { return bSprintLatched; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -42,7 +62,14 @@ private:
 	void HandleMove(const struct FInputActionValue& Value);
 	void HandleLook(const struct FInputActionValue& Value);
 	void HandleFire();
-	void HandleSprint(const struct FInputActionValue& Value);
+	/** Shift: klassieke hold. Zolang de toets neer is, sprint je. */
+	void HandleSprintHold(const struct FInputActionValue& Value);
+	/** L3: één klik zet de latch om. Zie CancelSprintLatch voor het uitstappen. */
+	void HandleSprintToggle();
+	/** Eén schrijver naar MaxWalkSpeed: hold OF latch = sprint, anders rennen. */
+	void ApplySprintDrive();
+	/** De vier uitstappen van de toggle (vooruit loslaten, mikken, vuren, L3). */
+	void CancelSprintLatch(const TCHAR* Reason);
 	void HandleCrouch();
 	/** C / R3: swap first and third person on the pawn (owner request 2026-07-25). */
 	void HandleToggleView();
@@ -56,6 +83,10 @@ private:
 	bool IsUsingGamepadLook() const;
 	/** Push the tuning asset's look/pitch numbers onto this controller. */
 	void ApplyLookTuning();
+
+	/** De feel-meting naar log én scherm. Eén implementatie voor F9, voor
+	 *  Eclipse.Feel.Dump en voor het harnas (S3). */
+	void DumpFeelState() const;
 	/** 1.0 = untouched. Below 1.0 while the reticle sits on a hostile. */
 	float ComputeAimAssistScale() const;
 
@@ -69,6 +100,14 @@ private:
 
 	/** Boot a fresh campaign from data if none is running (SPEC-P1-08 live loop). */
 	void EnsureCampaignStarted();
+
+	/**
+	 * Is er een scherm om widgets op te zetten? Headless (harnas, commandlet,
+	 * -nullrhi) is er geen game viewport, en dan is een widget bouwen niet alleen
+	 * zinloos maar ook de plek waar zo'n run omvalt. De game moet zonder scherm
+	 * kunnen draaien — dat is precies wat de geautomatiseerde speelronde doet.
+	 */
+	bool HasGameViewport() const;
 
 	/** Menu base presentation: show the hub, UI input, pawn parked. */
 	void EnterBaseMode();
@@ -103,8 +142,17 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInputAction> FireAction;
 
+	/** Toetsenbord-sprint (Shift): hold. */
 	UPROPERTY()
 	TObjectPtr<UInputAction> SprintAction;
+
+	/**
+	 * Pad-sprint (L3): toggle. Een EIGEN actie, geen tweede key op de bestaande —
+	 * anders is bij de handler niet te zien welk apparaat er drukte, en juist dat
+	 * onderscheid IS de fix (feel-audit S2, gebied INPUT).
+	 */
+	UPROPERTY()
+	TObjectPtr<UInputAction> SprintToggleAction;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> CrouchAction;
@@ -121,6 +169,20 @@ private:
 	TObjectPtr<UInputAction> AimAction;
 
 	bool bAiming = false;
+
+	// Sprint (feel-audit S2). Twee bronnen, één uitkomst: bSprinting is altijd
+	// (hold || latch), zodat er precies één schrijver naar MaxWalkSpeed is.
+	bool bSprinting = false;
+	bool bSprintHeld = false;
+	bool bSprintLatched = false;
+	/** Voorwaartse stickcomponent waaronder de toggle vervalt ("ophouden met
+	 *  vooruit duwen"). Ruim onder half stick, zodat sturen tijdens sprinten mag. */
+	float SprintForwardRelease = 0.35f;
+	/** Snelheden gecachet uit DA_CharacterTuning. Ze werden per input-event uit
+	 *  het asset geladen, en HandleSprint hing aan Triggered — dus een
+	 *  LoadSynchronous per frame zolang je sprintte (GDD 12.4). */
+	float RunSpeedCm = 420.0f;
+	float SprintSpeedCm = 650.0f;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> OrderActions;
@@ -177,4 +239,9 @@ private:
 	 */
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> DebugOverlayActions;
+
+	/** F9 — feel-dump zonder configlaag (S3). Staat los van DebugOverlayActions
+	 *  omdat die allemaal de mission-HUD aanroepen en deze de pawn leest. */
+	UPROPERTY()
+	TObjectPtr<UInputAction> FeelDumpAction;
 };

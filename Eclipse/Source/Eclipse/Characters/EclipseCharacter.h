@@ -18,6 +18,42 @@ class USpringArmComponent;
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEclipseCharacterDownedDelegate, AEclipseCharacter* /*Character*/, FName /*Cause*/);
 
 /**
+ * One instant of "how big is my character on screen, and why" (feel-audit S1).
+ *
+ * The owner's symptom — "mijn personage schaalt met snelheid" — has exactly four
+ * candidate causes and they cannot be told apart by looking: the mesh scale, the
+ * boom length, the FOV, or the distance the camera actually ends up at after lag
+ * and collision have had their say. Only the LAST of those is speed-coupled by
+ * construction (camera lag trails the pawn by v / CameraLagSpeed), which is why
+ * CameraToPawnCm is measured from the two world transforms rather than derived
+ * from TargetArmLength — a derived number would have hidden the very term that
+ * moves.
+ *
+ * ApparentHeightDegrees is the honest answer to "bigger or smaller": the angle
+ * the capsule subtends at the camera. It is resolution-independent, so it can be
+ * measured headless, and it is what the eye actually reads.
+ */
+struct FEclipseFeelSample
+{
+	float SpeedCm = 0.0f;
+	float MeshScale = 0.0f;
+	/** What the spring arm was asked for (post-blend). */
+	float BoomArmLength = 0.0f;
+	/** Where the blend is heading — differs from BoomArmLength mid-blend only. */
+	float BoomTargetArmLength = 0.0f;
+	/** Measured camera-to-pawn distance: arm length PLUS lag PLUS collision pull-in. */
+	float CameraToPawnCm = 0.0f;
+	float FieldOfView = 0.0f;
+	float TargetFieldOfView = 0.0f;
+	float SocketOffsetZ = 0.0f;
+	float CapsuleHalfHeightCm = 0.0f;
+	/** Angle the full capsule subtends at the camera — "how big it looks". */
+	float ApparentHeightDegrees = 0.0f;
+	/** That angle as a fraction of the FOV: 0.25 = a quarter of the screen. */
+	float ApparentFractionOfView = 0.0f;
+};
+
+/**
  * The one character body (GDD 12.3: player, soldiers and enemies share
  * AEclipseCharacter — soldiers must be player-quality; behavior differs by
  * controller and components, never by a divergent class). GAS carries health
@@ -115,6 +151,17 @@ public:
 	 *  van geraden. Uitgelezen door Eclipse.Feel.Dump. */
 	FString DescribeFeelState() const;
 
+	/** Dezelfde meting als DescribeFeelState, maar als getallen — het harnas moet
+	 *  erop kunnen asserten en niet op een tekstregel hoeven te parsen. */
+	FEclipseFeelSample SampleFeelState() const;
+
+	/** Camera-lag uitzetten zolang dit true is (feel-audit S1 / CAM-04). De
+	 *  spring arm laat zijn oorsprong achterlopen op de pawn, en die achterstand
+	 *  is per definitie evenredig met de snelheid — het is de enige term in de
+	 *  hele camerarig die MET de snelheid meebeweegt. */
+	void SetCameraLagSuspended(bool bSuspended);
+	bool IsCameraLagSuspended() const { return bCameraLagSuspended; }
+
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
@@ -157,6 +204,9 @@ private:
 	bool bFirstPerson = false;
 	bool bCommandModeCamera = false;
 	bool bAiming = false;
+	bool bCameraLagSuspended = false;
+	/** Lag speed as tuned, so suspending and restoring is lossless. */
+	float TunedCameraLagSpeed = 12.0f;
 	float ThirdPersonArmLength = 300.0f;
 	float CommandModeArmLength = 520.0f;
 	float CommandModeCameraRise = 120.0f;

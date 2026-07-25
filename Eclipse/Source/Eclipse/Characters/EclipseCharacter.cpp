@@ -75,6 +75,9 @@ AEclipseCharacter::AEclipseCharacter()
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->bEnableCameraLag = true;
 	CameraBoom->CameraLagSpeed = 12.0f;
+	// Zie DA_CharacterTuning::CameraLagMaxDistance: zonder klem loopt de camera
+	// evenredig met de snelheid achter, en dan schaalt het personage met snelheid.
+	CameraBoom->CameraLagMaxDistance = 6.0f;
 	CameraBoom->bDoCollisionTest = true;
 	CameraBoom->ProbeSize = 12.0f;
 
@@ -167,8 +170,10 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 		WarnIfStale(TEXT("ViewPitchMin"), Tuning->ViewPitchMin, Defaults->ViewPitchMin);
 		WarnIfStale(TEXT("StickDeadzone"), Tuning->StickDeadzone, Defaults->StickDeadzone);
 		WarnIfStale(TEXT("StickYawSpeed"), Tuning->StickYawSpeed, Defaults->StickYawSpeed);
+		WarnIfStale(TEXT("MouseLookScale"), Tuning->MouseLookScale, Defaults->MouseLookScale);
 		WarnIfStale(TEXT("AimAssistStrength"), Tuning->AimAssistStrength, Defaults->AimAssistStrength);
 		WarnIfStale(TEXT("ThirdPersonArmLength"), Tuning->ThirdPersonArmLength, Defaults->ThirdPersonArmLength);
+		WarnIfStale(TEXT("CameraLagMaxDistance"), Tuning->CameraLagMaxDistance, Defaults->CameraLagMaxDistance);
 	}
 	InitializeHealth(Tuning->MaxHealth);
 
@@ -182,11 +187,13 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	FirstPersonFOV = Tuning->CameraFOV;
 	ThirdPersonFOV = Tuning->ThirdPersonFOV;
 	ViewToggleBlendTime = Tuning->ViewToggleBlendTime;
+	TunedCameraLagSpeed = Tuning->CameraLagSpeed;
 	if (CameraBoom != nullptr)
 	{
 		CameraBoom->SocketOffset = Tuning->CameraSocketOffset;
-		CameraBoom->CameraLagSpeed = Tuning->CameraLagSpeed;
-		CameraBoom->bEnableCameraLag = Tuning->CameraLagSpeed > 0.0f;
+		CameraBoom->CameraLagSpeed = TunedCameraLagSpeed;
+		CameraBoom->CameraLagMaxDistance = Tuning->CameraLagMaxDistance;
+		CameraBoom->bEnableCameraLag = !bCameraLagSuspended && TunedCameraLagSpeed > 0.0f;
 		CameraBoom->ProbeSize = Tuning->CameraProbeSize;
 	}
 	RefreshCameraTargets();
@@ -248,24 +255,70 @@ void AEclipseCharacter::SetCommandModeCamera(bool bActive)
 	RefreshCameraTargets();
 }
 
-FString AEclipseCharacter::DescribeFeelState() const
+FEclipseFeelSample AEclipseCharacter::SampleFeelState() const
 {
 	// Feel-audit-instrument. De owner meldt "personage schaalt met snelheid:
-	// piepklein bij langzaam lopen, normaal bij sprinten". De mesh-schaal wordt
-	// echter maar EEN keer gezet (ApplyBodyDef), dus die kan dat niet doen — het
-	// moet de camera zijn. Deze regel zet de vier kandidaten naast elkaar op
-	// hetzelfde moment, zodat zichtbaar is welke meebeweegt in plaats van dat
-	// iemand het moet raden.
+	// piepklein bij langzaam lopen, groter bij sprinten". De mesh-schaal wordt
+	// maar EEN keer gezet (ApplyBodyDef), dus die kan dat niet doen — het moet de
+	// camera zijn. Deze meting zet alle kandidaten naast elkaar op hetzelfde
+	// moment, zodat zichtbaar is welke meebeweegt in plaats van dat iemand het
+	// moet raden.
+	//
+	// De beslissende regel is CameraToPawnCm, en die wordt uit de twee WERELD-
+	// transforms gehaald in plaats van uit TargetArmLength. Camera-lag en de
+	// collision-probe zitten allebei ná de boomlengte: een afgeleid getal zou
+	// precies de term wegpoetsen die met de snelheid meebeweegt.
+	FEclipseFeelSample Sample;
 	const UCharacterMovementComponent* Movement = GetCharacterMovement();
 	const USkeletalMeshComponent* Body = GetMesh();
+
+	Sample.SpeedCm = Movement != nullptr ? Movement->Velocity.Size2D() : 0.0f;
+	Sample.MeshScale = Body != nullptr ? Body->GetRelativeScale3D().X : 0.0f;
+	Sample.BoomArmLength = CameraBoom != nullptr ? CameraBoom->TargetArmLength : 0.0f;
+	Sample.BoomTargetArmLength = TargetArmLength;
+	Sample.FieldOfView = ViewCamera != nullptr ? ViewCamera->FieldOfView : 0.0f;
+	Sample.TargetFieldOfView = TargetFOV;
+	Sample.SocketOffsetZ = CameraBoom != nullptr ? CameraBoom->SocketOffset.Z : 0.0f;
+	Sample.CapsuleHalfHeightCm = GetCapsuleComponent() != nullptr ? GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 0.0f;
+
+	if (ViewCamera != nullptr)
+	{
+		Sample.CameraToPawnCm = FVector::Dist(ViewCamera->GetComponentLocation(), GetActorLocation());
+	}
+	if (Sample.CameraToPawnCm > KINDA_SMALL_NUMBER && Sample.CapsuleHalfHeightCm > 0.0f)
+	{
+		Sample.ApparentHeightDegrees = FMath::RadiansToDegrees(
+			2.0f * FMath::Atan(Sample.CapsuleHalfHeightCm / Sample.CameraToPawnCm));
+		if (Sample.FieldOfView > KINDA_SMALL_NUMBER)
+		{
+			Sample.ApparentFractionOfView = Sample.ApparentHeightDegrees / Sample.FieldOfView;
+		}
+	}
+	return Sample;
+}
+
+FString AEclipseCharacter::DescribeFeelState() const
+{
+	const FEclipseFeelSample S = SampleFeelState();
 	return FString::Printf(
-		TEXT("snelheid %.0f cm/s · mesh-schaal %.3f · boom %.0f (doel %.0f) · FOV %.1f (doel %.1f) · socketZ %.0f · modus %s"),
-		Movement != nullptr ? Movement->Velocity.Size2D() : 0.0f,
-		Body != nullptr ? Body->GetRelativeScale3D().X : 0.0f,
-		CameraBoom != nullptr ? CameraBoom->TargetArmLength : 0.0f, TargetArmLength,
-		ViewCamera != nullptr ? ViewCamera->FieldOfView : 0.0f, TargetFOV,
-		CameraBoom != nullptr ? CameraBoom->SocketOffset.Z : 0.0f,
+		TEXT("snelheid %.0f cm/s · mesh-schaal %.3f · boom %.0f (doel %.0f) · camera->pawn %.1f cm · FOV %.1f (doel %.1f) · schijnbare hoogte %.2f gr (%.1f%% van beeld) · socketZ %.0f · lag %s · modus %s"),
+		S.SpeedCm, S.MeshScale, S.BoomArmLength, S.BoomTargetArmLength,
+		S.CameraToPawnCm, S.FieldOfView, S.TargetFieldOfView,
+		S.ApparentHeightDegrees, S.ApparentFractionOfView * 100.0f, S.SocketOffsetZ,
+		(CameraBoom != nullptr && CameraBoom->bEnableCameraLag)
+			? *FString::Printf(TEXT("%.0f"), CameraBoom->CameraLagSpeed) : TEXT("uit"),
 		bFirstPerson ? TEXT("1e") : (bCommandModeCamera ? TEXT("command") : TEXT("3e")));
+}
+
+void AEclipseCharacter::SetCameraLagSuspended(bool bSuspended)
+{
+	if (bCameraLagSuspended == bSuspended || CameraBoom == nullptr)
+	{
+		return;
+	}
+	bCameraLagSuspended = bSuspended;
+	CameraBoom->CameraLagSpeed = TunedCameraLagSpeed;
+	CameraBoom->bEnableCameraLag = !bSuspended && TunedCameraLagSpeed > 0.0f;
 }
 
 void AEclipseCharacter::SetAiming(bool bNewAiming)
