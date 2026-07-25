@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-25 16:45",
+  bijgewerkt: "2026-07-25 17:00",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -34,10 +34,15 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
-    { titel: "Editor sluiten zodra je klaar bent met de pack-downloads", prio: "gauw", waarom: "je editor staat open sinds 16:27 (Live Coding), en die blokkeert mijn builds — er ligt één codewijziging klaar die ik daarom niet kan verifiëren: het weghalen van een emissieve plaat die plat in de straat lag (de art-review vond hem als letterlijke sticker aan de lampvoet). Geen haast: maak je downloads eerst af.", stappen: [
-      "Laat Factory Pack / IBuilding 49 / UNIBLOCKS eerst klaar downloaden",
+    { titel: "Editor sluiten — dit is nu de ENIGE blokkade voor de kit-pass", prio: "nu", waarom: "je editor staat open sinds 16:27 en Live Coding blokkeert élke build én élke commandlet. Daardoor kan ik vier dingen niet die je net vroeg: de groene bar draaien, de packs echt curateren (tri-counts en materiaal-slots zijn alleen in de editor leesbaar), de kit-pass starten, en de shotronde doen. Wat wél kon is gedaan: pack-inventaris op bestandsniveau, wishlist-check en de werklijst staan in phase0/CURATIE_ENVPACKS_2026-07-25.md.", stappen: [
+      "Laat de downloads eerst klaar worden",
       "Sluit Unreal (gewoon afsluiten; alleen Save All als hij erom vraagt)",
-      "Meer hoeft niet — ik zie het vanzelf en pak de rij dan op"
+      "Meer hoeft niet — ik zie het vanzelf en werk dan de hele rij af"
+    ] },
+    { titel: "Vier packs uit je wishlist zijn NIET binnen", prio: "gauw", waarom: "ik zie alleen Sci-Fi Hallway; de andere vier ontbreken. Sci-Fi Light Pack is de belangrijkste van de vier: de art-review vraagt om zichtbare lichtbronnen, en op een onverlicht district zijn dat emissieve fixtures — precies wat dat pack levert. Footsteps en muzzle flash zijn gameplay-feedback en blokkeren de kit-pass niet.", stappen: [
+      "Fab → My Library → Download: Sci-Fi Light Pack (de belangrijkste)",
+      "Optioneel daarna: Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash",
+      "Zeg: 'lightpack staat erin'"
     ] },
     { titel: "Feel-gauntlet Command Mode (~20 min) — het R3-verdict", prio: "nu", waarom: "beslist of Stage B (nieuwe orders/camera/UI) mag starten; expres op de lelijke build. Je mag de editor hiervoor gewoon weer openen — de landing draait nu eerst; alleen als de agent later opnieuw moet bouwen vraagt hij je nog eens te sluiten", stappen: [
       "Open phase0/FEEL_GAUNTLET_P2-02.md (het draaiboek met besturing + meetcriteria)",
