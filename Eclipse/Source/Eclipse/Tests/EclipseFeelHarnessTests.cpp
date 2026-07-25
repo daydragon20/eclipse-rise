@@ -933,4 +933,60 @@ bool FEclipseGuideNumbersMatchTuningTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+// ---------------------------------------------------------------------------
+// De derde beschrijving: de console-commando's die BESTURING.md adverteert
+// ---------------------------------------------------------------------------
+//
+// BESTURING.md heeft een tabel met startopties en console-commando's, en die is
+// het eerste wat iemand raadpleegt als iets niet werkt. Een commando dat daar
+// staat maar niet bestaat, kost precies dezelfde avond als de F9-binding die niet
+// aankwam: je typt het, er gebeurt niets, en je weet niet of je het fout typte of
+// dat het er niet is.
+//
+// Dit dekt de HARDE kant — bestaat het object — en niet de omschrijving. Waar de
+// vorige twee bewakers ophouden bij wat de speler tijdens het spelen leest, gaat
+// deze over wat hij leest als hij vastloopt.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDocumentedConsoleCommandsExistTest,
+	"Eclipse.Feel.Input.DocumentedConsoleCommandsExist",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	// De harnas draait mee omdat twee van de vier pas bij BeginPlay geregistreerd
+	// worden — een test die alleen de statische CVars kent, mist juist die twee.
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Exact de namen zoals ze in BESTURING.md staan. Wijzigt er een in de code,
+	// dan hoort deze test te vallen en de documentatie mee te veranderen.
+	const TCHAR* Documented[] = {
+		TEXT("Eclipse.Feel.Dump"),
+		TEXT("Eclipse.Command.Dump"),
+		TEXT("Eclipse.Look.InvertY"),
+		TEXT("Eclipse.Input.ForceGamepad"),
+		TEXT("Eclipse.Guide.Overlay"),
+	};
+	for (const TCHAR* Name : Documented)
+	{
+		TestNotNull(*FString::Printf(TEXT("BESTURING.md adverteert '%s' — bestaat dat commando?"), Name),
+			IConsoleManager::Get().FindConsoleObject(Name));
+	}
+
+	// Inline falsificatie: als de opzoeking alles zou vinden, bewees hij niets.
+	// Een naam die gegarandeerd niet bestaat MOET null geven.
+	TestNull(TEXT("de opzoeking discrimineert (een verzonnen commando bestaat niet)"),
+		IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.DitBestaatNiet.Controle")));
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
