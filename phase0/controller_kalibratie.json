@@ -1,0 +1,44 @@
+{
+  "_toelichting": "Kalibratie van Nathans controller via de browser-Gamepad-API (CONTROLLER_KALIBRATIE.html). LET OP: dit is de HID-indeling die de BROWSER ziet via Bluetooth. Unreal gebruikt XInput en ziet een andere indeling. Deze data is diagnostiek, geen bron voor engine-bindings.",
+  "_hardware": "Xbox Series X|S controller (model 1914), USB\\VID_045E&PID_0B13, verbonden via Bluetooth in HID-modus",
+  "_gemeten": "2026-07-25T17:12:24Z",
+
+  "buttons": {
+    "A":      { "index": 0 },
+    "B":      { "index": 1 },
+    "X":      { "index": 3 },
+    "Y":      { "index": 4 },
+    "LB":     { "index": 6 },
+    "RB":     { "index": 7 },
+    "View":   { "index": 10 },
+    "Menu":   { "index": 11 },
+    "Xbox":   { "index": 12 },
+    "L3":     { "index": 13 },
+    "R3":     { "index": 14 },
+    "LT":     { "as": 3 },
+    "RT":     { "as": 4 },
+    "Dup":    { "as": 9 },
+    "Ddown":  { "as": 9 },
+    "Dleft":  { "as": 9 },
+    "Dright": { "as": 9 }
+  },
+
+  "axes": {
+    "LX": { "index": 0, "sign": 1, "rest": -0.0115 },
+    "LY": { "index": 1, "sign": 1, "rest": -0.0483 },
+    "RX": { "index": 2, "sign": 1, "rest": 0.0050 },
+    "RY": { "index": 5, "sign": 1, "rest": 0.0245 }
+  },
+
+  "rest": [-0.0115, -0.0483, 0.0050, -1.0, -1.0, 0.0245, 0, 0, 0, 1227133568],
+
+  "_bevindingen": [
+    "RY zit op as 5, niet op de standaard as 3. As 3 en 4 zijn de triggers en rusten op -1.00 — dat verklaart volledig waarom de rechterstick permanent 'omhoog' leek te staan.",
+    "De D-pad is een POV-hat op as 9 (een enkele as met een waarde per richting), geen vier losse knoppen. Klassiek HID-gedrag.",
+    "Button-index 2 en 5 worden overgeslagen (A=0 B=1 X=3 Y=4, LB=6 RB=7). Dat is de HID-Xbox-indeling, niet de XInput-indeling.",
+    "gamepad.mapping is een lege string: de browser herkent dit expliciet NIET als standaardindeling.",
+    "Sticks hebben verwaarloosbare drift (max 0.048 op LY) — de hardware is in orde."
+  ],
+
+  "_conclusie": "De controller draait in HID-modus via Bluetooth. Unreal Engine leest gamepads via XInput, dat een andere indeling gebruikt. Dat de browser afwijkende nummers ziet, zegt daarom niets over de engine-bindings — maar het bevestigt wel dat Windows deze controller niet als XInput-apparaat presenteert, en dat is de waarschijnlijke reden dat hij in de game niets doet. Verbind via USB-datakabel voor XInput."
+}
