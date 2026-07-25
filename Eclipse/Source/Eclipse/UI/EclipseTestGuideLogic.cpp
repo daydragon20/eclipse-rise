@@ -25,7 +25,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Fire,
 			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt") },
 			{ EEclipseGuideSignal::Sprint,
-			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s zolang je hem vasthoudt, en terug bij loslaten") },
+			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s. LET OP, dit verschilt per apparaat sinds 26-07: Shift is een HOLD (terug bij loslaten), L3 is een TOGGLE — één klik start hem, en hij blijft aan tot je ophoudt met vooruit duwen, mikt, vuurt of nog eens L3 drukt") },
 			{ EEclipseGuideSignal::Crouch,
 			  TEXT("je zakt en gaat naar 150 cm/s. Deze toets was tot vandaag dood (bCanCrouch stond uit) — dus juist hier: gebeurt er niets, zeg het") },
 			{ EEclipseGuideSignal::Jump,

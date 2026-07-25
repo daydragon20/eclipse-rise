@@ -169,7 +169,7 @@ namespace EclipseGauntletOverlay
 			{ TEXT("Lopen"),        TEXT("WASD"),              TEXT("linkerstick") },
 			{ TEXT("Rondkijken"),   TEXT("muis"),              TEXT("rechterstick") },
 			{ TEXT("Vuren"),        TEXT("LMB"),               TEXT("RT") },
-			{ TEXT("Sprint"),       TEXT("Shift"),             TEXT("L3") },
+			{ TEXT("Sprint"),       TEXT("Shift (vasthouden)"), TEXT("L3 (togglen)") },
 			{ TEXT("Hurken"),       TEXT("Ctrl"),              TEXT("B") },
 			{ TEXT("Springen"),     TEXT("Spatie"),            TEXT("A") },
 			{ TEXT("Mikken"),       TEXT("RMB"),               TEXT("LT (buiten Command Mode)") },
