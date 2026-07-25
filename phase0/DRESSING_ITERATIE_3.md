@@ -72,7 +72,76 @@ Dat maakt de frame-probe (`Tools/measure_frame_values.py`, §4) meteen zijn eige
 rechtvaardiging: hij ving zowel de oorspronkelijke vloer-omkering als mijn eigen
 verkeerde conclusie.
 
-## 1c. Stap 3 GELAND — en stap 4 heeft nu een gemeten doel
+## 1d. Herziene ladder na de tweede art-review (shots 00092-00097) — LEES DIT EERST
+
+De tweede review kalibreerde eerst zijn eigen meetvakken tegen de ontwerpbaseline
+(reproduceerde 2.170× in 00069) en corrigeerde daarna drie dingen die hieronder in
+§1c nog fout staan. **De review heeft voorrang op §1c.**
+
+**1. Mijn pool-meting was fout: ring in plaats van kern.** Echte `pool_core` in
+00097 = **0.2907**, dus de ratio is **6.25×** de vloer, niet 3.68×. De correctie
+op de pool is daarmee **×0.35-0.40** (naar 0.10-0.12 lum), niet ×0.59 — en dat
+getal heeft nu drie onafhankelijke bewijzen: pool÷bulb moet van 40% naar 14-16%;
+de baanmarkering moet ≥2× haar asfalt houden; en 2.18 × vloer 0.0465 = 0.101.
+De ontworpen 2.18× was dus gewoon goed.
+
+**2. De metering-pin raakte ALLEEN de vloer.** Alles boven ~0.25 lum zit op de
+shoulder van de tonemapper en gaf maar 20-45% van de verwachte daling terug:
+vloer ÷4.21, maar barrière ÷1.11. Gevolg: **barrière ÷ vloer ging van 3.72× naar
+14.1×** — het plafond zakte niet mee, dus dressing staat nu *verder* van zijn
+ondergrond dan vóór de ingreep. Het histogram van de onderste beeldhelft is nu
+bimodaal met een **lege middenband** (middentonen 66.5% → 9.3% in cam 7, 2.0% in
+cam 4). Dat ís "stickers op een plaat", numeriek — het spiegelbeeld van het oude
+"alles middengrijs"-defect. **Daarom is stap 7 (waardeplafond) nu #1, en `Wall_`
+hoort erbij** (0.238-0.356 = 4.1-4.8× de vloer, grootste oppervlak in élk frame;
+"Wall_ blijft staan" uit stap 2 was in retrospectief fout). Let op: authored→frame
+is niet-lineair (2.4-2.7× op barrièreniveau, 0.75-0.92× op vloerniveau), dus
+**×0.518 werkt daar niet** — zet een frame-doel en bisecteer met de probe.
+
+**3. De vloer is AF — doe de stap terug naar ×0.72 NIET.** Mijn 1.52× was weer een
+probe-artefact; schone luchtmetingen geven een bandbreedte van 1.51-2.32×, met het
+~1.9×-doel er middenin. Naar ×0.72 zou pool÷vloer gratis van 6.25× naar 3.7×
+brengen *zonder de pool aan te raken* — een cosmetische no-op die het echte defect
+verbergt, en de derde instantie van precies de val die deze ronde al twee
+terugdraaiingen kostte. Het echte vloerdefect is **vlakheid** (18% variatie over
+55% van cam 4), niet het gemiddelde → nieuw item **2b: lokale vloervariatie**.
+
+**Nieuwe, gemeten defecten die zwaarder wegen dan de rest van de oude ladder:**
+- **De baanmarkering kantelt binnen de pool**: buiten 5.65× haar asfalt, binnen
+  **0.79×** — de gele lijn is in de pool *donkerder* dan het wegdek, en wat je nog
+  ziet is alleen zijn zwarte ink-outline. De sticker houdt het frame bijeen in
+  plaats van het licht. Daarom moet de pool **als multiply/add over de ondergrond**
+  composeren, niet eroverheen: ×0.40 alléén levert een koelere sticker.
+- **Bloom is de facto uit**: 1.07× op 12px van een bulb met 61% geclipte pixels.
+  En de inkpass zet een **zwarte rand** om de bulb (0.0223 < verre lucht 0.0270).
+  Een sodiumlamp zonder halo mét zwarte rand is per definitie plastic. → stap 3
+  splitst in **3b bloom/halo**, **3c bulb uit de inkpass**, **3d warme overdracht
+  op verticalen** (mast ín de pool R/B 1.05 tegen 0.97 buiten = nul overdracht).
+- **Nul contactverankering** in alle zes frames; de barrière heeft outline op zijn
+  silhouet maar niets op het grondcontact, dus zijn onderkant lost op in het
+  asfalt. → stap 6 (grounding) schuift naar de top-3.
+- **Outline-regel herformuleren**: ink op silhouetten, ink UIT op grondvlakke
+  dressing, ink NOOIT op emissives — en juist WEL (of een blob) op grondcontacten.
+- **`SM_AssetPlatform` staat er twee keer** in 00093, met maatstreepjes en
+  checker-schaalramp leesbaar op 1080p. Blokkerend en erger dan gedacht.
+- **Magenta is een MID, geen shade**: hue 336.7° op val 0.51 met B/G = **3.17**
+  (niet 1.9×). De regel "shade houdt B ≤ G" moet dus ook over de **midtinten**.
+- **Cam 4 heeft een camera-probleem, geen dressing-probleem**: 45% lege lucht +
+  45% lege vloer + 10% contentstrook kan nooit lezen. Kantel de pitch of zet een
+  lamp in het nabije veld. **Cam 6 valt af als reviewframe** (placeholder-pop).
+- Geparkeerd: **liners** (op geen enkele camera-afstand leesbaar als defect) en
+  **FogDensity** (met de grond op 0.03-0.06 is er niets om op te tillen; pas
+  hertesten nadat het plafond zakt).
+
+**Stand "stickers"-diagnose: ~35% opgelost** (was 25%). Winst: zichtbare bron,
+decal-recept houdt stand, vloer is art-directable, ladder is numeriek. Maar twee
+van de vier resterende tells zijn deze ronde *verslechterd*.
+
+**Referenties gebankt:** 00069 blijft de pool-recept-referentie; 00097 ernaast als
+"bron zichtbaar, plafond nog niet gezakt" (het frame waartegen de plafond-fix
+gemeten wordt); 00095 als dark-value-referentie voor commandoafstand.
+
+## 1c. Stap 3 GELAND — en het stap-4-getal dat §1d corrigeert
 
 **De bulb werkt.** De helderste pixel in cam 7 was in elke eerdere ronde de
 neutrale witte barrière (rgb ~226,225,226). Nu is het de lamp: **rgb (255,238,44)**
