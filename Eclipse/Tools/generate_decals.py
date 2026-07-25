@@ -6,6 +6,16 @@
 # marks. Output: Eclipse/Saved/GeneratedDecals/*.png (import via
 # Tools/import_generated_decals.py).
 #
+# Two kinds of map live here:
+#   *_diff  - luminance patterns, sampled as AlbedoTex, and therefore MEASURED
+#             (AlbedoGain = 1/linear-mean, Tools/measure_albedo_gain.py) before
+#             any builder line may use them.
+#   *_mask  - OPACITY falloffs for M_EclipseToonDecal (mask.r * OpacityScale),
+#             imported linear + grayscale by the "_mask" branch in
+#             import_generated_decals.py. A mask carries no gain by design: it
+#             modulates coverage, never luminance, so the builder can place one
+#             without a measurement round (dressing-iteratie 2).
+#
 # Run:  python Eclipse/Tools/generate_decals.py
 
 import math
@@ -118,3 +128,57 @@ for _ in range(9000):
     if 150 < r < 175 or random.random() < 0.15:
         px[x, y] = max(0, min(255, px[x, y] + random.randint(-70, 70)))
 save(stencil, "T_decal_stencil_diff.png")
+
+# --- The light pass (dressing-iteratie 2, phase0/DRESSING_ITERATIE_2.md) -------
+# The district renders UNLIT, so its "lighting" is decals: warm pools under the
+# sodium lamps and blob shadows under the dressing masses. Both are OPACITY
+# falloffs on M_EclipseToonDecal - the tint comes from the palette (pool =
+# sodium hue, blob = the floor tint x0.4), these files only say WHERE the cue
+# has coverage. Written last, each on its OWN rng stream, so every map above
+# stays bit-identical to the banked round.
+#
+# Both discs are INSCRIBED in their quad: r is normalized so it reaches 1.0 at
+# the edge midpoints, and coverage is forced to 0 there. A falloff that still
+# carries value at the border is exactly what made the first stain round read as
+# "carpet tiles" (review shots 00008-00013).
+
+
+def _smoothstep(t):
+    t = max(0.0, min(1.0, t))
+    return t * t * (3.0 - 2.0 * t)
+
+
+# Lamp pool: wide soft disc, small plateau core, faint smog mottle so the light
+# is not a CG-perfect gradient. Falloff span 0.78 -> core out to r 0.22.
+POOL = 512
+_pool_rng = random.Random(773)
+_pool_mottle = _value_noise(POOL, 5, _pool_rng).load()
+pool = Image.new("L", (POOL, POOL), 0)
+_poolpx = pool.load()
+for _y in range(POOL):
+    for _x in range(POOL):
+        nx, ny = (_x + 0.5) / POOL - 0.5, (_y + 0.5) / POOL - 0.5
+        r = math.hypot(nx, ny) * 2.0
+        m = _smoothstep((1.0 - r) / 0.78)
+        m *= 0.90 + 0.10 * (_pool_mottle[_x, _y] / 255.0)
+        _poolpx[_x, _y] = int(max(0.0, min(1.0, m)) * 255.0 + 0.5)
+save(pool, "T_pool_mask.png")
+
+# Blob shadow: dense core (plateau out to r ~0.45, falloff span 0.55) whose
+# radius is ERODED by up to 14% from a mid-frequency noise, so the contact
+# shadow reads hand-inked instead of as a vector ellipse. Erosion only ever
+# inflates the sampled radius, never shrinks it - that is what keeps coverage at
+# exactly 0 on the quad edge (a wobble in both directions would leave a faint
+# hard border, the carpet-tile failure again).
+BLOB = 512
+_blob_rng = random.Random(774)
+_blob_edge = _value_noise(BLOB, 9, _blob_rng).load()
+blob = Image.new("L", (BLOB, BLOB), 0)
+_blobpx = blob.load()
+for _y in range(BLOB):
+    for _x in range(BLOB):
+        nx, ny = (_x + 0.5) / BLOB - 0.5, (_y + 0.5) / BLOB - 0.5
+        r = math.hypot(nx, ny) * 2.0
+        r *= 1.0 + 0.14 * (_blob_edge[_x, _y] / 255.0)
+        _blobpx[_x, _y] = int(_smoothstep((1.0 - r) / 0.55) * 255.0 + 0.5)
+save(blob, "T_blob_mask.png")

@@ -118,7 +118,17 @@ namespace
 		// multiplier at 2.5, so raw gains stay honest here).
 		// Floor: Megascans 4K asphalt (A9, curation pass 2026-07-23, mean .081)
 		// with the 2K Poly Haven asphalt as repo-tracked fallback (mean .059).
-		{ TEXT("Floor"),  FLinearColor(0.165f, 0.150f, 0.160f), FLinearColor(0.055f, 0.052f, 0.080f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // asphalt — dark but never crushed
+		// Dressing-iteratie 2, step 1 (DRESSING_ITERATIE_2.md; art-review
+		// 00056-00062): the old warm-neutral tint (0.165/0.150/0.160) read as
+		// full-daylight concrete under the dusk sky — the root of the
+		// "stickers" verdict, and the biggest surface in every frame. Dusk fix:
+		// the floor joins the cool perimeter family at exactly one value step
+		// under Wall_ (x0.72 — the same step the CoverB hierarchy banked), so
+		// asphalt sits below the walls in value and in the same dusk hue lane.
+		// Measured gains untouched (12.41/16.8 = 1/linear-mean; the toon HLSL
+		// clamps the per-pixel multiplier at 2.5) — the mean multiplier stays
+		// 1.0, so this retint moves the histogram only by the tint delta.
+		{ TEXT("Floor"),  FLinearColor(0.166f, 0.180f, 0.209f), FLinearColor(0.054f, 0.059f, 0.094f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.5f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — Wall_ x0.72, never crushed
 		{ TEXT("Wall_"),  FLinearColor(0.230f, 0.250f, 0.290f), FLinearColor(0.075f, 0.082f, 0.130f), TEXT("/Game/Art/Textures/T_concrete_block_wall_diff.T_concrete_block_wall_diff"), 500.0f, 20.5f, 0.5f },  // perimeter concrete, cold
 		// Dominion post: oxide red, shade to maroon-purple (variation is
 		// luminance-only, hue stays palette). West-facade banding (15.8 look-ronde
@@ -144,8 +154,16 @@ namespace
 		// blocks) > DecoLine route paint (saturated worn yellow, mid-band ~x0.55
 		// of the barrier read). Hue stays in the hazard-amber family (15.5).
 		// CoverB MUST precede Cover: PaletteForLabel prefix-matches in order.
-		{ TEXT("CoverB"), FLinearColor(0.612f, 0.259f, 0.036f), FLinearColor(0.259f, 0.079f, 0.043f), nullptr, 0.0f, 1.0f, 0.0f },  // worn/older cover barriers, one value step down
-		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f), nullptr, 0.0f, 1.0f, 0.0f },  // hazard orange, reads as cover
+		// Dressing-iteratie 2, step 4 (graybox-restanten door de toon-master):
+		// the flat hazard slabs read as raw graybox boxes next to the dressed
+		// props (art-review: "geel barrier-blok", checkpoint frame). The whole
+		// yellow family now carries the worn hazard-paint grain, world-aligned
+		// (UVMode 0, these are scaled engine cubes) at the MEASURED gain 3.08
+		// (worn-stripe map mean-lin .325, SOURCES.md) — mean multiplier 1.0,
+		// so the banked Cover > CoverB > DecoLine value hierarchy is untouched;
+		// mix stays low so the hazard hue keeps its palette authority (15.5).
+		{ TEXT("CoverB"), FLinearColor(0.612f, 0.259f, 0.036f), FLinearColor(0.259f, 0.079f, 0.043f), TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 450.0f, 3.08f, 0.35f },  // worn/older cover barriers, one value step down
+		{ TEXT("Cover"),  FLinearColor(0.850f, 0.360f, 0.050f), FLinearColor(0.360f, 0.110f, 0.060f), TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 450.0f, 3.08f, 0.35f },  // hazard orange, reads as cover
 		{ TEXT("Skyline"), FLinearColor(0.048f, 0.044f, 0.058f), FLinearColor(0.018f, 0.017f, 0.028f), nullptr, 0.0f, 1.0f, 0.0f }, // graphite massing silhouetted in the smog (03.3); the haze adds the aerial fade
 		{ TEXT("Glow"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f), nullptr, 0.0f, 1.0f, 0.0f },  // sodium-orange window strips — bright enough to survive 15 km of smog
 		{ TEXT("Outland"), FLinearColor(0.045f, 0.042f, 0.055f), FLinearColor(0.020f, 0.020f, 0.030f), nullptr, 0.0f, 1.0f, 0.0f }, // industrial plain under the skyline, darker than the district floor
@@ -227,6 +245,35 @@ namespace
 		}
 		return FCString::Strnicmp(Label, TEXT("Skyline"), 7) == 0;
 	}
+
+	/**
+	 * The district's sodium lamp posts — ONE list consumed twice (dressing-
+	 * iteratie 2): the generated-prop pass spawns the pole + glow head here,
+	 * and the luminance-decal pass drops the warm lamp-pool disc under each
+	 * entry. The district is unlit (the iteratie-2 architecture anchor), so a
+	 * "light pool" can only exist as a decal — a diverging second position
+	 * list would strand pools without lamps. Yaw = the arm direction: the
+	 * Blender lamp (gen_street_props.py) hangs its head ~0.6-0.9 m along
+	 * local +X, so pools offset ~80 units along the yaw vector to sit under
+	 * the head, not the pole base. Includes the crossing cable-arc pair
+	 * (-4650/-4230): the pair's 420-unit spacing matches the measured
+	 * catenary span (headless bounds pass 2026-07-23).
+	 *
+	 * PoolSize = the pool disc's diameter in units. 700 is the street default:
+	 * one asphalt tile period (Floor TexWorldScale 700), so the pool's borrowed
+	 * grain continues the floor's own phase seamlessly. The yard lamp at
+	 * (-4000, 2100) stands 50 units off BldgB's south slab and hangs its head
+	 * toward it, so a 700-disc would print warm light on the warehouse's INSIDE
+	 * floor — a leak through an opaque wall. 300 keeps its coverage on the yard
+	 * side (the fringe that crosses the slab is under 10% and lands inside the
+	 * wall volume itself).
+	 */
+	struct FLampPostDef { float X; float Y; float Yaw; float PoolSize; };
+	constexpr FLampPostDef LampPosts[] = {
+		{ -4650.0f, -700.0f, 90.0f, 700.0f }, { -1250.0f, 700.0f, 270.0f, 700.0f }, { 2150.0f, -700.0f, 90.0f, 700.0f },
+		{ 4150.0f, -1500.0f, 200.0f, 700.0f }, { -4000.0f, 2100.0f, 20.0f, 300.0f },
+		{ -4230.0f, -700.0f, 90.0f, 700.0f },  // crossing pair, second pole (cable spans to -4440)
+	};
 
 	/**
 	 * One sun definition shared by the light actor AND the toon material's LightDir
@@ -313,11 +360,14 @@ void BuildDistrict(UWorld& World)
 	// 00008–00013). Either asset missing = the opaque master fallback (14.3.5).
 	UMaterialInterface* ToonDecalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonDecal.M_EclipseToonDecal"));
 	UTexture* StainMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_stain_mask.T_stain_mask"));
+	// Dressing-iteratie 2: a missing STAIN mask no longer disqualifies the decal
+	// MASTER — the light pass below rides that same master with its own pool/blob
+	// masks, so the two cues degrade independently (14.3.5). The stain path still
+	// needs both, which MidForPalette re-checks per instance.
 	if (ToonDecalMaterial == nullptr || StainMask == nullptr)
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("Graybox: stain decal path incomplete (material %s, mask %s) — stains fall back to hard-edged opaque cel (run Tools/author_toon_material.py + generate_decals.py/import_generated_decals.py)."),
 			ToonDecalMaterial != nullptr ? TEXT("ok") : TEXT("MISSING"), StainMask != nullptr ? TEXT("ok") : TEXT("MISSING"));
-		ToonDecalMaterial = nullptr;
 	}
 	if (ToonMaterial == nullptr)
 	{
@@ -336,8 +386,9 @@ void BuildDistrict(UWorld& World)
 	auto MidForPalette = [ToonMaterial, ToonLitMaterial, ToonDecalMaterial, StainMask, BaseMaterial, &MidByPrefix, &World](const FPaletteDef& Entry, bool bWestComp = false) -> UMaterialInstanceDynamic*
 	{
 		// Stains ride the translucent mask variant (15.8 art-fix) — unlit under
-		// every mode, like the glow strips below.
-		const bool bStainDecal = ToonDecalMaterial != nullptr && FCString::Stricmp(Entry.Prefix, TEXT("DecoStain")) == 0;
+		// every mode, like the glow strips below. Both halves required: without
+		// the baked mask the translucent master would render a hard quad.
+		const bool bStainDecal = ToonDecalMaterial != nullptr && StainMask != nullptr && FCString::Stricmp(Entry.Prefix, TEXT("DecoStain")) == 0;
 		// Glow strips stay unlit-emissive under every mode — they are light
 		// sources, not lit surfaces.
 		const bool bWantsLit = !bStainDecal && ToonLitMaterial != nullptr && FCString::Strnicmp(Entry.Prefix, TEXT("Glow"), 4) != 0;
@@ -459,6 +510,171 @@ void BuildDistrict(UWorld& World)
 		SpawnBlock(bRotated ? TEXT("Cover") : TEXT("CoverB"), FVector(Cover.X, Cover.Y, 60.0f),
 			FVector(bRotated ? 3.0f : 1.0f, bRotated ? 1.0f : 3.0f, 1.2f));
 	}
+
+	// PLACEHOLDER(15.8): THE LIGHT PASS — dressing-iteratie 2's answer to the
+	// art-review wish "light pools under the lamp posts + contact shadows"
+	// (phase0/DRESSING_ITERATIE_2.md, architecture anchor). The district renders
+	// UNLIT: M_EclipseToon computes its bands in-shader from LightDir, so real
+	// point lights would light nothing here and real shadow maps never reach the
+	// horizontals — adding either would cost VSM pages for no pixels (12.4).
+	// Both cues therefore ride the translucent toon-decal master the ground
+	// stains proved, with a baked radial falloff so a disc fades out organically
+	// instead of reading as a "carpet tile" (review shots 00008-00013):
+	//   * lamp pools — warm sodium discs under every LampPosts[] entry (the SAME
+	//     list the prop pass spawns its poles from, so a pool can never drift
+	//     away from its lamp), offset along the arm direction;
+	//   * blob shadows — the floor tint at x0.4 under each dressing mass,
+	//     spawned from that mass's OWN coordinates further down.
+	// Dressing tier throughout: no collision, no shadow casting, no per-tick
+	// work, one MID per cue, deterministic on every machine.
+	UMaterialInstanceDynamic* PoolMid = nullptr;
+	UMaterialInstanceDynamic* BlobMid = nullptr;
+	// Ground-decal Z stack, chosen against the dressing already on the asphalt
+	// (stains 0..4, lane paint 0..6, hazard pads 2..6): blobs 3..7 (centre 5),
+	// pools 6..10 (centre 8), both 4 units thick. Both must sit OVER the paint —
+	// a shadow the lane stripes shine through, or a pool that stops at them,
+	// reads as a sticker — and both stay as low as that allows, because every
+	// ground plane in this district cuts a faint band across a figure standing on
+	// it (already true of the 6-unit lane paint; 10 is the ceiling here).
+	constexpr float BlobDecalZ = 5.0f;
+	constexpr float PoolDecalZ = 8.0f;
+	{
+		UTexture* PoolMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_pool_mask.T_pool_mask"));
+		UTexture* BlobMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_blob_mask.T_blob_mask"));
+		if (BlobMask == nullptr)
+		{
+			// Existing art before new art (and 14.3.5): the stain falloff is the
+			// same radial/noise disc one generator round older — a serviceable
+			// blob until the new mask is imported.
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: blob-shadow mask T_blob_mask missing — falling back to the stain falloff mask (run Tools/generate_decals.py + import_generated_decals.py)."));
+			BlobMask = StainMask;
+		}
+		// Loud per piece (14.3.5): a missing master kills both cues, a missing
+		// mask only its own — the district then keeps its flat unlit ground read
+		// instead of crashing or half-lighting in silence.
+		if (ToonDecalMaterial == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: light pass skipped — M_EclipseToonDecal missing, so lamp pools and blob shadows cannot render (run Tools/author_toon_material.py)."));
+		}
+		else if (PoolMask == nullptr || BlobMask == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: light pass partial (pool mask %s, blob mask %s) — the missing cue is skipped (run Tools/generate_decals.py + import_generated_decals.py)."),
+				PoolMask != nullptr ? TEXT("ok") : TEXT("MISSING"),
+				BlobMask != nullptr ? TEXT("ok") : TEXT("MISSING"));
+		}
+
+		// One MID per cue (never per instance, 12.4). GrainSource opts a cue into
+		// a palette entry's MEASURED albedo — the pool borrows the floor's own
+		// asphalt so a light pool reads as lit asphalt instead of a painted disc,
+		// with the same primary/fallback/flat degradation chain as the blocks.
+		auto MakeGroundDecalMid = [ToonDecalMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade, UTexture* Mask, float OpacityScale, const FPaletteDef* GrainSource) -> UMaterialInstanceDynamic*
+		{
+			if (ToonDecalMaterial == nullptr || Mask == nullptr)
+			{
+				return nullptr;
+			}
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonDecalMaterial, &World);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), Lit);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Shade);
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+			// Mask rides MeshUV (an engine-cube face spans 0..1); the grain below
+			// stays world-aligned (UVMode 0) so it keeps the floor's tile phase.
+			Mid->SetTextureParameterValue(TEXT("MaskTex"), Mask);
+			Mid->SetScalarParameterValue(TEXT("OpacityScale"), OpacityScale);
+			if (GrainSource != nullptr && GrainSource->TexPath != nullptr)
+			{
+				UTexture* Albedo = LoadObject<UTexture>(nullptr, GrainSource->TexPath);
+				float Gain = GrainSource->TexGain;
+				if (Albedo == nullptr && GrainSource->FallbackTexPath != nullptr)
+				{
+					Albedo = LoadObject<UTexture>(nullptr, GrainSource->FallbackTexPath);
+					Gain = GrainSource->FallbackTexGain;
+				}
+				if (Albedo != nullptr)
+				{
+					// Measured gain straight off the palette entry — the light
+					// pass never invents a number (15.5).
+					Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Albedo);
+					Mid->SetScalarParameterValue(TEXT("TexWorldScale"), GrainSource->TexScale);
+					Mid->SetScalarParameterValue(TEXT("AlbedoGain"), Gain);
+					Mid->SetScalarParameterValue(TEXT("AlbedoMix"), GrainSource->TexMix);
+				}
+				else
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("Graybox: light-pass grain %s missing — pool discs run flat cel (14.3.5)."), GrainSource->TexPath);
+				}
+			}
+			return Mid;
+		};
+
+		// Sodium pool tint. Hue = the palette's Glow entry (2.2/1.0/0.3), the
+		// district's sodium authority and literally what the lamp heads emit, so
+		// the pool introduces no new colour (15.5: palette keeps hue authority).
+		// Luminance is DERIVED, not eyeballed — three banked value steps (x0.72
+		// each, the step the floor/CoverB hierarchy uses) over the dusk asphalt:
+		//   floor mid   = (Lit+Shade)/2 -> Rec709 luminance 0.1198
+		//   pool mid    = 0.1198 / 0.72^3            = 0.3209
+		//   pool lit    = pool mid / ((1+0.338)/2)   = 0.4797   (0.338 = the
+		//                 floor entry's own shade/lit luminance ratio, so a pool
+		//                 stays a floor-family tone in both bands)
+		//   on the Glow hue (luminance 1.2046) -> x0.398
+		// A flat pool renders its MID band (horizontals sit at ndl 0.423), so the
+		// composite over the asphalt at peak opacity 0.70 lands at 2.18x the
+		// floor: a pool that reads at command distance without a hot core.
+		const FPaletteDef& FloorPalette = PaletteForLabel(TEXT("Floor"));
+		PoolMid = MakeGroundDecalMid(FLinearColor(0.876f, 0.398f, 0.119f), FLinearColor(0.296f, 0.135f, 0.040f), PoolMask, 0.70f, &FloorPalette);
+		// Blob shadow: the floor tint at x0.4 — luminance only, no hue shift
+		// (spec). Peak opacity 0.85 puts the core at ~0.49x the asphalt, dark
+		// enough to ground a mass, far off the "silhouette black" the boulder
+		// stain was flagged for.
+		BlobMid = MakeGroundDecalMid(FLinearColor(0.066f, 0.072f, 0.084f), FLinearColor(0.022f, 0.024f, 0.038f), BlobMask, 0.85f, nullptr);
+	}
+
+	// Thin no-collision ground quad for the two light-pass cues. Non-uniform
+	// Size turns the mask's disc into the ellipse a rectangular mass needs, and
+	// Yaw carries the mass's own rotation so the ellipse lies along it.
+	auto SpawnGroundDecal = [&World, CubeMesh, &Params](UMaterialInstanceDynamic* Mid, const FVector2D& Center, const FVector2D& Size, float Yaw, float Z, const TCHAR* Tag)
+	{
+		if (Mid == nullptr)
+		{
+			return; // masks/master absent — the warning above already said so
+		}
+		AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(FVector(Center.X, Center.Y, Z), FRotator(0.0f, Yaw, 0.0f), Params);
+		if (Actor == nullptr)
+		{
+			return;
+		}
+		Actor->SetMobility(EComponentMobility::Movable);
+		Actor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
+		Actor->SetActorScale3D(FVector(Size.X / 100.0f, Size.Y / 100.0f, 0.04f));
+		Actor->GetStaticMeshComponent()->SetMaterial(0, Mid);
+		Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+		Actor->GetStaticMeshComponent()->SetCastShadow(false);
+		Actor->SetActorEnableCollision(false);
+		Actor->Tags.Add(Tag);
+	};
+
+	// Lamp pools — consumer #2 of LampPosts (the prop pass below spawns pole +
+	// glow head from the same rows). Pool centre = pole + 80 units along the arm
+	// yaw, exactly as the list documents: the Blender lamp hangs its head along
+	// local +X, so the light lands ahead of the pole base, not around it.
+	// Disc diameter comes from the row (see FLampPostDef: 700 = one asphalt tile
+	// period, the yard lamp runs smaller so it cannot print light through a
+	// wall). A pool whose pole failed to import still spawns by design: the
+	// ground read is the cue, and the missing mesh logs from the prop pass
+	// (14.3.5).
+	for (const FLampPostDef& Lamp : LampPosts)
+	{
+		const float YawRad = FMath::DegreesToRadians(Lamp.Yaw);
+		SpawnGroundDecal(PoolMid,
+			FVector2D(Lamp.X + FMath::Cos(YawRad) * 80.0f, Lamp.Y + FMath::Sin(YawRad) * 80.0f),
+			FVector2D(Lamp.PoolSize, Lamp.PoolSize), Lamp.Yaw, PoolDecalZ, TEXT("Deco_LampPool"));
+	}
+	UE_LOG(LogEclipse, Display, TEXT("Graybox: light pass — %d lamp pools (%s) from the same LampPosts[] the poles use; blob shadows %s and spawn with their masses."),
+		PoolMid != nullptr ? static_cast<int32>(UE_ARRAY_COUNT(LampPosts)) : 0,
+		PoolMid != nullptr ? TEXT("ok") : TEXT("SKIPPED"),
+		BlobMid != nullptr ? TEXT("ok") : TEXT("SKIPPED"));
 
 	// PLACEHOLDER(15.4): first real prop meshes — CC0 Poly Haven FBX restyled
 	// through the toon pipeline (mesh-UV albedo, luminance-only; provenance in
@@ -992,14 +1208,16 @@ void BuildDistrict(UWorld& World)
 		UStaticMesh* Cable = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_CableArc.SM_Prop_CableArc"));
 		UStaticMesh* Barricade = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Generated/SM_Prop_Barricade.SM_Prop_Barricade"));
 
-		const struct { FVector Loc; float Yaw; } Lamps[] = {
-			{ FVector(-4650, -700, 0), 90.0f }, { FVector(-1250, 700, 0), 270.0f }, { FVector(2150, -700, 0), 90.0f },
-			{ FVector(4150, -1500, 0), 200.0f }, { FVector(-4000, 2100, 0), 20.0f },
-		};
-		for (const auto& L : Lamps)
+		// Lamp posts — consumer #1 of LampPosts (the light pass above drops each
+		// pool from the same rows). The old local Lamps[] table here was that
+		// second position list: five poles listed twice over, with the crossing
+		// pair's sixth pole hand-placed 60 lines further down next to the cable.
+		// One list means a pool can never end up without its lamp, and moving a
+		// lamp moves its light (dressing-iteratie 2, spec step 2).
+		for (const FLampPostDef& Post : LampPosts)
 		{
-			SpawnGen(Lamp, MetalMid, L.Loc, L.Yaw);
-			SpawnGen(LampGlow, GenGlowMid, L.Loc, L.Yaw);
+			SpawnGen(Lamp, MetalMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
+			SpawnGen(LampGlow, GenGlowMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
 		}
 		const struct { FVector Loc; float Yaw; } Boards[] = {
 			{ FVector(-8300, 500, 0), 100.0f }, { FVector(-3800, -950, 0), 30.0f }, { FVector(6300, 1200, 0), 250.0f },
@@ -1051,11 +1269,9 @@ void BuildDistrict(UWorld& World)
 		// Scale audit (headless bounds pass, 2026-07-23): SM_Prop_CableArc
 		// measures 422x30x79 with its sag at z 236..315 — the parked "~100x
 		// oversized" QC eyeball was stale; the import is a sane 4.2 m catenary
-		// hung at pole height. Strung at natural scale between a lamp pair
-		// flanking the crossing; the pair's second lamp spawns here so the
-		// 420-unit spacing matches the measured span.
-		SpawnGen(Lamp, MetalMid, FVector(-4230, -700, 0), 90.0f);
-		SpawnGen(LampGlow, GenGlowMid, FVector(-4230, -700, 0), 90.0f);
+		// hung at pole height. Strung at natural scale between the crossing lamp
+		// pair; both poles of that pair now live in LampPosts (rows 1 and 6, 420
+		// units apart = the measured span), so only the cable spans them here.
 		SpawnGen(Cable, MetalMid, FVector(-4440, -700, 0), 0.0f);
 
 		// Gate portal at the Entry_Main approach (measured kit: CornerPillar
@@ -1163,7 +1379,12 @@ void BuildDistrict(UWorld& World)
 			// Palette tints (curation tint table; liner = BldgB worker-teal
 			// x0.8 so the interior sits one value step under the exterior —
 			// luminance-only, hue authority stays with the palette, 15.5).
-			const FLinearColor StainLit(0.070f, 0.062f, 0.075f), StainShade(0.028f, 0.026f, 0.038f);
+			// Slag: the DecoStain oil tint was too dark for a MASS — a stain is
+			// read against asphalt, a boulder against the sky, and at 0.070 it
+			// went silhouette-black (art-review 25-07, "boulder-stain 30-40%
+			// lichter"). Lifted x1.35, hue untouched (luminance-only, 15.5); the
+			// ground stains themselves keep the original DecoStain values.
+			const FLinearColor RubbleLit(0.095f, 0.084f, 0.101f), RubbleShade(0.038f, 0.035f, 0.051f);
 			const FLinearColor GraphiteLit(0.230f, 0.250f, 0.290f), GraphiteShade(0.075f, 0.082f, 0.130f);
 			const FLinearColor OxideLit(0.560f, 0.160f, 0.085f), OxideShade(0.200f, 0.045f, 0.085f);
 			const FLinearColor MachineLit(0.105f, 0.105f, 0.120f), MachineShade(0.040f, 0.040f, 0.052f);
@@ -1179,12 +1400,19 @@ void BuildDistrict(UWorld& World)
 			UStaticMesh* Chunk = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Imported/Meshes/SM_Rock_Chunk_LowPoly.SM_Rock_Chunk_LowPoly"));
 			if (Boulder != nullptr)
 			{
-				UMaterialInstanceDynamic* RubbleMid = MakeDressMid(StainLit, StainShade);
+				UMaterialInstanceDynamic* RubbleMid = MakeDressMid(RubbleLit, RubbleShade);
+				// Pocket centres clear the wall by ONE rule (art-review 00061:
+				// the gate-side boulder pushed through the wall face instead of
+				// bedding into the ground). The perimeter slabs' inner faces sit
+				// at ±9950 (Blocks: centre ±10000, 100-unit slab), so every
+				// pocket centre keeps 400 units of clearance — the slag still
+				// hugs the wall, no mesh half-extent can reach through it, and
+				// the chunk scatter (±170 below) stays inside that margin.
 				struct FPocketDef { FVector Center; float BoulderYaw; float BoulderScale; };
 				const FPocketDef Pockets[] = {
-					{ FVector(-9700.0f, -1600.0f, 0.0f), 20.0f, 0.85f },  // west wall south of the gate (cam 5 left frame)
-					{ FVector(-9650.0f, 3800.0f, 0.0f), 140.0f, 1.0f },   // west wall north section (cam 2 backdrop)
-					{ FVector(-2800.0f, 9600.0f, 0.0f), 260.0f, 0.75f },  // north wall (cam 4 overview)
+					{ FVector(-9550.0f, -1600.0f, 0.0f), 20.0f, 0.85f },  // west wall south of the gate (cam 5 left frame)
+					{ FVector(-9550.0f, 3800.0f, 0.0f), 140.0f, 1.0f },   // west wall north section (cam 2 backdrop)
+					{ FVector(-2800.0f, 9550.0f, 0.0f), 260.0f, 0.75f },  // north wall (cam 4 overview)
 				};
 				// Deterministic pockets on every machine; the variation stream
 				// is private by contract (the DecoRng lesson, 15.8 art-fix).
@@ -1195,11 +1423,19 @@ void BuildDistrict(UWorld& World)
 				}
 				for (const FPocketDef& Pocket : Pockets)
 				{
+					// Grounding (iteratie 2): one blob shadow per pocket, sized
+					// from the pocket's OWN chunk-scatter radius (±170 below)
+					// plus a 90-unit skirt for the boulder — derived from the
+					// numbers that place the slag, never a second position list.
+					SpawnGroundDecal(BlobMid, FVector2D(Pocket.Center.X, Pocket.Center.Y),
+						FVector2D(520.0f, 520.0f), Pocket.BoulderYaw, BlobDecalZ, TEXT("Deco_Blob"));
 					// Measured bounds (headless pass 2026-07-24): the debris
 					// pivot sits 84.4 units above the mesh base — grounded at
 					// 84.4*scale minus a settle-sink so slag reads bedded into
-					// the asphalt, never floating.
-					SpawnDress(Boulder, RubbleMid, Pocket.Center + FVector(0, 0, 84.4f * Pocket.BoulderScale - 18.0f),
+					// the asphalt, never floating. Sink deepened 18 -> 24 with
+					// the pocket move: the review wanted the slag bedded in the
+					// ground rather than shoved through the wall face.
+					SpawnDress(Boulder, RubbleMid, Pocket.Center + FVector(0, 0, 84.4f * Pocket.BoulderScale - 24.0f),
 						FRotator(0.0f, Pocket.BoulderYaw, 0.0f), FVector(Pocket.BoulderScale), TEXT("Deco_Rubble"), true);
 					if (Chunk != nullptr)
 					{
@@ -1240,32 +1476,68 @@ void BuildDistrict(UWorld& World)
 			// plus an entrance pad at the compound west gap (curation §5:
 			// "ramps, catwalks"). Thin pads: no shadow, like the lane paint.
 			UMaterialInstanceDynamic* TreadMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_9_BaseColor.T_4k_SciFi10_9_BaseColor"), 2.70f, 200.0f, 0.7f);
-			SpawnDress(CubeMesh, TreadMid, FVector(-2690.0f, 2820.0f, 12.0f), FRotator(-8.5f, 0.0f, 0.0f), FVector(1.4f, 1.2f, 0.06f), TEXT("Deco_Ramp"), false);
-			SpawnDress(CubeMesh, TreadMid, FVector(4100.0f, -1600.0f, 3.0f), FRotator::ZeroRotator, FVector(1.6f, 2.0f, 0.04f), TEXT("Deco_Ramp"), false);
+			// Dock seam (art-review 25-07, "zweefspleet"): the ramp geometry was
+			// right — 140 units of run at -8.5° pitch rises 21, exactly the
+			// plinth step (10-unit plate x scale 2, spawned at Z 1) — but the Z
+			// offset was not. At centre Z 12 the high end's top face landed at
+			// 25.3, i.e. 4.3 ABOVE the dock, with a 1.2-unit air slit against the
+			// plinth's side face. Z 12 -> 7.7 puts that face on 21.0 and the low
+			// end's on 0.3 (asphalt); X -2690 -> -2700 laps the ramp 8.8 units
+			// onto the plinth, so the seam is closed instead of bridged.
+			// Pad 2 y-scale 2.0 -> 1.7 (code-review #5): at 200 half-length the
+			// pad ran to -1500 and pierced the lamp base at (4150,-1500); 170
+			// clears the pole by 15 units.
+			SpawnDress(CubeMesh, TreadMid, FVector(-2700.0f, 2820.0f, 7.7f), FRotator(-8.5f, 0.0f, 0.0f), FVector(1.4f, 1.2f, 0.06f), TEXT("Deco_Ramp"), false);
+			SpawnDress(CubeMesh, TreadMid, FVector(4100.0f, -1600.0f, 3.0f), FRotator::ZeroRotator, FVector(1.6f, 1.7f, 0.04f), TEXT("Deco_Ramp"), false);
 
 			// --- SciFi10_5 perforated sheet (gain 1.11): warehouse interior
 			// liners proud of the BldgB inner faces — read through the east gap
 			// (cam 2 sightline). Interior sits one value step under the
 			// exterior corrugated read (LinerLit above).
 			UMaterialInstanceDynamic* LinerMid = MakeDressMid(LinerLit, LinerShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_5_BaseColor.T_4k_SciFi10_5_BaseColor"), 1.11f, 300.0f, 0.5f);
-			SpawnDress(CubeMesh, LinerMid, FVector(-4740.0f, 3000.0f, 200.0f), FRotator::ZeroRotator, FVector(0.05f, 11.0f, 3.6f), TEXT("Deco_Liner"), false);
-			SpawnDress(CubeMesh, LinerMid, FVector(-4000.0f, 2260.0f, 200.0f), FRotator::ZeroRotator, FVector(11.0f, 0.05f, 3.6f), TEXT("Deco_Liner"), false);
-			SpawnDress(CubeMesh, LinerMid, FVector(-4000.0f, 3740.0f, 200.0f), FRotator::ZeroRotator, FVector(11.0f, 0.05f, 3.6f), TEXT("Deco_Liner"), false);
+			// "Proud of" must mean touching (the teal-fin watch item): at ±10 from
+			// the wall centre these 5-unit panels stood in 7.5 units of AIR, and
+			// with ink outlines a floating plate reads as a loose teal fin rather
+			// than a wall lining. Each liner now laps 1 unit INTO its wall slab
+			// (BldgB inner faces: W -4750, S 2250, N 3750 from the 100-unit slabs
+			// at -4800/2200/3800) — no gap to see, no coplanar faces to fight.
+			SpawnDress(CubeMesh, LinerMid, FVector(-4748.5f, 3000.0f, 200.0f), FRotator::ZeroRotator, FVector(0.05f, 11.0f, 3.6f), TEXT("Deco_Liner"), false);
+			SpawnDress(CubeMesh, LinerMid, FVector(-4000.0f, 2251.5f, 200.0f), FRotator::ZeroRotator, FVector(11.0f, 0.05f, 3.6f), TEXT("Deco_Liner"), false);
+			SpawnDress(CubeMesh, LinerMid, FVector(-4000.0f, 3748.5f, 200.0f), FRotator::ZeroRotator, FVector(11.0f, 0.05f, 3.6f), TEXT("Deco_Liner"), false);
 
 			// --- SciFi10_7 cross-braced plating (gain 1.78): Dominion post trim
 			// bands proud of the BldgA west + north facades (curation §5), oxide
 			// family — the compound reads authored, not extruded.
 			UMaterialInstanceDynamic* TrimMid = MakeDressMid(OxideLit, OxideShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_7_BaseColor.T_4k_SciFi10_7_BaseColor"), 1.78f, 250.0f, 0.6f);
-			SpawnDress(CubeMesh, TrimMid, FVector(4145.0f, -2400.0f, 350.0f), FRotator::ZeroRotator, FVector(0.05f, 8.0f, 0.55f), TEXT("Deco_Trim"), false);
-			SpawnDress(CubeMesh, TrimMid, FVector(5000.0f, -1145.0f, 350.0f), FRotator::ZeroRotator, FVector(16.0f, 0.05f, 0.55f), TEXT("Deco_Trim"), false);
+			// Band Z 350 -> 365 (code-review #2, poster clash): at 350 the band
+			// spanned 322.5..377.5 and the compound's north poster (Z 210, half
+			// height 120 -> top 330) pushed 7.5 units through it. 365 spans
+			// 337.5..392.5 — clear of the poster and still under the 400-unit
+			// facade crest.
+			SpawnDress(CubeMesh, TrimMid, FVector(4145.0f, -2400.0f, 365.0f), FRotator::ZeroRotator, FVector(0.05f, 8.0f, 0.55f), TEXT("Deco_Trim"), false);
+			SpawnDress(CubeMesh, TrimMid, FVector(5000.0f, -1145.0f, 365.0f), FRotator::ZeroRotator, FVector(16.0f, 0.05f, 0.55f), TEXT("Deco_Trim"), false);
 
 			// --- Machine banks: dark mottled steel bodies (ambientCG Metal046B,
 			// gain 19.76 — curation §9 "machine blocks") with a SciFi10_6
 			// control-face graphic (gain 1.39, curation §5) on the working side.
 			// Two at the checkpoint's north wall, three as the Site_AlarmRelay
 			// bank — the relay finally has machinery to sabotage.
+			// Art-review 25-07: the control faces read as noise — at TexWorldScale
+			// 180 the SciFi10_6 panel graphic tiled ~1.5x across a 130-unit face,
+			// so the console detail dissolved at command distance. Projection
+			// 180 -> 450 (2.5x, the review's "2-3x") puts a bit over a quarter of
+			// the sheet on each face: one readable console, not a pattern. Gain
+			// stays the MEASURED 1.39 and the body stays dark (MachineLit
+			// unchanged, review: "body donker houden") — the read comes from the
+			// face plate and the selective readout below, not from lifting mass.
 			UMaterialInstanceDynamic* MachineBodyMid = MakeDressMid(MachineLit, MachineShade, TEXT("/Game/Art/Textures/T_Metal046B_diff.T_Metal046B_diff"), 19.76f, 250.0f, 0.6f);
-			UMaterialInstanceDynamic* MachineFaceMid = MakeDressMid(FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_6_BaseColor.T_4k_SciFi10_6_BaseColor"), 1.39f, 180.0f, 0.85f);
+			UMaterialInstanceDynamic* MachineFaceMid = MakeDressMid(FLinearColor(0.300f, 0.325f, 0.377f), FLinearColor(0.098f, 0.107f, 0.169f), TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_6_BaseColor.T_4k_SciFi10_6_BaseColor"), 1.39f, 450.0f, 0.85f);
+			// "Emissive selectief": ONE sodium readout strip per machine, on the
+			// palette's Glow entry — the district's existing emissive authority
+			// (the same tint the window strips and lamp heads carry), so the
+			// accent introduces no new colour and no new MID family (15.5). Small
+			// by design: a lit console edge, never a glowing appliance.
+			UMaterialInstanceDynamic* ReadoutMid = MidForPalette(PaletteForLabel(TEXT("Glow")));
 			struct FMachineDef { FVector BodyLoc; FVector BodyScale; FVector FaceLoc; FVector FaceScale; };
 			const FMachineDef Machines[] = {
 				{ FVector(4450.0f, -1080.0f, 68.0f), FVector(1.5f, 0.8f, 1.35f), FVector(4450.0f, -1039.0f, 75.0f), FVector(1.3f, 0.05f, 1.1f) },
@@ -1278,6 +1550,23 @@ void BuildDistrict(UWorld& World)
 			{
 				SpawnDress(CubeMesh, MachineBodyMid, Machine.BodyLoc, FRotator::ZeroRotator, Machine.BodyScale, TEXT("Deco_Machine"), true);
 				SpawnDress(CubeMesh, MachineFaceMid, Machine.FaceLoc, FRotator::ZeroRotator, Machine.FaceScale, TEXT("Deco_Machine"), false);
+				// Readout strip + blob shadow, both DERIVED from this row: the
+				// working side is wherever the face already sits outside the body
+				// (FaceLoc - BodyLoc), and the thin face axis says which way the
+				// strip runs. No second coordinate list anywhere in the bank.
+				const FVector FaceOut = Machine.FaceLoc - Machine.BodyLoc;
+				const bool bFaceAlongX = Machine.FaceScale.X > Machine.FaceScale.Y;
+				const FVector ReadoutOffset = bFaceAlongX
+					? FVector(0.0f, FMath::Sign(FaceOut.Y) * 4.0f, 25.0f)
+					: FVector(FMath::Sign(FaceOut.X) * 4.0f, 0.0f, 25.0f);
+				const FVector ReadoutScale = bFaceAlongX ? FVector(0.60f, 0.04f, 0.09f) : FVector(0.04f, 0.55f, 0.09f);
+				SpawnDress(CubeMesh, ReadoutMid, Machine.FaceLoc + ReadoutOffset, FRotator::ZeroRotator, ReadoutScale, TEXT("Deco_Machine"), false);
+				// Grounding blob: the body's own footprint x1.25, so the ellipse
+				// spills a quarter of the mass on every side. Neighbours in a
+				// bank stand 10 units apart, so the overlap lands UNDER the
+				// bodies where no camera sees the double darkening.
+				SpawnGroundDecal(BlobMid, FVector2D(Machine.BodyLoc.X, Machine.BodyLoc.Y),
+					FVector2D(Machine.BodyScale.X * 125.0f, Machine.BodyScale.Y * 125.0f), 0.0f, BlobDecalZ, TEXT("Deco_Blob"));
 			}
 
 			// --- Cargo containers: ambientCG Metal063 rust-speckled steel
@@ -1290,9 +1579,23 @@ void BuildDistrict(UWorld& World)
 			// (15.5), so the Dominion unit runs a lower texture mix; the next
 			// shot round verifies the read.
 			UMaterialInstanceDynamic* ContainerRedMid = MakeDressMid(OxideLit, OxideShade, TEXT("/Game/Art/Textures/T_Metal063_diff.T_Metal063_diff"), 6.42f, 300.0f, 0.45f);
-			SpawnDress(CubeMesh, ContainerMid, FVector(-2560.0f, 3500.0f, 130.0f), FRotator(0.0f, 90.0f, 0.0f), FVector(6.1f, 2.44f, 2.6f), TEXT("Deco_Container"), true);
-			SpawnDress(CubeMesh, ContainerRedMid, FVector(-2290.0f, 3460.0f, 130.0f), FRotator(0.0f, 96.0f, 0.0f), FVector(6.1f, 2.44f, 2.6f), TEXT("Deco_Container"), true);
-			SpawnDress(CubeMesh, ContainerMid, FVector(-3450.0f, 1500.0f, 130.0f), FRotator(0.0f, 100.0f, 0.0f), FVector(6.1f, 2.44f, 2.6f), TEXT("Deco_Container"), true);
+			// One row per unit (was three hand-written spawns): the grounding blob
+			// below has to read the SAME location, yaw and footprint the unit
+			// spawns with, and a table is the only way that stays true after the
+			// next nudge. All three share the measured 20-ft-container box.
+			const FVector ContainerScale(6.1f, 2.44f, 2.6f);
+			const struct { UMaterialInstanceDynamic* Mid; FVector Loc; float Yaw; } Containers[] = {
+				{ ContainerMid, FVector(-2560.0f, 3500.0f, 130.0f), 90.0f },     // dock approach, stacked yard
+				{ ContainerRedMid, FVector(-2290.0f, 3460.0f, 130.0f), 96.0f },  // Dominion supply unit (oxide)
+				{ ContainerMid, FVector(-3450.0f, 1500.0f, 130.0f), 100.0f },    // askew at the cross-street choke
+			};
+			for (const auto& Container : Containers)
+			{
+				SpawnDress(CubeMesh, Container.Mid, Container.Loc, FRotator(0.0f, Container.Yaw, 0.0f), ContainerScale, TEXT("Deco_Container"), true);
+				// Blob = the container's own footprint x1.25, turned with it.
+				SpawnGroundDecal(BlobMid, FVector2D(Container.Loc.X, Container.Loc.Y),
+					FVector2D(ContainerScale.X * 125.0f, ContainerScale.Y * 125.0f), Container.Yaw, BlobDecalZ, TEXT("Deco_Blob"));
+			}
 
 			// --- Perimeter-wall variant: ambientCG Concrete042A shuttered
 			// concrete (gain 8.94 — curation §9 "perimeter-wall variant,
@@ -1300,20 +1603,45 @@ void BuildDistrict(UWorld& World)
 			// cam-4 perimeterband watch-item) + a low checkpoint bunker at the
 			// gate approach. Positions clear the placed signs/stencils/strips.
 			UMaterialInstanceDynamic* BunkerMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Textures/T_Concrete042A_diff.T_Concrete042A_diff"), 8.94f, 400.0f, 0.6f);
+			// Buttresses, three ways at once (code-review #4 + art-review "dieper
+			// + donkerder — anders onzichtbaar"):
+			//  1. FLUSH: the perimeter slabs' inner faces sit at ±9950 (centre
+			//     ±10000, 100-unit slab), so at ±9890 the buttresses floated 10
+			//     units off the wall. Flush is the invariant here, not the literal
+			//     number the spec wrote for the old depth: with the deeper body
+			//     (160 units) the back face lands on ±9950 at centre ±9870.
+			//  2. DEEPER: 1.0 -> 1.6 on the protrusion axis. A 100-unit bump on a
+			//     20 000-unit wall carried no silhouette offset at overview
+			//     distance; 160 units breaks the band's straight edge.
+			//  3. DARKER: its own MID one banked value step (x0.72 — the step the
+			//     floor and the CoverB hierarchy use) under the Wall_ band, so the
+			//     buttress reads as a mass in front of the wall instead of a
+			//     same-value smear on it. Hue and the measured 8.94 gain unchanged
+			//     (luminance-only, 15.5).
+			UMaterialInstanceDynamic* ButtressMid = MakeDressMid(GraphiteLit * 0.72f, GraphiteShade * 0.72f, TEXT("/Game/Art/Textures/T_Concrete042A_diff.T_Concrete042A_diff"), 8.94f, 400.0f, 0.6f);
 			const struct { FVector Loc; FVector Scale; } Buttresses[] = {
-				{ FVector(-9890.0f, -800.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
-				{ FVector(-9890.0f, 950.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
-				{ FVector(-9890.0f, -3200.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
-				{ FVector(-9890.0f, 5200.0f, 170.0f), FVector(1.0f, 1.4f, 3.4f) },
-				{ FVector(-3000.0f, 9890.0f, 170.0f), FVector(1.4f, 1.0f, 3.4f) },
-				{ FVector(1000.0f, 9890.0f, 170.0f), FVector(1.4f, 1.0f, 3.4f) },
+				{ FVector(-9870.0f, -800.0f, 170.0f), FVector(1.6f, 1.4f, 3.4f) },
+				{ FVector(-9870.0f, 950.0f, 170.0f), FVector(1.6f, 1.4f, 3.4f) },
+				{ FVector(-9870.0f, -3200.0f, 170.0f), FVector(1.6f, 1.4f, 3.4f) },
+				{ FVector(-9870.0f, 5200.0f, 170.0f), FVector(1.6f, 1.4f, 3.4f) },
+				{ FVector(-3000.0f, 9870.0f, 170.0f), FVector(1.4f, 1.6f, 3.4f) },
+				{ FVector(1000.0f, 9870.0f, 170.0f), FVector(1.4f, 1.6f, 3.4f) },
 			};
 			for (const auto& Buttress : Buttresses)
 			{
-				SpawnDress(CubeMesh, BunkerMid, Buttress.Loc, FRotator::ZeroRotator, Buttress.Scale, TEXT("Deco_Bunker"), true);
+				SpawnDress(CubeMesh, ButtressMid, Buttress.Loc, FRotator::ZeroRotator, Buttress.Scale, TEXT("Deco_Bunker"), true);
 			}
-			SpawnDress(CubeMesh, BunkerMid, FVector(-9350.0f, -750.0f, 55.0f), FRotator(0.0f, 5.0f, 0.0f), FVector(2.2f, 1.6f, 1.1f), TEXT("Deco_Bunker"), true);
-			SpawnDress(CubeMesh, BunkerMid, FVector(-9350.0f, -750.0f, 121.0f), FRotator(0.0f, 5.0f, 0.0f), FVector(2.6f, 2.0f, 0.22f), TEXT("Deco_Bunker"), true);
+			// Checkpoint bunker: body + roof cap off ONE anchor (the cap sits on
+			// the 110-unit body, hence +66 to its own centre), plus a grounding
+			// blob sized off the cap — the widest part is what casts.
+			const FVector BunkerLoc(-9350.0f, -750.0f, 55.0f);
+			const FVector BunkerScale(2.2f, 1.6f, 1.1f);
+			const FVector BunkerCapScale(2.6f, 2.0f, 0.22f);
+			constexpr float BunkerYaw = 5.0f;
+			SpawnDress(CubeMesh, BunkerMid, BunkerLoc, FRotator(0.0f, BunkerYaw, 0.0f), BunkerScale, TEXT("Deco_Bunker"), true);
+			SpawnDress(CubeMesh, BunkerMid, BunkerLoc + FVector(0.0f, 0.0f, 66.0f), FRotator(0.0f, BunkerYaw, 0.0f), BunkerCapScale, TEXT("Deco_Bunker"), true);
+			SpawnGroundDecal(BlobMid, FVector2D(BunkerLoc.X, BunkerLoc.Y),
+				FVector2D(BunkerCapScale.X * 115.0f, BunkerCapScale.Y * 115.0f), BunkerYaw, BlobDecalZ, TEXT("Deco_Blob"));
 
 			UE_LOG(LogEclipse, Display, TEXT("Graybox: 15.8 dressing placed — SciFi10 slots 1/5/6/7/9 (+10 on the gantry), machine banks, containers, wall variant; rubble/dock only when their meshes loaded (warnings above otherwise)."));
 		}
