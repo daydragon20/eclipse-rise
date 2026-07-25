@@ -1477,9 +1477,23 @@ void BuildDistrict(UWorld& World)
 			// went silhouette-black (art-review 25-07, "boulder-stain 30-40%
 			// lichter"). Lifted x1.35, hue untouched (luminance-only, 15.5); the
 			// ground stains themselves keep the original DecoStain values.
-			const FLinearColor RubbleLit(0.095f, 0.084f, 0.101f), RubbleShade(0.038f, 0.035f, 0.051f);
+			// Same rule, same round: the boulders measured hue 279 — violet — because
+		// B sat above both R and G here too. The art-review called them "a
+		// mauve-violet potato". Rust/graphite family means B <= G, so R >= G >= B.
+		const FLinearColor RubbleLit(0.098f, 0.088f, 0.078f), RubbleShade(0.040f, 0.036f, 0.031f);
 			const FLinearColor GraphiteLit(0.230f, 0.250f, 0.290f), GraphiteShade(0.075f, 0.082f, 0.130f);
-			const FLinearColor OxideLit(0.560f, 0.160f, 0.085f), OxideShade(0.200f, 0.045f, 0.085f);
+			// Dressing-iteratie 3, step 8 — the magenta container, third attempt, and
+		// the first one aimed at the actual cause. Round 1 blamed the texture mix
+		// (0.75 -> 0.45): wrong variable, the container stayed magenta. The second
+		// art-review measured it properly: hue 336.6 at saturation 0.77-0.81 on
+		// three separate patches, sitting at value 0.51 — so it is a MID, not a
+		// shade, and it inherits from OxideShade, which was itself authored at hue
+		// 344.5 with B = 1.9x G. Blue above green in a rust family is magenta by
+		// construction, and ColorSaturation 1.38 then shouts it.
+		// Banked rule for Kessara, now covering MIDTONES and not just shades:
+		// every dark/shade tint keeps B <= G. New shade is hue 9.3 — deep rust.
+		// BldgA shares this shade, so its facade warms with the container.
+		const FLinearColor OxideLit(0.560f, 0.160f, 0.085f), OxideShade(0.200f, 0.062f, 0.038f);
 			const FLinearColor MachineLit(0.105f, 0.105f, 0.120f), MachineShade(0.040f, 0.040f, 0.052f);
 			const FLinearColor LinerLit(0.048f, 0.240f, 0.248f), LinerShade(0.016f, 0.080f, 0.120f);
 
@@ -1553,16 +1567,22 @@ void BuildDistrict(UWorld& World)
 			// curation recipe) on graphite. Measured: 200x200x10 plate, pivot at
 			// base — Z x2 makes it a 20 cm dock step without breaking the
 			// extruded-disc silhouette.
-			UStaticMesh* Plinth = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Art/Imported/Meshes/SM_AssetPlatform.SM_AssetPlatform"));
-			if (Plinth != nullptr)
+			// Dressing-iteratie 3 — SM_AssetPlatform is GONE, and this one was
+			// blocking. It is the marketplace asset-SHOWCASE turntable: the second
+			// art-review read its radial spokes, its measuring ticks and its
+			// checker scale-ramp at 1080p, twice over, in the middle of a banked
+			// review frame (00093). That is the ÉÉN-STIJL-WET question — "does it
+			// betray its source?" — answered yes with legible text on it. No amount
+			// of toon-mastering fixes a mesh whose geometry IS a product photo.
+			// Replacement: scaled engine cubes on the same graphite tint and the
+			// same measured SciFi10_1 deck-plate gain (4.96), keeping the 20 cm
+			// dock step the tread-ramp is built against (140 units of run at -8.5°
+			// rises 21). Squarer than the extruded disc, which is what a loading
+			// dock should be anyway.
 			{
 				UMaterialInstanceDynamic* PlinthMid = MakeDressMid(GraphiteLit, GraphiteShade, TEXT("/Game/Art/Imported/Textures/T_4k_SciFi10_1_BaseColor.T_4k_SciFi10_1_BaseColor"), 4.96f, 200.0f, 0.7f);
-				SpawnDress(Plinth, PlinthMid, FVector(-2900.0f, 2500.0f, 1.0f), FRotator(0.0f, 15.0f, 0.0f), FVector(1.4f, 1.4f, 2.0f), TEXT("Deco_Dock"), true);
-				SpawnDress(Plinth, PlinthMid, FVector(-2900.0f, 2820.0f, 1.0f), FRotator::ZeroRotator, FVector(1.4f, 1.4f, 2.0f), TEXT("Deco_Dock"), true);
-			}
-			else
-			{
-				UE_LOG(LogEclipse, Warning, TEXT("Graybox: A1 plinth missing — loading dock skipped (14.3.5)."));
+				SpawnDress(CubeMesh, PlinthMid, FVector(-2900.0f, 2500.0f, 10.0f), FRotator(0.0f, 15.0f, 0.0f), FVector(2.8f, 2.8f, 0.2f), TEXT("Deco_Dock"), true);
+				SpawnDress(CubeMesh, PlinthMid, FVector(-2900.0f, 2820.0f, 10.0f), FRotator::ZeroRotator, FVector(2.8f, 2.8f, 0.2f), TEXT("Deco_Dock"), true);
 			}
 
 			// --- SciFi10_9 diamond tread plate (gain 2.70): ramp onto the dock
