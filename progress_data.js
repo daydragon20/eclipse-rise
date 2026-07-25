@@ -43,6 +43,13 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Start opnieuw: de tuning ZIT er nu in (gemeten), je speelde ervoor", prio: "nu", waarom: "Je verdenking was scherp en de asset-datum was een echte rode vlag — maar de meting draait de uitkomst om. Een DataAsset dat is opgeslagen VOORDAT een property bestond heeft voor die property geen opgeslagen waarde, dus valt hij terug op de C++-default. Alle waarden uit de tuning-ronde zijn nieuwe velden. Er staat nu een logregel die uitleest wat er ná het toepassen echt op het component staat, en die zegt: accel 1400, draai 500 gr/s, luchtcontrole 0,35, sprong 500, valrem 1500, min-analoog 20 — op alle vier de gespawnde characters, zonder één waarschuwing. Je speelde om 20:48 en 21:26; de locomotie-tuning landde daarvoor nog niet in de build die jij draaide.", stappen: [
+      "Start de game opnieuw (SPEEL_ECLIPSE.bat) — dan draai je op de build mét de tuning",
+      "Let vooral op omkeren: de draaisnelheid van het lichaam ging van 360 naar 500 gr/s, en dat was de eigenlijke oorzaak van het schaatsgevoel",
+      "En op springen: luchtcontrole ging van 0,05 (een sprong op rails) naar 0,35, en een val remt nu af in plaats van nooit",
+      "Voel je het nog steeds niet? Zeg dat — dan hebben we een symptoom zonder verklaring en zoek ik verder met een meting, niet met een vermoeden",
+      "In het log staat vanaf nu ook luid wanneer een DataAsset de code overschrijft, met beide getallen erbij. Dat mag je geen tweede sessie kosten"
+    ] },
     { titel: "Twee logregels en ik kan de laatste twee dingen afmaken zonder gokken", prio: "nu", waarom: "De controller werkt (twaalf acties bevestigd) en het schaatsen is gerepareerd. Er blijven twee dingen over die ik niet vanaf hier kan zien, en voor allebei staat de meting al in de build klaar — ik heb alleen jouw scherm nodig, geen analyse.", stappen: [
       "SCHAAL-BUG: druk in de game op ` (links van de 1) voor de console, typ Eclipse.Feel.Dump en Enter. Doe dat één keer terwijl je LANGZAAM loopt en één keer terwijl je SPRINT",
       "Die regel zet snelheid, mesh-schaal, boomlengte, doel-boomlengte en FOV op hetzelfde moment naast elkaar — dan wijst hij zelf aan welke van de vier met je snelheid meebeweegt. De regel die jij aanwees (SetRelativeScale3D) kan het niet zijn: die draait één keer bij het aankleden",
