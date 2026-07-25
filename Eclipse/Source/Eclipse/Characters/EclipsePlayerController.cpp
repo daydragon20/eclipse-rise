@@ -140,9 +140,21 @@ void AEclipsePlayerController::LogNavigationState(const TCHAR* When) const
 	FNavLocation Projected;
 	const bool bNavUnderPawn = GetPawn() != nullptr
 		&& Nav->ProjectPointToNavigation(GetPawn()->GetActorLocation(), Projected, FVector(500.0f, 500.0f, 500.0f));
+	// De GROOTTE van de grens erbij, want "1 grens" zegt niets als die grens leeg
+	// is. Een runtime-gespawnde ANavMeshBoundsVolume draagt zijn brush niet
+	// vanzelf, en dan staat er wel een grens geregistreerd met een lege doos erin
+	// — dat is precies het onderscheid dat de vorige drie runs niet konden maken.
+	FBox Total(ForceInit);
+	for (const FNavigationBounds& Bounds : Nav->GetNavigationBounds())
+	{
+		Total += Bounds.AreaBox;
+	}
 	UE_LOG(LogEclipse, Display,
-		TEXT("Navigatie (%s): %d grens(zen), navmesh onder de speler = %s.%s"),
-		When, Nav->GetNavigationBounds().Num(), bNavUnderPawn ? TEXT("JA") : TEXT("NEE"),
+		TEXT("Navigatie (%s): %d grens(zen), samen %.0f x %.0f x %.0f uu, navmesh onder de speler = %s.%s"),
+		When, Nav->GetNavigationBounds().Num(),
+		Total.IsValid ? Total.GetSize().X : 0.0f, Total.IsValid ? Total.GetSize().Y : 0.0f,
+		Total.IsValid ? Total.GetSize().Z : 0.0f,
+		bNavUnderPawn ? TEXT("JA") : TEXT("NEE"),
 		bNavUnderPawn ? TEXT("") : TEXT(" Zonder navmesh weigert de squad elke verplaatsingsorder met 'no route'."));
 }
 

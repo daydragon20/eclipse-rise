@@ -19,6 +19,7 @@
 #include "Engine/StaticMeshActor.h"
 #include "Engine/Texture.h"
 #include "Engine/TargetPoint.h"
+#include "Components/BoxComponent.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "NavigationSystem.h"
 #include "Engine/World.h"
@@ -473,9 +474,23 @@ void BuildDistrict(UWorld& World)
 		{
 			Root->SetMobility(EComponentMobility::Movable);
 		}
-		// Ruim om het hele district heen: Entry_Main (-9000, 0) tot het
-		// controlepost (5000, -2000) en extractie (-8500, -8500), plus marge.
-		NavBounds->SetActorScale3D(FVector(140.0f, 140.0f, 20.0f));
+		// EEN BOX-COMPONENT en niet de actor-schaal, en dat is het verschil tussen
+		// werken en niet werken. Het navigatiesysteem leest de grens uit
+		// GetComponentsBoundingBox van de volume, en de brush van een
+		// ANavMeshBoundsVolume wordt door de brush-BUILDER gevuld — die draait
+		// alleen in de editor. Een runtime-gespawnde volume heeft dus geen
+		// geometrie, en schalen schaalt niets: de grens registreert zich netjes en
+		// is 0 x 0 x 0 uu groot. Gemeten in een echte -game-run, en het verklaart
+		// waarom er wél "1 grens" stond en tóch nooit een tegel gebouwd werd.
+		//
+		// Een gewone box-component telt wél mee in die bounding box, kost niets en
+		// heeft geen editor-code nodig. Geen collision: dit ding mag niets raken,
+		// het bakent alleen af.
+		UBoxComponent* Extent = NewObject<UBoxComponent>(NavBounds);
+		Extent->SetupAttachment(NavBounds->GetRootComponent());
+		Extent->SetBoxExtent(FVector(14000.0f, 14000.0f, 2000.0f), /*bUpdateOverlaps*/ false);
+		Extent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Extent->RegisterComponent();
 		if (UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(&World))
 		{
 			// Expliciet aanmelden: een runtime-gespawnde volume komt niet vanzelf
