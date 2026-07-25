@@ -36,6 +36,59 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
 	float CrouchSpeed = 150.0f;
 
+	// ---- Feel-audit 2026-07-25, gebied LOCOMOTIE + SPRONG -------------------
+	// Bevinding: van het CharacterMovementComponent werden alleen MaxWalkSpeed en
+	// MaxWalkSpeedCrouched gezet. Al het andere stond op de ENGINE-default, en die
+	// defaults zijn niet ontworpen voor een third-person shooter — Epic's eigen
+	// TP_ThirdPerson-template overschrijft ze allemaal. Dat is de reden dat lopen
+	// als schaatsen leest: geen aanloop, een trage draai en vrijwel geen
+	// luchtcontrole. Elke waarde hieronder noemt de engine-default en waar de
+	// gekozen waarde vandaan komt.
+
+	/**
+	 * cm/s². Engine-default 2048 = vrijwel onmiddellijk op topsnelheid, wat als
+	 * gewichtloos leest. 1400 geeft ~0,30 s aanloop naar de loopsnelheid van 420:
+	 * merkbaar dat er massa vertrekt, kort genoeg om niet traag te voelen.
+	 * [REDENERING binnen een [ENGINE]-band — Epic tuned dit niet in de template.]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float MaxAcceleration = 1400.0f;
+
+	/** cm/s². Engine-default 2048, TP-template 2000. [ENGINE] */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float BrakingDecelerationWalking = 2000.0f;
+
+	/**
+	 * Graden/s waarmee het lichaam naar zijn looprichting draait. Engine-default
+	 * 360, TP-template 500. Op 360 kost een omkering een halve seconde draaien
+	 * terwijl je al schuift — precies het schaats-effect. [ENGINE, template]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float BodyRotationRateYaw = 500.0f;
+
+	/** Engine-default 420, TP-template 500. [ENGINE, template] */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float JumpZVelocity = 500.0f;
+
+	/**
+	 * Engine-default 0.05 — dat is bijna geen sturing in de lucht en leest als een
+	 * sprong op rails. TP-template 0.35. [ENGINE, template]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0, ClampMax = 1))
+	float AirControl = 0.35f;
+
+	/** cm/s². Engine-default 0 (val remt nooit), TP-template 1500. [ENGINE, template] */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float BrakingDecelerationFalling = 1500.0f;
+
+	/**
+	 * cm/s. Engine-default 0: een stick die 5% uitslaat geeft dan 5% snelheid, en
+	 * dat is onder de snelheid waarop een loopcyclus nog leest — het personage
+	 * glijdt dan in een idle-pose vooruit. TP-template 20. [ENGINE, template]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float MinAnalogWalkSpeed = 20.0f;
+
 	/**
 	 * First-person FOV. This field predates the camera itself: it sat here unused
 	 * because AEclipseCharacter had no camera at all and the engine fell back to

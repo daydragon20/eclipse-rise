@@ -53,6 +53,24 @@ void AEclipsePlayerController::BeginPlay()
 		InputSubsystem->AddMappingContext(MappingContext, /*Priority*/ 0);
 	}
 
+	// Feel-audit-commando: één regel met snelheid, mesh-schaal, boomlengte, FOV en
+	// modus naast elkaar. Debug-tier (14.5), geen tick, alleen op verzoek.
+	FeelDumpCommand = IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("Eclipse.Feel.Dump"),
+		TEXT("Print snelheid, mesh-schaal, camera-boom, FOV en cameramodus van de speler."),
+		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+		{
+			if (const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+			{
+				UE_LOG(LogEclipse, Display, TEXT("Feel: %s"), *Body->DescribeFeelState());
+			}
+			else
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Feel: geen bestuurd personage."));
+			}
+		}),
+		ECVF_Default);
+
 	EnsureCampaignStarted();
 	// After EnsureCampaignStarted, because the tuning asset hangs off the active
 	// campaign setup and does not exist before there is one.
@@ -74,6 +92,11 @@ void AEclipsePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
 	{
 		Bus->Unsubscribe(MissionEventsHandle);
+	}
+	if (FeelDumpCommand != nullptr)
+	{
+		IConsoleManager::Get().UnregisterConsoleObject(FeelDumpCommand);
+		FeelDumpCommand = nullptr;
 	}
 	Super::EndPlay(EndPlayReason);
 }
@@ -154,7 +177,10 @@ void AEclipsePlayerController::EnterMissionMode()
 	if (const UInputDeviceSubsystem* Devices = UInputDeviceSubsystem::Get())
 	{
 		const FHardwareDeviceIdentifier Hardware = Devices->GetMostRecentlyUsedHardwareDevice(GetPlatformUserId());
-		UE_LOG(LogEclipse, Display, TEXT("Input: meest recent gebruikte apparaat = '%s' (input class '%s', type %d). Gamepad = %s."),
+		// BEGINSTAND, niet een oordeel: bij missiestart heeft de speler nog niets
+		// aangeraakt, dus "Gamepad = nee" betekent hier alleen "nog geen pad-input
+		// gezien". De regels die tellen zijn de per-actie-regels hieronder.
+		UE_LOG(LogEclipse, Display, TEXT("Input (BEGINSTAND, vóór de eerste druk): apparaat = '%s' (input class '%s', type %d). Gamepad = %s."),
 			*Hardware.HardwareDeviceIdentifier.ToString(), *Hardware.InputClassName.ToString(),
 			static_cast<int32>(Hardware.PrimaryDeviceType),
 			Hardware.PrimaryDeviceType == EHardwareDevicePrimaryType::Gamepad ? TEXT("JA") : TEXT("nee"));
@@ -449,6 +475,25 @@ void AEclipsePlayerController::SetupInputComponent()
 		if (DebugBindings[Index].PadKey.IsValid())
 		{
 			MapKey(DebugOverlayActions[Index], DebugBindings[Index].PadKey);
+		}
+
+		// Ook de debug-acties krijgen een eerste-actuatie-regel. De owner meldde dat
+		// twaalf gameplay-acties de gamepad bereikten maar de gids op de View-knop
+		// niet in het log stond - en zonder deze regel is "niet geraakt" niet te
+		// onderscheiden van "binding komt niet aan". CommonUI draait hier zonder
+		// afgeleide viewport client (waarschuwing bij boot), en View/Menu zijn
+		// precies de knoppen die een UI-laag pleegt op te eten.
+		if (DebugBindings[Index].PadKey.IsValid())
+		{
+			const FString DebugName = FString::Printf(TEXT("debug:%s"), *DebugBindings[Index].PadKey.ToString());
+			Input->BindActionValueLambda(DebugOverlayActions[Index], ETriggerEvent::Started, [this, DebugName](const FInputActionValue&)
+			{
+				if (!SeenGamepadActions.Contains(DebugName))
+				{
+					SeenGamepadActions.Add(DebugName);
+					UE_LOG(LogEclipse, Display, TEXT("Input: gamepad bereikte actie '%s' (eerste keer)."), *DebugName);
+				}
+			});
 		}
 
 		void (*Invoke)(UEclipseMissionHudWidget&) = DebugBindings[Index].Invoke;

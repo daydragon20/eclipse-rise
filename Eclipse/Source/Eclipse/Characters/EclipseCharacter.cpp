@@ -116,8 +116,20 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 		return;
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = Tuning->RunSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = Tuning->CrouchSpeed;
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	Movement->MaxWalkSpeed = Tuning->RunSpeed;
+	Movement->MaxWalkSpeedCrouched = Tuning->CrouchSpeed;
+	// Feel-audit: alles hieronder stond op de engine-default omdat het nooit was
+	// gezet. Die defaults zijn niet voor een third-person shooter bedoeld — Epic's
+	// eigen template overschrijft ze allemaal — en samen zijn ze de reden dat lopen
+	// als schaatsen leest. Waarden en herkomst staan in DA_CharacterTuning.
+	Movement->MaxAcceleration = Tuning->MaxAcceleration;
+	Movement->BrakingDecelerationWalking = Tuning->BrakingDecelerationWalking;
+	Movement->BrakingDecelerationFalling = Tuning->BrakingDecelerationFalling;
+	Movement->RotationRate = FRotator(0.0f, Tuning->BodyRotationRateYaw, 0.0f);
+	Movement->JumpZVelocity = Tuning->JumpZVelocity;
+	Movement->AirControl = Tuning->AirControl;
+	Movement->MinAnalogWalkSpeed = Tuning->MinAnalogWalkSpeed;
 	InitializeHealth(Tuning->MaxHealth);
 
 	// Camera framing is data, like every other feel number (GDD 14.2). The
@@ -194,6 +206,26 @@ void AEclipseCharacter::SetCommandModeCamera(bool bActive)
 	}
 	bCommandModeCamera = bActive;
 	RefreshCameraTargets();
+}
+
+FString AEclipseCharacter::DescribeFeelState() const
+{
+	// Feel-audit-instrument. De owner meldt "personage schaalt met snelheid:
+	// piepklein bij langzaam lopen, normaal bij sprinten". De mesh-schaal wordt
+	// echter maar EEN keer gezet (ApplyBodyDef), dus die kan dat niet doen — het
+	// moet de camera zijn. Deze regel zet de vier kandidaten naast elkaar op
+	// hetzelfde moment, zodat zichtbaar is welke meebeweegt in plaats van dat
+	// iemand het moet raden.
+	const UCharacterMovementComponent* Movement = GetCharacterMovement();
+	const USkeletalMeshComponent* Body = GetMesh();
+	return FString::Printf(
+		TEXT("snelheid %.0f cm/s · mesh-schaal %.3f · boom %.0f (doel %.0f) · FOV %.1f (doel %.1f) · socketZ %.0f · modus %s"),
+		Movement != nullptr ? Movement->Velocity.Size2D() : 0.0f,
+		Body != nullptr ? Body->GetRelativeScale3D().X : 0.0f,
+		CameraBoom != nullptr ? CameraBoom->TargetArmLength : 0.0f, TargetArmLength,
+		ViewCamera != nullptr ? ViewCamera->FieldOfView : 0.0f, TargetFOV,
+		CameraBoom != nullptr ? CameraBoom->SocketOffset.Z : 0.0f,
+		bFirstPerson ? TEXT("1e") : (bCommandModeCamera ? TEXT("command") : TEXT("3e")));
 }
 
 void AEclipseCharacter::SetAiming(bool bNewAiming)

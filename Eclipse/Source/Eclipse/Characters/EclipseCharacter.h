@@ -110,6 +110,11 @@ public:
 
 	UCameraComponent* GetViewCamera() const { return ViewCamera; }
 
+	/** Feel-audit-instrument: snelheid, mesh-schaal, boom, FOV en modus op één
+	 *  regel, zodat "het personage schaalt met snelheid" meetbaar wordt in plaats
+	 *  van geraden. Uitgelezen door Eclipse.Feel.Dump. */
+	FString DescribeFeelState() const;
+
 	virtual void Tick(float DeltaSeconds) override;
 
 private:

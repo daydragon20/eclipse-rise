@@ -144,6 +144,9 @@ private:
 	 *  zodat het log een diagnose is en geen spam. */
 	TSet<FString> SeenGamepadActions;
 
+	/** Eclipse.Feel.Dump — losgekoppeld in EndPlay, want de console overleeft ons. */
+	IConsoleCommand* FeelDumpCommand = nullptr;
+
 	// Command Mode inputs (SPEC-P2-02 Stage A; provisional debug bindings —
 	// the Enhanced Input context stack is a SPEC-P2-07 seam).
 	UPROPERTY()
