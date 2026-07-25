@@ -31,6 +31,18 @@ Wat deze generator anders doet dan een foto, en waarom:
    MEET dat op zijn eigen uitvoer en zegt het, zodat de volgende stap niet op
    een gevoel maar op een getal begint.
 
+EERLIJK OVER DE EERSTE UITVOER (bekeken 2026-07-25): het GETAL klopt - 13,8% eigen
+korrel tegen ~60% voor de foto - maar de VORMTAAL nog niet. De vlekken lezen als
+camouflage of wolken, niet als asfalt: te groot en te organisch. Asfalt is een
+tamelijk uniform oppervlak met subtiele reparatievlakken, niet een landschap. De
+scheuren lezen bovendien als dunne krassen in plaats van als scheuren.
+
+Wat er waarschijnlijk moet veranderen in ronde 2: het grove octaaf kleiner in
+amplitude (het draagt nu de compositie in plaats van hem te kruiden), een fijner
+derde octaaf voor de korrel op tegelschaal, en scheuren die vertakken vanuit een
+punt in plaats van te dwalen. Dat is een look-oordeel, dus het hoort langs de
+art-reviewer zodra het in een frame staat - niet nog een keer op een getal gestuurd.
+
 Draai (geen editor nodig, alleen Pillow):
   python Eclipse/Tools/generate_toon_asphalt.py
 Daarna importeren met Tools/import_generated_decals.py-patroon in een vrije slot.
