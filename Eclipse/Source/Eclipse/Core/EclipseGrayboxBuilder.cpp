@@ -212,7 +212,20 @@ namespace
 		// did. Hence bisect, do not compute: red to the midpoint of its own range
 		// (0.150 -> 0.225 lit, 0.050 -> 0.095 shade) and measure what comes out.
 		// Target: frame saturation <= 0.55 for the family.
-		{ TEXT("BldgB"),  FLinearColor(0.225f, 0.290f, 0.300f), FLinearColor(0.095f, 0.098f, 0.140f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: weathered worker teal over rusty corrugated sheet (ambientCG 007A, mean .367)
+		// Cyaan, owner-keuze A (2026-07-25): de WAARDE omhoog in plaats van de grade
+		// omlaag. Onderbouwing uit par. 1j: de grade werkt om de luminantie heen en
+		// versterkt verzadiging het hardst bij LAGE waarden - geauthord staat deze
+		// wand op verzadiging 0.27 en hij meet 0.99 in frame. Hem lichter maken haalt
+		// hem uit die versterkingszone; nog een rood-stap doet dat niet.
+		// RUIMTE GEMETEN VOORDAT ER IETS BEWOOG, want dit botst met het waardeplafond
+		// uit stap 7 (niets niet-emissief boven de lichtplek-kern): de wand meet in
+		// shot 00226 lum 0.0529 tegen een plafond van ~0.115. Ruim twee keer ruimte,
+		// dus x1.5 op lit en shade past er comfortabel onder.
+		// Bewust GEBISECTEERD en niet uitgerekend: authored -> frame is in dit project
+		// herhaaldelijk niet-lineair gemeten. x1.5 is de eerste stap; als de
+		// verzadiging nog boven 0.55 meet gaat er nog een stap bij, en de bovengrens
+		// is het plafond, niet mijn geduld.
+		{ TEXT("BldgB"),  FLinearColor(0.338f, 0.435f, 0.450f), FLinearColor(0.143f, 0.147f, 0.210f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: weathered worker teal over rusty corrugated sheet (ambientCG 007A, mean .367)
 		// Yellow value hierarchy (15.8 look-ronde, cam 3): every yellow element in
 		// the plaza midfield sat on the same value (screen 255/211/0 slabs next to
 		// 245/216/1 lane paint) and the field read as one flat sheet of yellow.
@@ -426,6 +439,9 @@ void BuildDistrict(UWorld& World)
 	// path rendered them as hard dark rectangles ("carpet tiles", review shots
 	// 00008–00013). Either asset missing = the opaque master fallback (14.3.5).
 	UMaterialInterface* ToonDecalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonDecal.M_EclipseToonDecal"));
+	// Shadow-variant van dezelfde master, BLEND_Modulate: contactverdonkering moet
+	// de grond VERMENIGVULDIGEN in plaats van hem te bedekken (par. 1h/1i).
+	UMaterialInterface* ToonShadowMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonDecalShadow.M_EclipseToonDecalShadow"));
 	UTexture* StainMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_stain_mask.T_stain_mask"));
 	// Dressing-iteratie 2: a missing STAIN mask no longer disqualifies the decal
 	// MASTER — the light pass below rides that same master with its own pool/blob
@@ -641,13 +657,14 @@ void BuildDistrict(UWorld& World)
 		// 0.50 to 0.20 to kill its photographic grain (par. 1i), the pools silently
 		// flattened with it — one knob, two intentions, and the second one moved by
 		// accident. Negative = follow the palette entry, as before.
-		auto MakeGroundDecalMid = [ToonDecalMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade, UTexture* Mask, float OpacityScale, const FPaletteDef* GrainSource, float MixOverride = -1.0f) -> UMaterialInstanceDynamic*
+		auto MakeGroundDecalMid = [ToonDecalMaterial, ToonShadowMaterial, &World](const FLinearColor& Lit, const FLinearColor& Shade, UTexture* Mask, float OpacityScale, const FPaletteDef* GrainSource, float MixOverride = -1.0f, UMaterialInterface* Master = nullptr) -> UMaterialInstanceDynamic*
 		{
-			if (ToonDecalMaterial == nullptr || Mask == nullptr)
+			UMaterialInterface* Parent = Master != nullptr ? Master : ToonDecalMaterial;
+			if (Parent == nullptr || Mask == nullptr)
 			{
 				return nullptr;
 			}
-			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonDecalMaterial, &World);
+			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Parent, &World);
 			Mid->SetVectorParameterValue(TEXT("LitColor"), Lit);
 			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Shade);
 			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
@@ -753,13 +770,13 @@ void BuildDistrict(UWorld& World)
 		// dus tegen donker asfalt landt hij bijna op hetzelfde niveau. De
 		// modulate-variant uit par. 1h is daarvoor de fix, en die moet samen met de
 		// sorteervolgorde van de pools gebeuren — een eigen stap, niet nog een tint.
-		BlobMid = MakeGroundDecalMid(FloorPalette.Lit * 0.775f, FloorPalette.Shade * 0.775f, BlobMask, 0.85f, nullptr);
+		BlobMid = MakeGroundDecalMid(FLinearColor(0.60f, 0.62f, 0.66f), FLinearColor(0.60f, 0.62f, 0.66f), BlobMask, 0.85f, nullptr, -1.0f, ToonShadowMaterial);
 	}
 
 	// Thin no-collision ground quad for the two light-pass cues. Non-uniform
 	// Size turns the mask's disc into the ellipse a rectangular mass needs, and
 	// Yaw carries the mass's own rotation so the ellipse lies along it.
-	auto SpawnGroundDecal = [&World, CubeMesh, &Params](UMaterialInstanceDynamic* Mid, const FVector2D& Center, const FVector2D& Size, float Yaw, float Z, const TCHAR* Tag)
+	auto SpawnGroundDecal = [&World, CubeMesh, &Params](UMaterialInstanceDynamic* Mid, const FVector2D& Center, const FVector2D& Size, float Yaw, float Z, const TCHAR* Tag, int32 SortPriority = 0)
 	{
 		if (Mid == nullptr)
 		{
@@ -776,9 +793,21 @@ void BuildDistrict(UWorld& World)
 		Actor->GetStaticMeshComponent()->SetMaterial(0, Mid);
 		Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
 		Actor->GetStaticMeshComponent()->SetCastShadow(false);
+		// Doorschijnende quads sorteren op afstand, en deze twee cues liggen 3 units
+		// uit elkaar op dezelfde vloer - dus welke wint werd feitelijk door de camera
+		// bepaald. Zo verloor de modulate-schaduw de vorige poging: de lichtplek
+		// tekende erna en veegde de verdonkering weg (gemeten cam 6: 0.57x voor de
+		// multiply, 0.82x erna - de fix maakte het slechter). Een expliciete
+		// prioriteit beslist het op bedoeling: de schaduw tekent als laatste, zodat
+		// een massa die IN een lichtplek staat zijn contactschaduw OP die plek werpt,
+		// wat hij buiten ook doet.
+		Actor->GetStaticMeshComponent()->SetTranslucentSortPriority(SortPriority);
 		Actor->SetActorEnableCollision(false);
 		Actor->Tags.Add(Tag);
 	};
+	// Tekenvolgorde van de twee grond-cues; laag tekent eerst.
+	constexpr int32 PoolSortPriority = 1;
+	constexpr int32 BlobSortPriority = 2;
 
 	// Lamp pools — consumer #2 of LampPosts (the prop pass below spawns pole +
 	// glow head from the same rows). Pool centre = pole + 80 units along the arm
@@ -794,7 +823,7 @@ void BuildDistrict(UWorld& World)
 		const float YawRad = FMath::DegreesToRadians(Lamp.Yaw);
 		SpawnGroundDecal(PoolMid,
 			FVector2D(Lamp.X + FMath::Cos(YawRad) * 80.0f, Lamp.Y + FMath::Sin(YawRad) * 80.0f),
-			FVector2D(Lamp.PoolSize, Lamp.PoolSize), Lamp.Yaw, PoolDecalZ, TEXT("Deco_LampPool"));
+			FVector2D(Lamp.PoolSize, Lamp.PoolSize), Lamp.Yaw, PoolDecalZ, TEXT("Deco_LampPool"), PoolSortPriority);
 	}
 	// Grounding coverage (dressing-iteratie 3, review item 6). Blobs used to spawn
 	// from four mass classes only — rubble, machine banks, containers, the bunker —
@@ -836,11 +865,11 @@ void BuildDistrict(UWorld& World)
 		const FVector2D Footprint = bRotated ? FVector2D(300.0f, 100.0f) : FVector2D(100.0f, 300.0f);
 		SpawnGroundDecal(BlobMid, FVector2D(Cover.X, Cover.Y),
 			Footprint + FVector2D(2.0f * CoverBlockSkirt, 2.0f * CoverBlockSkirt),
-			0.0f, BlobDecalZ, TEXT("Deco_Blob"));
+			0.0f, BlobDecalZ, TEXT("Deco_Blob"), BlobSortPriority);
 	}
 	for (const FLampPostDef& Lamp : LampPosts)
 	{
-		SpawnGroundDecal(BlobMid, FVector2D(Lamp.X, Lamp.Y), FVector2D(150.0f, 150.0f), Lamp.Yaw, BlobDecalZ, TEXT("Deco_Blob"));
+		SpawnGroundDecal(BlobMid, FVector2D(Lamp.X, Lamp.Y), FVector2D(150.0f, 150.0f), Lamp.Yaw, BlobDecalZ, TEXT("Deco_Blob"), BlobSortPriority);
 	}
 
 	UE_LOG(LogEclipse, Display, TEXT("Graybox: light pass — %d lamp pools (%s) from the same LampPosts[] the poles use; blob shadows %s, now on cover blocks and lamp feet as well as the dressing masses."),
@@ -1694,7 +1723,7 @@ void BuildDistrict(UWorld& World)
 					// plus a 90-unit skirt for the boulder — derived from the
 					// numbers that place the slag, never a second position list.
 					SpawnGroundDecal(BlobMid, FVector2D(Pocket.Center.X, Pocket.Center.Y),
-						FVector2D(520.0f, 520.0f), Pocket.BoulderYaw, BlobDecalZ, TEXT("Deco_Blob"));
+						FVector2D(520.0f, 520.0f), Pocket.BoulderYaw, BlobDecalZ, TEXT("Deco_Blob"), BlobSortPriority);
 					// Measured bounds (headless pass 2026-07-24): the debris
 					// pivot sits 84.4 units above the mesh base — grounded at
 					// 84.4*scale minus a settle-sink so slag reads bedded into
@@ -1838,7 +1867,7 @@ void BuildDistrict(UWorld& World)
 				// bank stand 10 units apart, so the overlap lands UNDER the
 				// bodies where no camera sees the double darkening.
 				SpawnGroundDecal(BlobMid, FVector2D(Machine.BodyLoc.X, Machine.BodyLoc.Y),
-					FVector2D(Machine.BodyScale.X * 125.0f, Machine.BodyScale.Y * 125.0f), 0.0f, BlobDecalZ, TEXT("Deco_Blob"));
+					FVector2D(Machine.BodyScale.X * 125.0f, Machine.BodyScale.Y * 125.0f), 0.0f, BlobDecalZ, TEXT("Deco_Blob"), BlobSortPriority);
 			}
 
 			// --- Cargo containers: ambientCG Metal063 rust-speckled steel
@@ -1866,7 +1895,7 @@ void BuildDistrict(UWorld& World)
 				SpawnDress(CubeMesh, Container.Mid, Container.Loc, FRotator(0.0f, Container.Yaw, 0.0f), ContainerScale, TEXT("Deco_Container"), true);
 				// Blob = the container's own footprint x1.25, turned with it.
 				SpawnGroundDecal(BlobMid, FVector2D(Container.Loc.X, Container.Loc.Y),
-					FVector2D(ContainerScale.X * 125.0f, ContainerScale.Y * 125.0f), Container.Yaw, BlobDecalZ, TEXT("Deco_Blob"));
+					FVector2D(ContainerScale.X * 125.0f, ContainerScale.Y * 125.0f), Container.Yaw, BlobDecalZ, TEXT("Deco_Blob"), BlobSortPriority);
 			}
 
 			// --- Perimeter-wall variant: ambientCG Concrete042A shuttered
@@ -1913,7 +1942,7 @@ void BuildDistrict(UWorld& World)
 			SpawnDress(CubeMesh, BunkerMid, BunkerLoc, FRotator(0.0f, BunkerYaw, 0.0f), BunkerScale, TEXT("Deco_Bunker"), true);
 			SpawnDress(CubeMesh, BunkerMid, BunkerLoc + FVector(0.0f, 0.0f, 66.0f), FRotator(0.0f, BunkerYaw, 0.0f), BunkerCapScale, TEXT("Deco_Bunker"), true);
 			SpawnGroundDecal(BlobMid, FVector2D(BunkerLoc.X, BunkerLoc.Y),
-				FVector2D(BunkerCapScale.X * 115.0f, BunkerCapScale.Y * 115.0f), BunkerYaw, BlobDecalZ, TEXT("Deco_Blob"));
+				FVector2D(BunkerCapScale.X * 115.0f, BunkerCapScale.Y * 115.0f), BunkerYaw, BlobDecalZ, TEXT("Deco_Blob"), BlobSortPriority);
 
 			UE_LOG(LogEclipse, Display, TEXT("Graybox: 15.8 dressing placed — SciFi10 slots 1/5/6/7/9 (+10 on the gantry), machine banks, containers, wall variant; rubble/dock only when their meshes loaded (warnings above otherwise)."));
 		}

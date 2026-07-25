@@ -103,6 +103,30 @@ return float4(col * EmissiveScale, saturate(mask * OpacityScale));
 DECAL_HLSL = TOON_HLSL.replace("return col * EmissiveScale;", DECAL_RETURN)
 assert DECAL_HLSL != TOON_HLSL, "toon return line moved - update DECAL_RETURN splice"
 
+# Shadow variant (dressing-iteratie 3 par. 1h/1i). A contact shadow is a
+# MULTIPLICATION of the light that was already there, not a layer of paint on
+# top of it. The translucent decal above composites OVER the ground, and that
+# was measured to make the SAME authored blob read 0.42x inside a bright lamp
+# pool and 0.95x on plain asphalt - i.e. absent exactly where most of the
+# district is, because its own value sits close to the floor's.
+#
+# BLEND_Modulate makes the emissive output the multiplier the scene is scaled
+# by. Two consequences that change how the MID is authored:
+#   * the mask fades toward WHITE (1.0 = keep all light), not toward zero;
+#   * LitColor/ShadeColor stop being a ground tint and become the FRACTION of
+#     light the ground keeps - so 0.62 grey means "0.62x", on any background.
+#
+# And it deliberately does NOT apply EmissiveScale. That constant is 10.0 in the
+# builder, there to push emissive cel colours through the tonemapper. A modulate
+# shadow does not emit, it attenuates, so scaling it would turn a 0.62x shadow
+# into a 6.2x BRIGHTENER. Leaving it out makes that mistake unreachable.
+DECAL_MODULATE_RETURN = """float mask = Texture2DSample(MaskTex, MaskTexSampler, MeshUV).r;
+float3 keep = lerp(float3(1.0, 1.0, 1.0), col, saturate(mask * OpacityScale));
+return float4(keep, 1.0);
+"""
+DECAL_MODULATE_HLSL = TOON_HLSL.replace("return col * EmissiveScale;", DECAL_MODULATE_RETURN)
+assert DECAL_MODULATE_HLSL != TOON_HLSL, "toon return line moved - update DECAL_MODULATE_RETURN splice"
+
 mel = unreal.MaterialEditingLibrary
 eal = unreal.EditorAssetLibrary
 
@@ -243,13 +267,14 @@ def author_toon(mat_name, lit):
     unreal.log(f"{mat_name}: authored and saved ({full_path})")
 
 
-def author_toon_decal(mat_name):
+def author_toon_decal(mat_name, modulate=False):
     """Unlit translucent stain/decal variant: cel body + MaskTex-driven opacity."""
     full_path = f"{ART_PATH}/{mat_name}"
     mat = fresh_material(mat_name)
 
     mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT)
-    mat.set_editor_property("blend_mode", unreal.BlendMode.BLEND_TRANSLUCENT)
+    mat.set_editor_property("blend_mode",
+        unreal.BlendMode.BLEND_MODULATE if modulate else unreal.BlendMode.BLEND_TRANSLUCENT)
 
     def vec_param(name, default, x, y):
         e = mel.create_material_expression(mat, unreal.MaterialExpressionVectorParameter, x, y)
@@ -292,9 +317,10 @@ def author_toon_decal(mat_name):
     opacity_scale = scalar_param("OpacityScale", 1.0, -900, 1280)
 
     toon = mel.create_material_expression(mat, unreal.MaterialExpressionCustom, -420, 0)
-    toon.set_editor_property("code", DECAL_HLSL)
+    toon.set_editor_property("code", DECAL_MODULATE_HLSL if modulate else DECAL_HLSL)
     toon.set_editor_property("output_type", unreal.CustomMaterialOutputType.CMOT_FLOAT4)
-    toon.set_editor_property("description", "EclipseToonDecal")
+    toon.set_editor_property("description",
+                             "EclipseToonDecalShadow" if modulate else "EclipseToonDecal")
 
     inputs = []
     for input_name in ("NormalWS", "LitColor", "ShadeColor", "LightDir", "BandHi", "BandLo",
@@ -324,6 +350,13 @@ def author_toon_decal(mat_name):
     rgb_mask.set_editor_property("a", False)
     mel.connect_material_expressions(toon, "", rgb_mask, "")
     mel.connect_material_property(rgb_mask, "", unreal.MaterialProperty.MP_EMISSIVE_COLOR)
+    if modulate:
+        # BLEND_Modulate neemt het hele resultaat uit emissive en negeert opacity.
+        mel.recompile_material(mat)
+        if not eal.save_asset(full_path):
+            raise RuntimeError(f"{mat_name}: save failed")
+        unreal.log(f"{mat_name}: authored and saved ({full_path})")
+        return
     alpha_mask = mel.create_material_expression(mat, unreal.MaterialExpressionComponentMask, -180, 160)
     alpha_mask.set_editor_property("r", False)
     alpha_mask.set_editor_property("g", False)
@@ -341,3 +374,4 @@ def author_toon_decal(mat_name):
 author_toon("M_EclipseToon", lit=False)
 author_toon("M_EclipseToonLit", lit=True)
 author_toon_decal("M_EclipseToonDecal")
+author_toon_decal("M_EclipseToonDecalShadow", modulate=True)
