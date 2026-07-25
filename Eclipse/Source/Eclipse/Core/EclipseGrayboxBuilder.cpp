@@ -148,7 +148,20 @@ namespace
 		// 0.50 -> 0.20 omdat de korrel lineair met de mix hoort te schalen (0.12/0.60),
 		// maar dat is een voorspelling: de mapping loopt door de tonemapper, dus dit
 		// wordt gemeten en zo nodig gebisecteerd - niet uitgerekend en geloofd.
-		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 700.0f, 12.41f, 0.20f, TEXT("/Game/Art/Textures/T_asphalt_03_diff.T_asphalt_03_diff"), 16.8f },  // dusk asphalt — anchored under the SKY, never crushed
+		// De vloer draait nu op een HAND-GEAUTHORDE tegel in plaats van een 4K-foto.
+		// Dat was de blokkerende stijlovertreding: rauw fotorealisme in een cel/ink-
+		// frame, op 60-80% van elk beeld. Gemeten eigen korrel van de foto ~60%, van
+		// de tegel 11,2% (Tools/generate_toon_asphalt.py meet dat op zijn eigen
+		// uitvoer). De tegel is laagfrequent, gekwantiseerd in vijf waardestappen en
+		// heeft vertakkende scheuren waar de inkpass op kan reageren.
+		// Gain 2.56 = 1/gemeten-lineair-gemiddelde, zoals elke andere gain hier.
+		// En de MIX gaat terug van 0.20 naar 0.50: die 0.20 was een noodgreep om een
+		// foto te dempen, en met een getekende tegel is dempen niet meer nodig - juist
+		// omgekeerd, de vlakken en scheuren moeten LEZEN. Voorspelde framevariantie
+		// ~6%; dat wordt gemeten, niet geloofd.
+		// De Megascans-foto blijft als FALLBACK staan: valt de tegel weg, dan degradeert
+		// het district naar de oude look in plaats van naar flat cel (14.3.5).
+		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Art/Textures/T_toon_asphalt_diff.T_toon_asphalt_diff"), 700.0f, 2.56f, 0.50f, TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 12.41f },  // dusk asphalt — anchored under the SKY, never crushed
 		// Dressing-iteratie 3, step 7 (nu prioriteit 1) — THE VALUE CEILING.
 		// The metering pin of step 1 only moved the FLOOR: everything above ~0.25
 		// lum sits on the tonemapper shoulder, so it returned just 20-45% of the
