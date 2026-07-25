@@ -86,8 +86,17 @@
 
   /* jijGedaan chips */
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-  .chip{background:var(--card2);border:1px solid var(--lijn);border-radius:999px;padding:7px 13px;font-size:14px}
-  .chip .t{color:var(--grijs);font-size:12px;margin-left:6px}
+  .chip{display:inline-flex;align-items:flex-start;gap:10px;background:var(--card2);border:1px solid var(--lijn);border-radius:999px;padding:7px 14px 7px 10px;font-size:14px;transition:opacity .25s ease,transform .25s ease}
+  .chip.weg{opacity:0;transform:scale(.96)}
+  .chip .t{color:var(--grijs);font-size:12px;margin-left:0;white-space:nowrap}
+  /* klikbaar kruisje: haalt de regel weg en onthoudt dat */
+  .chip .x{flex:none;width:22px;height:22px;margin-top:1px;display:grid;place-items:center;
+    background:none;border:1px solid var(--lijn);border-radius:6px;cursor:pointer;
+    color:var(--grijs);font:700 13px/1 inherit;padding:0;transition:all .15s ease}
+  .chip .x:hover{background:var(--rood);border-color:var(--rood);color:#fff;transform:scale(1.1)}
+  .chip .x:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .chips-tools{margin-top:10px;font-size:13px;color:var(--grijs)}
+  .chips-tools button{background:none;border:none;color:var(--amber);cursor:pointer;font:inherit;text-decoration:underline;padding:0}
 
   /* AI status */
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -278,12 +287,19 @@ function render(){
     }
   }
 
-  // WAT DE AI AL VAN JOU HEEFT
+  // WAT DE AI AL VAN JOU HEEFT — met wegklikbare kruisjes (v4)
   if((D.jijGedaan||[]).length){
-    H+=`<h2>✅ Wat de AI al van jou heeft gezien</h2>
+    const weg=hiddenSet();
+    const alle=D.jijGedaan;
+    const zichtbaar=alle.filter(g=>!weg.has(chipKey(g)));
+    H+=`<h2>✅ Wat de AI al van jou heeft gezien <span style="font-size:11px;font-weight:600;color:var(--grijs);letter-spacing:0">v4</span></h2>
       <div class="card"><div class="chips">
-      ${D.jijGedaan.map(g=>`<span class="chip">✔ ${esc(g.wat)}<span class="t">${esc(g.tijd||'')}</span></span>`).join('')}
-      </div></div>`;
+      ${zichtbaar.map(g=>`<span class="chip"><button class="x" data-hide="${esc(chipKey(g))}" title="Wegklikken">✕</button><span>${esc(g.wat)}</span><span class="t">${esc(g.tijd||'')}</span></span>`).join('')}
+      </div>
+      ${alle.length!==zichtbaar.length
+        ? `<div class="chips-tools">${alle.length-zichtbaar.length} weggeklikt · <button data-showall>toon alles weer</button></div>`
+        : `<div class="chips-tools">Klik op een ✕ om een regel weg te halen.</div>`}
+      </div>`;
   }
 
   // WAAR IS DE AI MEE BEZIG
@@ -342,11 +358,31 @@ function render(){
 
 function zoom(src){const lb=document.getElementById('lb');lb.querySelector('img').src=src;lb.style.display='flex';}
 
+/* weggeklikte regels onthouden in de browser */
+function chipKey(g){ return (g.tijd||'') + '|' + String(g.wat||'').slice(0,40); }
+function hiddenSet(){
+  try { return new Set(JSON.parse(localStorage.getItem('eclipseChipsWeg')||'[]')); }
+  catch(_) { return new Set(); }
+}
+function hideChip(key){
+  const s=hiddenSet(); s.add(key);
+  localStorage.setItem('eclipseChipsWeg', JSON.stringify([...s]));
+}
+function showAllChips(){ localStorage.removeItem('eclipseChipsWeg'); render(); }
+
 /* klik-afhandeling (delegatie — overleeft re-render) */
 document.getElementById('app').addEventListener('click',e=>{
   const m=e.target.closest('[data-mark]'); if(m){markDone(m.getAttribute('data-mark'),m.getAttribute('data-titel'));return;}
   const u=e.target.closest('[data-unmark]'); if(u){unmark(u.getAttribute('data-unmark'));return;}
   const c=e.target.closest('[data-copy]'); if(c){copyForAI();return;}
+  const s=e.target.closest('[data-showall]'); if(s){showAllChips();return;}
+  const h=e.target.closest('[data-hide]');
+  if(h){
+    const chip=h.closest('.chip');
+    hideChip(h.getAttribute('data-hide'));
+    if(chip){ chip.classList.add('weg'); setTimeout(render,260); } else { render(); }
+    return;
+  }
 });
 
 render();
