@@ -58,6 +58,64 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
 	float BrakingDecelerationWalking = 2000.0f;
 
+	// ---- Feel-audit fase 3, gebied LOCOMOTIE: remmen en richting -----------
+	// Het harnas mat wat er stond: een sprint stopte in 0,083 s over 12,0 cm. Dat
+	// is niet "responsief", dat is gewichtloos — de reference noemt het "dichter
+	// bij een arena-shooter dan bij een TPS met gewicht" (LOC-03). De drie velden
+	// hieronder zijn de enige knoppen die daar iets aan doen, en ze zitten in
+	// elkaars weg als je er maar één aanraakt.
+
+	/**
+	 * Zonder deze vlag gebruikt UE de GEWONE GroundFriction ook om te remmen, en
+	 * is BrakingFriction dood gewicht. Aanzetten is de voorwaarde voor alles
+	 * hieronder. [ENGINE] ApplyVelocityBraking.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement")
+	bool bUseSeparateBrakingFriction = true;
+
+	/**
+	 * De rem zelf. dv/dt = -(BrakingFriction x Factor)*v - BrakingDeceleration,
+	 * dus dit is de snelheidsAFHANKELIJKE helft: hij bijt hard bij hoge snelheid
+	 * en laat de staart uitlopen. 4.0 geeft sprint 200 ms / 57 cm en rennen
+	 * 150 ms / 28 cm — zwaar maar responsief, zonder in Division-traagheid te
+	 * vallen. [ENGINE] + Bijlage B van FEEL_REFERENTIE.md (exact nagerekend).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float BrakingFriction = 4.0f;
+
+	/**
+	 * 1.0, niet de engine-default 2.0. Epic's eigen commentaar in de broncode
+	 * noemt die 2.0 letterlijk "Historical value, 1 would be more appropriate" —
+	 * en hij vermenigvuldigt OOK BrakingFriction, dus met 2.0 rem je twee keer zo
+	 * hard als het veld hierboven suggereert en is elke tuning ervan misleidend.
+	 * [ENGINE] CMC-constructor, letterlijk commentaar.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float BrakingFrictionFactor = 1.0f;
+
+	/**
+	 * GEEN rem maar de RICHTINGSWISSELSNELHEID: in CalcVelocity draait
+	 * GroundFriction de snelheidsvector naar de inputrichting, met tijdconstante
+	 * 1/Friction. Op 8.0 kost een 90-graden wissel op sprint 233 ms — merkbaar
+	 * momentum, geen ijs (4 = 400 ms glijden, 16 = 117 ms klittenband). Stond
+	 * nooit gezet; 8.0 was toevallig goed maar niet GEKOZEN. [ENGINE] CalcVelocity.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float GroundFriction = 8.0f;
+
+	/**
+	 * Zijwaarts en achteruit, als factor op de topsnelheid. UE kent hier niets
+	 * voor — zie UEclipseCharacterMovementComponent, dat is de enige plek waar
+	 * het kan. 1.00 / 0.85 komen uit Gears 5 TU3, het enige spel in dit genre dat
+	 * er cijfers over publiceert, en 0.85 kwam daar NA een gemeten 0.739 die te
+	 * sloom bleek. [OFFICIEEL]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0.1, ClampMax = 1.0))
+	float StrafeSpeedRatio = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0.1, ClampMax = 1.0))
+	float BackwardSpeedRatio = 0.85f;
+
 	/**
 	 * Graden/s waarmee het lichaam naar zijn looprichting draait. Engine-default
 	 * 360, TP-template 500. Op 360 kost een omkering een halve seconde draaien
@@ -141,9 +199,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 0))
 	float CameraLagMaxDistance = 6.0f;
 
-	/** The boom's collision probe: the camera may never pass through a wall. */
+	/**
+	 * The boom's collision probe: the camera may never pass through a wall.
+	 *
+	 * 20 en niet 12 (feel-audit fase 3, CAM-06): een probe van 12 uu is kleiner
+	 * dan de capsule van 34 uu die hij moet beschermen, dus de camera schaaft
+	 * langs hoeken en schiet er soms half doorheen voordat de trace iets merkt.
+	 * De referentieband is 20-25; 20 is de onderkant daarvan, want elke uu extra
+	 * trekt de camera ook eerder naar binnen in krappe stegen.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Camera", meta = (ClampMin = 1))
-	float CameraProbeSize = 12.0f;
+	float CameraProbeSize = 20.0f;
 
 	/** Seconds for the first/third-person swap. Hard-cutting is nauseating; this
 	 *  is short enough to feel instant and long enough to keep the horizon. */

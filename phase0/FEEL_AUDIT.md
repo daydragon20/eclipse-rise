@@ -151,6 +151,43 @@ aan wat de tuning zegt, en de muis blijft even snel (`MouseLookScale` 1,0 → 2,
 een kale schaal zonder eenheid). **Dit is een merkbare gedragswijziging** — als
 240 gr/s te traag blijkt, is dat één getal in `DA_CharacterTuning`.
 
+## FASE 3 — afgewerkt op impact-volgorde, elk item gemeten
+
+Volgorde gekozen op "wat maakt het spelen het meest onnatuurlijk", en elk item
+heeft een meetbaar criterium in het harnas. Vier geland, de rest staat onderaan
+met een reden.
+
+| Item | Was | Wordt | Gemeten na de wijziging | Bron |
+|---|---|---|---|---|
+| LOC-03 remmen | stop in **0,083 s / 12,0 cm** vanaf rennen | `bUseSeparateBrakingFriction` aan, `BrakingFriction` 4.0 | **0,150 s / 26,6 cm** | [ENGINE] + Bijlage B (exact nagerekend) |
+| LOC-04 `BrakingFrictionFactor` | 2.0 (engine-default) | **1.0** | zie boven | [ENGINE] Epic's eigen commentaar: *"Historical value, 1 would be more appropriate"* |
+| LOC-14 `GroundFriction` | ongezet (toevallig 8.0) | **expliciet 8.0** | 180-omkering in **0,400 s** | [ENGINE] `CalcVelocity` |
+| LOC-11 strafe-ratio | bestond niet (1.00 impliciet) | **1.00 expliciet** | zijwaarts **420 cm/s** = 1,000× | [OFFICIEEL] Gears 5 TU3 |
+| LOC-12 achteruit-ratio | bestond niet — **achteruit was even snel als vooruit rennen** | **0.85** | achteruit **357 cm/s** = 0,850× | [OFFICIEEL] Gears 5 TU3 (na een gemeten 0.739 die te sloom bleek) |
+| CAM-06 camera-probe | 12 uu | **20 uu** | probe ≥ capsule-radius | referentieband 20–25 |
+
+**Waarom remmen bovenaan staat.** Het harnas mat een stop in 83 ms over 12 cm.
+Dat is geen "responsief", dat is gewichtloos — dezelfde familie als het schaatsen
+dat de vorige ronde opleverde, alleen aan de andere kant van de beweging. De drie
+remvelden zitten in elkaars weg als je er maar één aanraakt: zonder
+`bUseSeparateBrakingFriction` is `BrakingFriction` dood gewicht, en met
+`BrakingFrictionFactor` op 2.0 rem je twee keer zo hard als het veld suggereert.
+
+**Achteruitlopen was even snel als vooruit rennen.** UE kent geen ingebouwde
+richtingsstraf; `GetMaxSpeed()` is de enige plek waar dat kan, dus daar staat nu
+`UEclipseCharacterMovementComponent`. De ratio schaalt vloeiend tussen de drie
+ankers in plaats van in drie vakjes — een klif op precies 90 graden voelt als een
+hapering midden in een bocht. Dezelfde regel geldt voor speler, squad én vijand
+(GDD 8.3: dezelfde wapens, dezelfde regels); de speelronde bewijst dat de AI er
+niet door breekt.
+
+**Nog niet gedaan, met reden** — dit zijn bouwopdrachten, geen tuningrondes:
+turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip),
+sprint-camerastack (CAM-11), camera-shake en recoil/hitmarkers (§8 FEEDBACK
+bestaat volledig niet), coyote time + sprong-inputbuffer (JMP-07/08 — klein, maar
+het raakt de sprongtiming die de owner net getest heeft). Ze staan met een
+aanbeveling in HANDOFF.md.
+
 ## INPUT — hold versus toggle (owner-eis 2026-07-25)
 
 | Item | Status | Nu | Wordt | Reden |

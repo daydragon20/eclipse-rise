@@ -25,6 +25,11 @@ ASSET_PATH = "/Game/Data/DA_CharacterTuning"
 # de twee uiteenlopen, dus een vergeten rij hier wordt vanzelf zichtbaar.
 WANTED = {
     "mouse_look_scale": 2.5,
+    # CAM-06: een probe van 12 uu is kleiner dan de capsule van 34 uu die hij
+    # beschermt, dus de camera schaaft langs hoeken. Dit veld BESTOND al in het
+    # asset, dus de opgeslagen 12 wint van de nieuwe CDO-default en moet hier
+    # meegetrokken worden — precies het defect waar dit script voor bestaat.
+    "camera_probe_size": 20.0,
 }
 
 editor_asset = unreal.EditorAssetLibrary

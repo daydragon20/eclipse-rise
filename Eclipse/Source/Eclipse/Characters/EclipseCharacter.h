@@ -65,7 +65,7 @@ class ECLIPSE_API AEclipseCharacter : public ACharacter, public IAbilitySystemIn
 	GENERATED_BODY()
 
 public:
-	AEclipseCharacter();
+	AEclipseCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystem; }
 	virtual void PostInitializeComponents() override;

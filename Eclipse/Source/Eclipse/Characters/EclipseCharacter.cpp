@@ -6,6 +6,7 @@
 #include "Animation/Skeleton.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/EclipseAnimInstance.h"
+#include "Characters/EclipseCharacterMovementComponent.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -46,7 +47,12 @@ namespace
 	}
 }
 
-AEclipseCharacter::AEclipseCharacter()
+AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer)
+	// Het movement component vervangen moet HIER: ACharacter maakt het in zijn
+	// eigen constructor aan, dus later omzetten kan niet meer. Zie
+	// UEclipseCharacterMovementComponent — het draagt de richtingsstraf, waar UE
+	// zelf niets voor heeft.
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UEclipseCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Event-driven by default (GDD 14.2): nothing here needs per-frame work.
 	PrimaryActorTick.bCanEverTick = false;
@@ -79,7 +85,7 @@ AEclipseCharacter::AEclipseCharacter()
 	// evenredig met de snelheid achter, en dan schaalt het personage met snelheid.
 	CameraBoom->CameraLagMaxDistance = 6.0f;
 	CameraBoom->bDoCollisionTest = true;
-	CameraBoom->ProbeSize = 12.0f;
+	CameraBoom->ProbeSize = 20.0f;
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -133,6 +139,17 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	Movement->JumpZVelocity = Tuning->JumpZVelocity;
 	Movement->AirControl = Tuning->AirControl;
 	Movement->MinAnalogWalkSpeed = Tuning->MinAnalogWalkSpeed;
+	// Fase 3: remmen en richtingswisselen. Zonder bUseSeparateBrakingFriction is
+	// BrakingFriction dood gewicht — de drie horen bij elkaar.
+	Movement->bUseSeparateBrakingFriction = Tuning->bUseSeparateBrakingFriction;
+	Movement->BrakingFriction = Tuning->BrakingFriction;
+	Movement->BrakingFrictionFactor = Tuning->BrakingFrictionFactor;
+	Movement->GroundFriction = Tuning->GroundFriction;
+	if (UEclipseCharacterMovementComponent* Directional = Cast<UEclipseCharacterMovementComponent>(Movement))
+	{
+		Directional->StrafeSpeedRatio = Tuning->StrafeSpeedRatio;
+		Directional->BackwardSpeedRatio = Tuning->BackwardSpeedRatio;
+	}
 
 	// VERIFICATIE, en die is er gekomen na een terechte owner-melding: "niets is
 	// veranderd in de game". Een opgeslagen DataAsset wint van een C++-default voor
@@ -167,6 +184,11 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 		WarnIfStale(TEXT("AirControl"), Tuning->AirControl, Defaults->AirControl);
 		WarnIfStale(TEXT("JumpZVelocity"), Tuning->JumpZVelocity, Defaults->JumpZVelocity);
 		WarnIfStale(TEXT("MinAnalogWalkSpeed"), Tuning->MinAnalogWalkSpeed, Defaults->MinAnalogWalkSpeed);
+		WarnIfStale(TEXT("BrakingFriction"), Tuning->BrakingFriction, Defaults->BrakingFriction);
+		WarnIfStale(TEXT("BrakingFrictionFactor"), Tuning->BrakingFrictionFactor, Defaults->BrakingFrictionFactor);
+		WarnIfStale(TEXT("GroundFriction"), Tuning->GroundFriction, Defaults->GroundFriction);
+		WarnIfStale(TEXT("BackwardSpeedRatio"), Tuning->BackwardSpeedRatio, Defaults->BackwardSpeedRatio);
+		WarnIfStale(TEXT("CameraProbeSize"), Tuning->CameraProbeSize, Defaults->CameraProbeSize);
 		WarnIfStale(TEXT("ViewPitchMin"), Tuning->ViewPitchMin, Defaults->ViewPitchMin);
 		WarnIfStale(TEXT("StickDeadzone"), Tuning->StickDeadzone, Defaults->StickDeadzone);
 		WarnIfStale(TEXT("StickYawSpeed"), Tuning->StickYawSpeed, Defaults->StickYawSpeed);

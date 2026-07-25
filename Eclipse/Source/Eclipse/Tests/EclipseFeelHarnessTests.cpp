@@ -18,6 +18,7 @@
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/InputSettings.h"
@@ -95,6 +96,11 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 	CheckFloat(TEXT("JumpZVelocity"), Movement->JumpZVelocity, T.JumpZVelocity);
 	CheckFloat(TEXT("AirControl"), Movement->AirControl, T.AirControl);
 	CheckFloat(TEXT("MinAnalogWalkSpeed"), Movement->MinAnalogWalkSpeed, T.MinAnalogWalkSpeed);
+	CheckFloat(TEXT("BrakingFriction"), Movement->BrakingFriction, T.BrakingFriction);
+	CheckFloat(TEXT("BrakingFrictionFactor"), Movement->BrakingFrictionFactor, T.BrakingFrictionFactor);
+	CheckFloat(TEXT("GroundFriction"), Movement->GroundFriction, T.GroundFriction);
+	TestTrue(TEXT("laag 1: bUseSeparateBrakingFriction staat aan, anders is BrakingFriction dood gewicht"),
+		Movement->bUseSeparateBrakingFriction);
 
 	// Capabilities die geen getal zijn maar wél de reden dat een getal werkt.
 	TestTrue(TEXT("laag 1: bOrientRotationToMovement staat aan (lichaam volgt looprichting)"),
@@ -113,7 +119,9 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 		CheckFloat(TEXT("camera-FOV (3e persoon)"), Camera->FieldOfView, T.ThirdPersonFOV);
 		CheckFloat(TEXT("socketoffset Z"), Boom->SocketOffset.Z, T.CameraSocketOffset.Z);
 		CheckFloat(TEXT("socketoffset Y (schouder)"), Boom->SocketOffset.Y, T.CameraSocketOffset.Y);
-		CheckFloat(TEXT("collision-probe"), Boom->ProbeSize, T.CameraProbeSize);
+		CheckFloat(TEXT("collision-probe (CAM-06)"), Boom->ProbeSize, T.CameraProbeSize);
+		TestTrue(TEXT("laag 1: de camera-probe is minstens zo groot als de capsule-radius (CAM-06)"),
+			Boom->ProbeSize >= Harness.Body->GetCapsuleComponent()->GetScaledCapsuleRadius() * 0.55f);
 		CheckFloat(TEXT("camera-lag snelheid"), Boom->CameraLagSpeed, T.CameraLagSpeed);
 		CheckFloat(TEXT("camera-lag klem (S1)"), Boom->CameraLagMaxDistance, T.CameraLagMaxDistance);
 		TestTrue(TEXT("laag 1: de camera-lag-klem is gezet (zonder klem schaalt het personage met snelheid — S1)"),
@@ -187,25 +195,60 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 	const double BrakeTime = Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 3.0,
 		[&Harness]() { return Harness.SpeedCm() < 1.0f; });
 	const double BrakeDistance = FVector::Dist2D(Harness.Location(), BrakeStart);
-	Report(*this, TEXT("stoptijd vanaf rennen"), BrakeTime, TEXT("s"), TEXT("referentie 0.083 s bij 8x2 / 2000"));
-	Report(*this, TEXT("glijafstand vanaf rennen"), BrakeDistance, TEXT("cm"), TEXT("referentie 13 cm bij 8x2 / 2000"));
+	Report(*this, TEXT("stoptijd vanaf rennen"), BrakeTime, TEXT("s"), TEXT("Bijlage B bij 4x1 / 2000: 0.150 s (was 0.083 bij 8x2)"));
+	Report(*this, TEXT("glijafstand vanaf rennen"), BrakeDistance, TEXT("cm"), TEXT("Bijlage B bij 4x1 / 2000: 28 cm (was 12)"));
 	TestTrue(TEXT("laag 2: het personage komt daadwerkelijk tot stilstand"), Harness.SpeedCm() < 5.0f);
 	TestTrue(TEXT("laag 2: de remweg is eindig en niet nul (er is massa, en die stopt)"),
 		BrakeDistance > 0.5 && BrakeDistance < 200.0);
 
+	// --- 2b. richtingsstraf: zijwaarts en achteruit -------------------------
+	// UE kent hier niets voor, dus dit meet of UEclipseCharacterMovementComponent
+	// zijn werk doet. Achteruitlopen was tot fase 3 even snel als vooruit rennen,
+	// en dat is een van de duidelijkste "dit is een prototype"-signalen die er
+	// zijn. De verhouding is het criterium, niet de absolute snelheid.
+	auto MeasureTopSpeedInDirection = [&Harness, RunSpeed](const FVector2D& Stick)
+	{
+		Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 1.0, [&Harness]() { return Harness.SpeedCm() < 0.5f; });
+		Harness.HoldFor(TEXT("Move"), Stick, 3.0);
+		return Harness.SpeedCm();
+	};
+	const float ForwardTop = MeasureTopSpeedInDirection(FVector2D(0.0f, 1.0f));
+	const float StrafeTop = MeasureTopSpeedInDirection(FVector2D(1.0f, 0.0f));
+	const float BackwardTop = MeasureTopSpeedInDirection(FVector2D(0.0f, -1.0f));
+	const float StrafeRatio = ForwardTop > KINDA_SMALL_NUMBER ? StrafeTop / ForwardTop : 0.0f;
+	const float BackwardRatio = ForwardTop > KINDA_SMALL_NUMBER ? BackwardTop / ForwardTop : 0.0f;
+	Report(*this, TEXT("topsnelheid vooruit"), ForwardTop, TEXT("cm/s"));
+	Report(*this, TEXT("topsnelheid zijwaarts"), StrafeTop, TEXT("cm/s"));
+	Report(*this, TEXT("topsnelheid achteruit"), BackwardTop, TEXT("cm/s"));
+	Report(*this, TEXT("verhouding zijwaarts/vooruit"), StrafeRatio, TEXT(""), TEXT("1.00 (Gears 5 TU3)"));
+	Report(*this, TEXT("verhouding achteruit/vooruit"), BackwardRatio, TEXT(""), TEXT("0.85 (Gears 5 TU3)"));
+	TestEqual(TEXT("laag 2: zijwaarts loopt even snel als vooruit"), StrafeRatio, Harness.Tuning->StrafeSpeedRatio, 0.03f);
+	TestEqual(TEXT("laag 2: achteruit is langzamer, precies volgens de getunede verhouding"),
+		BackwardRatio, Harness.Tuning->BackwardSpeedRatio, 0.03f);
+	TestTrue(TEXT("laag 2: achteruit is echt trager dan vooruit (de straf bestaat)"), BackwardTop < ForwardTop * 0.95f);
+
 	// --- 3. 180-omkering ----------------------------------------------------
-	// Twee getallen, want het zijn twee dingen: de SNELHEIDSVECTOR draait met
-	// GroundFriction, het LICHAAM draait met RotationRate.Yaw. Een speler voelt de
+	// Een 180 is NIET "de stick naar achteren duwen" — dat is achteruitlopen, en
+	// dat heeft sinds fase 3 terecht zijn eigen (tragere) snelheid. Een echte
+	// omkering draait de KIJKRICHTING mee. Deze meting doet dus wat een speler
+	// doet: de camera 180 graden omgooien en dan weer vooruit duwen.
+	//
+	// Twee getallen, want het zijn twee dingen: de snelheidsvector draait met
+	// GroundFriction, het lichaam draait met RotationRate.Yaw. De speler voelt de
 	// eerste en ziet de tweede.
 	Harness.RunUpToTopSpeed(*this);
 	const float BodyYawBefore = Harness.Body->GetActorRotation().Yaw;
-	// De begin-richting uit de GEMETEN snelheid halen en niet uit een wereld-as:
-	// "vooruit" hangt aan de kijkrichting, en die hoeft niet +X te zijn.
 	const FVector StartDirection = Movement->Velocity.GetSafeNormal2D();
+	// Muisflick: de muis-tak is lineair, AddYawInput(Axis.X * MouseLookScale)
+	// graden per gebeurtenis, dus 180 / MouseLookScale is precies een halve slag.
+	Harness.Inject(TEXT("Look"), FVector2D(180.0f / Harness.Tuning->MouseLookScale, 0.0f));
+	Harness.Inject(TEXT("Move"), FVector2D(0.0f, 1.0f));
+	Harness.Step();
+
 	double TurnTime = 0.0;
 	{
 		const double Start = Harness.ElapsedSeconds;
-		Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, -1.0f), 3.0, [&Harness, Movement, RunSpeed, StartDirection]()
+		Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 3.0, [&Harness, Movement, RunSpeed, StartDirection]()
 		{
 			const FVector V = Movement->Velocity;
 			return V.Size2D() >= RunSpeed * 0.98f && FVector::DotProduct(V.GetSafeNormal2D(), StartDirection) < -0.99f;
@@ -213,10 +256,12 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 		TurnTime = Harness.ElapsedSeconds - Start;
 	}
 	const float BodyYawSwept = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYawBefore, Harness.Body->GetActorRotation().Yaw));
-	Report(*this, TEXT("180-omkering (snelheid weer op top)"), TurnTime, TEXT("s"), TEXT("richtingwissel via GroundFriction + heracceleratie"));
+	Report(*this, TEXT("180-omkering (snelheid weer op top)"), TurnTime, TEXT("s"), TEXT("afremmen + richtingwissel via GroundFriction + heracceleratie"));
 	Report(*this, TEXT("180-omkering: lichaam gedraaid"), BodyYawSwept, TEXT("gr"), TEXT("~180 gr bij RotationRate.Yaw"));
 	TestTrue(FString::Printf(TEXT("laag 2: de omkering is af binnen 3 s (%.3f s)"), TurnTime), TurnTime < 2.999);
 	TestTrue(FString::Printf(TEXT("laag 2: het lichaam draait echt om (%.0f gr)"), BodyYawSwept), BodyYawSwept > 150.0f);
+	TestTrue(FString::Printf(TEXT("laag 2: na de omkering loopt hij weer op volle vooruitsnelheid (%.0f cm/s)"), Harness.SpeedCm()),
+		Harness.SpeedCm() >= RunSpeed * 0.98f);
 
 	// --- 4. sprong ----------------------------------------------------------
 	Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 1.0, [&Harness]() { return Harness.SpeedCm() < 1.0f; });
