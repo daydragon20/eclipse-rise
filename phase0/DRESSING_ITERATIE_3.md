@@ -245,6 +245,34 @@ grondverankering dus niet zwak maar afwezig. Dat is de rok-vraag uit §5 (rok ui
 HOOGTE i.p.v. de footprint) plus mogelijk cameradekking — cam 3 en 4 kijken naar
 massa's die geen blob dragen.
 
+## 1i. Vloerkorrel gehalveerd — en een gekoppelde bijwerking gevonden (2026-07-25 20:30)
+
+De blokkerende stijlovertreding is voor de helft weg: de textuurmix van de vloer van
+0.50 → 0.20 bracht de eigen korrel van **29,0 / 29,0 / 30,1%** naar **13,8 / 12,8 /
+15,8%** (shots 00209 → 00216, identieke meetvakken). Doel uit de review was onder
+~12%, dus dit landt praktisch op de bar.
+
+**MAAR: die mix is gedeeld, en dat was niet de bedoeling.** `MakeGroundDecalMid`
+zet `AlbedoMix` uit `GrainSource->TexMix`, en de lamppool geeft `&FloorPalette` als
+GrainSource mee — bewust, zodat een lichtplek als *verlicht asfalt* leest in plaats
+van als een geschilderde schijf. Gevolg: het verlagen van de vloermix heeft de pools
+mee afgevlakt.
+
+Een herhaalde stencil-meting op de blobs geeft nu **1,02×** waar dezelfde meting
+eerder 0,62× gaf. Dat is **geen bruikbaar resultaat**: de stencil komt uit een oudere
+shotronde (00153) en de ring valt in de pools, die nu zelf zijn veranderd. Twee
+variabelen tegelijk, dus de meting zegt niets over de grounding.
+
+**Volgende stap, in deze volgorde:**
+1. Een verse magenta-proefronde op de HUIDIGE build, zodat stencil en frame uit
+   dezelfde staat komen. Pas dan is de vraag "leest de contactschaduw nu wel?"
+   beantwoordbaar.
+2. De pool zijn eigen TexMix geven in plaats van die van de vloer te lenen. De
+   koppeling was bedoeld voor de albedo (zelfde asfalt), niet voor de mix; nu draagt
+   één knop twee bedoelingen.
+3. Pas daarna de tweede helft van de vloerfix: een hand-geauthorde asfalt-albedo met
+   celband-respons en ink-reactie. Een mix-waarde koopt alleen lage variantie.
+
 - Geparkeerd: **liners** (op geen enkele camera-afstand leesbaar als defect) en
   **FogDensity** (met de grond op 0.03-0.06 is er niets om op te tillen; pas
   hertesten nadat het plafond zakt).
