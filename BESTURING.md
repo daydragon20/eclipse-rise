@@ -51,6 +51,37 @@ de beoordelaar, geen besturing die de speler uitvoert. De gids zelf moest wél o
 controller, anders is een controller-playtest er niet mee te doen — View en Menu
 waren de enige onbezette pad-knoppen.
 
+## De mapping tegen de genre-conventie (owner-vraag 2026-07-25)
+
+| Knop | Conventie (Borderlands/Gears/Division/Mass Effect) | ECLIPSE | Afwijking en reden |
+|---|---|---|---|
+| RT | vuren | vuren | — |
+| LT | mikken | mikken **buiten** Command Mode, vorige soldaat **tijdens** de hold | Contextueel op jouw verzoek; één tak op `IsHeld()`, geen tweede modus |
+| A | springen | springen | — |
+| B | hurken | hurken | — |
+| X | herladen / interact | soldaat onder richtkruis | **Afwijking.** Herladen bestaat niet in dit project; X is de dichtstbijzijnde "interact met wat je aanwijst" |
+| Y | wapen/gadget wisselen | stance togglen | **Afwijking.** Wapenwissel bestaat niet; stance is de gadget-achtige modifier die we wél hebben |
+| LB | wapen wisselen | **Command Mode vasthouden** | **Bewuste afwijking, jouw vraag.** Zie hieronder |
+| RB | wapen wisselen | volgende soldaat | Volgt LB: tijdens de hold is dit de natuurlijke buur |
+| L3 | sprint | sprint | — |
+| R3 | melee of camera | **niets** | Was 1e/3e persoon; eraf omdat je hem per ongeluk raakt met je richtstick |
+| D-pad | snelacties | orders 1–4 | — |
+| View | kaart / scorebord | testgids | Debug-tier; een kaart bestaat nog niet |
+| Menu | pauze | gids bevestigen | Debug-tier; pauze bestaat nog niet |
+
+**LB blijft Command Mode, en dat is een ontwerpkeuze, geen luiheid.** Drie redenen.
+Command Mode is de kernmechaniek van ECLIPSE — het is niet één actie tussen andere,
+het is de reden dat dit een action-*strategy* game is. Het is bovendien een HOLD, en
+een hold van seconden hoort op een schouderknop die je comfortabel ingedrukt houdt;
+op een face-button vecht hij met de stick waarmee je in diezelfde tijd moet richten.
+En de conflicterende conventie is vandaag theoretisch: **wapenwissel bestaat niet in
+dit project** — geen actie, geen handler, geen wapensysteem. Zodra dat er wel is, is
+de eerlijke plek daarvoor RB/LB *buiten* de hold, met dezelfde contextsplitsing die
+LT nu al doet.
+
+**Wat de conventie zegt en wij niet hebben:** herladen, melee, wapenwissel, kaart,
+pauze. Die staan hieronder als gat, niet als afwijking.
+
 ## Bestaat niet (en dat is geen defect maar een gat)
 
 Melee, wapenwissel en herladen bestaan nergens in het project — geen actie, geen
