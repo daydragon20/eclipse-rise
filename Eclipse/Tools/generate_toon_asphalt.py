@@ -31,17 +31,18 @@ Wat deze generator anders doet dan een foto, en waarom:
    MEET dat op zijn eigen uitvoer en zegt het, zodat de volgende stap niet op
    een gevoel maar op een getal begint.
 
-EERLIJK OVER DE EERSTE UITVOER (bekeken 2026-07-25): het GETAL klopt - 13,8% eigen
-korrel tegen ~60% voor de foto - maar de VORMTAAL nog niet. De vlekken lezen als
-camouflage of wolken, niet als asfalt: te groot en te organisch. Asfalt is een
-tamelijk uniform oppervlak met subtiele reparatievlakken, niet een landschap. De
-scheuren lezen bovendien als dunne krassen in plaats van als scheuren.
+RONDE 1 (13,8%) HAD HET GETAL GOED EN DE VORMTAAL FOUT: het zwaartepunt lag op het
+grove octaaf, wat zes grote klodders gaf die als camouflage lazen, en de scheuren
+dwaalden als krassen. Ronde 2 draait dat om - het middenoctaaf draagt, het grove
+schemert er alleen doorheen, en een derde fijn octaaf geeft korrel op tegelschaal.
+De scheuren vertakken nu vanuit een punt, want dat is wat een oog als breuk herkent.
 
-Wat er waarschijnlijk moet veranderen in ronde 2: het grove octaaf kleiner in
-amplitude (het draagt nu de compositie in plaats van hem te kruiden), een fijner
-derde octaaf voor de korrel op tegelschaal, en scheuren die vertakken vanuit een
-punt in plaats van te dwalen. Dat is een look-oordeel, dus het hoort langs de
-art-reviewer zodra het in een frame staat - niet nog een keer op een getal gestuurd.
+RONDE 2, gemeten: sd/gem 11,2% - onder de 12% die de review vraagt - en het
+oppervlak leest als tamelijk uniform korrelig aggregaat in plaats van als
+landschap. Wat er nog aan mankeert en pas in een frame te beoordelen is: de spikkel
+is over de hele tegel even druk, wat op close-up richting stucwerk kan neigen. Dat
+is een look-oordeel en gaat langs de art-reviewer zodra hij geplaatst is - een lage
+sd is een noodzakelijke voorwaarde, geen bewijs dat iets als asfalt leest.
 
 Draai (geen editor nodig, alleen Pillow):
   python Eclipse/Tools/generate_toon_asphalt.py
@@ -83,17 +84,21 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     rng = random.Random(SEED)
 
-    # Twee octaven: de grove vlekken dragen, de fijne breken de regelmaat.
-    coarse = value_noise(SIZE, 6, rng)
-    medium = value_noise(SIZE, 14, rng)
-    coarse_px, medium_px = coarse.load(), medium.load()
+    # Ronde 2. Ronde 1 legde het zwaartepunt op het GROVE octaaf (0.70) en dat gaf
+    # camouflagevlekken: de compositie werd gedragen door zes grote klodders. Asfalt
+    # is precies andersom - een tamelijk uniform vlak waar een grove variatie
+    # doorheen SCHEMERT. Dus het gewicht ligt nu op het middenoctaaf, met het grove
+    # als kruiding en een derde, fijn octaaf voor korrel op tegelschaal.
+    coarse = value_noise(SIZE, 5, rng)
+    medium = value_noise(SIZE, 18, rng)
+    fine = value_noise(SIZE, 64, rng)
+    coarse_px, medium_px, fine_px = coarse.load(), medium.load(), fine.load()
 
     img = Image.new("L", (SIZE, SIZE))
     px = img.load()
     for y in range(SIZE):
         for x in range(SIZE):
-            # 0..1, zwaartepunt op de grove laag
-            n = (0.70 * coarse_px[x, y] + 0.30 * medium_px[x, y]) / 255.0
+            n = (0.25 * coarse_px[x, y] + 0.45 * medium_px[x, y] + 0.30 * fine_px[x, y]) / 255.0
             v = TARGET_MEAN + (n - 0.5) * 2.0 * SPREAD
             # Kwantiseren NA het mengen: dat geeft vlakken met rafelige randen in
             # plaats van een schaakbord.
@@ -101,18 +106,28 @@ def main():
             v = TARGET_MEAN - SPREAD + round((v - (TARGET_MEAN - SPREAD)) / step) * step
             px[x, y] = int(max(0, min(255, v)))
 
-    # Scheuren: dun, donker, en met een knik zodat ze niet als een lijnstuk lezen.
+    # Scheuren, ronde 2: VERTAKKEND vanuit één punt in plaats van dwalend. Een
+    # dwalende lijn leest als een kras; een scheur begint ergens en splitst, en dat
+    # herkent het oog als breuk. Weinig en kort: dit is een vloer, geen craquele.
     draw = ImageDraw.Draw(img)
-    for _ in range(7):
-        x, y = rng.randrange(SIZE), rng.randrange(SIZE)
-        angle = rng.uniform(0, math.tau)
-        for _segment in range(rng.randint(3, 6)):
-            length = rng.randint(60, 200)
-            nx = x + math.cos(angle) * length
-            ny = y + math.sin(angle) * length
-            draw.line([(x, y), (nx, ny)], fill=max(0, TARGET_MEAN - SPREAD * 2), width=rng.randint(1, 2))
-            x, y = nx, ny
-            angle += rng.uniform(-0.6, 0.6)
+    crack_value = max(0, TARGET_MEAN - SPREAD * 2)
+
+    def crack(x, y, angle, length, depth):
+        if depth <= 0 or length < 18:
+            return
+        nx = x + math.cos(angle) * length
+        ny = y + math.sin(angle) * length
+        draw.line([(x, y), (nx, ny)], fill=crack_value, width=1 if depth < 3 else 2)
+        # Doorlopen met een lichte knik...
+        crack(nx, ny, angle + rng.uniform(-0.35, 0.35), length * rng.uniform(0.55, 0.8), depth - 1)
+        # ...en soms afsplitsen onder een duidelijke hoek.
+        if depth >= 2 and rng.random() < 0.55:
+            crack(nx, ny, angle + rng.choice((-1, 1)) * rng.uniform(0.5, 1.0),
+                  length * rng.uniform(0.4, 0.6), depth - 2)
+
+    for _ in range(4):
+        crack(rng.randrange(SIZE), rng.randrange(SIZE), rng.uniform(0, math.tau),
+              rng.randint(70, 130), 4)
 
     # Eén zachte pass: de kwantisatieranden mogen niet als vectorvlakken lezen,
     # maar hij moet ook niet terug naar een verloop. Radius 1 is precies genoeg.
