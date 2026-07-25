@@ -278,10 +278,15 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 			// ECHTE tijd geven, niet gesimuleerde. Recast bouwt zijn tegels op een
 			// achtergrondtaak, en duizend snelle wereldticks kosten samen minder
 			// wandkloktijd dan zo'n bouw nodig heeft — dan meet je de taakplanner
-			// in plaats van de game. Maximaal 5 s, want een test die blijft wachten
-			// meet ook niets.
+			// in plaats van de game.
+			//
+			// Eén seconde en niet vijf. Vijf was de eerste, onderzoekende waarde;
+			// inmiddels is gemeten dat er headless helemaal geen tegels komen, dus
+			// die vier extra seconden zijn dood wachten — en ze werden bij ELKE
+			// commit betaald (de suite duurde 13,9 s, waarvan 11,1 s deze test).
+			// De diagnose blijft: hij rapporteert nog steeds of er navmesh ligt.
 			const double WallStart = FPlatformTime::Seconds();
-			while (FPlatformTime::Seconds() - WallStart < 5.0)
+			while (FPlatformTime::Seconds() - WallStart < 1.0)
 			{
 				Harness.Step();
 				FNavLocation Projected;
