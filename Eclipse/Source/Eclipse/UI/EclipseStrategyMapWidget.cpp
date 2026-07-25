@@ -36,6 +36,13 @@ void UEclipseStrategyMapWidget::NativeConstruct()
 		RegionChangedHandle = Bus->Subscribe(
 			StrategyFamily,
 			FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseStrategyMapWidget::OnBoardChanged));
+
+		// A committed story beat retires/unlocks pins without any Strategy fact
+		// (M1.1/M1.2/M1.4 flip no region, decision 6) — the board re-renders on
+		// the beat or it shows the retired mission (catalog: BeatReached consumer).
+		BeatReachedHandle = Bus->Subscribe(
+			EclipseTags::Event_Story_BeatReached,
+			FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseStrategyMapWidget::OnBoardChanged));
 	}
 
 	Rebuild();
@@ -48,6 +55,7 @@ void UEclipseStrategyMapWidget::NativeDestruct()
 		if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
 		{
 			Bus->Unsubscribe(RegionChangedHandle);
+			Bus->Unsubscribe(BeatReachedHandle);
 		}
 	}
 

@@ -7,8 +7,16 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "Core/EclipseGameplayTags.h"
+#include "Engine/DataTable.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
 #include "Misc/AutomationTest.h"
 #include "Quests/EclipseStoryLogic.h"
+#include "Strategy/EclipseCampaignSetupAsset.h"
+#include "Strategy/EclipseCampaignSubsystem.h"
+#include "Strategy/EclipseRegionGraphAsset.h"
+#include "Strategy/EclipseStrategySubsystem.h"
 
 namespace EclipseStoryTest
 {
@@ -93,6 +101,145 @@ bool FEclipseStorySequencingTest::RunTest(const FString& Parameters)
 	TestFalse(TEXT("Set beat never commits twice (one Brick, ever)"), ShouldCommitBeat(Flags, BeatM13));
 	TestFalse(TEXT("Invalid beat never commits"), ShouldCommitBeat(Flags, FGameplayTag()));
 
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseStoryOfferPrecedenceTest,
+	"Eclipse.Story.PinnedOfferBeatsRegionOffer",
+	EclipseStoryTest::TestFlags)
+
+bool FEclipseStoryOfferPrecedenceTest::RunTest(const FString& Parameters)
+{
+	// SPEC-P2-04 locked decision 4, wired: a story-pinned row wins the offer
+	// query over the region-type offer, and retires to the generic offer the
+	// moment its completion beat commits — through the real subsystems.
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+
+	// The loud half of the 14.3.5 ladder is part of the contract under test:
+	// the orphan row below must warn twice (empty beat + unknown region), the
+	// malformed-table swap once, and the pin-only region once after it retires.
+	// Exact counts — the per-table validation must not re-fire across queries
+	// or a second campaign on the same table.
+	AddExpectedMessage(TEXT("has no CompletionBeatTag"), ELogVerbosity::Warning, EAutomationExpectedMessageFlags::Contains, 1);
+	AddExpectedMessage(TEXT("pins unknown region"), ELogVerbosity::Warning, EAutomationExpectedMessageFlags::Contains, 1);
+	AddExpectedMessage(TEXT("wrong row struct"), ELogVerbosity::Warning, EAutomationExpectedMessageFlags::Contains, 1);
+	AddExpectedMessage(TEXT("has no offer row for its type"), ELogVerbosity::Warning, EAutomationExpectedMessageFlags::Contains, 1);
+
+	UEclipseRegionGraphAsset* Graph = NewObject<UEclipseRegionGraphAsset>();
+	{
+		FEclipseRegionDefinition& Home = Graph->Regions.AddDefaulted_GetRef();
+		Home.RegionId = TEXT("Underworks");
+		Home.StartingOwner = EEclipseRegionOwner::Player;
+		Home.ConnectedRegionIds = { TEXT("AmbushBlock"), TEXT("OldQuarter") };
+		FEclipseRegionDefinition& Target = Graph->Regions.AddDefaulted_GetRef();
+		Target.RegionId = TEXT("AmbushBlock");
+		Target.RegionType = EEclipseRegionType::Checkpoint;
+		Target.StartingOwner = EEclipseRegionOwner::Dominion;
+		Target.ConnectedRegionIds = { TEXT("Underworks") };
+		// Industrial has no generic offer row: the asymmetric path — this
+		// region only ever surfaces through its story pin.
+		FEclipseRegionDefinition& PinOnly = Graph->Regions.AddDefaulted_GetRef();
+		PinOnly.RegionId = TEXT("OldQuarter");
+		PinOnly.RegionType = EEclipseRegionType::Industrial;
+		PinOnly.StartingOwner = EEclipseRegionOwner::Dominion;
+		PinOnly.ConnectedRegionIds = { TEXT("Underworks") };
+
+		UDataTable* Offers = NewObject<UDataTable>();
+		Offers->RowStruct = FEclipseMissionOfferRow::StaticStruct();
+		FEclipseMissionOfferRow Generic;
+		Generic.RegionType = EEclipseRegionType::Checkpoint;
+		Generic.TemplateId = TEXT("MT_Assault");
+		Generic.RewardCredits = 60;
+		Offers->AddRow(TEXT("Offer_Generic"), Generic);
+		Graph->MissionOffers = Offers;
+	}
+
+	UDataTable* StoryTable = NewObject<UDataTable>();
+	StoryTable->RowStruct = FEclipseStoryMissionRow::StaticStruct();
+	{
+		FEclipseStoryMissionRow M11;
+		M11.MissionId = TEXT("MT_M11");
+		M11.PinnedRegionId = TEXT("AmbushBlock");
+		M11.CompletionBeatTag = EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag();
+		M11.RewardMaterials = 25;
+		M11.RewardCredits = 50;
+		StoryTable->AddRow(TEXT("M11"), M11);
+
+		FEclipseStoryMissionRow M12;
+		M12.MissionId = TEXT("MT_M12");
+		M12.PinnedRegionId = TEXT("OldQuarter");
+		M12.CompletionBeatTag = EclipseTags::Story_Beat_M12_DeadDrop.GetTag();
+		M12.RewardIntel = 8;
+		StoryTable->AddRow(TEXT("M12"), M12);
+
+		// Both loud-validation defects on one row: no beat, unknown region.
+		FEclipseStoryMissionRow Orphan;
+		Orphan.MissionId = TEXT("MT_Orphan");
+		Orphan.PinnedRegionId = TEXT("Nowhere");
+		StoryTable->AddRow(TEXT("M_Orphan"), Orphan);
+	}
+
+	UEclipseCampaignSetupAsset* Setup = NewObject<UEclipseCampaignSetupAsset>();
+	Setup->StartingDay = 1;
+	Setup->StartingRosterSize = 2;
+	Setup->RegionGraph = Graph;
+	Setup->StoryMissions = StoryTable;
+	Campaign->StartNewCampaign(Setup);
+
+	FEclipseMissionOfferView Offer;
+	TestTrue(TEXT("Offer resolves"), Strategy->TryGetOffer(TEXT("AmbushBlock"), Offer));
+	TestEqual(TEXT("Story pin wins the offer query"), Offer.TemplateId, FName(TEXT("MT_M11")));
+	TestEqual(TEXT("Authored reward band surfaces"), Offer.RewardMaterials, 25);
+	TestTrue(TEXT("Pin surfaces a region with no generic offer"), Strategy->TryGetOffer(TEXT("OldQuarter"), Offer));
+	TestEqual(TEXT("Pin-only region carries the story template"), Offer.TemplateId, FName(TEXT("MT_M12")));
+	TestEqual(TEXT("Both pinned regions are on the board"), Strategy->GetAvailableOffers().Num(), 2);
+
+	// Degradation while the pins are still live (order matters: after a retire
+	// this assert could not tell the guard from the pin being done): a wrong-
+	// shaped story table disables pins loudly-but-safely, the region offer
+	// stands, and the resolver recovers the moment the table is fixed. NOTE:
+	// resolution reads the setup's soft ptr live per query — if rows ever get
+	// cached per campaign, this swap stops meaning what it tests.
+	Setup->StoryMissions = Graph->MissionOffers.Get();
+	TestTrue(TEXT("Offer resolves with a malformed story table"), Strategy->TryGetOffer(TEXT("AmbushBlock"), Offer));
+	TestEqual(TEXT("Malformed story table degrades to the region offer"), Offer.TemplateId, FName(TEXT("MT_Assault")));
+	TestFalse(TEXT("Pin-only region drops with pins disabled"), Strategy->TryGetOffer(TEXT("OldQuarter"), Offer));
+	Setup->StoryMissions = StoryTable;
+	TestTrue(TEXT("Offer resolves after the table is restored"), Strategy->TryGetOffer(TEXT("AmbushBlock"), Offer));
+	TestEqual(TEXT("Restored table re-surfaces the pin"), Offer.TemplateId, FName(TEXT("MT_M11")));
+
+	// Commit the completion beats: each pin retires the moment its beat lands.
+	FString Error;
+	FEclipseCampaignTransaction Done;
+	Done.Source = TEXT("Test");
+	FEclipseCampaignMutation& Beat = Done.Mutations.AddDefaulted_GetRef();
+	Beat.Type = EEclipseCampaignMutationType::SetStoryFlag;
+	Beat.StoryFlagTag = EclipseTags::Story_Beat_M11_ThirteenBullets.GetTag();
+	TestTrue(TEXT("Completion beat commits"), Campaign->CommitTransaction(Done, Error));
+
+	TestTrue(TEXT("Offer still resolves after the beat"), Strategy->TryGetOffer(TEXT("AmbushBlock"), Offer));
+	TestEqual(TEXT("Done mission retires to the generic offer"), Offer.TemplateId, FName(TEXT("MT_Assault")));
+
+	FEclipseCampaignTransaction Done12;
+	Done12.Source = TEXT("Test");
+	FEclipseCampaignMutation& Beat12 = Done12.Mutations.AddDefaulted_GetRef();
+	Beat12.Type = EEclipseCampaignMutationType::SetStoryFlag;
+	Beat12.StoryFlagTag = EclipseTags::Story_Beat_M12_DeadDrop.GetTag();
+	TestTrue(TEXT("Second completion beat commits"), Campaign->CommitTransaction(Done12, Error));
+	TestFalse(TEXT("Retired pin-only region has no offer left"), Strategy->TryGetOffer(TEXT("OldQuarter"), Offer));
+	// The pin-only region now falls off the board with the skip-warning.
+	TestEqual(TEXT("Board shrinks to the generic offer"), Strategy->GetAvailableOffers().Num(), 1);
+
+	// A fresh campaign resets StoryFlags: the pins re-arm — and the already-
+	// validated table must not warn again (the exact counts above prove it).
+	Campaign->StartNewCampaign(Setup);
+	TestTrue(TEXT("Offer resolves in the second campaign"), Strategy->TryGetOffer(TEXT("AmbushBlock"), Offer));
+	TestEqual(TEXT("A new campaign re-arms the pin"), Offer.TemplateId, FName(TEXT("MT_M11")));
+
+	GameInstance->Shutdown();
 	return true;
 }
 

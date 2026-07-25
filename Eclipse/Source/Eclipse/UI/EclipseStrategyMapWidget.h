@@ -53,4 +53,5 @@ private:
 	TObjectPtr<UVerticalBox> RootBox;
 
 	FEclipseEventSubscriptionHandle RegionChangedHandle;
+	FEclipseEventSubscriptionHandle BeatReachedHandle;
 };

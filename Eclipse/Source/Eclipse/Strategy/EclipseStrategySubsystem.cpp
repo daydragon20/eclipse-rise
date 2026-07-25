@@ -6,6 +6,8 @@
 #include "Eclipse.h"
 #include "Engine/GameInstance.h"
 #include "HAL/IConsoleManager.h"
+#include "Quests/EclipseStoryLogic.h"
+#include "Quests/EclipseStoryTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseStrategyLogic.h"
@@ -100,6 +102,98 @@ const FEclipseMissionOfferRow* UEclipseStrategySubsystem::FindOfferForType(const
 	return Found;
 }
 
+const UDataTable* UEclipseStrategySubsystem::GetValidatedStoryTable(const UEclipseCampaignSubsystem& Campaign, const UEclipseRegionGraphAsset& Graph) const
+{
+	// Missing table = the campaign runs on region offers alone (GDD 14.3.5).
+	const UEclipseCampaignSetupAsset* Setup = Campaign.GetActiveSetup();
+	const UDataTable* StoryTable = Setup != nullptr ? Setup->StoryMissions.LoadSynchronous() : nullptr;
+	if (StoryTable == nullptr)
+	{
+		return nullptr;
+	}
+
+	const UScriptStruct* RowStruct = StoryTable->GetRowStruct();
+	const bool bUsable = RowStruct != nullptr && RowStruct->IsChildOf(FEclipseStoryMissionRow::StaticStruct());
+
+	// Degradation must be loud, once per table — not once per process, and
+	// never silent (GDD 14.3.5): a forgotten completion beat is a forever-
+	// repeatable pin (econ-relevant by decision 10), an unknown region a story
+	// that can never surface, and two same-unlock pins on one region a tie the
+	// table order silently decides.
+	if (!ValidatedStoryTables.Contains(FObjectKey(StoryTable)))
+	{
+		ValidatedStoryTables.Add(FObjectKey(StoryTable));
+		if (!bUsable)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Strategy: StoryMissions table '%s' has the wrong row struct — story pins disabled, region offers stand (GDD 14.3.5)."), *StoryTable->GetName());
+		}
+		else
+		{
+			TSet<FString> SeenPins;
+			StoryTable->ForeachRow<FEclipseStoryMissionRow>(TEXT("StoryPinValidation"),
+				[&Graph, &SeenPins, StoryTable](const FName& RowName, const FEclipseStoryMissionRow& Row)
+				{
+					if (!Row.CompletionBeatTag.IsValid())
+					{
+						UE_LOG(LogEclipse, Warning, TEXT("Strategy: story row '%s' in '%s' has no CompletionBeatTag — its pin never retires, a repeatable story offer (GDD 14.3.5)."), *RowName.ToString(), *StoryTable->GetName());
+					}
+					if (!Graph.Regions.ContainsByPredicate([&Row](const FEclipseRegionDefinition& D) { return D.RegionId == Row.PinnedRegionId; }))
+					{
+						UE_LOG(LogEclipse, Warning, TEXT("Strategy: story row '%s' in '%s' pins unknown region '%s' — the mission can never surface (GDD 14.3.5)."), *RowName.ToString(), *StoryTable->GetName(), *Row.PinnedRegionId.ToString());
+					}
+					bool bAlreadySeen = false;
+					SeenPins.Add(Row.PinnedRegionId.ToString() + TEXT("|") + Row.UnlockBeatTag.ToString(), &bAlreadySeen);
+					if (bAlreadySeen)
+					{
+						UE_LOG(LogEclipse, Warning, TEXT("Strategy: story row '%s' in '%s' double-pins region '%s' with the same unlock — table order decides the tie (GDD 14.3.5)."), *RowName.ToString(), *StoryTable->GetName(), *Row.PinnedRegionId.ToString());
+					}
+				});
+		}
+	}
+	return bUsable ? StoryTable : nullptr;
+}
+
+bool UEclipseStrategySubsystem::ResolveOfferForRegion(const UEclipseRegionGraphAsset& Graph, FName RegionId, FEclipseMissionOfferView& OutOffer) const
+{
+	// Story pin first (SPEC-P2-04 locked decision 4).
+	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
+	const UDataTable* StoryTable = Campaign != nullptr ? GetValidatedStoryTable(*Campaign, Graph) : nullptr;
+	if (StoryTable != nullptr)
+	{
+		TArray<const FEclipseStoryMissionRow*> Rows;
+		StoryTable->ForeachRow<FEclipseStoryMissionRow>(TEXT("StoryPins"),
+			[&Rows](const FName&, const FEclipseStoryMissionRow& Row) { Rows.Add(&Row); });
+
+		const FGameplayTagContainer Flags = FGameplayTagContainer::CreateFromArray(Campaign->GetState().StoryFlags);
+		if (const FEclipseStoryMissionRow* Pinned = EclipseStoryLogic::ResolvePinnedMission(Rows, Flags, RegionId))
+		{
+			OutOffer.RegionId = RegionId;
+			OutOffer.TemplateId = Pinned->MissionId;
+			OutOffer.ContextLine = Pinned->BriefingText;
+			OutOffer.RewardCredits = Pinned->RewardCredits;
+			OutOffer.RewardMaterials = Pinned->RewardMaterials;
+			OutOffer.RewardIntel = Pinned->RewardIntel;
+			return true;
+		}
+	}
+
+	const FEclipseRegionDefinition* Definition = Graph.Regions.FindByPredicate(
+		[RegionId](const FEclipseRegionDefinition& D) { return D.RegionId == RegionId; });
+	const FEclipseMissionOfferRow* Offer = Definition != nullptr ? FindOfferForType(Graph, Definition->RegionType) : nullptr;
+	if (Offer == nullptr)
+	{
+		return false;
+	}
+
+	OutOffer.RegionId = RegionId;
+	OutOffer.TemplateId = Offer->TemplateId;
+	OutOffer.ContextLine = Offer->ContextLine;
+	OutOffer.RewardCredits = Offer->RewardCredits;
+	OutOffer.RewardMaterials = Offer->RewardMaterials;
+	OutOffer.RewardIntel = Offer->RewardIntel;
+	return true;
+}
+
 TArray<FEclipseMissionOfferView> UEclipseStrategySubsystem::GetAvailableOffers() const
 {
 	TArray<FEclipseMissionOfferView> Views;
@@ -116,22 +210,13 @@ TArray<FEclipseMissionOfferView> UEclipseStrategySubsystem::GetAvailableOffers()
 	const TArray<FName> LegalTargets = EclipseStrategyLogic::GetLegalMissionTargets(Campaign->GetState(), Graph->Regions);
 	for (const FName& RegionId : LegalTargets)
 	{
-		const FEclipseRegionDefinition* Definition = Graph->Regions.FindByPredicate(
-			[RegionId](const FEclipseRegionDefinition& D) { return D.RegionId == RegionId; });
-		const FEclipseMissionOfferRow* Offer = Definition != nullptr ? FindOfferForType(*Graph, Definition->RegionType) : nullptr;
-		if (Offer == nullptr)
+		FEclipseMissionOfferView View;
+		if (!ResolveOfferForRegion(*Graph, RegionId, View))
 		{
 			UE_LOG(LogEclipse, Warning, TEXT("Strategy: region '%s' has no offer row for its type — skipped (GDD 14.3.5)."), *RegionId.ToString());
 			continue;
 		}
-
-		FEclipseMissionOfferView& View = Views.AddDefaulted_GetRef();
-		View.RegionId = RegionId;
-		View.TemplateId = Offer->TemplateId;
-		View.ContextLine = Offer->ContextLine;
-		View.RewardCredits = Offer->RewardCredits;
-		View.RewardMaterials = Offer->RewardMaterials;
-		View.RewardIntel = Offer->RewardIntel;
+		Views.Add(View);
 	}
 	return Views;
 }
@@ -144,21 +229,7 @@ bool UEclipseStrategySubsystem::TryGetOffer(FName RegionId, FEclipseMissionOffer
 		return false;
 	}
 
-	const FEclipseRegionDefinition* Definition = Graph->Regions.FindByPredicate(
-		[RegionId](const FEclipseRegionDefinition& D) { return D.RegionId == RegionId; });
-	const FEclipseMissionOfferRow* Offer = Definition != nullptr ? FindOfferForType(*Graph, Definition->RegionType) : nullptr;
-	if (Offer == nullptr)
-	{
-		return false;
-	}
-
-	OutOffer.RegionId = RegionId;
-	OutOffer.TemplateId = Offer->TemplateId;
-	OutOffer.ContextLine = Offer->ContextLine;
-	OutOffer.RewardCredits = Offer->RewardCredits;
-	OutOffer.RewardMaterials = Offer->RewardMaterials;
-	OutOffer.RewardIntel = Offer->RewardIntel;
-	return true;
+	return ResolveOfferForRegion(*Graph, RegionId, OutOffer);
 }
 
 bool UEclipseStrategySubsystem::SelectMission(FName RegionId, FString& OutError)
@@ -176,10 +247,8 @@ bool UEclipseStrategySubsystem::SelectMission(FName RegionId, FString& OutError)
 		return false;
 	}
 
-	const FEclipseRegionDefinition* Definition = Graph->Regions.FindByPredicate(
-		[RegionId](const FEclipseRegionDefinition& D) { return D.RegionId == RegionId; });
-	const FEclipseMissionOfferRow* Offer = Definition != nullptr ? FindOfferForType(*Graph, Definition->RegionType) : nullptr;
-	if (Offer == nullptr)
+	FEclipseMissionOfferView Offer;
+	if (!ResolveOfferForRegion(*Graph, RegionId, Offer))
 	{
 		OutError = FString::Printf(TEXT("Region '%s' has no mission offer"), *RegionId.ToString());
 		return false;
@@ -194,7 +263,7 @@ bool UEclipseStrategySubsystem::SelectMission(FName RegionId, FString& OutError)
 
 	FEclipseStrategyEventPayload Payload;
 	Payload.RegionId = RegionId;
-	Payload.TemplateId = Offer->TemplateId;
+	Payload.TemplateId = Offer.TemplateId;
 	Bus->Broadcast(EclipseTags::Event_Strategy_MissionSelected, FInstancedStruct::Make(Payload));
 	return true;
 }

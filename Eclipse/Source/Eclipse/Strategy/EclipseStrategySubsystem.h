@@ -3,9 +3,11 @@
 #include "CoreMinimal.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UObject/ObjectKey.h"
 #include "EclipseStrategySubsystem.generated.h"
 
 class IConsoleObject;
+class UEclipseCampaignSubsystem;
 
 /** One selectable offer as the map screen renders it (SPEC-P1-04). */
 USTRUCT(BlueprintType)
@@ -62,6 +64,26 @@ public:
 private:
 	const UEclipseRegionGraphAsset* ResolveGraph() const;
 	const FEclipseMissionOfferRow* FindOfferForType(const UEclipseRegionGraphAsset& Graph, EEclipseRegionType RegionType) const;
+
+	/**
+	 * The one offer-resolution path (SPEC-P2-04 locked decision 4): a story
+	 * mission pinned to the region (unlocked, not done — EclipseStoryLogic
+	 * decides over StoryFlags) takes precedence over the region-type offer.
+	 * All three query sites route through here so precedence can never drift.
+	 */
+	bool ResolveOfferForRegion(const UEclipseRegionGraphAsset& Graph, FName RegionId, FEclipseMissionOfferView& OutOffer) const;
+
+	/**
+	 * Returns the campaign's StoryMissions table when usable, running the loud
+	 * one-time-per-table validation the 14.3.5 ladder and the row contract
+	 * (EclipseStoryTypes.h) promise: wrong row struct disables pins; an empty
+	 * CompletionBeatTag (never-retiring pin), an unknown PinnedRegionId (story
+	 * that can never surface) and same-unlock double pins each warn per row.
+	 */
+	const UDataTable* GetValidatedStoryTable(const UEclipseCampaignSubsystem& Campaign, const UEclipseRegionGraphAsset& Graph) const;
+
+	/** Story tables already taken through the loud validation pass — keyed per table object, so a fresh table re-validates (not once per process). */
+	mutable TSet<FObjectKey> ValidatedStoryTables;
 
 	IConsoleObject* FlipRegionCommand = nullptr;
 };

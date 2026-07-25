@@ -78,4 +78,13 @@ namespace EclipseTags
 	// on a building site is the crew, on an operational site the analyst.
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Base_Staff_Crew)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Base_Staff_Analyst)
+
+	// Story beat identities (SPEC-P2-04). Not events; DT_StoryMissions unlock/
+	// completion columns and the StoryFlags state key off these — the beat
+	// FACT travels as Event.Story.BeatReached.
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Story_Beat_M11_ThirteenBullets)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Story_Beat_M12_DeadDrop)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Story_Beat_M13_SignalFire)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Story_Beat_M14_Quartermaster)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Story_Beat_BrickRecruited)
 }

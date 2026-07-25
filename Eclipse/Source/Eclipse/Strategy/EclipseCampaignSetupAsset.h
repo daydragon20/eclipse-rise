@@ -91,6 +91,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> NamedCharacters;
 
+	/**
+	 * Rows: FEclipseStoryMissionRow — story-pinned missions (SPEC-P2-04 locked
+	 * decision 4). A pinned row takes precedence over the region-type offer;
+	 * missing table = the campaign runs on region offers alone (GDD 14.3.5).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	TSoftObjectPtr<UDataTable> StoryMissions;
+
 	/** The Hollow Point slot-graph (SPEC-P2-03); missing = build orders reject with a logged warning, the loop never gates (GDD 14.3.5). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UEclipseBaseLayoutAsset> BaseLayout;

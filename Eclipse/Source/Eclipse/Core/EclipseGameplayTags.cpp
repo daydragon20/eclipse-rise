@@ -33,7 +33,7 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_ConstructionStarted, "Event.Base.ConstructionStarted", "A build/upgrade order was accepted at a slot; emitted by CampaignState commit only (SPEC-P2-03).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_FacilityBuilt, "Event.Base.FacilityBuilt", "A facility reached L1 (day tick or rush, in that commit); vault presentation swaps the slot state on this (SPEC-P2-03, GDD 5.4).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_FacilityUpgraded, "Event.Base.FacilityUpgraded", "A facility reached L2+ (slice: Workshop only, per data); emitted by CampaignState commit only (SPEC-P2-03).")
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_StaffAssigned, "Event.Base.StaffAssigned", "Base staffing changed (crew/analyst by position, empty role = unassigned incl. completion release); emitted by CampaignState commit only (SPEC-P2-03).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Base_StaffAssigned, "Event.Base.StaffAssigned", "Base staffing changed (crew/analyst by position, empty role = unassigned incl. completion and casualty releases); emitted by CampaignState commit only (SPEC-P2-03).")
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Story_BeatReached, "Event.Story.BeatReached", "A story beat committed to campaign state (set-only flag); emitted by CampaignState commit only (SPEC-P2-04). Consumers: pinned-offer refresh, UI (P2-07), audio sting (16.12), soak asserts.")
 
@@ -52,4 +52,10 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Base_Staff_Crew, "Base.Staff.Crew", "Construction-crew role identity (SPEC-P2-03 staffing v1); positional — staff on a building site. Day reduction lives in DA_BaseTuning.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Base_Staff_Analyst, "Base.Staff.Analyst", "IC-analyst role identity (SPEC-P2-03 staffing v1); positional — staff on an operational site. Bonus lives in DA_BaseTuning.")
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Story_Beat_M11_ThirteenBullets, "Story.Beat.M11_ThirteenBullets", "M1.1 completed (SPEC-P2-04); unlocks M1.2 via DT_StoryMissions.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Story_Beat_M12_DeadDrop, "Story.Beat.M12_DeadDrop", "M1.2 completed (SPEC-P2-04); unlocks M1.3.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Story_Beat_M13_SignalFire, "Story.Beat.M13_SignalFire", "M1.3 completed (SPEC-P2-04); the SPEC-P2-05 liberation trigger consumes this beat's mission completion.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Story_Beat_M14_Quartermaster, "Story.Beat.M14_Quartermaster", "M1.4 completed (SPEC-P2-04); Act 1 opening closed.")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Story_Beat_BrickRecruited, "Story.Beat.BrickRecruited", "Brick joined the roster (SPEC-P2-04 decision 11; committed by M1.4's debrief).")
 }
