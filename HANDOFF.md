@@ -5,7 +5,7 @@
 
 # OCHTENDRAPPORT — nacht 25→26 juli 2026
 
-**Bar bij elke commit: build ✓ (-NoUba) · tests 107/107 (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Twaalf commits, alle twaalf gepusht: `f1049e9` (harnas + S1/S2/S3) · `2dc235d` (speelronde) · `f3c5211` (feel-audit fase 3) · `1bbce20` (dit rapport) · `c7274b3` (sprong-vergevingsvensters) · `46ffe9b` + `08eef5f` (navigatiegrenzen) · `393331f` (traversal) · `9c95d3b` (rapport-sync) · `79daac5` (drie documentatiefouten) · `6ed97dc` (pitch-demping).
+**Bar bij elke commit: build ✓ (-NoUba) · tests 109/109 (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Negentien commits, alle negentien gepusht: `f1049e9` (harnas + S1/S2/S3) · `2dc235d` (speelronde) · `f3c5211` (feel-audit fase 3) · `1bbce20` (dit rapport) · `c7274b3` (sprong-vergevingsvensters) · `46ffe9b` + `08eef5f` (navigatiegrenzen) · `393331f` (traversal) · `9c95d3b` (rapport-sync) · `79daac5` (drie documentatiefouten) · `6ed97dc` (pitch-demping) · `75c35bf` (F9 geeft ook de bewegingswaarden) · `41296e7` + `14f219b` (BESTURING tegen de code gelegd) · `af8e4c5` (de gids leerde nog de oude sprint) · `8129967` + `ea34e6d` (twee bewakers op de beschrijvingen).
 
 ## 1. Wat is af en gemeten — met de getallen
 
@@ -43,6 +43,10 @@
 1. **Kijken liep 2,5× te snel.** De tuning zegt 240 gr/s en het gidspaneel toont "1,50 s per 360"; het was 600 gr/s en 0,60 s. `bEnableLegacyInputScales` stond aan (engine-default), dus `AddYawInput`/`AddPitchInput` vermenigvuldigden nog met `InputYawScale = 2.5` en `InputPitchScale = **-**2.5` uit `BaseGame.ini`. Het negatieve teken betekende dat de handler een verborgen omkering compenseerde — daarom was "invert Y" niet te beredeneren.
 2. **"Take out the patrol leader" was af door erlangs te lopen.** De overlap-trigger voltooide objectives zonder naar het type te kijken, en `DestroyTarget` had zelf géén voltooiingspad. De missie eindigde in een keurige geslaagde debrief zonder dat er iets gebeurd was, en de hele suite stond groen.
 3. **Achteruitlopen was even snel als vooruit rennen.** UE kent geen richtingsstraf; `GetMaxSpeed()` is de enige plek waar dat kan.
+
+**De beschrijvingen hebben nu hun eigen bewakers.** Zes keer vannacht klopte een *beschrijving* niet met de code, en elke keer was het de beschrijving die de volgende ronde de verkeerde kant op stuurde — de 107 gedragstests zagen er geen één. Twee nieuwe tests sluiten dat gat voor de twee plekken die jij tijdens het spelen leest: de F2-controletabel mag geen binding claimen die niet bestaat, en de getallen in de testgids moeten die van `DA_CharacterTuning` zijn. **Allebei gefalsifieerd** — ik heb de historische fout teruggezet en gecontroleerd dat ze rood gaan, want een assert die niet rood kan worden geeft dekking die er niet is.
+
+Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de feel-referentie). Die zijn vannacht met de hand nagelopen — vijf fouten gevonden, waaronder één in de referentie die tot een verkeerde "fix" had geleid — maar er is geen mechanisme dat ze vasthoudt.
 
 ## 2. Wat is niet gelukt, en waarom
 
