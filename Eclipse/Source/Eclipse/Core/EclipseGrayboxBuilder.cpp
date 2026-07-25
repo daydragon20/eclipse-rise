@@ -1187,9 +1187,19 @@ void BuildDistrict(UWorld& World)
 			}
 		}
 
-		auto SpawnGen = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float Yaw, const FVector& Scale = FVector(1.0f))
+		// 14.3.5 gap closed (art-review of iteratie 2): this lambda used to
+		// swallow a missing generated mesh silently, so a district built without
+		// Tools/blender output looked "fine" while props were simply absent —
+		// exactly the quiet degradation the ladder forbids. One warning per
+		// missing mesh, then carry on.
+		int32 MissingGenMeshes = 0;
+		auto SpawnGen = [&World, &Params, &MissingGenMeshes](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float Yaw, const FVector& Scale = FVector(1.0f))
 		{
-			if (Mesh == nullptr) { return; }
+			if (Mesh == nullptr)
+			{
+				++MissingGenMeshes;
+				return;
+			}
 			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, Yaw, 0.0f), Params);
 			if (Actor == nullptr) { return; }
 			Actor->SetMobility(EComponentMobility::Movable);
@@ -1221,6 +1231,28 @@ void BuildDistrict(UWorld& World)
 		// pair's sixth pole hand-placed 60 lines further down next to the cable.
 		// One list means a pool can never end up without its lamp, and moving a
 		// lamp moves its light (dressing-iteratie 2, spec step 2).
+		// Dressing-iteratie 3, step 3 — OPEN, with one hypothesis falsified here.
+		// The art-review measured every lamp head at 0.038-0.10 linear while its
+		// own pool reads 0.3867: the bulb is ~4x DARKER than the light it casts,
+		// which is the strongest remaining reason a pool reads as a painted disc.
+		// TRIED AND REVERTED (2026-07-25): a cross-billboard (this same plane a
+		// second time at Yaw+90), on the review's theory that the single plane sits
+		// edge-on to the banked cameras. Built, shot and measured: the brightest
+		// pixel in cam 7 did not move (225.3 -> 215.6, and it is the neutral white
+		// barrier both times, not the lamp), and an image diff against the previous
+		// cam-7 shot found only scattered grain — no new bright cluster anywhere.
+		// So orientation is NOT the cause, and doubling the actor count for zero
+		// measured gain is a 12.4 cost with no benefit.
+		// STRONGER HYPOTHESIS for the next attempt, from reading this call: the
+		// glow plane is spawned at Z = 0 — ground level — while the bulb it
+		// represents hangs ~0.6-0.9 m along the arm at pole height. Unless
+		// GlowPlane.GlowPlane bakes that height into its own geometry, the emissive
+		// quad is lying in the street *inside the pool*, which would explain both
+		// the dark head and part of why the pool reads flat. Verify the mesh's
+		// authored pivot/extent first (Tools/blender/gen_street_props.py), then
+		// place it at the head, before touching orientation or brightness.
+		// EmissiveScale is already 10 on the unlit master with a >1 Glow tint
+		// (2.2,1.0,0.3), so brightness is almost certainly not the missing piece.
 		for (const FLampPostDef& Post : LampPosts)
 		{
 			SpawnGen(Lamp, MetalMid, FVector(Post.X, Post.Y, 0.0f), Post.Yaw);
@@ -1310,6 +1342,11 @@ void BuildDistrict(UWorld& World)
 			SpawnGen(KPillar, MetalMid, FVector(GateX, -500.0f, 0), 0.0f);
 			SpawnGen(KPillar, MetalMid, FVector(GateX, 500.0f, 0), 0.0f);
 			SpawnGen(KGantry, GantryMid != nullptr ? GantryMid : MetalMid, FVector(GateX, 0, 370.0f), 0.0f, FVector(1.0f, 1.8f, 1.0f));
+		}
+
+		if (MissingGenMeshes > 0)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: %d generated prop placement(s) skipped — their meshes are missing (GDD 14.3.5; run Tools/blender/gen_street_props.py + gen_building_kit.py, then import_generated_meshes.py). Lamps, boards, vents, barricades and the kit row degrade to absent, not to raw materials."), MissingGenMeshes);
 		}
 	}
 

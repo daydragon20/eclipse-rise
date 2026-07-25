@@ -28,7 +28,7 @@ iteratie 2 zoveel losse verbeteringen kon landen met zo weinig leeswinst.
 |---|---|---|---|
 | 1 | **Pin de metering** | waarde | `AutoExposureBias -0.7 → -1.55` (Δ = −log2(1.79) = −0.84 EV) in `EclipseGrayboxBuilder.cpp` ~r1949, of `AutoExposureMinBrightness == MaxBrightness`. **Verificatie: hershoot alleen cam 7 en meet de vloer terug op 0.1198 ±0.01 lineair.** Niet blind district-breed doorvoeren — passes 20-27 waarschuwen daar terecht voor. Bijeffect: BldgA (0.560) en Cover (0.850) clippen niet meer, dus oxide stopt met naar zalm desatureren. |
 | 2 | **Vloer twee stappen omlaag** | waarde | `Floor` Lit ×0.518 (=0.72²) → `(0.086,0.093,0.108)`; Shade → `(0.028,0.031,0.049)`. Mid 0.1198 → 0.0621, in frame ~1.9× de horizonlucht = schemerasfalt. `Wall_` blijft staan, zodat de grond/muur-stap eindelijk bestaat. TexGain 12.41/16.8 NIET aanraken. |
-| 3 | **Zet de lamp aan** | klein nieuw | De kop meet 0.0997 lin terwijl zijn pool 0.3867 is: de bron is **3.9× donkerder dan zijn eigen licht**. De `GlowPlane` (~r1220) staat met de lamp-yaw mee en dus vanaf de speelcamera's op zijn kant → vervang door kruis-billboard/tweezijdige quad, of zet de Glow-MID `(2.2,1.0,0.3)` op de bulb-slot. Doel: kop is het helderste object (≥1.0 lin) zodat bloom 0.45 een halo geeft. Dit alleen converteert elke pool van "geschilderde schijf" naar "licht". |
+| 3 | **Zet de lamp aan** | **OPEN — zie §1b** | De kop meet 0.0997 lin terwijl zijn pool 0.3867 is: de bron is **3.9× donkerder dan zijn eigen licht**. Dit blijft de grootste leeswinst. De oriëntatie-theorie (kruis-billboard) is geprobeerd en **weerlegd**; de werkende hypothese is nu de Z-plaatsing. |
 | 4 | **Pool: 3 → 5 waardestappen** | derivatie | `PoolMid = 0.0621/0.72^5 = 0.3209` — exact dezelfde schermwaarde als nu, op de nieuwe donkere vloer. Lit `(0.876,0.398,0.119)`, opacity 0.70 en de Glow-hue-factor ×0.398 blijven allemaal geldig; alleen de comment-derivatie ("three banked value steps") moet mee. |
 | 5 | **Blob herrekenen** | waarde | Op een vloer van 0.0621 zou de huidige ×0.4 bij opacity 0.85 uitkomen op 0.0304 — ónder de horizonlucht = silhouet-zwart, precies het defect waarvoor de boulder-stain al geflagd werd. Hou de kern op ~0.62×: vloertint **×0.55** bij opacity 0.85 → `BlobMid` Lit `(0.047,0.051,0.059)`, Shade `(0.015,0.017,0.027)`. **En: leid de skirt af van de HOOGTE, niet de footprint** — `footprint×1.25` geeft 76 units onder een 260 hoge container en verdwijnt vanaf ooghoogte (daarom was in 00065 geen enkele container-blob vindbaar). Voorstel `skirt = 0.35 × hoogte`. |
 | 6 | **Grounding-dekking** | nieuw, klein | Blobs komen nu uit 4 plekken (rubble, machine-bodies, containers, bunker) = ~10% van de massa's; in het overzichtsframe zweeft de rest. `SpawnGroundDecal` toevoegen voor `CoverPoints[]`, de prop-tabel (vaten/kratten/barrières), lamppaal-voeten (~120-unit blob) en de poortpilaren. Patroon staat er al. |
@@ -71,6 +71,37 @@ volgende rondes: **meet nooit een oppervlak in een band waar iets anders in staa
 Dat maakt de frame-probe (`Tools/measure_frame_values.py`, §4) meteen zijn eigen
 rechtvaardiging: hij ving zowel de oorspronkelijke vloer-omkering als mijn eigen
 verkeerde conclusie.
+
+## 1b. Stap 3 (de lamp): oriëntatie-theorie WEERLEGD, nieuwe hypothese = de Z-plaatsing
+
+De review dacht dat de `GlowPlane` vanaf de gebankte camera's op zijn kant staat,
+omdat hij op de lamp-yaw wordt gespawnd. Dat is gebouwd als kruis-billboard
+(dezelfde plaat nog eens op `Yaw+90`), geshoot en gemeten:
+
+- helderste pixel in cam 7: **225.3 → 215.6** — niet omhoog, en in *beide* shots is
+  dat de neutrale witte barrière (rgb ~226,225,226), niet de lamp;
+- geen enkele pixel ≥250 in beide frames;
+- image-diff tegen de vorige cam-7-shot: alleen verspreide grain-samples, **nergens
+  een nieuw helder cluster**.
+
+Conclusie: **oriëntatie is niet de oorzaak**, en de wijziging is teruggedraaid
+(twee keer zoveel actors voor nul meetbare winst is 12.4-kosten zonder baten).
+
+**De sterkere hypothese**, uit het lezen van de aanroep: de glow-plaat wordt
+gespawnd op `FVector(Post.X, Post.Y, 0.0f)` — **grondniveau** — terwijl de bulb die
+hij voorstelt op paalhoogte hangt, ~0.6-0.9 m langs de arm. Tenzij
+`GlowPlane.GlowPlane` die hoogte in zijn eigen geometrie bakt, ligt de emissive
+quad dus in de straat *binnen de pool*. Dat verklaart in één keer zowel de donkere
+kop als een deel van waarom de pool vlak leest. **Volgende stap: controleer eerst de
+authored pivot/extent van die mesh (`Tools/blender/gen_street_props.py`), plaats hem
+dan op de kop — en raak oriëntatie of helderheid niet aan.** `EmissiveScale` staat al
+op 10 op de unlit-master met een >1 Glow-tint (2.2,1.0,0.3), dus helderheid is
+vrijwel zeker niet het ontbrekende stuk.
+
+Wél gehouden uit deze poging: `SpawnGen` slikte een ontbrekende generated mesh
+**stil** (14.3.5-gat). Er komt nu één warning met het aantal overgeslagen
+plaatsingen en de scripts die je moet draaien. Geverifieerd dat hij niet afgaat op
+de huidige boom — alle generated meshes zijn aanwezig.
 
 ## 2. ÉÉN-STIJL-WET-overtredingen die nu blokkeren
 
