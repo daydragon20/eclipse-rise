@@ -225,6 +225,16 @@ namespace
 		// herhaaldelijk niet-lineair gemeten. x1.5 is de eerste stap; als de
 		// verzadiging nog boven 0.55 meet gaat er nog een stap bij, en de bovengrens
 		// is het plafond, niet mijn geduld.
+		// STENCIL-UITSLAG (magenta-proefronde, shot 00247): BldgB schildert 93 408
+		// pixels in cam 3, maar slechts 1 490 van de 31 500 in het meetvak
+		// (900-1250, 470-560) dat drie ronden lang als "de BldgB-wand" gold. Dat vak
+		// is dus voor 95% een ANDER oppervlak, en dat verklaart alles: rood omhoog
+		// deed niets, de Graphite-regel deed niets, en de waarde x1.5 gaf +5,7%
+		// omdat ik telkens de verkeerde ingang draaide voor het vlak dat ik mat.
+		// De cyaan-vraag is hiermee NIET opgelost maar wel eerlijk teruggebracht tot
+		// een gerichte vervolgstap: dezelfde stencil per kandidaat-ingang draaien tot
+		// het frame aanwijst welke dat oppervlak schildert. Drie keer raden heeft
+		// verloren van een keer meten.
 		{ TEXT("BldgB"),  FLinearColor(0.338f, 0.435f, 0.450f), FLinearColor(0.143f, 0.147f, 0.210f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: weathered worker teal over rusty corrugated sheet (ambientCG 007A, mean .367)
 		// Yellow value hierarchy (15.8 look-ronde, cam 3): every yellow element in
 		// the plaza midfield sat on the same value (screen 255/211/0 slabs next to
