@@ -180,7 +180,16 @@ namespace
 		// look. Also rejected: sun-yaw nudge — SunRotation is synced with the
 		// hard-coded SunTravel in EclipseCharacter.cpp (out of scope this round).
 		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },
-		{ TEXT("BldgB"),  FLinearColor(0.060f, 0.300f, 0.310f), FLinearColor(0.020f, 0.100f, 0.150f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: worker teal over rusty corrugated sheet (ambientCG 007A, mean .367 — replaces corrugated_iron_02)
+		// Dressing-iteratie 3 — the teal DESATURATED, not re-hued, and that split is
+		// the whole point. Two sources disagreed: this palette calls it "worker
+		// teal" (deliberate Kessara colour), the second art-review called it Shroud
+		// neon-cyan and flagged "one planet per frame" as blocking. Both are right
+		// about different things — the HUE belongs to Kessara, the SATURATION does
+		// not. Measured 0.81 (R at 20% of G/B), which is neon territory; raising R
+		// to 0.150 drops it to ~0.50 and the warehouse reads as weathered painted
+		// steel instead of a lightstrip. Value is deliberately left alone: it sits
+		// under the ceiling rule already, so this changes colour only.
+		{ TEXT("BldgB"),  FLinearColor(0.150f, 0.290f, 0.300f), FLinearColor(0.050f, 0.098f, 0.140f), TEXT("/Game/Art/Textures/T_CorrugatedSteel007A_diff.T_CorrugatedSteel007A_diff"), 300.0f, 2.72f, 0.45f },  // warehouse: weathered worker teal over rusty corrugated sheet (ambientCG 007A, mean .367)
 		// Yellow value hierarchy (15.8 look-ronde, cam 3): every yellow element in
 		// the plaza midfield sat on the same value (screen 255/211/0 slabs next to
 		// 245/216/1 lane paint) and the field read as one flat sheet of yellow.
@@ -746,7 +755,10 @@ void BuildDistrict(UWorld& World)
 			// 0.2909 = 3.08x — the ratio RISES as the value falls), which is exactly
 			// why this is bisected against the probe instead of computed.
 			{ TEXT("Prop_Barrier"), TEXT("/Game/Art/Props/concrete_road_barrier.concrete_road_barrier"), TEXT("/Game/Art/Textures/T_concrete_road_barrier_diff.T_concrete_road_barrier_diff"), 6.7f, FLinearColor(0.046f, 0.048f, 0.053f), FLinearColor(0.015f, 0.016f, 0.025f) },
-			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.080f, 0.280f, 0.300f), FLinearColor(0.030f, 0.100f, 0.150f) },
+			// Same desaturation as BldgB: the review read this crate as a neon-cyan
+			// "tech krate" from another planet's palette (measured hue 191, sat 0.77).
+			// Keep it in the worker-teal family, take the neon out.
+			{ TEXT("Prop_Crate"), TEXT("/Game/Art/Props/plastic_crate_03.plastic_crate_03"), TEXT("/Game/Art/Textures/T_plastic_crate_03_diff.T_plastic_crate_03_diff"), 8.0f, FLinearColor(0.140f, 0.260f, 0.270f), FLinearColor(0.052f, 0.096f, 0.135f) },
 		};
 
 		auto SpawnProp = [&World, &Params](UStaticMesh* Mesh, UMaterialInstanceDynamic* Mid, const FVector& Location, float YawDeg, float Scale)

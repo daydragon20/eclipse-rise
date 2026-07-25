@@ -72,6 +72,32 @@ Dat maakt de frame-probe (`Tools/measure_frame_values.py`, §4) meteen zijn eige
 rechtvaardiging: hij ving zowel de oorspronkelijke vloer-omkering als mijn eigen
 verkeerde conclusie.
 
+## 1g. Cyaan (stap "één planeet per frame"): DEELS, en de rest is een grade-beslissing
+
+De code noemde dit "worker teal" (bewust Kessara), de review noemde het Shroud
+neon-cyaan en blokkerend. Beide hebben deels gelijk: de **hue** hoort bij Kessara,
+de **verzadiging** niet. Gemeten 0.81 (rood op 20% van groen/blauw). Daarom
+gedesatureerd in plaats van van kleur gewisseld: BldgB rood 0.060 → 0.150 (authored
+sat 0.81 → 0.50), Prop_Crate idem.
+
+**Resultaat is mager en dat moet gezegd:** neon-pixels in cam 3 gingen van 11337 naar
+9554 (−16%), en de ergste pixel staat nog steeds op **sat 1.00 met rood = 0**
+(rgb 0,69,91) — terwijl er 0.150 rood geauthord staat.
+
+**Werkhypothese, en het is dezelfde vorm als de tonemapper-vondst:** net zoals
+authored *waarde* niet-lineair wordt vertaald door de tonemapper, wordt authored
+*verzadiging* teruggeblazen door de grade — `ColorSaturation 1.38` in de
+post-process. Een matig verzadigde kleur op lage waarde wordt daardoor naar volle
+verzadiging geduwd, waarbij het rode kanaal op 0 klipt. Authored desatureren
+vertaalt dus niet 1:1, precies zoals authored verdonkeren dat niet deed.
+
+**Dit is geen waarde die ik alleen mag zetten:** `ColorSaturation` raakt élke kleur
+in het district, en de owner koos die 1.38 zelf in de kalibratieronde van 23-07
+("Borderlands-punch"). Verlagen is een look-beslissing, geen bugfix. → **vraag voor
+de art-review:** is de cyaan-familie het waard om de district-brede saturatie te
+verlagen, of moet die specifieke tint veel verder omhoog in rood (richting 0.22+) om
+onder de grade uit te komen? Meet het antwoord, gok het niet.
+
 ## 1f. Stap 4 + 7 AFGEROND — beide op doel (shots 00119-00125)
 
 | meting (cam 7, identieke vakken) | 00104 | 00125 | doel |
