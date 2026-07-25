@@ -77,6 +77,7 @@
 | 5 | **Hurken ook als hold aanbieden, als optie naast de toggle?** | **Ja, maar later** — het vraagt een instellingenmenu, en dat is SPEC-P2-07. |
 | 6 | ~~Coyote time + sprong-inputbuffer bouwen?~~ **Gedaan** — 110 ms en 150 ms, beide gemeten en gepind. Ze voegen alleen vergeving toe: een sprong die eerst mislukte lukt nu, nooit andersom. | Niets te beslissen; speel het en zeg of het te toegeeflijk voelt. |
 | 7 | **Turn-in-place bouwen** (nu blijft je rug bevroren staan als je alleen de camera draait)? | **Ja, maar het vraagt een draai-animatie.** Zonder animatie krijg je voetslip, en dan ruil je het ene zichtbare defect voor het andere. |
+| 7b | **`AdsLookMultiplier`: 0.35 (nu) of 0.60?** Het commentaar redeneerde naar 0.60 terwijl het veld op 0.35 stond — het commentaar is gecorrigeerd, de waarde niet aangeraakt. | **Laat 0.35 staan tot je hebt gemikt.** Beide zijn onderbouwd (0.35 = wat CoD/Apex verschepen, 0.60 = richting de meetkundig neutrale 0.745). Dit is smaak, en jij hebt ADS nog niet beoordeeld. |
 | 8 | **Camera-shake, recoil, hitmarkers, sprint-camerastack** — §8 FEEDBACK bestaat volledig niet. | **Na de vorige punten.** Dit is de grootste feel-winst die er nog ligt (Gears koopt met 1,2× sprint méér snelheidsgevoel dan wij met 1,55×), maar het is een bouwopdracht van meerdere sessies. |
 
 ## 5. De eerlijke stand: speelt het beter?

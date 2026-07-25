@@ -29,6 +29,8 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Characters/EclipseCharacter.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
@@ -212,6 +214,40 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	AddInfo(FString::Printf(TEXT("speelronde: %d objectives actief, squad van %d, start op %s"),
 		Objectives.Num(), Mission->GetDeployedSoldierIds().Num(), *Harness.Location().ToCompactString()));
 	TestTrue(TEXT("speelronde: er zijn objectives om te halen"), Objectives.Num() >= 2);
+
+	// --- 1b. staan de voeten op de grond? (ANI-09) --------------------------
+	// Bijlage D van FEEL_REFERENTIE.md zegt dat MeshZOffset -90 tegen een capsule
+	// van 88 "de voeten 2 cm in de vloer" zet, en dat die twee gelijkgetrokken
+	// moeten worden. Dat klopt NIET, en het is de moeite waard om dat vast te
+	// pinnen voordat iemand het "repareert": UE laat een personage niet ép de
+	// vloer rusten maar er een paar centimeter boven (MIN/MAX_FLOOR_DIST), dus de
+	// capsule-onderkant zweeft en -90 compenseert precies dat. Op -88 zouden de
+	// voeten juist in de lucht hangen.
+	//
+	// Daarom niet narekenen maar METEN: waar ligt de meshwortel ten opzichte van
+	// het oppervlak waar hij op staat?
+	if (Harness.Body->GetMesh() != nullptr)
+	{
+		// Eerst laten landen. EnterMissionMode zet de pawn 100 cm boven het
+		// insertiepunt neer, dus wie meteen meet, meet een vallend personage — de
+		// eerste ronde las 160,86 cm en dat leek een defect.
+		Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 3.0, [&Harness]()
+		{
+			return Harness.Body->GetCharacterMovement()->IsMovingOnGround() && Harness.SpeedCm() < 1.0f;
+		});
+		FHitResult Ground;
+		FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseFootCheck), false, Harness.Body);
+		const FVector From = Harness.Location();
+		if (Harness.World->LineTraceSingleByChannel(Ground, From, From - FVector(0.0f, 0.0f, 500.0f), ECC_Visibility, Params))
+		{
+			const double MeshRootZ = Harness.Body->GetMesh()->GetComponentLocation().Z;
+			const double FeetAboveGround = MeshRootZ - Ground.ImpactPoint.Z;
+			Report(*this, TEXT("meshwortel boven de grond (ANI-09)"), FeetAboveGround, TEXT("cm"),
+				TEXT("~0; negatief = voeten in de vloer, positief = zwevend"));
+			TestTrue(FString::Printf(TEXT("speelronde: de voeten staan op de grond, niet erin of erboven (%.2f cm)"), FeetAboveGround),
+				FMath::Abs(FeetAboveGround) < 3.0);
+		}
+	}
 
 	// --- 2. een order geven, en er antwoord op krijgen ----------------------
 	// "Orders zijn beloftes" (GDD 8.4): elke order hoort exact één ack of één

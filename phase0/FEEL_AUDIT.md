@@ -223,6 +223,30 @@ dus bovenop het personage (0 cm op élke hoogte), en daarna mat ik de EINDhoogte
 in plaats van de hoogste stand — het personage stapte over het blokje van 20 cm
 heen en er aan de andere kant weer af, dus de eindhoogte was gewoon de vloer.
 
+### Drie plekken waar de documentatie niet klopte met de code
+
+De audit vindt niet alleen verkeerde waarden maar ook verkeerde *beschrijvingen*,
+en die zijn gevaarlijker: ze sturen de volgende ronde de verkeerde kant op.
+
+1. **`AdsLookMultiplier`** — het commentaar redeneerde zich naar **0.60** en het
+   veld staat op **0.35**. Een tuningwaarde waarvan de eigen onderbouwing een
+   ánder getal noemt is dezelfde soort leugen als het paneel dat "1,50 s per 360"
+   toonde terwijl de game 0,60 s draaide. **Het commentaar is gecorrigeerd, de
+   waarde niet aangeraakt:** 0.35 ligt binnen de band die spellen daadwerkelijk
+   verschepen (CoD 0.346, Apex-pro's 0.30–0.40) en is verdedigbaar; 0.60 is dat
+   óók. Welke bij ónze milde zoom hoort is smaak → ownerlijst.
+
+2. **ANI-09 in Bijlage D is FOUT, en dit is nu gemeten.** Bijlage D zegt dat
+   `MeshZOffset` −90 tegen een capsule van 88 "de voeten 2 cm in de vloer" zet en
+   dat de twee gelijkgetrokken moeten worden. UE laat een personage echter niet
+   ópde vloer rusten maar er ~2,15 cm boven (MIN/MAX_FLOOR_DIST), dus −90
+   compenseert precies dát. **Gemeten in de speelronde: de meshwortel staat
+   0,15 cm boven de grond.** Op −88 zouden de voeten juist 2 cm in de lucht
+   hangen. Vastgepind, zodat niemand dit "repareert".
+
+3. **TRV-01/TRV-02 in Bijlage D zijn verouderd** ten opzichte van de herziene §10
+   van hetzelfde document — zie de traversal-tabel hierboven.
+
 **Nog niet gedaan, met reden** — dit zijn bouwopdrachten, geen tuningrondes:
 turn-in-place (ROT-03, vraagt een draai-animatie of je krijgt voetslip),
 sprint-camerastack (CAM-11), camera-shake en recoil/hitmarkers (§8 FEEDBACK

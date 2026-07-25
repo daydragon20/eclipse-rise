@@ -336,9 +336,18 @@ public:
 	 * of what aiming is for.
 	 * The physically neutral value is tan(32)/tan(40) = 0.745 (a target then keeps
 	 * the same on-screen speed). Every shipped shooter goes deliberately below it:
-	 * CoD ships 0.346 for yaw, Apex pros run 0.30-0.40. 0.60 sits between neutral
-	 * and their strictness, because our zoom is mild — the band is sourced, this
-	 * exact number is a choice inside it.
+	 * CoD ships 0.346 for yaw, Apex pros run 0.30-0.40.
+	 *
+	 * LET OP — hier stond dat 0.60 gekozen was, terwijl het veld op 0.35 staat.
+	 * Een tuningwaarde waarvan de eigen onderbouwing een ANDER getal noemt is
+	 * dezelfde soort leugen als een paneel dat "1,50 s per 360" toont terwijl de
+	 * game 0,60 s draait — en die kostte deze week al een sessie. Het commentaar
+	 * beschrijft nu de waarde die er echt staat.
+	 *
+	 * 0.35 ligt binnen de band die spellen daadwerkelijk verschepen (CoD 0.346,
+	 * Apex-pro's 0.30-0.40) en is dus verdedigbaar; 0.60 (tussen die band en de
+	 * meetkundig neutrale 0.745) is dat óók. Welke van de twee bij ONZE milde zoom
+	 * hoort, is smaak en niet af te leiden — dat staat als keuze op de ownerlijst.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0.1, ClampMax = 1.5))
 	float AdsLookMultiplier = 0.35f;
