@@ -42,6 +42,14 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "CONTROLLER: plak me de 'Input:'-regels uit het log — dan weet ik waar het vastzit", prio: "nu", waarom: "Je meldt dat geen enkele controller-knop werkt. Dat kan ik niet vanaf hier reproduceren (jouw pad zit aan jouw machine), dus ik heb het afleesbaar gemaakt in plaats van te gokken. Er staan nu twee soorten logregels in, en samen scheiden ze de drie mogelijke oorzaken uit elkaar.", stappen: [
+      "Start de game, druk een stuk of vijf knoppen op de controller (ook de sticks), sluit af",
+      "Open Eclipse/Saved/Logs/Eclipse.log en plak hier elke regel die met 'Input:' begint",
+      "Zegt hij 'Gamepad = nee' en verder niets? Dan ziet UE je pad niet en helpt een kabel — maar dat zeg ik pas als het log het zegt",
+      "Zegt hij 'Gamepad = JA' maar komt er geen 'bereikte actie'-regel? Dan komt input binnen maar niet bij de bindings, en zit het in de mapping context",
+      "Komen beide? Dan is input en binding in orde en ligt het in een handler",
+      "R3 heb ik alvast weggehaald — je raakt hem per ongeluk met je richtstick; 1e/3e persoon zit nu alleen op C"
+    ] },
     { titel: "ALLES STAAT KLAAR OM TE TESTEN — camera, animaties, controls en de gids", prio: "nu", waarom: "Dit is de sessie waar je op wachtte. De camera bestaat nu (die ontbrak volledig), lopen ziet er als lopen uit (de animatieclips matchten het verkeerde skelet), springen en mikken bestaan, de stick-Y stond omgekeerd en de deadzones waren drie keer te breed. De gids opent nu bewezen — het log zegt letterlijk 'panel OPEN (26 rows)'. Bar: build ✓, 100/100 tests, validatie 0, catalog 29/29.", stappen: [
       "Start de game (SPEEL_ECLIPSE.bat) — je landt direct in de missie met de gids open",
       "F3 opent/sluit de gids · J = gehaald/goed/ja · N = sla over/niet goed/nee · op de controller: View opent, Menu bevestigt",
