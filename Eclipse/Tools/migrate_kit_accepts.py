@@ -83,21 +83,40 @@ for data in registry.get_assets_by_path(PACK, recursive=True):
 unreal.log(f"kit-migratie: {len(by_name)} assets geindexeerd onder {PACK}")
 
 
-def textures_of(package_path):
-    """Texture2D-packages waar dit package van afhangt, één niveau diep."""
-    found = []
+def dependencies_of(package_path):
     try:
-        deps = registry.get_dependencies(unreal.Name(package_path), dep_options)
+        return [str(d) for d in (registry.get_dependencies(unreal.Name(package_path), dep_options) or [])]
     except Exception as exc:
         unreal.log_warning(f"dependencies van {package_path} onleesbaar ({exc})")
-        return found
-    for dep in deps or []:
-        dep_name = str(dep)
-        if not dep_name.startswith(PACK):
+        return []
+
+
+def textures_of(package_path):
+    """Texture2D-packages onder deze mesh, TWEE niveaus diep.
+
+    Een mesh hangt niet aan textures maar aan MATERIALEN, en die hangen pas aan
+    textures. Een walk van één niveau vond daarom nul textures per mesh en
+    rapporteerde 1.8 MB voor twaalf meshes - een getal dat klopte en tegelijk de
+    hele vraag ontweek, want 4K-textures zijn juist waar de omvang zit.
+    """
+    found = []
+    seen = set()
+    for dep in dependencies_of(package_path):
+        if not dep.startswith(PACK) or dep in seen:
             continue
-        for data in registry.get_assets_by_package_name(unreal.Name(dep_name)):
-            if str(data.asset_class_path.asset_name) == "Texture2D":
-                found.append(dep_name)
+        seen.add(dep)
+        for data in registry.get_assets_by_package_name(unreal.Name(dep)):
+            cls = str(data.asset_class_path.asset_name)
+            if cls == "Texture2D":
+                found.append(dep)
+            elif cls in ("Material", "MaterialInstanceConstant"):
+                for sub in dependencies_of(dep):
+                    if not sub.startswith(PACK) or sub in seen:
+                        continue
+                    seen.add(sub)
+                    for sub_data in registry.get_assets_by_package_name(unreal.Name(sub)):
+                        if str(sub_data.asset_class_path.asset_name) == "Texture2D":
+                            found.append(sub)
     return found
 
 
@@ -129,6 +148,33 @@ def migrate(old_path, dest_folder, label):
         return None, 0
     lib.save_asset(new_path)
     return new_path, package_bytes(new_path)
+
+
+def colour_textures_from_candidate_report():
+    """De base-colour textures uit inspect_kit_candidates.py, op naam.
+
+    Waarom niet uit de dependency-graaf: zodra de meshes zijn geconsolideerd is
+    het oude pad een redirector zonder materiaal-afhankelijkheden, dus een
+    tweede run vindt niets meer. Het kandidatenrapport is geschreven VOOR de
+    migratie en heeft die namen wel - en het is ook precies de lijst waarvan de
+    gains gemeten zijn (KITPASS_P2-08 par. 2a), dus deze twee stappen kunnen
+    niet uit elkaar lopen.
+    """
+    path = os.path.join(unreal.SystemLibrary.get_project_saved_directory(),
+                        "CurationStaging", "kit_candidates.json")
+    if not os.path.isfile(path):
+        unreal.log_warning(f"kandidatenrapport ontbreekt op {path} — geen textures gemigreerd; "
+                           f"draai eerst Tools/inspect_kit_candidates.py.")
+        return []
+    with open(path, encoding="utf-8") as handle:
+        rows = json.load(handle)
+    names = []
+    for row in rows:
+        for slot in row.get("slots", []):
+            for tex in slot.get("textures", []):
+                if tex.get("is_colour") and tex["texture"] not in names:
+                    names.append(tex["texture"])
+    return names
 
 
 report = []
@@ -174,9 +220,27 @@ for mesh_name in CANDIDATES:
     unreal.log(f"KIT-OK {mesh_name}: {new_mesh} ({mesh_bytes/1024/1024:.1f} MB, "
                f"{len(moved_textures)} textures mee)")
 
+# De gemeten base-colours gaan mee, want zonder die reist de geometrie kaal en
+# valt het district op een andere machine terug op flat cel — precies wat keuze A
+# moest voorkomen.
+migrated_textures = []
+for tex_name in colour_textures_from_candidate_report():
+    tex_package = by_name.get(tex_name)
+    if tex_package is None:
+        unreal.log_error(f"KIT-MISS texture {tex_name}: staat niet in {PACK}")
+        failures.append(tex_name)
+        continue
+    new_tex, tex_bytes = migrate(tex_package, DEST_TEXTURES, tex_name)
+    if new_tex is None:
+        failures.append(tex_name)
+        continue
+    migrated_textures.append({"texture": tex_name, "new_path": new_tex, "bytes": tex_bytes})
+    total_bytes += tex_bytes
+    unreal.log(f"KIT-OK texture {tex_name}: {tex_bytes/1024/1024:.1f} MB")
+
 with open(REPORT, "w", encoding="utf-8") as handle:
-    json.dump({"assets": report, "total_bytes": total_bytes, "failures": failures},
-              handle, indent=1)
+    json.dump({"assets": report, "textures": migrated_textures,
+               "total_bytes": total_bytes, "failures": failures}, handle, indent=1)
 
 unreal.log(f"kit-migratie klaar: {len(report)}/{len(CANDIDATES)} meshes, "
            f"{total_bytes/1024/1024:.1f} MB toegevoegd aan de repo.")
