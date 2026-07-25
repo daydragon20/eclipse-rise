@@ -27,6 +27,7 @@
 #include "InputMappingContext.h"
 #include "Tests/EclipseFeelHarness.h"
 #include "UI/EclipseGauntletOverlayLogic.h"
+#include "UI/EclipseTestGuideLogic.h"
 
 namespace EclipseFeelTest
 {
@@ -858,6 +859,75 @@ bool FEclipseControlTableMatchesBindingsTest::RunTest(const FString& Parameters)
 
 	// De uitzonderingen tellen, zodat er niet stilletjes een derde bijkomt.
 	TestEqual(TEXT("controletabel: precies twee bewuste uitzonderingen, allebei met reden"), Exemptions, 2);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+// ---------------------------------------------------------------------------
+// De tweede beschrijving die de speler leest: de testgids
+// ---------------------------------------------------------------------------
+//
+// De F2-tabel zegt WELKE toets iets doet; de gids zegt WAT er dan hoort te
+// gebeuren, en die zin bevat harde getallen ("420 -> 650 cm/s", "150 cm/s").
+// Precies die getallen drijven weg zodra iemand DA_CharacterTuning aanraakt, en
+// dan leert de game de speler een verwachting die zijn eigen build niet waarmaakt
+// — hetzelfde defect als het paneel dat "1,50 s per 360" toonde bij 0,60 s.
+//
+// Bewust GEEN prozacontrole: als iemand de zin herschrijft maar de getallen laat
+// staan, hoort dat te mogen. Alleen de getallen worden vastgehouden.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseGuideNumbersMatchTuningTest,
+	"Eclipse.Feel.Input.GuideNumbersStillMatchTheTuning",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseGuideNumbersMatchTuningTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	const UEclipseCharacterTuningAsset& T = *Harness.Tuning;
+
+	const TArray<EclipseTestGuide::FEclipseGuideStep> Steps = EclipseTestGuide::GetGuideSteps();
+	auto ExpectationFor = [&Steps](EclipseTestGuide::EEclipseGuideSignal Signal) -> FString
+	{
+		const EclipseTestGuide::FEclipseGuideStep* Step = Steps.FindByPredicate(
+			[Signal](const EclipseTestGuide::FEclipseGuideStep& Candidate) { return Candidate.Signal == Signal; });
+		return Step != nullptr ? Step->Expectation : FString();
+	};
+
+	auto MentionsNumber = [](const FString& Text, float Value)
+	{
+		return Text.Contains(FString::Printf(TEXT("%.0f"), Value));
+	};
+
+	const FString SprintText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Sprint);
+	TestTrue(TEXT("gids: er is een sprint-stap"), !SprintText.IsEmpty());
+	TestTrue(*FString::Printf(TEXT("gids: de sprint-stap noemt de getunede rensnelheid (%.0f) — '%s'"), T.RunSpeed, *SprintText),
+		MentionsNumber(SprintText, T.RunSpeed));
+	TestTrue(*FString::Printf(TEXT("gids: de sprint-stap noemt de getunede sprintsnelheid (%.0f)"), T.SprintSpeed),
+		MentionsNumber(SprintText, T.SprintSpeed));
+
+	const FString CrouchText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Crouch);
+	TestTrue(TEXT("gids: er is een hurk-stap"), !CrouchText.IsEmpty());
+	TestTrue(*FString::Printf(TEXT("gids: de hurk-stap noemt de getunede hurksnelheid (%.0f)"), T.CrouchSpeed),
+		MentionsNumber(CrouchText, T.CrouchSpeed));
+
+	// En de kop van de gids toont de kijkwaarden; die regel wordt uit dezelfde
+	// members gebouwd die de handler gebruikt, dus hij kan niet verouderen — maar
+	// het getal dat hij toont MOET wel het getunede zijn. Dat was het tot vannacht
+	// niet, en dat is precies waarom deze test bestaat.
+	const FString LookLine = Harness.Controller->DescribeLookTuning();
+	TestTrue(*FString::Printf(TEXT("gids-kop: toont de getunede kijksnelheid (%.0f gr/s) — '%s'"), T.StickYawSpeed, *LookLine),
+		LookLine.Contains(FString::Printf(TEXT("%.0f"), T.StickYawSpeed)));
+	TestTrue(*FString::Printf(TEXT("gids-kop: toont de seconden per 360 die daarbij horen (%.2f s)"), 360.0f / T.StickYawSpeed),
+		LookLine.Contains(FString::Printf(TEXT("%.2f"), 360.0f / T.StickYawSpeed)));
 
 	Harness.Shutdown();
 	return true;
