@@ -83,6 +83,29 @@ De hele LOCOMOTIE- en SPRONG-kolom plus de pitch-limiet staan in de geparkeerde
 patch, met per waarde de engine-default en de herkomst in de code. Ze wachten op een
 vrij build-slot.
 
+## Twee overdraagbare lessen uit The Division (onderzoek 2026-07-25)
+
+**1. Aim-assist: los snap-misbruik op met een COOLDOWN, niet met minder sterkte.**
+Massive's antwoord op jarenlange klachten over "snappen naar het hoofd" was nooit het
+magnetisme verzwakken maar een **re-acquisitie-cooldown per doel**: snappen mag, maar
+niet herhaald op hetzelfde doelwit binnen korte tijd (D1 Update 1.8.2 `[OFFICIEEL]`,
+en pre-emptief meegenomen naar D2 vóór launch). Dat is scherper dan sterkte verlagen,
+want het raakt het misbruik zonder de hulp weg te nemen.
+**Toe te passen op onze target-slowdown**: die heeft nu geen enige tijdcomponent. Een
+cooldown per doelwit is de volgende stap zodra de owner meldt dat de assist te sterk
+of te plakkerig voelt — en het is een betere eerste knop dan `AimAssistStrength`.
+
+**2. Waarschuwing: per-toestand camera-profielen lezen als onvoorspelbaarheid.**
+Division past verschillende deadzones, curves en maximumsnelheden toe per toestand
+(idle / sprint / in dekking / ADS). Spelers ervaren de OVERGANGEN daartussen niet als
+polish maar als input-lag en willekeur; er lopen jarenlange klachten over, tot en met
+"het voelt alsof ik permanente input-lag heb" `[GEMETEN]`.
+**Direct relevant voor ons**, want we hebben al drie camera-toestanden (3e persoon,
+1e persoon, Command Mode) plus ADS, en de ADS-tak verandert nu al de kijksnelheid
+(×0.35). De regel die we hieruit overnemen: **verschillen tussen profielen klein
+houden, of de overgang ramp-en** — nooit een harde sprong in deadzone of curve op het
+moment dat de speler van toestand wisselt.
+
 ## Wat een beslissing vraagt
 
 Niets van het bovenstaande — het zijn allemaal conventie-waarden met een bron. De
