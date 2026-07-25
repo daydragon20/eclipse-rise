@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-25 16:15",
+  bijgewerkt: "2026-07-25 16:45",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -19,6 +19,9 @@ window.PROGRESS_DATA = {
   // Wat de AI al van Nathan heeft ontvangen én verwerkt/nagekeken — zodat hij ziet dat zijn acties zijn aangekomen.
   // Dev-sessie: zodra je een owner-actie verifieert, verplaats hem van ownerActies naar hier met de tijd. Nieuwste bovenaan.
   jijGedaan: [
+    { wat: "Old West uit de cache verwijderd — geverifieerd: geen Old West-map meer te vinden en de VaultCache bestaat niet meer. Je hebt méér opgeruimd dan gevraagd: vrije ruimte op C: ging van ~22 GB naar 172,6 GB. Nagekeken of er niets nodig is meegegaan — de asfalt-albedo die de districtsvloer gebruikt, de 904 MetaHuman-assets, de 11 civilians, de curatie-accepts en de generated meshes staan er allemaal nog.", tijd: "2026-07-25 16:45" },
+    { wat: "Character-pack beoordeeld en AFGEWEZEN op jouw verzoek — je twijfel was juist. LPCharacters_FREE is niet alleen stilistisch mis (low-poly is expliciet verworpen in het stijlkader; Borderlands is hoog detail mét inkomtrek), maar heeft ook vijf LOSSE skeletons voor vijf figuren, dus geen gedeelde animaties, en maar zes takes waarvan Dance en Victory. De 11 CC0-civilians die al binnen zijn delen één armature per gender-lijn met 24 takes inclusief Interact en Wave. Het pack staat in Eclipse/Saved/RejectedAssets met de reden erbij — niets verwijderd, terugzetten is één handeling.", tijd: "2026-07-25 16:45" },
+    { wat: "Drie environment-packs uit je wachtrij binnengehaald: Factory Pack Vol.1 (2,1 GB), Industrial Building 49 (66 MB) en UNIBLOCKS (3,8 GB). Die moeten nog door de curatie vóór gebruik — dat is agent-werk, geen actie voor jou.", tijd: "2026-07-25 16:45" },
     { wat: "Beslissing 15.7 gemaakt: B (hybride MetaHuman-shading) — huid/body/teeth gaan door de toon-master, ogen + lacrimal + grooms houden hun eigen shader mét exposure-compensatie, zodat de koppen in close-up leven én op dezelfde belichtings-tier lezen als het district. Vastgelegd in phase0/metahuman_recipes.md; de tegenprestatie is één 15.8-shotronde op de vaste camera's als harde poort (naad huid↔oog). Faalt die, dan is A de terugval — niet C.", tijd: "2026-07-25 14:45" },
     { wat: "MetaHuman-gezichten binnengehaald — probe-bewijs (25-07 13:16): Frey (11:25), Hannah + Mason (al 23-07) én bonus Advika (12:59) staan erin, plus volledige garderobe (hoodie/cargopants/boots/5 shirts/tanktop) en 6 grooms; 904 assets totaal. De 'missing optional item'-meldingen bleken het optionele Creator-contentpack van de plugin zelf — niets van jouw downloads mist. Assemblies (/Game/MetaHumans) genereren + slot-koppeling per de recepten is agent-vervolgwerk (SentinelC-precedent).", tijd: "2026-07-25 13:16" },
     { wat: "Editor gesloten — build-slot vrij; de landing-pijplijn (build → tests → 6 commits → data-scripts) is automatisch gestart", tijd: "2026-07-25 13:06" },
@@ -36,15 +39,7 @@ window.PROGRESS_DATA = {
       "Speel in PIE: houd Q (of LB op de pad) — wereld vertraagt naar 30%; geef orders met 1-4/D-pad; kies soldaten met Tab/RB of E/X",
       "Score de 5 criteria uit het draaiboek en zeg: 'R3-verdict: true' of 'false' + wat je zag"
     ] },
-    { titel: "Optioneel: 2× Old West uit de Vault-cache verwijderen (~4,8 GB)", prio: "optioneel", waarom: "die twee waren al gedownload vóór je annulering (23-07); C: heeft nog maar ~22 GB vrij", stappen: [
-      "Epic Launcher → Fab Library → zoek 'Old West' → Remove from cache (allebei)"
-    ] },
     // Civilian/worker-pack: overgenomen door de agent — 11 CC0-bodies binnen (zie takenlijst); alleen deze optionele close-up-kliks resten:
-    { titel: "Optioneel: 2 gratis close-up-characters uit Fab", prio: "optioneel", waarom: "de 11 CC0-figuranten zijn binnen; dit zijn alleen extra close-up-kandidaten (Bubba = werkman met face-blendshapes)", stappen: [
-      "Fab → zoek 'Bubba The Handyman' (Paul N, gratis) → Add to Project → Eclipse",
-      "Eventueel ook 'Casual Characters Pack FREE' (IZIGAMES) — reserve",
-      "Zeg: 'Fab-characters staan erin'"
-    ] },
     { titel: "13.2-playtest (~30 min)", prio: "als je tijd hebt", waarom: "sluit Fase 1 af + stuurt de eerste review", stappen: [
       "Speel de graybox-loop ~30 min in de editor",
       "Noteer kort wat goed/slecht voelt",
