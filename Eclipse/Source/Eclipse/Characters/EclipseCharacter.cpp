@@ -157,11 +157,31 @@ void AEclipseCharacter::SetFirstPerson(bool bNewFirstPerson)
 		return;
 	}
 	bFirstPerson = bNewFirstPerson;
-	// Hide the own body in first person, or the view sits inside the skull. The
-	// owner-only flag keeps the mesh visible to everyone else and in shadows.
+	// Hide only the HEAD, not the whole body (owner playtest 2026-07-25: "in 1e
+	// persoon zie ik letterlijk niets van mezelf"). SetOwnerNoSee on the mesh was
+	// the cheap first pass and it is wrong for a game with no first-person arms:
+	// it trades looking-inside-your-skull for looking-at-nothing. Hiding the head
+	// bone keeps arms, weapon and legs on screen and costs no new asset.
+	// It is honestly a stopgap: a third-person rig seen from its own eye socket
+	// has no arm animation authored for that view, so it will read as odd from
+	// some angles. Real FP arms are their own asset job; this at least gives you
+	// a body while that does not exist.
 	if (USkeletalMeshComponent* Body = GetMesh())
 	{
-		Body->SetOwnerNoSee(bFirstPerson);
+		Body->SetOwnerNoSee(false);
+		static const FName HeadBone(TEXT("head"));
+		if (Body->GetBoneIndex(HeadBone) != INDEX_NONE)
+		{
+			bFirstPerson
+				? Body->HideBoneByName(HeadBone, EPhysBodyOp::PBO_None)
+				: Body->UnHideBoneByName(HeadBone);
+		}
+		else if (bFirstPerson)
+		{
+			// Loud rather than silently headless-or-not (14.3.5): a rig without a
+			// bone called "head" would otherwise quietly keep its head on screen.
+			UE_LOG(LogEclipse, Warning, TEXT("%s: geen bone 'head' op dit skelet — 1e persoon toont het hoofd."), *GetName());
+		}
 	}
 	RefreshCameraTargets();
 }
