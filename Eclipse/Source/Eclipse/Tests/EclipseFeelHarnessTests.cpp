@@ -24,7 +24,9 @@
 #include "GameFramework/InputSettings.h"
 #include "HAL/IConsoleManager.h"
 #include "Misc/AutomationTest.h"
+#include "InputMappingContext.h"
 #include "Tests/EclipseFeelHarness.h"
+#include "UI/EclipseGauntletOverlayLogic.h"
 
 namespace EclipseFeelTest
 {
@@ -728,6 +730,134 @@ bool FEclipseFeelSprintTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("gemeten sprintsnelheid (L3-toggle)"), MeasuredSprint, TEXT("cm/s"), *FString::Printf(TEXT("%.0f"), SprintSpeed));
 	TestTrue(FString::Printf(TEXT("S2: de L3-sprint versnelt het personage echt (%.0f -> %.0f cm/s)"), MeasuredRun, MeasuredSprint),
 		MeasuredSprint >= SprintSpeed * 0.98f);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+// ---------------------------------------------------------------------------
+// De beschrijvingen bewaken, niet alleen het gedrag
+// ---------------------------------------------------------------------------
+//
+// Zes keer vannacht klopte een BESCHRIJVING niet met de code, en elke keer was
+// het de beschrijving die de volgende ronde de verkeerde kant op stuurde — niet
+// het gedrag. De tests dekten het gedrag volledig en zagen er geen één.
+//
+// Dit is de ontbrekende schakel in minimale vorm: de F2-controletabel is wat de
+// speler TIJDENS het spelen leest, en elke rij dáár claimt dat er een binding
+// bestaat. Deze test legt die claim naast de echte mapping context. Hij
+// controleert de TEKST niet ("Shift" versus LeftShift is prozawerk), maar wel
+// het harde deel: beweert de rij een controller-binding, dan hoort er een
+// gamepad-toets gemapt te zijn, en andersom.
+//
+// De twee uitzonderingen staan hier expliciet in plaats van in een comment,
+// zodat ze niet stilletjes kunnen groeien.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseControlTableMatchesBindingsTest,
+	"Eclipse.Feel.Input.ControlTableClaimsOnlyBindingsThatExist",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseControlTableMatchesBindingsTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const UInputMappingContext* Context = Harness.Controller->GetMappingContext();
+	if (!TestNotNull(TEXT("controletabel: mapping context"), Context))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Heeft deze actie minstens één toets van het gevraagde soort?
+	auto HasKeyOfKind = [Context](const UInputAction* Action, bool bWantGamepad)
+	{
+		if (Action == nullptr)
+		{
+			return false;
+		}
+		for (const FEnhancedActionKeyMapping& Mapping : Context->GetMappings())
+		{
+			if (Mapping.Action == Action && Mapping.Key.IsGamepadKey() == bWantGamepad)
+			{
+				return true;
+			}
+		}
+		return false;
+	};
+
+	struct FRowClaim
+	{
+		const TCHAR* Row;          // zoals hij in de F2-tabel staat
+		const TCHAR* KeyboardAction; // nullptr = deze rij claimt geen actie-binding
+		const TCHAR* PadAction;
+		const TCHAR* Exemption;    // niet-null = uitzondering, mét reden
+	};
+	const FRowClaim Claims[] = {
+		{ TEXT("Lopen"),         TEXT("Move"),        TEXT("Move"),          nullptr },
+		{ TEXT("Rondkijken"),    TEXT("Look"),        TEXT("Look"),          nullptr },
+		{ TEXT("Vuren"),         TEXT("Fire"),        TEXT("Fire"),          nullptr },
+		// Twee APARTE acties, en dat is de S2-fix: hold op toetsenbord, toggle op de pad.
+		{ TEXT("Sprint"),        TEXT("SprintHold"),  TEXT("SprintToggle"),  nullptr },
+		{ TEXT("Hurken"),        TEXT("Crouch"),      TEXT("Crouch"),        nullptr },
+		{ TEXT("Springen"),      TEXT("Jump"),        TEXT("Jump"),          nullptr },
+		{ TEXT("Mikken"),        TEXT("Aim"),         TEXT("Aim"),           nullptr },
+		{ TEXT("1e/3e persoon"), TEXT("ToggleView"),  nullptr,
+		  TEXT("de tabel zegt zelf 'geen' op de pad — R3 ging per ongeluk af en is eraf gehaald") },
+		{ TEXT("Command Mode"),  TEXT("CommandHold"), TEXT("CommandHold"),   nullptr },
+		{ TEXT("Volgende"),      TEXT("SelectNext"),  TEXT("SelectNext"),    nullptr },
+		{ TEXT("Vorige"),        TEXT("SelectPrev"),  TEXT("SelectPrev"),    nullptr },
+		{ TEXT("Onder kruis"),   TEXT("DirectPick"),  TEXT("DirectPick"),    nullptr },
+		{ TEXT("Orders"),        TEXT("Order1"),      TEXT("Order1"),        nullptr },
+		{ TEXT("Stance"),        nullptr,             TEXT("StanceToggle"),
+		  TEXT("LeftAlt is GEEN actie: IssueSquadOrder pollt IsInputKeyDown op het moment van geven") },
+	};
+
+	const TArray<EclipseGauntletOverlay::FEclipseControlRow> Rows = EclipseGauntletOverlay::GetControlRows();
+	TestEqual(TEXT("controletabel: evenveel rijen als claims — een nieuwe rij hoort hier ook te landen"),
+		Rows.Num(), static_cast<int32>(UE_ARRAY_COUNT(Claims)));
+
+	int32 Exemptions = 0;
+	for (const FRowClaim& Claim : Claims)
+	{
+		const EclipseGauntletOverlay::FEclipseControlRow* Row = Rows.FindByPredicate(
+			[&Claim](const EclipseGauntletOverlay::FEclipseControlRow& Candidate)
+			{
+				return FCString::Strcmp(Candidate.Action, Claim.Row) == 0;
+			});
+		if (!TestNotNull(*FString::Printf(TEXT("controletabel: rij '%s' bestaat"), Claim.Row), Row))
+		{
+			continue;
+		}
+
+		if (Claim.KeyboardAction != nullptr)
+		{
+			TestTrue(*FString::Printf(TEXT("controletabel: '%s' claimt muis/toetsenbord ('%s') en die binding bestaat"),
+					Claim.Row, Row->MouseKeyboard),
+				HasKeyOfKind(Harness.Controller->FindInputAction(Claim.KeyboardAction), /*bWantGamepad*/ false));
+		}
+		if (Claim.PadAction != nullptr)
+		{
+			TestTrue(*FString::Printf(TEXT("controletabel: '%s' claimt controller ('%s') en die binding bestaat"),
+					Claim.Row, Row->Controller),
+				HasKeyOfKind(Harness.Controller->FindInputAction(Claim.PadAction), /*bWantGamepad*/ true));
+		}
+		if (Claim.Exemption != nullptr)
+		{
+			++Exemptions;
+			AddInfo(FString::Printf(TEXT("controletabel: '%s' is een bewuste uitzondering — %s"), Claim.Row, Claim.Exemption));
+		}
+	}
+
+	// De uitzonderingen tellen, zodat er niet stilletjes een derde bijkomt.
+	TestEqual(TEXT("controletabel: precies twee bewuste uitzonderingen, allebei met reden"), Exemptions, 2);
 
 	Harness.Shutdown();
 	return true;
