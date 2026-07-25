@@ -5,7 +5,7 @@
 
 # OCHTENDRAPPORT — nacht 25→26 juli 2026
 
-**Bar bij elke commit: build ✓ (-NoUba) · tests 107/107 (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Negen commits, alle negen gepusht: `f1049e9` (harnas + S1/S2/S3) · `2dc235d` (speelronde) · `f3c5211` (feel-audit fase 3) · `1bbce20` (dit rapport) · `c7274b3` (sprong-vergevingsvensters) · `46ffe9b` + `08eef5f` (navigatiegrenzen) · `393331f` (traversal).
+**Bar bij elke commit: build ✓ (-NoUba) · tests 107/107 (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Twaalf commits, alle twaalf gepusht: `f1049e9` (harnas + S1/S2/S3) · `2dc235d` (speelronde) · `f3c5211` (feel-audit fase 3) · `1bbce20` (dit rapport) · `c7274b3` (sprong-vergevingsvensters) · `46ffe9b` + `08eef5f` (navigatiegrenzen) · `393331f` (traversal) · `9c95d3b` (rapport-sync) · `79daac5` (drie documentatiefouten) · `6ed97dc` (pitch-demping).
 
 ## 1. Wat is af en gemeten — met de getallen
 
@@ -27,6 +27,8 @@
 | Coyote-venster / inputbuffer | **110 ms / 150 ms** | bestonden niet | UE levert ze niet |
 | Stap over een stoeprand van 20 cm | **+19,98 cm** | +19,98 | blijft een stap |
 | Stap op kniehoogte (50 cm) | **0,00 cm**, stopt na 116 cm | klom er geruisloos overheen | wordt een vault (GDD-verb) |
+| Kijksnelheid 2° vóór de pitch-limiet | **52,8 gr/s** (midden: 180) | 180 — volle snelheid tot de klem | Nesky #47 |
+| Meshwortel boven de grond | **0,15 cm** | 0,15 — was al goed | Bijlage D beweerde −2 cm, dat klopt niet |
 
 **S1 — "personage schaalt met snelheid": oorzaak gevonden, gefixt, gepind.** Van de vier kandidaten bewegen er drie niet mee: mesh-schaal (1,000), boomlengte (300,0) en FOV (80,0) zijn identiek bij stilstand, rennen en sprinten. Wat wél meebewoog was de **gemeten camera-tot-pawn-afstand**: 312,07 cm stil tegen **342,26 cm rennend**, oftewel de schijnbare hoogte zakte van 31,50° naar 28,84° — **8,4% kleiner van gaan rennen**. Oorzaak is `bEnableCameraLag`: de achterstand is exact `snelheid / CameraLagSpeed`, de enige speed-gekoppelde term in de rig. Gefixt met `CameraLagMaxDistance = 6` uu. Na de fix: rennen→sprinten **0,00%**, stilstand→sprinten **1,67%**.
 
