@@ -760,12 +760,36 @@ void BuildDistrict(UWorld& World)
 	// These two classes are spawned from their OWN authored coordinate lists — the
 	// same discipline the lamp pools follow — so a blob can never drift away from
 	// the thing that casts it, and moving a cover block moves its shadow.
-	// Sizes: cover blocks are 300x120 at the spawn below, so 1.4x the footprint;
-	// lamp poles are a 0.54 m base, so a deliberately small 150-unit disc — a pole
-	// needs a bite of contact, not a puddle.
+	// Cover-block size, corrected after the art-review pulled two authoring errors
+	// out of the first version of this loop:
+	//  1. The blocks ALTERNATE their long axis (see the CoverPoints spawn above:
+	//     bRotated flips 3x1 to 1x3), and this loop spawned a fixed 420x240 at
+	//     yaw 0. So ten of the twenty blobs lay crosswise under their own block —
+	//     4.2x too wide across it and 60 units SHORT at each end, i.e. the block
+	//     stuck out of its own shadow at both tips. The lamp loop below already
+	//     passed Lamp.Yaw; this one simply forgot.
+	//  2. The old comment read "cover blocks are 300x120, so 1.4x the footprint".
+	//     120 is the HEIGHT (Z 1.2), not a footprint dimension — the footprint is
+	//     300x100, which made the authored 240 a 2.4x skirt on the short axis
+	//     while claiming to be 1.4x. A number that documents itself wrongly is
+	//     worse than no number, because the next reader trusts it.
+	// So the skirt is derived, per par. 5's rule, from the HEIGHT rather than the
+	// footprint: a tall mass hides more of its own contact shadow behind itself
+	// from eye height, so it needs a wider ring to show anything at all.
+	// Blocks are 1.2 units tall = 120, so skirt = 0.35 x 120 = 42 units per side.
+	constexpr float CoverBlockHeight = 120.0f;
+	constexpr float CoverBlockSkirt = 0.35f * CoverBlockHeight;
+	int32 BlobCoverIndex = 0;
 	for (const FPointDef& Cover : CoverPoints)
 	{
-		SpawnGroundDecal(BlobMid, FVector2D(Cover.X, Cover.Y), FVector2D(420.0f, 240.0f), 0.0f, BlobDecalZ, TEXT("Deco_Blob"));
+		// Same alternation as the block spawn, read from the same counter parity,
+		// so the blob turns with the block it belongs to instead of being told a
+		// size twice.
+		const bool bRotated = (BlobCoverIndex++ % 2) == 0;
+		const FVector2D Footprint = bRotated ? FVector2D(300.0f, 100.0f) : FVector2D(100.0f, 300.0f);
+		SpawnGroundDecal(BlobMid, FVector2D(Cover.X, Cover.Y),
+			Footprint + FVector2D(2.0f * CoverBlockSkirt, 2.0f * CoverBlockSkirt),
+			0.0f, BlobDecalZ, TEXT("Deco_Blob"));
 	}
 	for (const FLampPostDef& Lamp : LampPosts)
 	{

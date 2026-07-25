@@ -202,6 +202,49 @@ terugdraaiingen kostte. Het echte vloerdefect is **vlakheid** (18% variatie over
 - **Cam 4 heeft een camera-probleem, geen dressing-probleem**: 45% lege lucht +
   45% lege vloer + 10% contentstrook kan nooit lezen. Kantel de pitch of zet een
   lamp in het nabije veld. **Cam 6 valt af als reviewframe** (placeholder-pop).
+## 1h. Stap 6 GELAND + de eigenlijke oorzaak GEMETEN (2026-07-25 18:35)
+
+Dekking toegevoegd (20 cover-blokken + 6 lamppaalvoeten, uit hun eigen
+coördinatenlijsten) en het blob-niveau afgeleid van de vloer i.p.v. hardgecodeerd.
+Gemeten met een nieuwe methode die wél werkt voor een zacht effect: een
+magenta-proefrender levert de exacte pixels (`Tools/measure_masked_region.py`), die
+worden in het echte frame gelezen tegen een 14px-ring van de grond ernaast.
+
+**Het niveau blijkt niet het probleem — de COMPOSITING is het.** Per camera:
+
+| cam | blob-pixels | binnen | ring | verhouding | wat er onder ligt |
+|---|---|---|---|---|---|
+| 1 | 3204 | 0.0778 | 0.1842 | **0.42×** | lamppool |
+| 6 | 5512 | 0.0746 | 0.1308 | **0.57×** | lamppool |
+| 4 | 340 | 0.0259 | 0.0569 | 0.46× | deels pool |
+| 2 | 1048 | 0.0367 | 0.0475 | **0.77×** | kaal asfalt |
+| 5 | 4400 | 0.0353 | 0.0393 | **0.90×** | kaal asfalt |
+| 3 | 76 | — | — | — | vrijwel geen blob in beeld |
+
+Eén MID, één niveau — en tóch loopt de leesbaarheid van 0.42× naar 0.90×. De
+verklaring is de compositing: de blob ligt met opacity 0.85 **OVER** de grond in
+plaats van er **IN** te vermenigvuldigen. Zijn eigen waarde is ongeveer constant, dus
+tegen een heldere ondergrond (binnen een lamppool) is dat een flinke stap omlaag, en
+tegen donker asfalt — verreweg het grootste deel van het district — landt hij op
+bijna dezelfde waarde als de grond en verdwijnt hij.
+
+Dat is exact hetzelfde defect dat §4 al voor de POOL noteert, en voor een schaduw is
+het nog fundamenteler: een schaduw *is* per definitie een vermenigvuldiging van het
+licht dat er al was, geen laag verf erover.
+
+**Consequentie voor de ladder:** stap 5 (blob herrekenen) en de open pool-compositing
+zijn niet twee losse stappen maar één: er moet een **modulate-variant van de
+decal-master** komen (`BLEND_Modulate`, waarbij de mask naar 1.0 uitfadet in plaats
+van naar 0), die de blob gebruikt. De pool houdt zijn huidige blend — die moet licht
+TOEVOEGEN, niet vermenigvuldigen. Pas daarna is een niveau-discussie zinvol, want nu
+meet je per camera een ander getal voor dezelfde authored waarde.
+
+**Tweede, losse bevinding: de dekking is nog steeds te klein.** Cam 3 heeft 76
+blob-pixels op 2 miljoen en cam 4 heeft er 340. In twee van de zes gebankte frames is
+grondverankering dus niet zwak maar afwezig. Dat is de rok-vraag uit §5 (rok uit de
+HOOGTE i.p.v. de footprint) plus mogelijk cameradekking — cam 3 en 4 kijken naar
+massa's die geen blob dragen.
+
 - Geparkeerd: **liners** (op geen enkele camera-afstand leesbaar als defect) en
   **FogDensity** (met de grond op 0.03-0.06 is er niets om op te tillen; pas
   hertesten nadat het plafond zakt).
