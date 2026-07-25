@@ -463,7 +463,32 @@ void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)
 	{
 		return;
 	}
-	const FVector2D Axis = Value.Get<FVector2D>();
+	FVector2D Axis = Value.Get<FVector2D>();
+
+	// Movement had NO deadzone at all while look had one, and that single omission
+	// produced two symptoms that looked like separate bugs (owner measurement
+	// 2026-07-25, phase0/controller_kalibratie.json: the left stick rests at
+	// LY = -0.048). The pawn crept forward forever, and because the movement
+	// component orients the body to its movement direction, the character also
+	// rotated slowly on its own while nobody touched anything.
+	//
+	// RADIAL, not per-axis: a per-axis deadzone carves a SQUARE hole out of a round
+	// stick, so a diagonal push has to clear the zone on both axes and diagonal
+	// walking would start later and feel different from walking straight. The same
+	// rescale as the look path — past the deadzone the value restarts at zero
+	// instead of jumping to the deadzone's worth of speed, so a gentle push is
+	// actually a gentle walk.
+	if (IsUsingGamepadLook())
+	{
+		const float Magnitude = Axis.Size();
+		if (Magnitude <= MoveDeadzone)
+		{
+			return;
+		}
+		const float Live = FMath::Clamp((Magnitude - MoveDeadzone) / FMath::Max(1.0f - MoveDeadzone, KINDA_SMALL_NUMBER), 0.0f, 1.0f);
+		Axis = (Axis / FMath::Max(Magnitude, KINDA_SMALL_NUMBER)) * Live;
+	}
+
 	const FRotator YawRotation(0, GetControlRotation().Yaw, 0);
 	ControlledPawn->AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X), Axis.Y);
 	ControlledPawn->AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y), Axis.X);
@@ -638,6 +663,7 @@ void AEclipsePlayerController::ApplyLookTuning()
 	StickYawSpeed = Tuning->StickYawSpeed;
 	StickPitchSpeed = Tuning->StickPitchSpeed;
 	StickDeadzone = Tuning->StickDeadzone;
+	MoveDeadzone = Tuning->MoveDeadzone;
 	StickResponseExponent = Tuning->StickResponseExponent;
 	MouseLookScale = Tuning->MouseLookScale;
 	bInvertLookY = Tuning->bInvertLookY;

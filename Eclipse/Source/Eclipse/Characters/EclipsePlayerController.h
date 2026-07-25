@@ -121,6 +121,7 @@ private:
 	float StickYawSpeed = 160.0f;
 	float StickPitchSpeed = 110.0f;
 	float StickDeadzone = 0.18f;
+	float MoveDeadzone = 0.20f;
 	float StickResponseExponent = 2.0f;
 	float MouseLookScale = 1.0f;
 	bool bInvertLookY = false;

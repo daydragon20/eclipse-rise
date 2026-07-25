@@ -105,6 +105,17 @@ public:
 	float StickDeadzone = 0.18f;
 
 	/**
+	 * Radial deadzone on the MOVEMENT stick. Its own number, and slightly wider
+	 * than the look deadzone, because the two sticks fail differently: a drifting
+	 * look stick wobbles the camera and you notice at once, while a drifting move
+	 * stick walks the character away AND — with bOrientRotationToMovement — turns
+	 * the body with it, so the whole world appears to rotate on its own. The
+	 * owner's left stick measures LY = -0.048 at rest.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 0.9))
+	float MoveDeadzone = 0.20f;
+
+	/**
 	 * Response curve exponent for stick look, sign-preserving. Linear stick look
 	 * is the difference between aiming and wrestling: small deflections must stay
 	 * small so fine aim is possible, while full deflection keeps full speed. 2.0
@@ -134,8 +145,13 @@ public:
 /**
  * Visual body definition (DT_BodyDefs row — step-2 character pipeline). Soft
  * references only: a missing asset degrades to the capsule body with a logged
- * warning, never a crash (GDD 14.3.5). PLACEHOLDER(GDD 15.7): the minimal
- * idle-only anim tier; the locomotion AnimBlueprint tier is SPEC-P2-01 work.
+ * warning, never a crash (GDD 14.3.5).
+ *
+ * The anim columns feed UEclipseAnimInstance's minimal locomotion (GDD 14.5
+ * debug-grade). They are resolved PER BODY and checked against THAT body's
+ * skeleton, because DT_BodyDefs points at nine packs that share a skeleton
+ * family but not a skeleton asset — see FEclipseLocomotionSet. Missing takes
+ * cost the body a rung on the ladder, not the frame.
  */
 USTRUCT(BlueprintType)
 struct FEclipseBodyDefRow : public FTableRowBase
@@ -145,13 +161,25 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<USkeletalMesh> Mesh;
 
-	/** Looping idle; single-node playback until the ABP tier lands. */
+	/**
+	 * Looping standing pose. Mandatory: it is the floor of the locomotion ladder
+	 * (EEclipseLocomotionTier) — without it a body has nothing to cross-fade out
+	 * of and falls all the way back to the mesh's ref pose.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> IdleAnim;
 
-	/** Reserved for the SPEC-P2-01 locomotion tier. */
+	/** Looping walk cycle, blended in at DA_CharacterTuning's WalkSpeed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> WalkAnim;
+
+	/**
+	 * Looping run/jog cycle, blended in at RunSpeed and driven faster (never
+	 * swapped) for sprint. Optional: a body with only a walk still gets a gait,
+	 * it just carries the whole ramp (GDD 14.3.5).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> RunAnim;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> ShootAnim;
