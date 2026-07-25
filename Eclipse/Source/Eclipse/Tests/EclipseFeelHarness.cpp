@@ -12,6 +12,7 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/World.h"
+#include "AI/NavigationSystemBase.h"
 #include "GameFramework/WorldSettings.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -84,6 +85,15 @@ namespace EclipseFeelHarness
 			{
 				return false;
 			}
+
+			// EXPLICIET een navigatiesysteem, want UWorld::CreateWorld maakt er voor
+			// een Game-wereld géén (de InitializationValues zetten CreateNavigation
+			// alleen aan voor Editor-werelden). Zonder dit bestaat er geen navmesh,
+			// faalt elke MoveToLocation, en weigert de squad ELKE order met NoRoute
+			// — wat er van buitenaf uitziet als een gameplay-defect maar een gat in
+			// het harnas is. Precies het soort verschil dat je alleen ziet door te
+			// meten: de eerste ronde rapporteerde "navigatiesysteem ONTBREEKT".
+			FNavigationSystem::AddNavigationSystemToWorld(*World, FNavigationSystemRunMode::GameMode);
 		}
 		else if (!Test.TestTrue(TEXT("harnas: vloer gespawnd"), SpawnFloor(*World)))
 		{

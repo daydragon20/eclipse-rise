@@ -50,6 +50,7 @@ window.PROGRESS_DATA = {
       "SPRINT OP L3 IS EEN TOGGLE. Eén klik start hem; hij stopt als je ophoudt met vooruit duwen, als je mikt, als je vuurt, of als je nog eens L3 drukt. Schuin sturen stopt hem niet",
       "ACHTERUIT IS NU 15% TRAGER dan vooruit (was even snel) en stoppen kost 150 ms in plaats van 83 ms — er is massa die tot stilstand komt",
       "LET OP: SPEEL_ECLIPSE.bat klopt op meer punten niet meer (sprint staat er als hold, F9 ontbreekt, 1e/3e persoon staat nog op R3). Ik schrijf niet over jouw bestand heen — zeg 'bat bijwerken' en ik doe het in één keer. De geverifieerde lijst staat intussen in BESTURING.md",
+      "KIJK OF JE SQUAD JE VOLGT. Ze weigerden tot vannacht ELKE verplaatsingsorder met 'no route', en de oorzaak is gemeten: er waren nul navigatiegrenzen, dus er kon nooit een navmesh bestaan. Dat is gerepareerd (het district maakt nu zijn eigen grens). Of het gENOEG is kan ik headless niet bewijzen — jouw ronde wel",
       "Zeg daarna gewoon wat je voelde. Losse zinnen zijn genoeg"
     ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [

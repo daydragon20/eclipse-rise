@@ -41,6 +41,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "HAL/IConsoleManager.h"
 #include "Misc/AutomationTest.h"
+#include "NavigationData.h"
+#include "NavigationSystem.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Quests/EclipseMissionTypes.h"
 #include "Squad/EclipseSquadSubsystem.h"
@@ -214,6 +216,50 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	// --- 2. een order geven, en er antwoord op krijgen ----------------------
 	// "Orders zijn beloftes" (GDD 8.4): elke order hoort exact één ack of één
 	// beredeneerde weigering te krijgen. Stilte is de fout die dit meet.
+	// Hoe lang duurt het voordat de squad ERGENS heen kan? De navmesh wordt hier
+	// rond invokers gegenereerd (bGenerateNavigationOnlyAroundNavigationInvokers)
+	// en dat is asynchroon werk. Zolang er geen navmesh onder de squad ligt,
+	// weigert elke MoveTo terecht met NoRoute — luid en beredeneerd, maar voor de
+	// speler ziet het eruit als een squad die niets doet.
+	{
+		UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(Harness.World);
+		int32 NavDataActors = 0;
+		for (TActorIterator<ANavigationData> It(Harness.World); It; ++It)
+		{
+			++NavDataActors;
+		}
+		AddInfo(FString::Printf(TEXT("speelronde: navigatiesysteem %s · nav-data-actoren %d · nav-bounds %d"),
+			Nav != nullptr ? TEXT("aanwezig") : TEXT("ONTBREEKT"), NavDataActors,
+			Nav != nullptr ? Nav->GetNavigationBounds().Num() : -1));
+
+		// Synchroon bouwen. Recast bouwt zijn tegels normaal asynchroon, en de
+		// duizend snelle ticks van dit harnas kosten samen minder wandkloktijd dan
+		// zo'n bouw nodig heeft — dan meet je de taakplanner en niet de game.
+		double NavReadyAfter = -1.0;
+		if (Nav != nullptr && NavDataActors > 0)
+		{
+			Nav->Build();
+			// ECHTE tijd geven, niet gesimuleerde. Recast bouwt zijn tegels op een
+			// achtergrondtaak, en duizend snelle wereldticks kosten samen minder
+			// wandkloktijd dan zo'n bouw nodig heeft — dan meet je de taakplanner
+			// in plaats van de game. Maximaal 5 s, want een test die blijft wachten
+			// meet ook niets.
+			const double WallStart = FPlatformTime::Seconds();
+			while (FPlatformTime::Seconds() - WallStart < 5.0)
+			{
+				Harness.Step();
+				FNavLocation Projected;
+				if (Nav->ProjectPointToNavigation(Harness.Location(), Projected, FVector(500.0f, 500.0f, 500.0f)))
+				{
+					NavReadyAfter = FPlatformTime::Seconds() - WallStart;
+					break;
+				}
+				FPlatformProcess::Sleep(0.01f);
+			}
+		}
+		Report(*this, TEXT("navmesh onder de speler na (wandklok)"), NavReadyAfter, TEXT("s"), TEXT(">= 0 = er ligt navmesh; -1 = geen binnen 5 s"));
+	}
+
 	if (UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>())
 	{
 		Watch.Issued = 1;

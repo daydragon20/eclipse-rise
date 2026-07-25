@@ -19,6 +19,8 @@
 #include "Engine/StaticMeshActor.h"
 #include "Engine/Texture.h"
 #include "Engine/TargetPoint.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
+#include "NavigationSystem.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
@@ -449,6 +451,42 @@ void BuildDistrict(UWorld& World)
 
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	// NAVIGATIEGRENZEN. Zonder deze volume bestaat er GEEN navmesh, en dan faalt
+	// elke MoveToLocation — de squad weigert dus elke verplaatsingsorder met
+	// "no route" en staat de hele missie stil. Gemeten door de speelronde
+	// (2026-07-25): navigatiesysteem aanwezig, 1 nav-data-actor, en nav-bounds 0.
+	//
+	// De config zei het omgekeerde. bGenerateNavigationOnlyAroundNavigationInvokers
+	// stond aan met het commentaar "no authored bounds volume needed", en dat is
+	// een misverstand: invoker-modus bepaalt WELKE tegels binnen de grenzen
+	// gebouwd worden, hij vervangt de grenzen niet. Nul grenzen is nul navmesh,
+	// invokers of niet — en dat was ook na een synchrone Build() nog zo.
+	//
+	// Het district bouwt zichzelf uit code (SPEC-P1-05), dus de grens hoort daar
+	// ook vandaan te komen. De brush van ANavMeshBoundsVolume is een kubus van
+	// 200 uu, dus schaal = gewenste halve maat / 100. Movable, want een statieke
+	// brush is na registratie niet meer te schalen.
+	if (ANavMeshBoundsVolume* NavBounds = World.SpawnActor<ANavMeshBoundsVolume>(FVector(-2000.0f, -2500.0f, 0.0f), FRotator::ZeroRotator, Params))
+	{
+		if (USceneComponent* Root = NavBounds->GetRootComponent())
+		{
+			Root->SetMobility(EComponentMobility::Movable);
+		}
+		// Ruim om het hele district heen: Entry_Main (-9000, 0) tot het
+		// controlepost (5000, -2000) en extractie (-8500, -8500), plus marge.
+		NavBounds->SetActorScale3D(FVector(140.0f, 140.0f, 20.0f));
+		if (UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(&World))
+		{
+			// Expliciet aanmelden: een runtime-gespawnde volume komt niet vanzelf
+			// in de grenzenlijst zoals een in de map geplaatste dat wel doet.
+			Nav->OnNavigationBoundsUpdated(NavBounds);
+		}
+		else
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Graybox: geen navigatiesysteem — de squad kan nergens heen (GDD 14.3.5)."));
+		}
+	}
 
 	// The SM6 target (strong PC) runs full-fidelity extras the SM5 laptop
 	// fallback cannot; computed here because the material choice below also
