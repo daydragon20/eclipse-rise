@@ -5,6 +5,7 @@
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipsePlayerController.h"
+#include "Core/EclipseGameMode.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 #include "Engine/LocalPlayer.h"
@@ -52,8 +53,9 @@ namespace EclipseFeelHarness
 		}
 	}
 
-	bool FHarness::Start(FAutomationTestBase& Test)
+	bool FHarness::Start(FAutomationTestBase& Test, const FOptions& Options)
 	{
+		StepSeconds = Options.StepSeconds;
 		// CommonUI klaagt luid (op Error-niveau) zodra er een lokale speler bijkomt
 		// zonder CommonGameViewportClient. Dat is hier correct gedrag — er IS geen
 		// viewport, dat is het punt van headless — maar een Error laat de test
@@ -70,7 +72,20 @@ namespace EclipseFeelHarness
 			return false;
 		}
 
-		if (!Test.TestTrue(TEXT("harnas: vloer gespawnd"), SpawnFloor(*World)))
+		if (Options.bRealGameMode)
+		{
+			// De ECHTE game mode: AEclipseGameMode::InitGame bouwt het district (en
+			// levert dus de vloer, de sites, de objective-triggers en Entry_Main),
+			// en zijn Event.Mission.Started-abonnement spawnt squad en vijanden.
+			// SetGameMode moet vóór InitializeActorsForPlay, want die roept InitGame
+			// aan op de game mode die er dan staat.
+			World->GetWorldSettings()->DefaultGameMode = AEclipseGameMode::StaticClass();
+			if (!Test.TestTrue(TEXT("harnas: game mode aangemaakt"), World->SetGameMode(FURL())))
+			{
+				return false;
+			}
+		}
+		else if (!Test.TestTrue(TEXT("harnas: vloer gespawnd"), SpawnFloor(*World)))
 		{
 			return false;
 		}
@@ -191,6 +206,11 @@ namespace EclipseFeelHarness
 		{
 			return;
 		}
+		if (DeltaSeconds <= 0.0f)
+		{
+			DeltaSeconds = StepSeconds;
+		}
+		const double StepStart = FPlatformTime::Seconds();
 		// GFrameCounter OPHOGEN, en dat is geen detail: FTickFunction::QueueTickFunction
 		// onthoudt per tick-functie in welk frame hij al bezocht is
 		// (TickVisitedGFrameCounter) en slaat hem daarna over. Een test draait al zijn
@@ -201,11 +221,16 @@ namespace EclipseFeelHarness
 		++GFrameCounter;
 		World->Tick(LEVELTICK_All, DeltaSeconds);
 		ElapsedSeconds += DeltaSeconds;
+
+		const double StepMs = (FPlatformTime::Seconds() - StepStart) * 1000.0;
+		WorstStepMs = FMath::Max(WorstStepMs, StepMs);
+		TotalStepMs += StepMs;
+		++StepCount;
 	}
 
 	void FHarness::Idle(float Seconds)
 	{
-		const int32 Steps = FMath::Max(1, FMath::RoundToInt(Seconds / FixedStepSeconds));
+		const int32 Steps = FMath::Max(1, FMath::RoundToInt(Seconds / StepSeconds));
 		for (int32 I = 0; I < Steps; ++I)
 		{
 			Step();
@@ -239,7 +264,7 @@ namespace EclipseFeelHarness
 	double FHarness::HoldFor(FName ActionName, const FVector2D& Value, double Seconds, TFunctionRef<bool()> StopWhen)
 	{
 		const double Start = ElapsedSeconds;
-		const int32 MaxSteps = FMath::Max(1, FMath::RoundToInt(Seconds / FixedStepSeconds));
+		const int32 MaxSteps = FMath::Max(1, FMath::RoundToInt(Seconds / StepSeconds));
 		for (int32 I = 0; I < MaxSteps; ++I)
 		{
 			Inject(ActionName, Value);
@@ -294,6 +319,101 @@ namespace EclipseFeelHarness
 		const bool bReached = SpeedCm() >= Target * 0.98f;
 		Test.TestTrue(FString::Printf(TEXT("harnas: topsnelheid gehaald (%.0f van %.0f cm/s)"), SpeedCm(), Target), bReached);
 		return bReached;
+	}
+
+	void FHarness::AimAt(const FVector& WorldPoint)
+	{
+		if (Controller == nullptr || Body == nullptr || Tuning == nullptr)
+		{
+			return;
+		}
+		// Richten vanaf het VIEW POINT, niet vanaf de pawn. Het wapen traceert vanaf
+		// de camera (AEclipsePlayerController::HandleFire) en die hangt 300 uu
+		// achter en 55 uu naast het lichaam. Op 42 meter is die zijwaartse offset
+		// 0,75 graden, terwijl een capsule van 34 cm daar 0,46 graden beslaat —
+		// dus richten vanaf de pawn mist STRUCTUREEL. Eerste ronde: 5771 ticks
+		// gevuurd, 0 van de 4 vijanden geraakt. Een speler heeft dit probleem niet,
+		// want hij richt op wat er in het schermmidden staat, en dat IS de
+		// camerastraal.
+		FVector ViewLocation;
+		FRotator ViewRotation;
+		Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+		const FRotator Desired = (WorldPoint - ViewLocation).Rotation();
+		const FRotator Current = Controller->GetControlRotation();
+		const float YawError = FMath::FindDeltaAngleDegrees(Current.Yaw, Desired.Yaw);
+		const float PitchError = FMath::FindDeltaAngleDegrees(Current.Pitch, Desired.Pitch);
+		// De muis-tak is lineair: AddYawInput(Axis.X * MouseLookScale) graden per
+		// gebeurtenis, dus dit is exact de invoer die de fout in één tick wegdraait.
+		const float Scale = FMath::Max(Tuning->MouseLookScale, KINDA_SMALL_NUMBER);
+		Inject(TEXT("Look"), FVector2D(YawError / Scale, PitchError / Scale));
+	}
+
+	bool FHarness::DriveTo(const FVector& Target, double MaxSeconds, float ArriveRadiusCm, bool bSprint)
+	{
+		const int32 MaxSteps = FMath::Max(1, FMath::RoundToInt(MaxSeconds / StepSeconds));
+		// Vastloop-herstel. Het district heeft muren en compounds, dus een rechte
+		// lijn naar een routepunt loopt vroeg of laat ergens tegenaan — de eerste
+		// ronde bleef 897 cm voor het controlepost hangen tegen de compoundmuur.
+		// Een mens zet dan een paar stappen opzij en probeert opnieuw; dat doet dit
+		// ook. Geen pathfinding, wél een route die aankomt.
+		const int32 ProgressWindow = FMath::Max(1, FMath::RoundToInt(0.5f / StepSeconds));
+		float DistanceAtWindowStart = FVector::Dist2D(Body->GetActorLocation(), Target);
+		int32 StepsInWindow = 0;
+		int32 SidestepStepsLeft = 0;
+		float SidestepDirection = 1.0f;
+
+		for (int32 I = 0; I < MaxSteps; ++I)
+		{
+			const float Distance = FVector::Dist2D(Body->GetActorLocation(), Target);
+			if (Distance <= ArriveRadiusCm)
+			{
+				return true;
+			}
+
+			if (++StepsInWindow >= ProgressWindow)
+			{
+				if (SidestepStepsLeft <= 0 && DistanceAtWindowStart - Distance < 20.0f)
+				{
+					// Geen voortgang in een halve seconde: opzij, en de volgende keer
+					// de andere kant op zodat we niet in dezelfde hoek blijven duwen.
+					SidestepStepsLeft = FMath::Max(1, FMath::RoundToInt(0.8f / StepSeconds));
+					SidestepDirection = -SidestepDirection;
+				}
+				DistanceAtWindowStart = Distance;
+				StepsInWindow = 0;
+			}
+
+			AimAt(FVector(Target.X, Target.Y, Body->GetActorLocation().Z + 60.0f));
+			if (SidestepStepsLeft > 0)
+			{
+				--SidestepStepsLeft;
+				Inject(TEXT("Move"), FVector2D(SidestepDirection, 0.35f));
+			}
+			else
+			{
+				Inject(TEXT("Move"), FVector2D(0.0f, 1.0f));
+			}
+			if (bSprint && !Controller->IsSprintLatched())
+			{
+				Inject(TEXT("SprintToggle"), true);
+			}
+			Step();
+		}
+		return FVector::Dist2D(Body->GetActorLocation(), Target) <= ArriveRadiusCm;
+	}
+
+	bool FHarness::EngageHostile(AEclipseCharacter& Hostile, double MaxSeconds)
+	{
+		const int32 MaxSteps = FMath::Max(1, FMath::RoundToInt(MaxSeconds / StepSeconds));
+		for (int32 I = 0; I < MaxSteps && !Hostile.IsDowned(); ++I)
+		{
+			// Mikken op borsthoogte, niet op de actor-oorsprong: die ligt bij een
+			// character op vloerniveau en een schot daarheen gaat onder hem door.
+			AimAt(Hostile.GetActorLocation() + FVector(0.0f, 0.0f, 40.0f));
+			Inject(TEXT("Fire"), true);
+			Step();
+		}
+		return Hostile.IsDowned();
 	}
 
 	void Report(FAutomationTestBase& Test, const TCHAR* Label, double Value, const TCHAR* Unit, const TCHAR* Expectation)

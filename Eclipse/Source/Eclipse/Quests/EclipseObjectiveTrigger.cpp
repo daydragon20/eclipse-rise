@@ -28,6 +28,9 @@ void AEclipseObjectiveTrigger::HandleOverlap(UPrimitiveComponent*, AActor* Other
 
 	if (UEclipseMissionSubsystem* Mission = GetGameInstance()->GetSubsystem<UEclipseMissionSubsystem>())
 	{
-		Mission->CompleteObjectiveByTarget(SiteId);
+		// NotifySiteEntered en niet CompleteObjectiveByTarget: de trigger weet dat
+		// er iemand STAAT, niet dat er iets gedaan is. Het type bepaalt of dat
+		// genoeg is, en dat weet de missie-runtime (zie NotifySiteEntered).
+		Mission->NotifySiteEntered(SiteId);
 	}
 }

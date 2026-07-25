@@ -1,0 +1,553 @@
+// De missie speelt zichzelf uit (owner-nachtopdracht 2026-07-25, fase 2B).
+//
+// Waarom dit belangrijker is dan nog een shotronde, in de woorden van de
+// opdracht: screenshots van zes vaste camera's vinden alleen wat er in beeld
+// staat. Een missie die zichzelf uitspeelt vindt vastlopers, objectives die
+// nooit triggeren, orders die niet aankomen en debriefs die verkeerd afrekenen.
+//
+// Wat deze ronde doet:
+//   1. start M1.1 via het ECHTE laadpad — SelectMission -> AutoLaunch, exact de
+//      twee aanroepen die -EclipseStartMission doet, zodat een bug in dat pad
+//      zich er niet achter kan verstoppen;
+//   2. loopt met GEÏNJECTEERDE input van Entry_Main naar het controlepost-site;
+//   3. HAALT het objective echt — de patrouille gaat neer omdat er geschoten
+//      wordt, niet omdat er iemand langsloopt;
+//   4. loopt door naar extractie en bereikt de debrief;
+//   5. asserteert op de UITKOMST: beloning, dagklok en regiostaat;
+//   6. legt onderweg vast: haalt de squad zijn orders op, komt er ack terug,
+//      blijft de game-thread binnen budget, en gebeurt er nergens iets stils dat
+//      luid had moeten zijn.
+//
+// De eerste ronde vond meteen wat hij moest vinden: DestroyTarget had geen
+// enkel voltooiingspad, en de overlap-trigger vinkte hem daarom af op
+// AANWEZIGHEID. "Spring the ambush: take out the patrol leader" was dus af zodra
+// je erlangs liep, en de missie eindigde in een keurige geslaagde debrief zonder
+// dat er iets gebeurd was. Geen enkele bestaande test zag dat, want alles was
+// groen. Beide helften zijn gerepareerd (NotifySiteEntered + de
+// hostile-downed-koppeling in de game mode) en staan hieronder vastgepind.
+
+#if WITH_DEV_AUTOMATION_TESTS
+
+#include "Characters/EclipseCharacter.h"
+#include "Characters/EclipsePlayerController.h"
+#include "Core/EclipseEventBusSubsystem.h"
+#include "Core/EclipseEventPayloads.h"
+#include "Core/EclipseGameplayTags.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
+#include "Base/EclipsePrepSubsystem.h"
+#include "GameFramework/PlayerStart.h"
+#include "HAL/IConsoleManager.h"
+#include "Misc/AutomationTest.h"
+#include "Quests/EclipseMissionSubsystem.h"
+#include "Quests/EclipseMissionTypes.h"
+#include "Squad/EclipseSquadSubsystem.h"
+#include "Squad/EclipseSquadTypes.h"
+#include "Strategy/EclipseCampaignSetupAsset.h"
+#include "Strategy/EclipseCampaignSubsystem.h"
+#include "Strategy/EclipseStrategySubsystem.h"
+#include "Tests/EclipseFeelHarness.h"
+
+namespace EclipsePlaythrough
+{
+	constexpr EAutomationTestFlags TestFlags = EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter;
+
+	/** Het graybox-district uit EclipseGrayboxBuilder. Coördinaten en geen
+	 *  pathfinding — de opdracht zegt expliciet dat dat volstaat. */
+	const FVector SiteControlPost(5000.0f, -2000.0f, 120.0f);
+	const FVector SiteExtraction(-8500.0f, -8500.0f, 120.0f);
+
+	/** Telt de squad-feiten mee die de opdracht wil zien: elke order hoort exact
+	 *  één antwoord te krijgen, en een order zonder antwoord is de stilte waar
+	 *  "orders zijn beloftes" op stukloopt. */
+	struct FSquadWatch
+	{
+		int32 Issued = 0;
+		int32 Acknowledged = 0;
+		int32 Refused = 0;
+		TArray<FString> RefusalLines;
+	};
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionPlaythroughTest,
+	"Eclipse.Playthrough.M11PlaysItselfFromLaunchToDebrief",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	// Muis/toetsenbord-tak: die is lineair en zonder deadzone, dus sturen is exact
+	// en de route wordt niet ondergesneeuwd door een regelaar die zichzelf zit te
+	// corrigeren. De stick-tak wordt volledig gemeten in laag 2.
+	IConsoleVariable* ForceGamepad = IConsoleManager::Get().FindConsoleVariable(TEXT("Eclipse.Input.ForceGamepad"));
+	const int32 PreviousForce = ForceGamepad != nullptr ? ForceGamepad->GetInt() : -1;
+	if (ForceGamepad != nullptr)
+	{
+		ForceGamepad->Set(0, ECVF_SetByCode);
+	}
+	ON_SCOPE_EXIT
+	{
+		if (ForceGamepad != nullptr)
+		{
+			ForceGamepad->Set(PreviousForce, ECVF_SetByCode);
+		}
+	};
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	// 1/60 s: de ronde legt bijna 300 meter af, en 8 ms-resolutie koopt daar
+	// niets voor terwijl het de wandkloktijd verdubbelt.
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (!TestNotNull(TEXT("speelronde: campagne"), Campaign) || !TestNotNull(TEXT("speelronde: strategie"), Strategy)
+		|| !TestNotNull(TEXT("speelronde: prep"), Prep) || !TestNotNull(TEXT("speelronde: missie"), Mission)
+		|| !TestNotNull(TEXT("speelronde: eventbus"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Het district hoort te staan vóór de missie start: dat is wat InitGame doet,
+	// en zonder sites is er niets om naartoe te lopen.
+	int32 PlayerStarts = 0;
+	for (TActorIterator<APlayerStart> It(Harness.World); It; ++It)
+	{
+		++PlayerStarts;
+	}
+	TestTrue(FString::Printf(TEXT("speelronde: het district staat (%d insertiepunten)"), PlayerStarts), PlayerStarts > 0);
+
+	// --- squad-feiten meeluisteren -----------------------------------------
+	FSquadWatch Watch;
+	FEclipseEventSubscriptionHandle SquadHandle = Bus->Subscribe(
+		FGameplayTag::RequestGameplayTag(TEXT("Event.Squad")),
+		FEclipseEventNativeDelegate::CreateLambda([&Watch](FGameplayTag Tag, const FInstancedStruct& Payload)
+		{
+			const FString Name = Tag.ToString();
+			if (Name.Contains(TEXT("Acknowledged")))
+			{
+				++Watch.Acknowledged;
+			}
+			else if (Name.Contains(TEXT("Refused")))
+			{
+				++Watch.Refused;
+				// De REDEN meenemen, niet alleen de tag: "orders zijn beloftes"
+				// (GDD 8.4) betekent dat een weigering beredeneerd is, en een
+				// rapport dat alleen "geweigerd" zegt is zelf een stilte.
+				const FEclipseSquadEventPayload* Squad = Payload.GetPtr<FEclipseSquadEventPayload>();
+				Watch.RefusalLines.Add(Squad != nullptr
+					? FString::Printf(TEXT("%s (reden: %s, bark: '%s')"), *Name, *Squad->Reason.ToString(), *Squad->BarkLine)
+					: Name);
+			}
+		}));
+
+	// Beloningen worden gemeten aan de COMMIT-EIGEN feiten (Event.Economy.
+	// ResourcesChanged met reden "MissionReward") en niet aan wallet-delta's: de
+	// dagtick boekt legitiem eigen inkomsten en uitgaven, dus een saldoverschil
+	// zegt niets over wat de missie uitkeerde. Dezelfde discipline als de
+	// M1.1-Gauntlet in EclipseMissionM1Tests.
+	int32 CreditsRewarded = 0;
+	int32 MaterialsRewarded = 0;
+	FEclipseEventSubscriptionHandle RewardHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&CreditsRewarded, &MaterialsRewarded](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			const FEclipseEconomyEventPayload* Economy = Payload.GetPtr<FEclipseEconomyEventPayload>();
+			if (Economy == nullptr || Economy->Reason != TEXT("MissionReward"))
+			{
+				return;
+			}
+			if (Economy->ResourceType == EclipseTags::Resource_Credits.GetTag()) { CreditsRewarded += Economy->Delta; }
+			if (Economy->ResourceType == EclipseTags::Resource_Materials.GetTag()) { MaterialsRewarded += Economy->Delta; }
+		}));
+
+	// --- 1. starten via het ECHTE laadpad -----------------------------------
+	const int32 DayBefore = Campaign->GetState().Day;
+	// Wallet is een tag->saldo-map (GDD 14.2: grondstofsoorten zijn data).
+	auto Wallet = [Campaign](const FGameplayTag& Resource)
+	{
+		const int32* Balance = Campaign->GetState().Wallet.Find(Resource);
+		return Balance != nullptr ? *Balance : 0;
+	};
+	const int32 MaterialsBefore = Wallet(EclipseTags::Resource_Materials);
+	const int32 CreditsBefore = Wallet(EclipseTags::Resource_Credits);
+
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("speelronde: missie geselecteerd op TransitCheckpoint (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error)))
+	{
+		Bus->Unsubscribe(SquadHandle);
+		Harness.Shutdown();
+		return false;
+	}
+	if (!TestTrue(FString::Printf(TEXT("speelronde: gelanceerd via AutoLaunch (%s)"), *Error), Prep->AutoLaunch(Error)))
+	{
+		Bus->Unsubscribe(SquadHandle);
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f); // insertie laten landen (pawn naar Entry_Main, spawns)
+
+	TestTrue(TEXT("speelronde: de missie loopt"), Mission->GetPhase() == EEclipseMissionPhase::Objectives
+		|| Mission->GetPhase() == EEclipseMissionPhase::Insertion);
+	const TArray<FEclipseObjectiveDef>& Objectives = Mission->GetActiveObjectives();
+	AddInfo(FString::Printf(TEXT("speelronde: %d objectives actief, squad van %d, start op %s"),
+		Objectives.Num(), Mission->GetDeployedSoldierIds().Num(), *Harness.Location().ToCompactString()));
+	TestTrue(TEXT("speelronde: er zijn objectives om te halen"), Objectives.Num() >= 2);
+
+	// --- 2. een order geven, en er antwoord op krijgen ----------------------
+	// "Orders zijn beloftes" (GDD 8.4): elke order hoort exact één ack of één
+	// beredeneerde weigering te krijgen. Stilte is de fout die dit meet.
+	if (UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>())
+	{
+		Watch.Issued = 1;
+		Squad->IssueOrderToAll(EEclipseSquadOrder::MoveTo, Harness.Location() + FVector(600.0f, 0.0f, 0.0f), nullptr);
+		Harness.Idle(0.5f);
+		const int32 Answers = Watch.Acknowledged + Watch.Refused;
+		Report(*this, TEXT("orders gegeven"), Watch.Issued, TEXT(""));
+		Report(*this, TEXT("antwoorden terug (ack + weigering)"), Answers, TEXT(""), TEXT("nooit 0 — stilte is de fout"));
+		TestTrue(FString::Printf(TEXT("speelronde: de order kreeg antwoord (%d ack, %d geweigerd)"),
+				Watch.Acknowledged, Watch.Refused), Answers > 0);
+		Report(*this, TEXT("order-round-trip, slechtste"), Squad->GetOrderRoundTripStats().WorstSeconds, TEXT("s"), TEXT("< 1 s (R3-criterium 1)"));
+	}
+
+	// --- 3. oprukken EN vechten ---------------------------------------------
+	// Niet eerst lopen en dan pas kijken: de eerste ronde liep zo recht in vier
+	// vuurmonden en de speler lag neer voordat hij het site zag. Elke tick de
+	// dichtstbijzijnde levende vijand zoeken; is die binnen ONS bereik (5000 cm,
+	// AR_Foundry) maar liefst nog buiten het hunne (2500-3000 cm perceptie), dan
+	// staan blijven en vuren. Anders doorlopen. Dat is wat een speler doet die
+	// zijn wapenbereik kent, en het is de enige manier waarop deze missie te
+	// winnen is met 100 HP tegen vier schutters.
+	const FVector StartLocation = Harness.Location();
+	constexpr float EngageRangeCm = 4200.0f;
+
+	auto FindNearestHostile = [&Harness]() -> AEclipseCharacter*
+	{
+		AEclipseCharacter* Nearest = nullptr;
+		float NearestDistance = TNumericLimits<float>::Max();
+		for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+		{
+			AEclipseCharacter* Character = *It;
+			if (Character == nullptr || Character == Harness.Body || Character->IsPlayerSide() || Character->IsDowned())
+			{
+				continue;
+			}
+			const float Distance = FVector::Dist(Character->GetActorLocation(), Harness.Location());
+			if (Distance < NearestDistance)
+			{
+				NearestDistance = Distance;
+				Nearest = Character;
+			}
+		}
+		return Nearest;
+	};
+
+	int32 HostilesAtStart = 0;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Character = *It;
+		if (Character != nullptr && Character != Harness.Body && !Character->IsPlayerSide())
+		{
+			++HostilesAtStart;
+		}
+	}
+	Report(*this, TEXT("vijanden gespawnd voor deze missie"), HostilesAtStart, TEXT(""), TEXT("> 0 — anders valt er niets te halen"));
+	TestTrue(TEXT("speelronde: er staan vijanden om uit te schakelen"), HostilesAtStart > 0);
+
+	// Welk objective vraagt om een dood doelwit?
+	const FName DestroyObjectiveId = [&Objectives]()
+	{
+		for (const FEclipseObjectiveDef& O : Objectives)
+		{
+			if (O.Type == EEclipseObjectiveType::DestroyTarget) { return O.ObjectiveId; }
+		}
+		return FName(NAME_None);
+	}();
+	TestTrue(TEXT("speelronde: M1.1 heeft een DestroyTarget-objective"), !DestroyObjectiveId.IsNone());
+
+	// Bewijs dat AANWEZIGHEID het niet doet: we staan straks pal op het site en
+	// het objective mag pas afgaan als er geschoten is. Nu, aan het begin, hoort
+	// hij sowieso open te staan.
+	TestFalse(TEXT("speelronde: het DestroyTarget-objective staat nog open bij vertrek"),
+		Mission->GetCompletedObjectiveIds().Contains(DestroyObjectiveId));
+
+	int32 FiringTicks = 0;
+	int32 HostilesDowned = 0;
+	bool bReachedPost = false;
+	{
+		const int32 MaxSteps = FMath::RoundToInt(120.0f / Options.StepSeconds);
+		const int32 ProgressWindow = FMath::RoundToInt(0.5f / Options.StepSeconds);
+		const int32 StalledFireLimit = FMath::RoundToInt(2.0f / Options.StepSeconds);
+		float DistanceAtWindowStart = FVector::Dist2D(Harness.Location(), SiteControlPost);
+		int32 StepsInWindow = 0;
+		int32 SidestepStepsLeft = 0;
+		float SidestepDirection = 1.0f;
+		// Zakt het leven van het doelwit niet, dan schieten we in dekking. Een
+		// speler loopt dan door tot hij zicht heeft; dat doet dit ook.
+		AEclipseCharacter* LastTarget = nullptr;
+		float LastTargetHealth = 0.0f;
+		int32 TicksWithoutDamage = 0;
+
+		for (int32 I = 0; I < MaxSteps && !Harness.Body->IsDowned(); ++I)
+		{
+			const bool bObjectiveDone = Mission->GetCompletedObjectiveIds().Contains(DestroyObjectiveId);
+			AEclipseCharacter* Hostile = FindNearestHostile();
+			const float HostileDistance = Hostile != nullptr
+				? FVector::Dist(Hostile->GetActorLocation(), Harness.Location()) : TNumericLimits<float>::Max();
+
+			if (Hostile != nullptr && HostileDistance <= EngageRangeCm)
+			{
+				if (Hostile != LastTarget)
+				{
+					LastTarget = Hostile;
+					LastTargetHealth = Hostile->GetHealth();
+					TicksWithoutDamage = 0;
+				}
+				else if (Hostile->GetHealth() < LastTargetHealth - KINDA_SMALL_NUMBER)
+				{
+					LastTargetHealth = Hostile->GetHealth();
+					TicksWithoutDamage = 0;
+				}
+				else
+				{
+					++TicksWithoutDamage;
+				}
+
+				// Borsthoogte, niet de actor-oorsprong: die ligt bij een character op
+				// vloerniveau, en een schot daarheen gaat onder hem door.
+				Harness.AimAt(Hostile->GetActorLocation() + FVector(0.0f, 0.0f, 40.0f));
+				Harness.Inject(TEXT("Fire"), true);
+				++FiringTicks;
+				if (TicksWithoutDamage > StalledFireLimit && HostileDistance > 800.0f)
+				{
+					// Twee seconden vuren zonder schade = dekking. Doorlopen.
+					Harness.Inject(TEXT("Move"), FVector2D(0.0f, 1.0f));
+				}
+				Harness.Step();
+				continue;
+			}
+
+			const float Distance = FVector::Dist2D(Harness.Location(), SiteControlPost);
+			if (bObjectiveDone && HostileDistance > EngageRangeCm)
+			{
+				bReachedPost = true;
+				break; // doel geraakt en niemand meer in bereik: door naar extractie
+			}
+			if (Distance <= 700.0f && Hostile == nullptr)
+			{
+				bReachedPost = true;
+				break;
+			}
+			if (++StepsInWindow >= ProgressWindow)
+			{
+				if (SidestepStepsLeft <= 0 && DistanceAtWindowStart - Distance < 20.0f)
+				{
+					SidestepStepsLeft = FMath::RoundToInt(0.8f / Options.StepSeconds);
+					SidestepDirection = -SidestepDirection;
+				}
+				DistanceAtWindowStart = Distance;
+				StepsInWindow = 0;
+			}
+			Harness.AimAt(FVector(SiteControlPost.X, SiteControlPost.Y, Harness.Location().Z + 60.0f));
+			const bool bSidestepping = SidestepStepsLeft > 0;
+			if (bSidestepping)
+			{
+				--SidestepStepsLeft;
+			}
+			Harness.Inject(TEXT("Move"), bSidestepping ? FVector2D(SidestepDirection, 0.35f) : FVector2D(0.0f, 1.0f));
+			Harness.Step();
+		}
+	}
+
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Character = *It;
+		if (Character != nullptr && Character != Harness.Body && !Character->IsPlayerSide() && Character->IsDowned())
+		{
+			++HostilesDowned;
+		}
+	}
+
+	Report(*this, TEXT("afgelegde weg naar het controlepost"), FVector::Dist2D(Harness.Location(), StartLocation), TEXT("cm"));
+	Report(*this, TEXT("resterende afstand tot het site"), FVector::Dist2D(Harness.Location(), SiteControlPost), TEXT("cm"));
+	Report(*this, TEXT("ticks waarin gevuurd is"), FiringTicks, TEXT(""), TEXT("> 0 — er MOET geschoten worden"));
+	TestFalse(TEXT("speelronde: de speler overleefde het vuurgevecht"), Harness.Body->IsDowned());
+	TestTrue(TEXT("speelronde: er is daadwerkelijk gevuurd"), FiringTicks > 0);
+
+	Report(*this, TEXT("vijanden neergehaald"), HostilesDowned, TEXT(""), TEXT("minstens het doelwit"));
+	TestTrue(TEXT("speelronde: er ging minstens één vijand neer"), HostilesDowned > 0);
+
+	// --- 4. het objective is af DOOR TE SCHIETEN ----------------------------
+	Harness.Idle(0.3f);
+	TestTrue(TEXT("speelronde: 'take out the patrol leader' is af — door te schieten, niet door erlangs te lopen"),
+		Mission->GetCompletedObjectiveIds().Contains(DestroyObjectiveId));
+
+	// --- 5. naar extractie, en dus naar de debrief --------------------------
+	// 150 cm en niet 700: de objective-trigger is een box met extent 200, dus op
+	// 700 cm sta je er netjes naast en gebeurt er niets. De eerste ronde haalde
+	// 698 cm en meldde "aangekomen" terwijl de missie gewoon doorliep — een
+	// aankomstradius die groter is dan de trigger meet zichzelf voor de gek.
+	const bool bReachedExfil = Harness.DriveTo(SiteExtraction, /*MaxSeconds*/ 90.0, /*ArriveRadius*/ 150.0f);
+	Report(*this, TEXT("resterende afstand tot extractie"), FVector::Dist2D(Harness.Location(), SiteExtraction), TEXT("cm"), TEXT("< 150 (trigger-box extent 200)"));
+	TestTrue(TEXT("speelronde: extractie is te bereiken (geen vastloper)"), bReachedExfil);
+	Harness.Idle(0.5f);
+
+	// --- 6. asserteren op de UITKOMST ---------------------------------------
+	TestTrue(TEXT("speelronde: de missie is afgerond (debrief bereikt)"),
+		Mission->GetPhase() == EEclipseMissionPhase::Finished);
+	const FEclipseMissionOutcome& Outcome = Mission->GetLastOutcome();
+	AddInfo(FString::Printf(TEXT("speelronde: debrief — geslaagd=%d, %d/%d objectives"),
+		Outcome.bSuccess ? 1 : 0, Mission->GetCompletedObjectiveIds().Num(), Objectives.Num()));
+	TestTrue(TEXT("speelronde: de run slaagde (alle verplichte objectives gehaald)"), Outcome.bSuccess);
+
+	const int32 DayAfter = Campaign->GetState().Day;
+	const int32 MaterialsAfter = Wallet(EclipseTags::Resource_Materials);
+	const int32 CreditsAfter = Wallet(EclipseTags::Resource_Credits);
+	Report(*this, TEXT("dagklok voor -> na"), DayAfter - DayBefore, TEXT("dagen"), TEXT("+1 — elke missie kost een dag"));
+	Report(*this, TEXT("materialen uitgekeerd (commit-feit)"), MaterialsRewarded, TEXT(""), TEXT("M1.1-band: 25"));
+	Report(*this, TEXT("credits uitgekeerd (commit-feit)"), CreditsRewarded, TEXT(""), TEXT("M1.1-band: 50"));
+	Report(*this, TEXT("wallet-delta materialen (dagtick meegerekend)"), MaterialsAfter - MaterialsBefore, TEXT(""), TEXT("ter informatie, geen criterium"));
+	Report(*this, TEXT("wallet-delta credits (dagtick meegerekend)"), CreditsAfter - CreditsBefore, TEXT(""), TEXT("ter informatie, geen criterium"));
+	TestTrue(FString::Printf(TEXT("speelronde: de dag is opgeschoven (%d -> %d)"), DayBefore, DayAfter), DayAfter > DayBefore);
+	TestEqual(TEXT("speelronde: de missie keerde de materialen van de rij uit"), MaterialsRewarded, 25);
+	TestEqual(TEXT("speelronde: de missie keerde de credits van de rij uit"), CreditsRewarded, 50);
+
+	// Regiostaat: M1.1 mag de wereld NIET flippen (SPEC-P2-04 besluit 6 — M1.3 is
+	// via de P2-05-naad de enige world-state-change). Dit is de assert die een
+	// per ongeluk aangezette bProgressRegionOnSuccess zou vangen.
+	if (const FEclipseRegionState* Region = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint")))
+	{
+		AddInfo(FString::Printf(TEXT("speelronde: TransitCheckpoint blijft van %s"),
+			*UEnum::GetValueAsString(Region->Owner)));
+		TestTrue(TEXT("speelronde: M1.1 flipt de regio niet (SPEC-P2-04 besluit 6)"),
+			Region->Owner != EEclipseRegionOwner::Player);
+	}
+
+	// --- 7. het budget en de stiltes ----------------------------------------
+	// EERLIJK: dit is de kosten van de GAME-THREAD-simulatie, niet de framerate.
+	// Headless rendert niets, dus GPU-tijd komt hier niet in voor en dat mag dit
+	// getal ook niet suggereren.
+	Report(*this, TEXT("game-thread per tick, gemiddeld"), Harness.AverageStepMs(), TEXT("ms"), TEXT("< 16.7 ms (60 fps-budget, 12.4)"));
+	Report(*this, TEXT("game-thread per tick, slechtste"), Harness.WorstStepMs, TEXT("ms"), TEXT("uitschieters horen bij spawns"));
+	Report(*this, TEXT("ticks in deze ronde"), Harness.StepCount, TEXT(""));
+	Report(*this, TEXT("gesimuleerde speeltijd"), Harness.ElapsedSeconds, TEXT("s"));
+	TestTrue(FString::Printf(TEXT("speelronde: de game-thread blijft binnen het 60 fps-budget (%.2f ms gemiddeld)"),
+			Harness.AverageStepMs()), Harness.AverageStepMs() < 16.7);
+
+	Report(*this, TEXT("squad-weigeringen"), Watch.Refused, TEXT(""), TEXT("mag, maar nooit stil"));
+	for (const FString& Line : Watch.RefusalLines)
+	{
+		AddInfo(FString::Printf(TEXT("speelronde: weigering — %s"), *Line));
+	}
+
+	Bus->Unsubscribe(SquadHandle);
+	Bus->Unsubscribe(RewardHandle);
+	Harness.Shutdown();
+	return true;
+}
+
+
+// ---------------------------------------------------------------------------
+// De regressiepin onder het defect dat de speelronde vond
+// ---------------------------------------------------------------------------
+//
+// De volle speelronde hierboven bewijst dat de missie te WINNEN is door te
+// schieten. Deze test bewijst het omgekeerde, en dat is de helft die het defect
+// zou hebben gevangen: er STAAN op een DestroyTarget-site vinkt hem niet af.
+// Puur op de runtime-naad, zonder wereld — snel genoeg om elke bar mee te lopen.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipsePresenceDoesNotDestroyTest,
+	"Eclipse.Playthrough.PresenceNeverCompletesADestroyObjective",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipsePresenceDoesNotDestroyTest::RunTest(const FString& Parameters)
+{
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	const UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (!TestNotNull(TEXT("pin: DA_CampaignSetup"), Setup))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	Campaign->StartNewCampaign(Setup);
+
+	FString Error;
+	if (!TestTrue(TEXT("pin: M1.1 geselecteerd"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error))
+		|| !TestTrue(TEXT("pin: M1.1 gelanceerd"), Prep->AutoLaunch(Error)))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	FName DestroySite = NAME_None;
+	FName DestroyObjectiveId = NAME_None;
+	for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
+	{
+		if (Objective.Type == EEclipseObjectiveType::DestroyTarget)
+		{
+			DestroySite = Objective.TargetId;
+			DestroyObjectiveId = Objective.ObjectiveId;
+			break;
+		}
+	}
+	if (!TestTrue(TEXT("pin: M1.1 heeft een DestroyTarget-objective"), !DestroyObjectiveId.IsNone()))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// Dit is precies wat AEclipseObjectiveTrigger doet als je het vak binnenloopt.
+	// Tien keer, want een speler loopt heen en weer over zo'n site.
+	for (int32 I = 0; I < 10; ++I)
+	{
+		Mission->NotifySiteEntered(DestroySite);
+	}
+	TestFalse(TEXT("pin: erop staan vinkt het DestroyTarget-objective NIET af"),
+		Mission->GetCompletedObjectiveIds().Contains(DestroyObjectiveId));
+
+	// En de andere helft: het doelwit neerhalen doet het wél. Zonder deze assert
+	// zou "nooit voltooien" ook groen zijn, en dat is een erger defect.
+	Mission->CompleteObjectiveByTarget(DestroySite);
+	TestTrue(TEXT("pin: het doelwit neerhalen vinkt hem wél af"),
+		Mission->GetCompletedObjectiveIds().Contains(DestroyObjectiveId));
+
+	// Presence-typen blijven werken zoals ze deden — de gate mag niet te breed zijn.
+	for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
+	{
+		if (Objective.Type == EEclipseObjectiveType::ReachLocation || Objective.Type == EEclipseObjectiveType::CollectItem)
+		{
+			Mission->NotifySiteEntered(Objective.TargetId);
+			TestTrue(FString::Printf(TEXT("pin: aanwezigheid vervult '%s' wél"), *Objective.ObjectiveId.ToString()),
+				Mission->GetCompletedObjectiveIds().Contains(Objective.ObjectiveId));
+		}
+	}
+
+	GameInstance->Shutdown();
+	return true;
+}
+
+#endif // WITH_DEV_AUTOMATION_TESTS

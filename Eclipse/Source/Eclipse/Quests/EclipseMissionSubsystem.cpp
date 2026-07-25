@@ -195,6 +195,31 @@ bool UEclipseMissionSubsystem::CompleteObjective(FName ObjectiveId, FString& Out
 	return true;
 }
 
+void UEclipseMissionSubsystem::NotifySiteEntered(FName SiteId)
+{
+	const FEclipseObjectiveDef* Objective = ActiveObjectives.FindByPredicate(
+		[SiteId](const FEclipseObjectiveDef& O) { return O.TargetId == SiteId; });
+	if (Objective == nullptr)
+	{
+		return; // unbound site — sites outlive missions, that is not an error
+	}
+	if (Objective->Type == EEclipseObjectiveType::DestroyTarget)
+	{
+		// Aanwezigheid vervult dit type niet. Luid en één keer per site, want een
+		// speler die hier staat en niets ziet gebeuren verdient een reden — dit is
+		// precies het soort stilte dat de speelronde moet vinden (GDD 14.3.5).
+		if (!SitesReportedAsPresenceOnly.Contains(SiteId))
+		{
+			SitesReportedAsPresenceOnly.Add(SiteId);
+			UE_LOG(LogEclipse, Verbose,
+				TEXT("Objective '%s' op site '%s' is een DestroyTarget: aanwezigheid vinkt hem niet af, het doel moet neer."),
+				*Objective->ObjectiveId.ToString(), *SiteId.ToString());
+		}
+		return;
+	}
+	CompleteObjectiveByTarget(SiteId);
+}
+
 void UEclipseMissionSubsystem::CompleteObjectiveByTarget(FName TargetId)
 {
 	const FEclipseObjectiveDef* Objective = ActiveObjectives.FindByPredicate(
@@ -439,6 +464,7 @@ void UEclipseMissionSubsystem::ResetRuntime()
 	DownedSoldiers.Reset();
 	DownedAtSeconds.Reset();
 	StabilizedSoldiers.Reset();
+	SitesReportedAsPresenceOnly.Reset();
 	bAlarmRaised = false;
 	bProgressRegionOnSuccess = true;
 	Phase = EEclipseMissionPhase::None;

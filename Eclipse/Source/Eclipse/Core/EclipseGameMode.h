@@ -37,6 +37,21 @@ private:
 	/** Player body down = mission failure (fail-forward at debrief, GDD 11.4). */
 	void HandlePlayerDowned(AEclipseCharacter* Player, FName Cause);
 
+	/**
+	 * Een vijand van de missie ging neer. Ligt de LAATSTE van de set die bij het
+	 * doelwit-site hoort, dan is het DestroyTarget-objective vervuld.
+	 *
+	 * Dit pad ontbrak volledig tot 2026-07-25: DestroyTarget had geen enkele
+	 * voltooiingsroute, en de overlap-trigger vinkte hem daarom af zodra je
+	 * langsliep. De game mode is de eerlijke plek voor deze koppeling, want hij is
+	 * degene die de vijandenset spawnt en dus als enige weet wanneer hij op is.
+	 */
+	void HandleHostileDowned(AEclipseCharacter* Hostile, FName Cause);
+
+	/** De vijanden die bij het DestroyTarget-site horen, en dat site zelf. */
+	TArray<TWeakObjectPtr<AEclipseCharacter>> ObjectiveHostiles;
+	FName ObjectiveHostileSiteId;
+
 #if !UE_BUILD_SHIPPING
 	/**
 	 * Screenshot review rig (Part 15.8/15.9): with -EclipseShot on the command

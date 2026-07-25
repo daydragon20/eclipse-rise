@@ -65,18 +65,43 @@ namespace EclipseFeelHarness
 		/** Opgetelde wereldtijd sinds Start(), in seconden. */
 		double ElapsedSeconds = 0.0;
 
+		/** Wall-clock kosten van de wereldticks — de game-thread-kant van het
+		 *  12.4-budget. Meet GEEN GPU: headless rendert niets, en dat hoort in de
+		 *  rapportage te staan in plaats van als "framerate" verkocht te worden. */
+		double WorstStepMs = 0.0;
+		double TotalStepMs = 0.0;
+		int32 StepCount = 0;
+		double AverageStepMs() const { return StepCount > 0 ? TotalStepMs / StepCount : 0.0; }
+
+		/** Stapgrootte van Step()/Idle()/HoldFor(). De speelronde zet hem grover:
+		 *  die legt honderden meters af en heeft geen 8 ms-resolutie nodig. */
+		float StepSeconds = FixedStepSeconds;
+
 		bool IsValid() const { return World != nullptr && Controller != nullptr && Body != nullptr && Input != nullptr; }
+
+		struct FOptions
+		{
+			/**
+			 * ECHTE AEclipseGameMode in plaats van een kale wereld: die bouwt bij
+			 * InitGame het graybox-district en spawnt op Event.Mission.Started de
+			 * squad en de vijanden. Nodig voor de speelronde, ongewenst voor een
+			 * locomotie-meting (die wil een vlakke, lege vloer).
+			 */
+			bool bRealGameMode = false;
+			float StepSeconds = FixedStepSeconds;
+		};
 
 		/**
 		 * Wereld op, vloer erin, speler erin, tuning erop. Faalt luid via Test en
 		 * geeft false terug; de aanroeper hoort dan af te breken.
 		 */
-		bool Start(FAutomationTestBase& Test);
+		bool Start(FAutomationTestBase& Test, const FOptions& Options = FOptions());
 		void Shutdown();
 
-		/** Eén vaste stap wereldtijd. Injecties gelden per tick, dus wie een toets
-		 *  vast wil houden, injecteert vóór elke stap opnieuw (zie HoldFor). */
-		void Step(float DeltaSeconds = FixedStepSeconds);
+		/** Eén vaste stap wereldtijd. 0 = gebruik StepSeconds. Injecties gelden per
+		 *  tick, dus wie een toets vast wil houden, injecteert vóór elke stap
+		 *  opnieuw (zie HoldFor). */
+		void Step(float DeltaSeconds = 0.0f);
 
 		/** N stappen zonder injectie — "niets aanraken". */
 		void Idle(float Seconds);
@@ -114,6 +139,28 @@ namespace EclipseFeelHarness
 		/** Loop vooruit tot de snelheid niet meer noemenswaardig stijgt, zodat een
 		 *  meting op "volle snelheid" ook echt daar begint. */
 		bool RunUpToTopSpeed(FAutomationTestBase& Test, double MaxSeconds = 4.0);
+
+		// ---- de speelronde --------------------------------------------------
+		//
+		// Sturen gebeurt via de MUIS-tak van HandleLook, niet via de stick-tak.
+		// Die tak is lineair en zonder deadzone, dus een koersfout is in één tick
+		// weg te draaien en de route wordt niet ondergesneeuwd door een
+		// stuurregelaar die zichzelf zit te corrigeren. De stick-tak (deadzone,
+		// curve, graden per seconde) wordt apart en volledig gemeten in laag 2 —
+		// hier gaat het om de missie, niet om de invoercurve.
+
+		/** Draai de kijkrichting naar een wereldpunt (yaw én pitch), één tick. */
+		void AimAt(const FVector& WorldPoint);
+
+		/**
+		 * Loop naar een routepunt: elke tick bijsturen en vooruit duwen. Geeft
+		 * true zodra het punt binnen ArriveRadiusCm ligt, false bij time-out —
+		 * en dat laatste is een vastloper, precies wat deze ronde moet vinden.
+		 */
+		bool DriveTo(const FVector& Target, double MaxSeconds, float ArriveRadiusCm = 250.0f, bool bSprint = true);
+
+		/** Richt op een lichaam en vuur tot het neerligt. False = time-out. */
+		bool EngageHostile(class AEclipseCharacter& Hostile, double MaxSeconds);
 	};
 
 	/** Eén regel met naam, gemeten waarde en eenheid — het log dat de owner leest.

@@ -276,6 +276,9 @@ void AEclipseGameMode::OnMissionLifecycle(FGameplayTag EventTag, const FInstance
 
 void AEclipseGameMode::DespawnMissionActors()
 {
+	ObjectiveHostiles.Reset();
+	ObjectiveHostileSiteId = NAME_None;
+
 	if (UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr)
 	{
 		Squad->UnregisterAll();
@@ -304,6 +307,36 @@ void AEclipseGameMode::HandlePlayerDowned(AEclipseCharacter* /*Player*/, FName /
 		FString Error;
 		Mission->ResolveDebrief(false, Error);
 	}
+}
+
+void AEclipseGameMode::HandleHostileDowned(AEclipseCharacter* /*Hostile*/, FName /*Cause*/)
+{
+	if (ObjectiveHostileSiteId.IsNone())
+	{
+		return;
+	}
+	// Alle vijanden van de set moeten neer zijn. Een vernietigde (invalid) actor
+	// telt als neer: hij is er niet meer, en de speler kan hem niet alsnog raken.
+	for (const TWeakObjectPtr<AEclipseCharacter>& Hostile : ObjectiveHostiles)
+	{
+		const AEclipseCharacter* Live = Hostile.Get();
+		if (Live != nullptr && !Live->IsDowned())
+		{
+			return;
+		}
+	}
+
+	UEclipseMissionSubsystem* Mission = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseMissionSubsystem>() : nullptr;
+	if (Mission == nullptr)
+	{
+		return;
+	}
+	UE_LOG(LogEclipse, Display, TEXT("GameMode: het doelwit bij '%s' ligt neer — DestroyTarget vervuld."),
+		*ObjectiveHostileSiteId.ToString());
+	Mission->CompleteObjectiveByTarget(ObjectiveHostileSiteId);
+	// Eén keer: verdere downs mogen niet opnieuw voltooien (CompleteObjective is
+	// idempotent, maar een tweede logregel zou liegen over wat er gebeurde).
+	ObjectiveHostileSiteId = NAME_None;
 }
 
 FVector AEclipseGameMode::FindSiteLocation(FName SiteId, const FVector& Fallback) const
@@ -508,6 +541,21 @@ void AEclipseGameMode::SpawnMissionActors()
 	int32 EnemyIndex = 0;
 	const FVector PrimarySite = FindSiteLocation(TEXT("Site_ControlPost"), PlayerLocation + FVector(3000.0f, 0.0f, 0.0f));
 
+	// Welk site vraagt om een DESTROYED doelwit? De vijanden die daar spawnen zijn
+	// dat doelwit, en zodra de laatste neerligt is het objective vervuld. Zonder
+	// deze koppeling had DestroyTarget geen enkel voltooiingspad en vinkte de
+	// overlap-trigger hem af op aanwezigheid (gevonden door de speelronde).
+	ObjectiveHostiles.Reset();
+	ObjectiveHostileSiteId = NAME_None;
+	for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
+	{
+		if (Objective.Type == EEclipseObjectiveType::DestroyTarget)
+		{
+			ObjectiveHostileSiteId = Objective.TargetId;
+			break;
+		}
+	}
+
 	TArray<TPair<FName, const FEclipseEnemyArchetypeRow*>> ArchetypeRows;
 	if (ArchetypeTable != nullptr && ArchetypeTable->GetRowStruct() == FEclipseEnemyArchetypeRow::StaticStruct())
 	{
@@ -557,6 +605,19 @@ void AEclipseGameMode::SpawnMissionActors()
 			Controller->Possess(Enemy);
 			SpawnedMissionActors.Add(Controller);
 			++EnemyIndex;
+		}
+		if (!ObjectiveHostileSiteId.IsNone() && ObjectiveHostiles.IsEmpty())
+		{
+			// De EERSTE vijand van de set is het doelwit. M1.1 zegt "take out the
+			// patrol leader", enkelvoud: de andere drie zijn de patrouille, en die
+			// hoef je niet allemaal om te leggen om de hinderlaag te laten slagen.
+			// Eerst stond hier "alle vier", en de speelronde liet meteen zien
+			// waarom dat de verkeerde lezing is: één schutter achter dekking hield
+			// het objective 94 seconden lang open terwijl de missie al klaar was.
+			Enemy->OnDowned.AddUObject(this, &AEclipseGameMode::HandleHostileDowned);
+			ObjectiveHostiles.Add(Enemy);
+			UE_LOG(LogEclipse, Display, TEXT("GameMode: '%s' is het doelwit van '%s' (DestroyTarget)."),
+				*Enemy->GetName(), *ObjectiveHostileSiteId.ToString());
 		}
 		SpawnedMissionActors.Add(Enemy);
 	}

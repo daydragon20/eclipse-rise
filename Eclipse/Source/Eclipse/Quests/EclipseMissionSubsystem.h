@@ -44,6 +44,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
 	void CompleteObjectiveByTarget(FName TargetId);
 
+	/**
+	 * Een speler-eigen lichaam betrad een site. Voltooit ALLEEN objectives die
+	 * aanwezigheid kán vervullen — ReachLocation, CollectItem, ExtractSquad.
+	 *
+	 * Gevonden door de geautomatiseerde speelronde (2026-07-25): de overlap-
+	 * trigger riep CompleteObjectiveByTarget aan zonder naar het TYPE te kijken,
+	 * dus "Spring the ambush: take out the patrol leader" was af zodra je erlangs
+	 * liep. Geen enkele test merkte dat, want de missie eindigde keurig in een
+	 * geslaagde debrief — alleen zonder dat er iets gebeurd was. Een objective
+	 * die vraagt om schieten mag niet afgevinkt worden door lopen.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Eclipse|Mission")
+	void NotifySiteEntered(FName SiteId);
+
 	/** Roster ids deployed on the active mission (game-mode spawn wiring). */
 	const TArray<FGuid>& GetDeployedSoldierIds() const { return DeployedSoldierIds; }
 
@@ -146,6 +160,10 @@ private:
 
 	/** Run-scoped alarm latch (SPEC-P2-04): set once by NotifyAlarmRaised, reset by StartMission. */
 	bool bAlarmRaised = false;
+
+	/** Sites waar al gemeld is dat aanwezigheid het objective niet vervult — één
+	 *  regel per site per run, geen spam per overlap-frame. */
+	TSet<FName> SitesReportedAsPresenceOnly;
 
 	bool bProgressRegionOnSuccess = true;
 
