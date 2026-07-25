@@ -129,6 +129,23 @@ void AEclipsePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void AEclipsePlayerController::LogNavigationState(const TCHAR* When) const
+{
+	const UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if (Nav == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("Navigatie (%s): GEEN navigatiesysteem in deze wereld — de squad kan nergens heen."), When);
+		return;
+	}
+	FNavLocation Projected;
+	const bool bNavUnderPawn = GetPawn() != nullptr
+		&& Nav->ProjectPointToNavigation(GetPawn()->GetActorLocation(), Projected, FVector(500.0f, 500.0f, 500.0f));
+	UE_LOG(LogEclipse, Display,
+		TEXT("Navigatie (%s): %d grens(zen), navmesh onder de speler = %s.%s"),
+		When, Nav->GetNavigationBounds().Num(), bNavUnderPawn ? TEXT("JA") : TEXT("NEE"),
+		bNavUnderPawn ? TEXT("") : TEXT(" Zonder navmesh weigert de squad elke verplaatsingsorder met 'no route'."));
+}
+
 void AEclipsePlayerController::DumpFeelState() const
 {
 	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
@@ -267,18 +284,16 @@ void AEclipsePlayerController::EnterMissionMode()
 	// NoRoute, en dat ziet er voor de speler uit als een squad die niets doet.
 	// Deze regel maakt "volgt mijn squad me?" een MEETBARE vraag in plaats van een
 	// indruk — dezelfde reden als de bindings-regel hieronder.
-	if (const UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
+	LogNavigationState(TEXT("bij missiestart"));
+	// En nog een keer NA vijf seconden, en dat is geen luxe: Recast bouwt zijn
+	// tegels asynchroon, dus een meting op t=0 is per constructie te vroeg en zegt
+	// altijd "nee". Drie diagnostische runs zijn daarop stukgelopen voordat ik
+	// doorhad dat het meetmoment het probleem was, niet de navmesh.
+	FTimerHandle NavRecheck;
+	GetWorldTimerManager().SetTimer(NavRecheck, FTimerDelegate::CreateWeakLambda(this, [this]()
 	{
-		FNavLocation Projected;
-		const bool bNavUnderPawn = GetPawn() != nullptr
-			&& Nav->ProjectPointToNavigation(GetPawn()->GetActorLocation(), Projected, FVector(500.0f, 500.0f, 500.0f));
-		UE_LOG(LogEclipse, Display, TEXT("Navigatie: %d grens(zen), navmesh onder de speler = %s. Zonder navmesh weigert de squad elke verplaatsingsorder met 'no route'."),
-			Nav->GetNavigationBounds().Num(), bNavUnderPawn ? TEXT("JA") : TEXT("NEE"));
-	}
-	else
-	{
-		UE_LOG(LogEclipse, Warning, TEXT("Navigatie: GEEN navigatiesysteem in deze wereld — de squad kan nergens heen."));
-	}
+		LogNavigationState(TEXT("vijf seconden later"));
+	}), 5.0f, /*bLoop*/ false);
 
 	// S3, feel-audit 2026-07-25: de owner bond F9 aan Eclipse.Feel.Dump via
 	// DebugExecBindings en er kwam nooit een regel in het log. "De binding is niet

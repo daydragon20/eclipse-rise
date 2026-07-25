@@ -87,6 +87,11 @@ private:
 	/** De feel-meting naar log én scherm. Eén implementatie voor F9, voor
 	 *  Eclipse.Feel.Dump en voor het harnas (S3). */
 	void DumpFeelState() const;
+
+	/** Navmesh-stand naar het log. Wordt TWEE keer aangeroepen — bij missiestart
+	 *  en vijf seconden later — omdat Recast asynchroon bouwt en een meting op
+	 *  t=0 dus altijd "nee" zegt, ongeacht of het goed komt. */
+	void LogNavigationState(const TCHAR* When) const;
 	/** 1.0 = untouched. Below 1.0 while the reticle sits on a hostile. */
 	float ComputeAimAssistScale() const;
 
