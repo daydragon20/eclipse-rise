@@ -273,6 +273,40 @@ variabelen tegelijk, dus de meting zegt niets over de grounding.
 3. Pas daarna de tweede helft van de vloerfix: een hand-geauthorde asfalt-albedo met
    celband-respons en ink-reactie. Een mix-waarde koopt alleen lage variantie.
 
+## 1j. Cyaan: de bron is gelokaliseerd, en de fix is niet nog een rood-stap (2026-07-25 20:55)
+
+Twee tint-hypotheses zijn door meting gesneuveld (BldgB verder in rood duwen deed na
+de eerste stap niets, de Graphite-regel B ≤ G evenmin). Een ruimtelijke clustering van
+de neon-pixels in cam 3 wijst nu ondubbelzinnig één object aan: **de grote gegolfde
+wand van BldgB**, de warehouse. Geen container, geen krat — één oppervlak dat een
+groot deel van dat frame vult (bounding box x 0-1400, y 440-680).
+
+**Waarom de rood-stappen daar zo weinig deden.** De toon-master rekent drie banden:
+shade, mid = `lerp(Shade, Lit, 0.5)`, en lit. Ik heb Lit en Shade verhoogd, maar het
+zichtbare wandvlak staat in de MID-band, en die is een afgeleide — hij beweegt maar
+half zo ver als de banden waar ik aan draaide.
+
+**En het echte mechanisme zit in de waarde, niet in de tint.** Authored mid is
+(0.160, 0.194, 0.220), verzadiging **0.27**. Gemeten in frame: **0.99**. De grade
+(`ColorSaturation 1.38`) werkt om de luminantie heen, en juist bij LAGE waarden is
+die versterking het sterkst — de tonemapper drukt de luma samen terwijl de chroma
+blijft staan. Een donkere gekleurde tint komt er dus altijd verzadigder uit dan hij
+erin ging, en hoe donkerder, hoe erger.
+
+**Consequentie voor de volgende poging, en dit is de reden om NIET nog een keer rood
+te verhogen:** bij deze waarde en deze grade is er geen authored verzadiging die als
+worker-teal leest én onder 0.55 in frame blijft. Er zijn twee echte uitwegen, en
+allebei zijn ze een beslissing en geen tweak:
+1. **BldgB in WAARDE omhoog** zodat de tint uit de versterkingszone komt. Botst met de
+   plafondregel uit stap 7 (niets niet-emissief boven de pool-kern), dus dit vraagt
+   een expliciete afweging — het is een groot oppervlak.
+2. **De grade laten zakken voor deze familie.** Dat is `ColorSaturation`, een
+   owner-keuze uit de kalibratieronde van 23-07 die tien andere families raakt.
+
+Meten voordat er iets verandert: eerst de mid-band apart authoren (nu is hij een
+afgeleide van twee getallen die ik voor andere redenen bijstel), zodat de knop die
+aan het zichtbare vlak zit ook echt die knop is.
+
 - Geparkeerd: **liners** (op geen enkele camera-afstand leesbaar als defect) en
   **FogDensity** (met de grond op 0.03-0.06 is er niets om op te tillen; pas
   hertesten nadat het plafond zakt).
