@@ -349,7 +349,7 @@ namespace EclipseTestGuide
 		return Count;
 	}
 
-	TArray<FString> ComposeGuidePanelLines(const FEclipseGuideProgress& Progress, const FString& OrderRoundTripFact)
+	TArray<FString> ComposeGuidePanelLines(const FEclipseGuideProgress& Progress, const FString& OrderRoundTripFact, const FString& LookSummary)
 	{
 		const TArray<FEclipseGuideStep> Steps = GetGuideSteps();
 		const TArray<EEclipseGuideStepState>& States = Progress.GetStates();
@@ -372,6 +372,13 @@ namespace EclipseTestGuide
 				GetIndexWithinPart(Active) + 1, GetPartStepCount(Part), GuidePartLabel(Part),
 				GuideConfirmWord(Part), GuideRejectWord(Part)));
 		}
+
+		// The tuned look values, on screen while you judge them (owner request):
+		// with the numbers visible you can say "yaw te snel" instead of "voelt
+		// raar", and the next tuning round starts from a value instead of a mood.
+		// Always a line, blank when nothing was passed — the panel keeps a fixed
+		// height so it never reflows under the tester's eyes.
+		Lines.Add(LookSummary);
 
 		for (int32 Index = 0; Index < Steps.Num(); ++Index)
 		{

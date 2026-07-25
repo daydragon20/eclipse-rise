@@ -56,6 +56,15 @@ private:
 	bool IsUsingGamepadLook() const;
 	/** Push the tuning asset's look/pitch numbers onto this controller. */
 	void ApplyLookTuning();
+	/** 1.0 = untouched. Below 1.0 while the reticle sits on a hostile. */
+	float ComputeAimAssistScale() const;
+
+public:
+	/** The live look values as one line, for the test guide's header. Reads the
+	 *  same members the handler uses, so it cannot advertise a stale number. */
+	FString DescribeLookTuning() const;
+
+private:
 	void IssueSquadOrder(EEclipseSquadOrder Order);
 
 	/** Boot a fresh campaign from data if none is running (SPEC-P1-08 live loop). */
@@ -118,12 +127,17 @@ private:
 
 	// Look feel, pushed from DA_CharacterTuning at possession (GDD 14.2 — feel
 	// numbers are data). Defaults mirror the asset so an untuned boot still aims.
-	float StickYawSpeed = 160.0f;
-	float StickPitchSpeed = 110.0f;
-	float StickDeadzone = 0.18f;
-	float MoveDeadzone = 0.20f;
+	float StickYawSpeed = 240.0f;
+	float StickPitchSpeed = 180.0f;
+	float StickDeadzone = 0.08f;
+	float MoveDeadzone = 0.08f;
 	float StickResponseExponent = 2.0f;
 	float MouseLookScale = 1.0f;
+	float AdsLookMultiplier = 0.35f;
+	float AimAssistStrength = 0.6f;
+	float AimAssistFloor = 0.45f;
+	float AimAssistConeDegrees = 4.0f;
+	float AimAssistRange = 5000.0f;
 	bool bInvertLookY = false;
 
 	// Command Mode inputs (SPEC-P2-02 Stage A; provisional debug bindings —

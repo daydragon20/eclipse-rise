@@ -222,17 +222,17 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 
 		// The active step is the one that carries its expectation — knowing the key
 		// without knowing what proves it worked is half an instruction (spec §2).
-		TestTrue(TEXT("The active step is marked"), Lines[1].StartsWith(TEXT(">>")));
-		TestTrue(TEXT("The active step names the keyboard control"), Lines[1].Contains(Steps[0].MouseKeyboard));
-		TestTrue(TEXT("The active step names the controller control"), Lines[1].Contains(Steps[0].Controller));
-		TestTrue(TEXT("The active step states its expectation"), Lines[1].Contains(Steps[0].Expectation));
+		TestTrue(TEXT("The active step is marked"), Lines[2].StartsWith(TEXT(">>")));
+		TestTrue(TEXT("The active step names the keyboard control"), Lines[2].Contains(Steps[0].MouseKeyboard));
+		TestTrue(TEXT("The active step names the controller control"), Lines[2].Contains(Steps[0].Controller));
+		TestTrue(TEXT("The active step states its expectation"), Lines[2].Contains(Steps[0].Expectation));
 
 		// Steps still to come show their keys but not their expectations, so the
 		// panel stays readable without scrolling.
 		TestTrue(TEXT("A future step still shows both device cells"),
-			Lines[2].Contains(Steps[1].MouseKeyboard) && Lines[2].Contains(Steps[1].Controller));
-		TestFalse(TEXT("A future step does not shout its expectation"), Lines[2].Contains(Steps[1].Expectation));
-		TestFalse(TEXT("A future step is not marked active"), Lines[2].StartsWith(TEXT(">>")));
+			Lines[3].Contains(Steps[1].MouseKeyboard) && Lines[3].Contains(Steps[1].Controller));
+		TestFalse(TEXT("A future step does not shout its expectation"), Lines[3].Contains(Steps[1].Expectation));
+		TestFalse(TEXT("A future step is not marked active"), Lines[3].StartsWith(TEXT(">>")));
 
 		TestTrue(TEXT("The tally line closes the panel"), Lines.Last().Contains(TEXT("nog open 23")));
 	}
@@ -241,10 +241,10 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 	Progress.NoteSignal(EEclipseGuideSignal::Move);
 	{
 		const TArray<FString> Lines = ComposeGuidePanelLines(Progress);
-		TestTrue(TEXT("A settled step is ticked"), Lines[1].StartsWith(TEXT("[v]")));
-		TestTrue(TEXT("A settled step says it was detected"), Lines[1].Contains(TEXT("gedetecteerd")));
-		TestFalse(TEXT("A settled step folds its expectation away"), Lines[1].Contains(Steps[0].Expectation));
-		TestTrue(TEXT("The next step became active"), Lines[2].StartsWith(TEXT(">>")));
+		TestTrue(TEXT("A settled step is ticked"), Lines[2].StartsWith(TEXT("[v]")));
+		TestTrue(TEXT("A settled step says it was detected"), Lines[2].Contains(TEXT("gedetecteerd")));
+		TestFalse(TEXT("A settled step folds its expectation away"), Lines[2].Contains(Steps[0].Expectation));
+		TestTrue(TEXT("The next step became active"), Lines[3].StartsWith(TEXT(">>")));
 		TestTrue(TEXT("The header follows along"), Lines[0].Contains(TEXT("stap 2/14")));
 		TestTrue(TEXT("The tally counts the detection"), Lines.Last().Contains(TEXT("gedetecteerd 1")));
 	}
@@ -255,7 +255,8 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 	// step: deel 2's "Order-reactie voelt direct".
 	EclipseTestGuideTest::ConfirmSteps(Progress, ControlStepCount);
 	{
-		const int32 ResponsivenessLine = ControlStepCount + 2; // header + the eleven controls + the first system step
+		// header + the look-values line + every control + the first system step
+		const int32 ResponsivenessLine = ControlStepCount + 3;
 		const TArray<FString> Blank = ComposeGuidePanelLines(Progress);
 		TestTrue(TEXT("The responsiveness row is the active one"), Blank[ResponsivenessLine].StartsWith(TEXT(">>")));
 		TestTrue(TEXT("An unmeasured meter says so"), Blank[ResponsivenessLine].Contains(TEXT("nog geen orders gemeten")));

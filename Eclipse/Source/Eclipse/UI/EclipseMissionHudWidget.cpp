@@ -9,6 +9,7 @@
 #include "Eclipse.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
+#include "Characters/EclipsePlayerController.h"
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "HAL/IConsoleManager.h"
@@ -542,7 +543,14 @@ void UEclipseMissionHudWidget::RefreshGuideRows(bool bForce)
 	LastGuideRefreshWallSeconds = NowWallSeconds;
 
 	const int32 ActiveStep = GuideProgress.GetActiveIndex();
-	const TArray<FString> Lines = EclipseTestGuide::ComposeGuidePanelLines(GuideProgress, DescribeOrderRoundTrip());
+	// The look numbers come from the same tuning asset the controller reads, so the
+	// panel can never advertise a value the game is not actually using.
+	FString LookSummary;
+	if (const AEclipsePlayerController* Controller = Cast<AEclipsePlayerController>(GetOwningPlayer()))
+	{
+		LookSummary = Controller->DescribeLookTuning();
+	}
+	const TArray<FString> Lines = EclipseTestGuide::ComposeGuidePanelLines(GuideProgress, DescribeOrderRoundTrip(), LookSummary);
 	for (int32 Line = 0; Line < GuideRows.Num() && Line < Lines.Num(); ++Line)
 	{
 		UTextBlock* Row = GuideRows[Line];

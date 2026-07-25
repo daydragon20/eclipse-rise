@@ -95,14 +95,14 @@ public:
 	/** Degrees per second at full stick deflection, yaw and pitch separately —
 	 *  they are not the same task and never want the same speed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
-	float StickYawSpeed = 160.0f;
+	float StickYawSpeed = 240.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
-	float StickPitchSpeed = 110.0f;
+	float StickPitchSpeed = 180.0f;
 
 	/** Stick drift must never move the camera on its own. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 0.9))
-	float StickDeadzone = 0.18f;
+	float StickDeadzone = 0.08f;
 
 	/**
 	 * Radial deadzone on the MOVEMENT stick. Its own number, and slightly wider
@@ -113,13 +113,36 @@ public:
 	 * owner's left stick measures LY = -0.048 at rest.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0, ClampMax = 0.9))
-	float MoveDeadzone = 0.20f;
+	float MoveDeadzone = 0.08f;
 
 	/**
-	 * Response curve exponent for stick look, sign-preserving. Linear stick look
-	 * is the difference between aiming and wrestling: small deflections must stay
-	 * small so fine aim is possible, while full deflection keeps full speed. 2.0
-	 * is the console-shooter default.
+	 * How much slower looking gets while aiming. This was MISSING, and it is the
+	 * likely answer to the owner's "kijken voelt op sommige momenten te scherp":
+	 * ADS narrows the FOV to 0.80 but left the look speed alone, so the reticle
+	 * swept the screen FASTER while aiming than while hip-firing — the opposite
+	 * of what aiming is for.
+	 * The physically neutral value is tan(32)/tan(40) = 0.745 (a target then keeps
+	 * the same on-screen speed). Every shipped shooter goes deliberately below it:
+	 * CoD ships 0.346 for yaw, Apex pros run 0.30-0.40. 0.60 sits between neutral
+	 * and their strictness, because our zoom is mild — the band is sourced, this
+	 * exact number is a choice inside it.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0.1, ClampMax = 1.5))
+	float AdsLookMultiplier = 0.35f;
+
+	/**
+	 * Response curve exponent for stick look, sign-preserving. A stick is a RATE
+	 * controller with about a centimetre of travel that has to cover both a micro
+	 * correction and a 180-degree turn; linear spends that centimetre evenly, so
+	 * the slow band where aiming happens gets only 20% of the throw. At exponent 2
+	 * it gets about 45%.
+	 * The SHAPE is documented (Activision names its curves Standard = power curve,
+	 * Linear, Dynamic = reverse-S). The NUMBER is not: no publisher prints its
+	 * exponent, and an earlier comment here claimed "2.0 is the console-shooter
+	 * default" — that is folklore and it has been removed. What is measured:
+	 * Halo's older, livelier curve reads as roughly quadratic and Infinite's as
+	 * roughly cubic, and Infinite is the one players call sluggish. Hence 2.0,
+	 * chosen on that evidence rather than on a number someone repeated.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 1, ClampMax = 4))
 	float StickResponseExponent = 2.0f;
@@ -128,6 +151,35 @@ public:
 	 *  it breaks muscle memory. Only the scale is tunable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look", meta = (ClampMin = 0))
 	float MouseLookScale = 1.0f;
+
+	/**
+	 * Aim assist, target-slowdown form: the camera gets heavier while the reticle
+	 * is over a hostile. 0 = off, 1 = maximum. Deliberately NOT magnetism (which
+	 * pulls the reticle toward a target): at command distance you sweep the
+	 * reticle past your own squad to give orders, and a pull would fight that
+	 * every time. Slowdown only ever resists, so it can never move your aim
+	 * somewhere you did not point it — and it is the honest form when hits are
+	 * locational (GDD 8.2).
+	 * At full strength the look keeps AimAssistFloor of its speed; CoD ships 0.4
+	 * hip / 0.5 ADS for the same mechanism, so this band is sourced even though
+	 * this exact default is a starting point to tune against.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|AimAssist", meta = (ClampMin = 0, ClampMax = 1))
+	float AimAssistStrength = 0.6f;
+
+	/** Speed retained at full strength. 0.45 sits between CoD's 0.4 and 0.5. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|AimAssist", meta = (ClampMin = 0.1, ClampMax = 1))
+	float AimAssistFloor = 0.45f;
+
+	/** Half-angle of the cone around the reticle that counts as "over a target".
+	 *  Halo's friction cone measures about 5 degrees, Lyra's box is tighter. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|AimAssist", meta = (ClampMin = 0, ClampMax = 20))
+	float AimAssistConeDegrees = 4.0f;
+
+	/** Beyond this the assist fades out. 5000 uu = 50 m, which is where the GDD
+	 *  puts the hitscan/projectile boundary — help stops where ballistics change. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|AimAssist", meta = (ClampMin = 0))
+	float AimAssistRange = 5000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Look")
 	bool bInvertLookY = false;

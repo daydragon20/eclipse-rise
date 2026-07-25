@@ -382,20 +382,27 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 			TEXT("%s: the locomotion anim instance did not spawn — single-node idle stands in (GDD 14.3.5)."), *GetName());
 	}
 
-	if (LocomotionSet.Idle != nullptr)
+	// The fallback deliberately uses the RAW idle, not the skeleton-checked one.
+	// The strict gate above exists because THIS layer evaluates clips itself and
+	// a foreign skeleton would give it a mangled pose; single-node playback is
+	// the engine's own path and has been running these same rows since the
+	// step-2 pipeline landed. Gating it too would take working bodies away
+	// (DT_BodyDefs still has rows whose mesh and takes come from different
+	// packs) — a locomotion pass may not cost anyone a pose they already had.
+	if (UAnimSequence* RawIdle = BodyDef.IdleAnim.LoadSynchronous())
 	{
-		if (Tier == EEclipseLocomotionTier::IdleOnly)
+		if (Tier <= EEclipseLocomotionTier::IdleOnly)
 		{
 			UE_LOG(LogEclipse, Warning,
-				TEXT("%s: no walk or run take resolved on this skeleton — single-node idle stands in and this body WILL slide (GDD 14.3.5)."),
+				TEXT("%s: no gait take usable on this body's skeleton — single-node idle stands in and this body WILL slide (GDD 14.3.5)."),
 				*GetName());
 		}
 		MeshComponent.SetAnimationMode(EAnimationMode::AnimationSingleNode);
-		MeshComponent.PlayAnimation(LocomotionSet.Idle, /*bLooping*/ true);
+		MeshComponent.PlayAnimation(RawIdle, /*bLooping*/ true);
 		return;
 	}
 
-	UE_LOG(LogEclipse, Warning, TEXT("%s: no usable idle take for %s — the mesh draws its ref pose (GDD 14.3.5)."),
+	UE_LOG(LogEclipse, Warning, TEXT("%s: no idle take at all for %s — the mesh draws its ref pose (GDD 14.3.5)."),
 		*GetName(), *BodyDef.Mesh.ToString());
 }
 

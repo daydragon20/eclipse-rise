@@ -98,7 +98,8 @@ namespace EclipseTestGuide
 	inline constexpr int32 GuideStepCount = ControlStepCount + SystemStepCount + QuestionStepCount;
 
 	/** Header + one row per step + tally. Fixed, so the panel builds its rows once and afterwards only ever SetText (GDD 12.4: no widget churn in a firefight). */
-	inline constexpr int32 GuidePanelLineCount = GuideStepCount + 2;
+	/** Kop + de look-waardenregel + elke stap + de tellerregel. */
+	inline constexpr int32 GuidePanelLineCount = GuideStepCount + 3;
 
 	/** One step: what to do, on both devices, and what you must SEE if it works. */
 	struct FEclipseGuideStep
@@ -195,7 +196,10 @@ namespace EclipseTestGuide
 	 * to the tester's judgement. Empty = not measured yet, and it then says so
 	 * rather than implying a number.
 	 */
-	ECLIPSE_API TArray<FString> ComposeGuidePanelLines(const FEclipseGuideProgress& Progress, const FString& OrderRoundTripFact = FString());
+	/** LookSummary is the tuned look values, already formatted. Owner request: with
+	 *  them on screen he can say "te snel" or "te traag" about a specific number
+	 *  instead of "voelt raar". Empty = the line stays blank, never invented. */
+	ECLIPSE_API TArray<FString> ComposeGuidePanelLines(const FEclipseGuideProgress& Progress, const FString& OrderRoundTripFact = FString(), const FString& LookSummary = FString());
 
 	/**
 	 * The archive section, appended under the R3 verdict block in the SAME

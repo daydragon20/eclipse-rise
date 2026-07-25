@@ -32,8 +32,11 @@ struct FEclipseLocomotionProxy : public FAnimInstanceProxy
 {
 	GENERATED_BODY()
 
-	FEclipseLocomotionProxy() = default;
-	explicit FEclipseLocomotionProxy(UAnimInstance* InAnimInstance)
+	FEclipseLocomotionProxy()
+	{
+	}
+
+	FEclipseLocomotionProxy(UAnimInstance* InAnimInstance)
 		: FAnimInstanceProxy(InAnimInstance)
 	{
 	}

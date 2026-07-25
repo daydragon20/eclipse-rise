@@ -521,15 +521,23 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 		// the difference between aiming and wrestling.
 		const float Curved = FMath::Pow(Live, StickResponseExponent);
 		const float DeltaSeconds = GetWorld() != nullptr ? GetWorld()->GetDeltaSeconds() : 0.0f;
+		// Aiming slows the look down. Without this, narrowing the FOV made the
+		// reticle sweep the screen faster while aiming than while hip-firing.
+		const float AdsScale = (bAiming ? AdsLookMultiplier : 1.0f) * ComputeAimAssistScale();
 		// Degrees per second, so stick look is framerate-independent — unlike the
 		// mouse path, which is already per-event.
-		AddYawInput(Direction.X * Curved * StickYawSpeed * DeltaSeconds);
-		AddPitchInput(-Direction.Y * Curved * StickPitchSpeed * DeltaSeconds * InvertY);
+		AddYawInput(Direction.X * Curved * StickYawSpeed * AdsScale * DeltaSeconds);
+		AddPitchInput(-Direction.Y * Curved * StickPitchSpeed * AdsScale * DeltaSeconds * InvertY);
 		return;
 	}
 
-	AddYawInput(Axis.X * MouseLookScale);
-	AddPitchInput(-Axis.Y * MouseLookScale * InvertY);
+	// The mouse gets the same ADS slowdown but no curve and no deadzone: it has no
+	// rest position and no drift, so there is nothing to filter, and curving it
+	// would break the muscle memory a player built in every other game. Valve and
+	// id both ship raw with acceleration off for exactly this reason.
+	const float MouseAds = bAiming ? AdsLookMultiplier : 1.0f;
+	AddYawInput(Axis.X * MouseLookScale * MouseAds);
+	AddPitchInput(-Axis.Y * MouseLookScale * MouseAds * InvertY);
 }
 
 bool AEclipsePlayerController::IsUsingGamepadLook() const
@@ -645,6 +653,69 @@ void AEclipsePlayerController::SetAiming(bool bNewAiming)
 	}
 }
 
+float AEclipsePlayerController::ComputeAimAssistScale() const
+{
+	if (AimAssistStrength <= KINDA_SMALL_NUMBER)
+	{
+		return 1.0f; // 0 = off, and off means literally untouched input
+	}
+	// Never during the Command hold: there the reticle is a SELECTION tool for
+	// squadmates and positions, and a camera that gets heavy over a soldier would
+	// fight the order you are trying to give.
+	if (CommandMode != nullptr && CommandMode->IsHeld())
+	{
+		return 1.0f;
+	}
+
+	const APawn* Self = GetPawn();
+	if (Self == nullptr || GetWorld() == nullptr)
+	{
+		return 1.0f;
+	}
+	FVector ViewLocation;
+	FRotator ViewRotation;
+	GetPlayerViewPoint(ViewLocation, ViewRotation);
+	const FVector Forward = ViewRotation.Vector();
+	const float CosCone = FMath::Cos(FMath::DegreesToRadians(FMath::Max(AimAssistConeDegrees, 0.0f)));
+
+	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
+	{
+		const AEclipseCharacter* Other = *It;
+		// Hostiles only, and never a downed one: help that keeps tracking a body
+		// on the floor reads as the game aiming for you.
+		if (Other == nullptr || Other == Self || Other->IsPlayerSide() || Other->IsDowned())
+		{
+			continue;
+		}
+		const FVector ToTarget = Other->GetActorLocation() - ViewLocation;
+		const float Distance = ToTarget.Size();
+		if (Distance > AimAssistRange || Distance <= KINDA_SMALL_NUMBER)
+		{
+			continue;
+		}
+		if (FVector::DotProduct(ToTarget / Distance, Forward) < CosCone)
+		{
+			continue;
+		}
+		// Inside the cone: keep AimAssistFloor of the speed at full strength, and
+		// scale linearly with strength so 0.5 is genuinely half the help.
+		return FMath::Lerp(1.0f, FMath::Clamp(AimAssistFloor, 0.1f, 1.0f), FMath::Clamp(AimAssistStrength, 0.0f, 1.0f));
+	}
+	return 1.0f;
+}
+
+FString AEclipsePlayerController::DescribeLookTuning() const
+{
+	// Seconds per full turn is the criterion the owner asked to judge against —
+	// "yaw 240" means nothing to a hand, "1.5 s om rond te draaien" does.
+	const float SecondsPerTurn = StickYawSpeed > KINDA_SMALL_NUMBER ? 360.0f / StickYawSpeed : 0.0f;
+	return FString::Printf(
+		TEXT("   kijken: %.2f s per 360 (yaw %.0f gr/s, pitch %.0f = %.2fx) · curve x^%.1f · deadzone %.2f · ADS x%.2f · aim-assist %.0f%%"),
+		SecondsPerTurn, StickYawSpeed, StickPitchSpeed,
+		StickYawSpeed > KINDA_SMALL_NUMBER ? StickPitchSpeed / StickYawSpeed : 0.0f,
+		StickResponseExponent, StickDeadzone, AdsLookMultiplier, AimAssistStrength * 100.0f);
+}
+
 void AEclipsePlayerController::ApplyLookTuning()
 {
 	const UEclipseCampaignSubsystem* Campaign = GetGameInstance() != nullptr
@@ -666,6 +737,11 @@ void AEclipsePlayerController::ApplyLookTuning()
 	MoveDeadzone = Tuning->MoveDeadzone;
 	StickResponseExponent = Tuning->StickResponseExponent;
 	MouseLookScale = Tuning->MouseLookScale;
+	AdsLookMultiplier = Tuning->AdsLookMultiplier;
+	AimAssistStrength = Tuning->AimAssistStrength;
+	AimAssistFloor = Tuning->AimAssistFloor;
+	AimAssistConeDegrees = Tuning->AimAssistConeDegrees;
+	AimAssistRange = Tuning->AimAssistRange;
 	bInvertLookY = Tuning->bInvertLookY;
 
 	// Pitch limits live on the camera manager, not on the look handler: clamping
