@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-26 00:55",
+  bijgewerkt: "2026-07-26 01:30",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -52,6 +52,12 @@ window.PROGRESS_DATA = {
       "LET OP: SPEEL_ECLIPSE.bat klopt op meer punten niet meer (sprint staat er als hold, F9 ontbreekt, 1e/3e persoon staat nog op R3). Ik schrijf niet over jouw bestand heen — zeg 'bat bijwerken' en ik doe het in één keer. De geverifieerde lijst staat intussen in BESTURING.md",
       "KIJK OF JE SQUAD JE VOLGT. Ze weigerden tot vannacht ELKE verplaatsingsorder met 'no route', en de oorzaak is gemeten: er waren nul navigatiegrenzen, dus er kon nooit een navmesh bestaan. Dat is gerepareerd (het district maakt nu zijn eigen grens). Of het gENOEG is kan ik headless niet bewijzen — jouw ronde wel",
       "Zeg daarna gewoon wat je voelde. Losse zinnen zijn genoeg"
+    ] },
+    { titel: "EEN CONDITIE en je squad loopt — maar het is jouw beslissing", prio: "nu", waarom: "De squad weigerde elke verplaatsingsorder met 'no route'. Ik heb dat vannacht helemaal uitgezocht: er was geen navmesh (gefixt, gemeten in een echte run), en daarna bleef er één regel over. GatherFacts telt een GEDEELTELIJK pad als GEEN pad, en DecideOrder weigert dan. In de praktijk is bijna elk pad naar een aangewezen punt gedeeltelijk — je wijst een muur aan, dekking, of net naast de looproute — dus weigert hij alles. Waarom ik het niet zelf omzet: 'orders zijn beloftes' (GDD 8.4) is precies de reden dát die regel er staat, dus het gaat over wat een order bij ons BETEKENT. Dat is jouw call.", stappen: [
+      "OPTIE A (mijn aanbeveling): laat een gedeeltelijk pad tellen, mits de soldaat erbij zegt hoe ver hij komt. Een soldaat die 'tot daar kom ik' zegt en dan gaat, houdt de belofte beter dan een die 'no route' zegt en blijft staan",
+      "OPTIE B: laten zoals het is. De belofte blijft absoluut, maar je squad blijft in de praktijk vaak staan",
+      "Zeg 'A' of 'B'. Bij A is het een halve dag werk inclusief de bark die de afstand noemt",
+      "Los daarvan: de navmesh bestaat nu wél (gemeten: grens 0x0x0 -> 28000x28000, en vijf seconden na missiestart ligt er mesh onder je). Dat was een echte bug en die is weg"
     ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
