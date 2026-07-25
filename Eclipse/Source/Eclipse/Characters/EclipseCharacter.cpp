@@ -130,6 +130,46 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	Movement->JumpZVelocity = Tuning->JumpZVelocity;
 	Movement->AirControl = Tuning->AirControl;
 	Movement->MinAnalogWalkSpeed = Tuning->MinAnalogWalkSpeed;
+
+	// VERIFICATIE, en die is er gekomen na een terechte owner-melding: "niets is
+	// veranderd in de game". Een opgeslagen DataAsset wint van een C++-default voor
+	// velden die het asset al KENDE; nieuw toegevoegde velden bestaan niet in een
+	// oud asset en vallen dan terug op de CDO. Welke van die twee hier speelt is
+	// niet te zien aan de code en niet aan de asset-datum - alleen aan wat er
+	// werkelijk op het component staat NA het toepassen. Dus staat dat er nu.
+	// Eén regel per pawn bij spawn; geen tick, geen kosten tijdens spelen.
+	UE_LOG(LogEclipse, Display,
+		TEXT("Tuning TOEGEPAST op %s uit '%s': accel %.0f · draai %.0f gr/s · luchtcontrole %.2f · sprong %.0f · valrem %.0f · min-analoog %.0f · loop %.0f"),
+		*GetName(), *Tuning->GetName(),
+		Movement->MaxAcceleration, Movement->RotationRate.Yaw, Movement->AirControl,
+		Movement->JumpZVelocity, Movement->BrakingDecelerationFalling,
+		Movement->MinAnalogWalkSpeed, Movement->MaxWalkSpeed);
+
+	// En luid als het asset iets anders zegt dan de code bedoelde (14.3.5). Dit is
+	// precies het defect dat de owner een hele testronde kostte: tunen dat de game
+	// niet bereikt. Vergelijken met de CDO-default, want dát is wat de code zegt.
+	if (const UEclipseCharacterTuningAsset* Defaults = GetDefault<UEclipseCharacterTuningAsset>())
+	{
+		auto WarnIfStale = [this, Tuning](const TCHAR* Label, float FromAsset, float FromCode)
+		{
+			if (!FMath::IsNearlyEqual(FromAsset, FromCode, 0.01f))
+			{
+				UE_LOG(LogEclipse, Warning,
+					TEXT("Tuning VEROUDERD: %s staat op %.2f in %s maar de code bedoelt %.2f. Het asset wint — draai het setup-script of werk het asset bij."),
+					Label, FromAsset, *Tuning->GetName(), FromCode);
+			}
+		};
+		WarnIfStale(TEXT("MaxAcceleration"), Tuning->MaxAcceleration, Defaults->MaxAcceleration);
+		WarnIfStale(TEXT("BodyRotationRateYaw"), Tuning->BodyRotationRateYaw, Defaults->BodyRotationRateYaw);
+		WarnIfStale(TEXT("AirControl"), Tuning->AirControl, Defaults->AirControl);
+		WarnIfStale(TEXT("JumpZVelocity"), Tuning->JumpZVelocity, Defaults->JumpZVelocity);
+		WarnIfStale(TEXT("MinAnalogWalkSpeed"), Tuning->MinAnalogWalkSpeed, Defaults->MinAnalogWalkSpeed);
+		WarnIfStale(TEXT("ViewPitchMin"), Tuning->ViewPitchMin, Defaults->ViewPitchMin);
+		WarnIfStale(TEXT("StickDeadzone"), Tuning->StickDeadzone, Defaults->StickDeadzone);
+		WarnIfStale(TEXT("StickYawSpeed"), Tuning->StickYawSpeed, Defaults->StickYawSpeed);
+		WarnIfStale(TEXT("AimAssistStrength"), Tuning->AimAssistStrength, Defaults->AimAssistStrength);
+		WarnIfStale(TEXT("ThirdPersonArmLength"), Tuning->ThirdPersonArmLength, Defaults->ThirdPersonArmLength);
+	}
 	InitializeHealth(Tuning->MaxHealth);
 
 	// Camera framing is data, like every other feel number (GDD 14.2). The

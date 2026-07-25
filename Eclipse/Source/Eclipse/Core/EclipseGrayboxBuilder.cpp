@@ -161,7 +161,16 @@ namespace
 		// ~6%; dat wordt gemeten, niet geloofd.
 		// De Megascans-foto blijft als FALLBACK staan: valt de tegel weg, dan degradeert
 		// het district naar de oude look in plaats van naar flat cel (14.3.5).
-		{ TEXT("Floor"),  FLinearColor(0.086f, 0.093f, 0.108f), FLinearColor(0.028f, 0.031f, 0.049f), TEXT("/Game/Art/Textures/T_toon_asphalt_diff.T_toon_asphalt_diff"), 700.0f, 2.56f, 0.50f, TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 12.41f },  // dusk asphalt — anchored under the SKY, never crushed
+		// WAARDE-CORRECTIE na de tegelwissel, als eigen stap zodat er maar één ding
+		// tegelijk beweegt. De tegel bracht de korrel naar 8,6% (doel gehaald) maar
+		// de vloer zakte van 0.0296 naar 0.0217 - 27% donkerder, en daarmee onder het
+		// niveau waarop stap 2 hem bewust verankerde. De gain 2.56 is correct gemeten
+		// op de tegel; dat het frame toch zakt is dezelfde authored->frame
+		// niet-lineariteit die deze iteratie al drie keer liet zien.
+		// x1.30 op lit en shade is de eerste bisectiestap terug naar 0.0296. Bewust
+		// gebisecteerd en niet uitgerekend, want die mapping is precies wat hier
+		// onbetrouwbaar is.
+		{ TEXT("Floor"),  FLinearColor(0.112f, 0.121f, 0.140f), FLinearColor(0.036f, 0.040f, 0.064f), TEXT("/Game/Art/Textures/T_toon_asphalt_diff.T_toon_asphalt_diff"), 700.0f, 2.56f, 0.50f, TEXT("/Game/Fab/Megascans/Surfaces/Asphalt_Surface_rmqlqkp0/High/rmqlqkp0_tier_1/Textures/T_rmqlqkp0_4K_B.T_rmqlqkp0_4K_B"), 12.41f },  // dusk asphalt — anchored under the SKY, never crushed
 		// Dressing-iteratie 3, step 7 (nu prioriteit 1) — THE VALUE CEILING.
 		// The metering pin of step 1 only moved the FLOOR: everything above ~0.25
 		// lum sits on the tonemapper shoulder, so it returned just 20-45% of the
