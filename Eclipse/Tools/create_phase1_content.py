@@ -242,8 +242,49 @@ if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(archetyp
 weapons = get_or_create("DT_Weapons", unreal.DataTable,
                         make_table_factory(unreal.EclipseWeaponRow.static_struct()))
 weapons_json = json.dumps([
-    {"Name": "AR_Foundry", "Damage": 22, "RangeCm": 5000, "FireInterval": 0.15, "HeadshotMultiplier": 2.5},
-    {"Name": "Sidearm_Scrap", "Damage": 16, "RangeCm": 2500, "FireInterval": 0.25, "HeadshotMultiplier": 2.5},
+    # VIER ROLLEN, geen vier varianten (owner-opdracht 26-07 avond, punt 4).
+    #
+    # De profielen zijn zo gekozen dat elk wapen ergens het BESTE en ergens het
+    # SLECHTSTE in is. Wie op elke as middelmatig is, wordt nooit gekozen; wie
+    # nergens slecht in is, maakt de rest overbodig.
+    #
+    #                     schade  RPM   mag  bereik   heup    mik     rol
+    #   AR_Foundry          22    400   30   50 m     2,5     0,6     allrounder
+    #   SMG_Patch           11    800   40   20 m     4,0     1,4     dichtbij
+    #   DMR_Longsight       55    109   10   90 m     5,0     0,15    afstand
+    #   Sidearm_Scrap       16    500   12   25 m     3,0     1,0     noodgeval
+    #
+    # De DMR heeft de laagste DPS op papier (100/s tegen 147 voor de AR) en wint
+    # het pas op afstand, waar de AR al op halve schade zit. Dat is precies wat
+    # schade-afval moet doen: een wapen sterk maken zonder zijn getal te verhogen.
+    {"Name": "AR_Foundry", "Damage": 22, "RangeCm": 5000, "FireInterval": 0.15, "HeadshotMultiplier": 2.5,
+     "GunshotAlertRadiusCm": 5000, "MagazineSize": 30, "ReloadSeconds": 2.2,
+     "FalloffStartCm": 2500, "FalloffMinFraction": 0.55,
+     "HipSpreadDegrees": 2.5, "AimSpreadDegrees": 0.6, "MovingSpreadDegrees": 1.5,
+     "RecoilPitchDegrees": 0.5, "RecoilYawDegrees": 0.15, "RecoilRecoveryDegreesPerSecond": 6.0,
+     "ReadySeconds": 0.5, "PelletsPerShot": 1,
+     "RoleSummary": "Allrounder: nergens de beste, overal bruikbaar. Je standaardwapen."},
+    {"Name": "SMG_Patch", "Damage": 11, "RangeCm": 2000, "FireInterval": 0.075, "HeadshotMultiplier": 1.8,
+     "GunshotAlertRadiusCm": 3500, "MagazineSize": 40, "ReloadSeconds": 2.0,
+     "FalloffStartCm": 800, "FalloffMinFraction": 0.35,
+     "HipSpreadDegrees": 4.0, "AimSpreadDegrees": 1.4, "MovingSpreadDegrees": 0.8,
+     "RecoilPitchDegrees": 0.35, "RecoilYawDegrees": 0.3, "RecoilRecoveryDegreesPerSecond": 9.0,
+     "ReadySeconds": 0.35, "PelletsPerShot": 1,
+     "RoleSummary": "Dichtbij: hoogste vuursnelheid en het minste last van bewegen, maar valt na 8 m snel af."},
+    {"Name": "DMR_Longsight", "Damage": 55, "RangeCm": 9000, "FireInterval": 0.55, "HeadshotMultiplier": 3.0,
+     "GunshotAlertRadiusCm": 8000, "MagazineSize": 10, "ReloadSeconds": 2.8,
+     "FalloffStartCm": 4000, "FalloffMinFraction": 0.8,
+     "HipSpreadDegrees": 5.0, "AimSpreadDegrees": 0.15, "MovingSpreadDegrees": 4.0,
+     "RecoilPitchDegrees": 1.8, "RecoilYawDegrees": 0.1, "RecoilRecoveryDegreesPerSecond": 3.0,
+     "ReadySeconds": 0.8, "PelletsPerShot": 1,
+     "RoleSummary": "Afstand: hardste kogel en hoogste kopschot, maar traag, luid en waardeloos in beweging."},
+    {"Name": "Sidearm_Scrap", "Damage": 16, "RangeCm": 2500, "FireInterval": 0.12, "HeadshotMultiplier": 2.5,
+     "GunshotAlertRadiusCm": 2500, "MagazineSize": 12, "ReloadSeconds": 1.4,
+     "FalloffStartCm": 1200, "FalloffMinFraction": 0.4,
+     "HipSpreadDegrees": 3.0, "AimSpreadDegrees": 1.0, "MovingSpreadDegrees": 1.2,
+     "RecoilPitchDegrees": 0.7, "RecoilYawDegrees": 0.25, "RecoilRecoveryDegreesPerSecond": 8.0,
+     "ReadySeconds": 0.25, "PelletsPerShot": 1,
+     "RoleSummary": "Noodgeval: het snelst in de hand en het stilst, maar het kleinste magazijn."},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(weapons, weapons_json):
     raise RuntimeError("DT_Weapons JSON fill failed")

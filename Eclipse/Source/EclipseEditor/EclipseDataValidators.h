@@ -21,4 +21,17 @@ namespace EclipseDataValidators
 
 	/** SPEC-P2-05: liberation rows must be internally sane (trigger id, non-empty unique region set, unique TriggerMissionId per table) and their region ids must exist in the region graph of the campaign setup they're wired into — runtime drops such damage with a warning (GDD 14.3.5), so CI is where it gets loud. */
 	ECLIPSEEDITOR_API int32 ValidateLiberationTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
+
+	/**
+	 * Owner-opdracht 26-07 avond, punt 4: elk wapen moet een eigen ROL hebben en
+	 * die rol moet in de data staan, niet in een hoofd.
+	 *
+	 * Twee soorten fout worden hier luid. Een wapen zonder rolomschrijving of met
+	 * een onmogelijk profiel (mikken slordiger dan de heup, afval voorbij het
+	 * bereik) is een authoring-fout. Maar de belangrijkste controle is de tweede:
+	 * twee wapens die op ELKE as vrijwel gelijk zijn, zijn varianten en geen
+	 * rollen — en dat is precies wat de owner niet wil. Runtime merkt daar niets
+	 * van, dus CI is de enige plek waar het kan opvallen.
+	 */
+	ECLIPSEEDITOR_API int32 ValidateWeaponTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
 }

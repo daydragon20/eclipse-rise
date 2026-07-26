@@ -788,6 +788,82 @@ struct FEclipseWeaponRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 0))
 	float GunshotAlertRadiusCm = 5000.0f;
 
+	// ---- WAPENPROFIEL (owner-opdracht 26-07 avond, punt 4) ------------------
+	//
+	// RESEARCH. Wat een wapen in Borderlands, Destiny 2 en Fortnite van een ander
+	// onderscheidt, en welke daarvan alle drie gebruiken:
+	//
+	//   schade per kogel        alle drie
+	//   vuursnelheid            alle drie (RPM of interval)
+	//   magazijn + herladen     alle drie
+	//   bereik MET schade-afval Destiny (Range = waar de afval begint), Fortnite;
+	//                           Borderlands doet het per wapentype impliciet
+	//   spreiding heup vs mik   Borderlands (Accuracy), Fortnite (first-shot)
+	//   terugslag + stabiliteit Destiny (Stability + Recoil direction), Fortnite
+	//   handling                Borderlands en Destiny allebei een eigen stat
+	//   kritieke schade         alle drie
+	//   kogels per schot        Borderlands en Fortnite (hagel)
+	//
+	// Overgenomen: alle negen. Wat NIET: elementaire schade (vuur/zuur/schok).
+	// Dat is een ontwerpkeuze van formaat en staat als voorstel in HANDOFF.
+	//
+	// De velden hieronder zijn DATA; het gedrag landt in lagen. Laag A (dit) is
+	// het profiel plus validatie, zodat een wapen zonder profiel niet stil
+	// doorglipt.
+
+	/** Magazijn. 0 = oneindig (het gedrag van vóór 26-07). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	int32 MagazineSize = 30;
+
+	/** Herlaadtijd in seconden. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float ReloadSeconds = 2.2f;
+
+	/**
+	 * Schade-afval. Tot FalloffStartCm doet het wapen zijn volle schade; op
+	 * RangeCm is het FalloffMinFraction daarvan. Dit is wat een DMR anders maakt
+	 * dan een SMG zonder aan één schadegetal te komen.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float FalloffStartCm = 2500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0.05, ClampMax = 1.0))
+	float FalloffMinFraction = 0.5f;
+
+	/** Spreiding in graden vanaf de heup en tijdens mikken. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float HipSpreadDegrees = 2.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float AimSpreadDegrees = 0.6f;
+
+	/** Extra spreiding terwijl je beweegt; straft rennen-en-schieten. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float MovingSpreadDegrees = 1.5f;
+
+	/** Terugslag per schot: omhoog, en de horizontale uitslag eromheen. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float RecoilPitchDegrees = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float RecoilYawDegrees = 0.15f;
+
+	/** Stabiliteit: hoe snel het kruis terugzakt, in graden per seconde. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float RecoilRecoveryDegreesPerSecond = 6.0f;
+
+	/** Handling: hoe lang het duurt voor dit wapen klaar is na een wissel. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
+	float ReadySeconds = 0.5f;
+
+	/** Kogels per trekkerbeweging (hagel > 1). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 1))
+	int32 PelletsPerShot = 1;
+
+	/** Eén zin die zegt waar dit wapen voor is; de validator eist hem. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
+	FText RoleSummary;
+
 	/** Locational damage stub (GDD 8.2): headshot multiplier. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 1))
 	float HeadshotMultiplier = 2.5f;

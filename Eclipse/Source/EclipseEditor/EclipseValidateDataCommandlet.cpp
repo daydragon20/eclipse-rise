@@ -28,6 +28,10 @@ int32 UEclipseValidateDataCommandlet::Main(const FString& Params)
 	AssetsChecked += Checked;
 	++ValidatorCount;
 
+	EclipseDataValidators::ValidateWeaponTables(Errors, Checked);
+	AssetsChecked += Checked;
+	++ValidatorCount;
+
 	for (const FString& Error : Errors)
 	{
 		UE_LOG(LogEclipseEditor, Error, TEXT("ValidateData: %s"), *Error);

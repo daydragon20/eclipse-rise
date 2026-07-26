@@ -83,6 +83,89 @@ int32 ValidateRegionGraphAssets(TArray<FString>& OutErrors, int32& OutAssetsChec
 	return OutErrors.Num() - InitialErrors;
 }
 
+int32 ValidateWeaponTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
+{
+	const int32 InitialErrors = OutErrors.Num();
+	OutAssetsChecked = 0;
+
+	for (const FAssetData& AssetData : FindAssetsOfClass(UDataTable::StaticClass()))
+	{
+		const UDataTable* Table = Cast<UDataTable>(AssetData.GetAsset());
+		if (Table == nullptr || Table->GetRowStruct() != FEclipseWeaponRow::StaticStruct())
+		{
+			continue;
+		}
+		++OutAssetsChecked;
+
+		TArray<TPair<FName, const FEclipseWeaponRow*>> Rows;
+		Table->ForeachRow<FEclipseWeaponRow>(TEXT("ValidateWeapons"),
+			[&OutErrors, &AssetData, &Rows](const FName& RowName, const FEclipseWeaponRow& Row)
+			{
+				Rows.Emplace(RowName, &Row);
+				const FString Where = FString::Printf(TEXT("%s: wapen '%s'"), *AssetData.AssetName.ToString(), *RowName.ToString());
+
+				// Een wapen zonder rolomschrijving is een wapen zonder bedoeling.
+				if (Row.RoleSummary.IsEmpty())
+				{
+					OutErrors.Add(FString::Printf(TEXT("%s heeft geen RoleSummary — waar is dit wapen voor?"), *Where));
+				}
+				// Mikken moet nauwkeuriger zijn dan de heup, anders is mikken straf
+				// zonder beloning: het kost sinds 26-07 al snelheid.
+				if (Row.AimSpreadDegrees >= Row.HipSpreadDegrees)
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s: mikken (%.2f gr) is niet nauwkeuriger dan de heup (%.2f gr) — mikken kost al snelheid, dus dit is straf zonder beloning"),
+						*Where, Row.AimSpreadDegrees, Row.HipSpreadDegrees));
+				}
+				// Afval moet binnen het bereik beginnen, anders bestaat hij niet.
+				if (Row.FalloffStartCm >= Row.RangeCm)
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s: schade-afval begint op %.0f cm en het bereik is %.0f cm — het afval gebeurt dus nooit"),
+						*Where, Row.FalloffStartCm, Row.RangeCm));
+				}
+				if (Row.MagazineSize > 0 && Row.ReloadSeconds <= 0.0f)
+				{
+					OutErrors.Add(FString::Printf(TEXT("%s heeft een magazijn maar herlaadt in nul seconden"), *Where));
+				}
+			});
+
+		// DE BELANGRIJKSTE CONTROLE: zijn het rollen of varianten?
+		//
+		// De owner-opdracht is expliciet: "mogen niet als varianten van hetzelfde
+		// voelen". Runtime merkt daar niets van — twee identieke wapens werken
+		// prima — dus dit is de enige plek waar het kan opvallen.
+		//
+		// Vier assen die samen de ROL bepalen. Wijken twee wapens op geen enkele
+		// daarvan meer dan 25% af, dan zijn het varianten.
+		for (int32 A = 0; A < Rows.Num(); ++A)
+		{
+			for (int32 B = A + 1; B < Rows.Num(); ++B)
+			{
+				const FEclipseWeaponRow& L = *Rows[A].Value;
+				const FEclipseWeaponRow& R = *Rows[B].Value;
+				auto FarApart = [](float X, float Y)
+				{
+					const float Larger = FMath::Max(FMath::Abs(X), FMath::Abs(Y));
+					return Larger <= KINDA_SMALL_NUMBER || FMath::Abs(X - Y) / Larger > 0.25f;
+				};
+				const bool bDistinct = FarApart(L.Damage, R.Damage)
+					|| FarApart(L.FireInterval, R.FireInterval)
+					|| FarApart(L.RangeCm, R.RangeCm)
+					|| FarApart(L.AimSpreadDegrees, R.AimSpreadDegrees);
+				if (!bDistinct)
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s: '%s' en '%s' verschillen op geen enkele as meer dan 25%% (schade, cadans, bereik, mikspreiding) — dat zijn varianten en geen rollen"),
+						*AssetData.AssetName.ToString(), *Rows[A].Key.ToString(), *Rows[B].Key.ToString()));
+				}
+			}
+		}
+	}
+
+	return OutErrors.Num() - InitialErrors;
+}
+
 int32 ValidateProductionItemTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
 {
 	const int32 InitialErrors = OutErrors.Num();
