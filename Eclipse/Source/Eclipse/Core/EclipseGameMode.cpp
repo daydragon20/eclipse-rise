@@ -305,6 +305,28 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 	Controller->GetViewportSize(ViewportX, ViewportY);
 	UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d MEET] venster=%dx%d"), ShotIndex, ViewportX, ViewportY);
 
+	// HOE SNEL DRAAIT HET ECHT. De speelronde in de suite meet de game-thread
+	// headless op 0,80 ms, en dat getal zegt niets over wat de owner ziet: daar
+	// wordt niet gerenderd. Dit is de enige plek in het project waar een ECHTE
+	// frame draait, dus dit is de enige plek waar dit te meten valt.
+	//
+	// GAverageMS is het lopende gemiddelde van de engine zelf; geen eigen teller,
+	// want een tweede manier van meten geeft een tweede getal om te vertrouwen.
+	extern ENGINE_API float GAverageMS;
+	extern ENGINE_API float GAverageFPS;
+	UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d TEMPO] %.1f ms per frame (%.0f fps) op %dx%d"),
+		ShotIndex, GAverageMS, GAverageFPS, ViewportX, ViewportY);
+
+	// GDD 12.4 legt het budget op 16,7 ms (60 fps). Ruim daarboven is geen
+	// smaakkwestie meer: dan voelt mikken traag, en dat is precies het soort
+	// oordeel waar de owner voor moet spelen.
+	if (GAverageMS > 33.3f && GAverageMS > 0.0f)
+	{
+		UE_LOG(LogEclipse, Error,
+			TEXT("[PLAYSHOT %d FOUT] %.1f ms per frame — onder de 30 fps, dat voelt de speler"),
+			ShotIndex, GAverageMS);
+	}
+
 	// KOMT BEWEGING IN HET BEELD AAN? Moment 2 en 3 zijn de loopmomenten, en
 	// tussen die twee hoort het uitzicht verschoven te zijn. Zonder deze controle
 	// zou een speler die wel invoer krijgt maar niet beweegt (of een camera die

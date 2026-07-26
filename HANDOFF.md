@@ -143,6 +143,12 @@ echte historische bug:
 | silhouethoogte in pixels | 476–506 px van 720 | idem, valt terug naar 10 px |
 | staat hij in het frame | ja | camera losgekoppeld |
 | schuift het uitzicht bij lopen | 227–260 cm | invoer die het beeld niet haalt (0 cm) |
+| frametijd | 8,4–9,7 ms op 1920×1080 | boven 33 ms (onder 30 fps) |
+
+**Het draait ruim.** Op jouw resolutie 103–119 fps, tegen een budget van 16,7 ms
+(GDD 12.4). Op 1280×720 is het 4,9–5,4 ms. Dit is het eerste tempo-getal uit een
+ECHT gerenderd frame: de speelronde in de suite meet 0,80 ms game-thread, maar
+daar wordt niets getekend, dus dat getal zei niets over wat jij ziet.
 
 `verify.ps1` valt op die regels met exitcode 1. De ronde stopt er niet voor: hij
 logt en draait door, want een halve ronde levert minder bewijs op dan een
