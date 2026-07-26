@@ -5,7 +5,7 @@
 
 # AVONDRAPPORT — 26 juli 2026
 
-**Bar: build ✓ (-NoUba) · 143/143 tests · validatie 5 validators / 0 fouten.**
+**Bar: build ✓ (-NoUba) · 151/151 tests · validatie 6 validators / 0 fouten.**
 
 ## Geland vanavond
 
@@ -16,6 +16,13 @@
 | **Een schot heeft ruimte.** De nagalm klinkt bij het openende schot van een serie, niet bij elke kogel. | 14 schoten in 2 s → **4 nagalmen** |
 | **De demper is een keuze geworden.** De sidearm alarmeert tot 1200 cm in plaats van 2500 — onder de waarnemingsafstand van een vijand, dus hij verraadt je alleen aan wie je toch al zag. | Validator bewaakt de eis, niet het getal |
 | **Voetstappen weten waar je op staat.** Het district hád geen oppervlaktetypes; die zijn er nu, met physical materials en een trace op het moment van de stap. | Plein **beton**, bovenop een dekkingsblok **metaal** (op hoogte 210 cm) |
+| **Magazijn en herladen.** 30 kogels, 2,2 s, automatisch herladen bij leeg, de vier foley-cues op de FASEN van de beurt, munitieteller rechtsonder. Herladen op **X / R**. | 30 van 30 geschoten, foley-keten 4 van 4 |
+| **Je loadout-keuze bereikt eindelijk je wapen.** Primair + sidearm, wisselen op **RB**, elk slot houdt zijn eigen magazijn. Drie van de vier wapens waren tot vanavond voor niemand bereikbaar. | Primair 22 hp/30 kogels, sidearm 16 hp/12; na terugwisselen exact 26 kogels over |
+| **De squad loopt mee** zonder dat je het zegt — maar een staande order wint. | Verste soldaat na 6 s weglopen: **2326 → 779 cm**; een Hold-soldaat drijft **0 cm** af |
+| **De squad vuurt op wat hij ziet.** | **57 schoten en 979 hp in 5 s**, zonder dat de speler iets deed |
+| **Onder vuur zoeken ze dekking** — tenzij je ze ergens hebt neergezet. | 1 zoektocht per treffer (rem 2 s); onder Hold **0** |
+| **Y stuurt vier doctrines aan** (recon / ready / overwatch / aggressive) en die gelden METEEN voor de hele squad. Y was tot vanavond een dode knop. | Recon **0** schoten tegen Ready **35**; Overwatch **0** meelopen; Aggressive **0** dekking |
+| **Momentum en Killzone vuren uit zichzelf**, binnen de doctrine. Ze bestonden als tag plus getal. | 1 verb-inzet onder Aggressive |
 
 ## Correctie op mezelf: er ZIJN draai-animaties
 
@@ -105,29 +112,46 @@ de art-review, dan pas breed.
 doelsites een eigen kleur wilt (mijn advies: nee — één palet, en de hiërarchie
 komt uit helderheid, zoals de referentie het doet).
 
+## Het getal dat je moet voelen
+
+**De squad maakt een gevecht 2,78× korter.** Zelfde opstelling, zelfde doelwit van
+300 hp, één verschil — de doctrine:
+
+    speler alleen (squad op recon)   2,108 s
+    mét de squad (squad op ready)    0,758 s
+
+Dat is geen som maar een A/B. Alle getallen in de gevechts-audit waren gemeten met
+een squad die niets deed; dat staat er nu bij.
+
+**Mijn lezing, zodat je niet vanaf nul begint:** een factor 2,78 is groot, en het
+gevecht is waarschijnlijk te makkelijk geworden. Maar het genre-antwoord is niet
+"meer hp op de vijand" — een kogelspons voelt nooit goed — maar **meer vijanden of
+betere posities**. De vijandopstelling per missie bestaat sinds vanmorgen en is
+precies de knop die hierbij hoort. Of het écht te makkelijk is, moet jij voelen.
+
 ## Wat er klaarstaat maar nog niet geland is
 
-Terwijl jij speelde stond de build vast — Live Coding houdt het slot vast zolang
-de editor open is. Dat is geen klacht: ik heb ondertussen doorgewerkt aan wat
-geen compiler nodig heeft. Maar het betekent dat het volgende **geschreven en
-nagelezen is, en nog niet bewezen**:
+Niets meer. Terwijl jij speelde stond de build vast op Live Coding; sinds je de
+editor dicht deed is alles gecompileerd, gemeten en geland.
 
-- **Loadouts bereiken je wapen.** Elke loadout noemt nu een primair wapen en een
-  sidearm; RB wisselt buiten Command Mode; elk slot houdt zijn eigen magazijn;
-  `ReadySeconds` (handling) blokkeert het vuren vlak na een wissel. Plus een
-  validator die eist dat een loadout bestaande, verschillende wapens noemt.
-- **De hermeting van de kopschot-test**, die sinds het magazijn in een
-  herlaadbeurt kon vallen en dan nul schade mat.
+**Twee eigen fouten die de metingen vonden, en het zijn dezelfde klasse:**
 
-Zodra de editor dicht is: compileren, suite, landen. Het staat als klikje in het
-dashboard.
+1. De basis-loadout kreeg van mij de SMG, omdat "Scavenged arms" klinkt als "wat
+   je vond". De speelronde viel daarop om — met 11 schade en afval naar 35%
+   voorbij 8 m ging er geen vijand meer neer op afstand. Elke shooter geeft je als
+   startwapen de allrounder; een startwapen dat alleen dichtbij werkt straft je
+   voor het spel dat je nog niet kent.
+2. Zodra de squad meevuurde, zakte de kopschot-meting van 2,50× naar 1,75×. Hij
+   las de gezondheidsbalk van het doelwit, en dat doelwit stond binnen bereik van
+   de squad: twee correcte systemen die samen een verkeerd getal maken. De meting
+   hangt nu aan het FEIT (`Event.Combat.HitLanded` draagt zijn schutter mee) in
+   plaats van aan een toestand die iedereen mag aanraken.
 
 ## Ontwerpen die klaarliggen (geen build nodig, wel jouw oordeel)
 
-- **[SQUAD_DOCTRINE.md](phase0/SQUAD_DOCTRINE.md)** — punt 1 volledig uitgewerkt.
-  Twee lagen: basiscompetentie die er altijd is, en doctrine die hem inperkt of
-  loslaat. Vier waarden op de bestaande `stance`. Zes bouwlagen, elk apart
-  meetbaar, met de hermeting van het gevecht als laatste.
+- **[SQUAD_DOCTRINE.md](phase0/SQUAD_DOCTRINE.md)** — punt 1. **Alle zes de lagen
+  zijn gebouwd en gemeten**; dit document is nu de verantwoording, niet meer het
+  plan.
 - **[TESTGIDS_HERBOUW.md](phase0/TESTGIDS_HERBOUW.md)** — de F3-gids van 23
   stappen naar 6, langs jouw regel. Van de 23 waren er 17 dingen die ik zelf had
   moeten vaststellen.
