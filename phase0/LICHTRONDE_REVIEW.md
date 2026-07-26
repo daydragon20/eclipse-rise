@@ -135,3 +135,49 @@ detail uit de proeven wijst die kant op: op twee armaturen is bij hoge gain een
 flinterdun amber randje te zien. Er komt dús iets door, maar op een minuscuul deel
 van de mesh.
 
+---
+
+## HET ANTWOORD: ze zijn niet stuk, ze zijn zo groot als een blikje
+
+De vijfde meting sloeg de vorige conclusie onderuit. De armaturen zijn nagemeten
+op hun werkelijke afmeting in het spel:
+
+| Armatuur | Afmeting |
+|---|---|
+| `Beacon_AlarmRelay`, `Beacon_Crane`, `Beacon_Pens` | **9 × 9 × 40 cm** |
+| `Beacon_ControlPost`, `Beacon_Extraction` | 103 × 7 × 37 cm |
+| `RouteLight` (8×) | 47–61 cm breed, 33 cm hoog |
+
+Ter vergelijking: de speler is **190 cm**, een dekkingsblok **300 × 100 × 120 cm**,
+en het plein is **200 meter** breed.
+
+Een baken van 9 cm breed op 50 meter afstand beslaat ongeveer **2 pixels**. Dat is
+exact wat er op de isolatie-opname staat: stipjes. En het verklaart het flinterdunne
+amber randje bij gain 200 — dat is de lichtstrip, en die is een fractie van 9 cm.
+
+**Er is dus niets kapot.** De emissive werkt, het masker werkt, de graaf werkt. De
+armaturen zijn simpelweg tien tot twintig keer te klein voor de rol die ze moeten
+spelen. Mijn conclusie hierboven ("wat overblijft is de materiaalgraaf") was fout,
+en de meting die hem weerlegt kostte één logregel.
+
+### Dezelfde fout als de reuzen, maar andersom
+
+De aankleedfiguren waren **1,7× te groot**, de armaturen zijn **~15× te klein**.
+Beide keren: een pack met zijn eigen schaal, in het district gezet zonder die
+schaal na te meten. En beide keren onvindbaar met een meting op één object — je
+ziet het pas als je het náást iets anders legt.
+
+## Wat de owner moet beslissen
+
+De vraag is niet meer "waarom lichten ze niet op" maar **"hoe groot hoort een baken
+te zijn"**, en dat is een ontwerpvraag:
+
+1. **Op maat brengen zoals bij de aankleedfiguren?** Daar is genormaliseerd op een
+   gemeten doelhoogte. Voor een baken dat een plein van 200 m moet halen, ligt
+   iets van 2–4 m voor de hand — maar dat getal is van de owner, niet van mij.
+2. **Of dichterbij plaatsen** in plaats van vergroten: een routelamp op ooghoogte
+   langs een pad hoeft niet groot te zijn.
+
+Wat er NIET meer nodig is: sleutelen aan gain, masker of materiaal. Die drie zijn
+gemeten en in orde.
+

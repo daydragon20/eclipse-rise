@@ -1206,6 +1206,20 @@ void BuildDistrict(UWorld& World)
 				// gewoon een no-op. Alle regels hierboven "slagen" dan terwijl er
 				// niets aankomt — en dat is precies de vorm die verklaart waarom
 				// dertien armaturen met emissive=ok toch pikdonker zijn.
+				// HOE GROOT IS DIT DING EIGENLIJK. Op de isolatie-opname zijn de
+				// armaturen stipjes, en bij gain 200 licht alleen een flinterdun
+				// randje op. Dat past net zo goed bij "de emissive is stuk" als
+				// bij "de armatuur is klein en de lichtstrip is een fractie
+				// daarvan", en die twee vragen om totaal verschillende
+				// reparaties.
+				//
+				// Een beacon uit dit pack is behuizing met EEN lichtstrip; dat de
+				// behuizing donker blijft is correct. De vraag is of die strip op
+				// commando-afstand nog bestaat.
+				const FVector FixtureSize = Actor->GetStaticMeshComponent()->Bounds.BoxExtent * 2.0f;
+				UE_LOG(LogEclipse, Display, TEXT("Graybox: armatuur %s meet %.0f x %.0f x %.0f cm"),
+					Label, FixtureSize.X, FixtureSize.Y, FixtureSize.Z);
+
 				UTexture* ProbeTex = nullptr;
 				float ProbeGain = -1.0f;
 				const bool bHasEmissiveParam = Mid->GetTextureParameterValue(FMaterialParameterInfo(TEXT("EmissiveMaskTex")), ProbeTex);

@@ -300,8 +300,17 @@ mesh, basistextuur, emissive-masker en gain wél krijgen (16 / 10 / 6, precies d
 bedoelde hiërarchie). Er is dus niets ontbrekend en niets verkeerd ingesteld; het
 zit in de materiaalgraaf of het masker.
 
-Daardoor zijn de twee vragen hieronder **niet urgent**: over de helderheid van iets
-dat helemaal niet oplicht, valt nog niets te beslissen. Eerst dat uitzoeken.
+**EN DE OORZAAK IS GEVONDEN — er is niets kapot.** De armaturen zijn zo groot als
+een blikje: de drie kleinste bakens meten **9 × 9 × 40 cm**, de routelampen 47–61 cm.
+Jouw personage is 190 cm en het plein is 200 meter breed. Een baken van 9 cm op
+50 meter afstand is ongeveer 2 pixels — precies de stipjes op het beeld. De
+emissive, het masker en de materiaalgraaf zijn allemaal gemeten en in orde.
+
+De vraag is dus niet meer "waarom lichten ze niet op" maar **"hoe groot hoort een
+baken te zijn"** — en dat is jouw keuze. Op maat brengen zoals ik bij de
+aankleedfiguren deed (iets van 2–4 m voor een plein van 200 m), of ze juist
+dichterbij zetten in plaats van vergroten. Aan gain of materiaal hoeft niets meer
+te gebeuren.
 
 Twee vragen voor jou, allebei ontwerpkeuzes en geen bugs:
 - Mag een armatuur licht **werpen** (een plas op de grond) in plaats van alleen te
