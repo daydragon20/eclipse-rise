@@ -19,7 +19,7 @@ namespace EclipseTestGuide
 
 		const FGuideControlDetail GuideControlDetails[ControlStepCount] = {
 			{ EEclipseGuideSignal::Move,
-			  TEXT("je pion loopt en de camera volgt; de HUD-kop staat op MISSION ACTIVE. Met een stick is halve uitslag halve snelheid; op toetsenbord ren je altijd 420 (wandelen kan daar niet)") },
+			  TEXT("je pion loopt en de camera volgt. Stick: halve uitslag is halve snelheid. NIEUW: duw ACHTERUIT — hij hoort naar de camera te blijven KIJKEN en achteruit te lopen, niet om te draaien") },
 			{ EEclipseGuideSignal::Look,
 			  TEXT("het beeld draait mee, en de stick draait nu op graden per seconde in plaats van per frame — gemeten exact 240 gr/s, dus 1,50 s voor een volle draai. Kijk je ver omhoog, dan trekt de camera in je rug (van 300 naar 84 cm vanaf ~+25°); dat is gemeten en bekend, geen bug") },
 			{ EEclipseGuideSignal::Fire,
@@ -43,7 +43,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::DirectPick,
 			  TEXT("ook met Command Mode vast: de soldaat onder je kruis wordt 'target:'; wijs je niemand aan, dan blijft de vorige selectie staan") },
 			{ EEclipseGuideSignal::Order,
-			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup. Het antwoord komt als TEKST; de ingesproken zinnen bestaan wel maar zijn nog niet aangesloten — bekend, geen bug") },
+			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup. Je HOORT het antwoord nu ook: acht ingesproken zinnen, met een rem van 2 s per soldaat") },
 			{ EEclipseGuideSignal::Stance,
 			  TEXT("HOUD Command Mode vast (LB / Q) — daarbuiten doet Y niets. 'stance:' wisselt ready <-> aggressive. LET OP: dat is vandaag alleen een REGEL die omschakelt; je squad vecht er nog niet anders door. Op toetsenbord: druk J") }
 		};
