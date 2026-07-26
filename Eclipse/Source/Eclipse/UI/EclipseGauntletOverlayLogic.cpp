@@ -132,7 +132,11 @@ namespace EclipseGauntletOverlay
 		Verdict.Lines.Reserve(VerdictLineCount);
 		Verdict.Statuses.Reserve(CriterionCount);
 
-		Verdict.Lines.Add(TEXT("=== R3-VERDICT INPUT (feel-gauntlet P2-02 Stage A) ==="));
+		// De kop noemt zijn eigen toetsen. Drie van de vijf criteria vullen zich
+		// niet vanzelf (targeting, comfort, vertrouwen), en zonder die aanwijzing
+		// blijven ze op "nog niet gemeten" staan terwijl de tester zich afvraagt
+		// wat er kapot is.
+		Verdict.Lines.Add(TEXT("=== R3-VERDICT INPUT ===  [F4] pick schoon · [F5] mis-pick · [F6] comfort · [F7] vertrouwen · [F8] beat af"));
 
 		for (int32 Index = 0; Index < CriterionCount; ++Index)
 		{
@@ -214,7 +218,7 @@ namespace EclipseGauntletOverlay
 
 		TArray<FString> Lines;
 		Lines.Reserve(Questions.Num() + 2);
-		Lines.Add(TEXT("--- 13.2 PLAYTEST (gate: speel ik vrijwillig een tweede ronde?) ---"));
+		Lines.Add(TEXT("--- 13.2 PLAYTEST (gate: speel ik vrijwillig een tweede ronde?) ---  [6]-[0] antwoorden ---"));
 		for (int32 Index = 0; Index < Questions.Num(); ++Index)
 		{
 			const EEclipseGauntletAnswer Answer = Answers.IsValidIndex(Index) ? Answers[Index] : EEclipseGauntletAnswer::Unanswered;
