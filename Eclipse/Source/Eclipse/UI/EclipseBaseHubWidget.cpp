@@ -177,11 +177,16 @@ void UEclipseBaseHubWidget::RefreshHeader()
 	// design just has to be legible. Mode word first, then the next action; the
 	// numbers move to the back where they belong.
 	const FEclipseCampaignState& State = Campaign->GetState();
-	HeaderText->SetText(FText::FromString(FString::Printf(TEXT("BASE — Hollow Point · day %d · pick a mission below to start (walking is disabled here)  |  C %d  M %d  I %d"),
+	// Een afgewezen actie hoort HIER te staan en niet alleen in het log (26-07).
+	// Deze kop is het enige kanaal dat de hub heeft, en hij ververst toch al bij
+	// elke actie — dus een reden die blijft staan tot er iets WEL lukt, vertelt
+	// precies wat de speler moet weten: waarom er niets gebeurde.
+	HeaderText->SetText(FText::FromString(FString::Printf(TEXT("BASE — Hollow Point · day %d · pick a mission below to start (walking is disabled here)  |  C %d  M %d  I %d%s"),
 		State.Day,
 		State.GetBalance(EclipseTags::Resource_Credits.GetTag()),
 		State.GetBalance(EclipseTags::Resource_Materials.GetTag()),
-		State.GetBalance(EclipseTags::Resource_Intel.GetTag()))));
+		State.GetBalance(EclipseTags::Resource_Intel.GetTag()),
+		LastRejection.IsEmpty() ? TEXT("") : *FString::Printf(TEXT("   ⚠ %s"), *LastRejection))));
 }
 
 void UEclipseBaseHubWidget::RefreshWorkshop()
@@ -367,10 +372,14 @@ void UEclipseBaseHubWidget::HandleAdvanceDay()
 	FString Error;
 	if (!Campaign->CommitTransaction(Transaction, Error))
 	{
-		UE_LOG(LogEclipse, Warning,
-			TEXT("BaseHub: 'volgende dag' is afgewezen (%s) — de knop deed niets en de speler ziet dat niet (14.3.5)."),
-			*Error);
+		LastRejection = FString::Printf(TEXT("volgende dag geweigerd: %s"), *Error);
+		UE_LOG(LogEclipse, Warning, TEXT("BaseHub: 'volgende dag' is afgewezen (%s)."), *Error);
 	}
+	else
+	{
+		LastRejection.Reset();
+	}
+	RefreshAll();
 }
 
 void UEclipseBaseHubWidget::HandleProduce(FName ItemId)
