@@ -1317,6 +1317,35 @@ bool FEclipseAirControlTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("netto stuurwinst"), Steered - Drift, TEXT("cm"),
 		TEXT("wat je met één sprong opzij kunt komen"));
 
+	// CORRECTIE OP MEZELF. Bovenstaande sprong begint uit STILSTAND, en daar geldt
+	// AirControlBoostMultiplier: onder AirControlBoostVelocityThreshold (25 cm/s,
+	// engine-default) verdubbelt UE de luchtsturing. Die 287 cm is dus gemeten met
+	// effectief 0,70 aan het begin van de sprong en niet met de getunede 0,35 — ik
+	// heb dat getal gerapporteerd voordat ik die versterker kende.
+	//
+	// Een speler springt zelden vanuit stilstand. Daarom dezelfde meting nog eens
+	// met aanloop, want dat is wat hij werkelijk voelt.
+	Harness.RunUpToTopSpeed(*this);
+	const FVector RunStart = Harness.Location();
+	Harness.Inject(TEXT("Jump"), true);
+	Harness.Step();
+	double RunGuard = 0.0;
+	while (!Harness.Body->GetCharacterMovement()->IsFalling() && RunGuard < 0.5)
+	{
+		Harness.HoldFor(TEXT("Move"), FVector2D(1.0f, 0.0f), Harness.StepSeconds);
+		RunGuard += Harness.StepSeconds;
+	}
+	const FVector AirStart = Harness.Location();
+	while (Harness.Body->GetCharacterMovement()->IsFalling() && RunGuard < 4.0)
+	{
+		Harness.HoldFor(TEXT("Move"), FVector2D(1.0f, 0.0f), Harness.StepSeconds);
+		RunGuard += Harness.StepSeconds;
+	}
+	// Alleen de ZIJWAARTSE component telt: vooruit blijft hij toch wel gaan.
+	const double LateralWithRunUp = FMath::Abs((Harness.Location() - AirStart).Y);
+	Report(*this, TEXT("zijwaartse winst mét aanloop"), LateralWithRunUp, TEXT("cm"),
+		TEXT("zonder de boost die alleen onder 25 cm/s geldt — dit is het speelbare getal"));
+
 	TestTrue(FString::Printf(TEXT("sprong: zonder input blijf je boven je afzetpunt (%.2f cm)"), Drift),
 		Drift < 5.0);
 	// Ondergrens, geen streefwaarde: "op rails" is wat hier fout is, en de
@@ -1704,6 +1733,68 @@ bool FEclipseCrouchTest::RunTest(const FString& Parameters)
 	TestTrue(FString::Printf(TEXT("hurken: je komt écht lager (%.0f -> %.0f cm)"),
 			StandingHalfHeight * 2.0f, CrouchedHalfHeight * 2.0f),
 		CrouchedHalfHeight < StandingHalfHeight - 5.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
+// Welke engine-defaults staan er NOG in het bewegingscomponent?
+//
+// De feel-audit begon met de vondst dat er maar vier dingen gezet werden en de
+// rest op de engine-default stond. Die vier zijn er inmiddels twintig — maar
+// vannacht bleek de gehurkte capsule er alsnog doorheen geglipt (80 cm, oftewel
+// kruiphoogte), en dat was precies dezelfde fout één laag dieper.
+//
+// Deze test kiest niet en repareert niet. Hij zet de resterende feel-relevante
+// waarden op tafel met hun engine-default ernaast, zodat "nooit gekozen" niet
+// meer als "bewust zo" kan lezen. Wat een keuze verdient, gaat naar de owner.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseRemainingDefaultsTest,
+	"Eclipse.Feel.Layer1.WhichEngineDefaultsAreStillUnchosen",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseRemainingDefaultsTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UCharacterMovementComponent* Movement = Harness.Body->GetCharacterMovement();
+	int32 StillDefault = 0;
+
+	auto Note = [this, &StillDefault](const TCHAR* Label, float Value, float EngineDefault, const TCHAR* Why)
+	{
+		const bool bUnchanged = FMath::IsNearlyEqual(Value, EngineDefault, 0.01f);
+		StillDefault += bUnchanged ? 1 : 0;
+		Report(*this, Label, Value, TEXT(""),
+			*FString::Printf(TEXT("engine-default %.2f%s — %s"), EngineDefault,
+				bUnchanged ? TEXT(" (NOG ONGEKOZEN)") : TEXT(" (gekozen)"), Why));
+	};
+
+	Note(TEXT("JumpMaxHoldTime"), Movement->GetCharacterOwner()->JumpMaxHoldTime, 0.0f,
+		TEXT("0 = geen variabele spronghoogte; langer drukken springt niet hoger"));
+	Note(TEXT("AirControlBoostMultiplier"), Movement->AirControlBoostMultiplier, 2.0f,
+		TEXT("verdubbelt de luchtsturing onder de drempel hieronder"));
+	Note(TEXT("AirControlBoostVelocityThreshold"), Movement->AirControlBoostVelocityThreshold, 25.0f,
+		TEXT("cm/s waaronder die verdubbeling geldt — raakt sprongen vanuit stilstand"));
+	Note(TEXT("WalkableFloorAngle"), Movement->GetWalkableFloorAngle(), 44.765f,
+		TEXT("steilste helling die je nog oploopt"));
+	Note(TEXT("GravityScale"), Movement->GravityScale, 1.0f,
+		TEXT("bepaalt samen met JumpZVelocity de boog"));
+	Note(TEXT("LedgeCheckThreshold"), Movement->LedgeCheckThreshold, 4.0f,
+		TEXT("hoe ver over een rand je mag hangen voor je valt"));
+
+	Report(*this, TEXT("nog op de engine-default"), StillDefault, TEXT(""),
+		TEXT("geen assert: een default kan de juiste waarde zijn, maar hij hoort gekozen te zijn"));
+
+	// Bewust GEEN assert op dit aantal. Een engine-default is niet per definitie
+	// fout — hij is alleen niet-gekozen, en dat verschil is het hele punt van deze
+	// lijst. Een assert zou of nu rood staan (verboden) of de lijst bevriezen.
+	TestTrue(TEXT("laag 1: het bewegingscomponent is leesbaar"), Movement != nullptr);
 
 	Harness.Shutdown();
 	return true;
