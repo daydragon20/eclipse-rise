@@ -48,7 +48,7 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Actie | Muis/toetsenbord | Controller | Handler |
 |---|---|---|---|
 | Activeren | Q vasthouden | LB vasthouden | ja — `CommandMode->OnHoldPressed/Released` |
-| Volgende soldaat | Tab / scroll omhoog | RB | ja — `CycleSoldierSelection(+1)` |
+| Volgende soldaat | Tab / scroll omhoog | RB **tijdens de hold** (erbuiten: 1e/3e persoon) | ja — `CycleSoldierSelection(+1)` |
 | Vorige soldaat | scroll omlaag | *(pad: geen — RB wrapt rond)* | ja op muis; **de LT-tak is 26-07 verwijderd**, zie hieronder |
 | Soldaat onder richtkruis | E | X | ja — `PickSoldierUnderReticle` |
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |

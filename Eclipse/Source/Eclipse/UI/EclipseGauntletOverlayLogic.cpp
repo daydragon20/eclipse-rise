@@ -176,25 +176,31 @@ namespace EclipseGauntletOverlay
 			{ TEXT("Sprint"),       TEXT("Shift (vasthouden)"), TEXT("L3 (togglen)") },
 			{ TEXT("Hurken"),       TEXT("Ctrl"),              TEXT("B") },
 			{ TEXT("Springen"),     TEXT("Spatie"),            TEXT("A") },
-			{ TEXT("Mikken"),       TEXT("RMB"),               TEXT("LT (buiten Command Mode)") },
+			{ TEXT("Mikken"),       TEXT("RMB"),               TEXT("LT (altijd)") },
 			{ TEXT("1e/3e persoon"),TEXT("C"),                 TEXT("geen (R3 ging per ongeluk af)") },
 			{ TEXT("Command Mode"), TEXT("Q vasthouden"),      TEXT("LB vasthouden") },
-			{ TEXT("Volgende"),     TEXT("Tab / scroll op (tijdens Command Mode)"), TEXT("RB (tijdens Command Mode)") },
-			{ TEXT("Vorige"),       TEXT("scroll neer (tijdens Command Mode)"),     TEXT("LT (tijdens Command Mode)") },
-			{ TEXT("Onder kruis"),  TEXT("E (tijdens Command Mode)"),               TEXT("X (tijdens Command Mode)") },
+			{ TEXT("Volgende"),     TEXT("Tab / scroll op (tijdens Command Mode)"), TEXT("RB (in CM; erbuiten: 1e/3e persoon)") },
+			{ TEXT("Vorige"),       TEXT("scroll neer (tijdens Command Mode)"),     TEXT("geen — RB wrapt rond") },
+			{ TEXT("Onder kruis"),  TEXT("E (tijdens Command Mode)"),               TEXT("X (in CM; erbuiten: hergroepeer)") },
 			{ TEXT("Orders"),       TEXT("1 2 3 4"),           TEXT("D-pad") },
-			// VIER rijen noemen hun context, want alle vier gaan door een handler die
-			// meteen terugkeert als Command Mode niet vast staat (`if (!State.bHeld)
-			// return;`): stance, volgende, vorige en onder-kruis. Tot vannacht stond
-			// die voorwaarde bij precies één kolom van één rij, dus je drukte RB of X
-			// in het veld en er gebeurde stil niets. Vastgepind door
-			// Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode.
+			// Elke rij noemt zijn CONTEXT, en die contexten zijn 26-07 veranderd.
 			//
-			// Beide kolommen noemen hun CONTEXT, want stance werkt nergens anders:
-			// ToggleHeldStance() keert meteen terug als Command Mode niet vast staat,
-			// en op toetsenbord wordt LeftAlt gepollt op het moment van de order zelf.
-			// Zonder die toevoeging drukt de speler Y in het veld en gebeurt er stil
-			// niets.
+			// Tot vannacht deden vier controls buiten Command Mode stil niets. Drie
+			// daarvan hebben er nu echt werk gekregen, en de tabel zegt wat: RB
+			// wisselt buiten de modus het camerastandpunt, X geeft een snelle
+			// hergroepeer-order, en LT is geen moduskeuze meer — die is altijd
+			// mikken, want een moduskeuze op een analoge trigger druk je half per
+			// ongeluk (Division en Gears houden de triggers daarom heilig).
+			// "Vorige" heeft daardoor geen padknop meer: RB wrapt rond, en bij vier
+			// soldaten is drie keer vooruit hetzelfde als één keer terug.
+			//
+			// STANCE is de enige die nog nergens buiten de modus werkt, en dat staat
+			// er met opzet zo: stance verandert vandaag alleen de HUD-regel, dus er
+			// iets anders op zetten zou verbergen dat de stance zelf nog niet af is.
+			// Vastgepind door
+			// Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode, die
+			// bewaakt dat geen van deze knoppen buiten de modus de Command
+			// Mode-toestand aanraakt.
 			{ TEXT("Stance"),       TEXT("Alt vast bij de order"), TEXT("Y (tijdens Command Mode)") }
 		};
 	}
