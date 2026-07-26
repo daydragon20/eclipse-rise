@@ -49,25 +49,33 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 |---|---|---|---|
 | Activeren | Q vasthouden | LB vasthouden | ja — `CommandMode->OnHoldPressed/Released` |
 | Volgende soldaat | Tab / scroll omhoog | RB | ja — `CycleSoldierSelection(+1)` |
-| Vorige soldaat | scroll omlaag | LT **tijdens de hold** | ja — `CycleSoldierSelection(-1)` |
+| Vorige soldaat | scroll omlaag | *(pad: geen — RB wrapt rond)* | ja op muis; **de LT-tak is 26-07 verwijderd**, zie hieronder |
 | Soldaat onder richtkruis | E | X | ja — `PickSoldierUnderReticle` |
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |
 | Stance | Alt **ingedrukt houden terwijl je de order geeft** | Y (togglen, **alleen tijdens Command Mode**) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven. **LET OP (26-07): de stance wordt vandaag alleen ONTHOUDEN en getoond — de soldaat schrijft hem op (`CurrentStance`) en leest hem daarna nergens, dus je squad vecht er niet anders door.** Fase-1-placeholder, eerlijk zo gelabeld in de code; wanneer de gedragssplitsing komt is een owner-keuze |
 
 
-> **Vier controls doen buiten Command Mode niets, en dat stond er niet bij.**
-> Stance, Volgende, Vorige en Onder-kruis gaan alle vier door een handler die
-> meteen terugkeert als Command Mode niet vastgehouden wordt. In de F2-tabel
-> stond die voorwaarde bij precies één kolom van één rij; nu bij alle vier.
-> Je drukte dus RB of X in het veld en er gebeurde stil niets. Het gedrag zelf
-> is niet gewijzigd — alleen benoemd — en vastgepind door
-> `Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode`.
+> **Dit stond hier tot 26-07:** vier controls (stance, volgende, vorige,
+> onder-kruis) deden buiten Command Mode stil niets. Drie ervan zijn opgelost.
+> **RB** wisselt buiten de modus het camerastandpunt — dat vulde een echt gat,
+> want sinds R3 eraf ging kón de pad helemaal niet meer wisselen. **X** geeft
+> een snelle hergroepeer-order via het bestaande orderpad. **LT** is geen
+> moduskeuze meer (zie hieronder). **Y (stance) blijft dood**, met opzet: stance
+> verandert vandaag alleen de HUD-regel, en er iets anders op zetten zou
+> verbergen dat de stance zelf nog niet af is.
 
-**LT doet twee dingen en dat is bewust.** Buiten Command Mode is LT mikken (de
-genre-conventie); tijdens de Q/LB-hold is LT "vorige soldaat". Beide handlers
-splitsen op `CommandMode->IsHeld()`. Dat is géén tweede modus-systeem — SPEC-P2-07
-bezit de Enhanced Input context stacks — maar één tak in elke handler die de
-toestand leest die er toch al is.
+**LT is sinds 26-07 altijd mikken.** Hij was buiten de modus mikken en erbinnen
+"vorige soldaat". Zo'n overlading op een TRIGGER is in dit genre ongebruikelijk,
+en daar is een reden voor: een trigger heeft een analoge slag, dus je drukt hem
+half per ongeluk. Division en Gears houden de triggers heilig (mikken en vuren)
+en zetten moduskeuzes op de bumpers en het d-pad.
+
+Selectie cycelt daarom nog maar één kant op, met **RB**, en wrapt rond. Bij vier
+soldaten is dat geen verlies — drie keer RB is hetzelfde als één keer terug. Het
+muiswiel blijft beide richtingen doen, want een wiel is niet dubbelzinnig. De
+resterende contexttakken splitsen op `CommandMode->IsHeld()`; dat is géén tweede
+modus-systeem — SPEC-P2-07 bezit de Enhanced Input context stacks — maar één tak
+in elke handler die de toestand leest die er toch al is.
 
 ## Testgids en debug-overlay
 
@@ -145,7 +153,7 @@ toggle. Dat vraagt een instellingenmenu, en dat is SPEC-P2-07.
 | Knop | Conventie (Borderlands/Gears/Division/Mass Effect) | ECLIPSE | Afwijking en reden |
 |---|---|---|---|
 | RT | vuren | vuren | — |
-| LT | mikken | mikken **buiten** Command Mode, vorige soldaat **tijdens** de hold | Contextueel op jouw verzoek; één tak op `IsHeld()`, geen tweede modus |
+| LT | mikken | **altijd mikken** | 26-07: de overlading met "vorige soldaat" is weg. Een moduskeuze op een trigger is in dit genre ongebruikelijk — Division en Gears houden de triggers heilig, want een analoge slag druk je half per ongeluk. Selectie cycelt nu één kant op met RB en wrapt rond |
 | A | springen | springen | — |
 | B | hurken | hurken | — |
 | X | herladen / interact | soldaat onder richtkruis | **Afwijking.** Herladen bestaat niet in dit project; X is de dichtstbijzijnde "interact met wat je aanwijst" |

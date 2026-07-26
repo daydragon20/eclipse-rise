@@ -1686,15 +1686,19 @@ bool FEclipseAirControlTest::RunTest(const FString& Parameters)
 //   Vorige (LT / scroll neer) CycleSoldierSelection(-1)
 //   Onder kruis (X / E)       PickSoldierUnderReticle
 //
-// In de F2-tabel die de speler tijdens het spelen leest, stond die voorwaarde
-// bij precies één kolom van één rij ("LT (tijdens Command Mode)"). Bij de rest
-// niet, dus je drukt RB of X in het veld en er gebeurt stil niets — dezelfde
-// verwarring als de dode bukk-toets, alleen half: de toets leeft, maar niet waar
-// je hem indrukt.
+// BIJGEWERKT 26-07. Toen deze test geschreven werd deden alle vier die controls
+// buiten de modus stil niets, en dat was de bevinding. Sindsdien hebben RB en X
+// er echt werk gekregen (camerastandpunt en een snelle hergroepeer-order) en is
+// de LT-overlading helemaal weg.
 //
-// Deze test pint het GEDRAG vast en niet de tekst. Maakt iemand later een van
-// deze controls overal werkend, dan valt deze test om en wordt de tabel
-// meegenomen; een test op de tekst zou juist die verbetering blokkeren.
+// Wat deze test bewaakt is daarmee scherper geworden, niet minder waard: hij pint
+// vast dat die knoppen buiten de modus de COMMAND MODE-TOESTAND niet aanraken —
+// geen stance-wissel, geen selectiesprong. Dat is precies wat er mis zou gaan als
+// iemand de nieuwe buitentakken zonder poort zou schrijven: je zou in het veld
+// ongemerkt de selectie verzetten en dat pas merken bij je volgende order.
+//
+// Het gedrag en niet de tekst, nog steeds. De comment hierboven is wél twee keer
+// verouderd geweest, en dat is de reden dat deze regel er staat.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCommandModeGateTest,
 	"Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode",
 	EclipseFeelTest::TestFlags)

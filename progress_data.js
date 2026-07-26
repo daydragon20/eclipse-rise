@@ -45,6 +45,11 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Je ziet niet DAT je een kopschot maakt — er is geen hitmarker", prio: "later", waarom: "Kopschoten doen sinds vanochtend 2,5x schade (gemeten: 44 hp romp tegen 110 hp hoofd), maar er is geen enkele trefferfeedback in het spel: geen hitmarker, geen schadegetal, geen geluid bij een raak schot. Het verschil merk je alleen aan hoe snel iemand valt. Dat is een halve feature — in elke shooter is de bevestiging DAT je raakte net zo belangrijk als de schade zelf, want zonder die bevestiging weet je niet of je mist of dat de vijand veel leven heeft.", stappen: [
+      "Mijn advies: een hitmarker op het kruis, met een duidelijk andere vorm of kleur bij een kopschot",
+      "Dat is UI-werk dat je niet gevraagd hebt, dus ik heb het niet gebouwd",
+      "Zeg 'hitmarker' en ik doe het; het gaat via de bestaande HUD, niet via een nieuw systeem"
+    ] },
     { titel: "Speel het gevechtsblok en oordeel — meten kan ik het niet", prio: "nu", waarom: "Drie dingen die vandaag geland zijn veranderen hoe een gevecht speelt, en geen van drieën is met een getal te beoordelen. (1) Kopschoten werken echt: 44 hp romp tegen 110 hp hoofd, dus je time-to-kill halveert van 4 kogels naar 2. Dat was de bedoeling, maar jij moet voelen of het klopt. (2) Je eerste schot verraadt je: vijanden binnen 5000 cm lopen naar de plek waar geschoten werd, ook bij een misser. Sluipen blijft mogelijk, precies één schot lang. (3) De vijandopstelling is anders van vorm — groepen op het site dat de missie noemt in plaats van vier op een hoop bij het hoofddoel. Het aantal schuift nauwelijks: Assault +2, Rescue +1, Sabotage +0.", stappen: [
       "Speel M1.1 en daarna Assault of Sabotage — die laatste twee zijn het meest veranderd",
       "Let op de time-to-kill: voelt 2 kogels op het hoofd goed of goedkoop?",

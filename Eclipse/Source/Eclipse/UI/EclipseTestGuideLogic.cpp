@@ -23,7 +23,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Look,
 			  TEXT("het beeld draait mee, en de stick draait nu op graden per seconde in plaats van per frame — gemeten exact 240 gr/s, dus 1,50 s voor een volle draai. Kijk je ver omhoog, dan trekt de camera in je rug (van 300 naar 84 cm vanaf ~+25°); dat is gemeten en bekend, geen bug") },
 			{ EEclipseGuideSignal::Fire,
-			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt. LET OP: kopschoten doen vandaag NIETS extra (de kogel raakt de capsule, en die heeft geen hoofd) — dat is bekend, geen bug") },
+			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt. Kopschoten doen sinds 26-07 WEL extra schade (2,5x, gemeten 44 hp romp tegen 110 hp hoofd). Je ziet er alleen nog niets van: er is geen hitmarker, dus het verschil merk je aan hoe snel iemand valt") },
 			{ EEclipseGuideSignal::Sprint,
 			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s. LET OP, dit verschilt per apparaat sinds 26-07: Shift is een HOLD (terug bij loslaten), L3 is een TOGGLE — één klik start hem, en hij blijft aan tot je ophoudt met vooruit duwen, mikt, vuurt of nog eens L3 drukt") },
 			{ EEclipseGuideSignal::Crouch,
