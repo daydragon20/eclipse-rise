@@ -42,4 +42,12 @@ namespace EclipseDataValidators
 	 * deze laag kwam repareren.
 	 */
 	ECLIPSEEDITOR_API int32 ValidateLoadoutTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
+
+	/**
+	 * Lichamen (26-07 avond): elk lichaam moet een zijwaartse en een
+	 * achteruit-cyclus hebben. Zonder die takes schuift het personage zijwaarts
+	 * met een vooruit-pas onder zijn voeten — een zichtbaar defect dat tot vandaag
+	 * alleen in een auditregel stond.
+	 */
+	ECLIPSEEDITOR_API int32 ValidateBodyDefTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
 }

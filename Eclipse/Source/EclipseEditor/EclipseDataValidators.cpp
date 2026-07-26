@@ -84,6 +84,69 @@ int32 ValidateRegionGraphAssets(TArray<FString>& OutErrors, int32& OutAssetsChec
 	return OutErrors.Num() - InitialErrors;
 }
 
+int32 ValidateBodyDefTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
+{
+	const int32 InitialErrors = OutErrors.Num();
+	OutAssetsChecked = 0;
+
+	for (const FAssetData& AssetData : FindAssetsOfClass(UDataTable::StaticClass()))
+	{
+		const UDataTable* Table = Cast<UDataTable>(AssetData.GetAsset());
+		if (Table == nullptr || Table->GetRowStruct() != FEclipseBodyDefRow::StaticStruct())
+		{
+			continue;
+		}
+		++OutAssetsChecked;
+
+		Table->ForeachRow<FEclipseBodyDefRow>(TEXT("ValidateBodyDefs"),
+			[&OutErrors, &AssetData](const FName& RowName, const FEclipseBodyDefRow& Row)
+			{
+				const FString Where = FString::Printf(TEXT("%s: lichaam '%s'"),
+					*AssetData.AssetName.ToString(), *RowName.ToString());
+
+				// ZIJWAARTSE CYCLI (locomotie-audit punt 3, gerepareerd 26-07 avond).
+				//
+				// Vijf van de negen lichamen hadden er geen en schoven zijwaarts met
+				// een vooruit-pas onder hun voeten. Sinds de skeletten als compatibel
+				// geregistreerd zijn (Tools/link_compatible_skeletons.py) kan een
+				// anim-arm pack ze lenen van een donor.
+				//
+				// Als EIS en niet als telling: een lichaam zonder zijcyclus is een
+				// zichtbaar defect, en dat hoort rood te staan in plaats van in een
+				// audit-regel die iemand moet lezen.
+				// PER RICHTING en niet per tempo, want de code vult het tempo zelf
+				// aan: ApplyBodyDef laat Walk* terugvallen op Run* en andersom
+				// (FillFrom, EclipseCharacter.cpp). Eisen dat BEIDE er staan zou
+				// data eisen die de runtime met opzet invult — en dan is de
+				// validator fout, niet de tabel.
+				//
+				// Eerste versie deed dat wel, en zette de SPELER rood: Belica levert
+				// alleen jog-takes en helemaal geen wandelcyclus. Precies de fout die
+				// een validator hoort te vermijden, want hij leert je een defect te
+				// negeren dat er niet is.
+				auto MissingBoth = [](const TSoftObjectPtr<UAnimSequence>& Walk,
+					const TSoftObjectPtr<UAnimSequence>& Run)
+				{ return Walk.IsNull() && Run.IsNull(); };
+
+				if (MissingBoth(Row.WalkLeftAnim, Row.RunLeftAnim)
+					|| MissingBoth(Row.WalkRightAnim, Row.RunRightAnim))
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s heeft in GEEN van beide tempo's een zijwaartse cyclus — dat lichaam schuift zijwaarts met een vooruit-pas"),
+						*Where));
+				}
+				if (MissingBoth(Row.WalkBackAnim, Row.RunBackAnim))
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s heeft geen ACHTERUIT-cyclus — sinds het camera-relatieve model loop je echt achteruit"),
+						*Where));
+				}
+			});
+	}
+
+	return OutErrors.Num() - InitialErrors;
+}
+
 int32 ValidateLoadoutTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
 {
 	const int32 InitialErrors = OutErrors.Num();

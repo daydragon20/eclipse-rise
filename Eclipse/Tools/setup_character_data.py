@@ -136,6 +136,19 @@ DEATH_KEYWORDS = ("death", "die", "dead")
 # Soldier/Warrior/Girl packs and carries meshes AND animations per subfolder,
 # while /Game/SciFiSoldier and /Game/SciFiWarrior are the same meshes shipped
 # standalone with no animations at all. Point both columns at the bundle.
+# Waar een anim-arm pack zijn ontbrekende richtingen vandaan haalt. Expliciet en
+# niet geraden: een soldaat leent van een soldaat, een warrior van een warrior.
+# Een loopcyclus draagt de houding van het personage, dus een zwaargepantserde pas
+# onder een slank lichaam valt op. Zie Tools/link_compatible_skeletons.py — zonder
+# die koppeling weigert de engine de take.
+DONOR_PACKS = {
+    "SciFiGirl": "SciFiCharacter",
+    "SciFiCharacterPack/SciFiGirl": "SciFiCharacterPack/SciFiSoldier",
+    "SciFiSoldier02": "SciFiCharacter",
+    "SciFiSoldier03": "SciFiCharacter",
+    "SciFiWarrior02": "SciFiCharacterPack/SciFiWarrior",
+}
+
 BODIES = {
     "Player":       ("ParagonLtBelica", "ParagonLtBelica"),
     "Rebel_A":      ("SciFiCharacterPack/SciFiSoldier", "SciFiCharacterPack/SciFiSoldier"),
@@ -183,12 +196,29 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     turn_left = pick_anim(anim_pack, TURNLEFT_KEYWORDS)
     turn_right = pick_anim(anim_pack, TURNRIGHT_KEYWORDS)
     crouch_trans = pick_directional(anim_pack, CROUCHTRANS_KEYWORDS, ("crouch",))
-    walk_back = pick_directional(anim_pack, WALK_STEMS, BACK_KEYS)
-    walk_left = pick_directional(anim_pack, WALK_STEMS, LEFT_KEYS)
-    walk_right = pick_directional(anim_pack, WALK_STEMS, RIGHT_KEYS)
-    run_back = pick_directional(anim_pack, RUN_STEMS, BACK_KEYS)
-    run_left = pick_directional(anim_pack, RUN_STEMS, LEFT_KEYS)
-    run_right = pick_directional(anim_pack, RUN_STEMS, RIGHT_KEYS)
+    # LENEN VAN DE DONOR als het eigen pack de richting niet heeft (26-07 avond).
+    #
+    # Vijf van de negen lichamen hadden geen zijwaartse cyclus en schoven dus
+    # zijwaarts met een vooruit-pas onder hun voeten (locomotie-audit punt 3). De
+    # code hierboven zei dat lenen onmogelijk was omdat elk pack zijn EIGEN kopie
+    # van UE4_Mannequin_Skeleton levert. Dat klopt op assetniveau en het was de
+    # verkeerde conclusie: het zijn verschillende assets met dezelfde BOTTEN, en
+    # daar heeft UE5 CompatibleSkeletons voor. Tools/link_compatible_skeletons.py
+    # legt die verbanden; hier wordt er gebruik van gemaakt.
+    donor = DONOR_PACKS.get(anim_pack)
+
+    def directional(stems, keys):
+        take = pick_directional(anim_pack, stems, keys)
+        if take or donor is None:
+            return take
+        return pick_directional(donor, stems, keys)
+
+    walk_back = directional(WALK_STEMS, BACK_KEYS)
+    walk_left = directional(WALK_STEMS, LEFT_KEYS)
+    walk_right = directional(WALK_STEMS, RIGHT_KEYS)
+    run_back = directional(RUN_STEMS, BACK_KEYS)
+    run_left = directional(RUN_STEMS, LEFT_KEYS)
+    run_right = directional(RUN_STEMS, RIGHT_KEYS)
     directions = sum(1 for a in (walk_back, walk_left, walk_right, run_back, run_left, run_right) if a)
     # Locomotie-rapport per rij: welke rung van de EEclipseLocomotionTier-ladder
     # deze body haalt is precies wat de owner in het spel ziet, dus zeg het hier

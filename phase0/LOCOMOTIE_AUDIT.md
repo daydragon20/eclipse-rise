@@ -57,6 +57,35 @@ dat er expliciet bij in plaats van dat er een getal verschijnt.
 
 ---
 
+### Ronde 2, aanvulling: punt 3 is ook weg
+
+| # | Onderdeel | Ronde 1 | Nu |
+|---|---|---|---|
+| 3 | **Strafe-animatie** | 3 van de 9 lichamen hebben er een | **9 van de 9.** De validator eist het nu, en hij staat groen |
+
+**Ik had dit ten onrechte assetwerk genoemd.** De reden die eronder lag was een
+comment in het setup-script:
+
+> "MESH AND ANIMS MUST COME FROM THE SAME PATH. Every pack ships its OWN COPY of
+> UE4_Mannequin_Skeleton ... a different USkeleton asset"
+
+Dat is waar op ASSETNIVEAU en het is de verkeerde conclusie. Nagemeten: alle acht
+de packs dragen een kopie van hetzelfde `UE4_Mannequin_Skeleton` — verschillende
+assets, dezelfde botten. Daar heeft UE5 `CompatibleSkeletons` voor. Vijf
+koppelingen (`Tools/link_compatible_skeletons.py`) en de anim-arme packs mogen de
+takes van een donor afspelen.
+
+Donoren zijn expliciet, niet geraden: een soldaat leent van een soldaat, een
+warrior van een warrior. Een loopcyclus draagt de houding van het personage, dus
+een zwaargepantserde pas onder een slank lichaam valt op.
+
+**En de meting vond meteen mijn eigen te strenge validator.** Eerste versie eiste
+zowel een WANDEL- als een RENcyclus per richting, en zette daarmee de SPELER rood:
+Belica levert alleen jog-takes en helemaal geen wandelcyclus. De runtime vult dat
+al aan (`FillFrom` laat Walk terugvallen op Run en andersom), dus de validator
+eiste data die de code met opzet zelf invult. Nu eist hij per RICHTING dat er in
+minstens één tempo iets staat — dat is de regel die de code echt volgt.
+
 ## De stand na ronde 2
 
 Van de vier omissies uit ronde 1 zijn er twee weg (14 en deels 15), één is een
