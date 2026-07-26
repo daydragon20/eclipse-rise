@@ -74,6 +74,8 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 			Shot.Shooter = GetOwner();
 			Shot.Origin = ViewLocation;
 			Shot.AlertRadiusCm = Weapon.GunshotAlertRadiusCm;
+			Shot.WeaponSoundFamily = Weapon.SoundFamily;
+			Shot.bSuppressed = Weapon.bSuppressed;
 			Shot.bPlayerSide = Shooter != nullptr && Shooter->IsPlayerSide();
 			Bus->Broadcast(EclipseTags::Event_Combat_ShotFired, FInstancedStruct::Make(Shot));
 		}

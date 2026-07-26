@@ -254,6 +254,20 @@ weapons_json = json.dumps([
     #   DMR_Longsight       55    109   10   90 m     5,0     0,15    afstand
     #   Sidearm_Scrap       16    500   12   25 m     3,0     1,0     noodgeval
     #
+    # DE DEMPER (26-07 avond). De sidearm is gedempt en dat is een echte keuze
+    # geworden in plaats van een timbre: zijn alarmradius zakt van 2500 naar 1200 cm.
+    #
+    # Waarom precies onder de 2500: dat is de waarnemingsafstand van een vijand
+    # (DT_EnemyArchetypes). Een gedempt schot dat verder draagt dan iemand kan
+    # kijken, verraadt je aan een vijand die je niet eens kon zien — dan is de
+    # demper alleen een ander geluid. Onder die grens verraadt het pistool je
+    # alleen aan wie je toch al zag. Het genre legt de demper op een kwart tot een
+    # derde van de normale radius (Tarkov, Ghost Recon, Siege); 1200 op 5000 is
+    # een kwart, en valt dus toevallig precies goed uit beide kanten.
+    #
+    # De prijs staat er tegenover: 16 schade tegen 22 van de AR, 12 kogels tegen
+    # 30, en na 12 m nog 40 procent. Stil zijn kost je het gevecht dat erop volgt.
+    #
     # De DMR heeft de laagste DPS op papier (100/s tegen 147 voor de AR) en wint
     # het pas op afstand, waar de AR al op halve schade zit. Dat is precies wat
     # schade-afval moet doen: een wapen sterk maken zonder zijn getal te verhogen.
@@ -262,29 +276,29 @@ weapons_json = json.dumps([
      "FalloffStartCm": 2500, "FalloffMinFraction": 0.55,
      "HipSpreadDegrees": 2.5, "AimSpreadDegrees": 0.6, "MovingSpreadDegrees": 1.5,
      "RecoilPitchDegrees": 0.5, "RecoilYawDegrees": 0.15, "RecoilRecoveryDegreesPerSecond": 6.0,
-     "ReadySeconds": 0.5, "PelletsPerShot": 1,
+     "ReadySeconds": 0.5, "PelletsPerShot": 1, "SoundFamily": "AssaultRifle", "bSuppressed": False,
      "RoleSummary": "Allrounder: nergens de beste, overal bruikbaar. Je standaardwapen."},
     {"Name": "SMG_Patch", "Damage": 11, "RangeCm": 2000, "FireInterval": 0.075, "HeadshotMultiplier": 1.8,
      "GunshotAlertRadiusCm": 3500, "MagazineSize": 40, "ReloadSeconds": 2.0,
      "FalloffStartCm": 800, "FalloffMinFraction": 0.35,
      "HipSpreadDegrees": 4.0, "AimSpreadDegrees": 1.4, "MovingSpreadDegrees": 0.8,
      "RecoilPitchDegrees": 0.35, "RecoilYawDegrees": 0.3, "RecoilRecoveryDegreesPerSecond": 9.0,
-     "ReadySeconds": 0.35, "PelletsPerShot": 1,
+     "ReadySeconds": 0.35, "PelletsPerShot": 1, "SoundFamily": "AssaultRifle", "bSuppressed": False,
      "RoleSummary": "Dichtbij: hoogste vuursnelheid en het minste last van bewegen, maar valt na 8 m snel af."},
     {"Name": "DMR_Longsight", "Damage": 55, "RangeCm": 9000, "FireInterval": 0.55, "HeadshotMultiplier": 3.0,
      "GunshotAlertRadiusCm": 8000, "MagazineSize": 10, "ReloadSeconds": 2.8,
      "FalloffStartCm": 4000, "FalloffMinFraction": 0.8,
      "HipSpreadDegrees": 5.0, "AimSpreadDegrees": 0.15, "MovingSpreadDegrees": 4.0,
      "RecoilPitchDegrees": 1.8, "RecoilYawDegrees": 0.1, "RecoilRecoveryDegreesPerSecond": 3.0,
-     "ReadySeconds": 0.8, "PelletsPerShot": 1,
+     "ReadySeconds": 0.8, "PelletsPerShot": 1, "SoundFamily": "AssaultRifle", "bSuppressed": False,
      "RoleSummary": "Afstand: hardste kogel en hoogste kopschot, maar traag, luid en waardeloos in beweging."},
     {"Name": "Sidearm_Scrap", "Damage": 16, "RangeCm": 2500, "FireInterval": 0.12, "HeadshotMultiplier": 2.5,
-     "GunshotAlertRadiusCm": 2500, "MagazineSize": 12, "ReloadSeconds": 1.4,
+     "GunshotAlertRadiusCm": 1200, "MagazineSize": 12, "ReloadSeconds": 1.4,
      "FalloffStartCm": 1200, "FalloffMinFraction": 0.4,
      "HipSpreadDegrees": 3.0, "AimSpreadDegrees": 1.0, "MovingSpreadDegrees": 1.2,
      "RecoilPitchDegrees": 0.7, "RecoilYawDegrees": 0.25, "RecoilRecoveryDegreesPerSecond": 8.0,
-     "ReadySeconds": 0.25, "PelletsPerShot": 1,
-     "RoleSummary": "Noodgeval: het snelst in de hand en het stilst, maar het kleinste magazijn."},
+     "ReadySeconds": 0.25, "PelletsPerShot": 1, "SoundFamily": "Handgun", "bSuppressed": True,
+     "RoleSummary": "Sluipwerk: gedempt, dus je verraadt jezelf pas op 12 m. Het snelst in de hand, het kleinste magazijn."},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(weapons, weapons_json):
     raise RuntimeError("DT_Weapons JSON fill failed")

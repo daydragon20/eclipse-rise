@@ -860,6 +860,39 @@ struct FEclipseWeaponRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 1))
 	int32 PelletsPerShot = 1;
 
+	/**
+	 * Welke geluidsfamilie dit wapen gebruikt (FreeWeaponSounds, 26-07 avond).
+	 * AssaultRifle / Handgun / Shotgun / GrenadeLauncher — de mappen van het pack.
+	 *
+	 * Als NAAM en niet als pad: het pad is een detail van waar het pack toevallig
+	 * staat, de familie is wat het wapen IS. De validator controleert dat de naam
+	 * bestaat, want een tikfout hier maakt een wapen stil.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
+	FName SoundFamily = TEXT("AssaultRifle");
+
+	/**
+	 * Demper (owner-vraag 26-07 avond bij de drie sil_-varianten).
+	 *
+	 * RESEARCH — hoe het genre een demper laat meetellen:
+	 *   Metal Gear Solid V  demper maakt schoten vrijwel niet-alarmerend; slijt op
+	 *   Splinter Cell       gedempt pistool alarmeert alleen op enkele meters
+	 *   Rainbow Six Siege   haalt de richtingsindicator wég en verkleint het bereik
+	 *   Escape from Tarkov  hoorbare afstand van ~500 m naar ~100-150 m
+	 *   Ghost Recon         gedempt vuur alarmeert alleen dichtbij
+	 *
+	 * Wat ze ALLEMAAL doen: een demper maakt je niet stil, hij verkleint de
+	 * radius fors — grofweg naar een kwart tot een derde. Wat ik daaruit overneem
+	 * is niet dat getal maar de VERHOUDING waar het om draait: gedempt hoort ONDER
+	 * de waarnemingsafstand van een vijand (2500 cm) te liggen. Anders verraadt een
+	 * gedempt schot je alsnog aan iemand die je niet eens kon zien, en dan is de
+	 * demper alleen een ander geluid.
+	 *
+	 * De validator bewaakt precies dat, en niet een getal dat ik verzin.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
+	bool bSuppressed = false;
+
 	/** Eén zin die zegt waar dit wapen voor is; de validator eist hem. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
 	FText RoleSummary;

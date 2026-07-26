@@ -304,8 +304,22 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 	// Twee getallen, want het zijn twee dingen: de snelheidsvector draait met
 	// GroundFriction, het lichaam draait met RotationRate.Yaw. De speler voelt de
 	// eerste en ziet de tweede.
+	//
+	// HET APPARAAT VASTPINNEN, en dat is geen formaliteit. Deze meting doet een
+	// MUISFLICK: één gebeurtenis van 180 graden. Op de stick-tak bestaat die
+	// gebeurtenis niet — daar is kijken graden per SECONDE, dus één frame invoer
+	// levert er vier en de omkering komt nooit af. Zonder deze pin hing de uitslag
+	// aan wat UInputDeviceSubsystem toevallig als laatste apparaat rapporteert,
+	// en dat is geen eigenschap van de omkering maar van de omgeving.
+	//
+	// Gevonden op 26-07: de meting sloeg om naar 2 graden gedraaid, terwijl er aan
+	// draaien niets veranderd was. Beide takken kloppen; de test liet alleen in het
+	// midden welke ze bedoelde.
+	EclipseFeelTest::FForceGamepadScope Mouse(0);
+
 	Harness.RunUpToTopSpeed(*this);
 	const float BodyYawBefore = Harness.Body->GetActorRotation().Yaw;
+	const float ViewYawBefore = static_cast<float>(Harness.Controller->GetControlRotation().Yaw);
 	const FVector StartDirection = Movement->Velocity.GetSafeNormal2D();
 	// Muisflick: de muis-tak is lineair, AddYawInput(Axis.X * MouseLookScale)
 	// graden per gebeurtenis, dus 180 / MouseLookScale is precies een halve slag.
@@ -326,6 +340,9 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 	const float BodyYawSwept = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYawBefore, Harness.Body->GetActorRotation().Yaw));
 	Report(*this, TEXT("180-omkering (snelheid weer op top)"), TurnTime, TEXT("s"), TEXT("afremmen + richtingwissel via GroundFriction + heracceleratie"));
 	Report(*this, TEXT("180-omkering: lichaam gedraaid"), BodyYawSwept, TEXT("gr"), TEXT("~180 gr bij RotationRate.Yaw"));
+	Report(*this, TEXT("180-omkering: CAMERA gedraaid"), FMath::Abs(FMath::FindDeltaAngleDegrees(ViewYawBefore,
+		static_cast<float>(Harness.Controller->GetControlRotation().Yaw))), TEXT("gr"),
+		TEXT("scheidt \"de camera draaide niet\" van \"het lichaam volgde niet\""));
 	TestTrue(FString::Printf(TEXT("laag 2: de omkering is af binnen 3 s (%.3f s)"), TurnTime), TurnTime < 2.999);
 	TestTrue(FString::Printf(TEXT("laag 2: het lichaam draait echt om (%.0f gr)"), BodyYawSwept), BodyYawSwept > 150.0f);
 	TestTrue(FString::Printf(TEXT("laag 2: na de omkering loopt hij weer op volle vooruitsnelheid (%.0f cm/s)"), Harness.SpeedCm()),

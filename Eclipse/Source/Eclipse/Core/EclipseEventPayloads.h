@@ -158,6 +158,19 @@ struct FEclipseCombatEventPayload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	float AlertRadiusCm = 0.0f;
 
+	/**
+	 * ShotFired: welke geluidsfamilie er knalde, en of het gedempt was.
+	 *
+	 * In het FEIT en niet opgezocht door de luisteraar: de audiolaag zou anders
+	 * terug moeten redeneren van actor naar component naar datatabel, en dat is
+	 * precies de knoop die de bus moet voorkomen (12.2).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName WeaponSoundFamily;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bSuppressed = false;
+
 	/** True als de schutter aan spelerskant staat. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	bool bPlayerSide = false;

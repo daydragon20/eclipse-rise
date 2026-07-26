@@ -50,6 +50,44 @@ namespace
 	constexpr float ImpactVolume = 0.85f;
 
 	const TCHAR* ImpactCuePath = TEXT("/Game/Audio/SFX/Cue_SFX_Impact_BulletMetal_01.Cue_SFX_Impact_BulletMetal_01");
+
+	/**
+	 * WAPENGELUID PER FAMILIE (owner-levering 26-07 avond: FreeWeaponSounds).
+	 *
+	 * Waarom drie varianten en niet één: bij 6,67 schoten per seconde is één
+	 * sample geen geluid meer maar een loop, en dat hoor je binnen een halve
+	 * seconde. Elke shooter met automatisch vuur wisselt daarom af — Borderlands,
+	 * Destiny en Battlefield doen het alle drie, meestal met drie tot vijf takes.
+	 *
+	 * De mapnaam is de familienaam uit DT_Weapons; het prefix is hoe het pack zijn
+	 * bestanden noemt. Beide hier, op één plek, zodat een familie toevoegen één
+	 * regel is.
+	 */
+	struct FWeaponSoundFamilyDef
+	{
+		const TCHAR* Family;
+		const TCHAR* Folder;
+		const TCHAR* Prefix;
+	};
+
+	const FWeaponSoundFamilyDef WeaponSoundFamilies[] = {
+		{ TEXT("AssaultRifle"),    TEXT("AssaultRifle"),    TEXT("assault_rifle") },
+		{ TEXT("Handgun"),         TEXT("Handgun"),         TEXT("handgun") },
+		{ TEXT("Shotgun"),         TEXT("Shotgun"),         TEXT("shotgun") },
+	};
+
+	/**
+	 * De nagalm — de staart die een schot RUIMTE geeft in plaats van een klik.
+	 *
+	 * Niet bij elk schot, en dat is een keuze met een reden. Een nagalm duurt
+	 * ongeveer twee seconden; bij automatisch vuur zouden er dertien over elkaar
+	 * heen liggen en dat wordt modder. Insurgency en Squad lossen het op met een
+	 * limiet op gelijktijdige staarten. Deze rem doet hetzelfde met één getal: de
+	 * nagalm klinkt bij het OPENENDE schot van een serie, dat is het schot dat in
+	 * stilte valt en de ruimte laat horen.
+	 */
+	constexpr float TailCooldownSeconds = 0.6f;
+	constexpr float TailVolume = 0.55f;
 }
 
 void UEclipseAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -115,6 +153,9 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		{
 			UE_LOG(LogEclipse, Warning, TEXT("Audio: wapencue %s ontbreekt — schieten blijft stil (14.3.5)."), WeaponShotCuePath);
 		}
+
+		// De familiesets om exact dezelfde reden hier en niet bij het eerste schot.
+		LoadWeaponSoundSets();
 	}
 	if (!bTriedLoadImpact)
 	{
@@ -158,6 +199,104 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 	BoundBus = nullptr;
 }
 
+void UEclipseAudioSubsystem::LoadWeaponSoundSets()
+{
+	// BIJ INITIALIZE en niet bij het eerste schot. Dat is de les van vanmiddag:
+	// cues die synchroon laadden op het moment van vuren kostten 14,48 ms in de
+	// zwaarste tick — een hapering precies bij de eerste knal van een gevecht.
+	for (const FWeaponSoundFamilyDef& Def : WeaponSoundFamilies)
+	{
+		FWeaponSoundSet Set;
+
+		auto LoadInto = [](TArray<TObjectPtr<USoundBase>>& Into, const FString& Path)
+		{
+			if (USoundBase* Cue = LoadObject<USoundBase>(nullptr, *Path))
+			{
+				Into.Add(Cue);
+			}
+		};
+
+		for (int32 Index = 1; Index <= 3; ++Index)
+		{
+			const FString Shot = FString::Printf(
+				TEXT("/Game/FreeWeaponSounds/Cue/%s/Gunshots/%s_gunshot_%02d_Cue.%s_gunshot_%02d_Cue"),
+				Def.Folder, Def.Prefix, Index, Def.Prefix, Index);
+			LoadInto(Set.Shots, Shot);
+
+			const FString Silenced = FString::Printf(
+				TEXT("/Game/FreeWeaponSounds/Cue/%s/Gunshots/%s_sil_gunshot_%02d_Cue.%s_sil_gunshot_%02d_Cue"),
+				Def.Folder, Def.Prefix, Index, Def.Prefix, Index);
+			LoadInto(Set.Suppressed, Silenced);
+		}
+		for (int32 Index = 1; Index <= 2; ++Index)
+		{
+			const FString Tail = FString::Printf(
+				TEXT("/Game/FreeWeaponSounds/Cue/%s/Gunshots/%s_tail_%02d_Cue.%s_tail_%02d_Cue"),
+				Def.Folder, Def.Prefix, Index, Def.Prefix, Index);
+			LoadInto(Set.Tails, Tail);
+		}
+
+		if (Set.Shots.Num() == 0)
+		{
+			// 14.3.5: luid degraderen. Een familie zonder schoten betekent dat het
+			// pack er niet is, en dan hoort dat één keer hardop gezegd te worden in
+			// plaats van dat vuren stilletjes stil blijft.
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Audio: wapenfamilie %s heeft geen schotcues — die wapens vallen terug op de losse cue."),
+				Def.Family);
+			continue;
+		}
+
+		WeaponSoundSets.Add(FName(Def.Family), MoveTemp(Set));
+	}
+}
+
+int32 UEclipseAudioSubsystem::PickVariantIndex(int32 Count, int32 LastIndex)
+{
+	if (Count <= 0)
+	{
+		return INDEX_NONE;
+	}
+	if (Count == 1)
+	{
+		return 0;
+	}
+	if (LastIndex < 0 || LastIndex >= Count)
+	{
+		return FMath::RandRange(0, Count - 1);
+	}
+
+	// Trek uit de REST, niet uit alles: bij een gewone loting valt een op de drie
+	// keer dezelfde variant, en twee identieke knallen achter elkaar is precies
+	// wat afwisselen moest voorkomen.
+	int32 Index = FMath::RandRange(0, Count - 2);
+	if (Index >= LastIndex)
+	{
+		++Index;
+	}
+	return Index;
+}
+
+namespace
+{
+	USoundBase* PickVariant(const TArray<TObjectPtr<USoundBase>>& Options, int32& LastIndex)
+	{
+		const int32 Index = UEclipseAudioSubsystem::PickVariantIndex(Options.Num(), LastIndex);
+		if (Index == INDEX_NONE)
+		{
+			return nullptr;
+		}
+		LastIndex = Index;
+		return Options[Index];
+	}
+}
+
+int32 UEclipseAudioSubsystem::GetWeaponSoundVariantCount(FName Family) const
+{
+	const FWeaponSoundSet* Set = WeaponSoundSets.Find(Family);
+	return Set != nullptr ? Set->Shots.Num() : 0;
+}
+
 void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)
 {
 	const FEclipseCombatEventPayload* Shot = Payload.GetPtr<FEclipseCombatEventPayload>();
@@ -171,9 +310,60 @@ void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstanced
 	// Op de PLEK van het schot en niet 2D: je moet kunnen horen dat er naast je
 	// geschoten wordt, en straks waar vandaan. Het feit draagt zijn oorsprong al,
 	// precies waarvoor die in het event zit.
-	if (WeaponShotCue != nullptr && GetWorld() != nullptr)
+	UWorld* World = GetWorld();
+	if (World == nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, WeaponShotCue, Shot->Origin, WeaponShotVolume);
+		return;
+	}
+
+	FWeaponSoundSet* Set = WeaponSoundSets.Find(Shot->WeaponSoundFamily);
+	if (Set == nullptr)
+	{
+		// Terugval op de losse cue: een wapen zonder (of met een onbekende) familie
+		// hoort te knallen, niet stil te zijn. Eén logregel, want een tikfout in de
+		// tabel mag niet per schot een regel kosten.
+		if (!bWarnedMissingWeaponFamily && !Shot->WeaponSoundFamily.IsNone())
+		{
+			bWarnedMissingWeaponFamily = true;
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Audio: onbekende wapenfamilie '%s' — dat wapen valt terug op de losse schotcue (14.3.5)."),
+				*Shot->WeaponSoundFamily.ToString());
+		}
+		if (WeaponShotCue != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, WeaponShotCue, Shot->Origin, WeaponShotVolume);
+		}
+		return;
+	}
+
+	// Gedempt heeft een eigen set; ontbreekt die (het pack levert geen gedempte
+	// hagel), dan klinkt het gewone schot. Stil vallen zou erger zijn dan het
+	// verkeerde timbre.
+	const TArray<TObjectPtr<USoundBase>>& Bank =
+		(Shot->bSuppressed && Set->Suppressed.Num() > 0) ? Set->Suppressed : Set->Shots;
+
+	if (USoundBase* Variant = PickVariant(Bank, Set->LastShotIndex))
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Variant, Shot->Origin, WeaponShotVolume);
+	}
+
+	// De nagalm, met de rem uit TailCooldownSeconds. Per SCHUTTER, want twee man
+	// die naast elkaar vuren horen allebei hun eigen ruimte te maken — net als de
+	// rem op de squad-stemmen, en om dezelfde reden.
+	if (Set->Tails.Num() > 0 && !Shot->bSuppressed)
+	{
+		const double Now = World->GetTimeSeconds();
+		const TWeakObjectPtr<AActor> Key = Shot->Shooter;
+		const double* Last = LastTailSeconds.Find(Key);
+		if (Last == nullptr || Now - *Last >= TailCooldownSeconds)
+		{
+			LastTailSeconds.Add(Key, Now);
+			if (USoundBase* Tail = PickVariant(Set->Tails, Set->LastTailIndex))
+			{
+				++TailSoundCount;
+				UGameplayStatics::PlaySoundAtLocation(this, Tail, Shot->Origin, TailVolume);
+			}
+		}
 	}
 }
 

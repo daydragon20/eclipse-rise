@@ -41,6 +41,7 @@
 #include "Components/SphereComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
+#include "Audio/EclipseAudioSubsystem.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
@@ -2978,6 +2979,81 @@ bool FEclipseRecoilKicksAndRecovers::RunTest(const FString& Parameters)
 	const float Remaining = FRotator::NormalizeAxis(PitchAfterRest - PitchBefore);
 	Report(*this, TEXT("resterende klim na 1 s rust"), Remaining, TEXT("graden"));
 	TestTrue(TEXT("terugslag: het kruis zakt vanzelf terug"), FMath::Abs(Remaining) < FMath::Abs(Climb) * 0.5f);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * WAPENGELUID IN EEN ECHTE MISSIE (owner-levering 26-07 avond).
+ *
+ * Twee dingen die alleen in de missie waar kunnen zijn: de familiesets worden
+ * echt geladen (het pack staat op de plek waar de code hem zoekt), en de rem op
+ * de nagalm doet wat hij moet doen — één staart per opening, niet één per kogel.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseWeaponSoundSetsLoadAndTailIsBraked,
+	"Eclipse.Mission.Playthrough.WeaponSoundSetsLoadAndTailIsBraked",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseWeaponSoundSetsLoadAndTailIsBraked::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseAudioSubsystem* Audio = GameInstance->GetSubsystem<UEclipseAudioSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("wapengeluid: audio"), Audio) || !TestNotNull(TEXT("wapengeluid: strategie"), Strategy)
+		|| !TestNotNull(TEXT("wapengeluid: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("wapengeluid: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	Report(*this, TEXT("geladen wapenfamilies"), static_cast<float>(Audio->GetWeaponSoundFamilyCount()), TEXT(""),
+		TEXT("uit FreeWeaponSounds"));
+	Report(*this, TEXT("schotvarianten AssaultRifle"),
+		static_cast<float>(Audio->GetWeaponSoundVariantCount(TEXT("AssaultRifle"))), TEXT(""));
+	Report(*this, TEXT("schotvarianten Handgun"),
+		static_cast<float>(Audio->GetWeaponSoundVariantCount(TEXT("Handgun"))), TEXT(""));
+
+	TestTrue(TEXT("wapengeluid: de rifle heeft meer dan één schot"),
+		Audio->GetWeaponSoundVariantCount(TEXT("AssaultRifle")) > 1);
+
+	// Twee seconden automatisch vuur. Bij 6,67 schoten per seconde zijn dat er
+	// ruim dertien; de nagalm hoort er hooguit vier te geven (rem van 0,6 s).
+	const int32 ShotsBefore = Audio->GetShotSoundCount();
+	const int32 TailsBefore = Audio->GetTailSoundCount();
+	const double Start = Harness.ElapsedSeconds;
+	while (Harness.ElapsedSeconds - Start < 2.0)
+	{
+		Harness.Inject(TEXT("Fire"), true);
+		Harness.Step();
+	}
+	const float Shots = static_cast<float>(Audio->GetShotSoundCount() - ShotsBefore);
+	const float Tails = static_cast<float>(Audio->GetTailSoundCount() - TailsBefore);
+
+	Report(*this, TEXT("schoten in 2 s"), Shots, TEXT(""));
+	Report(*this, TEXT("nagalmen in 2 s"), Tails, TEXT(""), TEXT("rem staat op 0,6 s"));
+
+	TestTrue(TEXT("wapengeluid: er is geschoten"), Shots >= 5.0f);
+	TestTrue(TEXT("wapengeluid: de nagalm klinkt, maar niet bij elk schot"), Tails >= 1.0f && Tails < Shots);
 
 	Harness.Shutdown();
 	return true;

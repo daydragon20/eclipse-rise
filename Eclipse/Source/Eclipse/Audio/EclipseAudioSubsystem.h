@@ -58,6 +58,19 @@ public:
 	 */
 	int32 GetBarkRequestCount() const { return BarkRequestCount; }
 	int32 GetBarkSuppressedCount() const { return BarkSuppressedCount; }
+	int32 GetTailSoundCount() const { return TailSoundCount; }
+	int32 GetWeaponSoundFamilyCount() const { return WeaponSoundSets.Num(); }
+	int32 GetWeaponSoundVariantCount(FName Family) const;
+
+	/**
+	 * Kies een variant die niet dezelfde is als de vorige. Bij twee varianten is
+	 * dat afwisselen, bij drie of meer een keuze uit de rest — precies wat je wilt
+	 * horen: geen loop, maar ook geen twee identieke knallen achter elkaar.
+	 *
+	 * Publiek omdat het de enige regel is die je zonder geluidskaart kunt bewijzen:
+	 * duizend trekkingen, nul herhalingen. Zelfde reden als de pure hitmarker-logica.
+	 */
+	static int32 PickVariantIndex(int32 Count, int32 LastIndex);
 
 	/**
 	 * De rem, in seconden per soldaat (owner-beslissing 26-07: 2 s). Vier orders
@@ -103,6 +116,35 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<USoundBase> WeaponShotCue;
 	bool bTriedLoadWeaponShot = false;
+
+	/**
+	 * Eén wapenfamilie uit FreeWeaponSounds: drie schoten, drie gedempte, twee
+	 * nagalmen. Als SET en niet als losse velden, want de keuze "welke variant nu"
+	 * is precies wat een set moet kunnen en een veld niet.
+	 */
+	struct FWeaponSoundSet
+	{
+		TArray<TObjectPtr<USoundBase>> Shots;
+		TArray<TObjectPtr<USoundBase>> Suppressed;
+		TArray<TObjectPtr<USoundBase>> Tails;
+
+		/** Welke variant het laatst klonk — om hem niet meteen te herhalen. */
+		int32 LastShotIndex = -1;
+		int32 LastTailIndex = -1;
+	};
+
+	/** Familienaam (DT_Weapons.SoundFamily) → set. Gevuld bij Initialize. */
+	TMap<FName, FWeaponSoundSet> WeaponSoundSets;
+
+	void LoadWeaponSoundSets();
+
+
+	/** Wanneer er voor het laatst een nagalm klonk, per schutter (wereldseconden). */
+	TMap<TWeakObjectPtr<AActor>, double> LastTailSeconds;
+
+	/** Diagnostiek voor de suite: hoeveel nagalmen er echt zijn gespeeld. */
+	int32 TailSoundCount = 0;
+	bool bWarnedMissingWeaponFamily = false;
 
 	/** Treffers die om geluid vroegen. */
 	int32 HitSoundCount = 0;

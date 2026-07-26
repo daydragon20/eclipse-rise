@@ -117,6 +117,29 @@ int32 ValidateWeaponTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
 						TEXT("%s: mikken (%.2f gr) is niet nauwkeuriger dan de heup (%.2f gr) — mikken kost al snelheid, dus dit is straf zonder beloning"),
 						*Where, Row.AimSpreadDegrees, Row.HipSpreadDegrees));
 				}
+				// De geluidsfamilie moet bestaan. Een tikfout hier maakt een wapen
+				// niet luidruchtig-verkeerd maar STIL, en dat merk je pas in het spel.
+				static const TSet<FName> KnownFamilies = {
+					TEXT("AssaultRifle"), TEXT("Handgun"), TEXT("Shotgun"), TEXT("GrenadeLauncher") };
+				if (!KnownFamilies.Contains(Row.SoundFamily))
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s: geluidsfamilie '%s' bestaat niet in FreeWeaponSounds — dat wapen valt terug op de losse cue"),
+						*Where, *Row.SoundFamily.ToString()));
+				}
+
+				// EEN DEMPER MOET IETS BETEKENEN. Als een gedempt schot verder draagt
+				// dan een vijand kan kijken (2500 cm, DT_EnemyArchetypes), verraadt het
+				// je aan iemand die je niet eens kon zien — en dan is de demper alleen
+				// een ander timbre. Dit is de enige eis die het genre echt deelt.
+				constexpr float EnemyPerceptionCm = 2500.0f;
+				if (Row.bSuppressed && Row.GunshotAlertRadiusCm >= EnemyPerceptionCm)
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s is gedempt maar alarmeert tot %.0f cm — dat is verder dan een vijand kan kijken (%.0f cm), dus de demper doet niets"),
+						*Where, Row.GunshotAlertRadiusCm, EnemyPerceptionCm));
+				}
+
 				// Afval moet binnen het bereik beginnen, anders bestaat hij niet.
 				if (Row.FalloffStartCm >= Row.RangeCm)
 				{

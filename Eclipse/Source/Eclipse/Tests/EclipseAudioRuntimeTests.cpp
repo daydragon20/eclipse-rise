@@ -237,4 +237,63 @@ bool FEclipseSquadBarksHaveAudioTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * VARIANTEN (owner-levering 26-07 avond: FreeWeaponSounds).
+ *
+ * De regel is niet "kies willekeurig" maar "kies nooit dezelfde als net". Dat
+ * verschil hoor je: bij een gewone loting uit drie valt een op de drie schoten
+ * identiek aan de vorige, en dan klinkt automatisch vuur alsnog als een loop —
+ * precies wat drie varianten moesten oplossen.
+ *
+ * Duizend trekkingen zonder geluidskaart: dit is de hele bewijsbare kant.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseWeaponSoundVariantsNeverRepeatTest,
+	"Eclipse.Audio.Subsystem.WeaponSoundVariantsNeverRepeat",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProductFilter)
+
+bool FEclipseWeaponSoundVariantsNeverRepeatTest::RunTest(const FString& Parameters)
+{
+	// Drie varianten, zoals het pack ze per wapenfamilie levert.
+	constexpr int32 Count = 3;
+	constexpr int32 Draws = 1000;
+
+	int32 Last = UEclipseAudioSubsystem::PickVariantIndex(Count, INDEX_NONE);
+	int32 Repeats = 0;
+	int32 Seen[Count] = { 0, 0, 0 };
+	for (int32 Draw = 0; Draw < Draws; ++Draw)
+	{
+		const int32 Next = UEclipseAudioSubsystem::PickVariantIndex(Count, Last);
+		if (Next == Last)
+		{
+			++Repeats;
+		}
+		if (Next >= 0 && Next < Count)
+		{
+			++Seen[Next];
+		}
+		Last = Next;
+	}
+
+	AddInfo(FString::Printf(TEXT("GEMETEN  herhalingen in %d trekkingen              %d"), Draws, Repeats));
+	AddInfo(FString::Printf(TEXT("GEMETEN  verdeling over de drie varianten          %d / %d / %d"),
+		Seen[0], Seen[1], Seen[2]));
+
+	TestEqual(TEXT("varianten: nooit twee dezelfde achter elkaar"), Repeats, 0);
+
+	// Alle drie moeten voorkomen. Een variant die nooit klinkt is een dood asset,
+	// en dat is precies de klasse die deze levering kwam repareren.
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		TestTrue(FString::Printf(TEXT("varianten: variant %d wordt gebruikt"), Index), Seen[Index] > 0);
+	}
+
+	// Eén variant: dan is er niets te kiezen en moet hij hem gewoon teruggeven,
+	// niet in een lus blijven zoeken naar iets anders.
+	TestEqual(TEXT("varianten: één optie geeft die optie"), UEclipseAudioSubsystem::PickVariantIndex(1, 0), 0);
+	TestEqual(TEXT("varianten: geen opties geeft geen keuze"), UEclipseAudioSubsystem::PickVariantIndex(0, 0), int32(INDEX_NONE));
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
