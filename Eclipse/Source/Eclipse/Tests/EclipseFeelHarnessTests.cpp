@@ -1480,6 +1480,28 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("mikken: boom-inpull"), Third.BoomArmLength - Ads.BoomArmLength, TEXT("cm"));
 	Report(*this, TEXT("mikken: FOV-versmalling"), Third.FieldOfView - Ads.FieldOfView, TEXT("gr"));
 
+	// --- Command Mode-uitzoom -----------------------------------------------
+	// Dit getal stond als open vraag op de owner-lijst ("de code zegt 73%, de GDD
+	// zegt 15%") en was tot vannacht ONMEETBAAR voor hem: de blend liep niet, dus
+	// hij heeft nooit enige uitzoom gezien. Nu wel, dus hier het echte getal.
+	{
+		const double HoldStart = Harness.ElapsedSeconds;
+		while (Harness.ElapsedSeconds - HoldStart < 0.8)
+		{
+			Harness.Inject(TEXT("CommandHold"), true);
+			Harness.Step();
+		}
+		const FEclipseFeelSample Command = Harness.Body->SampleFeelState();
+		const float PullbackPct = Third.BoomArmLength > 0.0f
+			? (Command.BoomArmLength - Third.BoomArmLength) / Third.BoomArmLength * 100.0f : 0.0f;
+		Report(*this, TEXT("Command Mode: boomlengte"), Command.BoomArmLength, TEXT("cm"));
+		Report(*this, TEXT("Command Mode: uitzoom"), PullbackPct, TEXT("%"),
+			TEXT("code mikt op ~73%, GDD 4.1.1 zegt 15% — owner-keuze, geen assert"));
+		TestTrue(FString::Printf(TEXT("beeld: Command Mode zoomt écht uit (%.1f -> %.1f cm)"),
+				Third.BoomArmLength, Command.BoomArmLength),
+			Command.BoomArmLength > Third.BoomArmLength + 10.0f);
+	}
+
 	// Richting, geen streefwaarde: hoeveel ADS moet inzoomen is smaak en staat als
 	// open vraag op de owner-lijst (AdsLookMultiplier). Dat het IETS doet is het
 	// minimum dat de gids belooft.
