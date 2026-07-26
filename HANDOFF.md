@@ -3,6 +3,131 @@
 
 ---
 
+# START HIER — NACHTPROMPT 26→27 juli 2026
+
+*Plak dit in een verse chat om het nachtwerk te starten.*
+
+---
+
+## VEILIG TE SPELEN: JA, commit `6545c7c`
+
+Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
+is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
+van met een groene bar — zie het morgenrapport hieronder.
+
+**Eén ding dat ik NIET heb kunnen aantonen:** ik heb nog geen screenshot waarop ik
+zelf heb gezien dat je personage er staat. De opnamelaag is gebouwd maar levert nog
+geen beeld op (zie taak 1). De bewijzen hieronder zijn metingen op de mesh, niet op
+een frame.
+
+---
+
+## MORGENRAPPORT
+
+### Wat werkt er nu dat gisteren niet werkte
+
+| | Gemeten |
+|---|---|
+| **Je personage verdwijnt niet meer bij stilstand.** De idle-take van Belica heet gewoon "Idle" en is ADDITIEF — als volledige pose gesampeld vallen alle botten naar de oorsprong. | Bounding box stilstaand **1,0 → 189,9 cm**; botten die in 0,35 s bewegen **0 → 80 van 123** |
+| **De crash bij lopen is weg.** De geluidsbanken lagen in gewone structs zonder UPROPERTY, dus de GC ruimde de cues op en de eerste voetstap speelde vrijgegeven geheugen af. | 65 geldige cues vóór én ná een geforceerde volledige GC-pass |
+| **2948 stille afgewezen animaties → 0.** Onze eigen skeletpoort vergeleek op gelijkheid terwijl de engine de geleende takes al accepteerde. En het koppelscript had ze nooit opgeslagen: `save_asset(pad)` schreef niets en meldde geen fout. | 0 afwijzingen in de hele suite |
+| **Stil falen maakt de bar nu ROOD.** Elke degradatie — afgewezen animatie, niet-geladen cue, ontbrekende pose — telt mee, en een test eist nul in een echte missie. | 0 degradaties |
+| **Alle negen lichamen hebben een schietpose en een klap** (was: vijf lichamen met nul van de vijf poses). | 34 → 10 ontbrekende poses; wat rest is de reload van Belica |
+
+### Wat ik heb GEZIEN op screenshots
+
+**Niets.** Dat is de eerlijke stand. De opnamelaag draait wel als code maar heeft
+nog geen beeld opgeleverd: in de automation-run bestaat `HighResShot` niet (geen
+viewport), en de `-game`-variant die ik daarvoor bouwde (`-EclipseShotPlay`) heeft
+nog geen PNG geschreven. Taak 1 hieronder maakt dat af.
+
+Wat ik in plaats daarvan heb: metingen die precies jouw twee waarnemingen dekken
+(omvang stilstaand/rennend, bewegende botten, meshschaal). Die staan hierboven.
+
+### Wat wacht er op jou
+
+1. **Spelen** — en dat kan nu. Let vooral op: staat je personage stil goed in
+   beeld, en klopt zijn maat als je gaat lopen?
+2. **Drie zinnen laten inspreken** (squad-barks bij autonoom handelen) — kost een
+   betaalde generatie, dus jouw keuze. Staat in het kliklijstje.
+3. **Vaste-camera ronde** voor de 13 armaturen voordat er meer bij komen.
+4. **Welk lichaam is de speler?** Belica heeft draaitakes maar geen wandel- of
+   herlaadcyclus; de SciFi-packs andersom.
+
+---
+
+## OPDRACHT VOOR VANNACHT, in volgorde
+
+### 1. MAAK DE SCREENSHOTLAAG AF — dit vóór alles
+
+De owner: *"Als je niet op een screenshot kunt aanwijzen dat mijn personage er
+staat en meebeweegt, is het niet af."*
+
+Er staat een `-EclipseShotPlay`-modus in `EclipseGameMode` die vier momenten
+opneemt (stilstaand, lopend, vurend, weer stilstaand) en de speler daarbij zelf
+laat lopen en vuren. Hij schrijft nog geen bestand. Zoek uit waarom — kandidaten:
+de `-game`-run start niet (controleer het mappad), of `HighResShot` heeft een
+viewport nodig die er in deze aanroep niet is. `FScreenshotRequest::RequestScreenshot`
+rechtstreeks aanroepen is het alternatief.
+
+Als er beeld is: **kijk er zelf naar** met de Read-tool en schrijf op wat je ziet.
+Daarna harde asserties waar het kan (schermvulling, verschil tussen twee frames
+tijdens lopen, silhouethoogte over de tijd).
+
+Deze ronde hoort daarna bij ELKE landing te draaien, naast de suite.
+
+### 2. TURN-IN-PLACE AFMAKEN
+
+De takes zijn aangesloten en de drempel staat op 60 graden, maar het is nooit op
+een frame gezien. Bewijs het met de laag uit taak 1.
+
+### 3. HET KNOPPENSCHEMA PER MODUS (punt 7)
+
+Nooit gedaan, en LT doet nog twee dingen. Als DATA met een validator, en het wordt
+de bron van `BESTURING.md`, de F3-gids en `SPEEL_ECLIPSE.bat`. Nu staan die vier
+uit elkaar te lopen — dat kostte vandaag vier keer dezelfde correctie.
+
+### 4. HET LICHTPLAN, ronde 2
+
+Goedgekeurd. 13 armaturen staan; wacht op de vaste-camera ronde vóór er meer
+bijkomen.
+
+### 5. LOCOMOTIE-AUDIT OPNIEUW
+
+Er is sindsdien veel veranderd (additieve poses, compatibele skeletten, turn).
+
+---
+
+## HARDE REGELS
+
+- **Volledige suite groen per commit.** Geen uitzonderingen.
+- **Speelronde ÉN screenshotronde als bewijs.** Een groene bar is sinds vandaag
+  aantoonbaar geen bewijs dat er iets op het scherm staat.
+- **Land in fasen**, niet één grote klap.
+- **Beslis zelf.** Zet owner-acties in het kliklijstje en werk door.
+- **Geen poll-loops**, geen nieuw mode-systeem, geen handmatige bewerking van
+  `progress_auto.js` of `PROGRESS.html`.
+- **Zeg expliciet wanneer het veilig te spelen is**, met commit-hash.
+- **Research betekent**: opschrijven wat je overneemt en waarom, niet zelf een
+  getal verzinnen.
+
+## WAT JE NIET AANRAAKT
+
+- **Elementaire schade, pantser, squad-stemmen.** Staan in de rij tot de owner één
+  keer normaal heeft kunnen spelen.
+- **Meer armaturen** dan de 13 die er staan, tot de vaste-camera ronde is beoordeeld.
+- **Het spelerslichaam wisselen** — dat is een owner-keuze die in het kliklijstje staat.
+
+## DE LES VAN VANDAAG, in één regel
+
+Mijn tests bewezen dat de code doet wat de code zegt. Ze bewezen niet dat het
+resultaat zichtbaar wordt. 2948 stille afwijzingen, een GC-race en een additieve
+idle stonden alle drie tussen mijn werk en het scherm, en geen enkele test werd
+rood. Dat is dezelfde fout die ik de hele dag in de codebase vond — "staat in de
+data, wordt nergens gelezen" — maar dan één laag hoger, in mijn eigen controle.
+
+---
+
 # AVONDRAPPORT — 26 juli 2026
 
 **Bar: build ✓ (-NoUba) · 152/152 tests · validatie 7 validators / 0 fouten · 0 onverklaarde dode velden.**
