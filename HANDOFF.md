@@ -7,6 +7,28 @@
 
 **Bar: build ✓ (-NoUba) · 151/151 tests · validatie 6 validators / 0 fouten.**
 
+## Je hele lijst is af
+
+| Jouw punt | Stand |
+|---|---|
+| **Laten landen** wat klaarstond | Al geland vóór je bericht: loadouts, RB-wissel, magazijn per slot, ReadySeconds, kopschot-hermeting |
+| **1. Lichtplan JA** | **13 armaturen geplaatst** (niet 14 — mijn plan telde het extractiebaken dubbel). Eigen materiaal-ingang gebouwd, want `MaskTex` bleek helemaal niet op de toon-master te zitten |
+| **2. Elementaire schade NEE, pantser LATER** | In de rij gezet, niet gebouwd |
+| **3. Demper → in de gids** | Staat er als oordeel in deel 2 |
+| **4. Turn-in-place** | Gebouwd, drempel 90 → 60. Gemeten: 40° flick = 0° lichaam, 75° flick = 75° |
+| **5. Testgids herbouwen** | 23 stappen → **10 vandaag, 8 als er niets verandert** |
+| **6. Squad-doctrine** | **Alle zes de lagen**, elk apart geland en gemeten |
+
+**De squad-doctrine staat. Je kunt die sessie spelen.**
+
+## Wat er nu op jou wacht
+
+1. **Spelen.** Dat is de enige openstaande post, en hij is groot: het gevecht is
+   2,78× korter geworden en ik kan niet meten of dat lekker is.
+2. **Eén vaste-camera ronde** voor de armaturen, voordat er meer bij komen — dat
+   was de afspraak, en ik houd me eraan.
+
+
 ## Geland vanavond
 
 | | Gemeten |
