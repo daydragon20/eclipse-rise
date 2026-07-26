@@ -33,9 +33,6 @@ private:
 	void BuildLayout();
 	void RefreshAll();
 	void RefreshHeader();
-
-	/** Waarom de laatste knopdruk niets deed; leeg zodra er weer iets lukt (26-07). */
-	FString LastRejection;
 	void RefreshWorkshop();
 	void RefreshBarracks();
 	void RefreshMemorial();
