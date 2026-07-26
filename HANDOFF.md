@@ -82,6 +82,8 @@ Dat dit pas om half drie 's nachts boven kwam, komt doordat geen enkele test ooi
 
 Allebei bewust **niet** gerepareerd: het zijn precies de getallen waar jouw openstaande balansvraag over gaat, en die verplaatsen terwijl jij hem beantwoordt is onbehoorlijk. Eerst kiezen, dan repareren.
 
+**Alle console-commando's zijn daarna langs één vraag gelegd: welk mechanisme is ALLEEN via de console bereikbaar?** Van de negentien is er precies één die geen speelbaar pad heeft, en dat is het **alarm** — gemeten in de ronde waarin vier vijanden je zien en neerschieten: de latch blijft uit. De rest heeft wél een echte weg: een regio bevrijden gebeurt bij een geslaagde debrief (`bProgressRegionOnSuccess`), de dag draait via die debrief, en de overige commando's zijn dumps en rapporten die niets veranderen. Dat staat hier zodat niemand die sweep overdoet.
+
 **Drie stiltes, en de sweep die erop volgde.** Je opdracht vroeg te noteren of er iets stils gebeurt dat luid had moeten zijn. Dat bleek geen bijvangst maar een categorie:
 
 1. **Een missie logde haar start wel en haar einde niet.** Zie hieronder — dit vond de speelronde.
