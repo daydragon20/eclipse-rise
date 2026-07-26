@@ -2704,6 +2704,14 @@ bool FEclipseWhichTakesCouldFillTheGapsTest::RunTest(const FString& Parameters)
 	struct FGap { const TCHAR* Pose; TArray<const TCHAR*> Keywords; };
 	const FGap Gaps[] = {
 		{ TEXT("herladen"), { TEXT("reload"), TEXT("herlaad"), TEXT("ammo"), TEXT("magazine") } },
+		// Punt 15 van de locomotie-audit: geen start-, stop- of landtake. De
+		// picker SLUIT "start" en "stop" expliciet uit bij het zoeken naar
+		// basis-takes, en dat suggereert dat ze bestaan — maar suggereren is
+		// geen meten. Deze drie regels beantwoorden de vraag zonder er een
+		// animatiefeature voor te bouwen.
+		{ TEXT("starten"),  { TEXT("start"), TEXT("_begin"), TEXT("accel") } },
+		{ TEXT("stoppen"),  { TEXT("stop"), TEXT("_end"), TEXT("skid"), TEXT("halt") } },
+		{ TEXT("landen"),   { TEXT("land"), TEXT("_impact") } },
 		// "cover" stond hier ook, en dat leverde meteen twee valse treffers op:
 		// Jump_Recovery bevat "cover". Een te ruime match maakt een gat kleiner
 		// dan het is, en dat is erger dan geen zoekopdracht — je denkt dat er een

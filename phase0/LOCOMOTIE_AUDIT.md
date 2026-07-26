@@ -306,3 +306,42 @@ de skeletpoort de geleende takes af. Dat wordt niet stil: de degradatieteller lo
 op en `NothingDegradesSilently` wordt rood. Dat is bestaand gedrag voor alle packs
 en niet nieuw voor deze koppeling.
 
+### Ronde 3, derde aanvulling: punt 15 is GEEN assetwerk
+
+Punt 15 staat sinds ronde 1 als **"omissie, grotendeels assetwerk"**: geen start-,
+stop- of landtake. Dat is nagemeten en het klopt niet.
+
+`ParagonLtBelica` levert precies de takes die ontbreken, en per richting:
+
+| Wat | Takes |
+|---|---|
+| **Starten** | `Jog_Fwd_Start`, `Jog_Bwd_Start`, `Jog_Left_Start`, `Jog_Right_Start` |
+| **Stoppen** | `Jog_Fwd_Stop`, `Jog_Bwd_Stop`, `Jog_Left_Stop`, `Jog_Right_Stop` |
+| **Landen** | `Jump_PreLand` |
+
+Vier richtingen voor allebei, wat aansluit op het richtingsmodel dat er al staat.
+
+**Let op bij het lezen van de meting:** de sweep meldt vijftien "start"-kandidaten
+in dit pack, maar elf daarvan zijn abilities (`E_Ability_Start`, `Q_Ability_Start`,
+`Stun_Start`, `LevelStart`, `R_Intro_Start`). Alleen de `Jog_*`-familie is
+locomotie. Een trefwoord dat te ruim matcht maakt een gat kleiner dan het is —
+dezelfde valkuil als `Jump_Re**cover**y` bij het zoeken naar een hurktake.
+
+**Dit is de derde keer dat "assetwerk" aansluitwerk bleek.** Eerst de zijwaartse
+cycli (3 van 9 lichamen → 9 van 9), toen de draaitakes ("geen enkele pack heeft
+er een" — Belica levert er vier), nu start/stop/landen. Het patroon is steeds
+hetzelfde: de picker zoekt naar een BASIS-take en sluit overgangswoorden expliciet
+uit (`NOT_BASE_TAKE` bevat "start", "stop", "turn", "crouch"), dus een gerichte
+vraag naar juist die takes komt nooit langs die filter.
+
+**NIET GEBOUWD, en met reden.** Er ligt een ontwerpvraag onder die vanavond al één
+keer heeft toegeslagen: de one-shot-laag speelt een volledige pose op 0,85 gewicht
+en schaalt de andere samples met `1 − gewicht`. Bij de draaitake zakte de
+loopcyclus daardoor naar 15%. Een start- of stoptake gaat over precies het moment
+dát je gaat lopen, dus dezelfde mechaniek zou de cyclus onderdrukken die hij moet
+inleiden.
+
+**Aanbeveling voor de volgende ronde:** hang start/stop niet aan de one-shot-laag
+maar aan een eigen gewicht dat óver de loopcyclus heen mengt in plaats van hem te
+vervangen — en meet het op een beeld, niet op een getal.
+
