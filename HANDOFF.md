@@ -17,6 +17,32 @@
 | **De demper is een keuze geworden.** De sidearm alarmeert tot 1200 cm in plaats van 2500 — onder de waarnemingsafstand van een vijand, dus hij verraadt je alleen aan wie je toch al zag. | Validator bewaakt de eis, niet het getal |
 | **Voetstappen weten waar je op staat.** Het district hád geen oppervlaktetypes; die zijn er nu, met physical materials en een trace op het moment van de stap. | Plein **beton**, bovenop een dekkingsblok **metaal** (op hoogte 210 cm) |
 
+## Correctie op mezelf: er ZIJN draai-animaties
+
+Vanmorgen schreef ik bij punt 7 (turn-in-place) dat er geen bruikbare
+draai-animatie in de packs zat, en dat het daarom niet te bouwen was. Dat klopt
+niet, en het is het soort fout dat een hele taak ten onrechte doodverklaart.
+
+Ik keek in SciFiCharacter. Maar **de speler is Belica** (ParagonLtBelica), en die
+pack levert precies wat punt 7 vraagt:
+
+    Idle_Turn_90_Left / Idle_Turn_90_Right
+    Idle_Turn_180_Left / Idle_Turn_180_Right
+    RMB_TurnInPlace_Fast / _Slow / _Zero
+
+Vier draaitakes op de juiste hoeken, plus drie gemikte varianten. Voor het lichaam
+dat er het meest toe doet, want turn-in-place gaat over de speler die zijn camera
+draait terwijl hij stilstaat.
+
+**Gevolg:** punt 7 is niet geblokkeerd, en de drempel van 90 graden in de
+kijkcode (die er staat *omdat* ik dacht dat er geen animatie was) kan omlaag zodra
+de takes zijn aangesloten. Dat staat als volgende taak.
+
+De squadleden en vijanden gebruiken de SciFi-packs en hebben die takes níet — voor
+hen blijft de huidige drempel gelden. Dat is geen probleem: je ziet hun voeten
+zelden van dichtbij, en de speler is degene die zijn eigen lichaam de hele tijd
+in beeld heeft.
+
 ## Wat ik van jou wil horen — het LICHTPLAN
 
 Je vroeg één review-ronde voor ik honderd armaturen neerzet. Dit is die ronde.

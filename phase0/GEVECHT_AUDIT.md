@@ -51,6 +51,48 @@ erbij, en het vijfde (0,000 s) komt uit het harnas.*
 
 ---
 
+## Ronde 2 — 26-07-2026, avond
+
+*Zelfde zestien punten, opnieuw langsgelopen na de avondronde (terugslag,
+spreiding, magazijn, wapengeluid per familie, voetstappen per oppervlak). Alleen
+de rijen die VERANDERD zijn staan hier; de rest staat onveranderd in ronde 1.*
+
+| # | Onderdeel | Ronde 1 | Nu | Oordeel |
+|---|---|---|---|---|
+| 4 | **Bevestiging dát je raakt** | Alleen hoorbaar | **Hitmarker sinds vanmiddag** — een `+` dat 0,12 s oplicht | **Compleet** |
+| 5 | **Kopschot voelbaar anders** | Alleen 1,35× harder | **Eigen vorm en kleur**: `×` in oranje tegen `+` in wit | **Compleet** |
+| 7 | **Reactie van de schutter** | Pose ✓, terugslag ✗ | **Terugslag: 0,500° klim per schot, 0,000° over na 1 s rust** | Was half, **nu compleet** |
+| 8 | **Spreiding** | Geen | **Heup 2,5° / mikken 0,6° / bewegen +1,5°**, met het eerste schot van een reeks zuiver | Was een omissie, **gerepareerd** |
+| 9 | **Terugslag** | Geen | Zie 7 | Was een omissie, **gerepareerd** |
+| 10 | **Munitie en herladen** | Geen | **Magazijn van 30, herlaadtijd 2,2 s, automatisch herladen bij leeg.** Vier foley-fasen op de herlaadbeurt, munitieteller rechtsonder | Was een omissie, **gerepareerd** |
+| 11 | **Wapenwissel** | Vier wapens, drie onbereikbaar | **Onveranderd.** De wapens verschillen nu wél echt (negen assen plus een demper), maar de loadout-keuze bereikt het wapen nog steeds niet | **Nog steeds de grootste omissie in dit gevecht** |
+| 12 | **Geluid bij een schot** | Eén cue | **Drie varianten per wapenfamilie plus een nagalm**, nooit twee dezelfde achter elkaar | Was gerepareerd, **nu compleet** |
+| 14 | **Schade aan de speler zichtbaar** | Alleen de balk | **Richtingsindicator aangesloten** (het pack dat dood lag) | Was een omissie, **gerepareerd** |
+
+**Nieuw punt dat ronde 1 niet had:**
+
+| # | Onderdeel | Referentie | Wij (gemeten) | Oordeel |
+|---|---|---|---|---|
+| 17 | **Hoorbaar onderscheid tussen wapens** | Borderlands, Destiny en Battlefield geven elk wapentype een eigen stem | **Familie per wapen** (AssaultRifle / Handgun), drie schotvarianten elk. De sidearm is bovendien **gedempt**, met een alarmradius van 1200 tegen 5000 | Keuze — compleet voor twee families |
+| 18 | **Voetstappen zeggen waar je bent** | Universeel oppervlakgebonden | **Beton op het plein, metaal op de dekkingsblokken**, zeven varianten per oppervlak | Was er niet, **vandaag gebouwd** |
+
+---
+
+## De stand na ronde 2
+
+**Van de zestien punten uit ronde 1 waren er zes een omissie. Er is er nog één
+over, en het is dezelfde die er 's ochtends al uitsprong: punt 11.**
+
+Vier wapens die nu echt verschillen — schade, tempo, magazijn, afval, drie
+soorten spreiding, terugslag, stabiliteit, handling, kopschot, en of ze gedempt
+zijn — en drie ervan kan niemand vasthouden. Elke as die ik vandaag heb
+toegevoegd maakt dat gat *groter*, niet kleiner: hoe beter de wapens van elkaar
+verschillen, hoe zonder betekent het dat je er maar één krijgt.
+
+**Dat is dus de volgende taak, en hij staat al op de owner-lijst als punt 5
+(loadouts).** Niet omdat de lijst hem noemt, maar omdat deze audit er twee
+rondes achter elkaar op uitkomt.
+
 ## De rode draad
 
 **Vier van de vijf omissies gingen over FEEDBACK, niet over mechaniek.** Eén ervan
