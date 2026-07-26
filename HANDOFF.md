@@ -232,7 +232,11 @@ Waar ik terughoudend ben: de rest is vier tuningwaarden en één camera-klem. Ze
 - **Eén audit-rij was zelf fout, en had tot een verkeerde reparatie geleid.** De pitch-limieten zouden "bij −70 in de grond duiken" — gemeten gebeurt daar niets, en zit het probleem aan de andere kant: omhoog kijken duwt de camera van 300 naar 84 cm. De voorgestelde fix zou niets hebben opgelost.
 - **Drie dingen die stil gebeurden zijn nu luid** (missie-einde, neergaan, geweigerde orders). Het tweede is het vervelendste geweest: wie na een sessie de logs opende, kon niet eens zien dát hij was doodgegaan.
 
-Wat daarmee nog steeds waar is: het onnatuurlijke is eraf, er is nog niets toegevoegd. §8 FEEDBACK blijft leeg, en dat blijft het volgende grote ding.
+**En in de laatste uren kantelde het antwoord op je vraag nog een keer, want de grootste vondst kwam als laatste.** Ik schreef hierboven dat de rest "vier tuningwaarden en één camera-klem" was. Dat was te bescheiden: **de camera bewoog helemaal niet** bij 1e persoon, mikken en Command Mode. Drie dingen die je elke minuut gebruikt, allemaal dood, allemaal met een correct gezet doel. Dat is geen afstelling maar een reparatie, en het is het eerste wat je gaat merken.
+
+Daarnaast zijn er drie dingen bijgekomen die **niet** kapot zijn maar wel ontbreken, en die samen verklaren waarom vechten leeg aanvoelt: kopschoten doen niets (de trace raakt de capsule), het alarm kan tijdens spelen niet afgaan (de enige aanroep is een console-commando), en twee van je drie squad-klassen hebben geen signature verb. Alle drie zijn eerlijk gelabeld in de code als aanstaand werk — maar van buiten zie je alleen dat er niets gebeurt.
+
+Wat daarmee nog steeds waar is, en scherper dan vanavond vroeg: **het onnatuurlijke is eraf en de camera doet eindelijk wat hij beloofde, maar aan het GEVECHT is nog niets toegevoegd.** §8 FEEDBACK blijft leeg, en die leegte is nu beter in kaart: het is niet alleen shake en recoil, het is ook dat raak schieten, betrapt worden en klassen die verschillen allemaal nog geen uitkomst hebben.
 
 En één ding dat niet over feel gaat maar wel over vertrouwen: de missie speelt zichzelf nu uit, van start tot debrief, met asserts op de uitkomst. Dat vond in de eerste ronde meteen een objective dat afging zonder dat er geschoten was — met een volledig groene testsuite eromheen. Elke fix die vannacht landde is daarna opnieuw uitgespeeld als bewijs dat er niets brak.
 
