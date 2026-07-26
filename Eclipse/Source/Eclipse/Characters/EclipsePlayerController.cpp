@@ -811,7 +811,8 @@ void AEclipsePlayerController::SetupInputComponent()
 		// af op een druk die in werkelijkheid de SELECTIE verzette — hij zou dus een
 		// andere handeling bevestigen dan de stap beschrijft.
 		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim,         false, true },
-		{ ToggleViewAction,    EclipseTestGuide::EEclipseGuideSignal::ToggleView },
+		// ToggleView zit niet meer in deze tabel: HandleToggleView meldt het zelf,
+		// zodat ELKE knop die het standpunt wisselt de stap afvinkt (26-07).
 		{ CommandHoldAction,   EclipseTestGuide::EEclipseGuideSignal::CommandMode },
 		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext,  true },
 		{ SelectPrevAction,    EclipseTestGuide::EEclipseGuideSignal::SelectPrev,  true },
@@ -1065,6 +1066,21 @@ void AEclipsePlayerController::HandleToggleView()
 		return;
 	}
 	Body->SetFirstPerson(!Body->IsFirstPerson());
+
+	// De gids moet dit ZIEN, ongeacht welke knop het deed (26-07).
+	//
+	// Het signaal hing aan de ToggleView-ACTIE, en sinds RB buiten Command Mode
+	// ook het standpunt wisselt kwam die weg langs de gids heen: je drukte RB, de
+	// camera verspringt, en de stap bleef onafgevinkt. Dat is precies de stille
+	// mismatch die deze gids moet uitroeien, en ik heb hem vanochtend zelf
+	// gemaakt.
+	//
+	// Hier en niet in de bindingtabel, want dit is de plek waar het FEIT gebeurt.
+	// Elke toekomstige knop die hier langskomt vinkt de stap vanzelf af.
+	if (MissionHud != nullptr && MissionHud->IsInViewport())
+	{
+		MissionHud->NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal::ToggleView);
+	}
 	UE_LOG(LogEclipse, Verbose, TEXT("View toggled to %s person."),
 		Body->IsFirstPerson() ? TEXT("first") : TEXT("third"));
 }
