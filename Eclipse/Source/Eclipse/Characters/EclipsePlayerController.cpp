@@ -636,15 +636,61 @@ void AEclipsePlayerController::SetupInputComponent()
 		if (CommandMode != nullptr) { CommandMode->OnHoldReleased(); }
 		if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn())) { Body->SetCommandModeCamera(false); }
 	});
-	Input->BindActionValueLambda(SelectNextAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(+1); } });
-	// LT shares itself with aim: during the hold it cycles, in the field it does
-	// not (the aim handler takes the opposite branch). Mouse-scroll keeps working
-	// either way — a wheel is not ambiguous.
-	Input->BindActionValueLambda(SelectPrevAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->CycleSoldierSelection(-1); } });
+	// GEEN DODE KNOPPEN (owner-opdracht 26-07, punt 4).
+	//
+	// RB deed buiten Command Mode niets. Nu wisselt hij daar het camerastandpunt —
+	// en dat vult een echt gat: sinds R3 eraf ging (te vaak per ongeluk) kón de
+	// controller helemaal niet meer wisselen tussen 1e en 3e persoon, terwijl het
+	// toetsenbord daar C voor heeft. Binnen de hold blijft hij "volgende soldaat".
+	//
+	// Waarom niet "wapen wisselen", jouw eerdere wens: er IS geen tweede wapen.
+	// Die knop zou dan opnieuw niets doen, alleen met een mooiere naam — precies
+	// wat deze opdracht wil uitroeien. Zodra er een loadout-wissel bestaat is dit
+	// de plek.
+	Input->BindActionValueLambda(SelectNextAction, ETriggerEvent::Started, [this](const FInputActionValue&)
+	{
+		const bool bHeld = CommandMode != nullptr && CommandMode->IsHeld();
+		if (bHeld)
+		{
+			CommandMode->CycleSoldierSelection(+1);
+			return;
+		}
+		HandleToggleView();
+	});
+
+	// HET LT-CONFLICT, opgelost zoals andere games het oplossen: door het niet te
+	// hebben. LT was buiten de modus mikken en erbinnen "vorige soldaat", en zo'n
+	// overlading op een TRIGGER is in dit genre ongebruikelijk — Division en Gears
+	// houden de triggers heilig (mikken en vuren) en zetten moduskeuzes op de
+	// bumpers en het d-pad. Daar is een goede reden voor: een trigger heeft een
+	// analoge slag, dus je "drukt" hem half per ongeluk.
+	//
+	// Selectie cycelt daarom nog maar één kant op, met RB, en wrapt rond. Dat is
+	// bij vier soldaten geen verlies (drie keer RB is hetzelfde als één keer
+	// terug) en het maakt LT weer één ding: mikken, altijd. De muiswiel-tak
+	// hieronder blijft beide richtingen doen, want een wiel is niet dubbelzinnig.
+	Input->BindActionValueLambda(SelectPrevAction, ETriggerEvent::Started, [this](const FInputActionValue&)
+	{
+		if (CommandMode != nullptr && CommandMode->IsHeld()) { CommandMode->CycleSoldierSelection(-1); }
+	});
 	Input->BindAction(JumpAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleJump);
 	Input->BindAction(AimAction, ETriggerEvent::Started, this, &AEclipsePlayerController::HandleAimStart);
 	Input->BindAction(AimAction, ETriggerEvent::Completed, this, &AEclipsePlayerController::HandleAimStop);
-	Input->BindActionValueLambda(DirectPickAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->PickSoldierUnderReticle(); } });
+	// X/E: binnen de hold "soldaat onder het kruis", daarbuiten een SNELLE
+	// hergroepeer-order aan de hele squad. Genre-conventie (Mass Effect, Ghost
+	// Recon, Division): één face-knop geeft de meest gevraagde order zonder dat je
+	// een menu in hoeft. Het gebruikt het bestaande orderpad, dus het is echt
+	// gedrag en geen decoratie — je squad komt naar je toe en antwoordt hoorbaar.
+	Input->BindActionValueLambda(DirectPickAction, ETriggerEvent::Started, [this](const FInputActionValue&)
+	{
+		const bool bHeld = CommandMode != nullptr && CommandMode->IsHeld();
+		if (bHeld)
+		{
+			CommandMode->PickSoldierUnderReticle();
+			return;
+		}
+		IssueSquadOrder(EEclipseSquadOrder::Regroup);
+	});
 	Input->BindActionValueLambda(StanceToggleAction, ETriggerEvent::Started, [this](const FInputActionValue&) { if (CommandMode != nullptr) { CommandMode->ToggleHeldStance(); } });
 
 	// Debug overlay (feel gauntlet, SPEC-P2-02 R3) + the in-game test guide

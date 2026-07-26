@@ -35,8 +35,8 @@ echo   MIKKEN ............... Rechtermuisknop      ^|  LT
 echo   SPRINGEN ............. Spatie               ^|  A
 echo   Sprint ............... Shift VASTHOUDEN     ^|  L3 = AAN/UIT (toggle)
 echo   Hurken ............... Ctrl (je zakt 52 cm) ^|  B
-echo   1e/3e persoon wisselen  C                   ^|  (geen - stond op R3, ging
-echo                                               ^|   te vaak per ongeluk af)
+echo   1e/3e persoon wisselen  C                   ^|  RB (buiten Command Mode)
+echo   Squad hergroeperen ... E                    ^|  X  (buiten Command Mode)
 echo.
 echo   Sprint verschilt per apparaat en dat is met opzet: op toetsenbord houd je
 echo   Shift vast, op de pad zet L3 hem AAN en blijft hij aan. Hij gaat vanzelf uit
@@ -64,14 +64,14 @@ echo.
 echo   COMMAND MODE (wereld naar 30%%):
 echo   Activeren ............ Q VASTHOUDEN         ^|  LB VASTHOUDEN
 echo   Volgende soldaat ..... Tab / scroll omhoog  ^|  RB
-echo   Vorige soldaat ....... scroll omlaag        ^|  LT
+echo   Vorige soldaat ....... scroll omlaag        ^|  (pad: RB wrapt rond)
 echo   Soldaat onder kruis .. E                    ^|  X
 echo   Orders geven ......... 1 2 3 4              ^|  D-pad
 echo   Stance ............... Alt vasthouden       ^|  Y (togglen)
 echo.
-echo   LET OP: die vier regels hierboven werken ALLEEN terwijl je Q/LB vasthoudt.
-echo   Buiten Command Mode doen ze niets - dat is geen bug maar de contextstack.
-echo   En stance wisselt vandaag alleen de HUD-regel; het gedrag verandert nog niet.
+echo   Die regels hierboven gelden TERWIJL je Q/LB vasthoudt. Buiten Command Mode
+echo   doen RB en X iets anders (zie boven); LT is buiten en binnen gewoon MIKKEN.
+echo   Stance wisselt vandaag alleen de HUD-regel; het gedrag verandert nog niet.
 echo.
 echo   Muis vrijgeven ....... Shift+F1
 echo   Afsluiten ............ Esc
