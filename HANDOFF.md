@@ -5,6 +5,23 @@
 
 # OCHTENDRAPPORT — nacht 25→26 juli 2026
 
+## Wat je om 07:55 vroeg, en wat ervan geland is
+
+Zes opdrachten in één regel, alle zes af — build groen, 127/127 tests, validatie 0, catalog 29/29.
+
+| # | opdracht | wat er nu gebeurt | wat je moet weten |
+|---|---|---|---|
+| 1 | **bat bijwerken** | Sprint staat per apparaat (Shift = hold, L3 = toggle met vier uitstappen), hurken zegt 52 cm, F9 staat erbij, en de vier Command Mode-regels zeggen dat ze alleen binnen de hold werken | Verder niets aan jouw bestand aangeraakt |
+| 2 | **alarm bij eerste waarneming** | De latch gaat af zodra een vijand je ziet. De haak bestond al en deed niets | **De missie wordt strenger:** elke detectie kost je de spook-optionals |
+| 3 | **spawns aansluiten** | De vaste lus van vier is weg; missies plaatsen hun eigen vijanden | **De data vraagt om 15 vijanden waar er 4 stonden.** Assault/Rescue/Sabotage worden zwaarder én anders van vorm |
+| 4 | **stemmen met rem van 2 s** | Twee abonnementen op de bus; rem per soldaat, niet globaal | Zinnen die nooit gegenereerd zijn blijven stil — bewust: laten genereren kost een betaalde API-aanroep |
+| 5 | **downed-bark optie 1** | Eigen pool: *"I'm hit - can't move."*, *"I'm down, boss."*, *"Need a medic, not an order."* | Zinnen zijn van mij; herschrijf ze gerust, de test pint ze niet vast |
+| 6 | **no-casualties als voorwaarde** | Betaalt uit. Gemeten: **20 materiaal** | **Raakt je economie:** elke ronde zonder gewonden levert nu 20 meer op. In de HUD blijft de regel tijdens de missie onafgevinkt — je kunt hem tot het eind verliezen |
+
+**Twee dingen die ik onderweg fout had en zelf heb gevonden.** De bark-rem hing aan het geluidsbestand in plaats van aan de soldaat, dus hij remde alleen op machines waar de audio al gegenereerd was. En bij de +20 bleek de **meting** net zo stuk als het mechanisme: de speelronde telde alleen uitbetalingen met reden `MissionReward`, terwijl de bonus onder `OptionalObjective` binnenkomt — die teller had hem dus ook niet gezien als hij al gewerkt had. Twee fouten die naar dezelfde conclusie wezen; precies het patroon waar de hele nacht over ging.
+
+---
+
 ## Als je één ding doet: start de build en druk **F3**
 
 De game loopt je dan zelf door alle controls, en elke stap zegt waaraan je ziet dat het klopt. Dit is wat er sinds jouw laatste sessie veranderd is, op volgorde van wat je het eerst merkt:
