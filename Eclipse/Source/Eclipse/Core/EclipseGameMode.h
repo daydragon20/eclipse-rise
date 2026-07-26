@@ -90,6 +90,7 @@ private:
 	int32 PlayShotStep = 0;
 	bool bPlayShotWalking = false;
 	bool bPlayShotFiring = false;
+	bool bPlayShotTurning = false;
 
 	/** Duwt elke tick beweging/vuur door zodat de opnames een LOPEND spel vangen. */
 	void DrivePlayShotInput();

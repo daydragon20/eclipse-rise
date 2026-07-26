@@ -261,6 +261,13 @@ void AEclipseGameMode::DrivePlayShotInput()
 		const FRotator YawOnly(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
 		Body->AddMovementInput(FRotationMatrix(YawOnly).GetUnitAxis(EAxis::X), 1.0f);
 	}
+	if (bPlayShotTurning)
+	{
+		// Via AddYawInput en niet met SetControlRotation: dit is dezelfde weg die
+		// jouw muis neemt, dus een fout in die weg kan zich hier niet achter
+		// verstoppen.
+		Controller->AddYawInput(1.2f);
+	}
 	if (bPlayShotFiring)
 	{
 		if (UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>())
@@ -317,6 +324,16 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		// dat is precies het gat waar de owner op wees: "je tests bewijzen dat de
 		// code doet wat de code zegt, niet dat het resultaat zichtbaar wordt".
 		// WasRecentlyRendered() vraagt het aan de renderer zelf.
+		if (Body == PlayerPawn)
+		{
+			const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
+			const float ViewYaw = static_cast<float>(Controller->GetControlRotation().Yaw);
+			UE_LOG(LogEclipse, Display,
+				TEXT("[PLAYSHOT %d DRAAI] lichaam=%.1f gr  camera=%.1f gr  verschil=%.1f gr"),
+				ShotIndex, BodyYaw, ViewYaw,
+				FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYaw, ViewYaw)));
+		}
+
 		UE_LOG(LogEclipse, Display,
 			TEXT("[PLAYSHOT %d MEET] %s%s  schaal=%.3f  hoogte=%.1fcm  afstand=%.0fcm  scherm=%s(%.0f,%.0f)  zichtbaar=%d verborgen=%d eigenaarzietniet=%d GETEKEND=%d"),
 			ShotIndex,
@@ -381,7 +398,7 @@ void AEclipseGameMode::AdvancePlayShotRound()
 	{
 		return;
 	}
-	if (PlayShotStep >= 1 && PlayShotStep <= 5)
+	if (PlayShotStep >= 1 && PlayShotStep <= 7)
 	{
 		MeasurePlayShot(PlayShotStep);
 		MeasureDressingFigures(PlayShotStep);
@@ -431,10 +448,40 @@ void AEclipseGameMode::AdvancePlayShotRound()
 				Body->GetMesh()->SetVisibility(false, true);
 			}
 		}
+		// De aankleedfiguren erbij: de camera zwaait er bij de draaiing vlak
+		// langs, en dan vult een figuur van 40 cm afstand het frame terwijl je
+		// juist naar het silhouet van de speler moet kijken.
+		for (TActorIterator<ASkeletalMeshActor> It(GetWorld()); It; ++It)
+		{
+			ASkeletalMeshActor* Figure = *It;
+			if (Figure != nullptr && Figure->GetSkeletalMeshComponent() != nullptr)
+			{
+				Figure->GetSkeletalMeshComponent()->SetVisibility(false, true);
+			}
+		}
 		break;
 	case 5:
 		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 5] alleen de SPELER zichtbaar — wat hier staat, is jouw personage"));
+		// TURN-IN-PLACE OP BEELD. Gebouwd, drempel op 60 graden, gemeten — maar
+		// nooit gezien. De andere lichamen blijven verborgen: bij een draaiing
+		// gaat het om ÉÉN silhouet, en drie extra figuren maken het beeld alleen
+		// moeilijker te lezen.
+		//
+		// 100 graden en niet 61: net over de drempel meet de drempel, en die is
+		// al gedekt door een test. Hier moet je ZIEN dat het lichaam de camera
+		// nadraait, en daarvoor moet de draai groot genoeg zijn om op twee
+		// frames uit elkaar te houden.
+		bPlayShotTurning = true;
+		break;
+	case 6:
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 6] tijdens het wegkijken — draait het lichaam mee?"));
+		break;
+	case 7:
+		bPlayShotTurning = false;
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 7] uitgedraaid — lichaam hoort weer met de camera mee te staan"));
 		break;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));
