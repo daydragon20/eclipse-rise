@@ -95,9 +95,19 @@ onaangeraakt, en het checkpoint biedt M1.1 **opnieuw** aan — verliezen is geen
 `Eclipse.Mission.RaiseAlarm` zet de alarm-latch. Die is idempotent (tweemaal
 aanroepen doet niets extra) en **faalt de missie niet** — hij kost alleen bonussen
 die stilte eisen. M1.1 heeft nog geen alarm-afhankelijke bonus; die komt met M1.2's
-ghost-optional. Het pad is nu al te testen: alarm zetten, dan `ForceEnd win`, en in
-de debrief moet de betreffende optional als *gemist* verschijnen in plaats van
-stilletjes te verdwijnen.
+ghost-optional.
+
+> **LET OP (26-07): dit pad is in M1.1 NIET te testen, ook al staat dat er eerder.**
+> Twee redenen, allebei gemeten. Er is geen optional die stilte eist, dus er valt
+> niets te laten vervallen. En "gemist" verschijnt alleen voor een optional die
+> je eerst hebt *voltooid* — de debrief slaat optionals over die niet in
+> `CompletedObjectiveIds` staan, dus een niet-voltooide optional verdwijnt
+> sowieso stilletjes. Wil je de gemist-melding zien, dan moet je in M1.1 het
+> casualty-objective expliciet voltooien én iemand laten neergaan; met alarm lukt
+> het pas als M1.2 zijn ghost-optional meebrengt.
+>
+> **En het alarm zelf gaat tijdens spelen nooit af** — de enige aanroep is dit
+> console-commando. Zie de owner-lijst; koppelen is een ontwerpbeslissing.
 
 ## Als iets niet lijkt te werken
 
