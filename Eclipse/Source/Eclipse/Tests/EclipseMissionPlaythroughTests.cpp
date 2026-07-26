@@ -3908,4 +3908,106 @@ bool FEclipseDoctrineChangesBehaviour::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * KLASSE-VERBS IN DE BASISLAAG (owner-opdracht 26-07 avond, punt 1 — laag 5).
+ *
+ * Momentum en Killzone bestonden als tag plus getal en werden nergens afgevuurd
+ * (squad-audit punt 10). Ze horen niet op een eigen knop maar IN de doctrine:
+ * een Assault sluit af onder Aggressive, een Sniper reikt verder onder Overwatch.
+ *
+ * De meting doet wat de audit vroeg: laat zien dat het verb iets DOET, en niet
+ * alleen dat de tag bestaat.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseClassVerbsFireWithoutBeingCalled,
+	"Eclipse.Mission.Playthrough.ClassVerbsFireWithoutBeingCalled",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseClassVerbsFireWithoutBeingCalled::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("verbs: strategie"), Strategy) || !TestNotNull(TEXT("verbs: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("verbs: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	if (!TestTrue(TEXT("verbs: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Welke verbs zijn er überhaupt aan boord? Zonder dat getal zegt een nul
+	// hieronder niets — dat is de nulmeting-valkuil.
+	int32 WithPush = 0;
+	int32 WithKillzone = 0;
+	for (const AEclipseSquadmateController* Mate : Mates)
+	{
+		WithPush += Mate->GetClassKit().OrderPushDistanceCm > 0.0f ? 1 : 0;
+		WithKillzone += Mate->GetClassKit().KillzoneRangeCm > 0.0f ? 1 : 0;
+	}
+	Report(*this, TEXT("soldaten met een Momentum-getal"), static_cast<float>(WithPush), TEXT(""));
+	Report(*this, TEXT("soldaten met een Killzone-laan"), static_cast<float>(WithKillzone), TEXT(""));
+
+	// --- Momentum: onder AGGRESSIVE sluit hij af in plaats van te dekken ----
+	int32 VerbsBefore = 0;
+	for (const AEclipseSquadmateController* Mate : Mates)
+	{
+		VerbsBefore += Mate->GetVerbUses();
+	}
+	for (AEclipseSquadmateController* Mate : Mates)
+	{
+		Mate->SetDoctrine(EEclipseSquadStance::Aggressive);
+		if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(Mate->GetPawn()))
+		{
+			Body->ApplyDamage(5.0f, Harness.Body, TEXT("TestIncoming"));
+		}
+	}
+	Harness.Idle(1.0f);
+	int32 VerbsAfter = 0;
+	for (const AEclipseSquadmateController* Mate : Mates)
+	{
+		VerbsAfter += Mate->GetVerbUses();
+	}
+	Report(*this, TEXT("verb-inzetten onder AGGRESSIVE"), static_cast<float>(VerbsAfter - VerbsBefore), TEXT(""),
+		TEXT("Momentum: afsluiten op wie er schoot, in plaats van dekken"));
+
+	if (WithPush > 0)
+	{
+		TestTrue(TEXT("verbs: Momentum vuurt uit zichzelf onder Aggressive"), VerbsAfter > VerbsBefore);
+	}
+	else
+	{
+		AddInfo(TEXT("GEMETEN  geen enkele soldaat heeft een Momentum-getal — dan is 0 geen defect maar een lege kit"));
+	}
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

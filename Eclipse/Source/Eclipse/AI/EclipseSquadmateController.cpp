@@ -1,4 +1,9 @@
 #include "AI/EclipseSquadmateController.h"
+#include "Engine/GameInstance.h"
+#include "StructUtils/InstancedStruct.h"
+#include "Core/EclipseGameplayTags.h"
+#include "Core/EclipseEventPayloads.h"
+#include "Core/EclipseEventBusSubsystem.h"
 
 #include "Characters/EclipseCharacter.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
@@ -275,8 +280,20 @@ AEclipseCharacter* AEclipseSquadmateController::FindHostileInRange() const
 	// op iets wat hij niet kan raken, verraadt de squad voor niets. De vijand
 	// gebruikt hiervoor zijn PerceptionRadius, maar die staat voor "wanneer merk ik
 	// je op"; hier is de vraag "kan ik je raken".
+	// KILLZONE (laag 5). Een Sniper in OVERWATCH reikt tot zijn laanbereik in
+	// plaats van tot zijn wapenbereik. Dat is het verb dat zijn klasse belooft, en
+	// het is precies de doctrine waarin hij hoort: staan blijven en ver kijken.
+	// Buiten Overwatch geldt het niet — dan is hij gewoon een schutter die meeloopt.
+	float Reach = Weapon->GetRangeCm();
+	bool bKillzoneReach = false;
+	if (CurrentStance == EEclipseSquadStance::Overwatch && ClassKit.KillzoneRangeCm > Reach)
+	{
+		Reach = ClassKit.KillzoneRangeCm;
+		bKillzoneReach = true;
+	}
+
 	AEclipseCharacter* Nearest = nullptr;
-	float NearestDistanceSquared = FMath::Square(Weapon->GetRangeCm());
+	float NearestDistanceSquared = FMath::Square(Reach);
 	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
 	{
 		AEclipseCharacter* Candidate = *It;
@@ -291,6 +308,11 @@ AEclipseCharacter* AEclipseSquadmateController::FindHostileInRange() const
 		{
 			NearestDistanceSquared = DistanceSquared;
 			Nearest = Candidate;
+			// Alleen melden als het verb ECHT iets deed: dit doelwit ligt buiten
+			// zijn wapenbereik en is dus alleen bereikbaar dankzij Killzone. Een
+			// verb dat zich meldt terwijl het niets toevoegt, is ruis.
+			bKillzoneEngaged = bKillzoneReach
+				&& DistanceSquared > FMath::Square(Weapon->GetRangeCm());
 		}
 	}
 	return Nearest;
@@ -338,8 +360,13 @@ void AEclipseSquadmateController::UpdateEngagement()
 		}
 	}
 
+	bKillzoneEngaged = false;
 	AEclipseCharacter* Target = FindHostileInRange();
 	AutoTarget = Target;
+	if (bKillzoneEngaged)
+	{
+		NoteVerbUsed();
+	}
 	if (Target != nullptr && !GetWorldTimerManager().IsTimerActive(AutoFireTimer))
 	{
 		ContinueAutoFire();
@@ -394,6 +421,18 @@ void AEclipseSquadmateController::HandleHitTaken(AEclipseCharacter* Shooter, flo
 	// vuurt terug — het autonome vuur hierboven doet de rest.
 	if (CurrentStance == EEclipseSquadStance::Aggressive)
 	{
+		// MOMENTUM (laag 5). Een Assault sluit onder dit kader AF op wie er schoot,
+		// in plaats van dekking te zoeken. OrderPushDistanceCm stond al in zijn kit
+		// als "hoe ver duwt deze klasse door" en werd alleen bij orders gelezen.
+		if (ClassKit.OrderPushDistanceCm > 0.0f && Shooter != nullptr)
+		{
+			const FVector Toward = (Shooter->GetActorLocation() - Body->GetActorLocation()).GetSafeNormal2D();
+			const FVector PushTo = Body->GetActorLocation() + Toward * ClassKit.OrderPushDistanceCm;
+			if (MoveToLocation(PushTo, /*AcceptanceRadius*/ 100.0f) == EPathFollowingRequestResult::RequestSuccessful)
+			{
+				NoteVerbUsed();
+			}
+		}
 		return;
 	}
 
@@ -436,6 +475,25 @@ void AEclipseSquadmateController::HandleHitTaken(AEclipseCharacter* Shooter, flo
 	{
 		++CoverRuns;
 	}
+}
+
+void AEclipseSquadmateController::NoteVerbUsed()
+{
+	++VerbUses;
+
+	// Het FEIT bestaat al (Event.Squad.ClassAbilityUsed) en werd tot vandaag alleen
+	// door Stabilize gevuurd. Momentum en Killzone horen er net zo goed in: wie
+	// naar de barks of de HUD luistert, hoort dan alle drie de verbs en niet één.
+	UGameInstance* GameInstance = GetWorld() != nullptr ? GetWorld()->GetGameInstance() : nullptr;
+	UEclipseEventBusSubsystem* Bus = GameInstance != nullptr
+		? GameInstance->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr;
+	if (Bus == nullptr || !ClassKit.SignatureVerb.IsValid())
+	{
+		return;
+	}
+	FEclipseSquadEventPayload Ability;
+	Ability.AbilityVerb = ClassKit.SignatureVerb;
+	Bus->Broadcast(EclipseTags::Event_Squad_ClassAbilityUsed, FInstancedStruct::Make(Ability));
 }
 
 void AEclipseSquadmateController::HandlePawnDowned()

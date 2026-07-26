@@ -53,6 +53,9 @@ public:
 	/** Diagnostiek: verplaatsingen naar dekking onder vuur — het bewijs van laag 3. */
 	int32 GetCoverRuns() const { return CoverRuns; }
 
+	/** Diagnostiek: hoe vaak het klasse-verb uit zichzelf iets deed (laag 5). */
+	int32 GetVerbUses() const { return VerbUses; }
+
 	/** Start de basislaag: meelopen. Aangeroepen zodra de soldaat een lichaam heeft. */
 	void BeginFollowing(float FollowDistanceCm, float CoverSearchRadiusCm);
 
@@ -177,6 +180,22 @@ private:
 
 	/** Diagnostiek: hoe vaak deze soldaat onder vuur naar dekking vertrok. */
 	int32 CoverRuns = 0;
+
+	/**
+	 * KLASSE-VERBS (26-07 avond, punt 1 — laag 5 van zes).
+	 *
+	 * Momentum en Killzone bestonden als tag plus getal en werden nergens
+	 * afgevuurd (squad-audit punt 10). Ze horen IN de basislaag en niet op een
+	 * eigen knop: een Assault gebruikt Momentum wanneer zijn doctrine hem laat
+	 * opsluiten, een Sniper zet Killzone wanneer hij in Overwatch staat. Zo doet
+	 * Mass Effect het ook — de krachten zijn autonoom, de speler kan ze hooguit
+	 * overrulen.
+	 */
+	int32 VerbUses = 0;
+	void NoteVerbUsed();
+
+	/** Killzone raakte dit doelwit alleen dankzij zijn laanbereik (mutable: gezet in een const zoeker). */
+	mutable bool bKillzoneEngaged = false;
 	void ContinueAutoFire();
 
 	FTimerHandle AutoFireTimer;
