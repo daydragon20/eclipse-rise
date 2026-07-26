@@ -1,5 +1,7 @@
 #include "Characters/EclipseCharacterMovementComponent.h"
 
+#include "Characters/EclipseCharacter.h"
+
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
@@ -7,6 +9,22 @@
 float UEclipseCharacterMovementComponent::GetMaxSpeed() const
 {
 	const float BaseSpeed = Super::GetMaxSpeed();
+
+	// MIKKEN ZET JE VAST (owner-opdracht 26-07 avond, punt 3). Vóór de
+	// grond-controle, want mikken hoort ook in de lucht te remmen — al is dat een
+	// randgeval, het is geen reden om het anders te laten werken dan de speler
+	// verwacht.
+	//
+	// Een CAP en geen factor: de straf moet gelden ongeacht of je loopt, rent of
+	// hurkt, en een vermenigvuldiging zou hurkend mikken (150 x 0,345) op 52 cm/s
+	// zetten. De traagste van de twee wint, dus hurkend mikken blijft 145.
+	if (const AEclipseCharacter* Body = Cast<AEclipseCharacter>(CharacterOwner))
+	{
+		if (Body->IsAiming() && AimSpeed > 0.0f)
+		{
+			return FMath::Min(BaseSpeed, AimSpeed);
+		}
+	}
 
 	// Alleen op de grond. In de lucht stuurt AirControl al, en een richtingsstraf
 	// daar bovenop zou een sprong onvoorspelbaar maken.

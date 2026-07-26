@@ -105,6 +105,9 @@ public:
 	 */
 	bool ShotLineHitsHead(const FVector& Start, const FVector& End) const;
 
+	/** Mikt dit lichaam? Het bewegingscomponent leest dit voor de mikstraf (26-07). */
+	bool IsAiming() const { return bAiming; }
+
 	/** Speel de schietpose (26-07, punt 3) — aangeroepen door het wapen bij elk schot. */
 	void PlayShootPose();
 

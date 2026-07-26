@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0.1, ClampMax = 1.0))
 	float StrafeSpeedRatio = 1.0f;
 
+	/** Snelheidsplafond tijdens mikken (cm/s); 0 = geen straf. Gezet door ApplyTuning. */
+	UPROPERTY()
+	float AimSpeed = 145.0f;
+
 	/** Snelheidsfactor bij achteruit. 0.85 = de enige gepubliceerde waarde in het genre. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0.1, ClampMax = 1.0))
 	float BackwardSpeedRatio = 0.85f;

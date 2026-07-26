@@ -37,6 +37,26 @@ public:
 	float CrouchSpeed = 150.0f;
 
 	/**
+	 * Snelheid terwijl je MIKT (owner-opdracht 26-07 avond, punt 3). Tot vandaag
+	 * kostte mikken niets: je sprintte even hard met je vizier op, en dan is
+	 * mikken geen keuze maar een gratis verbetering.
+	 *
+	 * RESEARCH. De multipliers die dit genre gebruikt, uitgedrukt op de
+	 * basisloopsnelheid: Call of Duty ~0,45x (zwaardere wapens lager), Rainbow Six
+	 * Siege ~0,5x, Battlefield ~0,6x, Destiny 2 ~0,4x, The Division ongeveer
+	 * halveert. De band is dus 0,4-0,6, met de zware kant bij tactische shooters.
+	 *
+	 * Onze 420 is snel voor het genre, dus de onderkant van die band is hier de
+	 * juiste: 145 is 0,345x. Dat is bewust ONDER wandelen (180) én onder hurken
+	 * (150), zodat mikken de traagste houding is die er is — de owner-opdracht
+	 * zegt letterlijk "mikken is een keuze die je vastzet", en dan mag het niet
+	 * ook nog de snelste manier zijn om ergens te komen.
+	 * [CONVENTIE met bron, onderkant van de band gekozen om de snelle basis.]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
+	float AimSpeed = 145.0f;
+
+	/**
 	 * Halve capsulehoogte gehurkt, in cm. De ENGINE-default is 40 (dus 80 cm
 	 * totaal) en die stond hier nooit tegenover een keuze — precies zoals de rest
 	 * van het bewegingscomponent bij de feel-audit.

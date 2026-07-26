@@ -1364,6 +1364,69 @@ bool FEclipseFootstepsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Mikken zet je vast (owner-opdracht 26-07 avond, punt 3).
+//
+// Tot vandaag kostte mikken niets: je sprintte even hard met je vizier op, en dan
+// is mikken geen keuze maar een gratis verbetering — er was geen enkele reden om
+// ooit NIET te mikken.
+//
+// Gemeten op de UITKOMST en niet op de vlag: hoe hard loop je écht terwijl je
+// mikt. Een test op AimSpeed zou groen blijven als het bewegingscomponent hem
+// nooit leest, en dat is exact de fout die deze sessie drieëntwintig keer heeft
+// opgeleverd.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseAimSlowsYouTest,
+	"Eclipse.Feel.Layer2.AimingCostsSpeed",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseAimSlowsYouTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Eerst zonder mikken op topsnelheid, als referentie in dezelfde ronde.
+	if (!Harness.RunUpToTopSpeed(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	const float FreeSpeed = Harness.SpeedCm();
+
+	// Dan mikken en opnieuw uitlopen. Ruim de tijd geven: de rem moet zijn werk
+	// doen en de snelheid moet settelen op het nieuwe plafond.
+	Harness.Inject(TEXT("Aim"), true);
+	for (int32 Step = 0; Step < 180; ++Step)
+	{
+		Harness.Inject(TEXT("Aim"), true);
+		Harness.Inject(TEXT("Move"), FVector2D(0.0f, 1.0f));
+		Harness.Step();
+	}
+	const float AimedSpeed = Harness.SpeedCm();
+
+	Report(*this, TEXT("topsnelheid zonder mikken"), FreeSpeed, TEXT("cm/s"));
+	Report(*this, TEXT("snelheid tijdens mikken"), AimedSpeed, TEXT("cm/s"),
+		*FString::Printf(TEXT("tuning zegt %.0f"), Harness.Tuning->AimSpeed));
+	Report(*this, TEXT("wandelsnelheid ter vergelijking"), Harness.Tuning->WalkSpeed, TEXT("cm/s"),
+		TEXT("mikken hoort hier ONDER te zitten"));
+
+	TestTrue(FString::Printf(TEXT("mikken: het kost echt snelheid (%.0f tegen %.0f)"), AimedSpeed, FreeSpeed),
+		AimedSpeed < FreeSpeed - 50.0f);
+	TestTrue(FString::Printf(TEXT("mikken: je bent trager dan WANDELEN (%.0f tegen %.0f)"),
+			AimedSpeed, Harness.Tuning->WalkSpeed),
+		AimedSpeed < Harness.Tuning->WalkSpeed);
+	TestTrue(FString::Printf(TEXT("mikken: de gemeten snelheid is de getunede (%.0f tegen %.0f)"),
+			AimedSpeed, Harness.Tuning->AimSpeed),
+		FMath::IsNearlyEqual(AimedSpeed, Harness.Tuning->AimSpeed, 10.0f));
+
+	Harness.Shutdown();
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLandingDipTest,
 	"Eclipse.Feel.Layer2.LandingHasWeight",
 	EclipseFeelTest::TestFlags)

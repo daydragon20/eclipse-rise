@@ -335,6 +335,7 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	if (UEclipseCharacterMovementComponent* Directional = Cast<UEclipseCharacterMovementComponent>(Movement))
 	{
 		Directional->StrafeSpeedRatio = Tuning->StrafeSpeedRatio;
+		Directional->AimSpeed = Tuning->AimSpeed;
 		Directional->BackwardSpeedRatio = Tuning->BackwardSpeedRatio;
 	}
 	CoyoteTimeSeconds = Tuning->CoyoteTimeSeconds;
