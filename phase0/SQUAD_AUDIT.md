@@ -31,6 +31,46 @@ Gears heeft AI-teamgenoten zonder commandolaag en is hier maar half bruikbaar.
 
 ---
 
+## Ronde 2 — 26-07-2026, laat op de avond: de doctrine staat
+
+*Alleen de rijen die veranderd zijn.*
+
+| # | Onderdeel | Ronde 1 | Nu | Oordeel |
+|---|---|---|---|---|
+| 4 | **Autonoom vuren zonder order** | **Niet.** Zonder FocusTarget vuurt niemand | **57 schoten en 979 hp in 5 s**, zonder dat de speler iets deed | Was een omissie, **gebouwd** |
+| 5 | **Meelopen zonder order** | **Niet.** `FollowDistance` is dood | Verste soldaat na 6 s weglopen: **2326 → 779 cm**. Een Hold-soldaat drijft **0 cm** af | Was een omissie, **gebouwd** |
+| 6 | **Dekking zoeken** | **Niet.** `CoverSearchRadius` is dood | Eén zoektocht per treffer, met een rem van 2 s. Onder een Hold-order: **0** | Was een omissie, **gebouwd** |
+| 10 | **Klasse-verbs** | 1 van de 3 (alleen Stabilize) | **3 van de 3.** Momentum sluit af onder `aggressive`, Killzone reikt verder onder `overwatch` | Was een omissie, **gebouwd** |
+| 12 | **Stance / houding** | Wisselt de HUD-regel, verandert **geen gedrag** | **Vier doctrines die gedrag veranderen**, en ze gelden meteen voor de hele squad in plaats van mee te reizen met een order | Was een omissie, **gebouwd** |
+
+**Nieuwe punten die ronde 1 niet had:**
+
+| # | Onderdeel | Referentie | Wij (gemeten) | Oordeel |
+|---|---|---|---|---|
+| 13 | **Rules of engagement** | Ghost Recon: recon / assault / suppress | Vier: `recon` (vuurt niet tot er op hem geschoten wordt), `ready`, `overwatch`, `aggressive` | Keuze — de set van de referentie plus het kamikaze-kader van de owner |
+| 14 | **Een order blijft een belofte, óók onder de nieuwe basis** | Impliciet in het hele genre | Bij ALLE DRIE de basislagen wint een staande order: meelopen 0 verplaatsingen, dekking 0 zoektochten, 0 cm afdrijving | **Dit is de belangrijkste rij van de tabel** |
+
+---
+
+## Wat er van de rode draad over is
+
+Ronde 1 zei: *"de squad is sterk waar het genre zwak is, en zwak waar het genre
+sterk is. Waar wij achterlopen: de squad doet niets uit zichzelf."*
+
+**Dat is weg.** Alle drie de punten die daar onder vielen zijn gebouwd, en de
+klasse-verbs en de stance erbij. Van de twaalf punten uit ronde 1 waren er vier
+een omissie; er is er **nul** over.
+
+Wat ervoor in de plaats komt is dezelfde vraag als bij het gevecht: niet "wat
+ontbreekt" maar **"is dit nu te sterk"**. De squad maakt een gevecht 2,78× korter
+(gemeten A/B), en of dat lekker speelt kan geen enkele meting zeggen.
+
+**Rij 14 is waar ik het scherpst op zou letten in die speelronde.** De hele
+doctrine staat of valt bij of een order nog voelt als een belofte. De meting zegt
+ja — nul afdrijving onder Hold, ook onder vuur — maar dat is de mechanische kant.
+Of het ook zo VOELT als je squad opeens uit zichzelf beweegt, is het soort ding
+waar één ronde spelen meer over zegt dan tien metingen.
+
 ## De rode draad
 
 **De squad is sterk waar het genre zwak is, en zwak waar het genre sterk is.**
