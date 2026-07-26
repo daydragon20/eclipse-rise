@@ -38,6 +38,15 @@ Eclipse/Content/MetaHumans/
 Eclipse/Content/Atira_LODSettings/
 Eclipse/Content/Locodrome/
 
+# Env-packs uit de curatieronde van 25-07 (samen 5,9 GB). Zelfde regel als de
+# packs hierboven: machine-lokaal via de Epic Launcher, nooit in de repo. Ze
+# stonden nog untracked, en een enkele 'git add -A' van een volgende sessie zou
+# hebben geprobeerd bijna zes gigabyte te committen.
+Eclipse/Content/Factory_Pack_V1/
+Eclipse/Content/Uniblocks/
+Eclipse/Content/Sci_fi_hallway/
+Eclipse/Content/IBuilding_49/
+
 Eclipse/Content/FD_WarningSigns_V1/
 Eclipse/Content/RustyCarsFree/
 Eclipse/Content/Screen_Damage_Indicator/
