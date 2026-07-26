@@ -80,6 +80,11 @@ window.PROGRESS_DATA = {
       "Mijn aanbeveling: laten staan tot je het zelf gespeeld hebt. Als het abrupt voelt bij het uitkomen van een sprint, zeg het en ik trek de uitstap naar ongeveer 0,10 s",
       "Ik heb niets gewijzigd - dit is smaak"
     ] },
+    { titel: "Je kunt in de lucht 2,9 meter opzij sturen — royaal voor dit spel?", prio: "later", waarom: "Gemeten vanuit stilstand, zodat er geen aanloop meespeelt: een sprong zonder input komt 0,00 cm van zijn plek, een sprong met zijwaartse sturing 287,01 cm. Met een airtime van 1,008 s en een rensnelheid van 420 cm/s betekent dat: tijdens een sprong kun je bijna 70 procent van een volle renseconde opzij. De waarde (0,35) komt uit Epic's eigen third-person-template, dus hij is verdedigbaar - maar hij is nooit tegen DIT spel afgewogen. Gears geeft je vrijwel niets, Halo juist veel.", stappen: [
+      "De oude waarde was 0,05 en dat was een sprong op rails - dat is opgelost, dit gaat alleen nog over hoeveel",
+      "Mijn aanbeveling: laten staan tot je gesprongen hebt. Als het zwevend voelt is 0,20 de logische tussenstap",
+      "Ik heb alleen een ondergrens in de test gezet (niet op rails), geen streefwaarde - hoeveel prettig is, is smaak"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",

@@ -56,7 +56,7 @@ ze allemaal overschrijft. Samen zijn ze de reden dat lopen als schaatsen leest.
 | Item | Status | Was | Wordt | Bron |
 |---|---|---|---|---|
 | Sprongkracht | AFWIJKEND | 420 (default) | 500 | [ENGINE] template |
-| Luchtcontrole | AFWIJKEND | **0,05** (default) — een sprong op rails | 0,35 | [ENGINE] template |
+| Luchtcontrole | **GEMETEN — geland** | 0,05 (default) was een sprong op rails | 0,35 = **287 cm sturing per sprong** (controle-sprong: 0,00 cm drift) | [ENGINE] template + meting |
 | Valremming | AFWIJKEND | **0** (default) — een val remt nooit | 1500 | [ENGINE] template |
 | Landingsanimatie | ONTBREEKT | geen landings-take, geen knikje | eigen stap | — |
 
@@ -124,6 +124,31 @@ terugzakken via de grondwrijving, en die twee zijn nooit op elkaar afgestemd.
 Niets aan gewijzigd. Snel uit de sprint vallen is verdedigbaar (je wilt je
 controle terug), maar 3,5x is een gevolg van twee losse mechanismen en geen
 keuze, dus het hoort langs de owner. Staat in zijn lijstje.
+
+
+### JMP-05 luchtcontrole: 287 cm per sprong, en dat is veel
+
+Laag 1 controleerde al dat 0,35 op het component aankomt, maar een waarde die
+aankomt is nog geen gedrag. Gemeten
+(`Eclipse.Feel.Layer2.AirControlSteersTheJump`), vanuit stilstand zodat er geen
+horizontale beginsnelheid meespeelt:
+
+| sprong | verplaatsing |
+|---|---|
+| zonder input (controle) | **0,00 cm** |
+| met zijwaartse sturing | **287,01 cm** |
+
+De controle-sprong op exact nul is wat de meting geldig maakt: zonder die tweede
+sprong weet je niet of je luchtcontrole meet of drift.
+
+**Ter maat:** de airtime is 1,008 s en de rensnelheid 420 cm/s, dus je kunt
+tijdens één sprong bijna **70% van een volle renseconde** opzij komen. Dat is
+royaal voor een aardse shooter — Gears geeft je vrijwel niets, Halo juist veel.
+De waarde komt uit Epic's eigen third-person-template en is dus verdedigbaar,
+maar hij is nooit tégen dit spel afgewogen.
+
+Niets aan gewijzigd: de assert is een ondergrens ("niet op rails"), geen
+streefwaarde. Hoeveel sturing prettig is, is smaak — dat staat in het lijstje.
 
 
 ## WAPEN, FEEDBACK, ANIMATIE, TRAVERSAL — de ONTBREEKT-lijst

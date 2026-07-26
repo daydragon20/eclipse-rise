@@ -1223,4 +1223,78 @@ bool FEclipseSprintRampTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Kun je in de lucht nog sturen? (JMP-05, luchtcontrole)
+//
+// De audit noemde de engine-default 0,05 "een sprong op rails" en zette hem op
+// 0,35. Laag 1 controleert dat die 0,35 ook echt op het component staat — maar
+// een waarde die aankomt is nog geen gedrag. Wat de speler voelt is hoeveel hij
+// tijdens één sprong opzij kan komen, en dat getal bestond nergens.
+//
+// Vanuit stilstand springen isoleert het: er is geen horizontale beginsnelheid,
+// dus alles wat zijwaarts gebeurt komt van de luchtcontrole en van niets anders.
+// De controle-sprong zonder input hoort daarom op nul uit te komen — zonder die
+// tweede meting weet je niet of je luchtcontrole meet of drift.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseAirControlTest,
+	"Eclipse.Feel.Layer2.AirControlSteersTheJump",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseAirControlTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f); // op de vloer laten zakken voor de eerste sprong
+
+	// Eén sprong, en tijdens de vlucht een stuurrichting vasthouden. Geeft de
+	// zijwaartse verplaatsing tussen afzet en landing.
+	auto MeasureJump = [&Harness](const FVector2D& AirInput) -> double
+	{
+		const FVector Start = Harness.Location();
+		Harness.Inject(TEXT("Jump"), true);
+		Harness.Step();
+
+		double Guard = 0.0;
+		// Eerst echt van de grond komen; anders leest de lus meteen "geland".
+		while (!Harness.Body->GetCharacterMovement()->IsFalling() && Guard < 0.5)
+		{
+			Harness.HoldFor(TEXT("Move"), AirInput, Harness.StepSeconds);
+			Guard += Harness.StepSeconds;
+		}
+		while (Harness.Body->GetCharacterMovement()->IsFalling() && Guard < 4.0)
+		{
+			Harness.HoldFor(TEXT("Move"), AirInput, Harness.StepSeconds);
+			Guard += Harness.StepSeconds;
+		}
+		Harness.Idle(0.4f); // laten uitzakken voor de volgende meting
+		return FVector::Dist2D(Harness.Location(), Start);
+	};
+
+	// Controle eerst: springen zonder input mag NERGENS heen. Wie dit overslaat
+	// weet niet of hij luchtcontrole meet of gewoon drift.
+	const double Drift = MeasureJump(FVector2D::ZeroVector);
+	Report(*this, TEXT("sprong zonder input: verplaatsing"), Drift, TEXT("cm"),
+		TEXT("~0 — anders meet de sturing hieronder deels drift"));
+
+	const double Steered = MeasureJump(FVector2D(1.0f, 0.0f));
+	Report(*this, TEXT("sprong met zijwaartse sturing"), Steered, TEXT("cm"));
+	Report(*this, TEXT("netto stuurwinst"), Steered - Drift, TEXT("cm"),
+		TEXT("wat je met één sprong opzij kunt komen"));
+
+	TestTrue(FString::Printf(TEXT("sprong: zonder input blijf je boven je afzetpunt (%.2f cm)"), Drift),
+		Drift < 5.0);
+	// Ondergrens, geen streefwaarde: "op rails" is wat hier fout is, en de
+	// engine-default 0,05 zou hier rond een handvol centimeter uitkomen. Hoeveel
+	// sturing PRETTIG is, is smaak en krijgt dus geen bovengrens.
+	TestTrue(FString::Printf(TEXT("sprong: je kunt in de lucht echt sturen (%.2f cm opzij)"), Steered - Drift),
+		Steered - Drift > 25.0);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
