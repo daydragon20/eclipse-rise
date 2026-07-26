@@ -64,7 +64,8 @@ window.PROGRESS_DATA = {
       "Optie 1: waarneming omhoog (DT_EnemyArchetypes, PerceptionRadius 2500-3000)",
       "Optie 2: wapenbereik omlaag (DT_Weapons, RangeCm 5000)",
       "Optie 3: laten zoals het is — sluipschuttersgedrag belonen is een geldige keuze, maar zeg het dan bewust",
-      "Ik heb niets gewijzigd: dit is balans en dus jouw terrein. Zeg een optie en ik reken hem door met de speelronde"
+      "Ik heb niets gewijzigd: dit is balans en dus jouw terrein. Zeg een optie en ik reken hem door met de speelronde",
+      "Wat er intussen wel gebeurd is: de speelronde meldt nu zelf zijn dichtste nadering (4169,67 cm). Zolang die boven hun waarnemingsbereik ligt, is de helft waarin de vijand nadert, dekking zoekt en terugvuurt ONGETEST — dat stond nergens en leek groen"
     ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",

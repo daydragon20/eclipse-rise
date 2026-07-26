@@ -113,6 +113,8 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 
   Dat is geen bug maar een **bereikasymmetrie**: het spelerwapen overtreft de vijandelijke waarneming met 60–100%. Zolang dat zo staat is out-ranging de dominante, risicoloze strategie en is dekking zoeken zinloos. Of dat erg is, is een balanskeuze — de getallen staan in `DT_Weapons` en `DT_EnemyArchetypes` en het zijn er twee.
 
+  **Gevolg voor de dekking, en dat is het punt dat blijft staan tot jij kiest.** De speelronde meet nu zelf hoe dicht hij ooit bij een vijand kwam: **4169,67 cm**. Zolang dat getal boven hun waarnemingsbereik ligt, worden naderen, dekking zoeken en terugvuren in die ronde **nooit uitgeoefend** — de test is groen en las als "gevecht werkt", maar dekt alleen de helft waarin de vijand niets doet. Dat staat nu als meetregel in de uitvoer in plaats van als aanname. Bewust **geen** assert erop: welke kant het op moet is jouw balanskeuze, en een assert zou het huidige gedrag vastzetten voordat je gekozen hebt.
+
 ## 3. Beslissingen die ik zelf genomen heb, en waarop
 
 | Beslissing | Grond |
