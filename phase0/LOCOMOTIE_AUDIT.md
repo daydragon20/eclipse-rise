@@ -299,3 +299,10 @@ vanochtend in zit.
 project **10 → 8**, degradaties 0. Wat rest is de draaitake bij de acht
 niet-speler-lichamen.
 
+**Eén ding om te weten bij een verse kloon:** de character-packs staan in
+`.gitignore` (te groot), dus de skeletkoppeling zelf reist niet mee in de repo —
+alleen `link_compatible_skeletons.py`, dat hem opnieuw legt. Zonder die run wijst
+de skeletpoort de geleende takes af. Dat wordt niet stil: de degradatieteller loopt
+op en `NothingDegradesSilently` wordt rood. Dat is bestaand gedrag voor alle packs
+en niet nieuw voor deze koppeling.
+
