@@ -81,6 +81,14 @@ toestand leest die er toch al is.
 | 13.2-vragenpaneel | H | — | ja — `TogglePlaytestPanel` |
 | Gauntlet-metingen | F4–F8, 6–0 | — | ja — per functie |
 
+> **Wat elke gauntlet-toets doet, want drie van de vijf R3-criteria vullen zichzelf
+> NIET.** `F4` = deze pick was schoon · `F5` = dit was een mis-pick · `F6` =
+> dilatatie-comfort goed/slecht · `F7` = vertrouwen goed/slecht · `F8` = markeer
+> het einde van een gevechtsbeat. Zonder die toetsen blijft criterium 2
+> (targeting) op *"nog niet gemeten"* staan, hoe lang je ook speelt — het telt
+> alleen wat jij als schoon of mis boekt. Criterium 1 (antwoord binnen 1 s) en 5
+> (gebruiks-trek) vullen zich wél vanzelf.
+
 De gauntlet-meettoetsen blijven bewust toetsenbord-only: dat is instrumentatie voor
 de beoordelaar, geen besturing die de speler uitvoert. De gids zelf moest wél op de
 controller, anders is een controller-playtest er niet mee te doen — View en Menu
