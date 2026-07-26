@@ -92,6 +92,14 @@ toestand leest die er toch al is.
 > **En het playtest-paneel (`H`) beantwoord je met `6` t/m `0`** — één toets per
 > vraag, in de volgorde waarin ze op het scherm staan. Sinds 26-07 staat de toets
 > vóór elke regel in het paneel zelf, zodat je het niet hoeft te onthouden.
+>
+> **En weet dit voordat je het verdict velt: criterium 1 (antwoord binnen 1 s) kan
+> vandaag niet falen.** De slechtst gemeten order-round-trip is 0,000 s, want de
+> order wordt gegeven en beantwoord binnen hetzelfde frame — beide tijdstempels
+> staan in dezelfde functie-aanroep. Als bewaker is dat waardevol (hij gaat rood
+> zodra iemand het orderpad asynchroon maakt), maar als bewijs dat het antwoord
+> goed *voelt* zegt hij niets. Dat kun je pas beoordelen als je de squad hóórt
+> antwoorden.
 
 De gauntlet-meettoetsen blijven bewust toetsenbord-only: dat is instrumentatie voor
 de beoordelaar, geen besturing die de speler uitvoert. De gids zelf moest wél op de

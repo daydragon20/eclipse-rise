@@ -141,12 +141,6 @@ window.PROGRESS_DATA = {
       "Mijn aanbeveling: laten tot je zelf met beide apparaten gespeeld hebt. Het valt pas op als je op toetsenbord door een ruimte wilt sluipen en merkt dat je altijd rent",
       "Niet gewijzigd: een toets toevoegen is een bindingskeuze en die zijn van jou"
     ] },
-    { titel: "R3-criterium 1 (antwoord binnen 1 seconde) kan vandaag niet falen", prio: "later", waarom: "Opgevallen bij het nalopen van alle 174 gemeten waarden: de slechtst gemeten order-round-trip is 0,000 s. Dat is geen meetfout maar de bouw: beide tijdstempels staan in dezelfde functie-aanroep, dus de order wordt gegeven en beantwoord binnen hetzelfde frame. Het criterium meet dus of de keten SYNCHROON is, niet of het antwoord snel VOELT. Zolang niemand er een wachtrij of animatie tussen zet, is die eis altijd groen.", stappen: [
-      "Niet kapot en niet fout gebouwd: als bewaker is hij juist waardevol, want hij gaat rood zodra iemand het orderpad asynchroon maakt - en dat is precies wanneer 'orders zijn beloftes' in gevaar komt",
-      "Maar als BEWIJS voor je R3-verdict zegt hij weinig: hij bewijst dat er antwoord komt, niet dat het antwoord goed voelt",
-      "Wat het wel zou meten: de tijd tot je het antwoord HOORT of ZIET. Dat vraagt een hoorbare bark (zie het item over de acht ingesproken zinnen) of een HUD-regel met een eigen tijdstempel",
-      "Mijn aanbeveling: laat het criterium staan zoals het is, en beoordeel het antwoord-gevoel pas als de stemmen zijn aangesloten"
-    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",
