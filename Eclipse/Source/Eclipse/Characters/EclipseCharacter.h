@@ -69,6 +69,24 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystem; }
 	virtual void PostInitializeComponents() override;
+	virtual void NotifyControllerChanged() override;
+
+	/**
+	 * Zet het camera-relatieve oriëntatiemodel aan of uit (26-07, punt 8).
+	 *
+	 * AAN voor een speler: het lichaam kijkt waar de camera kijkt en beweegt daar
+	 * omheen — de third-person-shooter-conventie (Gears, The Division,
+	 * Borderlands). UIT voor AI: die heeft geen camera, dus "kijk waar je loopt"
+	 * is voor een squadmate of vijand juist het goede model.
+	 */
+	void SetCameraRelativeOrientation(bool bEnabled);
+
+	/**
+	 * Volgt het lichaam op DIT moment de camera? Alleen waar zolang er
+	 * bewegingsinvoer is: stilstaand ronddraaien zou voetslip geven zolang er geen
+	 * draai-animatie in de packs zit. De invoerlaag zet dit per frame.
+	 */
+	void SetOrientationFollowsCameraNow(bool bFollowing);
 
 	/** Apply tuning (movement speeds, max health) from data — never hardcode (GDD 14.2). */
 	void ApplyTuning(const UEclipseCharacterTuningAsset* Tuning);
@@ -220,6 +238,9 @@ private:
 	// never receives tuning still frames correctly instead of sitting at 0.
 	bool bFirstPerson = false;
 	bool bCommandModeCamera = false;
+
+	/** Volgt dit lichaam het camera-relatieve model (speler) of het AI-model? */
+	bool bCameraRelativeOrientation = false;
 	bool bAiming = false;
 	bool bCameraLagSuspended = false;
 

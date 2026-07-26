@@ -213,6 +213,12 @@ void FEclipseLocomotionProxy::InitializeObjects(UAnimInstance* InAnimInstance)
 		Walk = Set.Walk;
 		Run = Set.Run;
 		Death = Set.Death;
+		WalkBack = Set.WalkBack;
+		WalkLeft = Set.WalkLeft;
+		WalkRight = Set.WalkRight;
+		RunBack = Set.RunBack;
+		RunLeft = Set.RunLeft;
+		RunRight = Set.RunRight;
 	}
 }
 
@@ -224,14 +230,22 @@ void FEclipseLocomotionProxy::ClearObjects()
 	Walk = nullptr;
 	Run = nullptr;
 	Death = nullptr;
+	WalkBack = nullptr;
+	WalkLeft = nullptr;
+	WalkRight = nullptr;
+	RunBack = nullptr;
+	RunLeft = nullptr;
+	RunRight = nullptr;
 }
 
-void FEclipseLocomotionProxy::SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned)
+void FEclipseLocomotionProxy::SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned,
+	float InMoveDirectionDegrees)
 {
 	Blend = InBlend;
 	StrideRate = InStrideRate;
 	bIsInAir = bInIsInAir;
 	bIsDowned = bInIsDowned;
+	MoveDirectionDegrees = InMoveDirectionDegrees;
 }
 
 float FEclipseLocomotionProxy::GaitCycleLength() const
@@ -307,13 +321,35 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	{
 		Samples.Add({ Idle, Blend.IdleWeight, IdleTime, true });
 	}
-	if (Walk != nullptr && FAnimWeight::IsRelevant(Blend.WalkWeight))
+	// Welke van de vier richtingen? De klippen staan 90 graden uit elkaar, dus de
+	// dichtstbijzijnde kiezen is precies wat je bij dat interval ziet. Ontbreekt
+	// die richting, dan valt hij terug op vooruit — moonwalken, maar zichtbaar
+	// beter dan de ref-pose (14.3.5).
+	auto PickDirectional = [this](UAnimSequence* Fwd, UAnimSequence* Back, UAnimSequence* Left, UAnimSequence* Right) -> UAnimSequence*
 	{
-		Samples.Add({ Walk, Blend.WalkWeight, GaitPhase * Walk->GetPlayLength(), true });
+		const float Abs = FMath::Abs(MoveDirectionDegrees);
+		UAnimSequence* Chosen = Fwd;
+		if (Abs > 135.0f)
+		{
+			Chosen = Back;
+		}
+		else if (Abs > 45.0f)
+		{
+			Chosen = MoveDirectionDegrees > 0.0f ? Right : Left;
+		}
+		return Chosen != nullptr ? Chosen : Fwd;
+	};
+
+	UAnimSequence* const WalkClip = PickDirectional(Walk, WalkBack, WalkLeft, WalkRight);
+	UAnimSequence* const RunClip = PickDirectional(Run, RunBack, RunLeft, RunRight);
+
+	if (WalkClip != nullptr && FAnimWeight::IsRelevant(Blend.WalkWeight))
+	{
+		Samples.Add({ WalkClip, Blend.WalkWeight, GaitPhase * WalkClip->GetPlayLength(), true });
 	}
-	if (Run != nullptr && FAnimWeight::IsRelevant(Blend.RunWeight))
+	if (RunClip != nullptr && FAnimWeight::IsRelevant(Blend.RunWeight))
 	{
-		Samples.Add({ Run, Blend.RunWeight, GaitPhase * Run->GetPlayLength(), true });
+		Samples.Add({ RunClip, Blend.RunWeight, GaitPhase * RunClip->GetPlayLength(), true });
 	}
 
 	if (Samples.Num() == 0)
@@ -425,12 +461,26 @@ void UEclipseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		const UCharacterMovementComponent* Movement = Body->GetCharacterMovement();
 		bIsInAir = Movement != nullptr && Movement->IsFalling();
 		bIsDowned = Body->IsDowned();
+
+		// De hoek tussen waar hij LOOPT en waar hij KIJKT (26-07, punt 8). Vóór het
+		// camera-relatieve model was die per definitie 0 — het lichaam draaide naar
+		// zijn eigen snelheid — en daarom bestond deze regel niet. Nu blijft hij
+		// naar de camera kijken, dus achteruit duwen geeft ±180 en dat moet een
+		// andere cyclus opleveren dan vooruit.
+		//
+		// Onder de sta-drempel bevriezen we de hoek op 0: bij bijna-nul snelheid
+		// is de richting ruis, en die zou de cyclus laten flikkeren tussen links
+		// en rechts op het moment dat je stopt.
+		MoveDirectionDegrees = GroundSpeed > EclipseLocomotion::StandingSpeedThreshold
+			? static_cast<float>(FMath::UnwindDegrees(Velocity.Rotation().Yaw - Body->GetActorRotation().Yaw))
+			: 0.0f;
 	}
 	else
 	{
 		GroundSpeed = 0.0f;
 		bIsInAir = false;
 		bIsDowned = false;
+		MoveDirectionDegrees = 0.0f;
 	}
 
 	const FEclipseLocomotionBlend NewBlend = EclipseLocomotion::ComputeBlend(GroundSpeed, LocomotionSet);
@@ -442,5 +492,5 @@ void UEclipseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// Push on the game thread, before the parallel update reads it. PreUpdate
 	// runs BEFORE this function, so copying state there would evaluate every
 	// frame against the previous frame's speed.
-	GetProxyOnGameThread<FEclipseLocomotionProxy>().SetLocomotionState(NewBlend, StrideRate, bIsInAir, bIsDowned);
+	GetProxyOnGameThread<FEclipseLocomotionProxy>().SetLocomotionState(NewBlend, StrideRate, bIsInAir, bIsDowned, MoveDirectionDegrees);
 }

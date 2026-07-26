@@ -568,6 +568,11 @@ void AEclipsePlayerController::SetupInputComponent()
 	Input->BindActionValueLambda(MoveAction, ETriggerEvent::Completed, [this](const FInputActionValue&)
 	{
 		CancelSprintLatch(TEXT("bewegingsstick losgelaten"));
+		// En stoppen met meedraaien: vanaf hier is elke camerabeweging puur kijken.
+		if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+		{
+			Body->SetOrientationFollowsCameraNow(false);
+		}
 	});
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleLook);
 	Input->BindAction(FireAction, ETriggerEvent::Triggered, this, &AEclipsePlayerController::HandleFire);
@@ -851,6 +856,14 @@ void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)
 	if (bSprintLatched && Axis.Y < SprintForwardRelease)
 	{
 		CancelSprintLatch(TEXT("niet meer vooruit"));
+	}
+
+	// Het lichaam mag meedraaien met de camera zolang er invoer is (26-07, punt 8).
+	// Zonder deze poort zou stilstaand ronddraaien voetslip geven: er zit geen
+	// draai-animatie in de packs.
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(ControlledPawn))
+	{
+		Body->SetOrientationFollowsCameraNow(true);
 	}
 
 	const FRotator YawRotation(0, GetControlRotation().Yaw, 0);

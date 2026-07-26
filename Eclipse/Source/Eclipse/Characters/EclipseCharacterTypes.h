@@ -501,6 +501,36 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	TSoftObjectPtr<UAnimSequence> RunAnim;
 
 	/**
+	 * Zijwaarts en achteruit (owner-opdracht 26-07, punt 8).
+	 *
+	 * Vanaf vandaag is het personage CAMERA-relatief: duw je achteruit, dan blijft
+	 * hij naar de camera kijken en loopt hij achteruit — zoals Gears, The Division
+	 * en Borderlands het doen. Daarvoor draaide hij zich om, en dan volstond één
+	 * vooruit-cyclus voor elke richting.
+	 *
+	 * Ontbreekt een richting, dan valt hij terug op de vooruit-cyclus: dat leest
+	 * als moonwalken, maar het is nog altijd beter dan de ref-pose (14.3.5). De
+	 * SciFiCharacter-pack heeft alle vier (Jog_Fwd/Bwd/Lt/Rt_Rifle).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> WalkBackAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> WalkLeftAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> WalkRightAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> RunBackAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> RunLeftAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> RunRightAnim;
+
+	/**
 	 * NIET GELEZEN door C++. Er wordt nergens een schietanimatie afgespeeld: de
 	 * lichamen draaien idle of een gangbeweging, en vuren verandert de pose niet.
 	 * setup_character_data.py vult dit veld wel, dus de take staat klaar.

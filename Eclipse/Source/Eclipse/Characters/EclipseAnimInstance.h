@@ -42,7 +42,8 @@ struct FEclipseLocomotionProxy : public FAnimInstanceProxy
 	}
 
 	/** Pushed once per frame from the game thread, before the parallel update. */
-	void SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned);
+	void SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned,
+		float InMoveDirectionDegrees);
 
 	virtual void Initialize(UAnimInstance* InAnimInstance) override;
 	virtual void InitializeObjects(UAnimInstance* InAnimInstance) override;
@@ -60,6 +61,22 @@ private:
 	UAnimSequence* Walk = nullptr;
 	UAnimSequence* Run = nullptr;
 	UAnimSequence* Death = nullptr;
+
+	/** Richtingsvarianten; null = terugval op de vooruit-cyclus (26-07, punt 8). */
+	UAnimSequence* WalkBack = nullptr;
+	UAnimSequence* WalkLeft = nullptr;
+	UAnimSequence* WalkRight = nullptr;
+	UAnimSequence* RunBack = nullptr;
+	UAnimSequence* RunLeft = nullptr;
+	UAnimSequence* RunRight = nullptr;
+
+	/**
+	 * Bewegingsrichting ten opzichte van waar het lichaam KIJKT, in graden:
+	 * 0 = vooruit, +90 = naar rechts strafen, ±180 = achteruit, -90 = naar links.
+	 * Vóór 26-07 bestond dit niet en hoefde het ook niet: het lichaam draaide naar
+	 * zijn bewegingsrichting, dus die hoek was per definitie 0.
+	 */
+	float MoveDirectionDegrees = 0.0f;
 
 	FEclipseLocomotionBlend Blend;
 	float StrideRate = 1.0f;
@@ -110,6 +127,14 @@ public:
 	/** Horizontal speed in cm/s — Z is dropped, falling is not walking. */
 	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Locomotion")
 	float GroundSpeed = 0.0f;
+
+	/**
+	 * Bewegingsrichting t.o.v. de kijkrichting (26-07, punt 8): 0 = vooruit,
+	 * +90 = strafe rechts, ±180 = achteruit. Blueprint-leesbaar zodat een
+	 * toekomstige animatiegraaf hem kan gebruiken zonder de proxy aan te raken.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Locomotion")
+	float MoveDirectionDegrees = 0.0f;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Locomotion")
 	bool bIsInAir = false;

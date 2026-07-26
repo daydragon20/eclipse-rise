@@ -44,6 +44,32 @@ NOT_BASE_TAKE = (
 )
 
 
+def pick_directional(path, wanted, direction_keys):
+    """Zoek de richtingsvariant van een gangcyclus (26-07, punt 8).
+
+    pick_anim() SLUIT richtingen expliciet uit - het zoekt de basis-take en
+    bwd/_lt/_rt staan daarom in NOT_BASE_TAKE. Sinds het personage camera-relatief
+    is hebben we die varianten juist nodig: achteruit lopen moet een
+    achteruit-cyclus spelen en niet een omgekeerde vooruit-cyclus.
+
+    Zelfde prioriteitsregel en dezelfde kortste-naam-tiebreak, alleen met de
+    richting als extra eis en zonder de richtingsuitsluiting."""
+    anims = sorted(find_assets(path, "AnimSequence"), key=lambda a: len(str(a.asset_name)))
+    stance_or_technical = tuple(b for b in NOT_BASE_TAKE
+                                if b not in ("bwd", "back", "_lt", "_rt", "left", "right"))
+    for keyword in wanted:
+        for asset in anims:
+            name = str(asset.asset_name).lower()
+            if keyword not in name:
+                continue
+            if not any(d in name for d in direction_keys):
+                continue
+            if any(bad in name for bad in stance_or_technical):
+                continue
+            return obj_path(asset)
+    return ""
+
+
 def pick_anim(path, wanted):
     """First take matching a keyword from `wanted` (priority order) that is not
     a direction/stance/technical variant. Ties break on the SHORTEST name, so
@@ -71,6 +97,14 @@ def pick_mesh(path):
 # _Ironsights variants: in the SciFiSoldier/Warrior/Character packs those are
 # the ONLY walk cycles shipped (the hip-fire set jumps straight to Jog).
 IDLE_KEYWORDS = ("idle_rifle_hip", "thirdpersonidle", "idle")
+# Richtingsstammen: het naamdeel ZONDER _Fwd, zodat dezelfde stam de vier
+# varianten vindt (Jog_Bwd_Rifle, Jog_Lt_Rifle, ...).
+WALK_STEMS = ("walk", "thirdpersonwalk")
+RUN_STEMS = ("jog", "run", "sprint")
+BACK_KEYS = ("bwd", "back")
+LEFT_KEYS = ("_lt", "left")
+RIGHT_KEYS = ("_rt", "right")
+
 WALK_KEYWORDS = ("walk_fwd", "thirdpersonwalk", "walk")
 RUN_KEYWORDS = ("jog_fwd", "thirdpersonrun", "sprint_fwd", "run", "jog")
 SHOOT_KEYWORDS = ("fire_rifle_hip", "fire_rifle", "primary_fire", "shoot", "fire", "attack")
@@ -135,6 +169,13 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     run = pick_anim(anim_pack, RUN_KEYWORDS)
     shoot = pick_anim(anim_pack, SHOOT_KEYWORDS)
     death = pick_anim(anim_pack, DEATH_KEYWORDS)
+    walk_back = pick_directional(anim_pack, WALK_STEMS, BACK_KEYS)
+    walk_left = pick_directional(anim_pack, WALK_STEMS, LEFT_KEYS)
+    walk_right = pick_directional(anim_pack, WALK_STEMS, RIGHT_KEYS)
+    run_back = pick_directional(anim_pack, RUN_STEMS, BACK_KEYS)
+    run_left = pick_directional(anim_pack, RUN_STEMS, LEFT_KEYS)
+    run_right = pick_directional(anim_pack, RUN_STEMS, RIGHT_KEYS)
+    directions = sum(1 for a in (walk_back, walk_left, walk_right, run_back, run_left, run_right) if a)
     # Locomotie-rapport per rij: welke rung van de EEclipseLocomotionTier-ladder
     # deze body haalt is precies wat de owner in het spel ziet, dus zeg het hier
     # hardop in plaats van het in de tabel te laten verdwijnen.
@@ -142,14 +183,20 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
             "idle+walk+run" if (walk and run) else
             "idle+1 gait" if (walk or run) else
             "alleen idle -> body glijdt")
-    unreal.log(f"{row_name}: {tier}")
+    unreal.log(f"{row_name}: {tier}, {directions}/6 richtingsvarianten")
+    if directions == 0 and (walk or run):
+        unreal.log_warning(
+            f"{row_name}: geen enkele zij-/achteruitcyclus in {anim_pack} - deze body "
+            "moonwalkt bij achteruit en strafen (14.3.5)")
     if not idle:
         unreal.log_warning(f"{row_name}: geen idle-take in {anim_pack} — deze body krijgt geen pose")
     lit, shade = TINTS.get(row_name, ((0.20, 0.20, 0.22), (0.07, 0.07, 0.09)))
-    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}",true,'
+    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}",'
+                f'"{walk_back}","{walk_left}","{walk_right}","{run_back}","{run_left}","{run_right}",true,'
                 f'{color(lit)},{color(shade)},1.0,-90.0,-90.0')
 
-csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,bToonRestyle,"
+csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,"
+            "WalkBackAnim,WalkLeftAnim,WalkRightAnim,RunBackAnim,RunLeftAnim,RunRightAnim,bToonRestyle,"
             "TintLit,TintShade,MeshScale,MeshZOffset,MeshYaw\n" + "\n".join(rows))
 
 DT_PATH = "/Game/Data/DT_BodyDefs"

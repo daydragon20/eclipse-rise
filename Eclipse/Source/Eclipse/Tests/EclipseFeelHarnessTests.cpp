@@ -117,8 +117,23 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 		Movement->GetWalkableFloorAngle(), 44.765f, 0.05f);
 
 	// Capabilities die geen getal zijn maar wél de reden dat een getal werkt.
-	TestTrue(TEXT("laag 1: bOrientRotationToMovement staat aan (lichaam volgt looprichting)"),
-		Movement->bOrientRotationToMovement);
+	// Tot 26-07 stond hier "bOrientRotationToMovement staat aan". Dat was een test
+	// op een VLAG, en de vlag is sinds het camera-relatieve model (owner-opdracht
+	// punt 8) niet meer constant: een vers lichaam start op het AI-model en de
+	// invoerlaag zet het camera-relatieve model aan zodra de speler beweegt. Deze
+	// test kijkt naar een lichaam dat al bewogen heeft, dus hij mat het moment en
+	// niet de regel.
+	//
+	// Wat hier WEL constant hoort te zijn is de oorspronkelijke zorg: het lichaam
+	// mag nooit RECHTSTREEKS aan de camera-yaw hangen, want dan draait het exact
+	// zo snel als de stick en leest lopen als schaatsen. Beide modellen laten die
+	// vlag uit — het camera-relatieve model draait via RotationRate.
+	//
+	// Het model zelf wordt op UITKOMST gemeten door
+	// Eclipse.Feel.Layer2.BackpedalDoesNotSpinTheBody, en dat is de juiste plek:
+	// die test ging rood op de 180 graden die de owner meldde.
+	TestFalse(TEXT("laag 1: het lichaam hangt niet rechtstreeks aan de camera-yaw (anders leest lopen als schaatsen)"),
+		Harness.Body->bUseControllerRotationYaw);
 	TestTrue(TEXT("laag 1: bCanCrouch staat aan, dus Crouch() is geen no-op"),
 		Movement->GetNavAgentPropertiesRef().bCanCrouch);
 	TestFalse(TEXT("laag 1: bUseControllerRotationYaw staat uit (anders leest lopen als schaatsen)"),
@@ -1230,6 +1245,74 @@ bool FEclipseCameraPitchCollapseTest::RunTest(const FString& Parameters)
 // Dus meten, beide kanten, en de vorm van de curve rapporteren in plaats van
 // alleen de duur: een overgang die in twee ticks klaar is voelt als een schakelaar,
 // ook als "0,16 s" op papier soepel lijkt.
+// Achteruit duwen mag het personage NIET omdraaien (owner-melding 26-07, punt 8).
+//
+// Wat de owner zag: alleen achteruit duwen liet het personage volledig omdraaien.
+// Dat was geen bug maar het verkeerde MODEL — bOrientRotationToMovement laat het
+// lichaam zijn eigen snelheid volgen, wat klopt voor een third-person adventure
+// (Uncharted, Tomb Raider) en fout is voor een shooter. Gears, The Division en
+// Borderlands doen het alle drie andersom: het lichaam kijkt waar de camera
+// kijkt en beweegt daar omheen.
+//
+// Deze test meet de UITKOMST en niet de vlaggen: duw achteruit, en kijk waar het
+// lichaam na een seconde heen wijst en waar het heen bewoog. Een test op
+// bOrientRotationToMovement zou groen blijven als iemand het model elders weer
+// omzet; een test op de gierhoek niet.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBackpedalKeepsFacingTest,
+	"Eclipse.Feel.Layer2.BackpedalDoesNotSpinTheBody",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseBackpedalKeepsFacingTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const float FacingBefore = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+	const FVector StartLocation = Harness.Location();
+
+	// Puur achteruit, een seconde lang. Geen camerabeweging: de vraag is wat het
+	// LICHAAM doet bij enkel een achterwaartse duw.
+	for (int32 Step = 0; Step < 120; ++Step)
+	{
+		Harness.Inject(TEXT("Move"), FVector2D(0.0f, -1.0f));
+		Harness.Step();
+	}
+
+	const float FacingAfter = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+	const float Turned = FMath::Abs(FMath::UnwindDegrees(FacingAfter - FacingBefore));
+	const FVector Moved = Harness.Location() - StartLocation;
+	const FVector Forward = Harness.Body->GetActorForwardVector();
+	const float AlongFacing = static_cast<float>(FVector::DotProduct(Moved.GetSafeNormal2D(), Forward));
+
+	Report(*this, TEXT("gedraaid tijdens achteruit lopen"), Turned, TEXT("graden"),
+		TEXT("< 30 — hij hoort naar de camera te blijven kijken"));
+	Report(*this, TEXT("afgelegde afstand"), static_cast<float>(Moved.Size2D()), TEXT("cm"));
+	Report(*this, TEXT("richting t.o.v. zijn kijkrichting"), AlongFacing, TEXT(""),
+		TEXT("-1 = zuiver achteruit, +1 = hij is omgedraaid en loopt vooruit"));
+
+	// Zonder deze regel bewijst de hoek niets: een personage dat helemaal niet
+	// beweegt draait ook niet.
+	if (!TestTrue(TEXT("achteruit: hij heeft daadwerkelijk bewogen"), Moved.Size2D() > 100.0f))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	TestTrue(FString::Printf(TEXT("achteruit: het lichaam draait niet om (gemeten %.1f graden)"), Turned),
+		Turned < 30.0f);
+	TestTrue(FString::Printf(TEXT("achteruit: hij loopt ACHTERUIT en niet vooruit (dot %.2f)"), AlongFacing),
+		AlongFacing < -0.5f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSprintRampTest,
 	"Eclipse.Feel.Layer2.SprintRampsInsteadOfSnapping",
 	EclipseFeelTest::TestFlags)

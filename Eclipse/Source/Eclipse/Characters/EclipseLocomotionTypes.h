@@ -52,6 +52,34 @@ struct FEclipseLocomotionSet
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> Run = nullptr;
 
+	/**
+	 * Richtingsvarianten (owner-opdracht 26-07, punt 8). Null = die richting valt
+	 * terug op de vooruit-cyclus; dat leest als moonwalken maar is beter dan de
+	 * ref-pose (14.3.5). Vier richtingen en geen echte 2D-blendspace: de klippen
+	 * staan 90 graden uit elkaar, en de dichtstbijzijnde kiezen is precies wat je
+	 * bij dat interval ziet — een blend tussen twee zij-cycli levert bij 45 graden
+	 * geen betere pose op, alleen meer rekentijd en meer manieren om het fout te
+	 * doen. Als de packs ooit diagonalen krijgen, is dit de plek om dat uit te
+	 * breiden.
+	 */
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> WalkBack = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> WalkLeft = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> WalkRight = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> RunBack = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> RunLeft = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> RunRight = nullptr;
+
 	/** One-shot; holds its last frame. Not part of the locomotion ladder. */
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> Death = nullptr;

@@ -106,11 +106,36 @@ AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer
 	ViewCamera->bUsePawnControlRotation = false;
 	ViewCamera->SetFieldOfView(ThirdPersonFOV);
 
-	// The body must NOT turn with the camera, or walking reads as skating: the
-	// character faces where it moves, the camera looks where the player aims.
-	bUseControllerRotationYaw = false;
+	// CAMERA-RELATIEF (owner-opdracht 26-07, punt 8).
+	//
+	// Hiervoor stond hier bOrientRotationToMovement=true met de redenering "het
+	// lichaam kijkt waar het loopt". Die redenering klopt voor een third-person
+	// ADVENTURE (Uncharted, Tomb Raider), maar niet voor een third-person SHOOTER,
+	// en dat verschil is precies wat de owner meldde: alleen achteruit duwen liet
+	// het personage volledig omdraaien.
+	//
+	// Wat de referentie doet — Gears, The Division en Borderlands doen dit alle
+	// drie hetzelfde: het personage kijkt waar de CAMERA kijkt, en beweegt daar
+	// omheen met vier gangcycli (vooruit, achteruit, links, rechts). Achteruit en
+	// zijwaarts zijn trager dan vooruit. Dat is geen stijlkeuze maar een gevolg
+	// van het genre: je moet kunnen schieten waar je kijkt terwijl je wegloopt,
+	// en dat kan niet als je lichaam meedraait met je looprichting.
+	//
+	// Wat we NIET overnemen: die drie draaien het lichaam ook mee als je alleen de
+	// camera beweegt en stilstaat. Zonder draai-animatie (die zit niet in de
+	// packs) levert dat voetslip op — je ruilt een zichtbaar defect voor een
+	// ander. Daarom volgt het lichaam de camera alleen terwijl er bewegingsinvoer
+	// is; stilstaand kijken blijft aan de bovenlichaam-aimoffset over. Zie
+	// SetOrientationFollowsCameraNow().
+	//
+	// De constructor zelf houdt het AI-model: een vijand of squadmate heeft geen camera,
+	// dus "kijk waar je loopt" is voor hen precies goed. Het camera-relatieve model
+	// wordt aangezet door NotifyControllerChanged zodra een SPELER dit lichaam
+	// bestuurt — anders zou een squadmate zijn AI-focus als looprichting nemen en
+	// zijwaarts naar zijn doel schuifelen.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	// Crouch is a designed control, not an engine extra (GDD 04_core_gameplay:
 	// "Crouch = stealth default"), and ApplyTuning already feeds it a speed from
@@ -120,6 +145,61 @@ AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer
 	// Found by the in-game test guide while writing the crouch step's expectation,
 	// which is exactly what that guide exists for.
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+}
+
+void AEclipseCharacter::NotifyControllerChanged()
+{
+	Super::NotifyControllerChanged();
+
+	// Alleen het bestuurde lichaam krijgt het camera-relatieve model. Hier en niet
+	// in de constructor, omdat een lichaam pas bij bezetting weet of er een speler
+	// of een AI achter zit — en de game mode spawnt beide uit dezelfde klasse.
+	SetCameraRelativeOrientation(IsPlayerControlled());
+}
+
+void AEclipseCharacter::SetCameraRelativeOrientation(bool bEnabled)
+{
+	bCameraRelativeOrientation = bEnabled;
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (Movement == nullptr)
+	{
+		return;
+	}
+
+	// Uit = terug naar het AI-model (kijk waar je loopt). Aan = het lichaam draait
+	// naar de camera, maar pas zodra er bewegingsinvoer is; zie
+	// SetOrientationFollowsCameraNow.
+	Movement->bOrientRotationToMovement = !bEnabled;
+	Movement->bUseControllerDesiredRotation = false;
+}
+
+void AEclipseCharacter::SetOrientationFollowsCameraNow(bool bFollowing)
+{
+	// Lui aanzetten in plaats van vertrouwen op NotifyControllerChanged.
+	//
+	// Die haak bleek niet betrouwbaar het moment te markeren waarop een SPELER dit
+	// lichaam overneemt: in het testharnas bezit een echte player controller de
+	// pawn, maar de eerste achteruit-meting kwam er toch uit op 180 graden gedraaid
+	// — het AI-model stond nog aan. Deze functie wordt alleen aangeroepen vanuit de
+	// invoerlaag van de speler, dus het feit DAT hij wordt aangeroepen bewijst al
+	// wat de haak moest vaststellen.
+	if (!bCameraRelativeOrientation)
+	{
+		SetCameraRelativeOrientation(true);
+	}
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (Movement == nullptr)
+	{
+		return;
+	}
+
+	// De hele reden dat dit per frame schakelt in plaats van één keer: zonder
+	// draai-animatie levert stilstaand meedraaien met de camera voetslip op — de
+	// voeten staan stil terwijl het bekken roteert. De owner was daar expliciet
+	// over bij het turn-in-place-punt: een zichtbaar defect inruilen voor een
+	// ander is geen winst. Dus draait het lichaam alleen mee terwijl je LOOPT, en
+	// neemt de bovenlichaam-aimoffset het stilstaande kijken over.
+	Movement->bUseControllerDesiredRotation = bFollowing;
 }
 
 void AEclipseCharacter::PostInitializeComponents()
@@ -589,6 +669,36 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	LocomotionSet.Idle = ResolveClip(BodyDef.IdleAnim, TEXT("idle"));
 	LocomotionSet.Walk = ResolveClip(BodyDef.WalkAnim, TEXT("walk"));
 	LocomotionSet.Run = ResolveClip(BodyDef.RunAnim, TEXT("run"));
+	// Richtingsvarianten (26-07, punt 8). Ontbreken mag: de proxy valt dan terug op
+	// de vooruit-cyclus. Geen aparte waarschuwing per richting — dat zou bij een
+	// pack zonder zijcycli vier regels per lichaam opleveren, en de tier-melding
+	// hieronder zegt al wat er te weinig is.
+	LocomotionSet.WalkBack = ResolveClip(BodyDef.WalkBackAnim, TEXT("walk-back"));
+	LocomotionSet.WalkLeft = ResolveClip(BodyDef.WalkLeftAnim, TEXT("walk-left"));
+	LocomotionSet.WalkRight = ResolveClip(BodyDef.WalkRightAnim, TEXT("walk-right"));
+	LocomotionSet.RunBack = ResolveClip(BodyDef.RunBackAnim, TEXT("run-back"));
+	LocomotionSet.RunLeft = ResolveClip(BodyDef.RunLeftAnim, TEXT("run-left"));
+	LocomotionSet.RunRight = ResolveClip(BodyDef.RunRightAnim, TEXT("run-right"));
+
+	// Kruislingse terugval: mist een gang zijn zijcyclus maar heeft de ANDERE gang
+	// hem wel, gebruik die. Gemeten op de verscheepte lichamen (26-07): de speler
+	// (ParagonLtBelica) heeft er 3 van de 6, en zonder deze regel moonwalkt hij in
+	// precies die drie gevallen. Een looppas op renttempo ziet er hooguit gehaast
+	// uit — de gangklok schaalt hem toch al — en dat is onvergelijkbaar veel beter
+	// dan achteruit lopen met een vooruit-cyclus.
+	auto FillFrom = [](TObjectPtr<UAnimSequence>& Target, const TObjectPtr<UAnimSequence>& Source)
+	{
+		if (Target == nullptr)
+		{
+			Target = Source;
+		}
+	};
+	FillFrom(LocomotionSet.WalkBack, LocomotionSet.RunBack);
+	FillFrom(LocomotionSet.WalkLeft, LocomotionSet.RunLeft);
+	FillFrom(LocomotionSet.WalkRight, LocomotionSet.RunRight);
+	FillFrom(LocomotionSet.RunBack, LocomotionSet.WalkBack);
+	FillFrom(LocomotionSet.RunLeft, LocomotionSet.WalkLeft);
+	FillFrom(LocomotionSet.RunRight, LocomotionSet.WalkRight);
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
 
 	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();
