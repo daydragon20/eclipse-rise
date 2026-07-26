@@ -16,6 +16,8 @@ De game loopt je dan zelf door alle controls, en elke stap zegt waaraan je ziet 
 5. **Je squad loopt mee** in plaats van elke order te weigeren.
 6. **Vier knoppen werken alleen ín Command Mode** (stance, volgende, vorige, onder-kruis). Dat stond nergens; nu wel.
 
+En je **meetgereedschap** is meegerepareerd, want daar hing je verdict aan: drie van de vier panelen zeiden niet welke toets ze bedient (F4/F5 boeken een pick, F6/F7 je oordeel, 6–0 de 13.2-vragen), en zonder die toetsen blijven drie R3-criteria op *"nog niet gemeten"* staan hoe lang je ook speelt. Dat staat nu in de koppen zelf én in `BESTURING.md`.
+
 Wat ik níét kan meten is hoe het **voelt**. Daarvoor staat de lijst in §4, elk punt met mijn aanbeveling erbij — maar er is er één die alleen jij kunt beantwoorden: **is de schaal-bug weg?**
 
 ---
