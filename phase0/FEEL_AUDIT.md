@@ -47,7 +47,7 @@ ze allemaal overschrijft. Samen zijn ze de reden dat lopen als schaatsen leest.
 | Lag | OK | 12 | owner-spec |
 | Botsing met muren | OK | probe 12, `bDoCollisionTest` aan | [ENGINE] |
 | FOV | OK | 80 (3e) / 90 (1e) / ×0,80 bij ADS | owner-spec |
-| Pitch-limieten | **AFWIJKEND** | −70/+70 — owner meldt "camera kijkt onder mijn eigen schoenen"; bij −70 duikt de boom in de grond en trekt de collision hem naar binnen | −55/+70 | conventie |
+| Pitch-limieten | **GEMETEN — deze rij was FOUT** | −70/+70. De oorspronkelijke redenering hieronder klopte van richting niet; zie de meting eronder | geen wijziging op −, wel een keuze op + (owner) | meting |
 | Shake | ONTBREEKT | geen enkele camera-shake in het project | eigen stap | — |
 | Gedrag bij sprint | ONTBREEKT | camera reageert niet op sprint (geen FOV-punch, geen lag-verandering) | eigen stap | conventie: lichte FOV-toename |
 
@@ -59,6 +59,48 @@ ze allemaal overschrijft. Samen zijn ze de reden dat lopen als schaatsen leest.
 | Luchtcontrole | AFWIJKEND | **0,05** (default) — een sprong op rails | 0,35 | [ENGINE] template |
 | Valremming | AFWIJKEND | **0** (default) — een val remt nooit | 1500 | [ENGINE] template |
 | Landingsanimatie | ONTBREEKT | geen landings-take, geen knikje | eigen stap | — |
+
+### CAM-05 pitch-limieten: de redenering klopte niet, de meting wel
+
+Deze rij stond als **AFWIJKEND** met als reden: *"bij −70 duikt de boom in de
+grond en trekt de collision hem naar binnen"*, met −55/+70 als doel. Dat was een
+redenering uit code lezen, en de **richting klopt niet**. Een spring arm steekt
+tégen de kijkrichting in: omlaag kijken tilt de camera juist **omhoog**, weg van
+de vloer.
+
+Gemeten over het hele bereik (`Eclipse.Feel.Camera.WhereTheBoomCollapsesAcrossThePitchRange`),
+met de daadwerkelijke camera-tot-pawn-afstand waarin arm, lag én collision zitten:
+
+| pitch | afstand | van de boom |
+|---|---|---|
+| −70 t/m +20 | 311,85 cm | 104% — vlak, geen enkele inpull |
+| +30 | 233,45 cm | 78% |
+| +40 | 152,93 cm | 51% |
+| +50 | 116,34 cm | 39% |
+| +60 | 96,24 cm | 32% |
+| **+70** | **84,24 cm** | **28%** |
+
+**Omlaag kijken doet niets. Omhoog kijken vanaf ongeveer +25 duwt de camera in
+je rug**, tot 216 cm inpull op de limiet.
+
+Dat het de **vloer** is en niet het personage zelf, is apart gemeten: dezelfde
+sweep met de pawn los van de grond komt nergens onder 300,00 cm — nul inpull over
+het hele bereik. (Die controle deugde in eerste opzet niet: de pawn 1500 cm hoog
+zetten en dan 19 stappen van 0,3 s aflopen betekent dat hij na 1,75 s gewoon weer
+op de vloer staat, en dan meet de "controle" hetzelfde als het origineel. Met
+vliegen aan klopt hij.)
+
+**Gevolg: `ViewPitchMin` op −55 zetten lost niets op** — er valt daar niets te
+repareren. De wijziging die de audit voorstelde is dus **niet** doorgevoerd; dat
+zou een verandering op een weerlegde aanname zijn geweest.
+
+**Wat er wél ligt is een keuze, en die is van de owner** (staat in zijn lijstje):
+omhoog kijken kost je het derde-persoons-kader. Drie richtingen, geen ervan
+duidelijk beter zonder zijn oordeel: `ViewPitchMax` omlaag naar ~+45 (behoudt het
+kader, kost je omhoog richten), de socket hoger of de boom korter bij positieve
+pitch (behoudt beide, vraagt bouwwerk), of laten staan (elke derde-persoons-game
+met een boom van 3 m heeft dit in enige mate).
+
 
 ## WAPEN, FEEDBACK, ANIMATIE, TRAVERSAL — de ONTBREEKT-lijst
 

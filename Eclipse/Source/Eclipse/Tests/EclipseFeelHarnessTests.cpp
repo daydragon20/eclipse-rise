@@ -989,4 +989,129 @@ bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Paramete
 	return true;
 }
 
+// Waar stort de boom in? (CAM-05, de laatste openstaande AFWIJKEND-rij)
+//
+// De feel-audit zegt over de pitch-limieten: "bij -70 duikt de boom in de grond
+// en trekt de collision hem naar binnen", met -55/+70 als doel. Dat is een
+// REDENERING, geen meting, en de richting klopt bovendien niet vanzelf: een
+// spring arm steekt tegen de kijkrichting in, dus omlaag kijken (negatieve
+// pitch) tilt de camera juist OMHOOG, weg van de vloer. Wie in de grond duikt is
+// dan eerder de andere kant.
+//
+// Deze test rekent niet na maar meet: over het hele bereik de daadwerkelijke
+// camera-tot-pawn-afstand, waarin arm, lag en collision-inpull alle drie zitten.
+// De hoek waar dat getal begint te zakken is de echte grens; een conventie-getal
+// is dat hoogstens bij toeval.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCameraPitchCollapseTest,
+	"Eclipse.Feel.Camera.WhereTheBoomCollapsesAcrossThePitchRange",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseCameraPitchCollapseTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Op de vloer laten staan: een vallende pawn sleept de boom mee en dan meet je
+	// de val, niet de hoek (dezelfde valkuil als bij de ANI-09-meting).
+	Harness.Idle(0.5f);
+
+	const float NominalArm = Harness.Body->SampleFeelState().BoomArmLength;
+	Report(*this, TEXT("boomlengte zonder hindernis"), NominalArm, TEXT("cm"));
+
+	float WorstDistance = NominalArm;
+	float WorstPitch = 0.0f;
+	TArray<FString> Curve;
+
+	// Van omlaag naar omhoog in stappen van 10 graden, plus de twee limieten zelf.
+	TArray<float> Pitches;
+	for (float Pitch = -80.0f; Pitch <= 80.0f; Pitch += 10.0f)
+	{
+		Pitches.Add(Pitch);
+	}
+	Pitches.Add(Harness.Tuning->ViewPitchMin);
+	Pitches.Add(Harness.Tuning->ViewPitchMax);
+	Pitches.Sort();
+
+	for (float Pitch : Pitches)
+	{
+		Harness.Controller->SetControlRotation(FRotator(Pitch, 0.0f, 0.0f));
+		// Even laten zetten: de boom volgt met lag, dus de eerste tick na een
+		// sprong in de rotatie meet nog de vorige hoek.
+		Harness.Idle(0.4f);
+
+		const FEclipseFeelSample Sample = Harness.Body->SampleFeelState();
+		// De camera-manager klemt de pitch; wat we vroegen is niet altijd wat we
+		// kregen, dus de BEREIKTE hoek rapporteren en niet de gevraagde.
+		const float Reached = Harness.Controller->GetControlRotation().Pitch > 180.0f
+			? Harness.Controller->GetControlRotation().Pitch - 360.0f
+			: Harness.Controller->GetControlRotation().Pitch;
+
+		const float Ratio = NominalArm > 0.0f ? Sample.CameraToPawnCm / NominalArm : 0.0f;
+		Curve.Add(FString::Printf(TEXT("pitch %+6.1f gr (gevraagd %+6.1f) -> %7.2f cm  (%5.1f%% van de boom)"),
+			Reached, Pitch, Sample.CameraToPawnCm, Ratio * 100.0f));
+
+		if (Sample.CameraToPawnCm < WorstDistance)
+		{
+			WorstDistance = Sample.CameraToPawnCm;
+			WorstPitch = Reached;
+		}
+	}
+
+	for (const FString& Line : Curve)
+	{
+		AddInfo(FString::Printf(TEXT("pitch-sweep: %s"), *Line));
+	}
+
+	// Discriminator: is de VLOER de hindernis, of duwt het personage zijn eigen
+	// camera weg? Dezelfde sweep hoog in de lucht. Verdwijnt het inpullen daar,
+	// dan is de grond de dader; blijft het, dan zit het in de pawn zelf. Zonder
+	// deze tweede meting is "de boom duikt in de grond" weer een redenering.
+	//
+	// LET OP het meetmoment: alleen omhoog zetten is niet genoeg. De eerste versie
+	// zette de pawn 1500 cm hoog en liep daarna 19 stappen van 0,3 s af — na 1,75 s
+	// valt hij die hoogte er weer af, dus vanaf stap drie stond hij gewoon weer op
+	// de vloer en mat de "controle" precies hetzelfde als het origineel. Vliegen
+	// zetten houdt hem er echt boven.
+	Harness.Body->SetActorLocation(Harness.Body->GetActorLocation() + FVector(0.0f, 0.0f, 1500.0f));
+	Harness.Body->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	Harness.Idle(0.3f);
+	float WorstAloft = NominalArm;
+	float WorstAloftPitch = 0.0f;
+	for (float Pitch : Pitches)
+	{
+		Harness.Controller->SetControlRotation(FRotator(Pitch, 0.0f, 0.0f));
+		Harness.Idle(0.3f);
+		const float Distance = Harness.Body->SampleFeelState().CameraToPawnCm;
+		if (Distance < WorstAloft)
+		{
+			WorstAloft = Distance;
+			WorstAloftPitch = Pitch;
+		}
+	}
+	Report(*this, TEXT("kortste camera-afstand LOS van de vloer"), WorstAloft, TEXT("cm"),
+		TEXT("~gelijk aan de boomlengte = de vloer was de hindernis"));
+	Report(*this, TEXT("bij pitch (los van de vloer)"), WorstAloftPitch, TEXT("gr"));
+
+	Report(*this, TEXT("kortste camera-afstand over het bereik"), WorstDistance, TEXT("cm"));
+	Report(*this, TEXT("bij pitch"), WorstPitch, TEXT("gr"));
+	Report(*this, TEXT("inpull op het diepste punt"), NominalArm - WorstDistance, TEXT("cm"),
+		TEXT("0 = de boom raakt nergens iets binnen de limieten"));
+
+	// GEEN assert op een grenswaarde: welke hoek acceptabel is, is smaak, en het
+	// vastpinnen van de huidige limiet zou juist de wijziging blokkeren die de
+	// audit voorstelt. Wat hier WEL vastligt is dat de meting blijft bestaan —
+	// een boom die instort binnen zijn eigen limieten is per definitie een
+	// probleem, en dat is meetbaar zonder over de juiste hoek te oordelen.
+	TestTrue(TEXT("camera: er is een bruikbare boomlengte om tegen af te zetten"), NominalArm > 0.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
