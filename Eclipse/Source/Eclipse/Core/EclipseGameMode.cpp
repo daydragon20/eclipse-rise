@@ -373,8 +373,23 @@ void AEclipseGameMode::HandlePlayerDowned(AEclipseCharacter* /*Player*/, FName /
 	if (P == EEclipseMissionPhase::Objectives || P == EEclipseMissionPhase::Extraction)
 	{
 		// Player down ends the run as a failure — fail-forward commits at debrief (GDD 11.4).
+		//
+		// De UITKOMST wordt gelezen en niet weggegooid (26-07). Dit is het pad dat
+		// draait op het moment dat de speler doodgaat, en juist daar mag niets stil
+		// mislukken: faalt de debrief, dan committeert er niets — geen gewonden,
+		// geen dagklok, geen regiostand — en blijft de missie in een halve toestand
+		// hangen terwijl het scherm zegt dat je verloren hebt.
+		//
+		// Gevonden door te zoeken naar aanroepen die succes teruggeven waar de
+		// aanroeper niets mee doet. De twee andere treffers (Weapon->Fire) negeren
+		// hun uitkomst terecht: missen is geen fout.
 		FString Error;
-		Mission->ResolveDebrief(false, Error);
+		if (!Mission->ResolveDebrief(false, Error))
+		{
+			UE_LOG(LogEclipse, Error,
+				TEXT("GameMode: de speler ging neer maar de debrief mislukte (%s) — er is NIETS gecommitteerd (14.3.5)."),
+				*Error);
+		}
 	}
 }
 
