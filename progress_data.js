@@ -158,7 +158,7 @@ window.PROGRESS_DATA = {
       "Start de game en druk F3 — de testgids opent met 20 stappen in drie delen",
       "Deel 1 (11 controls): doe wat er staat; de meeste stappen vinken zichzelf af zodra je de toets gebruikt. J = gehaald, N = sla over",
       "Deel 2 (4 systeem-oordelen) + deel 3 (de 5 vragen uit 13.2): J = goed/ja, N = niet goed/nee",
-      "F2 geeft daarnaast de gauntlet-overlay met de vijf R3-criteria live",
+      "F2 geeft daarnaast de gauntlet-overlay met de vijf R3-criteria live. LET OP, gerepareerd om 05:40: drie van die vijf vullen zichzelf NIET — targeting wacht op F4 (deze pick was schoon) en F5 (dit was een mis-pick), comfort op F6, vertrouwen op F7. Zonder die toetsen blijven ze op 'nog niet gemeten' staan hoe lang je ook speelt, en dat leest als een defect terwijl het op jouw oordeel wacht. De toetsen staan nu in de kop van het paneel zelf, dus je hoeft ze niet te onthouden",
       "Aan het eind staat er een kopieerbare samenvatting in Saved/Logs — plak die hier"
     ] },
   ],
