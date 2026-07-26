@@ -85,6 +85,11 @@ window.PROGRESS_DATA = {
       "Mijn aanbeveling: laten staan tot je gesprongen hebt. Als het zwevend voelt is 0,20 de logische tussenstap",
       "Ik heb alleen een ondergrens in de test gezet (niet op rails), geen streefwaarde - hoeveel prettig is, is smaak"
     ] },
+    { titel: "Vier knoppen doen niets buiten Command Mode — wil je dat zo?", prio: "later", waarom: "Stance, Volgende, Vorige en Onder-kruis gaan alle vier door een handler die meteen terugkeert als je Command Mode (LB / Q) niet vasthoudt. Dat is waarschijnlijk precies zoals bedoeld - het zijn squad-commando's - maar in de tabel die je tijdens het spelen leest stond die voorwaarde bij precies EEN kolom van EEN rij. Je drukt dus RB of X in het veld en er gebeurt stil niets, net als bij de dode bukk-toets. Ik heb het GEDRAG niet aangeraakt en alleen de tabel eerlijk gemaakt: alle vier de rijen noemen nu hun context. Dit soort fout vinden gedragstests per definitie niet, want het gedrag klopt.", stappen: [
+      "Als dit zo bedoeld is: niets doen, de tabel klopt nu",
+      "Als je verwacht dat Volgende/Onder-kruis ook in het veld werken (bijvoorbeeld om snel iemand te selecteren voor een order), zeg het - dat is een kleine wijziging",
+      "Er staat nu een test op die het gedrag vastpint, dus als we het veranderen valt hij om en gaat de tabel automatisch mee"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",
