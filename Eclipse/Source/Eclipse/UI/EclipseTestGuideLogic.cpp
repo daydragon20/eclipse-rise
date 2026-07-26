@@ -23,7 +23,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Look,
 			  TEXT("het beeld draait mee; stick-kijken is nog framerate-gebonden (PLACEHOLDER GDD 8.1)") },
 			{ EEclipseGuideSignal::Fire,
-			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt") },
+			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt. LET OP: kopschoten doen vandaag NIETS extra (de kogel raakt de capsule, en die heeft geen hoofd) — dat is bekend, geen bug") },
 			{ EEclipseGuideSignal::Sprint,
 			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s. LET OP, dit verschilt per apparaat sinds 26-07: Shift is een HOLD (terug bij loslaten), L3 is een TOGGLE — één klik start hem, en hij blijft aan tot je ophoudt met vooruit duwen, mikt, vuurt of nog eens L3 drukt") },
 			{ EEclipseGuideSignal::Crouch,
