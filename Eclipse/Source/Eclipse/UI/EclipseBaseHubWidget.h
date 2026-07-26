@@ -40,6 +40,13 @@ private:
 	void OnAnyFact(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	void HandleTab(int32 TabIndex);
+	/**
+	 * Eén afhandeling voor elke knopdruk: loggen, de reden tonen of wissen, en
+	 * verversen. Bestaat omdat 'volgende dag' zijn uitkomst weggooide en dus stil
+	 * niets deed — met deze helper valt dat niet meer te vergeten.
+	 */
+	bool NoteActionResult(bool bSucceeded, const FString& Error, const TCHAR* What);
+
 	void HandleAdvanceDay();
 	void HandleProduce(FName ItemId);
 	void HandleToggleSquadPick(const FGuid& SoldierId);

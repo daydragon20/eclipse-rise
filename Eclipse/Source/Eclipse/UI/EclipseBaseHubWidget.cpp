@@ -346,6 +346,32 @@ void UEclipseBaseHubWidget::HandleTab(int32 TabIndex)
 	}
 }
 
+bool UEclipseBaseHubWidget::NoteActionResult(bool bSucceeded, const FString& Error, const TCHAR* What)
+{
+	// EEN plek waar een knopdruk zijn uitkomst afhandelt (26-07).
+	//
+	// De drie knoppen in dit bestand deden alle drie hetzelfde: loggen, de note
+	// zetten of wissen, en verversen. Twee van de drie deden het goed en de derde
+	// ('volgende dag') gooide zijn uitkomst helemaal weg — die deed dus stil
+	// niets, wat de vervelendste soort defect is: je klikt nog een keer en
+	// concludeert dat het spel hangt.
+	//
+	// Met deze helper KAN een volgende knop het niet meer vergeten, want er is
+	// niets meer om te vergeten. Dat is structureel goedkoper dan een test op een
+	// widget-laag die een viewport nodig heeft.
+	if (bSucceeded)
+	{
+		LastActionNote.Reset();
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("BaseHub: %s afgewezen — %s"), What, *Error);
+		LastActionNote = Error;
+	}
+	RefreshAll();
+	return bSucceeded;
+}
+
 void UEclipseBaseHubWidget::HandleAdvanceDay()
 {
 	UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
@@ -365,37 +391,14 @@ void UEclipseBaseHubWidget::HandleAdvanceDay()
 	// de aanroeper niets mee doet — zelfde sweep die de debrief bij spelersdood
 	// opleverde. Dit waren de enige twee in het hele project.
 	FString Error;
-	if (!Campaign->CommitTransaction(Transaction, Error))
-	{
-		// Via het BESTAANDE kanaal: LastActionNote verschijnt als "!! <reden>" in het
-		// prep-paneel, en de twee andere knoppen (produceren, intel uitgeven)
-		// gebruiken hem al. Mijn eerste versie zette hier een tweede mechanisme
-		// naast — precies de dubbeling die deze sessie overal opruimt, en die ik
-		// pas zag door te vragen wat de ANDERE knoppen doen.
-		LastActionNote = FString::Printf(TEXT("volgende dag geweigerd: %s"), *Error);
-		UE_LOG(LogEclipse, Warning, TEXT("BaseHub: 'volgende dag' is afgewezen (%s)."), *Error);
-	}
-	else
-	{
-		LastActionNote.Reset();
-	}
-	RefreshAll();
+	NoteActionResult(Campaign->CommitTransaction(Transaction, Error), Error, TEXT("volgende dag"));
 }
 
 void UEclipseBaseHubWidget::HandleProduce(FName ItemId)
 {
 	UEclipseEconomySubsystem* Economy = GetGameInstance()->GetSubsystem<UEclipseEconomySubsystem>();
 	FString Error;
-	if (Economy != nullptr && !Economy->TryQueueProduction(ItemId, Error))
-	{
-		UE_LOG(LogEclipse, Warning, TEXT("Workshop: %s"), *Error);
-		LastActionNote = Error;
-	}
-	else
-	{
-		LastActionNote.Reset();
-	}
-	RefreshAll();
+	NoteActionResult(Economy != nullptr && Economy->TryQueueProduction(ItemId, Error), Error, TEXT("produceren"));
 }
 
 void UEclipseBaseHubWidget::HandleToggleSquadPick(const FGuid& SoldierId)
@@ -411,16 +414,7 @@ void UEclipseBaseHubWidget::HandleIntelReveal()
 {
 	UEclipsePrepSubsystem* Prep = GetGameInstance()->GetSubsystem<UEclipsePrepSubsystem>();
 	FString Error;
-	if (Prep != nullptr && !Prep->SpendIntelForReveal(Error))
-	{
-		UE_LOG(LogEclipse, Warning, TEXT("Prep: %s"), *Error);
-		LastActionNote = Error;
-	}
-	else
-	{
-		LastActionNote.Reset();
-	}
-	RefreshAll();
+	NoteActionResult(Prep != nullptr && Prep->SpendIntelForReveal(Error), Error, TEXT("intel inzetten"));
 }
 
 void UEclipseBaseHubWidget::HandleLaunch(FGameplayTag LoadoutTag)
