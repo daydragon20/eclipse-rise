@@ -37,6 +37,7 @@
 #include "Characters/EclipsePlayerController.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
@@ -1854,7 +1855,19 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 
 		auto DamageAiming = [&](float ZOffset) -> float
 		{
-			Harness.AimAt(Target->GetActorLocation() + FVector(0.0f, 0.0f, ZOffset));
+			// HERHAALD richten, niet één keer. AimAt injecteert één Look-correctie ter
+			// grootte van de fout, maar het kijkpad schaalt die invoer, dus één
+			// correctie komt er niet. Gemeten bleef de schotlijn 18,9 cm langs een
+			// hitbox van 14 cm liggen — dat leek een te kleine hitbox en was een
+			// niet-geconvergeerde richtbeweging. Tien iteraties halen de restfout
+			// naar vrijwel nul; het is een test, geen speler.
+			const FVector AimPoint = Target->GetActorLocation() + FVector(0.0f, 0.0f, ZOffset);
+			for (int32 Correction = 0; Correction < 10; ++Correction)
+			{
+				Harness.AimAt(AimPoint);
+				Harness.Step();
+			}
+			Harness.Idle(0.2f);
 			const float Before = Target->GetHealth();
 			const double Start3 = Harness.ElapsedSeconds;
 			while (Harness.ElapsedSeconds - Start3 < FireInterval * 1.5)
@@ -1865,18 +1878,41 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 			return Before - Target->GetHealth();
 		};
 
+		// Mikken op waar de hitbox ECHT staat, niet op een hoogte die ik zelf
+		// uitreken. Eerste rondes mikten op 0,85 x halve capsulehoogte en kwamen
+		// gemeten 18,4 cm langs het hoofd — dat leek een te kleine hitbox en was
+		// mijn eigen meetkunde. De component weet zijn positie; vraag het hem.
+		const USphereComponent* HeadBox = Target->GetHeadHitbox();
+		const float HeadOffset = HeadBox != nullptr
+			? static_cast<float>(HeadBox->GetComponentLocation().Z - Target->GetActorLocation().Z)
+			: TargetHalfHeight * 0.85f;
+		Report(*this, TEXT("hoogte van de hoofd-hitbox"), HeadOffset, TEXT("cm"),
+			TEXT("boven het midden van de capsule"));
+
 		const float ChestDamage = DamageAiming(0.0f);
-		const float HeadDamage = DamageAiming(TargetHalfHeight * 0.85f);
+		const float HeadDamage = DamageAiming(HeadOffset);
 		Report(*this, TEXT("schade op borsthoogte"), ChestDamage, TEXT("hp"));
 		Report(*this, TEXT("schade op hoofdhoogte"), HeadDamage, TEXT("hp"),
 			*FString::Printf(TEXT("×%.1f zou %.0f hp zijn"), Weapon->GetHeadshotMultiplier(),
 				ChestDamage * Weapon->GetHeadshotMultiplier()));
-		// GEEN assert dat kopschoten meer doen: als dat vandaag niet zo is, is dat
-		// een BEVINDING en geen reden om rood te landen. Het getal spreekt.
-		AddInfo(HeadDamage > ChestDamage * 1.5f
-			? TEXT("kopschot: de vermenigvuldiging wordt in de praktijk toegepast")
-			: TEXT("kopschot: hoofd en romp doen EVENVEEL — de vermenigvuldiging wordt hier niet bereikt (graybox-capsule zonder bone 'head')"));
+		// WEL een assert sinds 26-07 (owner-opdracht punt 2, optie 1). Hier stond
+		// expliciet dat er niet geasserteerd werd, omdat kopschoten toen niets
+		// deden: 22 hp op borst én hoofd, want Hit.BoneName == "head" komt bij een
+		// capsule-trace nooit terug. Nu is er een echte hitbox op de hoofd-socket
+		// (met een meetkundige terugval bovenin de capsule voor lichamen zonder
+		// mesh) en wordt de beslissing als straal-tegen-bol genomen.
 		TestTrue(TEXT("kopschot: er is überhaupt schade om te vergelijken"), ChestDamage > 0.0f);
+		TestTrue(FString::Printf(
+				TEXT("kopschot: het hoofd doet meer dan de romp (%.0f tegen %.0f hp)"), HeadDamage, ChestDamage),
+			HeadDamage > ChestDamage);
+		// Op de VERHOUDING en niet op 110 hp: het aantal schoten per meetvenster mag
+		// veranderen zonder deze test rood te maken, de multiplier niet.
+		const float Ratio = ChestDamage > 0.0f ? HeadDamage / ChestDamage : 0.0f;
+		Report(*this, TEXT("kopschot-verhouding"), Ratio, TEXT("x"),
+			*FString::Printf(TEXT("DT_Weapons zegt %.1fx"), Weapon->GetHeadshotMultiplier()));
+		TestTrue(FString::Printf(TEXT("kopschot: de verhouding is de geschreven %.1fx (gemeten %.2fx)"),
+				Weapon->GetHeadshotMultiplier(), Ratio),
+			FMath::IsNearlyEqual(Ratio, Weapon->GetHeadshotMultiplier(), 0.15f));
 	}
 	// 10% marge: de laatste schot-poort valt zelden precies op het einde van het
 	// venster, en de stapgrootte kwantiseert.

@@ -1,6 +1,8 @@
 #include "Combat/EclipseHitscanWeaponComponent.h"
 
 #include "Characters/EclipseCharacter.h"
+#include "Eclipse.h"
+#include "Components/SphereComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
@@ -76,12 +78,41 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 
 	// Locational damage stub (GDD 8.2): head bone multiplier when a skeletal
 	// hit is available; graybox capsules simply take base damage.
+	// KOPSCHOT (owner-opdracht 26-07, punt 2, optie 1).
+	//
+	// Hier stond `Hit.BoneName == "head"`, en die naam komt bij een capsule-trace
+	// nooit terug: de graybox-lichamen worden geraakt op hun capsule, die geen
+	// botten heeft. Kopschoten deden dus letterlijk niets — 22 hp op borst én
+	// hoofd, terwijl DT_Weapons 2,5x zegt. Gemeten in de nacht van 25→26 juli en
+	// vandaag gerepareerd.
+	//
+	// De hitbox is een echte component op de hoofd-socket; de beslissing is een
+	// straal-tegen-bol. Zie AEclipseCharacter::ShotLineHitsHead voor waarom niet
+	// op trace-volgorde: de bol zit binnen de capsule, dus die wint altijd.
 	float Damage = Weapon.Damage;
-	if (Hit.BoneName == TEXT("head"))
+	const bool bHeadshot = HitCharacter->ShotLineHitsHead(ViewLocation, End);
+	// Verbose: de probe was onmisbaar bij het bouwen (hij liet zien dat de
+	// schotlijn 18,9 cm langs een hitbox van 14 cm ging) en is dat weer zodra
+	// iemand aan de hitbox of het richten komt. Op Display zou hij het log
+	// vullen met een regel per schot.
+	if (HeadshotProbesLogged < 40)
+	{
+		++HeadshotProbesLogged;
+		const USphereComponent* Head = HitCharacter->GetHeadHitbox();
+		const FVector Centre = Head != nullptr ? Head->GetComponentLocation() : FVector::ZeroVector;
+		UE_LOG(LogEclipse, Verbose,
+			TEXT("Kopschot-probe: hitbox=%s midden=%s straal=%.1f, dichtste nadering=%.1f cm, raak=%d"),
+			Head != nullptr ? TEXT("ja") : TEXT("NEE"), *Centre.ToCompactString(),
+			Head != nullptr ? Head->GetScaledSphereRadius() : -1.0f,
+			Head != nullptr ? FVector::Dist(FMath::ClosestPointOnSegment(Centre, ViewLocation, End), Centre) : -1.0f,
+			bHeadshot ? 1 : 0);
+	}
+	if (bHeadshot)
 	{
 		Damage *= Weapon.HeadshotMultiplier;
 	}
 
-	HitCharacter->ApplyDamage(Damage, Cast<AEclipseCharacter>(GetOwner()), Cause);
+	HitCharacter->ApplyDamage(Damage, Cast<AEclipseCharacter>(GetOwner()),
+		bHeadshot ? FName(*(Cause.ToString() + TEXT("_Head"))) : Cause);
 	return true;
 }

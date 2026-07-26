@@ -9,6 +9,7 @@
 class AEclipseCharacter;
 class UAbilitySystemComponent;
 class UCameraComponent;
+class USphereComponent;
 class UEclipseCharacterTuningAsset;
 class UEclipseHealthAttributeSet;
 class USkeletalMesh;
@@ -87,6 +88,25 @@ public:
 	 * draai-animatie in de packs zit. De invoerlaag zet dit per frame.
 	 */
 	void SetOrientationFollowsCameraNow(bool bFollowing);
+
+	/**
+	 * Raakt deze schotlijn het hoofd? (owner-opdracht 26-07, punt 2.)
+	 *
+	 * De kopschot-multiplier hing aan Hit.BoneName == "head", en die naam komt bij
+	 * een capsule-trace NOOIT terug — daarom deden kopschoten precies niets: 22 hp
+	 * op borst én hoofd, terwijl DT_Weapons 2,5x zegt.
+	 *
+	 * Straal-tegen-BOL en niet op trace-volgorde vertrouwen, want dat kan niet
+	 * werken: de hoofdbol zit BINNEN de capsule, dus een lijntrace raakt altijd
+	 * eerst de capsule. Dat zou een eigen collision-channel vragen (capsule
+	 * negeert, hitboxen blokkeren) en daarmee elk bestaand collision-profiel in het
+	 * project raken. De bol zelf is wél een echte component: die geeft positie en
+	 * straal, is zichtbaar in de editor en volgt de hoofd-socket mee.
+	 */
+	bool ShotLineHitsHead(const FVector& Start, const FVector& End) const;
+
+	/** De hoofd-hitbox, of null als dit lichaam geen hoofd-socket heeft. */
+	const USphereComponent* GetHeadHitbox() const { return HeadHitbox; }
 
 	/** Apply tuning (movement speeds, max health) from data — never hardcode (GDD 14.2). */
 	void ApplyTuning(const UEclipseCharacterTuningAsset* Tuning);
@@ -241,6 +261,16 @@ private:
 
 	/** Volgt dit lichaam het camera-relatieve model (speler) of het AI-model? */
 	bool bCameraRelativeOrientation = false;
+
+	/** Kopschot-volume op de hoofd-socket (26-07, punt 2). */
+	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Combat")
+	TObjectPtr<USphereComponent> HeadHitbox;
+
+	/** Zit hij op een echte hoofd-socket? Zo niet, dan telt dit lichaam geen kopschoten. */
+	bool bHeadHitboxAttached = false;
+
+	/** Hoofd-hitbox op de capsule zetten (terugval voor lichamen zonder mesh). */
+	void PlaceHeadHitboxOnCapsule();
 	bool bAiming = false;
 	bool bCameraLagSuspended = false;
 

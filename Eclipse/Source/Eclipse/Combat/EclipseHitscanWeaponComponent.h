@@ -38,6 +38,9 @@ public:
 	float GetFireInterval() const { return Weapon.FireInterval; }
 
 private:
+	/** Eén diagnostische regel over de eerste kopschot-beslissing. */
+	int32 HeadshotProbesLogged = 0;
+
 	FEclipseWeaponRow Weapon;
 	double LastFireTimeSeconds = -1.0;
 };

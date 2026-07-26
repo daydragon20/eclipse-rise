@@ -9,6 +9,7 @@
 #include "Characters/EclipseCharacterMovementComponent.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Eclipse.h"
@@ -145,6 +146,62 @@ AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer
 	// Found by the in-game test guide while writing the crouch step's expectation,
 	// which is exactly what that guide exists for.
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	// Kopschot-volume (owner-opdracht 26-07, punt 2). 14 cm straal: een mensenhoofd
+	// is ongeveer 22 cm breed, dus dit is iets ruimer dan levensecht — bewust, want
+	// een hitbox die exact het model volgt leest als "ik raakte hem wél" terwijl de
+	// game nee zegt. Shooters maken hoofdhitboxen standaard iets genereuzer dan het
+	// silhouet; wie 'm strakker wil zet 'm hier smaller.
+	// Aan de CAPSULE en niet aan de mesh, want een graybox-lichaam heeft vaak geen
+	// mesh — en juist dat lichaam is waar de owner tegenaan schoot. Zonder een
+	// meetkundige terugval zou "kopschoten werken nu" alleen gelden voor de drie
+	// lichamen die toevallig een aangeklede mesh hebben, en dat is precies het
+	// soort halve reparatie dat deze sessie steeds aan het licht brengt.
+	// ApplyBodyDef verhangt hem naar de echte hoofdbot zodra die er is.
+	HeadHitbox = CreateDefaultSubobject<USphereComponent>(TEXT("HeadHitbox"));
+	HeadHitbox->SetupAttachment(GetCapsuleComponent());
+	HeadHitbox->InitSphereRadius(14.0f);
+	// Puur een meetvolume: het mag niets blokkeren, niets duwen en geen overlaps
+	// genereren. De schotlijn wordt er in code tegenaan gerekend.
+	HeadHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HeadHitbox->SetGenerateOverlapEvents(false);
+}
+
+void AEclipseCharacter::PlaceHeadHitboxOnCapsule()
+{
+	if (HeadHitbox == nullptr)
+	{
+		return;
+	}
+	const UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (Capsule == nullptr)
+	{
+		return;
+	}
+
+	// Bovenin de capsule, één straal onder de kruin: dat is waar een hoofd zit bij
+	// een staande capsule van 176 cm. Hij schaalt mee met hurken, want de
+	// capsulehoogte doet dat ook — gehurkt zit je hoofd lager, en daar hoort de
+	// hitbox te volgen.
+	const float HalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+	HeadHitbox->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	HeadHitbox->SetRelativeLocation(FVector(0.0f, 0.0f, HalfHeight - HeadHitbox->GetScaledSphereRadius()));
+	bHeadHitboxAttached = true;
+}
+
+bool AEclipseCharacter::ShotLineHitsHead(const FVector& Start, const FVector& End) const
+{
+	if (HeadHitbox == nullptr || !bHeadHitboxAttached)
+	{
+		return false;
+	}
+
+	// Dichtste punt van het SEGMENT tot het middelpunt van de bol. Segment en niet
+	// oneindige lijn: een schot dat vóór het hoofd stopt (bereik op, muur ertussen)
+	// is geen kopschot.
+	const FVector Centre = HeadHitbox->GetComponentLocation();
+	const FVector Closest = FMath::ClosestPointOnSegment(Centre, Start, End);
+	return FVector::DistSquared(Closest, Centre) <= FMath::Square(HeadHitbox->GetScaledSphereRadius());
 }
 
 void AEclipseCharacter::NotifyControllerChanged()
@@ -204,6 +261,9 @@ void AEclipseCharacter::SetOrientationFollowsCameraNow(bool bFollowing)
 
 void AEclipseCharacter::PostInitializeComponents()
 {
+	// Elke capsule krijgt meteen een hoofd (26-07, punt 2); ApplyBodyDef verhangt
+	// hem later naar de echte hoofdbot als het lichaam er een heeft.
+	PlaceHeadHitboxOnCapsule();
 	Super::PostInitializeComponents();
 
 	AbilitySystem->InitAbilityActorInfo(this, this);
@@ -585,6 +645,35 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 	MeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, BodyDef.MeshZOffset));
 	MeshComponent->SetRelativeRotation(FRotator(0.0f, BodyDef.MeshYaw, 0.0f));
 	MeshComponent->SetRelativeScale3D(FVector(BodyDef.MeshScale));
+
+	// De kopschot-hitbox op de hoofdbot hangen (26-07, punt 2). Hier en niet in de
+	// constructor: pas met een mesh is er een skelet om aan te hechten.
+	//
+	// Vier kandidaatnamen omdat de lichamen uit drie verschillende packs komen en
+	// niemand het over botnamen eens is. Vindt hij er geen, dan telt dit lichaam
+	// geen kopschoten — en dat wordt gezegd, want stil geen kopschot is precies de
+	// toestand die vandaag gerepareerd wordt (14.3.5).
+	bHeadHitboxAttached = false;
+	if (HeadHitbox != nullptr)
+	{
+		static const FName HeadBoneCandidates[] = { TEXT("head"), TEXT("Head"), TEXT("neck_01"), TEXT("Bip001Head") };
+		for (const FName& Candidate : HeadBoneCandidates)
+		{
+			if (MeshComponent->DoesSocketExist(Candidate))
+			{
+				HeadHitbox->AttachToComponent(MeshComponent,
+					FAttachmentTransformRules::SnapToTargetNotIncludingScale, Candidate);
+				bHeadHitboxAttached = true;
+				break;
+			}
+		}
+		if (!bHeadHitboxAttached)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("%s: geen hoofdbot gevonden op %s — kopschoten tellen op dit lichaam als rompschoten (14.3.5)."),
+				*GetName(), *BodyDef.Mesh.ToString());
+		}
+	}
 
 	ApplyBodyDefAnimation(BodyDef, BodyMesh, *MeshComponent);
 
