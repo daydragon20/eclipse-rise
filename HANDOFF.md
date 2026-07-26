@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `d3bcaa1`
+## VEILIG TE SPELEN: JA, commit `6ec6508`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -35,8 +35,12 @@ vinden. Zie hieronder.
 | **De crash bij lopen is weg.** De geluidsbanken lagen in gewone structs zonder UPROPERTY, dus de GC ruimde de cues op en de eerste voetstap speelde vrijgegeven geheugen af. | 65 geldige cues vóór én ná een geforceerde volledige GC-pass |
 | **2948 stille afgewezen animaties → 0.** Onze eigen skeletpoort vergeleek op gelijkheid terwijl de engine de geleende takes al accepteerde. En het koppelscript had ze nooit opgeslagen: `save_asset(pad)` schreef niets en meldde geen fout. | 0 afwijzingen in de hele suite |
 | **Stil falen maakt de bar nu ROOD.** Elke degradatie — afgewezen animatie, niet-geladen cue, ontbrekende pose — telt mee, en een test eist nul in een echte missie. | 0 degradaties |
-| **Alle negen lichamen hebben een schietpose en een klap** (was: vijf lichamen met nul van de vijf poses). | 34 → 10 ontbrekende poses; wat rest is de reload van Belica |
+| **Alle negen lichamen hebben een schietpose en een klap** (was: vijf lichamen met nul van de vijf poses). | 34 → 10 ontbrekende poses |
 | **De aankleedfiguren waren reuzen.** Alleen op een beeld te vinden; zie hieronder. | 328,4 → 180,0 cm, naast een speler van 189,6 cm |
+| **Jouw personage heeft nu ALLE vijf de poses.** Herladen en hurken bestaan niet in Belica's pack (alle 143 takes doorzocht) en zijn geleend uit SciFiCharacter. Dat lenen kán is gemeten en niet aangenomen. | 3/5 → **5/5**; project 10 → 8; skeletoverlap 68 van 68 botnamen (100%) |
+| **Na elke draai zakte je loopcyclus naar 15%.** De draaitake is 4,00 s en werd zo lang aangehouden; het piekgewicht viel op t=2,00 s waar de take al was uitgezakt. | Duur begrensd op 0,8 s (referentie 0,4–0,8 s) |
+| **LT deed nog steeds twee dingen.** De afschaffing van vanochtend was alleen in het commentaar, de tabel en BESTURING.md geland — de `MapKey` stond er nog. | LT draagt nu 1 actie in plaats van 2 |
+| **Een gele engine-waarschuwing liep over je scherm.** Twee directionele lampen streden om "de" zon. | 0 waarschuwingen in het log en weg van het beeld |
 
 ### Wat ik heb GEZIEN op screenshots
 
@@ -80,6 +84,12 @@ Wat er nu op staat, met eigen ogen bekeken:
 **Twee dingen die ik eerst als bug meldde en die van MIJ waren, niet van de game:**
 "nul schoten" kwam van een verkeerd zoekwoord (gemeten: 30 → 19 munitie, elf
 schoten) en de ontbrekende HUD is de opnamemethode. Beide teruggenomen.
+
+6. **De geleende herlaadpose speelt, en het rig houdt het.** Negende opname, midden
+   in de herlaadbeurt: de linkerarm komt omhoog in een herlaadgebaar terwijl hij
+   stilstaand langs het lichaam hangt. Geen vervormde botten, geen uitgerekte
+   geometrie. Dat een Paragon-rig een mannequin-take schadeloos afspeelt, is niet
+   uit een tabel af te lezen — daar moest een beeld voor komen.
 
 **Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
 laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
@@ -146,9 +156,23 @@ uit elkaar te lopen — dat kostte vandaag vier keer dezelfde correctie.
 Goedgekeurd. 13 armaturen staan; wacht op de vaste-camera ronde vóór er meer
 bijkomen.
 
-### 5. LOCOMOTIE-AUDIT OPNIEUW
+### 5. ~~LOCOMOTIE-AUDIT~~ — RONDE 3 STAAT
 
-Er is sindsdien veel veranderd (additieve poses, compatibele skeletten, turn).
+Zie `phase0/LOCOMOTIE_AUDIT.md`. Wat er uit die ronde nog open ligt:
+
+- **De acht niet-speler-lichamen hebben geen draaitake.** Mild: turn-in-place is
+  een speler-ervaring. Of het leenbaar is vanuit Belica is nog niet gemeten — dat
+  is de omgekeerde richting van de leenoperatie die vannacht wél is gedaan.
+- **De draai-animatie draagt geen eigen rotatie** en dat is inherent aan dit
+  materiaal, niet met tuning te verhelpen.
+- **Punt 15 blijft half:** nog steeds geen start-, stop- of landtake.
+
+### 6. HET KNOPPENSCHEMA, FASE 2
+
+De data en twee validators staan (`GetBindings()`, `NoButtonMeansTwoThingsInOneMode`,
+`EveryPadButtonIsDescribed`). Wat nog niet staat: `BESTURING.md`, de F3-gids en
+`SPEEL_ECLIPSE.bat` leiden hun tekst nog niet uit dat schema af. Ze worden nu
+gecontroleerd, niet gegenereerd.
 
 ---
 
