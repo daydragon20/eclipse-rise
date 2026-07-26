@@ -357,8 +357,20 @@ void UEclipseBaseHubWidget::HandleAdvanceDay()
 	Transaction.Source = TEXT("BaseHub");
 	FEclipseCampaignMutation& Advance = Transaction.Mutations.AddDefaulted_GetRef();
 	Advance.Type = EEclipseCampaignMutationType::AdvanceDay;
+	// De uitkomst LEZEN (26-07). Dit hangt aan een knop die de speler indrukt, en
+	// een knop die stil niets doet is de vervelendste soort defect: je klikt nog
+	// een keer, en nog een keer, en concludeert dat het spel hangt.
+	//
+	// Gevonden door te zoeken naar aanroepen die een foutmelding teruggeven waar
+	// de aanroeper niets mee doet — zelfde sweep die de debrief bij spelersdood
+	// opleverde. Dit waren de enige twee in het hele project.
 	FString Error;
-	Campaign->CommitTransaction(Transaction, Error);
+	if (!Campaign->CommitTransaction(Transaction, Error))
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("BaseHub: 'volgende dag' is afgewezen (%s) — de knop deed niets en de speler ziet dat niet (14.3.5)."),
+			*Error);
+	}
 }
 
 void UEclipseBaseHubWidget::HandleProduce(FName ItemId)
