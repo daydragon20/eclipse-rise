@@ -157,7 +157,7 @@ handler, geen mapping. Ze staan hier zodat de lijst compleet is en niemand ze zo
 | `-EclipseShot` | vaste-camera reviewronde; onderdrukt bewust ALLE debug-UI |
 | `Eclipse.Look.InvertY 0/1` | Y-as van het kijken forceren (-1 = volg de tuning) |
 | `Eclipse.Command.Dump` | Command Mode-metingen naar de console |
-| `Eclipse.Feel.Dump` | **drie regels op F9**: (1) snelheid, mesh-schaal, boomlengte, camera-afstand, FOV en schijnbare grootte; (2) de bewegingswaarden zoals ze op het component staan — loopsnelheid, aanloop, rem, draaisnelheid, grondwrijving, zijwaarts/achteruit, stap-hoogte, sprong; (3) de kijkwaarden. Ook op het scherm |
+| `Eclipse.Feel.Dump` | **drie regels op F9**: (1) snelheid, mesh-schaal, boomlengte, camera-afstand, FOV en schijnbare grootte; (2) de bewegingswaarden zoals ze op het component staan — loopsnelheid, aanloop, rem, draaisnelheid, grondwrijving, zijwaarts/achteruit, stap-hoogte, sprong; (3) de kijkwaarden. Ook op het scherm. **Sinds 26-07 ook een VIERDE regel: het verschil met je vorige druk** — snelheid, schijnbare grootte in procenten, camera-afstand. Groen binnen de ruis, rood met "SCHAALT MEE — dit is S1" boven 2%. Dat is er omdat S1 een *verschil* is en geen absoluut getal: je drukt één keer stappend en één keer sprintend, en de dump rekent het zelf uit in plaats van jou getallen te laten onthouden terwijl je speelt. De drempel van 2% is dezelfde die de geautomatiseerde test gebruikt |
 | `Eclipse.Input.ForceGamepad 0/1` | invoer als muis (0) of als stick (1) behandelen; -1 = autodetectie |
 
 ## Welke config-map een toetsbinding leest (feel-audit S3)
