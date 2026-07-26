@@ -562,6 +562,8 @@ void AEclipseGameMode::SpawnMissionActors()
 		UEclipseHitscanWeaponComponent& PlayerWeapon = EnsureWeapon(*PlayerBody);
 		const FEclipseWeaponRow* Primary = nullptr;
 		const FEclipseWeaponRow* Sidearm = nullptr;
+		FName PrimaryName;
+		FName SidearmName;
 		if (Mission != nullptr)
 		{
 			// Mission staat hierboven al opgezocht (regel ~461); nog een keer
@@ -576,7 +578,7 @@ void AEclipseGameMode::SpawnMissionActors()
 			if (Chosen.IsValid() && LoadoutTable != nullptr && WeaponTable != nullptr)
 			{
 				LoadoutTable->ForeachRow<FEclipseLoadoutOptionRow>(TEXT("EquipLoadout"),
-					[&Primary, &Sidearm, &Chosen, WeaponTable](const FName&, const FEclipseLoadoutOptionRow& Option)
+					[&Primary, &Sidearm, &PrimaryName, &SidearmName, &Chosen, WeaponTable](const FName&, const FEclipseLoadoutOptionRow& Option)
 					{
 						if (Option.LoadoutTag != Chosen)
 						{
@@ -585,10 +587,12 @@ void AEclipseGameMode::SpawnMissionActors()
 						if (!Option.PrimaryWeapon.IsNone())
 						{
 							Primary = WeaponTable->FindRow<FEclipseWeaponRow>(Option.PrimaryWeapon, TEXT("Primary"));
+							PrimaryName = Option.PrimaryWeapon;
 						}
 						if (!Option.SidearmWeapon.IsNone())
 						{
 							Sidearm = WeaponTable->FindRow<FEclipseWeaponRow>(Option.SidearmWeapon, TEXT("Sidearm"));
+							SidearmName = Option.SidearmWeapon;
 						}
 					});
 			}
@@ -600,7 +604,7 @@ void AEclipseGameMode::SpawnMissionActors()
 		}
 		if (Primary != nullptr && Sidearm != nullptr)
 		{
-			PlayerWeapon.ApplyLoadout(*Primary, *Sidearm);
+			PlayerWeapon.ApplyLoadout(*Primary, PrimaryName, *Sidearm, SidearmName);
 		}
 		else
 		{

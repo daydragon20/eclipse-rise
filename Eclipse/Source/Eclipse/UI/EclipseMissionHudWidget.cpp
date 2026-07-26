@@ -122,7 +122,14 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 	}
 
 	const int32 Ammo = Weapon->GetAmmoInMagazine();
-	AmmoReadout->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), Ammo, Weapon->GetMagazineSize())));
+	// De NAAM erbij zodra er meer dan één wapen is. Met een wisselknop op RB is
+	// "hoeveel kogels" niet genoeg — je moet zien welk wapen dat magazijn heeft,
+	// anders wissel je en weet je niet wat je in handen hebt.
+	const FName WeaponName = Weapon->GetActiveWeaponName();
+	AmmoReadout->SetText(FText::FromString(
+		Weapon->GetSlotCount() > 1 && !WeaponName.IsNone()
+			? FString::Printf(TEXT("%s   %d / %d"), *WeaponName.ToString(), Ammo, Weapon->GetMagazineSize())
+			: FString::Printf(TEXT("%d / %d"), Ammo, Weapon->GetMagazineSize())));
 	// Onder een derde kleurt hij. Dat is het punt waarop je moet BESLUITEN of je
 	// herlaadt of doorschiet, en een getal alleen haal je in een vuurgevecht niet
 	// van het scherm — kleur wel.

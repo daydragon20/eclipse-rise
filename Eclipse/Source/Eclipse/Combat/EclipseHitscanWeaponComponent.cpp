@@ -31,15 +31,19 @@ void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row
 	// geen wissel — die is van de speler, want alleen hij kiest een loadout.
 	SlotRows = { Row };
 	SlotAmmo = { AmmoInMagazine };
+	SlotNames = { NAME_None };
 	ActiveSlot = 0;
 	ReadyAtSeconds = -1.0;
 }
 
-void UEclipseHitscanWeaponComponent::ApplyLoadout(const FEclipseWeaponRow& Primary, const FEclipseWeaponRow& Sidearm)
+void UEclipseHitscanWeaponComponent::ApplyLoadout(const FEclipseWeaponRow& Primary, FName PrimaryName,
+	const FEclipseWeaponRow& Sidearm, FName SidearmName)
 {
 	ApplyWeaponRow(Primary);
+	SlotNames[0] = PrimaryName;
 	SlotRows.Add(Sidearm);
 	SlotAmmo.Add(Sidearm.MagazineSize);
+	SlotNames.Add(SidearmName);
 }
 
 bool UEclipseHitscanWeaponComponent::IsReady() const

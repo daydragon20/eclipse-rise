@@ -31,14 +31,23 @@ public:
 	 * van cosmetisch: een halfleeg wapen wegstoppen betekent dat het halfleeg
 	 * terugkomt.
 	 */
-	void ApplyLoadout(const FEclipseWeaponRow& Primary, const FEclipseWeaponRow& Sidearm);
+	void ApplyLoadout(const FEclipseWeaponRow& Primary, FName PrimaryName,
+		const FEclipseWeaponRow& Sidearm, FName SidearmName);
 
 	/** Wissel naar het andere slot. False als er niets te wisselen valt. */
 	bool SwapWeapon();
 
 	int32 GetSlotCount() const { return SlotRows.Num(); }
 	int32 GetActiveSlot() const { return ActiveSlot; }
-	FName GetActiveWeaponName() const { return Weapon.SoundFamily; }
+	/**
+	 * De rijnaam van het wapen in je handen (AR_Foundry, Sidearm_Scrap, ...).
+	 *
+	 * Voor de HUD: met twee slots en een wisselknop is "hoeveel kogels" niet genoeg
+	 * — je moet ook zien WELK wapen dat magazijn heeft. De rijnaam en niet de
+	 * RoleSummary: die laatste is een hele zin, en een zin lees je niet middenin
+	 * een vuurgevecht.
+	 */
+	FName GetActiveWeaponName() const { return SlotNames.IsValidIndex(ActiveSlot) ? SlotNames[ActiveSlot] : NAME_None; }
 	/** Klaar om te vuren? Vlak na een wissel niet — dat is de handling-tijd. */
 	bool IsReady() const;
 
@@ -104,6 +113,7 @@ private:
 	/** Beide slots, met per slot het magazijn dat erin zit. */
 	TArray<FEclipseWeaponRow> SlotRows;
 	TArray<int32> SlotAmmo;
+	TArray<FName> SlotNames;
 	int32 ActiveSlot = 0;
 
 	/** Tot wanneer het opgetilde wapen nog niet kan vuren (ReadySeconds). */
