@@ -78,6 +78,25 @@ def fields_in(header: Path) -> list:
     return out
 
 
+BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
+LINE_COMMENT = re.compile(r"//[^\n]*")
+
+
+def strip_comments(text):
+    """Haal commentaar weg voordat je naar gebruik zoekt.
+
+    Toegevoegd 26-07 avond, en gevonden door de tool per ongeluk zelf te raken:
+    ik herschreef ergens een comment die ResponseTimeoutSeconds noemde, en dat
+    veld dook meteen op als dood. Die vermelding IN EEN COMMENT was de enige plek
+    waar de naam voorkwam - de sweep telde hem al die tijd als gebruik.
+
+    Een naam in een comment is geen gebruik. Het is vaak juist het tegendeel: een
+    comment die uitlegt waarom iets NIET gelezen wordt, hield zichzelf zo uit de
+    lijst.
+    """
+    return LINE_COMMENT.sub(" ", BLOCK_COMMENT.sub(" ", text))
+
+
 DECLARED = "NIET GELEZEN"
 
 
@@ -122,7 +141,7 @@ def is_declared_unread(header, name):
 
 def main() -> int:
     sources = [p for p in SOURCE_ROOT.rglob("*.cpp")] + [p for p in SOURCE_ROOT.rglob("*.h")]
-    bodies = {p: p.read_text(encoding="utf-8", errors="replace") for p in sources}
+    bodies = {p: strip_comments(p.read_text(encoding="utf-8", errors="replace")) for p in sources}
 
     dead = []
     for header in sorted(ROOT.rglob("*.h")):
