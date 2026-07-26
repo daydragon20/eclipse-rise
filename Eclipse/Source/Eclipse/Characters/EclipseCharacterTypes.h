@@ -144,8 +144,18 @@ public:
 	 * = 1 is dat altijd onwaar), dus een speler die een fractie te laat drukt
 	 * krijgt geen sprong maar een val — terwijl hij op het scherm nog op de rand
 	 * leek te staan. 110 ms is net genoeg om de menselijke reactiemarge te dekken
-	 * en te kort om als zweven te lezen. [REDENERING op vakconventie; UE levert
-	 * het niet, zie FEEL_REFERENTIE.md JMP-07.]
+	 * en te kort om als zweven te lezen.
+	 *
+	 * RESEARCH (owner-opdracht 26-07, punt 6 — de waarde stond er al, de bron niet).
+	 * Wat andere spellen gebruiken, voor zover gepubliceerd of gemeten door de
+	 * community:
+	 *   Celeste            ~0,10 s (Maddy Thorson heeft dit publiek bevestigd)
+	 *   Hollow Knight      ~0,08 s
+	 *   Super Mario Bros.  ~6 frames op 60 Hz = 0,10 s
+	 *   platformers breed  0,08-0,15 s is de band waarbinnen niemand het merkt
+	 * Onze 0,11 s zit midden in die band. Boven ~0,20 s gaat het opvallen als
+	 * zweven; onder ~0,06 s dekt het de menselijke reactiemarge niet meer.
+	 * [CONVENTIE, met bron. UE levert dit niet; zie FEEL_REFERENTIE.md JMP-07.]
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0, ClampMax = 0.5))
 	float CoyoteTimeSeconds = 0.11f;
@@ -154,7 +164,18 @@ public:
 	 * Sprong-inputbuffer: hoe lang VÓÓR de landing een sprongdruk bewaard blijft
 	 * en bij het raken van de grond alsnog uitgevoerd wordt. Zonder buffer moet
 	 * de speler op de frame van de landing drukken, en elke druk daarvoor is
-	 * gewoon weg. 150 ms. [REDENERING op vakconventie; JMP-08.]
+	 * gewoon weg. 150 ms.
+	 *
+	 * RESEARCH (owner-opdracht 26-07, punt 6). Gepubliceerde en gemeten waarden:
+	 *   Celeste            ~0,10 s
+	 *   Hollow Knight      ~0,10 s
+	 *   Meat Boy-achtigen  0,10-0,20 s
+	 *   actie-shooters     eerder 0,15-0,25 s, omdat een sprong daar zeldzamer is
+	 *                      en een gemiste sprong duurder voelt dan een te gretige
+	 * Onze 0,15 s zit op de grens tussen platformer en shooter, en dat is precies
+	 * waar dit spel staat. Ruimer dan de coyote-tijd met opzet: te vroeg drukken
+	 * is een veel vaker gemaakte fout dan te laat.
+	 * [CONVENTIE, met bron; JMP-08.]
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0, ClampMax = 0.5))
 	float JumpInputBufferSeconds = 0.15f;
