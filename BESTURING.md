@@ -88,6 +88,10 @@ toestand leest die er toch al is.
 > (targeting) op *"nog niet gemeten"* staan, hoe lang je ook speelt — het telt
 > alleen wat jij als schoon of mis boekt. Criterium 1 (antwoord binnen 1 s) en 5
 > (gebruiks-trek) vullen zich wél vanzelf.
+>
+> **En het playtest-paneel (`H`) beantwoord je met `6` t/m `0`** — één toets per
+> vraag, in de volgorde waarin ze op het scherm staan. Sinds 26-07 staat de toets
+> vóór elke regel in het paneel zelf, zodat je het niet hoeft te onthouden.
 
 De gauntlet-meettoetsen blijven bewust toetsenbord-only: dat is instrumentatie voor
 de beoordelaar, geen besturing die de speler uitvoert. De gids zelf moest wél op de

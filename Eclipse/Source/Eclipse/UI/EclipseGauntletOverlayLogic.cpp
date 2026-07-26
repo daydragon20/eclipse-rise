@@ -218,7 +218,12 @@ namespace EclipseGauntletOverlay
 		for (int32 Index = 0; Index < Questions.Num(); ++Index)
 		{
 			const EEclipseGauntletAnswer Answer = Answers.IsValidIndex(Index) ? Answers[Index] : EEclipseGauntletAnswer::Unanswered;
-			Lines.Add(FString::Printf(TEXT("[%s] %s"), *DescribeAnswer(Answer), *Questions[Index]));
+			// De TOETS erbij, want het paneel toonde de vragen zonder te zeggen hoe je
+			// ze beantwoordt. De owner moest weten dat 6 t/m 0 op de vijf regels
+			// slaan; dat stond nergens, ook niet in BESTURING.md, en een vraag die
+			// je niet kunt beantwoorden leest als een vraag die kapot is.
+			Lines.Add(FString::Printf(TEXT("[%d] [%s] %s"), Index + 6 <= 9 ? Index + 6 : 0,
+				*DescribeAnswer(Answer), *Questions[Index]));
 		}
 
 		const EEclipseGauntletAnswer Gate = Answers.IsValidIndex(PlaytestQuestionCount - 1)
