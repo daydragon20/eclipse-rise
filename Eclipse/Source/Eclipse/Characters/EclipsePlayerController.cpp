@@ -706,6 +706,8 @@ void AEclipsePlayerController::SetupInputComponent()
 	{
 		UInputAction* Action;
 		EclipseTestGuide::EEclipseGuideSignal Signal;
+		/** Deze actie DOET alleen iets terwijl Command Mode vastgehouden wordt. */
+		bool bNeedsCommandMode = false;
 	};
 	const FGuideSignalBinding GuideSignals[] = {
 		{ MoveAction,          EclipseTestGuide::EEclipseGuideSignal::Move },
@@ -718,10 +720,10 @@ void AEclipsePlayerController::SetupInputComponent()
 		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim },
 		{ ToggleViewAction,    EclipseTestGuide::EEclipseGuideSignal::ToggleView },
 		{ CommandHoldAction,   EclipseTestGuide::EEclipseGuideSignal::CommandMode },
-		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext },
-		{ SelectPrevAction,    EclipseTestGuide::EEclipseGuideSignal::SelectPrev },
-		{ DirectPickAction,    EclipseTestGuide::EEclipseGuideSignal::DirectPick },
-		{ StanceToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Stance },
+		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext,  true },
+		{ SelectPrevAction,    EclipseTestGuide::EEclipseGuideSignal::SelectPrev,  true },
+		{ DirectPickAction,    EclipseTestGuide::EEclipseGuideSignal::DirectPick,  true },
+		{ StanceToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Stance,      true },
 		// All four order keys answer the one "orders" step; the step is about the
 		// order path working, not about which of the four you happened to press.
 		{ OrderActions[0],     EclipseTestGuide::EEclipseGuideSignal::Order },
@@ -737,8 +739,23 @@ void AEclipsePlayerController::SetupInputComponent()
 			continue; // a missing action costs the guide one undetectable step, never a crash (GDD 14.3.5)
 		}
 		const EclipseTestGuide::EEclipseGuideSignal Signal = Binding.Signal;
-		Input->BindActionValueLambda(Binding.Action, ETriggerEvent::Started, [this, Signal](const FInputActionValue&)
+		const bool bNeedsCommandMode = Binding.bNeedsCommandMode;
+		Input->BindActionValueLambda(Binding.Action, ETriggerEvent::Started,
+			[this, Signal, bNeedsCommandMode](const FInputActionValue&)
 		{
+			// De gids vinkte af op de TOETSDRUK, niet op het effect. Vier van deze
+			// acties doen buiten Command Mode niets (CycleSoldierSelection,
+			// PickSoldierUnderReticle en ToggleHeldStance keren meteen terug), dus
+			// RB indrukken in het veld zette de stap op "gehaald" terwijl er op het
+			// scherm niets gebeurde — en de stap beschrijft juist wat je zou moeten
+			// zien ("de regel 'target:' springt van ALL naar een soldaat-id").
+			//
+			// Een gids die zichzelf afvinkt terwijl het beschreven effect uitblijft,
+			// is erger dan geen detectie: hij spreekt de speler tegen.
+			if (bNeedsCommandMode && (CommandMode == nullptr || !CommandMode->IsHeld()))
+			{
+				return;
+			}
 			if (MissionHud != nullptr && MissionHud->IsInViewport())
 			{
 				MissionHud->NoteGuideSignal(Signal);
