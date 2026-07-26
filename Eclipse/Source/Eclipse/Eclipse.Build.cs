@@ -40,7 +40,8 @@ public class Eclipse : ModuleRules
 			"Json",
 			"JsonUtilities",
 			"HTTP", // ElevenLabs voice pipeline (GDD 16.12); dev/editor-time generation
-			"AssetRegistry" // tests tellen ALLE verscheepte missies, niet een lijst bij naam
+			"AssetRegistry", // tests tellen ALLE verscheepte missies, niet een lijst bij naam
+			"PhysicsCore" // oppervlaktetypes onder je voeten (voetstappen per oppervlak, 26-07)
 		});
 	}
 }

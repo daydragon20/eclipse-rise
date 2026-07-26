@@ -88,6 +88,36 @@ namespace
 	 */
 	constexpr float TailCooldownSeconds = 0.6f;
 	constexpr float TailVolume = 0.55f;
+
+	/**
+	 * VOETSTAPPEN PER OPPERVLAK (owner-levering 26-07: Footsteps_Volume_02).
+	 *
+	 * De mapnamen zijn zoals het pack ze levert, tikfout en al: "Foostep_Grass"
+	 * mist een t. Die overschrijven zou het pack veranderen; hier staan betekent
+	 * dat het klopt met wat er op schijf ligt, en dat is wat telt.
+	 *
+	 * Het getal is het oppervlaktetype uit DefaultEngine.ini. Als BYTE en niet als
+	 * EPhysicalSurface, zodat deze tabel niets hoeft te weten van de physics-enum
+	 * en een zevende oppervlak één regel is.
+	 */
+	struct FFootstepBankDef
+	{
+		uint8 SurfaceType;
+		const TCHAR* Prefix;
+		int32 Count;
+	};
+
+	const FFootstepBankDef FootstepBankDefs[] = {
+		{ 1, TEXT("Footstep_Metal"),         6 },   // SurfaceType1 — loopvlak, rooster, dekplaat
+		{ 2, TEXT("Footstep_Shoe_On_Street"), 7 },  // SurfaceType2 — plein en straat
+		{ 3, TEXT("Footstep_Mud"),           7 },   // SurfaceType3
+		{ 4, TEXT("Foostep_Grass"),          7 },   // SurfaceType4 — pack-tikfout, met opzet
+		{ 5, TEXT("Footstep_Sand"),          7 },   // SurfaceType5
+		{ 6, TEXT("Footstep_Wood"),          7 },   // SurfaceType6
+	};
+
+	/** Waar het op valt als er geen physical material onder je voeten ligt. */
+	constexpr uint8 DefaultFootstepSurface = 2;
 }
 
 void UEclipseAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -154,8 +184,10 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 			UE_LOG(LogEclipse, Warning, TEXT("Audio: wapencue %s ontbreekt — schieten blijft stil (14.3.5)."), WeaponShotCuePath);
 		}
 
-		// De familiesets om exact dezelfde reden hier en niet bij het eerste schot.
+		// De familiesets en de voetstapbanken om exact dezelfde reden hier en niet
+		// bij het eerste schot of de eerste stap.
 		LoadWeaponSoundSets();
+		LoadFootstepBanks();
 	}
 	if (!bTriedLoadImpact)
 	{
@@ -295,6 +327,68 @@ int32 UEclipseAudioSubsystem::GetWeaponSoundVariantCount(FName Family) const
 {
 	const FWeaponSoundSet* Set = WeaponSoundSets.Find(Family);
 	return Set != nullptr ? Set->Shots.Num() : 0;
+}
+
+void UEclipseAudioSubsystem::LoadFootstepBanks()
+{
+	for (const FFootstepBankDef& Def : FootstepBankDefs)
+	{
+		FWeaponSoundSet Bank;
+		for (int32 Index = 1; Index <= Def.Count; ++Index)
+		{
+			const FString Path = FString::Printf(
+				TEXT("/Game/Footsteps_Volume_02/Cues/%s_%02d_Cue.%s_%02d_Cue"),
+				Def.Prefix, Index, Def.Prefix, Index);
+			if (USoundBase* Cue = LoadObject<USoundBase>(nullptr, *Path))
+			{
+				Bank.Shots.Add(Cue);
+			}
+		}
+
+		if (Bank.Shots.Num() == 0)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Audio: voetstapbank %s is leeg — lopen op dat oppervlak blijft stil (14.3.5)."),
+				Def.Prefix);
+			continue;
+		}
+		FootstepBanks.Add(Def.SurfaceType, MoveTemp(Bank));
+	}
+}
+
+void UEclipseAudioSubsystem::PlayFootstep(const FVector& Location, uint8 SurfaceType, float Volume)
+{
+	if (GetWorld() == nullptr)
+	{
+		return;
+	}
+
+	FWeaponSoundSet* Bank = FootstepBanks.Find(SurfaceType);
+	if (Bank == nullptr)
+	{
+		// Onbekend oppervlak: op de straat-bank. Stil vallen zou erger zijn, want
+		// dan verdwijnt de speler zodra iemand een vloer vergeet te taggen.
+		Bank = FootstepBanks.Find(DefaultFootstepSurface);
+	}
+	if (Bank == nullptr)
+	{
+		return;
+	}
+
+	// Zeven varianten per oppervlak, en dezelfde regel als bij de schoten: nooit
+	// twee dezelfde achter elkaar. Bij drie stappen per seconde hoor je een
+	// herhaling meteen.
+	if (USoundBase* Variant = PickVariant(Bank->Shots, Bank->LastShotIndex))
+	{
+		++FootstepSoundCount;
+		UGameplayStatics::PlaySoundAtLocation(this, Variant, Location, Volume);
+	}
+}
+
+int32 UEclipseAudioSubsystem::GetFootstepVariantCount(uint8 SurfaceType) const
+{
+	const FWeaponSoundSet* Bank = FootstepBanks.Find(SurfaceType);
+	return Bank != nullptr ? Bank->Shots.Num() : 0;
 }
 
 void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)

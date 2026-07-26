@@ -59,6 +59,14 @@ public:
 	int32 GetBarkRequestCount() const { return BarkRequestCount; }
 	int32 GetBarkSuppressedCount() const { return BarkSuppressedCount; }
 	int32 GetTailSoundCount() const { return TailSoundCount; }
+
+	/**
+	 * Speel de voetstap die bij dit oppervlak hoort. Het oppervlak komt van de
+	 * beller (die traceert), want alleen hij weet waar de voeten staan.
+	 */
+	void PlayFootstep(const FVector& Location, uint8 SurfaceType, float Volume);
+	int32 GetFootstepSoundCount() const { return FootstepSoundCount; }
+	int32 GetFootstepVariantCount(uint8 SurfaceType) const;
 	int32 GetWeaponSoundFamilyCount() const { return WeaponSoundSets.Num(); }
 	int32 GetWeaponSoundVariantCount(FName Family) const;
 
@@ -137,6 +145,18 @@ private:
 	TMap<FName, FWeaponSoundSet> WeaponSoundSets;
 
 	void LoadWeaponSoundSets();
+
+	/**
+	 * Voetstapbanken per oppervlak (Footsteps_Volume_02, owner-levering 26-07).
+	 *
+	 * HIER en niet in de anim-instance, en dat is de hele reden dat deze functie
+	 * bestaat: elke soldaat heeft een eigen anim-instance, dus zes banken van zeven
+	 * cues zouden per lichaam opnieuw geladen worden. Eén eigenaar, één keer laden.
+	 */
+	void LoadFootstepBanks();
+
+	TMap<uint8, FWeaponSoundSet> FootstepBanks;
+	int32 FootstepSoundCount = 0;
 
 
 	/** Wanneer er voor het laatst een nagalm klonk, per schutter (wereldseconden). */

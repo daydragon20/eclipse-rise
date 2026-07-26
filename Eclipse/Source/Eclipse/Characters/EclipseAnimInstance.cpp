@@ -1,5 +1,7 @@
 #include "Characters/EclipseAnimInstance.h"
 #include "Sound/SoundBase.h"
+#include "Audio/EclipseAudioSubsystem.h"
+#include "Engine/GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Animation/AnimCurveTypes.h"
@@ -496,10 +498,47 @@ void UEclipseAnimInstance::UpdateFootsteps(float SpeedOnGround)
 	DistanceSinceFootstep = 0.0f;
 	++FootstepCount;
 
-	// Alleen asfalt. Cue_SFX_Foot_Metal_01 ligt er ook, maar kiezen tussen de twee
-	// vraagt physical materials op de vloeren en die zijn er niet — dat is
-	// assetwerk en staat als bevinding in de gevechts-audit.
-	if (FootstepCue != nullptr && GetWorld() != nullptr)
+	// WAAR STAAT HIJ OP (26-07 avond, Footsteps_Volume_02). Tot vandaag klonk elke
+	// stap op asfalt, overal, omdat er geen physical materials op de vloeren lagen.
+	// Die liggen er nu wel, dus de vraag is te beantwoorden: één streep omlaag
+	// vanaf de voeten en aflezen wat er onder ligt.
+	//
+	// Alleen op het moment van de STAP en niet elke tick — drie keer per seconde
+	// per lichaam, niet zestig. Dat is de reden dat deze trace hier staat en niet
+	// in de update: een voetstap weet zelf wanneer hij bestaat.
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		return;
+	}
+
+	uint8 Surface = 0;
+	{
+		const FVector Feet = Body->GetActorLocation();
+		const float Reach = Body->GetSimpleCollisionHalfHeight() + 40.0f;
+		FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseFootstep), /*bTraceComplex=*/false, Body);
+		Params.bReturnPhysicalMaterial = true;
+		FHitResult Hit;
+		if (World->LineTraceSingleByChannel(Hit, Feet, Feet - FVector(0.0f, 0.0f, Reach),
+				ECC_Visibility, Params))
+		{
+			Surface = static_cast<uint8>(UGameplayStatics::GetSurfaceType(Hit));
+		}
+	}
+
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		if (UEclipseAudioSubsystem* Audio = GameInstance->GetSubsystem<UEclipseAudioSubsystem>())
+		{
+			LastFootstepSurface = Surface;
+			Audio->PlayFootstep(Body->GetActorLocation(), Surface, 0.45f);
+			return;
+		}
+	}
+
+	// Geen audiosubsysteem (harnas zonder game instance): de oude losse cue, zodat
+	// lopen niet stil valt in contexten die geen subsysteem hebben.
+	if (FootstepCue != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FootstepCue, Body->GetActorLocation(), 0.45f);
 	}

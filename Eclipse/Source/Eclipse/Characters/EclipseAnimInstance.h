@@ -147,6 +147,7 @@ public:
 
 	/** Diagnostiek: hoeveel voetstappen er gespeeld zijn (testlaag, geen speaker nodig). */
 	int32 GetFootstepCount() const { return FootstepCount; }
+	uint8 GetLastFootstepSurface() const { return LastFootstepSurface; }
 
 	/**
 	 * Loopt er nu een eenmalige pose, en met welk gewicht? Alleen-lezen, voor de
@@ -169,6 +170,10 @@ private:
 	static constexpr float FootstepStrideCm = 140.0f;
 	float DistanceSinceFootstep = 0.0f;
 	int32 FootstepCount = 0;
+
+	/** Waar de laatste stap op viel (oppervlaktetype). Voor het harnas: zonder dit
+	 * kun je alleen HOREN dat het klopt, en horen is geen meting. */
+	uint8 LastFootstepSurface = 0;
 
 	UPROPERTY(Transient)
 	TObjectPtr<USoundBase> FootstepCue;

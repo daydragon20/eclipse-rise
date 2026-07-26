@@ -42,6 +42,7 @@
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Audio/EclipseAudioSubsystem.h"
+#include "Characters/EclipseAnimInstance.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
@@ -3054,6 +3055,135 @@ bool FEclipseWeaponSoundSetsLoadAndTailIsBraked::RunTest(const FString& Paramete
 
 	TestTrue(TEXT("wapengeluid: er is geschoten"), Shots >= 5.0f);
 	TestTrue(TEXT("wapengeluid: de nagalm klinkt, maar niet bij elk schot"), Tails >= 1.0f && Tails < Shots);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * VOETSTAPPEN PER OPPERVLAK (owner-levering 26-07: Footsteps_Volume_02).
+ *
+ * De vraag die deze meting beantwoordt is niet "klinkt er iets" maar "weet het
+ * spel waar je op staat". Tot vandaag was het antwoord nee: er was geen enkel
+ * oppervlaktetype in het project, geen physical material van ons, en geen regel
+ * code die er een uitlas — elke stap klonk op asfalt, overal.
+ *
+ * Drie sporten, alle drie hier gemeten: de banken laden, de vloer meldt zijn
+ * oppervlak, en de stap kiest de bank die erbij hoort.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseFootstepsKnowTheirSurface,
+	"Eclipse.Mission.Playthrough.FootstepsKnowTheirSurface",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseFootstepsKnowTheirSurface::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseAudioSubsystem* Audio = GameInstance->GetSubsystem<UEclipseAudioSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("voetstappen: audio"), Audio) || !TestNotNull(TEXT("voetstappen: strategie"), Strategy)
+		|| !TestNotNull(TEXT("voetstappen: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("voetstappen: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	// --- 1. laden de banken? ------------------------------------------------
+	Report(*this, TEXT("varianten op metaal"),
+		static_cast<float>(Audio->GetFootstepVariantCount(1)), TEXT(""), TEXT("SurfaceType1"));
+	Report(*this, TEXT("varianten op beton"),
+		static_cast<float>(Audio->GetFootstepVariantCount(2)), TEXT(""), TEXT("SurfaceType2"));
+	Report(*this, TEXT("varianten op modder"),
+		static_cast<float>(Audio->GetFootstepVariantCount(3)), TEXT(""), TEXT("SurfaceType3 — cues staan klaar, vloer nog niet"));
+
+	TestTrue(TEXT("voetstappen: de metaalbank heeft meer dan één variant"),
+		Audio->GetFootstepVariantCount(1) > 1);
+	TestTrue(TEXT("voetstappen: de betonbank heeft meer dan één variant"),
+		Audio->GetFootstepVariantCount(2) > 1);
+
+	// --- 2. weet de stap waar hij op valt? ----------------------------------
+	UEclipseAnimInstance* Anim = Harness.Body->GetMesh() != nullptr
+		? Cast<UEclipseAnimInstance>(Harness.Body->GetMesh()->GetAnimInstance()) : nullptr;
+	if (!TestNotNull(TEXT("voetstappen: het lichaam heeft een anim-instance"), Anim))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const int32 StepsBefore = Anim->GetFootstepCount();
+	const int32 SoundsBefore = Audio->GetFootstepSoundCount();
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 2.0,
+		[Anim, StepsBefore]() { return Anim->GetFootstepCount() - StepsBefore >= 4; });
+
+	const float Steps = static_cast<float>(Anim->GetFootstepCount() - StepsBefore);
+	const float Sounds = static_cast<float>(Audio->GetFootstepSoundCount() - SoundsBefore);
+	const uint8 Surface = Anim->GetLastFootstepSurface();
+
+	Report(*this, TEXT("stappen gezet"), Steps, TEXT(""));
+	Report(*this, TEXT("stappen die om een geluid vroegen"), Sounds, TEXT(""));
+	Report(*this, TEXT("oppervlak onder de laatste stap"), static_cast<float>(Surface), TEXT(""),
+		TEXT("0 = niets gevonden, 1 = metaal, 2 = beton"));
+
+	TestTrue(TEXT("voetstappen: er is gelopen"), Steps >= 1.0f);
+	TestEqual(TEXT("voetstappen: elke stap vraagt om een geluid"), Sounds, Steps);
+
+	// Dit is het getal waar het om gaat. 0 betekent dat de streep omlaag niets
+	// vond of dat de vloer geen physical material draagt — dan valt alles terug op
+	// de straatbank en is er in de praktijk niets veranderd.
+	TestTrue(FString::Printf(TEXT("voetstappen: de vloer meldt zijn oppervlak (%d)"), Surface),
+		Surface != 0);
+
+	// --- 3. HOORT hij het verschil? -----------------------------------------
+	// Eén oppervlak bewijst niets: als alles beton meldt, klinkt alles hetzelfde
+	// en is er sinds vanmorgen niets veranderd. Dus bovenop een dekkingsblok —
+	// hazard-oranje industriële barrier, 120 cm hoog, het enige metaal in dit
+	// district waar je op kunt staan.
+	// LANGS de lange as, en dat is geen detail: het blok is 300 bij 100 cm en één
+	// stap is 140. Dwars erop loop je er dus af vóór de eerste stap valt — de
+	// eerste poging mat daardoor gewoon de vloer weer, en dat leest als "metaal
+	// werkt niet" terwijl het "hij stond er niet meer op" was.
+	//
+	// Het lopen is camera-relatief sinds vanmorgen, dus de KIJKRICHTING moet langs
+	// de as staan, niet de acteur.
+	Harness.Body->SetActorLocation(FVector(-6120.0f, -4000.0f, 260.0f),
+		/*bSweep=*/false, nullptr, ETeleportType::TeleportPhysics);
+	Harness.Controller->SetControlRotation(FRotator::ZeroRotator);
+	Harness.Idle(1.0f); // laten zakken tot hij echt op het blok staat
+
+	const int32 StepsOnMetal = Anim->GetFootstepCount();
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 2.0,
+		[Anim, StepsOnMetal]() { return Anim->GetFootstepCount() - StepsOnMetal >= 1; });
+	const uint8 MetalSurface = Anim->GetLastFootstepSurface();
+
+	// Stond hij er nog op? Zonder deze controle is een 2 dubbelzinnig: hij kan van
+	// het blok gelopen zijn en gewoon de vloer gemeten hebben.
+	Report(*this, TEXT("hoogte bij die stap"), static_cast<float>(Harness.Location().Z), TEXT("cm"),
+		TEXT("blokdek ligt op 120; de vloer op 0"));
+
+	Report(*this, TEXT("oppervlak bovenop een dekkingsblok"), static_cast<float>(MetalSurface), TEXT(""),
+		TEXT("1 = metaal — anders klinkt het hele district hetzelfde"));
+
+	TestEqual(TEXT("voetstappen: op een dekkingsblok klinkt metaal"), static_cast<int32>(MetalSurface), 1);
+	TestTrue(TEXT("voetstappen: dat is een ANDER oppervlak dan de vloer"),
+		MetalSurface != Surface);
 
 	Harness.Shutdown();
 	return true;

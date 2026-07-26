@@ -29,6 +29,7 @@
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Materials/MaterialInterface.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Quests/EclipseObjectiveTrigger.h"
 #include "Sound/AmbientSound.h"
 #include "Sound/SoundBase.h"
@@ -523,6 +524,20 @@ void BuildDistrict(UWorld& World)
 	// master whose baked opacity mask fades them out organically — the opaque
 	// path rendered them as hard dark rectangles ("carpet tiles", review shots
 	// 00008–00013). Either asset missing = the opaque master fallback (14.3.5).
+	// OPPERVLAKTETYPES (26-07 avond). Deze twee zeggen niets over hoe iets ERUIT
+	// ziet — dat doet de toon-master — maar waar je OP staat. De voetstapcode
+	// leest ze af met een streep omlaag; zonder deze regels traceert hij naar een
+	// vloer die niets over zichzelf te melden heeft.
+	UPhysicalMaterial* MetalSurface = LoadObject<UPhysicalMaterial>(nullptr, TEXT("/Game/Art/Physics/PM_Metal.PM_Metal"));
+	UPhysicalMaterial* ConcreteSurface = LoadObject<UPhysicalMaterial>(nullptr, TEXT("/Game/Art/Physics/PM_Concrete.PM_Concrete"));
+	if (MetalSurface == nullptr || ConcreteSurface == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Graybox: physical materials ontbreken (metaal %s, beton %s) — voetstappen vallen terug op de straatbank (14.3.5)."),
+			MetalSurface != nullptr ? TEXT("ok") : TEXT("MISSING"),
+			ConcreteSurface != nullptr ? TEXT("ok") : TEXT("MISSING"));
+	}
+
 	UMaterialInterface* ToonDecalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToonDecal.M_EclipseToonDecal"));
 	// Shadow-variant van dezelfde master, BLEND_Modulate: contactverdonkering moet
 	// de grond VERMENIGVULDIGEN in plaats van hem te bedekken (par. 1h/1i).
@@ -624,7 +639,36 @@ void BuildDistrict(UWorld& World)
 		return Mid;
 	};
 
-	auto SpawnBlock = [&World, CubeMesh, &Params, &MidForPalette](const TCHAR* Label, const FVector& Location, const FVector& Scale, float YawDeg = 0.0f)
+	// Welk oppervlak hoort bij welk label. Metaal waar het district metaal IS en
+	// waar je er ook OP kunt staan; beton op de vloer en de vlakte eromheen.
+	//
+	// Ik had hier eerst ook DecoPlaza (de dekplaat van het plein) en "Crate"
+	// staan. Allebei fout, en om verschillende redenen die het onthouden waard
+	// zijn: Deco* krijgt met opzet geen botsing (dressing mag nav, dekking en
+	// hitscan niet verstoren), dus daar loopt niemand op — en "Crate" bestaat
+	// helemaal niet in dit district. Een oppervlak toewijzen aan iets waar je niet
+	// op kunt staan is precies zo dood als een asset dat niemand laadt.
+	//
+	// Modder, gras, zand en hout hebben cues én een oppervlaktetype, maar nog geen
+	// plek in Kessara waar ze liggen. Een vloer taggen als modder omdat het kan
+	// zou een leugen zijn die je HOORT.
+	auto SurfaceForLabel = [MetalSurface, ConcreteSurface](const TCHAR* Label) -> UPhysicalMaterial*
+	{
+		// De dekkingsblokken: hazard-oranje industriële barriers, 120 cm hoog. Dat
+		// is het enige metaal in het district waar een speler bovenop kan komen.
+		if (FCString::Strnicmp(Label, TEXT("Cover"), 5) == 0)
+		{
+			return MetalSurface;
+		}
+		if (FCString::Stricmp(Label, TEXT("Floor")) == 0 ||
+			FCString::Strnicmp(Label, TEXT("Outland"), 7) == 0)
+		{
+			return ConcreteSurface;
+		}
+		return nullptr; // muren en dressing: daar loopt niemand op
+	};
+
+	auto SpawnBlock = [&World, CubeMesh, &Params, &MidForPalette, &SurfaceForLabel](const TCHAR* Label, const FVector& Location, const FVector& Scale, float YawDeg = 0.0f)
 	{
 		AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, YawDeg, 0.0f), Params);
 		if (Actor != nullptr)
@@ -642,6 +686,14 @@ void BuildDistrict(UWorld& World)
 			// high scalability. Graybox blocks light via CSM only; the authored
 			// district gets proper per-kit distance fields in the art pass.
 			Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+			if (UPhysicalMaterial* Surface = SurfaceForLabel(Label))
+			{
+				// Als OVERRIDE op de component en niet op het materiaal: de toon-master
+				// is één materiaal voor het hele district, dus daar een oppervlak in
+				// zetten zou betekenen dat alles hetzelfde klinkt. Het oppervlak hoort
+				// bij het BLOK, niet bij zijn kleur.
+				Actor->GetStaticMeshComponent()->SetPhysMaterialOverride(Surface);
+			}
 			if (FCString::Stricmp(Label, TEXT("Floor")) == 0 ||
 				FCString::Strnicmp(Label, TEXT("Skyline"), 7) == 0 ||
 				FCString::Strnicmp(Label, TEXT("Glow"), 4) == 0 ||
