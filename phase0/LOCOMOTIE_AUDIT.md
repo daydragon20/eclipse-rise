@@ -41,8 +41,6 @@ dat er expliciet bij in plaats van dat er een getal verschijnt.
 
 ## Wat ik hiervan zelf repareer
 
-**Vandaag gedaan:** 1 (oriëntatie), 5 (drempel van 90°).
-
 **Vandaag gedaan:** 1 (oriëntatie), 5 (drempel van 90°), 12 (landingsdip), 13
 (hurk-overgang). Van de vijf omissies in ronde 1 zijn er dus vier weg; de vijfde
 (14, mikken kost geen snelheid) vraagt een owner-beslissing.
