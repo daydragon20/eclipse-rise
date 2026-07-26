@@ -16,6 +16,10 @@
 
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Base/EclipsePrepSubsystem.h"
+#include "Characters/EclipseAnimInstance.h"
+#include "EngineUtils.h"
+#include "Strategy/EclipseStrategySubsystem.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Characters/EclipseCommandModeComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -1258,6 +1262,110 @@ bool FEclipseCameraPitchCollapseTest::RunTest(const FString& Parameters)
 // lichaam na een seconde heen wijst en waar het heen bewoog. Een test op
 // bOrientRotationToMovement zou groen blijven als iemand het model elders weer
 // omzet; een test op de gierhoek niet.
+// Vuren en geraakt worden veranderen de pose (owner-opdracht 26-07, punten 2 en 3).
+//
+// Tot vandaag deed geen van beide iets: ShootAnim stond geauthord in elk lichaam
+// en werd nooit afgespeeld, en er was helemaal geen hit-reactie. Dat is dezelfde
+// klasse als de camera-blend — een take die klaarligt en nooit draait.
+//
+// Deze test meet de ENVELOPPE en niet de pose zelf: of het skelet er anders bij
+// staat hangt af van welke clips er op dit lichaam zitten, en dat verschilt per
+// pack (gemeten: vijf van de negen lichamen hebben niet eens zijcycli). Wat op
+// ELK lichaam moet gelden is dat het mechanisme aanslaat, piekt en weer uitdooft
+// — een klap die blijft hangen is net zo fout als een die nooit komt.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseHitAndShootPosesTest,
+	"Eclipse.Feel.Layer2.ShootingAndBeingHitChangeThePose",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseHitAndShootPosesTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	// De ECHTE game mode, want alleen die kleedt lichamen aan. Het kale
+	// harnas-lichaam is een capsule zonder mesh en dus zonder animinstance —
+	// daarop meten zou bewijzen dat de test draait, niet dat de pose speelt.
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	// Een MISSIE starten, want zonder missie kleedt niemand een lichaam aan:
+	// ApplyBodyDef draait op de squad en de vijanden die de game mode bij een run
+	// spawnt. Zonder deze twee regels staat er alleen een kale speler-capsule en
+	// meet deze test niets — precies de val die deze test moet vangen.
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestTrue(TEXT("pose: missie gelanceerd"),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	// Welk lichaam dan ook met een animinstance: de speler heeft er soms geen
+	// (ParagonLtBelica krijgt zijn mesh pas via ApplyBodyDef), maar de squad wel.
+	AEclipseCharacter* Dressed = nullptr;
+	UEclipseAnimInstance* Anim = nullptr;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Body = *It;
+		UEclipseAnimInstance* Candidate = Body != nullptr && Body->GetMesh() != nullptr
+			? Cast<UEclipseAnimInstance>(Body->GetMesh()->GetAnimInstance()) : nullptr;
+		if (Candidate != nullptr)
+		{
+			Dressed = Body;
+			Anim = Candidate;
+			break;
+		}
+	}
+	if (!TestNotNull(TEXT("pose: er is een aangekleed lichaam met een animinstance"), Anim))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	TestFalse(TEXT("pose: in rust loopt er geen eenmalige pose"), Anim->bOneShotActive);
+
+	// GERAAKT WORDEN. Via ApplyDamage en niet via de proxy rechtstreeks: het gaat
+	// erom dat de klap aan SCHADE hangt, niet dat de functie bestaat.
+	Dressed->ApplyDamage(5.0f, nullptr, TEXT("TestHit"));
+	Harness.Step();
+	const bool bStarted = Anim->bOneShotActive;
+	Harness.Idle(0.1f);
+	const float PeakSeen = Anim->OneShotWeight;
+	Harness.Idle(0.4f);
+	const bool bFadedOut = !Anim->bOneShotActive;
+
+	Report(*this, TEXT("gewicht van de klap op 0,1 s"), PeakSeen, TEXT(""), TEXT("> 0 = de pose mengt echt mee"));
+	TestTrue(TEXT("pose: schade start een klap"), bStarted);
+	TestTrue(TEXT("pose: die klap heeft ook gewicht (niet alleen een vlag)"), PeakSeen > 0.0f);
+	TestTrue(TEXT("pose: de klap dooft uit in plaats van te blijven hangen"), bFadedOut);
+
+	// VUREN. Zelfde mechanisme, kortere duur — die moet binnen het vuurinterval
+	// passen, anders herstart een automatisch vurend wapen de pose voor hij klaar
+	// is en bevriest de beweging.
+	Dressed->PlayShootPose();
+	Harness.Step();
+	const bool bShootStarted = Anim->bOneShotActive;
+	Harness.Idle(0.2f);
+	const bool bShootDone = !Anim->bOneShotActive;
+
+	TestTrue(TEXT("pose: vuren start een pose"), bShootStarted);
+	TestTrue(TEXT("pose: de schietpose is korter dan het vuurinterval (0,15 s)"), bShootDone);
+
+	Harness.Shutdown();
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBackpedalKeepsFacingTest,
 	"Eclipse.Feel.Layer2.BackpedalDoesNotSpinTheBody",
 	EclipseFeelTest::TestFlags)

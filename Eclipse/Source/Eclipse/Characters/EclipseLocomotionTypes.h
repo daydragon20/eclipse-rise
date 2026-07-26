@@ -84,6 +84,13 @@ struct FEclipseLocomotionSet
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> Death = nullptr;
 
+	/** Eenmalige overlays (26-07, punten 2 en 3): vuren en geraakt worden. */
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> Shoot = nullptr;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> HitReact = nullptr;
+
 	// Blend anchors, mirrored from DA_CharacterTuning (GDD 14.2 — feel numbers
 	// are data). The defaults here are the LOCKED feel targets
 	// (phase0/graybox_feel_targets.md §2) so a body that never sees a tuning

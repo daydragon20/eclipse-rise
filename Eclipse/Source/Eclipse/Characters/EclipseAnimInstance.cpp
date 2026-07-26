@@ -213,6 +213,8 @@ void FEclipseLocomotionProxy::InitializeObjects(UAnimInstance* InAnimInstance)
 		Walk = Set.Walk;
 		Run = Set.Run;
 		Death = Set.Death;
+		Shoot = Set.Shoot;
+		HitReact = Set.HitReact;
 		WalkBack = Set.WalkBack;
 		WalkLeft = Set.WalkLeft;
 		WalkRight = Set.WalkRight;
@@ -236,6 +238,18 @@ void FEclipseLocomotionProxy::ClearObjects()
 	RunBack = nullptr;
 	RunLeft = nullptr;
 	RunRight = nullptr;
+}
+
+void FEclipseLocomotionProxy::PlayOneShot(UAnimSequence* Clip, float Duration, float PeakWeight)
+{
+	if (Clip == nullptr || Duration <= 0.0f)
+	{
+		return;
+	}
+	OneShot = Clip;
+	OneShotTime = 0.0f;
+	OneShotDuration = Duration;
+	OneShotPeakWeight = FMath::Clamp(PeakWeight, 0.0f, 1.0f);
 }
 
 void FEclipseLocomotionProxy::SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned,
@@ -269,6 +283,14 @@ void FEclipseLocomotionProxy::Update(float DeltaSeconds)
 	// A hitch (level stream, shader compile) must cost one frame of animation,
 	// not teleport the cycle to a random contact frame.
 	const float Delta = FMath::Clamp(DeltaSeconds, 0.0f, 0.25f);
+
+	// De overlay-klok loopt hier, samen met de andere klokken. Evaluate leest hem
+	// alleen; dat scheelt een tweede tijdbron en houdt het gedrag identiek of de
+	// pose nu wel of niet geëvalueerd wordt.
+	if (OneShot != nullptr)
+	{
+		OneShotTime += Delta;
+	}
 
 	if (bIsDowned && Death != nullptr)
 	{
@@ -317,6 +339,24 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	// single blend in practice; the accumulator below stays general anyway so a
 	// future third pose cannot silently be dropped on the floor.
 	TArray<FEclipseLocomotionSample, TInlineAllocator<3>> Samples;
+	// De overlay-klok. Hij loopt in Evaluate en niet in Update omdat de proxy zijn
+	// deltatijd daar heeft; wanneer hij afloopt wist hij zichzelf, zodat een
+	// uitgespeelde klap niets meer kost.
+	float OneShotWeight = 0.0f;
+	if (OneShot != nullptr && OneShotDuration > 0.0f)
+	{
+		const float Alpha = FMath::Clamp(OneShotTime / OneShotDuration, 0.0f, 1.0f);
+		// Snel erin, langzamer eruit: een klap moet meteen zichtbaar zijn en dan
+		// wegebben. Sin-envelope met de piek op een derde van de duur.
+		OneShotWeight = OneShotPeakWeight * FMath::Sin(FMath::Clamp(Alpha, 0.0f, 1.0f) * PI);
+		if (Alpha >= 1.0f)
+		{
+			OneShot = nullptr;
+			OneShotDuration = 0.0f;
+			OneShotWeight = 0.0f;
+		}
+	}
+
 	if (Idle != nullptr && FAnimWeight::IsRelevant(Blend.IdleWeight))
 	{
 		Samples.Add({ Idle, Blend.IdleWeight, IdleTime, true });
@@ -350,6 +390,17 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	if (RunClip != nullptr && FAnimWeight::IsRelevant(Blend.RunWeight))
 	{
 		Samples.Add({ RunClip, Blend.RunWeight, GaitPhase * RunClip->GetPlayLength(), true });
+	}
+
+	// De overlay bovenop: de gangposes maken ruimte, zodat het totaal 1 blijft en
+	// de klap niet optelt bij een al volledige pose.
+	if (OneShot != nullptr && FAnimWeight::IsRelevant(OneShotWeight))
+	{
+		for (FEclipseLocomotionSample& Sample : Samples)
+		{
+			Sample.Weight *= 1.0f - OneShotWeight;
+		}
+		Samples.Add({ OneShot, OneShotWeight, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false });
 	}
 
 	if (Samples.Num() == 0)
@@ -394,6 +445,18 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 FAnimInstanceProxy* UEclipseAnimInstance::CreateAnimInstanceProxy()
 {
 	return new FEclipseLocomotionProxy(this);
+}
+
+void UEclipseAnimInstance::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight)
+{
+	GetProxyOnGameThread<FEclipseLocomotionProxy>().PlayOneShot(Clip, Duration, PeakWeight);
+	// De spiegel voor de testlaag meteen bijwerken: de proxy leeft op de
+	// werkthread en is daar niet veilig uit te lezen.
+	bOneShotActive = Clip != nullptr && Duration > 0.0f;
+	OneShotDurationLeft = bOneShotActive ? Duration : 0.0f;
+	OneShotPeak = bOneShotActive ? FMath::Clamp(PeakWeight, 0.0f, 1.0f) : 0.0f;
+	OneShotElapsed = 0.0f;
+	OneShotWeight = 0.0f;
 }
 
 void UEclipseAnimInstance::SetLocomotionSet(const FEclipseLocomotionSet& InSet)
@@ -492,5 +555,17 @@ void UEclipseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// Push on the game thread, before the parallel update reads it. PreUpdate
 	// runs BEFORE this function, so copying state there would evaluate every
 	// frame against the previous frame's speed.
+	// De spiegel van de eenmalige pose bijhouden op de game thread, met dezelfde
+	// envelope als de proxy gebruikt. Twee klokken die hetzelfde moeten zeggen is
+	// niet ideaal, maar de proxy-klok leeft op de werkthread; hem daar uitlezen is
+	// een datarace, en een testlaag die niets kan meten was het alternatief.
+	if (bOneShotActive)
+	{
+		OneShotElapsed += GetDeltaSeconds();
+		const float Alpha = OneShotDurationLeft > 0.0f ? OneShotElapsed / OneShotDurationLeft : 1.0f;
+		OneShotWeight = Alpha >= 1.0f ? 0.0f : OneShotPeak * FMath::Sin(FMath::Clamp(Alpha, 0.0f, 1.0f) * PI);
+		bOneShotActive = Alpha < 1.0f;
+	}
+
 	GetProxyOnGameThread<FEclipseLocomotionProxy>().SetLocomotionState(NewBlend, StrideRate, bIsInAir, bIsDowned, MoveDirectionDegrees);
 }

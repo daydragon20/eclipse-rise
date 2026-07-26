@@ -204,6 +204,35 @@ bool AEclipseCharacter::ShotLineHitsHead(const FVector& Start, const FVector& En
 	return FVector::DistSquared(Closest, Centre) <= FMath::Square(HeadHitbox->GetScaledSphereRadius());
 }
 
+void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight)
+{
+	if (Clip == nullptr)
+	{
+		return;
+	}
+	if (UEclipseAnimInstance* Anim = Cast<UEclipseAnimInstance>(GetMesh() != nullptr ? GetMesh()->GetAnimInstance() : nullptr))
+	{
+		Anim->PlayOneShotPose(Clip, Duration, PeakWeight);
+	}
+}
+
+void AEclipseCharacter::PlayShootPose()
+{
+	// 0,12 s: korter dan het vuurinterval (0,15) zodat automatisch vuur een
+	// doorlopende beweging geeft in plaats van een pose die zichzelf steeds
+	// herstart en daardoor bevriest.
+	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f);
+}
+
+void AEclipseCharacter::PlayHitReactPose()
+{
+	// 0,25 s en vol gewicht. De referentie (Gears, Division, Destiny) zit op
+	// 0,2-0,35 s voor een flinch; korter leest als ruis, langer onderbreekt het
+	// vuurgevecht. Vol gewicht omdat dit een VIJAND is die je neerschiet: dat is
+	// waar de klap gezien wordt, en daar mag hij duidelijk zijn.
+	PlayOneShotPose(LocomotionSet.HitReact, 0.25f, 1.0f);
+}
+
 void AEclipseCharacter::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
@@ -789,6 +818,8 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	FillFrom(LocomotionSet.RunLeft, LocomotionSet.WalkLeft);
 	FillFrom(LocomotionSet.RunRight, LocomotionSet.WalkRight);
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
+	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"));
+	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"));
 
 	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();
 	if (Tier >= EEclipseLocomotionTier::OneGait)
@@ -938,6 +969,11 @@ void AEclipseCharacter::ApplyDamage(float Amount, AEclipseCharacter* DamageInsti
 	}
 
 	LastDamageCause = Cause;
+
+	// De klap (26-07, punt 2, tweede helft). Hier en niet in het wapen, want
+	// schade komt ook van andere kanten — melee, en straks vallen of vuur. Wie
+	// geraakt wordt hoort te reageren, ongeacht waardoor.
+	PlayHitReactPose();
 	// PLACEHOLDER(GDD 12.1): direct attribute write until damage GameplayEffects
 	// land with the ability pass — the IncomingDamage meta attribute is already
 	// in place as their landing zone (PostGameplayEffectExecute).

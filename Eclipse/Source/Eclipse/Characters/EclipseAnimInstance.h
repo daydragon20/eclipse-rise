@@ -45,6 +45,9 @@ struct FEclipseLocomotionProxy : public FAnimInstanceProxy
 	void SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned,
 		float InMoveDirectionDegrees);
 
+	/** Start een eenmalige pose (schot of klap). Duur 0 = niets doen. */
+	void PlayOneShot(UAnimSequence* Clip, float Duration, float PeakWeight);
+
 	virtual void Initialize(UAnimInstance* InAnimInstance) override;
 	virtual void InitializeObjects(UAnimInstance* InAnimInstance) override;
 	virtual void ClearObjects() override;
@@ -61,6 +64,26 @@ private:
 	UAnimSequence* Walk = nullptr;
 	UAnimSequence* Run = nullptr;
 	UAnimSequence* Death = nullptr;
+	UAnimSequence* Shoot = nullptr;
+	UAnimSequence* HitReact = nullptr;
+
+	/**
+	 * Eenmalige overlay: schieten en geraakt worden (26-07, punten 2 en 3).
+	 *
+	 * Eén slot voor allebei, want ze kunnen niet tegelijk belangrijk zijn: word je
+	 * geraakt terwijl je vuurt, dan is de klap het nieuws. Geraakt worden
+	 * overschrijft dus een lopende schietpose, andersom niet.
+	 *
+	 * Vol gewicht en geen additieve laag: deze anim-proxy blendt gewogen poses en
+	 * heeft geen per-bot gelaagde blend. Een echte additieve upper-body-laag hoort
+	 * bij een animatiegraaf, en die bouwen we niet vandaag. Voor een klap van een
+	 * kwart seconde is een volledige pose wat de meeste shooters bij VIJANDEN ook
+	 * doen — en dat is waar dit het meest gezien wordt.
+	 */
+	UAnimSequence* OneShot = nullptr;
+	float OneShotTime = 0.0f;
+	float OneShotDuration = 0.0f;
+	float OneShotPeakWeight = 0.0f;
 
 	/** Richtingsvarianten; null = terugval op de vooruit-cyclus (26-07, punt 8). */
 	UAnimSequence* WalkBack = nullptr;
@@ -118,6 +141,27 @@ class ECLIPSE_API UEclipseAnimInstance : public UAnimInstance
 public:
 	/** Install the clips + anchors for this body (game thread; ApplyBodyDef calls it). */
 	void SetLocomotionSet(const FEclipseLocomotionSet& InSet);
+
+	/** Eenmalige pose over de gang heen (schot of klap; 26-07). */
+	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight);
+
+	/**
+	 * Loopt er nu een eenmalige pose, en met welk gewicht? Alleen-lezen, voor de
+	 * testlaag: zonder dit is "de klap speelt" een bewering en geen meting — en
+	 * dat onderscheid is de duurste les van deze sessie.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Locomotion")
+	float OneShotWeight = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Eclipse|Locomotion")
+	bool bOneShotActive = false;
+
+private:
+	float OneShotElapsed = 0.0f;
+	float OneShotDurationLeft = 0.0f;
+	float OneShotPeak = 0.0f;
+
+public:
 
 	const FEclipseLocomotionSet& GetLocomotionSet() const { return LocomotionSet; }
 

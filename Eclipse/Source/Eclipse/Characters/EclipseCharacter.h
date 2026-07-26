@@ -105,6 +105,12 @@ public:
 	 */
 	bool ShotLineHitsHead(const FVector& Start, const FVector& End) const;
 
+	/** Speel de schietpose (26-07, punt 3) — aangeroepen door het wapen bij elk schot. */
+	void PlayShootPose();
+
+	/** Speel de klap (26-07, punt 2) — aangeroepen bij het oplopen van schade. */
+	void PlayHitReactPose();
+
 	/** De hoofd-hitbox, of null als dit lichaam geen hoofd-socket heeft. */
 	const USphereComponent* GetHeadHitbox() const { return HeadHitbox; }
 
@@ -271,6 +277,8 @@ private:
 
 	/** Hoofd-hitbox op de capsule zetten (terugval voor lichamen zonder mesh). */
 	void PlaceHeadHitboxOnCapsule();
+
+	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight);
 	bool bAiming = false;
 	bool bCameraLagSuspended = false;
 

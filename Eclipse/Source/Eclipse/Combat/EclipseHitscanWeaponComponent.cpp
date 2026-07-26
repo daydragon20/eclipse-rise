@@ -62,6 +62,13 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 		}
 	}
 
+	// De schutter beweegt zichtbaar (26-07, punt 3). Vóór de trace, net als het
+	// geluid: of je raakt verandert niets aan de beweging die je maakt.
+	if (AEclipseCharacter* ShooterBody = Cast<AEclipseCharacter>(GetOwner()))
+	{
+		ShooterBody->PlayShootPose();
+	}
+
 	FHitResult Hit;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseHitscan), /*bTraceComplex*/ false, GetOwner());
 	const FVector End = ViewLocation + ViewDirection.GetSafeNormal() * Weapon.RangeCm;

@@ -531,12 +531,19 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	TSoftObjectPtr<UAnimSequence> RunRightAnim;
 
 	/**
-	 * NIET GELEZEN door C++. Er wordt nergens een schietanimatie afgespeeld: de
-	 * lichamen draaien idle of een gangbeweging, en vuren verandert de pose niet.
-	 * setup_character_data.py vult dit veld wel, dus de take staat klaar.
+	 * Wordt afgespeeld bij elk schot (owner-opdracht 26-07, punt 3). Stond hier
+	 * tot vandaag als NIET GELEZEN: de take was geauthord en werd nooit gespeeld,
+	 * dus vuren veranderde de pose niet.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> ShootAnim;
+
+	/**
+	 * Korte klap bij het oplopen van schade (26-07, punt 2, tweede helft).
+	 * SciFiCharacter levert Hit_React_1..4; het setup-script pakt de kortste.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> HitReactAnim;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> DeathAnim;

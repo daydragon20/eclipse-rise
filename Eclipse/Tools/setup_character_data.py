@@ -107,6 +107,7 @@ RIGHT_KEYS = ("_rt", "right")
 
 WALK_KEYWORDS = ("walk_fwd", "thirdpersonwalk", "walk")
 RUN_KEYWORDS = ("jog_fwd", "thirdpersonrun", "sprint_fwd", "run", "jog")
+HITREACT_KEYWORDS = ("hit_react", "hitreact", "impact", "flinch", "hit")
 SHOOT_KEYWORDS = ("fire_rifle_hip", "fire_rifle", "primary_fire", "shoot", "fire", "attack")
 DEATH_KEYWORDS = ("death", "die", "dead")
 
@@ -169,6 +170,7 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     run = pick_anim(anim_pack, RUN_KEYWORDS)
     shoot = pick_anim(anim_pack, SHOOT_KEYWORDS)
     death = pick_anim(anim_pack, DEATH_KEYWORDS)
+    hit_react = pick_anim(anim_pack, HITREACT_KEYWORDS)
     walk_back = pick_directional(anim_pack, WALK_STEMS, BACK_KEYS)
     walk_left = pick_directional(anim_pack, WALK_STEMS, LEFT_KEYS)
     walk_right = pick_directional(anim_pack, WALK_STEMS, RIGHT_KEYS)
@@ -191,11 +193,11 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     if not idle:
         unreal.log_warning(f"{row_name}: geen idle-take in {anim_pack} — deze body krijgt geen pose")
     lit, shade = TINTS.get(row_name, ((0.20, 0.20, 0.22), (0.07, 0.07, 0.09)))
-    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}",'
+    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}","{hit_react}",'
                 f'"{walk_back}","{walk_left}","{walk_right}","{run_back}","{run_left}","{run_right}",true,'
                 f'{color(lit)},{color(shade)},1.0,-90.0,-90.0')
 
-csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,"
+csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,HitReactAnim,"
             "WalkBackAnim,WalkLeftAnim,WalkRightAnim,RunBackAnim,RunLeftAnim,RunRightAnim,bToonRestyle,"
             "TintLit,TintShade,MeshScale,MeshZOffset,MeshYaw\n" + "\n".join(rows))
 
