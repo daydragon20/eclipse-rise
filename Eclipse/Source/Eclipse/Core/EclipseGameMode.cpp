@@ -410,7 +410,7 @@ void AEclipseGameMode::AdvancePlayShotRound()
 	{
 		return;
 	}
-	if (PlayShotStep >= 1 && PlayShotStep <= 8)
+	if (PlayShotStep >= 1 && PlayShotStep <= 9)
 	{
 		MeasurePlayShot(PlayShotStep);
 		MeasureDressingFigures(PlayShotStep);
@@ -496,6 +496,36 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 7] uitgedraaid — lichaam hoort weer met de camera mee te staan"));
 		break;
 	case 8:
+		// DE HERLAADPOSE OP BEELD. Belica heeft er zelf geen; deze is geleend uit
+		// SciFiCharacter via compatibele skeletten. Dat de take RESOLVET is
+		// gemeten, maar dat is niet hetzelfde als dat hij er goed uitziet: dit is
+		// een take van een ander rig, en een verkeerd landende bot valt alleen op
+		// een beeld op.
+		//
+		// Vandaar de opname MIDDEN in de herlaadbeurt (0,8 s van de 2,2 s) via
+		// een eenmalige timer, en niet op de volgende stap van deze ronde — die
+		// valt 2,0 s later en dan is de beurt zo goed als voorbij.
+		if (AEclipseCharacter* Reloader = Cast<AEclipseCharacter>(Controller->GetPawn()))
+		{
+			if (UEclipseHitscanWeaponComponent* Weapon = Reloader->FindComponentByClass<UEclipseHitscanWeaponComponent>())
+			{
+				if (Weapon->StartReload(TEXT("PlayShot")))
+				{
+					FTimerHandle MidReload;
+					GetWorldTimerManager().SetTimer(MidReload, FTimerDelegate::CreateWeakLambda(this,
+						[this, Controller]()
+						{
+							Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+							UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 9] MIDDEN in het herladen — geleende take uit SciFiCharacter"));
+							MeasurePlayShot(9);
+						}), 0.8f, /*bLoop*/ false);
+				}
+				else
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("[PLAYSHOT 9] herladen START NIET — geen opname van de herlaadpose."));
+				}
+			}
+		}
 		// MET DE UI EROP. HighResShot tekent alleen de 3D-scene; de HUD is een
 		// UMG-widget en valt er buiten. Op de eerste zes beelden stond dus geen
 		// munitieteller, en ik had dat bijna als ontbrekende HUD gerapporteerd —
