@@ -113,16 +113,19 @@ schot valt, maar er is geen model in de handen.
 
 ### 1. DE OPNAMERONDE STAAT — bouw hem uit
 
-Draaien met:
+Draaien met **één commando**, dat ook bouwt en de suite draait:
 
 ```
-UnrealEditor-Cmd.exe Eclipse.uproject /Game/Maps/GrayboxDistrict -game -windowed ^
-    -resx=1280 -resy=720 -nosplash -NoLiveCoding -EclipseShotPlay ^
-    -EclipseStartMission=TransitCheckpoint
+powershell -File Eclipse\Toolserify.ps1
+powershell -File Eclipse\Toolserify.ps1 -SkipShots     # alleen bouwen + suite
 ```
 
-Vijf opnames in `Saved/Screenshots/WindowsEditor/`: stilstaand, lopend, lopend en
-vurend, weer stilstaand, en één waarop alleen de speler zichtbaar is. Elke opname
+Gebruik dit bij elke landing. Het was vier losse stappen die ik met de hand aan
+elkaar knoopte, en zo wordt er stilletjes eentje overgeslagen.
+
+Negen opnames in `Saved/Screenshots/WindowsEditor/`: stilstaand, lopend, lopend en
+vurend, weer stilstaand, één waarop alleen de speler zichtbaar is, twee tijdens
+het draaien, één met de UI erop, en één midden in de herlaadbeurt. Elke opname
 heeft een `[PLAYSHOT n MEET]`-regel met naam, schaal, hoogte, afstand,
 schermpositie en `GETEKEND` per lichaam.
 
