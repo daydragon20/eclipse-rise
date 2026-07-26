@@ -26,7 +26,7 @@ Wat ik níét kan meten is hoe het **voelt**. Daarvoor staat de lijst in §4, el
 
 Vier dingen, want "de tests zijn groen" bewijst niet dat een document klopt.
 
-- **De build start ook echt.** Om 03:45 gedraaid met `-game -EclipseStartMission=TransitCheckpoint`, dus jouw weg en niet die van het harnas: district gebouwd (13 blokken, 20 dekkingen, 10 sites, 3 ingangen), navigatiegrens 28000 × 28000 × 4000, missieactoren gespawnd, `Mission 'MT_M11' started`, navmesh onder de speler NEE bij start en JA vijf seconden later — en **nul fouten, nul waarschuwingen** van Eclipse.
+- **De build start ook echt.** Twee keer gedraaid met `-game -EclipseStartMission=TransitCheckpoint` — om 03:45 en nog eens om 05:55, na ruim twintig commits meer, dus jouw weg en niet die van het harnas: district gebouwd (13 blokken, 20 dekkingen, 10 sites, 3 ingangen), navigatiegrens 28000 × 28000 × 4000, missieactoren gespawnd, `Mission 'MT_M11' started`, navmesh onder de speler NEE bij start en JA vijf seconden later — en **beide keren nul fouten, nul waarschuwingen** van Eclipse.
 - **De metingen zijn reproduceerbaar, geen benaderingen.** De suite drie keer achter elkaar gedraaid en de tijdgevoelige getallen kwamen er identiek uit tot op drie decimalen. Dat is constructie, geen toeval: het harnas tikt met een vaste stap. **Verandert er morgen een getal, dan is dat een echte verandering en geen ruis.**
 - **De getallen in dit document zijn tegen verse metingen gelegd** — vier keer, laatst om 04:25, inclusief alles wat na middernacht bijkwam. De eerste twee controles vonden een fout, de laatste twee niets.
 - **De suite kost 38 seconden**, inclusief engine-start, met zes speelrondes die echte missies starten erin. Er is dus geen reden om hem over te slaan.
