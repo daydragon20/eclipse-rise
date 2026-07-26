@@ -45,6 +45,12 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Mag je squad iets doen zonder dat je het zegt? Eén vraag in drie vormen", prio: "nu", waarom: "Uit de squad-audit (phase0/SQUAD_AUDIT.md). Je squad doet vandaag NIETS uit zichzelf: geen autonoom vuur, geen meelopen, geen dekking zoeken. In Mass Effect, Ghost Recon en The Division doen teamgenoten dat allemaal wel — het is wat hen medespelers maakt in plaats van gereedschap. De drie velden staan er zelfs al (FollowDistance, CoverSearchRadius) maar worden door niets gelezen. Dit is de grootste balansverschuiving die er op tafel ligt, groter dan kopschoten of de vijandopstelling, en hij raakt de identiteit van het spel: een squad die alles zelf doet maakt je commando-systeem overbodig. Daarom zet ik hem niet stilletjes aan.", stappen: [
+      "Mijn advies: autonoom vuren JA, meelopen JA, dekking zoeken NEE (dat laatste vraagt een cover-systeem dat er niet is en dat je volgens de gevechts-audit ook niet wilt)",
+      "Beslis het als EEN vraag, niet los — ze hangen samen",
+      "LET OP: als autonoom vuren ja wordt, moet ik alle gevechtsgetallen opnieuw meten. Drie extra schutters halveert de tijd waarin een groep vijanden valt, en de hele gevechts-audit is zonder hen gemeten",
+      "Wat vandaag WEL gerepareerd is: een FocusTarget-order werd niet volgehouden (1 schot in plaats van 14). Dat was een gebroken belofte uit GDD 8.4 en dus geen keuze"
+    ] },
     { titel: "Je ziet niet DAT je een kopschot maakt — er is geen hitmarker", prio: "nu", waarom: "Kopschoten doen sinds vanochtend 2,5x schade (gemeten: 44 hp romp tegen 110 hp hoofd), maar er is geen enkele trefferfeedback in het spel: geen hitmarker, geen schadegetal, geen geluid bij een raak schot. Het verschil merk je alleen aan hoe snel iemand valt. Dat is een halve feature — in elke shooter is de bevestiging DAT je raakte net zo belangrijk als de schade zelf, want zonder die bevestiging weet je niet of je mist of dat de vijand veel leven heeft.", stappen: [
       "Mijn advies: een hitmarker op het kruis, met een duidelijk andere vorm of kleur bij een kopschot",
       "Dat is UI-werk dat je niet gevraagd hebt, dus ik heb het niet gebouwd",
