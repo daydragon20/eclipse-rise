@@ -1,11 +1,11 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-26 (dagopdracht: gevecht, oriëntatie, locomotie-audit).*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-26 (dagopdracht + drie audits: locomotie, gevecht, squad).*
 
 ---
 
-# DAGRAPPORT — 26 juli 2026, bijgewerkt 11:30
+# DAGRAPPORT — 26 juli 2026, bijgewerkt 12:25
 
-**Bar: build ✓ (-NoUba) · 136/136 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
+**Bar: build ✓ (-NoUba) · 137/137 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
 
 *Alle getallen hieronder zijn om 12:05 tegen verse metingen gelegd en klopten alle
 acht. Wil je het zelf nakijken: `python Eclipse/Tools/show_measurements.py [woord]`
@@ -22,7 +22,7 @@ kopie bij.*
 | **Vuren en geraakt worden veranderen de pose.** Schietanimatie en hit-reactie, allebei op één overlay-slot. | Klap heeft op 0,1 s gewicht **0,995** en dooft uit; schietpose past binnen het vuurinterval |
 | **Landen heeft gewicht.** Camera-dip geschaald met de valsnelheid. | **4,3 cm** bij een normale sprong, komt exact terug op 65 |
 | **Hurken heeft een overgang.** De take zat al in de pack en werd nooit gespeeld. | 0,3 s op half gewicht; hoofd-hitbox zakt mee |
-| **Missies plaatsen hun eigen vijanden.** De vaste lus van vier is weg. | Assault **6**, Rescue **5**, Sabotage **4** (was overal 4). Sjabloon vraagt 5 → er staan er 5. M1.1 houdt zijn 4 |
+| **Missies plaatsen hun eigen vijanden.** De vaste lus van vier is weg. | Assault **6**, Rescue **5**, Sabotage **4** (was overal 4). M1.1 houdt zijn 4. In een echte `-game`-run bevestigd: *"5 vijanden uit 2 geauthorde batch(es)"* |
 | **Je squad praat.** Acht order-antwoorden met een rem van 2 s per soldaat. | **8 van de 8** aangesloten zinnen hebben een clip; een gevallen soldaat zegt nu *"I'm hit - can't move."* in plaats van *"No route, boss."* |
 | **De +20 voor een ronde zonder gewonden betaalt uit.** | **20 materiaal** gemeten; was 0 |
 | **Geen dode knoppen meer op RB en X.** RB wisselt buiten Command Mode het camerastandpunt (de pad kón dat helemaal niet meer), X geeft een snelle hergroepeer-order. LT is weer alleen mikken. | — |
@@ -33,7 +33,7 @@ kopie bij.*
 ## Wat wacht er op jou
 
 **Spelen en oordelen — dat kan ik niet meten:**
-1. **De nieuwe vijandopstelling.** Niet meer vier op een hoop bij het hoofddoel, maar groepen op het site dat de missie noemt. Het aantal schuift nauwelijks (+2, +1, +0); de **vorm** verandert wel.
+1. **De nieuwe vijandopstelling.** Niet meer vier op een hoop bij het hoofddoel, maar groepen op het site dat de missie noemt. Het aantal schuift nauwelijks (+2, +1, +0); de **vorm** verandert wel. **Start hem met `-EclipseStartMission=WorkerHousing`** — dat is de rescue, en op dag 1 de enige missie mét eigen opstelling die je kunt bereiken. Assault en Sabotage vragen eerst een aangrenzende regio (GDD 3.1 regel 1); de snelstart meldt dat en zet je in de hub.
 2. **Kopschoten halveren je time-to-kill** van 4 kogels naar 2. Dat was de bedoeling, maar je moet het voelen.
 3. **Het schot-alarm.** Sluipen blijft mogelijk, precies één schot lang.
 
