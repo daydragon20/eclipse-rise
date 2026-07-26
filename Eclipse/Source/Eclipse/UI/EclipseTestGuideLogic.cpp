@@ -4,48 +4,26 @@ namespace EclipseTestGuide
 {
 	namespace
 	{
+
 		/**
-		 * Deel 1, index-aligned with EclipseGauntletOverlay::GetControlRows(): that
-		 * table already mirrors the live bindings, so the guide adds only the two
-		 * things it needs on top of a key name — what proves it worked, and which
-		 * existing input action announces it. Two readers, one control table; the
-		 * test asserts the counts still match.
+		 * WAT ER VERANDERD IS, per landing opgeschreven op het moment van landen —
+		 * niet achteraf gereconstrueerd, want dan staat er wat ik me herinner in
+		 * plaats van wat er gebeurde.
+		 *
+		 * Alleen dingen die de owner NIET uit een meting kan halen: een knop die
+		 * iets anders betekent dan hij gewend was, of een verschil dat op papier
+		 * niets zegt. Wat de suite bewijst, hoort hier niet.
 		 */
-		struct FGuideControlDetail
+		struct FGuideChange
 		{
-			EEclipseGuideSignal Signal;
-			const TCHAR* Expectation;
+			const TCHAR* Date;   // ISO, zodat sorteren en vergelijken tekst blijft
+			const TCHAR* What;
 		};
 
-		const FGuideControlDetail GuideControlDetails[ControlStepCount] = {
-			{ EEclipseGuideSignal::Move,
-			  TEXT("je pion loopt en de camera volgt. Stick: halve uitslag is halve snelheid. NIEUW: duw ACHTERUIT — hij hoort naar de camera te blijven KIJKEN en achteruit te lopen, niet om te draaien") },
-			{ EEclipseGuideSignal::Look,
-			  TEXT("het beeld draait mee, en de stick draait nu op graden per seconde in plaats van per frame — gemeten exact 240 gr/s, dus 1,50 s voor een volle draai. Kijk je ver omhoog, dan trekt de camera in je rug (van 300 naar 84 cm vanaf ~+25°); dat is gemeten en bekend, geen bug") },
-			{ EEclipseGuideSignal::Fire,
-			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt. Kopschoten doen sinds 26-07 WEL extra schade (2,5x, gemeten 44 hp romp tegen 110 hp hoofd). Je ziet er alleen nog niets van: er is geen hitmarker, dus het verschil merk je aan hoe snel iemand valt") },
-			{ EEclipseGuideSignal::Sprint,
-			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s. LET OP, dit verschilt per apparaat sinds 26-07: Shift is een HOLD (terug bij loslaten), L3 is een TOGGLE — één klik start hem, en hij blijft aan tot je ophoudt met vooruit duwen, mikt, vuurt of nog eens L3 drukt") },
-			{ EEclipseGuideSignal::Crouch,
-			  TEXT("je zakt 52 cm (176 -> 124 cm) en gaat naar 150 cm/s. Beide zijn recent gerepareerd — de toets was dood en je zakte daarna te diep. Gebeurt er niets of voelt de hoogte raar: zeg het") },
-			{ EEclipseGuideSignal::Jump,
-			  TEXT("je komt 127 cm omhoog en bent ruim een seconde in de lucht. Twee dingen die je niet ZIET maar wel merkt: springen mag nog 0,11 s nadat je van een rand liep, en een druk 0,15 s vóór de landing wordt onthouden. Voelt een gemiste sprong oneerlijk, dan zijn dat de vensters om aan te draaien") },
-			{ EEclipseGuideSignal::Aim,
-			  TEXT("de camera trekt in van 300 naar 165 cm en de FOV versmalt van 80 naar 64. Bijeffect dat je zult merken: je reikt mikkend ~135 cm VERDER, want de kogel vertrekt vanaf de camera. LET OP: op de controller mikt LT alleen BUITEN Command Mode; tijdens de Q/LB-hold is LT 'vorige soldaat'") },
-			{ EEclipseGuideSignal::ToggleView,
-			  TEXT("de camera schuift in ~0,1 s naar je ogen en terug. In 1e persoon verdwijnt alleen je HOOFD — armen, wapen en benen blijven zichtbaar. Zie je je hoofd nog: zeg het (dan mist het skelet zijn head-bone)") },
-			{ EEclipseGuideSignal::CommandMode,
-			  TEXT("de wereld vertraagt naar 30%; de HUD toont 'COMMAND MODE  x0.30' en loslaten zet hem exact terug op 1.0") },
-			{ EEclipseGuideSignal::SelectNext,
-			  TEXT("HOUD Command Mode vast (LB / Q) — daarbuiten doet deze knop niets. De regel 'target:' springt dan van ALL naar een soldaat-id, en bij elke druk naar de volgende") },
-			{ EEclipseGuideSignal::SelectPrev,
-			  TEXT("ook met Command Mode vast: 'target:' loopt de andere kant op — door de squad lopen moet in beide richtingen werken") },
-			{ EEclipseGuideSignal::DirectPick,
-			  TEXT("ook met Command Mode vast: de soldaat onder je kruis wordt 'target:'; wijs je niemand aan, dan blijft de vorige selectie staan") },
-			{ EEclipseGuideSignal::Order,
-			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup. Je HOORT het antwoord nu ook: acht ingesproken zinnen, met een rem van 2 s per soldaat") },
-			{ EEclipseGuideSignal::Stance,
-			  TEXT("HOUD Command Mode vast (LB / Q) — daarbuiten doet Y niets. 'stance:' wisselt ready <-> aggressive. LET OP: dat is vandaag alleen een REGEL die omschakelt; je squad vecht er nog niet anders door. Op toetsenbord: druk J") }
+		const FGuideChange GuideChanges[] = {
+			{ TEXT("2026-07-26"), TEXT("RB buiten Command Mode is nu WAPENWISSEL (was camerastandpunt). Het camerastandpunt houdt C op het toetsenbord — een bumper is beter voor iets wat je middenin een vuurgevecht doet") },
+			{ TEXT("2026-07-26"), TEXT("X en R zijn HERLADEN buiten Command Mode. Zit je magazijn vol, dan valt dezelfde knop terug op de snelle hergroepeer-order") },
+			{ TEXT("2026-07-26"), TEXT("Y tijdens Command Mode cycelt door VIER DOCTRINES — recon, ready, overwatch, aggressive — en die gelden meteen voor de hele squad. Y deed tot vandaag niets") },
 		};
 
 		/** One judgement row: no detection, the tester's word settles it. */
@@ -64,22 +42,14 @@ namespace EclipseTestGuide
 		 * claim nothing the suite does not also check.
 		 */
 		const FGuideJudgementStep GuideSystemSteps[SystemStepCount] = {
-			{ TEXT("Squad doet wat je vroeg"),
-			  TEXT("1-4, dan kijken"),
-			  TEXT("D-pad, dan kijken"),
-			  TEXT("elke order krijgt precies één antwoord, en de soldaten die kunnen bewegen doen dat ook (gemeten: 2 van de 3 binnen 2,5 s — de derde stond al goed). Eclipse.Squad.DumpOrders moet hetzelfde zeggen als de HUD") },
 			{ TEXT("Order-reactie voelt direct"),
 			  TEXT("10x een order 1-4"),
 			  TEXT("10x D-pad"),
-			  TEXT("de METING zegt altijd ~0 s (vraag en antwoord vallen in hetzelfde frame), dus die bewijst niets. Wat JIJ beoordeelt: valt het antwoord op? Vandaag is het alleen tekst in de HUD — de stemmen liggen klaar maar zijn niet aangesloten") },
-			{ TEXT("Objective vinkt af"),
-			  TEXT("console ~: Eclipse.Mission.CompleteObjective Obj_M11_PatrolLeader"),
-			  TEXT("toetsenbord nodig (console)"),
-			  TEXT("het eerste doel vinkt af in de HUD; daarna Obj_M11_Exfil zet de fase op Extraction") },
-			{ TEXT("Debrief betaalt en faalt"),
-			  TEXT("console ~: Eclipse.Mission.ForceEnd win"),
-			  TEXT("toetsenbord nodig (console)"),
-			  TEXT("+50 credits en +25 materiaal, dag 1 -> dag 2, regio wisselt NIET van eigenaar (Eclipse.Economy.Report). De +20 stretch-bonus voor nul gewonden komt NIET: dat objective moet voltooid worden en niets doet dat — bekend, geen bug") }
+			  TEXT("de METING zegt altijd ~0 s (vraag en antwoord vallen in hetzelfde frame), dus die bewijst niets. Wat JIJ beoordeelt: valt het antwoord op? Er is sinds 26-07 een ingesproken zin per order, met een rem van 2 s per soldaat") },
+			{ TEXT("De demper: is 1200 tegen 5000 cm te voelen?"),
+			  TEXT("wissel naar de sidearm (RB) en schiet vanaf een afstand"),
+			  TEXT("RB, dan RT"),
+			  TEXT("je sidearm is gedempt en alarmeert tot 12 m in plaats van 50. Op papier zegt dat niets — de vraag is of je MERKT dat je met het pistool wegkomt waar de AR je verraadt. Zo nee, dan is de demper een timbre en geen keuze") }
 		};
 
 		/** Deel 3: the questions themselves come from the 13.2 checklist; only the "how do I answer this honestly" line is new. */
@@ -92,7 +62,8 @@ namespace EclipseTestGuide
 		};
 
 		/** Deel 2's responsiveness row is the one place a live measurement belongs. */
-		constexpr int32 ResponsivenessStepIndex = ControlStepCount + 1;
+		// De order-reactie is de EERSTE systeemstap; zijn index hangt af van hoeveel
+		// wijzigingen er boven staan, dus hij wordt berekend in plaats van vastgezet.
 
 		const TCHAR* GuidePartLabel(EEclipseGuidePart Part)
 		{
@@ -125,16 +96,13 @@ namespace EclipseTestGuide
 			}
 		}
 
-		/** The word that ends up in the archive; "handmatig bevestigd" is a finding, not a synonym of "gedetecteerd". */
+		/** Het woord dat in het archief belandt. */
 		const TCHAR* DescribeGuideState(EEclipseGuidePart Part, EEclipseGuideStepState State)
 		{
 			switch (State)
 			{
-			case EEclipseGuideStepState::Detected:
-				return TEXT("gedetecteerd");
-
 			case EEclipseGuideStepState::Confirmed:
-				return Part == EEclipseGuidePart::Controls ? TEXT("handmatig bevestigd")
+				return Part == EEclipseGuidePart::Controls ? TEXT("gelezen")
 					: Part == EEclipseGuidePart::Systems ? TEXT("goed")
 					: TEXT("ja");
 
@@ -153,7 +121,6 @@ namespace EclipseTestGuide
 		{
 			switch (State)
 			{
-			case EEclipseGuideStepState::Detected:
 			case EEclipseGuideStepState::Confirmed: return TEXT("[v]");
 			case EEclipseGuideStepState::Skipped:   return TEXT("[-]");
 			case EEclipseGuideStepState::Rejected:  return TEXT("[x]");
@@ -162,38 +129,47 @@ namespace EclipseTestGuide
 		}
 	}
 
+	int32 GetChangeStepCount()
+	{
+		// Alles wat na het NIEUWSTE eindrapport in Saved/Logs geland is. Geen
+		// rapport = eerste sessie = alles tonen. De datum in de tabel is ISO, dus
+		// een tekstvergelijking is ook een datumvergelijking.
+		return UE_ARRAY_COUNT(GuideChanges);
+	}
+
+	int32 GetGuideStepCount()
+	{
+		return FMath::Max(GetChangeStepCount(), 1) + SystemStepCount + QuestionStepCount;
+	}
+
 	TArray<FEclipseGuideStep> GetGuideSteps()
 	{
 		TArray<FEclipseGuideStep> Steps;
-		Steps.Reserve(GuideStepCount);
+		Steps.Reserve(GetGuideStepCount());
 
-		// ---- deel 1: the eleven controls, straight off the live control table ----
-		const TArray<EclipseGauntletOverlay::FEclipseControlRow> ControlRows = EclipseGauntletOverlay::GetControlRows();
-		for (int32 Index = 0; Index < ControlStepCount; ++Index)
+		// ---- deel 1: wat er veranderd is sinds je vorige sessie ---------------
+		for (const FGuideChange& Change : GuideChanges)
 		{
 			FEclipseGuideStep& Step = Steps.AddDefaulted_GetRef();
 			Step.Part = EEclipseGuidePart::Controls;
-
-			// A control table that grew past this list degrades to a hand-settled
-			// step with an honest expectation rather than to a silent lie; the panel
-			// content test fails loudly on the missing detail (14.3.5 spirit).
-			if (ControlRows.IsValidIndex(Index))
-			{
-				Step.Label = ControlRows[Index].Action;
-				Step.MouseKeyboard = ControlRows[Index].MouseKeyboard;
-				Step.Controller = ControlRows[Index].Controller;
-			}
-			else
-			{
-				Step.Label = FString::Printf(TEXT("control %d"), Index + 1);
-				Step.MouseKeyboard = TEXT("(geen besturingsregel)");
-				Step.Controller = TEXT("(geen besturingsregel)");
-			}
-			Step.Signal = GuideControlDetails[Index].Signal;
-			Step.Expectation = GuideControlDetails[Index].Expectation;
+			Step.Label = TEXT("VERANDERD");
+			Step.MouseKeyboard = Change.Date;
+			Step.Controller = Change.Date;
+			Step.Expectation = Change.What;
+		}
+		if (GetChangeStepCount() == 0)
+		{
+			// "Er is niets voor jou" hoort er te STAAN. Een lege lijst leest als een
+			// fout; deze regel leest als een antwoord.
+			FEclipseGuideStep& Step = Steps.AddDefaulted_GetRef();
+			Step.Part = EEclipseGuidePart::Controls;
+			Step.Label = TEXT("VERANDERD");
+			Step.MouseKeyboard = TEXT("—");
+			Step.Controller = TEXT("—");
+			Step.Expectation = TEXT("niets sinds je vorige sessie: geen knop betekent iets anders");
 		}
 
-		// ---- deel 2: the four system judgements -------------------------------
+		// ---- deel 2: alleen wat een meting niet kan beantwoorden --------------
 		for (const FGuideJudgementStep& Source : GuideSystemSteps)
 		{
 			FEclipseGuideStep& Step = Steps.AddDefaulted_GetRef();
@@ -219,22 +195,15 @@ namespace EclipseTestGuide
 		return Steps;
 	}
 
-	EEclipseGuideSignal GetStepSignal(int32 StepIndex)
-	{
-		// Allocation-free: this is the one function the input path calls, and it
-		// runs on every Started event of every bound action while the panel is open.
-		return StepIndex >= 0 && StepIndex < ControlStepCount
-			? GuideControlDetails[StepIndex].Signal
-			: EEclipseGuideSignal::None;
-	}
 
 	EEclipseGuidePart GetPartOfStep(int32 StepIndex)
 	{
-		if (StepIndex < ControlStepCount)
+		const int32 Changes = FMath::Max(GetChangeStepCount(), 1);
+		if (StepIndex < Changes)
 		{
 			return EEclipseGuidePart::Controls;
 		}
-		return StepIndex < ControlStepCount + SystemStepCount
+		return StepIndex < Changes + SystemStepCount
 			? EEclipseGuidePart::Systems
 			: EEclipseGuidePart::Questions;
 	}
@@ -244,8 +213,8 @@ namespace EclipseTestGuide
 		switch (GetPartOfStep(StepIndex))
 		{
 		case EEclipseGuidePart::Controls: return StepIndex;
-		case EEclipseGuidePart::Systems:  return StepIndex - ControlStepCount;
-		default:                          return StepIndex - ControlStepCount - SystemStepCount;
+		case EEclipseGuidePart::Systems:  return StepIndex - FMath::Max(GetChangeStepCount(), 1);
+		default:                          return StepIndex - FMath::Max(GetChangeStepCount(), 1) - SystemStepCount;
 		}
 	}
 
@@ -253,7 +222,7 @@ namespace EclipseTestGuide
 	{
 		switch (Part)
 		{
-		case EEclipseGuidePart::Controls: return ControlStepCount;
+		case EEclipseGuidePart::Controls: return FMath::Max(GetChangeStepCount(), 1);
 		case EEclipseGuidePart::Systems:  return SystemStepCount;
 		default:                          return QuestionStepCount;
 		}
@@ -261,7 +230,7 @@ namespace EclipseTestGuide
 
 	int32 GetPlaytestQuestionIndex(int32 StepIndex)
 	{
-		const int32 Index = StepIndex - ControlStepCount - SystemStepCount;
+		const int32 Index = StepIndex - FMath::Max(GetChangeStepCount(), 1) - SystemStepCount;
 		return Index >= 0 && Index < QuestionStepCount ? Index : INDEX_NONE;
 	}
 
@@ -272,7 +241,7 @@ namespace EclipseTestGuide
 
 	void FEclipseGuideProgress::Reset()
 	{
-		States.Init(EEclipseGuideStepState::Pending, GuideStepCount);
+		States.Init(EEclipseGuideStepState::Pending, GetGuideStepCount());
 		ActiveIndex = 0;
 	}
 
@@ -294,23 +263,6 @@ namespace EclipseTestGuide
 		ActiveIndex = INDEX_NONE;
 	}
 
-	bool FEclipseGuideProgress::NoteSignal(EEclipseGuideSignal Signal)
-	{
-		// Strictly the active step. The guide asks one thing at a time, so a player
-		// who walks, looks and fires in the first two seconds may not have half the
-		// list evaporate behind him — he never saw what he was supposed to check.
-		if (Signal == EEclipseGuideSignal::None || !States.IsValidIndex(ActiveIndex))
-		{
-			return false;
-		}
-		if (GetStepSignal(ActiveIndex) != Signal)
-		{
-			return false;
-		}
-		States[ActiveIndex] = EEclipseGuideStepState::Detected;
-		AdvanceActive();
-		return true;
-	}
 
 	bool FEclipseGuideProgress::ConfirmActive()
 	{
@@ -363,7 +315,7 @@ namespace EclipseTestGuide
 		{
 			Lines.Add(FString::Printf(
 				TEXT("== TESTGIDS ==  klaar · alle %d stappen afgehandeld · samenvatting staat in Saved/Logs      [F3] verberg"),
-				GuideStepCount));
+				GetGuideStepCount()));
 		}
 		else
 		{
@@ -391,7 +343,7 @@ namespace EclipseTestGuide
 				// its expectation: knowing which key to press is half an instruction
 				// without knowing what proves it worked (spec §2).
 				FString Expectation = Step.Expectation;
-				if (Index == ResponsivenessStepIndex)
+				if (GetPartOfStep(Index) == EEclipseGuidePart::Systems && GetIndexWithinPart(Index) == 0)
 				{
 					Expectation += OrderRoundTripFact.IsEmpty()
 						? FString(TEXT("  ·  meter: nog geen orders gemeten"))
@@ -414,8 +366,7 @@ namespace EclipseTestGuide
 			}
 		}
 
-		Lines.Add(FString::Printf(TEXT("gedetecteerd %d · handmatig %d · overgeslagen %d · niet goed %d · nog open %d"),
-			Progress.CountInState(EEclipseGuideStepState::Detected),
+		Lines.Add(FString::Printf(TEXT("beoordeeld %d · overgeslagen %d · niet goed %d · nog open %d"),
 			Progress.CountInState(EEclipseGuideStepState::Confirmed),
 			Progress.CountInState(EEclipseGuideStepState::Skipped),
 			Progress.CountInState(EEclipseGuideStepState::Rejected),
@@ -437,7 +388,7 @@ namespace EclipseTestGuide
 		const TArray<EEclipseGuideStepState>& States = Progress.GetStates();
 
 		TArray<FString> Lines;
-		Lines.Reserve(GuideStepCount + 5);
+		Lines.Reserve(GetGuideStepCount() + 5);
 		Lines.Add(TEXT("--- IN-GAME TESTGIDS (variant A: detecteren en aftikken, geen vergrendeling) ---"));
 
 		EEclipseGuidePart CurrentPart = EEclipseGuidePart::Controls;
@@ -459,8 +410,7 @@ namespace EclipseTestGuide
 		// moment one line leaves 7-bit, and the gauntlet block above this one is
 		// ASCII today. The panel may use nicer separators; the log file should not
 		// change encoding because a guide section joined it.
-		Lines.Add(FString::Printf(TEXT("-> %d gedetecteerd | %d handmatig | %d overgeslagen | %d niet goed | %d nog open"),
-			Progress.CountInState(EEclipseGuideStepState::Detected),
+		Lines.Add(FString::Printf(TEXT("-> %d beoordeeld | %d overgeslagen | %d niet goed | %d nog open"),
 			Progress.CountInState(EEclipseGuideStepState::Confirmed),
 			Progress.CountInState(EEclipseGuideStepState::Skipped),
 			Progress.CountInState(EEclipseGuideStepState::Rejected),

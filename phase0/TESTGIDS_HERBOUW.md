@@ -81,8 +81,23 @@ SAMENVATTING                                  (kopieerbaar, naar Saved/Logs)
 Zes stappen in plaats van 23. Als er niets veranderd is: **vijf**, plus een regel
 die zegt dat er niets voor hem klaarligt.
 
-## Status
+## Status: GEBOUWD, 26-07 avond
 
-Ontwerp vastgelegd 26-07 avond. Nog niet gebouwd — de build stond vast op een
-open editor (Live Coding) terwijl de owner speelde, en dit is code, geen tekst.
-Bouwvolgorde: eerst loadouts groen krijgen, dan dit.
+Uitgevoerd. Wat er anders ging dan het ontwerp hierboven, en waarom:
+
+- **Deel 2 heeft twee oordelen, niet één.** De owner voegde de demper toe: *"1200
+  tegen 2500 is precies het soort verschil dat op papier niets zegt. Zet het in de
+  F3-gids als iets dat ik moet beoordelen."* Dat is exact de regel, dus hij hoort
+  erbij.
+- **De detectie is helemaal weg.** Het ontwerp zei alleen "deel 1 eruit", maar
+  daarmee werd de hele signaal-machinerie dood: een tweede delegate op veertien
+  acties, een enum, `NoteSignal`, `GetStepSignal`, en de `Detected`-toestand. Een
+  oordeel geeft geen invoergebeurtenis af, dus er valt niets meer te detecteren.
+  Dode code is van mij om weg te halen, niet om inert te laten staan.
+- **Eén test is verwijderd**: `GuideNumbersStillMatchTheTuning` bewaakte dat de
+  gidsstappen dezelfde getallen noemden als DA_CharacterTuning. Die tekst bestaat
+  niet meer — al die getallen zijn gemeten. Een bewaker op tekst die niet meer
+  bestaat, houdt niets tegen.
+
+**Eindstand: 23 stappen → 10 vandaag** (3 wijzigingen + 2 oordelen + 5 vragen),
+**en 8 zodra er niets verandert.** Suite 151/151 groen.

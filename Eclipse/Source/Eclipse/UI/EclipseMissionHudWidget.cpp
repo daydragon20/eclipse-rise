@@ -794,7 +794,7 @@ void UEclipseMissionHudWidget::RefreshGuideRows(bool bForce)
 		// in the order ComposeGuidePanelLines guarantees. The active step is the
 		// only bright row — settled steps dim so the eye lands on what to do next.
 		const int32 StepIndex = Line - 1;
-		const bool bStepRow = StepIndex >= 0 && StepIndex < EclipseTestGuide::GuideStepCount;
+		const bool bStepRow = StepIndex >= 0 && StepIndex < EclipseTestGuide::GetGuideStepCount();
 		Row->SetColorAndOpacity(FSlateColor(bStepRow
 			? (StepIndex == ActiveStep ? ColourNeutral : ColourDim)
 			: ColourNeutral));
@@ -830,17 +830,6 @@ void UEclipseMissionHudWidget::SkipGuideStep()
 	OnGuideStepSettled();
 }
 
-void UEclipseMissionHudWidget::NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal Signal)
-{
-	// Cheapest possible early-out: this runs from the controller's extra Started
-	// bindings, i.e. only when the player actually presses something, and with the
-	// guide closed it costs one bool test. No tick, no key polling, no consumption.
-	if (!IsGuidePanelVisible() || !GuideProgress.NoteSignal(Signal))
-	{
-		return;
-	}
-	OnGuideStepSettled();
-}
 
 void UEclipseMissionHudWidget::OnGuideStepSettled()
 {

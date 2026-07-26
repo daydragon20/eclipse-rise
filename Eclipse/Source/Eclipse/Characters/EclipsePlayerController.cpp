@@ -817,85 +817,19 @@ void AEclipsePlayerController::SetupInputComponent()
 	MapKey(FeelDumpAction, EKeys::F9);
 	Input->BindActionValueLambda(FeelDumpAction, ETriggerEvent::Started, [this](const FInputActionValue&) { DumpFeelState(); });
 
-	// Test-guide detection (variant A). A SECOND delegate on the actions bound
-	// above — Enhanced Input dispatches every binding that matches an action and
-	// event, so the gameplay handler keeps running untouched, nothing is consumed
-	// and no mapping changes. ETriggerEvent::Started, not Triggered: Started fires
-	// once when an action actuates (None -> Triggered raises Started first,
-	// EnhancedPlayerInput.cpp), so holding W does not call the guide every frame.
-	// This is why the guide needs no tick and reads no keys itself.
-	struct FGuideSignalBinding
-	{
-		UInputAction* Action;
-		EclipseTestGuide::EEclipseGuideSignal Signal;
-		/** Deze actie DOET alleen iets terwijl Command Mode vastgehouden wordt. */
-		bool bNeedsCommandMode = false;
-		/** ...en deze juist alleen DAARBUITEN (LT deelt zich met "vorige soldaat"). */
-		bool bBlockedByCommandMode = false;
-	};
-	const FGuideSignalBinding GuideSignals[] = {
-		{ MoveAction,          EclipseTestGuide::EEclipseGuideSignal::Move },
-		{ LookAction,          EclipseTestGuide::EEclipseGuideSignal::Look },
-		{ FireAction,          EclipseTestGuide::EEclipseGuideSignal::Fire },
-		{ SprintAction,        EclipseTestGuide::EEclipseGuideSignal::Sprint },
-		{ SprintToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Sprint },
-		{ CrouchAction,        EclipseTestGuide::EEclipseGuideSignal::Crouch },
-		{ JumpAction,          EclipseTestGuide::EEclipseGuideSignal::Jump },
-		// LT is mikken in het veld en "vorige soldaat" tijdens de hold; HandleAimStart
-		// keert terug als de modus vast staat. Zonder deze vlag vinkt de gids "Mikken"
-		// af op een druk die in werkelijkheid de SELECTIE verzette — hij zou dus een
-		// andere handeling bevestigen dan de stap beschrijft.
-		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim,         false, true },
-		// ToggleView zit niet meer in deze tabel: HandleToggleView meldt het zelf,
-		// zodat ELKE knop die het standpunt wisselt de stap afvinkt (26-07).
-		{ CommandHoldAction,   EclipseTestGuide::EEclipseGuideSignal::CommandMode },
-		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext,  true },
-		{ SelectPrevAction,    EclipseTestGuide::EEclipseGuideSignal::SelectPrev,  true },
-		{ DirectPickAction,    EclipseTestGuide::EEclipseGuideSignal::DirectPick,  true },
-		{ StanceToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Stance,      true },
-		// De vier orderknoppen staan hier NIET meer (26-07): ze lopen alle vier door
-		// IssueSquadOrder, en dat is nu de plek die het signaal meldt. Zouden ze
-		// hier blijven staan, dan meldde één druk twee keer — en NoteSignal roept
-		// AdvanceActive() aan, dus dat had niet "één keer te veel" gekost maar een
-		// overgeslagen gidsstap. Dat is precies de fout die deze gids moet vinden.
-	};
+	// DE DETECTIE IS WEG (26-07 avond, herbouw van de gids).
+	//
+	// Hier stond een tweede delegate op veertien acties, die de gidsstappen
+	// afvinkte zodra de speler de knop indrukte. Die stappen bestaan niet meer:
+	// de owner-regel is dat de gids alleen mag bevatten wat IK NIET KAN METEN, en
+	// dat een binding bestaat wordt getest terwijl het effect gemeten is. Van de
+	// drieëntwintig stappen waren er zeventien dingen die ik zelf had moeten
+	// vaststellen.
+	//
+	// Wat overblijft zijn oordelen, en een oordeel valt niet te detecteren. Deze
+	// tabel is daarmee dode code geworden, en dode code is van mij om weg te
+	// halen — niet om inert te laten staan met een comment erboven.
 
-	for (const FGuideSignalBinding& Binding : GuideSignals)
-	{
-		if (Binding.Action == nullptr)
-		{
-			continue; // a missing action costs the guide one undetectable step, never a crash (GDD 14.3.5)
-		}
-		const EclipseTestGuide::EEclipseGuideSignal Signal = Binding.Signal;
-		const bool bNeedsCommandMode = Binding.bNeedsCommandMode;
-		const bool bBlockedByCommandMode = Binding.bBlockedByCommandMode;
-		Input->BindActionValueLambda(Binding.Action, ETriggerEvent::Started,
-			[this, Signal, bNeedsCommandMode, bBlockedByCommandMode](const FInputActionValue&)
-		{
-			// De gids vinkte af op de TOETSDRUK, niet op het effect. Vier van deze
-			// acties doen buiten Command Mode niets (CycleSoldierSelection,
-			// PickSoldierUnderReticle en ToggleHeldStance keren meteen terug), dus
-			// RB indrukken in het veld zette de stap op "gehaald" terwijl er op het
-			// scherm niets gebeurde — en de stap beschrijft juist wat je zou moeten
-			// zien ("de regel 'target:' springt van ALL naar een soldaat-id").
-			//
-			// Een gids die zichzelf afvinkt terwijl het beschreven effect uitblijft,
-			// is erger dan geen detectie: hij spreekt de speler tegen.
-			const bool bCommandHeld = CommandMode != nullptr && CommandMode->IsHeld();
-			if (bNeedsCommandMode && !bCommandHeld)
-			{
-				return;
-			}
-			if (bBlockedByCommandMode && bCommandHeld)
-			{
-				return; // de druk deed iets anders dan deze stap beschrijft
-			}
-			if (MissionHud != nullptr && MissionHud->IsInViewport())
-			{
-				MissionHud->NoteGuideSignal(Signal);
-			}
-		});
-	}
 }
 
 void AEclipsePlayerController::PlayerTick(float DeltaSeconds)
@@ -1246,7 +1180,6 @@ void AEclipsePlayerController::HandleToggleView()
 	// Elke toekomstige knop die hier langskomt vinkt de stap vanzelf af.
 	if (MissionHud != nullptr && MissionHud->IsInViewport())
 	{
-		MissionHud->NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal::ToggleView);
 	}
 	UE_LOG(LogEclipse, Verbose, TEXT("View toggled to %s person."),
 		Body->IsFirstPerson() ? TEXT("first") : TEXT("third"));
@@ -1559,7 +1492,6 @@ void AEclipsePlayerController::IssueSquadOrder(EEclipseSquadOrder Order)
 	// Dat had ik bijna over het hoofd gezien met "hooguit één keer te veel".
 	if (MissionHud != nullptr && MissionHud->IsInViewport())
 	{
-		MissionHud->NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal::Order);
 	}
 
 	FVector AimLocation = GetPawn() != nullptr ? GetPawn()->GetActorLocation() : FVector::ZeroVector;

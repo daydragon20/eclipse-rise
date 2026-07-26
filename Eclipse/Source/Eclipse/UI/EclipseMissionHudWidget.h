@@ -69,7 +69,6 @@ public:
 	 * listens next to the real handler and never consumes, blocks or rewrites it;
 	 * with the panel closed this is a single bool test and nothing else happens.
 	 */
-	void NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal Signal);
 
 	/** Criterion 2 by hand: one clean pick, or one mis-pick (a mis-pick falsifies the criterion — draaiboek). */
 	void NoteTargetingPick(bool bCleanPick);

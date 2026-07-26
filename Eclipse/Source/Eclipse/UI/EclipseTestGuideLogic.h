@@ -29,7 +29,20 @@ namespace EclipseTestGuide
 	/** The three parts of the guide, in the order the panel stacks them. */
 	enum class EEclipseGuidePart : uint8
 	{
-		/** Deel 1 — the eleven controls; detectable through the existing input actions. */
+		/**
+		 * Deel 1 — WAT ER VERANDERD IS sinds de vorige sessie (26-07 avond).
+		 *
+		 * Hier stonden veertien controlstappen. Die zijn eruit langs de owner-regel:
+		 * *de gids mag alleen bevatten wat ik NIET kan meten.* Dat een binding
+		 * bestaat wordt getest, en het effect is gemeten — snelheden, springhoogte,
+		 * FOV, coyote-venster. Zeventien van de drieëntwintig stappen waren dingen
+		 * die ik zelf had moeten vaststellen.
+		 *
+		 * Wat blijft is niet "leer de besturing" maar "welke knop betekent sinds
+		 * jouw laatste sessie iets anders". Dat is geen meting: ik kan meten dát RB
+		 * van wapen wisselt, niet of de owner dat weet. Staat er niets in, dan is
+		 * dat het antwoord — en dat hoort er ook te staan.
+		 */
 		Controls,
 
 		/** Deel 2 — systems the tester judges himself (a measurement cannot answer these). */
@@ -40,41 +53,22 @@ namespace EclipseTestGuide
 	};
 
 	/**
-	 * What an input action tells the guide. Exactly one value per *existing*
-	 * AEclipsePlayerController action — the guide invents no action, adds no key
-	 * to a mapping context and only ever listens alongside the real handler.
+	 * DE SIGNAAL-ENUM IS WEG (26-07 avond). Hij vertelde de gids welke invoeractie
+	 * er binnenkwam, zodat een stap zichzelf kon afvinken. Sinds de gids alleen
+	 * nog oordelen bevat, valt er niets meer te detecteren — een oordeel geeft geen
+	 * invoergebeurtenis af.
 	 */
-	enum class EEclipseGuideSignal : uint8
-	{
-		None,
-		Move,
-		Look,
-		Fire,
-		Sprint,
-		Crouch,
-		Jump,
-		Aim,
-		ToggleView,
-		CommandMode,
-		SelectNext,
-		SelectPrev,
-		DirectPick,
-		Order,
-		Stance
-	};
+
 
 	/** How a step was settled; Pending is neither pass nor fail (14.5's rule). */
 	enum class EEclipseGuideStepState : uint8
 	{
 		Pending,
 
-		/** Enhanced Input saw the action the step asked for (deel 1 only). */
-		Detected,
-
 		/** The tester settled it himself: J — "gehaald" / "goed" / "ja". */
 		Confirmed,
 
-		/** N on a control step: moved past without doing it. */
+		/** N op een wijzigingsregel: gelezen en verder. */
 		Skipped,
 
 		/** N on a judgement step: a real negative answer — "niet goed" / "nee". */
@@ -87,19 +81,36 @@ namespace EclipseTestGuide
 	 * (empty expectation, no signal) if that table ever grows, and the test asserts
 	 * the counts still match.
 	 */
-	inline constexpr int32 ControlStepCount = 14;
+	/**
+	 * Wijzigingen sinds de vorige sessie. Geen mirror van de controletabel meer —
+	 * zie de toelichting bij EEclipseGuidePart::Controls.
+	 */
+	ECLIPSE_API int32 GetChangeStepCount();
 
-	/** Deel 2 — squad obedience, order responsiveness, objective tick, debrief payout. */
-	inline constexpr int32 SystemStepCount = 4;
+	/**
+	 * Deel 2 — alleen wat een meting NIET kan beantwoorden.
+	 *
+	 * Was vier. Drie eruit: "squad doet wat je vroeg" (Eclipse.Squad.* meet het
+	 * antwoord én de beweging), "objective vinkt af" en "debrief betaalt" (allebei
+	 * assert in M11GauntletOnShippedData). Wat blijft is de order-reactie, en
+	 * juist omdat de meting daar altijd ~0 s zegt — vraag en antwoord vallen in
+	 * hetzelfde frame — en daarmee niets bewijst.
+	 *
+	 * Sinds 26-07 avond een tweede: de demper. 1200 tegen 2500 cm is precies het
+	 * soort verschil dat op papier niets zegt.
+	 */
+	inline constexpr int32 SystemStepCount = 2;
 
 	/** Deel 3 is the 13.2 checklist itself, so it can never drift from the playtest block. */
 	inline constexpr int32 QuestionStepCount = EclipseGauntletOverlay::PlaytestQuestionCount;
 
-	inline constexpr int32 GuideStepCount = ControlStepCount + SystemStepCount + QuestionStepCount;
+	/** Runtime, want het aantal wijzigingen hangt af van wanneer je voor het laatst speelde. */
+	ECLIPSE_API int32 GetGuideStepCount();
 
 	/** Header + one row per step + tally. Fixed, so the panel builds its rows once and afterwards only ever SetText (GDD 12.4: no widget churn in a firefight). */
 	/** Kop + de look-waardenregel + elke stap + de tellerregel. */
-	inline constexpr int32 GuidePanelLineCount = GuideStepCount + 3;
+	/** Bovengrens: drie wijzigingen is het meeste wat één sessie oplevert. */
+	inline constexpr int32 GuidePanelLineCount = 3 + SystemStepCount + EclipseGauntletOverlay::PlaytestQuestionCount + 3;
 
 	/** One step: what to do, on both devices, and what you must SEE if it works. */
 	struct FEclipseGuideStep
@@ -117,19 +128,15 @@ namespace EclipseTestGuide
 		/** The visible expectation: what proves it worked. Never empty. */
 		FString Expectation;
 
-		/** None = nothing to detect; the tester settles this one by hand. */
-		EEclipseGuideSignal Signal = EEclipseGuideSignal::None;
 	};
 
 	/**
 	 * The whole stappenlijst. Allocates, so the panel calls it on a refresh and
-	 * never on an input event — GetStepSignal() is the allocation-free lookup the
-	 * detection path uses, and both read the same table.
+	 * never on an input event.
 	 */
 	ECLIPSE_API TArray<FEclipseGuideStep> GetGuideSteps();
 
 	/** Detection signal of one step; None for out-of-range and for the judgement steps. */
-	ECLIPSE_API EEclipseGuideSignal GetStepSignal(int32 StepIndex);
 
 	ECLIPSE_API EEclipseGuidePart GetPartOfStep(int32 StepIndex);
 
@@ -168,7 +175,6 @@ namespace EclipseTestGuide
 		bool HasAnyProgress() const;
 
 		/** Enhanced Input reported an action. Returns true only when it settled the active step. */
-		bool NoteSignal(EEclipseGuideSignal Signal);
 
 		/** J — gehaald / goed / ja. Returns true when a step moved. */
 		bool ConfirmActive();

@@ -969,108 +969,17 @@ bool FEclipseControlTableMatchesBindingsTest::RunTest(const FString& Parameters)
 }
 
 
-// ---------------------------------------------------------------------------
-// De tweede beschrijving die de speler leest: de testgids
-// ---------------------------------------------------------------------------
+// DEZE TEST IS WEG (26-07 avond, herbouw van de gids).
 //
-// De F2-tabel zegt WELKE toets iets doet; de gids zegt WAT er dan hoort te
-// gebeuren, en die zin bevat harde getallen ("420 -> 650 cm/s", "150 cm/s").
-// Precies die getallen drijven weg zodra iemand DA_CharacterTuning aanraakt, en
-// dan leert de game de speler een verwachting die zijn eigen build niet waarmaakt
-// — hetzelfde defect als het paneel dat "1,50 s per 360" toonde bij 0,60 s.
+// Hij bewaakte dat de gidsstappen dezelfde getallen noemden als
+// DA_CharacterTuning — rensnelheid, springhoogte, coyote-venster. Een goede
+// bewaker voor tekst die de owner moest lezen.
 //
-// Bewust GEEN prozacontrole: als iemand de zin herschrijft maar de getallen laat
-// staan, hoort dat te mogen. Alleen de getallen worden vastgehouden.
-
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseGuideNumbersMatchTuningTest,
-	"Eclipse.Feel.Input.GuideNumbersStillMatchTheTuning",
-	EclipseFeelTest::TestFlags)
-
-bool FEclipseGuideNumbersMatchTuningTest::RunTest(const FString& Parameters)
-{
-	using namespace EclipseFeelHarness;
-
-	FHarness Harness;
-	if (!Harness.Start(*this))
-	{
-		Harness.Shutdown();
-		return false;
-	}
-	const UEclipseCharacterTuningAsset& T = *Harness.Tuning;
-
-	const TArray<EclipseTestGuide::FEclipseGuideStep> Steps = EclipseTestGuide::GetGuideSteps();
-	auto ExpectationFor = [&Steps](EclipseTestGuide::EEclipseGuideSignal Signal) -> FString
-	{
-		const EclipseTestGuide::FEclipseGuideStep* Step = Steps.FindByPredicate(
-			[Signal](const EclipseTestGuide::FEclipseGuideStep& Candidate) { return Candidate.Signal == Signal; });
-		return Step != nullptr ? Step->Expectation : FString();
-	};
-
-	// LET OP de decimalen, en de KOMMA. Deze helper formatteerde met %.0f, en dat
-	// maakte elke assert op een waarde onder 1 een tautologie: 0,11 werd "0", en
-	// "0" staat in vrijwel elke zin. Zo stonden er even twee bewakers die niet rood
-	// kónden worden — precies wat ze horen te voorkomen.
-	//
-	// Nu: waarden onder 10 met twee decimalen, en de gidsteksten schrijven Nederlands
-	// (0,11 met een komma), dus beide schrijfwijzen tellen.
-	auto MentionsNumber = [](const FString& Text, float Value)
-	{
-		const FString Dotted = Value < 10.0f
-			? FString::Printf(TEXT("%.2f"), Value)
-			: FString::Printf(TEXT("%.0f"), Value);
-		FString Comma = Dotted;
-		Comma.ReplaceInline(TEXT("."), TEXT(","));
-		return Text.Contains(Dotted) || Text.Contains(Comma);
-	};
-
-	const FString SprintText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Sprint);
-	TestTrue(TEXT("gids: er is een sprint-stap"), !SprintText.IsEmpty());
-	TestTrue(*FString::Printf(TEXT("gids: de sprint-stap noemt de getunede rensnelheid (%.0f) — '%s'"), T.RunSpeed, *SprintText),
-		MentionsNumber(SprintText, T.RunSpeed));
-	TestTrue(*FString::Printf(TEXT("gids: de sprint-stap noemt de getunede sprintsnelheid (%.0f)"), T.SprintSpeed),
-		MentionsNumber(SprintText, T.SprintSpeed));
-
-	const FString CrouchText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Crouch);
-	TestTrue(TEXT("gids: er is een hurk-stap"), !CrouchText.IsEmpty());
-	TestTrue(*FString::Printf(TEXT("gids: de hurk-stap noemt de getunede hurksnelheid (%.0f)"), T.CrouchSpeed),
-		MentionsNumber(CrouchText, T.CrouchSpeed));
-	// De hurkstap noemt sinds de capsule-fix ook een HOOGTE, en dat is een met de
-	// hand geschreven getal dat van de tuning afhangt — precies waarvoor deze
-	// bewaker bestaat. Verandert CrouchedHalfHeightCm, dan moet de tekst mee.
-	TestTrue(*FString::Printf(TEXT("gids: de hurk-stap noemt de getunede hurkhoogte (%.0f cm)"), T.CrouchedHalfHeightCm * 2.0f),
-		MentionsNumber(CrouchText, T.CrouchedHalfHeightCm * 2.0f));
-
-	// De sprong-stap noemt sinds 26-07 de twee vergevingsvensters. Die zijn de enige
-	// feel-toevoeging die je NIET opmerkt tenzij iemand het zegt — ze bestaan om
-	// onzichtbaar te zijn — dus juist daar mag de tekst niet stil van de tuning
-	// afdrijven.
-	const FString JumpText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Jump);
-	TestTrue(TEXT("gids: er is een sprong-stap"), !JumpText.IsEmpty());
-	TestTrue(*FString::Printf(TEXT("gids: de sprong-stap noemt het getunede coyote-venster (%.2f s)"), T.CoyoteTimeSeconds),
-		MentionsNumber(JumpText, T.CoyoteTimeSeconds));
-	TestTrue(*FString::Printf(TEXT("gids: de sprong-stap noemt het getunede inputbuffer-venster (%.2f s)"), T.JumpInputBufferSeconds),
-		MentionsNumber(JumpText, T.JumpInputBufferSeconds));
-
-	// En de kijk-stap noemt de getunede stick-snelheid, want die zin claimt sinds
-	// vannacht expliciet dat het graden per SECONDE zijn.
-	const FString LookText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Look);
-	TestTrue(TEXT("gids: er is een kijk-stap"), !LookText.IsEmpty());
-	TestTrue(*FString::Printf(TEXT("gids: de kijk-stap noemt de getunede kijksnelheid (%.0f gr/s)"), T.StickYawSpeed),
-		MentionsNumber(LookText, T.StickYawSpeed));
-
-	// En de kop van de gids toont de kijkwaarden; die regel wordt uit dezelfde
-	// members gebouwd die de handler gebruikt, dus hij kan niet verouderen — maar
-	// het getal dat hij toont MOET wel het getunede zijn. Dat was het tot vannacht
-	// niet, en dat is precies waarom deze test bestaat.
-	const FString LookLine = Harness.Controller->DescribeLookTuning();
-	TestTrue(*FString::Printf(TEXT("gids-kop: toont de getunede kijksnelheid (%.0f gr/s) — '%s'"), T.StickYawSpeed, *LookLine),
-		LookLine.Contains(FString::Printf(TEXT("%.0f"), T.StickYawSpeed)));
-	TestTrue(*FString::Printf(TEXT("gids-kop: toont de seconden per 360 die daarbij horen (%.2f s)"), 360.0f / T.StickYawSpeed),
-		LookLine.Contains(FString::Printf(TEXT("%.2f"), 360.0f / T.StickYawSpeed)));
-
-	Harness.Shutdown();
-	return true;
-}
+// Maar precies die tekst is eruit. De owner-regel is dat de gids alleen mag
+// bevatten wat IK NIET KAN METEN, en al die getallen zijn gemeten (zie
+// Eclipse.Feel.Layer2.*). Een bewaker op tekst die niet meer bestaat houdt niets
+// tegen; laten staan zou betekenen dat de suite een belofte bewaakt die niemand
+// meer doet.
 
 
 // ---------------------------------------------------------------------------
