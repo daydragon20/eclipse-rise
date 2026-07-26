@@ -93,6 +93,33 @@ de art-review, dan pas breed.
 doelsites een eigen kleur wilt (mijn advies: nee — één palet, en de hiërarchie
 komt uit helderheid, zoals de referentie het doet).
 
+## Wat er klaarstaat maar nog niet geland is
+
+Terwijl jij speelde stond de build vast — Live Coding houdt het slot vast zolang
+de editor open is. Dat is geen klacht: ik heb ondertussen doorgewerkt aan wat
+geen compiler nodig heeft. Maar het betekent dat het volgende **geschreven en
+nagelezen is, en nog niet bewezen**:
+
+- **Loadouts bereiken je wapen.** Elke loadout noemt nu een primair wapen en een
+  sidearm; RB wisselt buiten Command Mode; elk slot houdt zijn eigen magazijn;
+  `ReadySeconds` (handling) blokkeert het vuren vlak na een wissel. Plus een
+  validator die eist dat een loadout bestaande, verschillende wapens noemt.
+- **De hermeting van de kopschot-test**, die sinds het magazijn in een
+  herlaadbeurt kon vallen en dan nul schade mat.
+
+Zodra de editor dicht is: compileren, suite, landen. Het staat als klikje in het
+dashboard.
+
+## Ontwerpen die klaarliggen (geen build nodig, wel jouw oordeel)
+
+- **[SQUAD_DOCTRINE.md](phase0/SQUAD_DOCTRINE.md)** — punt 1 volledig uitgewerkt.
+  Twee lagen: basiscompetentie die er altijd is, en doctrine die hem inperkt of
+  loslaat. Vier waarden op de bestaande `stance`. Zes bouwlagen, elk apart
+  meetbaar, met de hermeting van het gevecht als laatste.
+- **[TESTGIDS_HERBOUW.md](phase0/TESTGIDS_HERBOUW.md)** — de F3-gids van 23
+  stappen naar 6, langs jouw regel. Van de 23 waren er 17 dingen die ik zelf had
+  moeten vaststellen.
+
 ## Wat nog steeds op je wacht
 
 ### Voorstel: elementaire schade — mijn advies is NEE, en hier is waarom
