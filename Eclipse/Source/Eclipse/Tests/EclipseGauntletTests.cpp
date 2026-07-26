@@ -402,4 +402,106 @@ bool FEclipseHitMarkerTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+/**
+ * GEEN KNOP DIE BINNEN EEN MODUS TWEE DINGEN DOET.
+ *
+ * Dit is de fout die LT maakte: buiten Command Mode was hij mikken, erbinnen
+ * "vorige soldaat". Dat werd niet gevonden door een test maar doordat iemand de
+ * zin in de controletabel las — de modus stond daar als proza in de cel, en
+ * proza is niet te controleren.
+ *
+ * Twee betekenissen over twee modi is bewust ontwerp en blijft toegestaan: de
+ * speler houdt Q/LB ingedrukt op het moment dat hij orders geeft, dus er is een
+ * moment waarop hij weet welke geldt. Twee betekenissen BINNEN een modus is dat
+ * niet — dan bestaat dat moment niet.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseNoButtonMeansTwoThingsInOneMode,
+	"Eclipse.Gauntlet.Overlay.NoButtonMeansTwoThingsInOneMode",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseNoButtonMeansTwoThingsInOneMode::RunTest(const FString& Parameters)
+{
+	using namespace EclipseGauntletOverlay;
+
+	const TArray<FEclipseBinding> Bindings = GetBindings();
+	if (!TestTrue(TEXT("schema: er staan bindingen in"), Bindings.Num() > 0))
+	{
+		return false;
+	}
+
+	// Sleutel is modus + apparaat + knop; waarde is de handeling die hem al claimt.
+	TMap<FString, FString> Claimed;
+	for (const FEclipseBinding& Binding : Bindings)
+	{
+		TestTrue(TEXT("schema: elke binding noemt een handeling"),
+			Binding.Action != nullptr && FCString::Strlen(Binding.Action) > 0);
+
+		// Een binding zonder enig apparaat is geen binding maar een gat in de
+		// tabel; dat hoort hier rood te worden en niet stil te verdwijnen.
+		TestTrue(*FString::Printf(TEXT("schema: '%s' in %s noemt minstens een apparaat"),
+				Binding.Action, ModeName(Binding.Mode)),
+			Binding.Key != nullptr || Binding.Pad != nullptr);
+
+		const TCHAR* Devices[2] = { Binding.Key, Binding.Pad };
+		const TCHAR* DeviceNames[2] = { TEXT("toets"), TEXT("pad") };
+		for (int32 Index = 0; Index < 2; ++Index)
+		{
+			if (Devices[Index] == nullptr)
+			{
+				continue;
+			}
+			const FString Slot = FString::Printf(TEXT("%s|%s|%s"),
+				ModeName(Binding.Mode), DeviceNames[Index], Devices[Index]);
+			if (const FString* Owner = Claimed.Find(Slot))
+			{
+				AddError(FString::Printf(
+					TEXT("schema: %s '%s' doet in %s twee dingen — '%s' en '%s'. Een knop met twee betekenissen in dezelfde modus laat de speler nooit weten welke geldt."),
+					DeviceNames[Index], Devices[Index], ModeName(Binding.Mode), **Owner, Binding.Action));
+				continue;
+			}
+			Claimed.Add(Slot, FString(Binding.Action));
+		}
+	}
+
+	// De overlading OVER modi heen is toegestaan, maar hij hoort zichtbaar te
+	// zijn: dit zijn de knoppen waarvan de betekenis met de modus meebeweegt, en
+	// precies daar zit het risico dat iemand er een derde betekenis bij zet.
+	TMap<FString, TArray<FString>> ByPadButton;
+	for (const FEclipseBinding& Binding : Bindings)
+	{
+		if (Binding.Pad != nullptr)
+		{
+			ByPadButton.FindOrAdd(FString(Binding.Pad)).Add(
+				FString::Printf(TEXT("%s=%s"), ModeName(Binding.Mode), Binding.Action));
+		}
+	}
+	for (const TPair<FString, TArray<FString>>& Pair : ByPadButton)
+	{
+		if (Pair.Value.Num() > 1)
+		{
+			AddInfo(FString::Printf(TEXT("schema: %s verandert met de modus — %s"),
+				*Pair.Key, *FString::Join(Pair.Value, TEXT(" / "))));
+		}
+	}
+
+	// De twee tabellen mogen niet uit elkaar lopen: elke handeling die de F2-tabel
+	// aan de owner toont, moet in het schema staan. Zonder deze band is het schema
+	// een tweede waarheid in plaats van de bron, en dan heb ik het probleem
+	// verdubbeld in plaats van opgelost.
+	for (const FEclipseControlRow& Row : GetControlRows())
+	{
+		const bool bKnown = Bindings.ContainsByPredicate(
+			[&Row](const FEclipseBinding& Binding)
+			{
+				return FCString::Stricmp(Binding.Action, Row.Action) == 0
+					|| FCString::Strifind(Row.Action, Binding.Action) != nullptr
+					|| FCString::Strifind(Binding.Action, Row.Action) != nullptr;
+			});
+		TestTrue(*FString::Printf(TEXT("schema: F2-rij '%s' komt terug in het knoppenschema"), Row.Action),
+			bKnown);
+	}
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

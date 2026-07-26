@@ -109,6 +109,49 @@ namespace EclipseGauntletOverlay
 	 */
 	ECLIPSE_API FEclipseGauntletVerdict ComposeVerdict(const FEclipseGauntletCriteria& Criteria);
 
+	/**
+	 * IN WELKE MODUS EEN KNOP IETS BETEKENT (owner-punt 7).
+	 *
+	 * De controletabel hieronder heeft één rij per handeling, en de modus zit
+	 * daar als PROZA in de cel verstopt: "RB (in CM; erbuiten: WAPENWISSEL)".
+	 * Zo'n cel leest prima en is niet te controleren — en juist dáár ging het
+	 * mis. LT was buiten Command Mode mikken en erbinnen "vorige soldaat", en
+	 * niets kon dat zien behalve een mens die de zin las.
+	 *
+	 * Eén knop mag twee dingen doen; dat is hier bewust ontwerp, want de speler
+	 * houdt LB ingedrukt op het moment dat hij orders geeft en weet dus in welke
+	 * van de twee hij zit. Wat NIET mag is twee betekenissen BINNEN dezelfde
+	 * modus, want dan bestaat er geen moment waarop de speler weet welke geldt.
+	 *
+	 * Die regel is pas te bewaken als de modus een veld is in plaats van een zin.
+	 */
+	enum class EEclipseControlMode : uint8
+	{
+		/** Gewoon lopen en vechten — Command Mode NIET ingedrukt. */
+		OnFoot,
+		/** Zolang Q/LB ingedrukt blijft. */
+		CommandMode,
+	};
+
+	/** Eén knop in één modus. Een leeg apparaatveld betekent: die knop bestaat hier niet. */
+	struct FEclipseBinding
+	{
+		EEclipseControlMode Mode = EEclipseControlMode::OnFoot;
+		const TCHAR* Action = nullptr;
+		const TCHAR* Key = nullptr;
+		const TCHAR* Pad = nullptr;
+	};
+
+	/**
+	 * Het knoppenschema per modus. Bron voor de controle hieronder, en bedoeld om
+	 * de bron te worden van BESTURING.md, de F3-gids en de startbat — die vier
+	 * liepen 26-07 vier keer op één dag uit elkaar.
+	 */
+	ECLIPSE_API TArray<FEclipseBinding> GetBindings();
+
+	/** Leesbare naam van een modus, voor testmeldingen en documentatie. */
+	ECLIPSE_API const TCHAR* ModeName(EEclipseControlMode Mode);
+
 	/** One row of the control overview: the action and its two device cells. */
 	struct FEclipseControlRow
 	{

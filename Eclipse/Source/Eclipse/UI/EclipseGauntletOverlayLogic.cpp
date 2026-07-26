@@ -165,6 +165,45 @@ namespace EclipseGauntletOverlay
 		return Verdict;
 	}
 
+	const TCHAR* ModeName(EEclipseControlMode Mode)
+	{
+		return Mode == EEclipseControlMode::CommandMode ? TEXT("Command Mode") : TEXT("te voet");
+	}
+
+	TArray<FEclipseBinding> GetBindings()
+	{
+		// Zelfde bron als SetupInputComponent, nu met de modus als veld. Waar de
+		// controletabel "RB (in CM; erbuiten: WAPENWISSEL)" schrijft, staan hier
+		// twee regels — en dan kan een test zien wat een zin verbergt.
+		using EMode = EEclipseControlMode;
+		return {
+			// TE VOET
+			{ EMode::OnFoot, TEXT("Lopen"),          TEXT("WASD"),           TEXT("linkerstick") },
+			{ EMode::OnFoot, TEXT("Rondkijken"),     TEXT("muis"),           TEXT("rechterstick") },
+			{ EMode::OnFoot, TEXT("Vuren"),          TEXT("LMB"),            TEXT("RT") },
+			{ EMode::OnFoot, TEXT("Mikken"),         TEXT("RMB"),            TEXT("LT") },
+			{ EMode::OnFoot, TEXT("Sprint"),         TEXT("Shift"),          TEXT("L3") },
+			{ EMode::OnFoot, TEXT("Hurken"),         TEXT("Ctrl"),           TEXT("B") },
+			{ EMode::OnFoot, TEXT("Springen"),       TEXT("Spatie"),         TEXT("A") },
+			{ EMode::OnFoot, TEXT("Herladen"),       TEXT("R"),              TEXT("X") },
+			// Geen padknop: RB draagt hier de wapenwissel, en dat is een bewuste
+			// ruil — wisselen doe je tientallen keren per missie, standpunt kies
+			// je één keer.
+			{ EMode::OnFoot, TEXT("1e/3e persoon"),  TEXT("C"),              nullptr },
+			{ EMode::OnFoot, TEXT("Wapenwissel"),    nullptr,                TEXT("RB") },
+			{ EMode::OnFoot, TEXT("Command Mode"),   TEXT("Q vasthouden"),   TEXT("LB vasthouden") },
+
+			// COMMAND MODE
+			{ EMode::CommandMode, TEXT("Volgende soldaat"), TEXT("Tab"),     TEXT("RB") },
+			// Geen padknop: RB wrapt rond, en bij vier soldaten is drie keer
+			// vooruit hetzelfde als één keer terug.
+			{ EMode::CommandMode, TEXT("Vorige soldaat"),   TEXT("scroll neer"), nullptr },
+			{ EMode::CommandMode, TEXT("Onder kruis"),      TEXT("E"),       TEXT("X") },
+			{ EMode::CommandMode, TEXT("Orders"),           TEXT("1 2 3 4"), TEXT("D-pad") },
+			{ EMode::CommandMode, TEXT("Doctrine"),         TEXT("LeftAlt"), TEXT("Y") },
+		};
+	}
+
 	TArray<FEclipseControlRow> GetControlRows()
 	{
 		// Mirrors AEclipsePlayerController::SetupInputComponent one-for-one
