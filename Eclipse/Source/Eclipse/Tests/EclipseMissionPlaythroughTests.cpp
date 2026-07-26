@@ -3774,4 +3774,138 @@ bool FEclipseSquadTakesCoverUnderFire::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * DOCTRINE (owner-opdracht 26-07 avond, punt 1 — laag 4 van zes).
+ *
+ * Geen schakelaars voor basisgedrag: elke doctrine PERKT DE BASIS IN of LAAT
+ * HEM LOS. Deze meting bewijst dat verschil per doctrine, en dat is de enige
+ * manier waarop je kunt zien dat het een kader is en geen naam:
+ *
+ *   Recon      vuurt NIET terwijl Ready dat wel doet
+ *   Overwatch  loopt NIET mee terwijl Ready dat wel doet
+ *   Aggressive zoekt GEEN dekking terwijl Ready dat wel doet
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDoctrineChangesBehaviour,
+	"Eclipse.Mission.Playthrough.DoctrineChangesBehaviour",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseDoctrineChangesBehaviour::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("doctrine: strategie"), Strategy) || !TestNotNull(TEXT("doctrine: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("doctrine: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	if (!TestTrue(TEXT("doctrine: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Een vijand binnen bereik van iedereen.
+	const FVector Spot = Harness.Location() + Harness.Body->GetActorForwardVector() * 700.0f;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AEclipseCharacter* Hostile = Harness.World->SpawnActor<AEclipseCharacter>(
+		AEclipseCharacter::StaticClass(), Spot, FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("doctrine: er staat een vijand"), Hostile))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Hostile->InitializeHealth(100000.0f);
+
+	auto ShotsOverTwoSeconds = [&Harness, &Mates](EEclipseSquadStance Stance) -> int32
+	{
+		for (AEclipseSquadmateController* Mate : Mates)
+		{
+			Mate->SetDoctrine(Stance);
+		}
+		int32 Before = 0;
+		for (const AEclipseSquadmateController* Mate : Mates)
+		{
+			Before += Mate->GetAutoFireShots();
+		}
+		Harness.Idle(2.0f);
+		int32 After = 0;
+		for (const AEclipseSquadmateController* Mate : Mates)
+		{
+			After += Mate->GetAutoFireShots();
+		}
+		return After - Before;
+	};
+
+	// --- Recon zwijgt, Ready vuurt -----------------------------------------
+	const int32 ReconShots = ShotsOverTwoSeconds(EEclipseSquadStance::Recon);
+	const int32 ReadyShots = ShotsOverTwoSeconds(EEclipseSquadStance::Ready);
+	Report(*this, TEXT("schoten in 2 s onder RECON"), static_cast<float>(ReconShots), TEXT(""),
+		TEXT("hoort 0 te zijn: vuur pas als er op je geschoten wordt"));
+	Report(*this, TEXT("schoten in 2 s onder READY"), static_cast<float>(ReadyShots), TEXT(""));
+	TestEqual(TEXT("doctrine: Recon vuurt niet uit zichzelf"), ReconShots, 0);
+	TestTrue(TEXT("doctrine: Ready vuurt wel"), ReadyShots > 0);
+
+	// --- Overwatch loopt niet mee ------------------------------------------
+	AEclipseSquadmateController* Mate = Mates[0];
+	AEclipseCharacter* MateBody = Cast<AEclipseCharacter>(Mate->GetPawn());
+	if (!TestNotNull(TEXT("doctrine: de soldaat heeft een lichaam"), MateBody))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	for (AEclipseSquadmateController* Each : Mates)
+	{
+		Each->SetDoctrine(EEclipseSquadStance::Overwatch);
+	}
+	const int32 MovesBefore = Mate->GetFollowMoves();
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 5.0, []() { return false; });
+	Report(*this, TEXT("meelopen-verplaatsingen onder OVERWATCH"),
+		static_cast<float>(Mate->GetFollowMoves() - MovesBefore), TEXT(""),
+		TEXT("hoort 0 te zijn: zij houden dat terrein"));
+	TestEqual(TEXT("doctrine: Overwatch blijft staan"), Mate->GetFollowMoves() - MovesBefore, 0);
+
+	// --- Aggressive zoekt geen dekking --------------------------------------
+	Harness.Idle(2.5f); // dekkingsrem laten aflopen
+	for (AEclipseSquadmateController* Each : Mates)
+	{
+		Each->SetDoctrine(EEclipseSquadStance::Aggressive);
+	}
+	const int32 CoverBefore = Mate->GetCoverRuns();
+	MateBody->ApplyDamage(5.0f, Harness.Body, TEXT("TestIncoming"));
+	Harness.Idle(1.0f);
+	Report(*this, TEXT("dekkingszoektochten onder AGGRESSIVE"),
+		static_cast<float>(Mate->GetCoverRuns() - CoverBefore), TEXT(""),
+		TEXT("hoort 0 te zijn: het kamikaze-kader haalt dekking zoeken weg"));
+	TestEqual(TEXT("doctrine: Aggressive zoekt geen dekking"), Mate->GetCoverRuns() - CoverBefore, 0);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

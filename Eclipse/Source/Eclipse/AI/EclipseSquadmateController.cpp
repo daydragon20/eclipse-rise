@@ -210,6 +210,13 @@ void AEclipseSquadmateController::UpdateFollow()
 		return;
 	}
 
+	// OVERWATCH BLIJFT STAAN. Dat is de hele betekenis van die doctrine: je zet je
+	// squad ergens neer en loopt zelf door, en zij houden dat stuk terrein.
+	if (CurrentStance == EEclipseSquadStance::Overwatch)
+	{
+		return;
+	}
+
 	// EEN STAANDE ORDER WINT. Hold en MoveTo zetten deze soldaat ergens neer; die
 	// belofte breken omdat de speler wegloopt zou orders waardeloos maken (8.4).
 	// FocusTarget houdt hem ook: hij staat te vuren op wat je aanwees.
@@ -315,6 +322,22 @@ void AEclipseSquadmateController::UpdateEngagement()
 		return;
 	}
 
+	// RECON ZWIJGT tot er op hem geschoten wordt. Dat is geen "vuren uit" maar
+	// "vuur pas als het toch al te laat is om stil te blijven" — precies wat de
+	// Recon-ROE in Ghost Recon doet, en wat sluipen bruikbaar maakt sinds een
+	// schot je verraadt (26-07 punt 1).
+	if (CurrentStance == EEclipseSquadStance::Recon)
+	{
+		const UWorld* World = GetWorld();
+		const double Now = World != nullptr ? World->GetTimeSeconds() : 0.0;
+		if (Now > WeaponsFreeUntil)
+		{
+			AutoTarget = nullptr;
+			GetWorldTimerManager().ClearTimer(AutoFireTimer);
+			return;
+		}
+	}
+
 	AEclipseCharacter* Target = FindHostileInRange();
 	AutoTarget = Target;
 	if (Target != nullptr && !GetWorldTimerManager().IsTimerActive(AutoFireTimer))
@@ -357,6 +380,19 @@ void AEclipseSquadmateController::HandleHitTaken(AEclipseCharacter* Shooter, flo
 	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
 	UWorld* World = GetWorld();
 	if (Body == nullptr || World == nullptr || Body->IsDowned() || CoverSearchRadius <= 0.0f)
+	{
+		return;
+	}
+
+	// RECON MAG NU VUREN. Er is op hem geschoten, dus stil blijven levert niets
+	// meer op. Tien seconden: lang genoeg om het vuurgevecht uit te vechten, kort
+	// genoeg om daarna weer stil te worden.
+	WeaponsFreeUntil = World->GetTimeSeconds() + 10.0;
+
+	// AGGRESSIVE ZOEKT GEEN DEKKING. Dat is het kamikaze-kader van de owner: niet
+	// "zet aanvallen aan" maar "laat dekking zoeken weg". Hij blijft staan en
+	// vuurt terug — het autonome vuur hierboven doet de rest.
+	if (CurrentStance == EEclipseSquadStance::Aggressive)
 	{
 		return;
 	}

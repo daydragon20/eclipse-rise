@@ -57,6 +57,13 @@ public:
 	void BeginFollowing(float FollowDistanceCm, float CoverSearchRadiusCm);
 
 	/**
+	 * De doctrine zetten (26-07 avond, laag 4). Geldt METEEN en blijft gelden tot
+	 * je hem wisselt — het is een kader, geen orderparameter.
+	 */
+	void SetDoctrine(EEclipseSquadStance Stance) { CurrentStance = Stance; }
+	EEclipseSquadStance GetDoctrine() const { return CurrentStance; }
+
+	/**
 	 * Apply this soldier's resolved class kit (SPEC-P2-01). Pure data over the
 	 * shared body (GDD 12.3): modulates order execution (push distance, cover
 	 * lane bias) and enables auto-triage — never a divergent behavior class.
@@ -161,6 +168,9 @@ private:
 
 	/** Tot wanneer een verse dekkingszoektocht niet nog eens mag starten. */
 	double CoverCooldownUntil = -1.0;
+
+	/** Recon: tot wanneer hij mag vuren omdat er op hem geschoten is. */
+	double WeaponsFreeUntil = -1.0;
 
 	/** Zoekstraal uit DA_SquadTuning; 0 = geen dekkingzoekgedrag. */
 	float CoverSearchRadius = 0.0f;

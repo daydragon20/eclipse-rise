@@ -53,6 +53,16 @@ public:
 	FGuid GetSelectedSoldier() const { return State.SelectedSoldier; }
 	EEclipseSquadStance GetHeldStance() const { return HeldStance; }
 
+	/**
+	 * Zet de doctrine METEEN bij alle squadleden neer (26-07 avond, laag 4).
+	 *
+	 * Niet pas bij de volgende order, en dat is het hele punt van een KADER: de
+	 * owner stuurt intentie, en intentie geldt vanaf het moment dat je hem
+	 * uitspreekt. Tot vanavond reisde de stance als parameter mee met een order,
+	 * dus wisselen van houding deed niets tot je toevallig iets beval.
+	 */
+	void PushDoctrineToSquad();
+
 	/** The order path reports each issue so ModeExited telemetry counts usage (R3 metric). */
 	void NotifyOrderIssued();
 

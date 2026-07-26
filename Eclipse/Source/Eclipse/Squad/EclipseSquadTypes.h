@@ -40,9 +40,45 @@ enum class EEclipseOrderRefusalReason : uint8
 UENUM(BlueprintType)
 enum class EEclipseSquadStance : uint8
 {
+	/**
+	 * DOCTRINE (owner-opdracht 26-07 avond, punt 1 — laag 4 van zes).
+	 *
+	 * Geen schakelaars voor basisgedrag: elke waarde hier PERKT DE BASIS IN of
+	 * LAAT HEM LOS. Dat is het verschil dat de owner aanwees — "kamikaze" betekent
+	 * niet "zet aanvallen aan" maar "laat dekking zoeken weg".
+	 *
+	 * De set komt uit Ghost Recon (Recon / Assault / Suppress) plus het
+	 * kamikaze-voorbeeld van de owner zelf. Vier, niet acht: de referentie houdt
+	 * het klein omdat de basis groot is.
+	 */
+
+	/** Vuurt NIET tenzij er op hem geschoten wordt. Zoekt dekking. (GR: Recon.) */
+	Recon,
+
+	/** De volledige basis: vuurt op wat hij ziet, zoekt dekking, loopt mee. */
 	Ready,
+
+	/** Blijft staan waar hij staat. Vuurt vrij. Loopt niet mee. (FSW / GR: Suppress.) */
+	Overwatch,
+
+	/** Zoekt GEEN dekking; sluit af op de dichtstbijzijnde vijand. (Het kamikaze-kader.) */
 	Aggressive
 };
+
+namespace EclipseSquad
+{
+	/** Eén woord per doctrine, voor de HUD en de logs. */
+	inline const TCHAR* StanceLabel(EEclipseSquadStance Stance)
+	{
+		switch (Stance)
+		{
+		case EEclipseSquadStance::Recon:      return TEXT("recon");
+		case EEclipseSquadStance::Overwatch:  return TEXT("overwatch");
+		case EEclipseSquadStance::Aggressive: return TEXT("aggressive");
+		default:                              return TEXT("ready");
+		}
+	}
+}
 
 /** One order's line pools (DT_SquadOrderDefs row; row name = order id). */
 USTRUCT(BlueprintType)

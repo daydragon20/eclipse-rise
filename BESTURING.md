@@ -52,7 +52,7 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Vorige soldaat | scroll omlaag | *(pad: geen — RB wrapt rond)* | ja op muis; **de LT-tak is 26-07 verwijderd**, zie hieronder |
 | Soldaat onder richtkruis | E | X | ja — `PickSoldierUnderReticle` |
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |
-| Stance | Alt **ingedrukt houden terwijl je de order geeft** | Y (togglen, **alleen tijdens Command Mode**) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven. **LET OP (26-07): de stance wordt vandaag alleen ONTHOUDEN en getoond — de soldaat schrijft hem op (`CurrentStance`) en leest hem daarna nergens, dus je squad vecht er niet anders door.** Fase-1-placeholder, eerlijk zo gelabeld in de code; wanneer de gedragssplitsing komt is een owner-keuze |
+| Doctrine (stance) | Alt **ingedrukt houden terwijl je de order geeft** | Y (cyclen, **alleen tijdens Command Mode**) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven. **Sinds 26-07 avond verandert dit echt gedrag** en niet alleen de HUD-regel: **recon** vuurt niet tot er op hem geschoten wordt, **ready** is de volledige basis, **overwatch** blijft staan waar hij staat, **aggressive** zoekt geen dekking. Een doctrine geldt meteen voor de hele squad — hij reist niet meer mee met een order |
 
 
 > **Dit stond hier tot 26-07:** vier controls (stance, volgende, vorige,
@@ -68,9 +68,10 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 > HERLADEN (**R** of **X**; buiten Command Mode). Valt er niets te herladen, dan
 > geeft dezelfde knop de snelle hergroepeer-order via het bestaande orderpad —
 > geen dode knop, ook niet als het magazijn vol is. **LT** is geen
-> moduskeuze meer (zie hieronder). **Y (stance) blijft dood**, met opzet: stance
-> verandert vandaag alleen de HUD-regel, en er iets anders op zetten zou
-> verbergen dat de stance zelf nog niet af is.
+> moduskeuze meer (zie hieronder). **Y (stance) LEEFT sinds 26-07 avond**: hij
+> cycelt door de vier doctrines — recon, ready, overwatch, aggressive — en die
+> gelden METEEN voor de hele squad, niet pas bij de volgende order. Dat is het
+> verschil tussen een kader en een orderparameter.
 
 **LT is sinds 26-07 altijd mikken.** Hij was buiten de modus mikken en erbinnen
 "vorige soldaat". Zo'n overlading op een TRIGGER is in dit genre ongebruikelijk,

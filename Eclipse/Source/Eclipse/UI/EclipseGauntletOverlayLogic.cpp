@@ -207,7 +207,7 @@ namespace EclipseGauntletOverlay
 			// Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode, die
 			// bewaakt dat geen van deze knoppen buiten de modus de Command
 			// Mode-toestand aanraakt.
-			{ TEXT("Stance"),       TEXT("Alt vast bij de order"), TEXT("Y (tijdens Command Mode)") }
+			{ TEXT("Doctrine"),     TEXT("Alt vast bij de order"), TEXT("Y: recon/ready/overwatch/aggressive") }
 		};
 	}
 

@@ -1,4 +1,6 @@
 #include "Characters/EclipseCommandModeComponent.h"
+#include "EngineUtils.h"
+#include "AI/EclipseSquadmateController.h"
 
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipsePlayerController.h"
@@ -283,7 +285,28 @@ void UEclipseCommandModeComponent::ToggleHeldStance()
 	{
 		return;
 	}
-	HeldStance = HeldStance == EEclipseSquadStance::Aggressive ? EEclipseSquadStance::Ready : EEclipseSquadStance::Aggressive;
+	// Door alle vier cyclen, niet twee heen en weer. De volgorde is die van
+	// oplopende agressie — Recon, Ready, Overwatch, Aggressive — zodat één druk
+	// altijd dezelfde kant op beweegt en je weet waar je uitkomt.
+	HeldStance = static_cast<EEclipseSquadStance>(
+		(static_cast<uint8>(HeldStance) + 1) % 4);
+	PushDoctrineToSquad();
+}
+
+void UEclipseCommandModeComponent::PushDoctrineToSquad()
+{
+	const UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		return;
+	}
+	for (TActorIterator<AEclipseSquadmateController> It(GetWorld()); It; ++It)
+	{
+		if (AEclipseSquadmateController* Mate = *It)
+		{
+			Mate->SetDoctrine(HeldStance);
+		}
+	}
 }
 
 void UEclipseCommandModeComponent::NotifyOrderIssued()
@@ -312,7 +335,7 @@ TArray<FString> UEclipseCommandModeComponent::GetDebugLines() const
 		State.SelectedSoldier.IsValid() && Squad != nullptr && Squad->IsRegisteredSquadmate(State.SelectedSoldier)
 			? *State.SelectedSoldier.ToString().Left(8)
 			: TEXT("ALL"),
-		HeldStance == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready")));
+		EclipseSquad::StanceLabel(HeldStance)));
 	Lines.Add(TEXT("  Tab/RB next · scroll/LT prev · E/X pick · Y stance · 1-4/D-pad order"));
 	return Lines;
 }

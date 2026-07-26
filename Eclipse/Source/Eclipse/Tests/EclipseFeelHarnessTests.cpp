@@ -921,7 +921,7 @@ bool FEclipseControlTableMatchesBindingsTest::RunTest(const FString& Parameters)
 		{ TEXT("Vorige"),        TEXT("SelectPrev"),  TEXT("SelectPrev"),    nullptr },
 		{ TEXT("Onder kruis"),   TEXT("DirectPick"),  TEXT("DirectPick"),    nullptr },
 		{ TEXT("Orders"),        TEXT("Order1"),      TEXT("Order1"),        nullptr },
-		{ TEXT("Stance"),        nullptr,             TEXT("StanceToggle"),
+		{ TEXT("Doctrine"),      nullptr,             TEXT("StanceToggle"),
 		  TEXT("LeftAlt is GEEN actie: IssueSquadOrder pollt IsInputKeyDown op het moment van geven") },
 	};
 
