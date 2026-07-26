@@ -1067,7 +1067,146 @@ void BuildDistrict(UWorld& World)
 			}
 		};
 
-		FRandomStream PropRng(211);
+		// ---- ARMATUREN (owner-besluit 26-07 avond: ja op het lichtplan) ---------
+	//
+	// VEERTIEN, niet honderd. Vijf bakens op de doelsites, acht wandarmaturen op
+	// de routes ertussen, en de extractie als sterkste bron. Daarna een ronde
+	// vaste-camera screenshots door de art-review, en pas dan breed.
+	//
+	// De opbouw komt uit het Epic-leerproject over cinematische belichting - de
+	// OPBOUW en niet de techniek, want ray tracing blijft uit: POELEN met donker
+	// ertussen, een helderste bron, en elk licht heeft een zichtbare armatuur.
+	// Wat het district mist is contrast, niet helderheid.
+	//
+	// GEEN EIGEN KLEUR voor de bakens (owner-besluit). Dat volgt de regel die het
+	// district al heeft: het palet is de enige kleur-autoriteit (15.5), en de
+	// hierarchie komt uit HELDERHEID.
+	{
+		struct FFixtureDef
+		{
+			const TCHAR* Label;
+			const TCHAR* MeshPath;
+			const TCHAR* BaseColorPath;
+			const TCHAR* EmissivePath;
+			FVector Location;
+			float Yaw;
+			float GlowGain;
+		};
+
+		const FFixtureDef Fixtures[] = {
+			// De vijf doelsites. Een doel dat oplicht is leesbaar vanaf de andere
+			// kant van het plein; dat is navigatie, geen dressing.
+			{ TEXT("Beacon_ControlPost"), TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Heavy_Duty_Linear_Beacon/Mesh/SM_Sci_Fi_Heavy_Duty_Linear_Beacon.SM_Sci_Fi_Heavy_Duty_Linear_Beacon"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Heavy_Duty_Linear_Beacon/Textures/T_Sci_Fi_Heavy_Duty_Linear_Beacon_BaseColor.T_Sci_Fi_Heavy_Duty_Linear_Beacon_BaseColor"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Heavy_Duty_Linear_Beacon/Textures/T_Sci_Fi_Heavy_Duty_Linear_Beacon_Emissive.T_Sci_Fi_Heavy_Duty_Linear_Beacon_Emissive"),
+			  FVector(5000, -2000, 0), 0.0f, 10.0f },
+			{ TEXT("Beacon_AlarmRelay"), TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Monolith_Light/Mesh/SM_Sci_Fi_Monolith_Light.SM_Sci_Fi_Monolith_Light"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Monolith_Light/Textures/T_Sci_Fi_Monolith_Light_BaseColor.T_Sci_Fi_Monolith_Light_BaseColor"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Monolith_Light/Textures/T_Sci_Fi_Monolith_Light_Emissive.T_Sci_Fi_Monolith_Light_Emissive"),
+			  FVector(5000, 1500, 0), 0.0f, 10.0f },
+			{ TEXT("Beacon_Crane"), TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Monolith_Light/Mesh/SM_Sci_Fi_Monolith_Light.SM_Sci_Fi_Monolith_Light"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Monolith_Light/Textures/T_Sci_Fi_Monolith_Light_BaseColor.T_Sci_Fi_Monolith_Light_BaseColor"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Monolith_Light/Textures/T_Sci_Fi_Monolith_Light_Emissive.T_Sci_Fi_Monolith_Light_Emissive"),
+			  FVector(-4000, 3000, 0), 0.0f, 10.0f },
+			{ TEXT("Beacon_Pens"), TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Bollard_Light/Mesh/SM_Sci_Fi_Bollard_Light.SM_Sci_Fi_Bollard_Light"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Bollard_Light/Textures/T_Sci_Fi_Bollard_Light_BaseColor.T_Sci_Fi_Bollard_Light_BaseColor"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Bollard_Light/Textures/T_Sci_Fi_Bollard_Light_Emissive.T_Sci_Fi_Bollard_Light_Emissive"),
+			  FVector(-4000, 2600, 0), 0.0f, 10.0f },
+			// DE STERKSTE BRON van het district: een punt dat feller is dan al het
+			// andere. Dat is de hierarchie waar de referentie op draait, en het is
+			// ook het punt waar je heen moet.
+			{ TEXT("Beacon_Extraction"), TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Heavy_Duty_Linear_Beacon/Mesh/SM_Sci_Fi_Heavy_Duty_Linear_Beacon.SM_Sci_Fi_Heavy_Duty_Linear_Beacon"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Heavy_Duty_Linear_Beacon/Textures/T_Sci_Fi_Heavy_Duty_Linear_Beacon_BaseColor.T_Sci_Fi_Heavy_Duty_Linear_Beacon_BaseColor"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Heavy_Duty_Linear_Beacon/Textures/T_Sci_Fi_Heavy_Duty_Linear_Beacon_Emissive.T_Sci_Fi_Heavy_Duty_Linear_Beacon_Emissive"),
+			  FVector(-8500, -8500, 0), 0.0f, 16.0f },
+		};
+
+		// De acht wandarmaturen op de routes ertussen. Poelen; het donker tussen
+		// twee poelen hoort net zo goed bij het plan als de poelen zelf.
+		const FVector RoutePoints[] = {
+			FVector(3200, -1400, 0), FVector(1500, -600, 0), FVector(0, 300, 0), FVector(-1800, 1200, 0),
+			FVector(-3000, 2200, 0), FVector(2600, 900, 0), FVector(-5600, -2600, 0), FVector(-7200, -5600, 0),
+		};
+
+		UMaterialInterface* FixtureMaster = LoadObject<UMaterialInterface>(nullptr,
+			TEXT("/Game/Art/M_EclipseToonFixture.M_EclipseToonFixture"));
+		if (FixtureMaster == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Graybox: M_EclipseToonFixture ontbreekt - armaturen blijven ongelicht (draai Tools/create_fixture_material.py)."));
+		}
+
+		int32 Placed = 0;
+		const FLinearColor SunVector(FVector4(SunRotation.Vector(), 0.0f));
+		auto SpawnFixture = [&World, &Params, FixtureMaster, SunVector, &Placed](
+			const TCHAR* Label, const TCHAR* MeshPath, const TCHAR* BasePath, const TCHAR* EmissivePath,
+			const FVector& Location, float Yaw, float GlowGain)
+		{
+			UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath);
+			if (Mesh == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: armatuur %s ontbreekt (%s)."), Label, MeshPath);
+				return;
+			}
+			AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Location, FRotator(0.0f, Yaw, 0.0f), Params);
+			if (Actor == nullptr)
+			{
+				return;
+			}
+			Actor->SetMobility(EComponentMobility::Movable);
+			Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+			Actor->Tags.Add(Label);
+
+			if (FixtureMaster != nullptr)
+			{
+				UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(FixtureMaster, &World);
+				// Behuizing door de toon-master, met de graphite-tint van het
+				// district. Het PALET bepaalt de kleur, ook hier.
+				Mid->SetVectorParameterValue(TEXT("LitColor"), FLinearColor(0.300f, 0.325f, 0.377f));
+				Mid->SetVectorParameterValue(TEXT("ShadeColor"), FLinearColor(0.098f, 0.107f, 0.169f));
+				Mid->SetVectorParameterValue(TEXT("LightDir"), SunVector);
+				Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+				if (UTexture* Base = LoadObject<UTexture>(nullptr, BasePath))
+				{
+					Mid->SetTextureParameterValue(TEXT("AlbedoTex"), Base);
+					Mid->SetScalarParameterValue(TEXT("AlbedoMix"), 0.85f);
+				}
+				// HET LICHTVLAK. De emissive-map van het pack zegt WAAR het licht
+				// zit; GlowColor zegt welke kleur (palet), GlowGain hoe fel.
+				if (UTexture* Emissive = LoadObject<UTexture>(nullptr, EmissivePath))
+				{
+					Mid->SetTextureParameterValue(TEXT("EmissiveMaskTex"), Emissive);
+				}
+				Mid->SetScalarParameterValue(TEXT("GlowGain"), GlowGain);
+				for (int32 Slot = 0; Slot < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++Slot)
+				{
+					Actor->GetStaticMeshComponent()->SetMaterial(Slot, Mid);
+				}
+			}
+			Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+			// Armaturen zijn dressing: ze mogen nav, dekking en hitscan niet
+			// verstoren - dezelfde regel als de lane paint en de vlekken.
+			Actor->SetActorEnableCollision(false);
+			++Placed;
+		};
+
+		for (const FFixtureDef& Def : Fixtures)
+		{
+			SpawnFixture(Def.Label, Def.MeshPath, Def.BaseColorPath, Def.EmissivePath, Def.Location, Def.Yaw, Def.GlowGain);
+		}
+		for (int32 Index = 0; Index < static_cast<int32>(UE_ARRAY_COUNT(RoutePoints)); ++Index)
+		{
+			// Een stap onder de bakens (gain 6 tegen 10): de routes wijzen de weg,
+			// de doelen trekken je erheen.
+			SpawnFixture(TEXT("RouteLight"), TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Patterned_Wall_Light/Mesh/SM_Sci_Fi_Patterned_Wall_Light.SM_Sci_Fi_Patterned_Wall_Light"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Patterned_Wall_Light/Textures/T_Sci_Fi_Patterned_Wall_Light_BaseColor.T_Sci_Fi_Patterned_Wall_Light_BaseColor"),
+			  TEXT("/Game/Sci_Fi_Light/Static_Meshes/SM_Sci_Fi_Patterned_Wall_Light/Textures/T_Sci_Fi_Patterned_Wall_Light_Emissive.T_Sci_Fi_Patterned_Wall_Light_Emissive"),
+				RoutePoints[Index] + FVector(0.0f, 0.0f, 260.0f), Index * 45.0f, 6.0f);
+		}
+		UE_LOG(LogEclipse, Display, TEXT("Graybox: %d armaturen geplaatst (5 bakens, 8 routes)."), Placed);
+	}
+
+	FRandomStream PropRng(211);
 		for (int32 PropIndex = 0; PropIndex < static_cast<int32>(UE_ARRAY_COUNT(Props)); ++PropIndex)
 		{
 			const FPropDef& Prop = Props[PropIndex];
