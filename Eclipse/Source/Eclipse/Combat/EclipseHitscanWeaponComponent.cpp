@@ -22,6 +22,12 @@ void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row
 	Weapon = Row;
 }
 
+bool UEclipseHitscanWeaponComponent::ShooterBodyIsAiming() const
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner());
+	return Body != nullptr && Body->IsAiming();
+}
+
 bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVector& ViewDirection, FName Cause)
 {
 	UWorld* World = GetWorld();
@@ -35,7 +41,17 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	{
 		return false;
 	}
+
+	// De reeks breekt als je de trekker loslaat. Drie vuurintervallen stilte is
+	// ruim genoeg om een bewuste pauze te zijn en te kort om per ongeluk te halen
+	// tijdens aanhoudend vuur — dat is wat "eerste schot zuiver" bruikbaar maakt
+	// in plaats van een eenmalige gratis kogel per missie.
+	if (LastFireTimeSeconds < 0.0 || Now - LastFireTimeSeconds > Weapon.FireInterval * 3.0)
+	{
+		ConsecutiveShots = 0;
+	}
 	LastFireTimeSeconds = Now;
+	++ShotsFired;
 
 	// HET SCHOT VERRAADT JE (owner-opdracht 26-07, punt 1).
 	//
@@ -69,9 +85,46 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 		ShooterBody->PlayShootPose();
 	}
 
+	// SPREIDING (owner-opdracht 26-07 avond, punt 4, laag B).
+	//
+	// EERSTE SCHOT IS ALTIJD ZUIVER. Dat is geen concessie aan testbaarheid maar
+	// de conventie: Fortnite noemt het first-shot accuracy, CS bouwt zijn hele
+	// spraypatroon eromheen, en Borderlands laat de accuracy pas onder aanhoudend
+	// vuur zakken. Het maakt een enkel gericht schot een precisiehandeling en
+	// aanhoudend vuur een gok — precies het onderscheid dat een DMR van een SMG
+	// scheidt.
+	//
+	// Het geeft er ook een meetbaar systeem van: één schot is deterministisch, dus
+	// het harnas kan de kogel volgen. Zonder dat zou elke gevechtsmeting ruis
+	// bevatten en zou "mist hij of is hij kapot?" niet meer te beantwoorden zijn.
+	const bool bAiming = ShooterBodyIsAiming();
+	float SpreadDegrees = 0.0f;
+	if (ConsecutiveShots > 0)
+	{
+		SpreadDegrees = bAiming ? Weapon.AimSpreadDegrees : Weapon.HipSpreadDegrees;
+
+		// Bewegen straft, en per wapen anders: de SMG heeft 0,8 graden en de DMR
+		// 4,0. Dat is wat "waardeloos in beweging" in data betekent.
+		if (const APawn* ShooterPawn = Cast<APawn>(GetOwner()))
+		{
+			const float Speed = ShooterPawn->GetVelocity().Size2D();
+			// Op de loopsnelheid geschaald, niet op de sprint: wie wandelt hoort
+			// nauwelijks straf te voelen, wie rent de volle.
+			const float MoveFraction = FMath::Clamp(Speed / 420.0f, 0.0f, 1.0f);
+			SpreadDegrees += Weapon.MovingSpreadDegrees * MoveFraction;
+		}
+	}
+	++ConsecutiveShots;
+
+	FVector ShotDirection = ViewDirection.GetSafeNormal();
+	if (SpreadDegrees > 0.0f)
+	{
+		ShotDirection = FMath::VRandCone(ShotDirection, FMath::DegreesToRadians(SpreadDegrees));
+	}
+
 	FHitResult Hit;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseHitscan), /*bTraceComplex*/ false, GetOwner());
-	const FVector End = ViewLocation + ViewDirection.GetSafeNormal() * Weapon.RangeCm;
+	const FVector End = ViewLocation + ShotDirection * Weapon.RangeCm;
 	if (!World->LineTraceSingleByChannel(Hit, ViewLocation, End, ECC_Pawn, Params))
 	{
 		return false;

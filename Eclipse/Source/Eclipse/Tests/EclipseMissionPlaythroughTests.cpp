@@ -1773,6 +1773,7 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 	Harness.Idle(0.1f);
 
 	const float HealthBefore = Target->GetHealth();
+	const int32 ShotsBefore = Weapon->GetShotsFired();
 	const double Start = Harness.ElapsedSeconds;
 	constexpr double FireSeconds = 2.0;
 	while (Harness.ElapsedSeconds - Start < FireSeconds)
@@ -1783,10 +1784,11 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 	const double Elapsed = Harness.ElapsedSeconds - Start;
 	const float DamageDealt = HealthBefore - Target->GetHealth();
 
-	// Kop- en rompschoten verschillen in schade, dus het aantal schoten volgt niet
-	// zomaar uit de totale schade. Daarom delen door de schade van het schot dat
-	// we ook echt maken: op borsthoogte gemikt = rompschade.
-	const float ShotsFired = ShotDamage > 0.0f ? DamageDealt / ShotDamage : 0.0f;
+	// Uit de WAPENTELLER en niet uit de schade (26-07). Dit leidde het aantal
+	// schoten af uit de aangerichte schade, wat klopt zolang elk schot raak is —
+	// en dat is precies wat spreiding en terugslag komen wegnemen. Dan zou deze
+	// test het aantal TREFFERS meten en het vuurtempo noemen.
+	const float ShotsFired = static_cast<float>(Weapon->GetShotsFired() - ShotsBefore);
 	const float MeasuredRate = Elapsed > 0.0 ? ShotsFired / static_cast<float>(Elapsed) : 0.0f;
 
 	Report(*this, TEXT("schade in 2 s vuren"), DamageDealt, TEXT("hp"));
@@ -1809,7 +1811,7 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 			Harness.AimAt(Target->GetActorLocation());
 			const float Before = Target->GetHealth();
 			// Ruim over één vuurinterval heen, zodat de poort zeker opengaat.
-			const double Start2 = Harness.ElapsedSeconds;
+	const double Start2 = Harness.ElapsedSeconds;
 			while (Harness.ElapsedSeconds - Start2 < FireInterval * 3.0)
 			{
 				Harness.Inject(TEXT("Fire"), true);
@@ -1868,14 +1870,19 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 				Harness.AimAt(AimPoint);
 				Harness.Step();
 			}
-			Harness.Idle(0.2f);
+			// PRECIES EEN SCHOT, en dat is sinds de spreiding van 26-07 het enige
+			// wat deze meting kan zijn. Hij vuurde er twee, en met spreiding is het
+			// tweede schot geen kopschot meer: gemeten 55 + 22 = 77, oftewel een
+			// verhouding van 1,75 die niets zegt over de multiplier.
+			//
+			// De rust ervoor breekt de vuurreeks (drie vuurintervallen stilte), dus
+			// dit schot is gegarandeerd het EERSTE van zijn reeks en daarmee zuiver.
+			// Dat is precies waar first-shot accuracy voor gemaakt is.
+			Harness.Idle(FireInterval * 4.0f);
 			const float Before = Target->GetHealth();
-			const double Start3 = Harness.ElapsedSeconds;
-			while (Harness.ElapsedSeconds - Start3 < FireInterval * 1.5)
-			{
-				Harness.Inject(TEXT("Fire"), true);
-				Harness.Step();
-			}
+			Harness.Inject(TEXT("Fire"), true);
+			Harness.Step();
+			Harness.Idle(0.1f);
 			return Before - Target->GetHealth();
 		};
 
@@ -1894,7 +1901,7 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		const float HeadDamage = DamageAiming(HeadOffset);
 		Report(*this, TEXT("schade op borsthoogte"), ChestDamage, TEXT("hp"));
 		Report(*this, TEXT("schade op hoofdhoogte"), HeadDamage, TEXT("hp"),
-			*FString::Printf(TEXT("×%.1f zou %.0f hp zijn"), Weapon->GetHeadshotMultiplier(),
+			*FString::Printf(TEXT("één zuiver schot; ×%.1f zou %.0f hp zijn"), Weapon->GetHeadshotMultiplier(),
 				ChestDamage * Weapon->GetHeadshotMultiplier()));
 		// WEL een assert sinds 26-07 (owner-opdracht punt 2, optie 1). Hier stond
 		// expliciet dat er niet geasserteerd werd, omdat kopschoten toen niets

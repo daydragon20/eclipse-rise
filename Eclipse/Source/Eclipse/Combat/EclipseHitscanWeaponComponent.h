@@ -37,7 +37,24 @@ public:
 	/** Seconden tussen twee schoten — de poort die het vuurtempo bepaalt. */
 	float GetFireInterval() const { return Weapon.FireInterval; }
 
+	/**
+	 * Schoten die de cadanspoort passeerden, raak of mis (26-07).
+	 *
+	 * Bestaat omdat de vuurtempo-test het aantal schoten AFLEIDDE uit de schade.
+	 * Dat werkte zolang elk schot raak was; met spreiding en terugslag meet hij
+	 * dan het aantal TREFFERS en noemt dat het tempo. De meting robuust maken
+	 * hoort vóór de gedragswijziging, niet erna.
+	 */
+	int32 GetShotsFired() const { return ShotsFired; }
+
 private:
+	int32 ShotsFired = 0;
+
+	/** Schoten in de huidige reeks; 0 = het volgende schot is zuiver. */
+	int32 ConsecutiveShots = 0;
+
+	bool ShooterBodyIsAiming() const;
+
 	/** Eén diagnostische regel over de eerste kopschot-beslissing. */
 	int32 HeadshotProbesLogged = 0;
 
