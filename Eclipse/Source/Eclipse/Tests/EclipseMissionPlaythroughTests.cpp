@@ -1685,6 +1685,55 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		*FString::Printf(TEXT("data zegt %.2f"), FireInterval > 0.0f ? 1.0f / FireInterval : 0.0f));
 
 	TestTrue(TEXT("vuurtempo: er is überhaupt geschoten"), ShotsFired >= 1.0f);
+
+	// --- bereik: houdt het wapen op waar de data zegt? ----------------------
+	// RangeCm staat op 5000 en is nooit nagemeten, terwijl het precies het getal
+	// is waar de bereik-asymmetrie op de owner-lijst over gaat. Een doelwit net
+	// binnen en net buiten die grens beantwoordt het.
+	{
+		const float Range = Weapon->GetRangeCm();
+		auto DamageAt = [&](float DistanceCm) -> float
+		{
+			Target->SetActorLocation(Harness.Location() + Harness.Body->GetActorForwardVector() * DistanceCm);
+			Harness.Idle(0.2f);
+			Harness.AimAt(Target->GetActorLocation());
+			const float Before = Target->GetHealth();
+			// Ruim over één vuurinterval heen, zodat de poort zeker opengaat.
+			const double Start2 = Harness.ElapsedSeconds;
+			while (Harness.ElapsedSeconds - Start2 < FireInterval * 3.0)
+			{
+				Harness.Inject(TEXT("Fire"), true);
+				Harness.Step();
+			}
+			return Before - Target->GetHealth();
+		};
+
+		// Een REEKS afstanden, want één meting die nul geeft zegt niet waar de grens
+		// ligt. De eerste versie prikte op 95% en 110% en kreeg twee keer nul; dat
+		// leest als "het wapen raakt nooit", terwijl het betekende dat de grens
+		// ergens anders lag dan verwacht.
+		Report(*this, TEXT("wapenbereik uit de data"), Range, TEXT("cm"));
+		float LastHitDistance = -1.0f;
+		float FirstMissDistance = -1.0f;
+		for (const float Fraction : { 0.30f, 0.60f, 0.80f, 0.90f, 0.94f, 0.98f, 1.10f })
+		{
+			const float Distance = Range * Fraction;
+			const float Dealt = DamageAt(Distance);
+			AddInfo(FString::Printf(TEXT("bereik: op %.0f cm (%.0f%% van %.0f) -> %.0f hp"),
+				Distance, Fraction * 100.0f, Range, Dealt));
+			if (Dealt > 0.0f)
+			{
+				LastHitDistance = Distance;
+			}
+			else if (FirstMissDistance < 0.0f && LastHitDistance > 0.0f)
+			{
+				FirstMissDistance = Distance;
+			}
+		}
+		Report(*this, TEXT("verste afstand waarop je nog raakt"), LastHitDistance, TEXT("cm"));
+		Report(*this, TEXT("eerste afstand waarop je mist"), FirstMissDistance, TEXT("cm"));
+		TestTrue(TEXT("bereik: het wapen raakt überhaupt iets binnen zijn bereik"), LastHitDistance > 0.0f);
+	}
 	// 10% marge: de laatste schot-poort valt zelden precies op het einde van het
 	// venster, en de stapgrootte kwantiseert.
 	const float Authored = FireInterval > 0.0f ? 1.0f / FireInterval : 0.0f;
