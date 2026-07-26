@@ -268,6 +268,20 @@ void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
 	{
 		return; // geen take voor dit lichaam: draaien zonder animatie, zoals voorheen
 	}
+	// Eén keer hardop WELKE take er draait en of hij additief is. De
+	// locomotie-audit vroeg of de draaianimatie echt speelt, en "de pose
+	// resolvet" is daar geen antwoord op — een additieve take gedraagt zich
+	// anders dan een volledige, en juist dat verschil liet vandaag een
+	// personage verdwijnen. Eén regel, niet per draai: dit is een feit over het
+	// lichaam en geen gebeurtenis.
+	if (!bLoggedTurnTake)
+	{
+		bLoggedTurnTake = true;
+		UE_LOG(LogEclipse, Display, TEXT("Draaitake: %s (%s, %.2f s)"),
+			*Clip->GetName(),
+			Clip->IsValidAdditive() ? TEXT("ADDITIEF") : TEXT("volledige pose"),
+			Clip->GetPlayLength());
+	}
 	// Half gewicht: draaien is een beweging van het onderlichaam en mag een
 	// schietpose of een klap niet overrulen. En de duur uit de take zelf, want
 	// die weet hoe lang hij is.

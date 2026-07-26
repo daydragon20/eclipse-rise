@@ -141,6 +141,9 @@ public:
 	 */
 	void PlayTurnPose(bool bTurningRight);
 
+	/** Zodat de draaitake zich één keer bekendmaakt en niet bij elke draai. */
+	bool bLoggedTurnTake = false;
+
 	/** De hoofd-hitbox, of null als dit lichaam geen hoofd-socket heeft. */
 	const USphereComponent* GetHeadHitbox() const { return HeadHitbox; }
 

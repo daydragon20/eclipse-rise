@@ -157,3 +157,65 @@ strafen, en dat blijft zo tot er cycli voor hun skelet zijn.
 Datzelfde geldt voor de draai-animatie: **geen enkele pack heeft een `Turn_*`-take.**
 Zolang die er niet is, is punt 5 half — de drempel voorkomt het ergste, de voetslip
 blijft.
+
+---
+
+## Ronde 3 — 26-07-2026, laat
+
+**Waarom opnieuw.** Sinds ronde 2 is er veel veranderd dat locomotie raakt: de
+additieve poses (een idle-take die als volledige pose het lichaam liet inklappen),
+de compatibele skeletten (2948 stil afgewezen animaties naar 0), en turn-in-place
+dat daadwerkelijk is aangesloten. Deze ronde meet wat daarvan is blijven staan.
+
+**Nieuw deze ronde: er is voor het eerst naar het SCHERM gekeken.** De vorige twee
+rondes staan volledig op getallen. Dat is precies de kritiek die de owner op de
+verificatie gaf, en punt 5 hieronder is er niet los van te zien.
+
+| # | Onderdeel | Ronde 2 | Nu (gemeten) | Oordeel |
+|---|---|---|---|---|
+| 5 | **Draaien in stilstand** | Drempel er, take gevonden maar niet aangesloten | Drempel 60°, take resolvet, en op beeld: camera 118,4° / lichaam 118,4° / verschil 0,0°. De speler heeft de draaipose (`Idle_Turn_90_Right`, **volledige pose**, niet additief) | **Gesloten voor de speler** — met een kanttekening, zie hieronder |
+| 15 | **Animatie per overgang** | Idle/gang/klap/schot + hurkovergang + herladen | Ongewijzigd. Nog steeds geen start-, stop- of landtake | Half, ongewijzigd |
+
+### De kanttekening bij punt 5: de take duurt 4,00 seconden
+
+`Idle_Turn_90_Right` is **4,00 s** lang, en de pose wordt precies zo lang
+aangehouden — `PlayOneShotPose` neemt de lengte van de take zelf. Het lichaam is
+zijn draai in een fractie daarvan rond (de draaisnelheid staat op 500°/s), dus de
+draaipose blijft daarna nog seconden op 0,85 gewicht staan, óók als je alweer loopt.
+
+De referentie zit op **0,4–0,8 s** voor een kwartslag-draai in stilstand (Gears,
+The Division). Vier seconden is daar een veelvoud van, en dat is geen tuningkeuze
+maar een eigenschap van een Paragon-take: die dragen een lange nasleep waarin het
+personage uitzakt naar idle.
+
+**Ik heb dit NIET gerepareerd, en dat is bewust.** Er zijn twee wegen — de take
+afkappen op een genre-waarde, of hem koppelen aan het moment dat het lichaam
+klaar is met draaien — en welke goed is, hangt af van waar in die 4,00 s de draai
+zelf zit. Dat heb ik niet gemeten, en een getal kiezen zonder die meting is
+precies de fout die deze audit moet vinden. Volgende ronde: bemonster het gewicht
+en de bothoek over de duur van de take, en bepaal daaruit het afkappunt.
+
+### Punt 3 en de draaitake: de stand per lichaam
+
+| Lichaam | Poses | Wat ontbreekt |
+|---|---|---|
+| **Player** (Belica) | 3/5 | herladen, hurken |
+| Rebel_A, Rebel_B, Rebel_C | 4/5 | draaien |
+| Enforcer, Trooper, Shock | 4/5 | draaien |
+| Veil, RadiantGuard | 4/5 | draaien |
+
+**Correctie op de vorige regel van dit document.** Onderaan stond: *"geen enkele
+pack heeft een `Turn_*`-take"*. Dat is de fout die in ronde 2 al één keer is
+rechtgezet en die hier bleef staan — ParagonLtBelica levert ze wél, en de speler
+gebruikt er nu één. Wat klopt is de beperktere vorm: **de acht niet-speler-lichamen
+hebben geen draaitake**, want hun packs leveren er geen.
+
+Voor die acht is dat minder erg dan het klinkt: turn-in-place is een
+speler-ervaring. Een squadmate die je van opzij ziet bijdraaien valt nauwelijks op,
+en een vijand al helemaal niet. Het staat hier omdat een "9/9" ergens anders in dit
+document anders zou suggereren dat dit ook rond is.
+
+**De speler mist herladen en hurken**, en dat is de scherpste van de tien: herladen
+duurt 2,2 s met vier foley-fasen eronder, dus je hóórt een handeling die je niet
+ziet.
+
