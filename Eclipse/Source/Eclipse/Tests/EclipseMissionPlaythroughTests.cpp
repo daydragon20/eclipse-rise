@@ -28,6 +28,9 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/IAssetRegistry.h"
+#include "Eclipse.h" // LogEclipse
 #include "Characters/EclipseCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -2110,6 +2113,88 @@ bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
 	}
 
 	GameInstance->Shutdown();
+	return true;
+}
+
+// Een val die vandaag nog dicht is, en die luid moet worden op het moment dat de
+// owner erin stapt (14.3.5).
+//
+// UEclipseMissionAsset::EnemySpawns ziet eruit als de knop waarmee je bepaalt
+// welke vijanden waar staan — drie velden, netjes geclampt, met een comment die
+// zei dat de graybox-wiring hem consumeerde. Niets leest hem. De vijanden komen
+// uit een vaste lus van VIER in AEclipseGameMode::SpawnMissionActors, die de
+// rijen van DT_EnemyArchetypes afwisselt en ze naast het primaire doel neerzet.
+//
+// En het is geen toekomstig risico: DRIE van de vier verscheepte missies vullen
+// het veld al in (Assault 2 batches, Rescue 2, Sabotage 1, M1.1 geen). Die
+// missies beschrijven dus een vijandopstelling die nooit gebeurt. Ik ontdekte
+// dat met deze test zelf — de setup-scripts authoren geen spawns, dus de eerste
+// conclusie ("nog niets ingevuld") was fout; de assets zijn in de editor gevuld.
+//
+// Aansluiten verandert vijandaantallen en dus de moeilijkheid van elke missie:
+// een ontwerpbeslissing, geen reparatie. Daarom staat de bevinding in HANDOFF §4
+// en klemt deze test het BEKENDE getal vast. Groen zolang de situatie is wat er
+// beschreven staat; rood zodra iemand er data bij zet (dan wordt er méér stil
+// genegeerd) of weghaalt (dan is de beslissing genomen en moet deze tekst mee).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseAuthoredSpawnsAreConsumedTest,
+	"Eclipse.Playthrough.AuthoredEnemySpawnsWouldActuallySpawn",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseAuthoredSpawnsAreConsumedTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	// Via de asset registry en niet via een lijst met namen: een vijfde missie
+	// die er later bij komt moet vanzelf meegeteld worden. Een bewaker die zijn
+	// eigen dekking bij naam kent, mist stil precies het nieuwe geval.
+	IAssetRegistry& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
+		TEXT("AssetRegistry")).Get();
+	Registry.ScanPathsSynchronous({ TEXT("/Game/Data") }, /*bForceRescan*/ true);
+
+	TArray<FAssetData> Found;
+	Registry.GetAssetsByClass(UEclipseMissionAsset::StaticClass()->GetClassPathName(), Found, /*bSearchSubClasses*/ true);
+
+	Report(*this, TEXT("verscheepte missiesjablonen"), Found.Num(), TEXT(""),
+		TEXT("gevonden via de asset registry"));
+
+	// Zonder deze regel is de hele test een tautologie: nul missies gevonden zou
+	// even groen zijn als nul ingevulde batches. Dat is exact de valkuil die
+	// vannacht al twee bewakers stil hield.
+	if (!TestTrue(TEXT("spawns: er zijn uberhaupt missiesjablonen gevonden"), Found.Num() > 0))
+	{
+		return false;
+	}
+
+	int32 TotalBatches = 0;
+	for (const FAssetData& Data : Found)
+	{
+		const UEclipseMissionAsset* Mission = Cast<UEclipseMissionAsset>(Data.GetAsset());
+		if (Mission == nullptr)
+		{
+			continue;
+		}
+		TotalBatches += Mission->EnemySpawns.Num();
+		if (Mission->EnemySpawns.Num() > 0)
+		{
+			// Display en geen Warning: de suite draait met warnings-as-errors en dit
+			// is een vastgelegde toestand, geen nieuw defect. De luidheid zit in de
+			// tekst en in het feit dat het getal geklemd staat.
+			UE_LOG(LogEclipse, Display,
+				TEXT("EnemySpawns: '%s' authordt %d batch(es) die NIET gelezen worden — ")
+				TEXT("de vijanden komen uit een vaste lus van vier in AEclipseGameMode."),
+				*Data.AssetName.ToString(), Mission->EnemySpawns.Num());
+		}
+	}
+
+	Report(*this, TEXT("ingevulde spawnbatches"), TotalBatches, TEXT(""),
+		TEXT("3 van de 4 missies; geen ervan wordt gelezen"));
+
+	// De klem op de bekende toestand. Verandert dit getal, dan is er iets gebeurd
+	// wat iemand moet weten: er is data bij gekomen die stil genegeerd wordt, of
+	// de knoop is doorgehakt en dan hoort de uitleg hierboven mee te veranderen.
+	TestEqual(TEXT("spawns: nog steeds precies de vastgelegde 5 genegeerde batches ")
+		TEXT("(zie HANDOFF §4 — aansluiten of weghalen is een owner-beslissing)"),
+		TotalBatches, 5);
 	return true;
 }
 
