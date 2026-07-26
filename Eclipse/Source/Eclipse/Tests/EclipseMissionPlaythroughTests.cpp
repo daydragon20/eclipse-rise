@@ -1641,13 +1641,24 @@ bool FEclipseDownedSoldierRefusesTest::RunTest(const FString& Parameters)
 	}
 	Bus->Unsubscribe(Handle);
 
-	// GEEN assert op de INHOUD van die zinnen, en dat is bewust. De reden in de
-	// payload klopt (Downed), maar de zin komt uit de pool van het ORDERTYPE, dus
-	// een gevallen soldaat antwoordt met "Can't hold here." — dat wijst de speler
-	// naar een plaatsingsprobleem terwijl de man neerligt. Reden-specifieke zinnen
-	// vragen een veld in DT_SquadOrderDefs en dus een ontwerpbesluit; dat staat in
-	// het owner-lijstje. Asserteren dat de zin het woord "neer" bevat zou vandaag
-	// rood zijn, en op rood landen mag niet.
+	// WEL een assert op de inhoud, sinds 26-07 (owner koos optie 1: één gedeelde
+	// Downed-pool). Tot vandaag stond hier het omgekeerde: de reden in de payload
+	// klopte, maar de zin kwam uit de pool van het ORDERTYPE, dus een gevallen
+	// soldaat antwoordde met "Can't hold here." — dat wijst de speler naar een
+	// plaatsingsprobleem terwijl de man op de grond ligt.
+	//
+	// De assert is op de VORM en niet op één zin: welke van de drie hij pakt hangt
+	// af van zijn id. Wat moet gelden is dat het antwoord over zijn toestand gaat.
+	// Daarom drie sleutelwoorden en niet één citaat — een test die de exacte zin
+	// vastpint blokkeert het herschrijven ervan.
+	{
+		const bool bAboutBeingDown = Bark.Contains(TEXT("hit"))
+			|| Bark.Contains(TEXT("down"))
+			|| Bark.Contains(TEXT("medic"));
+		TestTrue(FString::Printf(
+				TEXT("neer: de weigerzin gaat over zijn TOESTAND en niet over de opdracht — kreeg \"%s\""), *Bark),
+			bAboutBeingDown);
+	}
 
 	Harness.Shutdown();
 	return true;

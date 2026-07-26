@@ -89,6 +89,9 @@ private:
 
 	void BroadcastOrderEvent(const FGameplayTag& Tag, const FGuid& SoldierId, EEclipseSquadOrder Order, const FString& BarkLine, EEclipseOrderRefusalReason Reason);
 
+	/** 14.3.5: de ontbrekende Downed-pool meldt zich een keer, niet elk order. */
+	bool bWarnedMissingDownedPool = false;
+
 	/** Dispatch the first triage-capable free squadmate to this casualty (data decides who — GDD 14.2). */
 	void DispatchTriage(AEclipseCharacter* DownedBody);
 

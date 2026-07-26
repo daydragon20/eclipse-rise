@@ -338,8 +338,32 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 	}
 	else
 	{
+		// Downed heeft zijn eigen pool (owner-beslissing 26-07, optie 1). Tot
+		// vandaag weigerde een neergeschoten soldaat met de zin van het ORDERTYPE:
+		// vraag hem te verplaatsen en hij zei "No route, boss." — een routeprobleem
+		// dat er niet was, terwijl hij op de grond lag. De reden geldt identiek
+		// voor alle vier de orders, dus één gedeelde rij volstaat.
+		const FEclipseSquadOrderDefRow* PoolRow = Row;
+		if (Decision.Reason == EEclipseOrderRefusalReason::Downed && OrderDefs != nullptr)
+		{
+			if (const FEclipseSquadOrderDefRow* DownedRow = OrderDefs->FindRow<FEclipseSquadOrderDefRow>(
+					TEXT("Downed"), TEXT("SquadOrderDowned"), /*bWarnIfMissing*/ false))
+			{
+				PoolRow = DownedRow;
+			}
+			else if (!bWarnedMissingDownedPool)
+			{
+				// Terugval op de orderzin is beter dan zwijgen, maar het is precies
+				// de verwarrende zin waar dit voor gebouwd is — dus luid (14.3.5).
+				bWarnedMissingDownedPool = true;
+				UE_LOG(LogEclipse, Warning,
+					TEXT("Squad: DT_SquadOrderDefs mist de rij 'Downed' — een neergeschoten soldaat weigert weer met de ")
+					TEXT("zin van het ordertype, en die wijst de speler op het verkeerde probleem. Draai Tools/create_phase1_content.py."));
+			}
+		}
+
 		const FString Bark = EclipseSquadOrderLogic::PickBarkLine(
-			Row != nullptr ? Row->RefusalLines : TArray<FString>(), SoldierId, static_cast<uint32>(Order) + 100u);
+			PoolRow != nullptr ? PoolRow->RefusalLines : TArray<FString>(), SoldierId, static_cast<uint32>(Order) + 100u);
 
 		// A refusal is an answer (GDD 8.4), and it is the answer most worth
 		// reading back: acknowledgements are the expected case, refusals are the

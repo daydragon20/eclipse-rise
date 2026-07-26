@@ -205,6 +205,16 @@ order_defs_json = json.dumps([
     {"Name": "Regroup",
      "AcknowledgeLines": ["Falling back to you.", "Coming in.", "Regrouping."],
      "RefusalLines": ["No way back to you.", "Route's cut."]},
+    # Een RIJ en geen veld (owner-beslissing 26-07, optie 1). Een neergeschoten
+    # soldaat weigerde tot vandaag met de zin van het ORDERTYPE: vroeg je hem te
+    # verplaatsen, dan zei hij "No route, boss." en wees hij je op een
+    # routeprobleem dat er niet was. De reden Downed geldt identiek voor alle vier
+    # de orders, dus een gedeelde pool is genoeg — en een extra rij vraagt geen
+    # schemawijziging, wat na een nacht dode velden opruimen de bedoeling is.
+    # AcknowledgeLines blijft leeg: wie neer ligt bevestigt niets.
+    {"Name": "Downed",
+     "AcknowledgeLines": [],
+     "RefusalLines": ["I'm hit - can't move.", "I'm down, boss.", "Need a medic, not an order."]},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(order_defs, order_defs_json):
     raise RuntimeError("DT_SquadOrderDefs JSON fill failed")
