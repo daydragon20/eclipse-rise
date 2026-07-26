@@ -143,6 +143,7 @@ window.PROGRESS_DATA = {
       "Niet gewijzigd: een toets toevoegen is een bindingskeuze en die zijn van jou"
     ] },
     { titel: "De +20 bonus voor een ronde zonder gewonden kan niet uitbetaald worden", prio: "gauw", waarom: "Gevonden door de getallen in de gids te vergelijken met wat de speelronde meet. De gids beloofde '+20 materiaal extra als niemand neerging'; gemeten kreeg ik 25 materiaal terwijl er nul gewonden vielen. De oorzaak: die bonus hangt aan een OPTIONEEL objective (Obj_M11_NoCasualties) dat voltooid moet worden om uit te betalen — en niets voltooit het. Er is geen vak om binnen te lopen en geen doelwit om neer te halen; het is een voorwaarde, geen taak. Zesde keer vannacht dat iets bestaat in de data en nergens in het spel bereikbaar is.", stappen: [
+      "JE ZIET HEM OOK STAAN, en dat maakt het vervelender: de HUD toont 'Bring everyone home standing (optional)' zolang er niemand neergaat, en die regel wordt nooit afgevinkt. Je gaat dus zoeken naar wat je moet DOEN om hem te halen, en er is niets te doen",
       "Wat er waarschijnlijk hoort te gebeuren: een voorwaarde-objective vinkt zichzelf af bij de debrief als de voorwaarde geldt (geen gewonden, geen alarm) in plaats van dat je hem moet 'halen'",
       "Dat is een klein stukje logica in ResolveDebrief, maar het RAAKT de economie: elke geslaagde stille ronde levert er dan 20 materiaal bij, en dat verandert je bouwtempo",
       "Mijn aanbeveling: doen, want een stretch-doel dat niet uitbetaalt is erger dan geen stretch-doel — het staat wel in de HUD en belooft iets",
