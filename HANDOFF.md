@@ -48,6 +48,14 @@
 2. **"Take out the patrol leader" was af door erlangs te lopen.** De overlap-trigger voltooide objectives zonder naar het type te kijken, en `DestroyTarget` had zelf géén voltooiingspad. De missie eindigde in een keurige geslaagde debrief zonder dat er iets gebeurd was, en de hele suite stond groen.
 3. **Achteruitlopen was even snel als vooruit rennen.** UE kent geen richtingsstraf; `GetMaxSpeed()` is de enige plek waar dat kan.
 
+**De grootste vondst kwam als laatste, en hij was al die tijd onzichtbaar: de camera-blend heeft NOOIT gedraaid.** De gids belooft dat de camera in ~0,2 s naar je ogen schuift bij 1e persoon, en dat mikken hem intrekt. Gemeten bleef alles staan waar het stond — 300,00 cm en 80,0°, onveranderd.
+
+De oorzaak is één regel in de constructor: `bCanEverTick = false`, terwijl de blend zichzelf aanvraagt met `SetActorTickEnabled(true)`. Dat is een **no-op** op een actor waarvan de tickfunctie nooit geregistreerd is. De code las volkomen correct — er stond zelfs een nette 12.4-onderbouwing bij waarom de tick uit hoort te staan — en het dóél werd elke keer keurig gezet. Alleen bewoog er nooit iets naartoe.
+
+**Drie dingen die jij ziet waren daardoor dood:** 1e/3e persoon (C), mikken (RMB/LT) en de Command Mode-uitzoom. Na de fix (tickfunctie bestaat, staat uit tot een blend loopt, zet zichzelf weer uit — de perf-bedoeling blijft exact): 1e persoon boom **300 → 0,00** en FOV **80 → 90**, terug naar 3e persoon exact **300,00**, mikken boom **300 → 165** (0,55×) en FOV **80 → 64** (0,80×).
+
+Dat dit pas om half drie 's nachts boven kwam, komt doordat geen enkele test ooit vroeg wat er ná een druk op de knop *gebeurt* — alleen of de binding bestond. Het is de scherpste versie van de les die vannacht vier keer terugkwam.
+
 **Drie stiltes, en de sweep die erop volgde.** Je opdracht vroeg te noteren of er iets stils gebeurt dat luid had moeten zijn. Dat bleek geen bijvangst maar een categorie:
 
 1. **Een missie logde haar start wel en haar einde niet.** Zie hieronder — dit vond de speelronde.
@@ -152,7 +160,7 @@ Wat nog *niet* bewaakt is: de losse documenten (dit bestand, `BESTURING.md`, de 
 |---|---|---|
 | 1 | **Speel de build en zeg of S1 weg is.** Druk F9 terwijl je langzaam loopt en nog eens terwijl je sprint; de regel staat op je scherm. | Doe dit eerst — het is de enige open vraag uit jouw sessie waar ik geen meting voor heb. |
 | 2 | **Kijken is nu 2,5× trager (1,50 s per 360 in plaats van 0,60 s).** Goed zo, of te traag? | **Eerst zo laten.** 240 gr/s is jouw eigen getunede waarde en 600 gr/s is fors boven de genre-band. Te traag? Dan is het één getal: `StickYawSpeed` in `DA_CharacterTuning`. |
-| 3 | **Command Mode trekt de camera 73% terug (300→520), maar `DA_CommandModeTuning` zegt 15% en de GDD 4.1.1 ook.** Eén waarheid kiezen. | **Houd de 73% en corrigeer de GDD-regel** via change management. 520 is bewust geauthord om het veld te lezen; 15% (=345) is nooit gespeeld. Maar dit is smaak, dus jouw call. |
+| 3 | **Command Mode trekt de camera 73% terug (300→520), maar `DA_CommandModeTuning` zegt 15% en de GDD 4.1.1 ook.** **LET OP — deze vraag is veranderd:** je hebt tot vannacht NOOIT enige uitzoom gezien, want de camera-blend draaide niet (zie §1). Beoordeel hem opnieuw met een werkende camera voordat je een getal kiest. Eén waarheid kiezen. | **Houd de 73% en corrigeer de GDD-regel** via change management. 520 is bewust geauthord om het veld te lezen; 15% (=345) is nooit gespeeld. Maar dit is smaak, dus jouw call. |
 | 4 | **De navmesh bestaat nu** — gemeten in een echte `-game`-run: 28000 × 28000 × 4000 uu grens, en vijf seconden na missiestart ligt er navmesh onder de speler. De oorzaak was een lege grens (0×0×0): een runtime-gespawnde volume krijgt zijn brush niet buiten de editor. | **Kijk of je squad je nu volgt.** In het harnas weigeren ze nog; of dat die wereld is of een tweede oorzaak weet ik niet, en de echte run kon het niet zeggen omdat daar niemand een order geeft. Jouw ronde beantwoordt dat in één keer. |
 | 5 | **Hurken ook als hold aanbieden, als optie naast de toggle?** | **Ja, maar later** — het vraagt een instellingenmenu, en dat is SPEC-P2-07. |
 | 6 | ~~Coyote time + sprong-inputbuffer bouwen?~~ **Gedaan** — 110 ms en 150 ms, beide gemeten en gepind. Ze voegen alleen vergeving toe: een sprong die eerst mislukte lukt nu, nooit andersom. | Niets te beslissen; speel het en zeg of het te toegeeflijk voelt. |
