@@ -3955,6 +3955,7 @@ bool FEclipseDoctrineChangesBehaviour::RunTest(const FString& Parameters)
 		TEXT("hoort 0 te zijn: het kamikaze-kader haalt dekking zoeken weg"));
 	TestEqual(TEXT("doctrine: Aggressive zoekt geen dekking"), Mate->GetCoverRuns() - CoverBefore, 0);
 
+
 	Harness.Shutdown();
 	return true;
 }

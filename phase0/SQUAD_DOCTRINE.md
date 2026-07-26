@@ -87,7 +87,7 @@ Vier waarden, uit de Ghost Recon-set plus het voorbeeld van de owner zelf:
 
 | Doctrine | Wat het met de basis doet | Bron |
 |---|---|---|
-| `Recon` | **Vuurt niet** tenzij er op hem geschoten wordt. Zoekt dekking. Blijft dicht | Ghost Recon "Recon" |
+| `Recon` | **Vuurt niet** tenzij er op hem geschoten wordt. Zoekt dekking | Ghost Recon "Recon" |
 | `Ready` *(default)* | De volledige basis: vuurt op wat hij ziet, zoekt dekking, loopt mee | Ghost Recon "Assault" |
 | `Overwatch` | **Blijft staan** waar hij staat. Vuurt vrij. Loopt niet mee | Full Spectrum Warrior / GR "Suppress" |
 | `Aggressive` | **Zoekt geen dekking**, sluit af op de dichtstbijzijnde vijand | Het "kamikaze"-voorbeeld van de owner |
@@ -152,6 +152,14 @@ Verhouding 0,067. Recon maakt je niet onzichtbaar — het houdt je sluippad open
 tot iemand het eerste schot lost, en daarna verdedigt je squad zich gewoon. Dat
 is precies wat de Ghost Recon-ROE belooft, en het was geen ontwerpdoel: het viel
 eruit omdat de twee lagen elkaar raakten.
+
+**"Blijft dicht" is uit de recon-regel geschrapt, en dat is gemeten.** Geprobeerd
+met 0,6× de volgafstand: geen waarneembaar gevolg. Loop je weg, dan haalt niemand
+het in — de squad loopt even hard als jij, dus je meet de achterstand die het
+weglopen zelf maakt (1704 tegen 1752 cm). Sta je stil, dan sluiten ze onder beide
+doctrines helemaal aan. De volgafstand bepaalt *wanneer* iemand begint te lopen,
+niet hoe snel hij inhaalt; "dicht blijven" zou formatie of tempo vragen, en dat is
+niet gevraagd. Een knop die niets doet is erger dan geen knop.
 
 **En recon zweeg niet meteen.** De vuurlus liep door tot de volgende
 doelselectie, een halve seconde later: drie tot vier naschoten, goed voor zestien

@@ -245,8 +245,22 @@ void AEclipseSquadmateController::UpdateFollow()
 		return;
 	}
 
+	// GEEN KRAPPERE VOLGAFSTAND VOOR RECON, en dat is een gemeten beslissing.
+	//
+	// Het ontwerp beloofde dat recon "dicht blijft". Geprobeerd met 0,6× de
+	// volgafstand, en het bleek geen waarneembaar gevolg te hebben: loop je weg,
+	// dan haalt niemand het in (de squad loopt even hard als jij, dus je meet de
+	// achterstand die het weglopen zelf maakt — 1704 tegen 1752 cm). Sta je stil,
+	// dan sluiten ze onder beide doctrines helemaal aan.
+	//
+	// De volgafstand bepaalt WANNEER iemand begint te lopen, niet hoe snel hij
+	// inhaalt. "Dicht blijven" zou dus een ander mechanisme vragen (formatie of
+	// tempo), en dat is niet gevraagd. Een knop die niets doet is erger dan geen
+	// knop.
+	const float Reach = FollowDistance;
+
 	const float Apart = FVector::Dist2D(Body->GetActorLocation(), Leader->GetActorLocation());
-	if (Apart <= FollowDistance)
+	if (Apart <= Reach)
 	{
 		return;
 	}
@@ -255,8 +269,8 @@ void AEclipseSquadmateController::UpdateFollow()
 	// allemaal exact op de speler af lopen duwen elkaar weg en blijven om hem heen
 	// draaien. Op volgafstand achter hem is waar een squad in Ghost Recon en
 	// Division ook loopt.
-	const FVector Behind = Leader->GetActorLocation() - Leader->GetActorForwardVector() * (FollowDistance * 0.5f);
-	if (MoveToLocation(Behind, /*AcceptanceRadius*/ FollowDistance * 0.5f) == EPathFollowingRequestResult::RequestSuccessful)
+	const FVector Behind = Leader->GetActorLocation() - Leader->GetActorForwardVector() * (Reach * 0.5f);
+	if (MoveToLocation(Behind, /*AcceptanceRadius*/ Reach * 0.5f) == EPathFollowingRequestResult::RequestSuccessful)
 	{
 		++FollowMoves;
 	}
