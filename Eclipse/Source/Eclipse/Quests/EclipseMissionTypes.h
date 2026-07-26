@@ -129,7 +129,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission")
 	TArray<FEclipseObjectiveDef> Objectives;
 
-	/** Insertion choice (GDD 11.1): the graybox district's three entries. */
+	/**
+	 * Insertiekeuze (GDD 11.1): de drie ingangen van het graybox-district.
+	 * NIET GELEZEN door C++ — het district bouwt zijn drie ingangen zelf en de
+	 * speler start altijd bij Entry_Main. Welke ingangen een missie aanbiedt is
+	 * dus geauthorde data zonder effect, net als EnemySpawns hieronder.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Mission")
 	TArray<FName> InsertionPointIds;
 

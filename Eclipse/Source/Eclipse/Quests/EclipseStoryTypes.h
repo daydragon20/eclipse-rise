@@ -24,6 +24,12 @@ struct FEclipseStoryMissionRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Story")
 	FName MissionId;
 
+	/**
+	 * NIET GELEZEN. De koppeling loopt volledig via MissionId hierboven: die wordt
+	 * de TemplateId van het aanbod en daarmee zoekt de missie zijn spec op. Deze
+	 * pointer is een tweede manier om hetzelfde te zeggen, en de stille: wijs hem
+	 * naar een andere missie dan MissionId en er verandert niets.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Story")
 	TSoftObjectPtr<UEclipseMissionAsset> MissionAsset;
 

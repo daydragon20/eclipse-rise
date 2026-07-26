@@ -500,6 +500,11 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> RunAnim;
 
+	/**
+	 * NIET GELEZEN door C++. Er wordt nergens een schietanimatie afgespeeld: de
+	 * lichamen draaien idle of een gangbeweging, en vuren verandert de pose niet.
+	 * setup_character_data.py vult dit veld wel, dus de take staat klaar.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> ShootAnim;
 

@@ -37,7 +37,12 @@ struct FEclipseFacilityLevelData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base")
 	TMap<FGameplayTag, int32> YieldPerDay;
 
-	/** Capability unlocked while operational (e.g. Workshop L2's manufacture tier); empty = none. */
+	/**
+	 * Capability die vrijkomt zolang de faciliteit draait (bv. Workshop L2's
+	 * fabricagetier); leeg = geen. NIET GELEZEN door C++ — setup_base_data.py
+	 * vult de tags, maar niets vraagt er ooit naar, dus een draaiende faciliteit
+	 * ontsluit vandaag niets.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base")
 	FGameplayTag UnlockTag;
 };

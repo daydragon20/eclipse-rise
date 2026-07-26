@@ -31,7 +31,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Audio")
 	FString ModelId = TEXT("eleven_multilingual_v2");
 
-	/** Base settings used when an emotion has no override. */
+	/**
+	 * Basisinstellingen wanneer een emotie geen override heeft. NIET GELEZEN —
+	 * noch BaseSettings noch EmotionSettings hieronder komt ergens in de code
+	 * terecht; de stemgeneratie draait op wat er in het genereerscript staat.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Audio")
 	FEclipseVoiceSettings BaseSettings;
 
