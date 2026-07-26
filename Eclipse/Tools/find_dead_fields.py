@@ -78,6 +78,48 @@ def fields_in(header: Path) -> list:
     return out
 
 
+DECLARED = "NIET GELEZEN"
+
+
+def is_declared_unread(header, name):
+    """Staat er boven dit veld dat het BEWUST niet gelezen wordt?
+
+    Toegevoegd 26-07 avond. De tool drukte al af dat elk dood veld "een NIET
+    GELEZEN-regel hoort te hebben, of aangesloten te worden" - en controleerde dat
+    vervolgens niet. Een veld dat keurig gelabeld was, stond daardoor elke ronde
+    opnieuw in de lijst, naast de velden waar niemand nog over nagedacht heeft.
+    Dat is het verschil tussen een bevinding en ruis, en zonder dat verschil leer
+    je de hele lijst negeren.
+
+    Twaalf regels terug: ruim genoeg voor een uitgeschreven reden, te weinig om per
+    ongeluk het label van de buurman te pakken.
+    """
+    lines = header.read_text(encoding="utf-8", errors="replace").splitlines()
+    for index, line in enumerate(lines):
+        if not FIELD.match(line):
+            continue
+        if name not in line:
+            continue
+        # Terug tot het BEGIN van het commentaarblok, niet een vast aantal regels.
+        # Eerste versie keek twaalf regels terug en miste daardoor een label dat
+        # netjes bovenaan een uitgeschreven reden stond - dertien regels hoger.
+        # Een venster dat je moet raden is geen venster.
+        start = index
+        while start > 0:
+            above = lines[start - 1].strip()
+            # UPROPERTY staat TUSSEN het commentaar en het veld, dus die hoort
+            # overgeslagen te worden. Zonder deze regel stopt de terugloop meteen
+            # en is het venster leeg — dan meldt de tool alles als onverklaard,
+            # inclusief de zes die al netjes gelabeld waren.
+            if above.startswith(("//", "*", "/*", "UPROPERTY")) or above == "":
+                start -= 1
+                continue
+            break
+        if DECLARED in "\n".join(lines[start:index]):
+            return True
+    return False
+
+
 def main() -> int:
     sources = [p for p in SOURCE_ROOT.rglob("*.cpp")] + [p for p in SOURCE_ROOT.rglob("*.h")]
     bodies = {p: p.read_text(encoding="utf-8", errors="replace") for p in sources}
@@ -93,24 +135,34 @@ def main() -> int:
                 for path, text in bodies.items()
             )
             if not elsewhere:
-                dead.append((header.name, name))
+                dead.append((header.name, name, is_declared_unread(header, name)))
+
+    unexplained = [(h, n) for h, n, declared in dead if not declared]
+    labelled = [(h, n) for h, n, declared in dead if declared]
 
     if "--tel" in sys.argv:
-        print(len(dead))
+        print(len(unexplained))
         return 0
 
-    if not dead:
-        print("Geen dode velden — alles wat de owner kan verdraaien wordt ergens gelezen.")
+    if labelled:
+        print(f"{len(labelled)} velden zijn BEWUST niet gelezen (het label staat erboven):")
+        for header, name in labelled:
+            print(f"  {header}  ::{name}")
+        print()
+
+    if not unexplained:
+        print("Geen ONVERKLAARDE dode velden - alles wat de owner kan verdraaien")
+        print("wordt gelezen, of draagt een reden waarom niet.")
         return 0
 
-    width = max(len(h) for h, _ in dead)
+    width = max(len(h) for h, _ in unexplained)
     current = None
-    for header, name in dead:
+    for header, name in unexplained:
         if header != current:
             print()
             current = header
         print(f"  {header:<{width}}  ::{name}")
-    print(f"\n{len(dead)} velden die niemand leest.")
+    print(f"\n{len(unexplained)} velden die niemand leest EN geen reden dragen.")
     print("Elk hoort een NIET GELEZEN-regel in zijn header te hebben, of aangesloten te worden.")
     return 0
 

@@ -145,7 +145,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 1))
 	float RegroupAcceptanceRadius = 150.0f;
 
-	/** Feel bar: order -> visible answer within 1 s (graybox feel targets §4). */
+	/**
+	 * Gevoelslat: een order krijgt binnen 1 s een zichtbaar antwoord (graybox feel
+	 * targets §4). **NIET GELEZEN — en hij hoort het ook niet te zijn.**
+	 *
+	 * Dit is een DOEL, geen instelling. De code wacht nergens op deze seconde: een
+	 * order krijgt zijn antwoord in hetzelfde frame (gemeten 0,000 s). Het getal
+	 * staat er om de lat vast te leggen waaraan je de meting houdt, en de dag dat
+	 * de code hem zou gaan lezen, zou hij van lat in vertraging veranderen.
+	 *
+	 * Hij dook 26-07 avond op in de dode-veldensweep doordat ik elders een comment
+	 * herschreef die hem noemde — de sweep telde die vermelding als "gelezen".
+	 * Dat is precies de zwakte die dit label afdekt: een naam in een comment is
+	 * geen gebruik.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0.1))
 	float ResponseTimeoutSeconds = 1.0f;
 

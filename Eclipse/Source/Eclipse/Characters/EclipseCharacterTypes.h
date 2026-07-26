@@ -668,15 +668,30 @@ struct FEclipseNamedCharacterRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	FText DisplayName;
 
-	/** Imported MetaHuman body (MH_<Name>); unset = fallback body below. */
+	/**
+	 * Imported MetaHuman body (MH_<Name>); unset = fallback body below.
+	 *
+	 * **NIET GELEZEN** — deze drie velden horen bij elkaar en wachten op hetzelfde:
+	 * er is nog geen code die een NAMED CHARACTER aankleedt. De game mode kleedt
+	 * lichamen aan uit DT_BodyDefs op rol (Player, Rebel_A, ...), niet op naam.
+	 *
+	 * Dat is geen vergeetachtigheid maar een volgorde: de MetaHuman-gezichten zijn
+	 * machine-lokaal (908 MB, per machine opnieuw ophalen) en het aankleden op
+	 * naam heeft pas zin als die gezichten er staan. Zolang dat niet zo is, zou
+	 * lezen van deze velden betekenen dat de code een pad kiest dat op elke andere
+	 * machine leeg is.
+	 *
+	 * Wat er dan moet gebeuren: MetaHumanMesh als mesh, FallbackBodyDef als
+	 * terugval zodra hij ontbreekt, en Faction voor de tint en de barkkeuze.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	TSoftObjectPtr<USkeletalMesh> MetaHumanMesh;
 
-	/** DT_BodyDefs row die moet instaan zolang de MetaHuman ontbreekt (nog niet gelezen). */
+	/** DT_BodyDefs-rij die instaat zolang de MetaHuman ontbreekt. **NIET GELEZEN**, zie MetaHumanMesh. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	FName FallbackBodyDef;
 
-	/** Rebel / Dominion — bedoeld voor tint en bark-keuze (GDD 08/16; nog niet gelezen). */
+	/** Rebel / Dominion — tint en barkkeuze (GDD 08/16). **NIET GELEZEN**, zie MetaHumanMesh. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	FName Faction;
 };

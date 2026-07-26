@@ -21,14 +21,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.05, ClampMax = 1.0))
 	float DilationFactor = 0.30f;
 
-	/** Tactician difficulty factor (0 = full pause). Data-ready, headless-tested only this phase (SPEC-P2-00 scope). */
+	/**
+	 * Tactician-moeilijkheidsfactor (0 = volledige pauze). **NIET GELEZEN.**
+	 *
+	 * Er is één moeilijkheidsgraad en geen keuzescherm, dus er is niets dat deze
+	 * waarde zou kunnen kiezen. Hij staat er omdat de spec hem vastlegt; hij wordt
+	 * gelezen op de dag dat moeilijkheidsgraden bestaan.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.0, ClampMax = 1.0))
 	float TacticianDilationFactor = 0.0f;
 
-	/** Enter/exit dilation blend; 0 = hard cut (the Stage A verdict runs on the cut). */
+	/**
+	 * In- en uitvloeien van de tijdvertraging. **NIET GELEZEN — en dat is een
+	 * KEUZE, geen omissie.**
+	 *
+	 * Command Mode knipt hard naar 30% en weer terug naar 1.0. Dat is bewust: het
+	 * Stage A-oordeel is op die harde knip geveld, en de gids belooft de speler dat
+	 * loslaten "exact terug op 1.0" zet. Een vloeiende overgang zou dat allebei
+	 * ongeldig maken, en het is precies het soort ding dat je moet VOELEN voordat
+	 * je het inruilt.
+	 *
+	 * Aansluiten is een half uur werk zodra de owner zegt dat de knip te hard
+	 * aanvoelt. Tot die tijd zou het gedrag veranderen op een getal dat niemand
+	 * heeft afgesteld.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.0))
 	float EnterBlendSeconds = 0.0f;
 
+	/** Uitvloeien. **NIET GELEZEN**, zelfde reden als EnterBlendSeconds. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.0))
 	float ExitBlendSeconds = 0.0f;
 
@@ -36,15 +56,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 100.0))
 	float SoldierSelectMaxRangeCm = 10000.0f;
 
-	/** Stage B (SyncStrike) cap — reserved in data per the spec. */
+	/**
+	 * De drie Stage B-getallen: SyncStrike, Flank en Suppress. **NIET GELEZEN —
+	 * die drie orders bestaan niet.**
+	 *
+	 * Ze staan in data omdat de spec ze vastlegt en het schema dan niet halverwege
+	 * een fase hoeft te veranderen. Dat is een prima reden om ze te hebben en geen
+	 * reden om te doen alsof ze iets doen: er is geen SyncStrike-order, geen
+	 * flank-goedkeuring en geen onderdrukkingsgebied.
+	 *
+	 * Zodra die orders er komen zijn dit hun knoppen. Tot dan zijn het drie
+	 * getallen die niemand kan verdraaien met gevolg.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 1))
 	int32 MaxSyncStrikeMarks = 4;
 
-	/** Stage B (Flank) approval window, wall-clock seconds (same basis as ResponseTimeoutSeconds — locked decision 2). */
+	/** Stage B (Flank) goedkeuringsvenster. **NIET GELEZEN**, zie MaxSyncStrikeMarks. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.5))
 	float FlankApprovalTimeoutSeconds = 6.0f;
 
-	/** Stage B (Suppress) area radius. */
+	/** Stage B (Suppress) straal. **NIET GELEZEN**, zie MaxSyncStrikeMarks. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 50.0))
 	float SuppressRadiusCm = 400.0f;
 };

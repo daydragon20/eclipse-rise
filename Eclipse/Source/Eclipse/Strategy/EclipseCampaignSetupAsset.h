@@ -87,7 +87,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> ClassDefs;
 
-	/** Rows: FEclipseNamedCharacterRow — story-character slots (step-3 MetaHuman pipeline, phase0/metahuman_recipes.md). */
+	/**
+	 * Rijen: FEclipseNamedCharacterRow — verhaalpersonages (stap 3 van de
+	 * MetaHuman-pijplijn, phase0/metahuman_recipes.md).
+	 *
+	 * **NIET GELEZEN.** Geen enkele regel C++ laadt deze tabel; lichamen worden
+	 * aangekleed op ROL (Player, Rebel_A, ...) en niet op naam. Zie de drie velden
+	 * van FEclipseNamedCharacterRow in EclipseCharacterTypes.h voor waarom dat een
+	 * volgorde is en geen vergeetachtigheid: de gezichten zijn machine-lokaal, en
+	 * aankleden op naam heeft pas zin als ze er staan.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TSoftObjectPtr<UDataTable> NamedCharacters;
 

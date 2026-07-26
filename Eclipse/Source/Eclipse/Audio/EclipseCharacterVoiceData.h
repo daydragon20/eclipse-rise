@@ -39,7 +39,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Audio")
 	FEclipseVoiceSettings BaseSettings;
 
-	/** Optional per-emotion setting overrides (GDD 16.4). */
+	/** Per-emotie overrides (GDD 16.4). **NIET GELEZEN**, zie BaseSettings hierboven. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Audio")
 	TMap<EEclipseVoiceEmotion, FEclipseVoiceSettings> EmotionSettings;
 
