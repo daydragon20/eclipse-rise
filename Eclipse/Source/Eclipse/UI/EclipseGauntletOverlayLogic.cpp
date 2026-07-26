@@ -185,7 +185,11 @@ namespace EclipseGauntletOverlay
 			{ EMode::OnFoot, TEXT("Sprint"),         TEXT("Shift"),          TEXT("L3") },
 			{ EMode::OnFoot, TEXT("Hurken"),         TEXT("Ctrl"),           TEXT("B") },
 			{ EMode::OnFoot, TEXT("Springen"),       TEXT("Spatie"),         TEXT("A") },
-			{ EMode::OnFoot, TEXT("Herladen"),       TEXT("R"),              TEXT("X") },
+			// Eén handeling met een terugval, en niet twee betekenissen: als er
+			// niets te herladen valt geeft dezelfde knop de hergroepeer-order.
+			// De startbat noemde die terugval al terwijl dit schema hem miste —
+			// gevonden door de twee naast elkaar te leggen.
+			{ EMode::OnFoot, TEXT("Herladen (vol: hergroeperen)"), TEXT("R of E"), TEXT("X") },
 			// Geen padknop: RB draagt hier de wapenwissel, en dat is een bewuste
 			// ruil — wisselen doe je tientallen keren per missie, standpunt kies
 			// je één keer.

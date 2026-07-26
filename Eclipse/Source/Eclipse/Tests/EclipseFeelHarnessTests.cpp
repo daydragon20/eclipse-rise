@@ -918,7 +918,8 @@ bool FEclipseControlTableMatchesBindingsTest::RunTest(const FString& Parameters)
 		  TEXT("de tabel zegt zelf 'geen' op de pad — R3 ging per ongeluk af en is eraf gehaald") },
 		{ TEXT("Command Mode"),  TEXT("CommandHold"), TEXT("CommandHold"),   nullptr },
 		{ TEXT("Volgende"),      TEXT("SelectNext"),  TEXT("SelectNext"),    nullptr },
-		{ TEXT("Vorige"),        TEXT("SelectPrev"),  TEXT("SelectPrev"),    nullptr },
+		{ TEXT("Vorige"),        TEXT("SelectPrev"),  nullptr,
+		  TEXT("de tabel zegt zelf 'geen — RB wrapt rond'. Deze claim STOND op SelectPrev en hield daarmee de afgeschafte LT-mapping in leven: de test eiste een padbinding die er niet meer hoorde te zijn") },
 		{ TEXT("Onder kruis"),   TEXT("DirectPick"),  TEXT("DirectPick"),    nullptr },
 		{ TEXT("Orders"),        TEXT("Order1"),      TEXT("Order1"),        nullptr },
 		{ TEXT("Doctrine"),      nullptr,             TEXT("StanceToggle"),
@@ -962,7 +963,8 @@ bool FEclipseControlTableMatchesBindingsTest::RunTest(const FString& Parameters)
 	}
 
 	// De uitzonderingen tellen, zodat er niet stilletjes een derde bijkomt.
-	TestEqual(TEXT("controletabel: precies twee bewuste uitzonderingen, allebei met reden"), Exemptions, 2);
+	// Drie sinds 26-07: "Vorige" kwam erbij toen de LT-mapping werd weggehaald.
+	TestEqual(TEXT("controletabel: precies drie bewuste uitzonderingen, alledrie met reden"), Exemptions, 3);
 
 	Harness.Shutdown();
 	return true;
@@ -2373,6 +2375,125 @@ bool FEclipseWhichBodiesMissWhichPoses::RunTest(const FString& Parameters)
 				Row.ShootAnim.IsNull());
 		});
 
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// Het knoppenschema tegen de ECHTE mappings
+// ---------------------------------------------------------------------------
+//
+// De vorige bewaker vraagt: claimt de tabel iets dat niet bestaat? Deze vraagt
+// het ANDERSOM: bestaat er een padknop die door niemand beschreven wordt?
+//
+// Die richting ontbrak, en daar zat een bug in te wachten. LT bleef op
+// SelectPrev gemapt nadat die overlading was afgeschaft — het commentaar en de
+// F2-tabel waren bijgewerkt, de MapKey niet. Binnen Command Mode was LT dus
+// tegelijk mikken en "vorige soldaat". Geen enkele test werd rood; de
+// claim-tabel eiste die padbinding zelfs.
+//
+// Een knop die niemand beschrijft is per definitie een knop die niemand
+// nakijkt, en dat is hoe de vorige overlading een halve dag overleefde nadat
+// hij was weggehaald.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEveryPadButtonIsDescribedTest,
+	"Eclipse.Feel.Input.EveryPadButtonIsDescribed",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseEveryPadButtonIsDescribedTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const UInputMappingContext* Context = Harness.Controller->GetMappingContext();
+	if (!TestNotNull(TEXT("schema: mapping context"), Context))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Welke padknoppen kent het schema? Namen zoals de owner ze leest (LT, RB),
+	// niet zoals de engine ze heet — dus vertalen we de engine-kant.
+	TSet<FString> Described;
+	for (const EclipseGauntletOverlay::FEclipseBinding& Binding : EclipseGauntletOverlay::GetBindings())
+	{
+		if (Binding.Pad != nullptr)
+		{
+			// Alleen de KNOP, niet het gebaar: het schema schrijft "LB vasthouden"
+			// omdat de owner dat leest, maar de mapping kent alleen LB. Het gebaar
+			// (hold tegen toggle) heeft een eigen bewaker en hoort niet in deze
+			// vergelijking thuis.
+			FString Button = FString(Binding.Pad).ToUpper();
+			FString Rest;
+			Button.Split(TEXT(" "), &Button, &Rest);
+			Described.Add(Button.IsEmpty() ? FString(Binding.Pad).ToUpper() : Button);
+		}
+	}
+
+	struct FPadName { FKey Key; const TCHAR* Human; };
+	const FPadName PadNames[] = {
+		{ EKeys::Gamepad_LeftTrigger,       TEXT("LT") },
+		{ EKeys::Gamepad_RightTrigger,      TEXT("RT") },
+		{ EKeys::Gamepad_LeftShoulder,      TEXT("LB") },
+		{ EKeys::Gamepad_RightShoulder,     TEXT("RB") },
+		{ EKeys::Gamepad_FaceButton_Bottom, TEXT("A") },
+		{ EKeys::Gamepad_FaceButton_Right,  TEXT("B") },
+		{ EKeys::Gamepad_FaceButton_Left,   TEXT("X") },
+		{ EKeys::Gamepad_FaceButton_Top,    TEXT("Y") },
+		{ EKeys::Gamepad_LeftThumbstick,    TEXT("L3") },
+		{ EKeys::Gamepad_RightThumbstick,   TEXT("R3") },
+	};
+
+	// Sticks, d-pad en de debug-knoppen blijven buiten beschouwing: het schema
+	// beschrijft ze als groep ("linkerstick", "D-pad") en een test die elke
+	// afzonderlijke richting eist zou ruis produceren in plaats van bewijs.
+	int32 Checked = 0;
+	for (const FPadName& Pad : PadNames)
+	{
+		TArray<FString> BoundTo;
+		for (const FEnhancedActionKeyMapping& Mapping : Context->GetMappings())
+		{
+			if (Mapping.Key == Pad.Key && Mapping.Action != nullptr)
+			{
+				BoundTo.AddUnique(Mapping.Action->GetName());
+			}
+		}
+		if (BoundTo.Num() == 0)
+		{
+			continue;
+		}
+		++Checked;
+		TestTrue(*FString::Printf(
+				TEXT("schema: %s is gemapt op %s — staat die knop in het knoppenschema?"),
+				Pad.Human, *FString::Join(BoundTo, TEXT(" + "))),
+			Described.Contains(FString(Pad.Human).ToUpper()));
+	}
+
+	// Zonder discriminator bewijst deze lus niets: als er nul knoppen gevonden
+	// waren, was hij net zo groen.
+	TestTrue(TEXT("schema: er zijn padknoppen gevonden om te controleren"), Checked > 0);
+
+	// En de kern van de LT-fout apart, want die is te belangrijk om alleen als
+	// bijvangst van de lus hierboven te bestaan: mikken hoort de ENIGE
+	// betekenis van LT te zijn.
+	TArray<FString> LeftTrigger;
+	for (const FEnhancedActionKeyMapping& Mapping : Context->GetMappings())
+	{
+		if (Mapping.Key == EKeys::Gamepad_LeftTrigger && Mapping.Action != nullptr)
+		{
+			LeftTrigger.AddUnique(Mapping.Action->GetName());
+		}
+	}
+	TestEqual(*FString::Printf(TEXT("schema: LT doet precies een ding (nu: %s)"),
+			*FString::Join(LeftTrigger, TEXT(" + "))),
+		LeftTrigger.Num(), 1);
+
+	Harness.Shutdown();
 	return true;
 }
 

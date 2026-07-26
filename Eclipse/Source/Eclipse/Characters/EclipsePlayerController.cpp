@@ -536,7 +536,19 @@ void AEclipsePlayerController::SetupInputComponent()
 	MapKey(SelectNextAction, EKeys::Gamepad_RightShoulder);
 	SelectPrevAction = MakeAction(EInputActionValueType::Boolean);
 	MapKey(SelectPrevAction, EKeys::MouseScrollDown);
-	MapKey(SelectPrevAction, EKeys::Gamepad_LeftTrigger); // pad prev (review minor; RT stays fire)
+	// GEEN PADKNOP VOOR "VORIGE". Hier stond LT, en dat is de overlading die
+	// 26-07 werd afgeschaft — maar alleen in het commentaar en in de F2-tabel.
+	// De mapping bleef staan, dus LT was BINNEN Command Mode tegelijk mikken en
+	// "vorige soldaat": twee betekenissen in dezelfde modus, precies wat de
+	// afschaffing moest wegnemen.
+	//
+	// Gevonden op 26-07 laat, door het knoppenschema naast de echte mappings te
+	// leggen. Dezelfde vorm als alle andere vondsten van vandaag: de
+	// BESCHRIJVING veranderde en de code niet, en geen enkele test werd rood —
+	// die eiste zelfs dat deze mapping bleef bestaan.
+	//
+	// Selectie cycelt één kant op met RB en wrapt rond; bij vier soldaten is
+	// drie keer vooruit hetzelfde als één keer terug.
 	DirectPickAction = MakeAction(EInputActionValueType::Boolean);
 	MapKey(DirectPickAction, EKeys::E);
 	// R is herladen op elk toetsenbord sinds Half-Life. Op dezelfde actie als E/X,
