@@ -2963,4 +2963,91 @@ bool FEclipseBesturingMatchesTheSchemeTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// De startbat tegen het knoppenschema
+// ---------------------------------------------------------------------------
+//
+// SPEEL_ECLIPSE.bat is het eerste wat de owner leest: hij start de game ermee en
+// de besturing staat er in het scherm dat hij daarvoor voorbij ziet komen. De
+// owner meldde het zelf — "de startbat leert drie controls die sinds vandaag niet
+// meer kloppen".
+//
+// Deze bewaker is SMALLER dan die op BESTURING.md, en met opzet. Daar wordt per
+// knop gecontroleerd of de claim klopt; hier alleen of de bat geen knop leert die
+// niet meer bestaat. De bat is opgemaakte tekst met puntjeslijnen en
+// echo-escapes, en een test die dat ontleedt gaat rood op een correcte regel
+// zodra iemand de opmaak aanraakt. Rood-op-correct is de ene fout die een test
+// nooit mag maken: die leer je negeren, en dan bewaakt hij niets meer.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLauncherTeachesNoDeadButtonsTest,
+	"Eclipse.Feel.Input.LauncherTeachesNoDeadButtons",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseLauncherTeachesNoDeadButtonsTest::RunTest(const FString& Parameters)
+{
+	const FString BatPath = FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), TEXT("SPEEL_ECLIPSE.bat")));
+	FString Bat;
+	if (!TestTrue(FString::Printf(TEXT("startbat: %s is leesbaar"), *BatPath),
+			FFileHelper::LoadFileToString(Bat, *BatPath)))
+	{
+		return false;
+	}
+
+	TSet<FString> Live;
+	for (const EclipseGauntletOverlay::FEclipseBinding& Binding : EclipseGauntletOverlay::GetBindings())
+	{
+		if (Binding.Pad == nullptr)
+		{
+			continue;
+		}
+		FString Button = FString(Binding.Pad);
+		FString Rest;
+		Button.Split(TEXT(" "), &Button, &Rest);
+		Live.Add(Button.ToUpper());
+	}
+
+	// Alleen de padkolom: alles NA de escape "^|" op een echo-regel. De
+	// toetsenbordkant staat links en heeft zijn eigen namen.
+	TArray<FString> Lines;
+	Bat.ParseIntoArrayLines(Lines);
+
+	const TSet<FString> KnownPadButtons = { TEXT("LT"), TEXT("RT"), TEXT("LB"), TEXT("RB"),
+		TEXT("A"), TEXT("B"), TEXT("X"), TEXT("Y"), TEXT("L3"), TEXT("R3") };
+
+	int32 Checked = 0;
+	for (const FString& Line : Lines)
+	{
+		int32 Split = INDEX_NONE;
+		if (!Line.FindLastChar(TEXT('|'), Split))
+		{
+			continue;
+		}
+		FString PadSide = Line.Mid(Split + 1).TrimStartAndEnd();
+		FString First;
+		FString Tail;
+		if (!PadSide.Split(TEXT(" "), &First, &Tail))
+		{
+			First = PadSide;
+		}
+		First = First.ToUpper();
+		if (!KnownPadButtons.Contains(First))
+		{
+			continue;   // sticks, d-pad, View/Menu en gewone tekst
+		}
+		++Checked;
+		TestTrue(*FString::Printf(
+				TEXT("startbat: leert '%s', en die knop hangt in het schema aan een handeling.  Regel: %s"),
+				*First, *Line.TrimStartAndEnd()),
+			Live.Contains(First));
+	}
+
+	// Zonder discriminator zegt "geen dode knoppen" niets: als er nul regels
+	// herkend waren, was deze test net zo groen.
+	TestTrue(FString::Printf(TEXT("startbat: er zijn %d padknop-regels herkend"), Checked),
+		Checked >= 5);
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

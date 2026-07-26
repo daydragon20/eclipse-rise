@@ -36,7 +36,7 @@ echo   SPRINGEN ............. Spatie               ^|  A
 echo   Sprint ............... Shift VASTHOUDEN     ^|  L3 = AAN/UIT (toggle)
 echo   Hurken ............... Ctrl (je zakt 52 cm) ^|  B
 echo   1e/3e persoon wisselen  C                   ^|  (geen - RB draagt nu de wissel)
-echo   WAPEN WISSELEN ....... (geen)               ^|  RB (buiten Command Mode)
+echo   Wapenwissel .......... (geen)               ^|  RB (buiten Command Mode)
 echo   HERLADEN ............. R                    ^|  X  (buiten Command Mode)
 echo   Squad hergroeperen ... E                    ^|  X  (als het magazijn vol is)
 echo.
@@ -45,8 +45,13 @@ echo   Shift vast, op de pad zet L3 hem AAN en blijft hij aan. Hij gaat vanzelf 
 echo   bij loslaten van de stick, mikken, hurken of geen voorwaartse invoer meer.
 echo.
 echo   F9 ....... toont de bewegingswaarden op het scherm (en wat er sinds de
-echo              vorige druk veranderd is). Hiermee controleer je de schaal-bug:
-echo              blijf rennen en kijk of er iets meeschaalt met je snelheid.
+echo              vorige druk veranderd is).
+echo.
+echo   DE SCHAAL-BUG IS WEG - hier stond dat je hem met F9 moest opsporen.
+echo   Oorzaak was de camera die evenredig met je snelheid achterliep; nu geklemd
+echo   op 0,00%% verschil tussen rennen en sprinten. Het VERDWIJNENDE personage
+echo   had een andere oorzaak: de idle-take van Belica is additief en klapte alle
+echo   botten in. Omvang stilstaand ging van 1,0 naar 189,9 cm.
 echo.
 echo   TESTGIDS:  F3 openen  ^|  J = gehaald/ja  ^|  N = overslaan/nee
 echo   Op de pad: View-knop (links van Xbox-logo) opent de gids,
@@ -86,6 +91,12 @@ echo   Welke actief is staat op de HUD, ook buiten Command Mode.
 echo.
 echo   Muis vrijgeven ....... Shift+F1
 echo   Afsluiten ............ Esc
+echo.
+echo   NIEUW SINDS JE VORIGE SESSIE - waar je op kunt letten:
+echo     - je personage staat stil weer in beeld (was helemaal weg)
+echo     - hij DRAAIT mee als je ver wegkijkt, met een draai-animatie
+echo     - HERLADEN heeft nu een houding; die is geleend uit een ander pack
+echo     - er hangt nog GEEN wapen in je handen - dat is bekend, geen bug
 echo.
 echo   Muis en controller werken tegelijk - gewoon oppakken, niets omzetten.
 echo.
