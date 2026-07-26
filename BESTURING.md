@@ -44,7 +44,7 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Vorige soldaat | scroll omlaag | LT **tijdens de hold** | ja — `CycleSoldierSelection(-1)` |
 | Soldaat onder richtkruis | E | X | ja — `PickSoldierUnderReticle` |
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |
-| Stance | Alt **ingedrukt houden terwijl je de order geeft** | Y (togglen) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven |
+| Stance | Alt **ingedrukt houden terwijl je de order geeft** | Y (togglen, **alleen tijdens Command Mode**) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven. **LET OP (26-07): de stance wordt vandaag alleen ONTHOUDEN en getoond — de soldaat schrijft hem op (`CurrentStance`) en leest hem daarna nergens, dus je squad vecht er niet anders door.** Fase-1-placeholder, eerlijk zo gelabeld in de code; wanneer de gedragssplitsing komt is een owner-keuze |
 
 
 > **Vier controls doen buiten Command Mode niets, en dat stond er niet bij.**
