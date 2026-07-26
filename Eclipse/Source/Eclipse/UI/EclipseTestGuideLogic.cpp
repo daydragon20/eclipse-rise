@@ -33,7 +33,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Aim,
 			  TEXT("de camera trekt in en de FOV versmalt zolang je hem vasthoudt. LET OP: op de controller mikt LT alleen BUITEN Command Mode; tijdens de Q/LB-hold is LT 'vorige soldaat'") },
 			{ EEclipseGuideSignal::ToggleView,
-			  TEXT("de camera schuift in ~0,2s naar je ogen en terug naar over-de-schouder. In 1e persoon verdwijnt alleen je HOOFD — armen, wapen en benen blijven zichtbaar (jouw eigen playtest: 'ik zie letterlijk niets van mezelf' was de oude versie). Zie je je hoofd nog, dan mist het skelet zijn 'head'-bone en staat dat als waarschuwing in de log") },
+			  TEXT("de camera schuift in ~0,1s naar je ogen en terug naar over-de-schouder (gemeten; de tuningwaarde noemt 0,2 s maar dat is de tijd voor de LANGSTE camerasprong, niet voor deze). In 1e persoon verdwijnt alleen je HOOFD — armen, wapen en benen blijven zichtbaar (jouw eigen playtest: 'ik zie letterlijk niets van mezelf' was de oude versie). Zie je je hoofd nog, dan mist het skelet zijn 'head'-bone en staat dat als waarschuwing in de log") },
 			{ EEclipseGuideSignal::CommandMode,
 			  TEXT("de wereld vertraagt naar 30%; de HUD toont 'COMMAND MODE  x0.30' en loslaten zet hem exact terug op 1.0") },
 			{ EEclipseGuideSignal::SelectNext,

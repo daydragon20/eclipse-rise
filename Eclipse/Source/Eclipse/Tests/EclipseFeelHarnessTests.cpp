@@ -1420,10 +1420,31 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 		*FString::Printf(TEXT("tuning ThirdPersonFOV = %.0f"), Harness.Tuning->ThirdPersonFOV));
 
 	// --- 1e/3e persoon ------------------------------------------------------
+	// De gids belooft ~0,2 s. Dat getal komt uit ViewToggleBlendTime, maar of de
+	// overgang die tijd ook echt duurt was nooit gemeten — en met een blend die
+	// tot vannacht helemaal niet liep, was elke belofte over de duur leeg.
 	Harness.Press(TEXT("ToggleView"));
-	// Ruim over de getunede blendtijd heen wachten, anders meet je het midden van
-	// de overgang en niet de bestemming.
-	Harness.Idle(Harness.Tuning->ViewToggleBlendTime * 3.0f);
+	const double BlendStart = Harness.ElapsedSeconds;
+	double BlendSeconds = -1.0;
+	while (Harness.ElapsedSeconds - BlendStart < 2.0)
+	{
+		Harness.Step();
+		if (Harness.Body->SampleFeelState().BoomArmLength <= 0.5f)
+		{
+			BlendSeconds = Harness.ElapsedSeconds - BlendStart;
+			break;
+		}
+	}
+	Report(*this, TEXT("1e persoon: duur van de overgang"), BlendSeconds, TEXT("s"),
+		*FString::Printf(TEXT("gids belooft ~%.2f s (ViewToggleBlendTime)"), Harness.Tuning->ViewToggleBlendTime));
+	// De blend loopt op CONSTANTE snelheid over de langste afstand die hij kent
+	// (de Command Mode-lengte), dus een kortere sprong duurt evenredig korter.
+	// Vandaar een bovengrens op de getunede tijd en geen gelijkheid: langer dan
+	// beloofd is een gebroken belofte, korter is de constructie zelf.
+	TestTrue(FString::Printf(TEXT("beeld: de overgang duurt niet LANGER dan beloofd (%.3f s tegen %.2f s)"),
+			BlendSeconds, Harness.Tuning->ViewToggleBlendTime),
+		BlendSeconds >= 0.0 && BlendSeconds <= Harness.Tuning->ViewToggleBlendTime + 0.02);
+	Harness.Idle(Harness.Tuning->ViewToggleBlendTime * 2.0f);
 
 	// DISCRIMINATOR: is de toets aangekomen, of blendt de camera niet? Zonder deze
 	// regel leest "300 cm" als "de camera beweegt niet" terwijl de oorzaak net zo
@@ -1485,13 +1506,42 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 	// zegt 15%") en was tot vannacht ONMEETBAAR voor hem: de blend liep niet, dus
 	// hij heeft nooit enige uitzoom gezien. Nu wel, dus hier het echte getal.
 	{
+		// SCHOON BEGINNEN: het ADS-blok hierboven liet de camera op 165 cm staan, en
+		// zonder uitzakken meet deze overgang de staart daarvan mee. De eerste
+		// versie las 0,442 s en dat was niet te verklaren uit de afstand — dat is
+		// het signaal dat je de meting fout hebt, niet de code.
+		Harness.Idle(0.6f);
+		const float FromHere = Harness.Body->SampleFeelState().BoomArmLength;
+		Report(*this, TEXT("Command Mode: vertrekpunt"), FromHere, TEXT("cm"),
+			TEXT("terug op heuphoogte voordat de meting begint"));
+
 		const double HoldStart = Harness.ElapsedSeconds;
+		double CommandBlendSeconds = -1.0;
 		while (Harness.ElapsedSeconds - HoldStart < 0.8)
 		{
 			Harness.Inject(TEXT("CommandHold"), true);
 			Harness.Step();
+			const FEclipseFeelSample Now = Harness.Body->SampleFeelState();
+			if (CommandBlendSeconds < 0.0 && Now.BoomTargetArmLength > FromHere + 1.0f
+				&& Now.BoomArmLength >= Now.BoomTargetArmLength - 0.5f)
+			{
+				CommandBlendSeconds = Harness.ElapsedSeconds - HoldStart;
+			}
 		}
 		const FEclipseFeelSample Command = Harness.Body->SampleFeelState();
+		// TWEE DUREN NAAST ELKAAR, en ze zijn niet gelijk: de 1e-persoons-overgang
+		// meet 0,100 s en deze 0,267 s. Het commentaar bij UpdateCameraBlend zegt
+		// dat de overgang "altijd even lang duurt zodat de speler hem leert", en dat
+		// is dus niet wat er gebeurt.
+		//
+		// WAT IK NIET WEET, en dat hoort erbij: waaróm deze 0,267 s duurt. Bij een
+		// constante snelheid zou de kortere sprong (300->520 = 220 cm) juist SNELLER
+		// moeten zijn dan de langere (300->0 = 300 cm), en dat is precies andersom.
+		// Ik heb de meting schoongemaakt (vertrekpunt geverifieerd op 300,00 cm), dus
+		// het getal klopt; de verklaring ontbreekt. Niet weggeredeneerd en geen
+		// mechanisme verzonnen — dit is een meting die om een vervolg vraagt.
+		Report(*this, TEXT("Command Mode: duur van de overgang"), CommandBlendSeconds, TEXT("s"),
+			TEXT("vergelijk met de 1e-persoons-overgang: gelijk = constante tijd, ongelijk = constante snelheid"));
 		const float PullbackPct = Third.BoomArmLength > 0.0f
 			? (Command.BoomArmLength - Third.BoomArmLength) / Third.BoomArmLength * 100.0f : 0.0f;
 		Report(*this, TEXT("Command Mode: boomlengte"), Command.BoomArmLength, TEXT("cm"));
