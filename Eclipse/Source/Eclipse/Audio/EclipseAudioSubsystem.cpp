@@ -70,10 +70,17 @@ namespace
 		const TCHAR* Prefix;
 	};
 
+	// ALLEEN DE FAMILIES DIE EEN WAPEN ECHT GEBRUIKT (26-07 avond, na de
+	// dode-assetsweep). Het pack levert er vier; DT_Weapons gebruikt er twee.
+	// Shotgun en GrenadeLauncher laden was geen fout maar wel verspilling: cues
+	// inladen die niets kan selecteren.
+	//
+	// Een familie erbij is één regel, op de dag dat er een hagelwapen of een
+	// granaatwerper in de tabel staat — en dan valt hij meteen op zijn plek, want
+	// de validator eist al dat SoundFamily een bestaande naam is.
 	const FWeaponSoundFamilyDef WeaponSoundFamilies[] = {
 		{ TEXT("AssaultRifle"),    TEXT("AssaultRifle"),    TEXT("assault_rifle") },
 		{ TEXT("Handgun"),         TEXT("Handgun"),         TEXT("handgun") },
-		{ TEXT("Shotgun"),         TEXT("Shotgun"),         TEXT("shotgun") },
 	};
 
 	/**
@@ -151,8 +158,6 @@ namespace
 		{ TEXT("Handgun"), 0.58f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/03_insert_the_mag_handgun_reload_1_Cue.03_insert_the_mag_handgun_reload_1_Cue") },
 		{ TEXT("Handgun"), 0.85f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/04_slide_release_handgun_reload_1_Cue.04_slide_release_handgun_reload_1_Cue") },
 
-		{ TEXT("Shotgun"), 0.20f, TEXT("/Game/FreeWeaponSounds/Cue/Shotgun/Foley/shotgun_reload_chambering_Cue.shotgun_reload_chambering_Cue") },
-		{ TEXT("Shotgun"), 0.75f, TEXT("/Game/FreeWeaponSounds/Cue/Shotgun/Foley/shotgun_reload_slide_action_Cue.shotgun_reload_slide_action_Cue") },
 	};
 
 	constexpr float ReloadFoleyVolume = 0.8f;
@@ -161,7 +166,6 @@ namespace
 	const FReloadFoleyDef WeaponEquipDefs[] = {
 		{ TEXT("AssaultRifle"), 0.0f, TEXT("/Game/FreeWeaponSounds/Cue/AssaultRifle/Foley/assault_rifle_weapon_equip_Cue.assault_rifle_weapon_equip_Cue") },
 		{ TEXT("Handgun"),      0.0f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/handgun_weapon_equip_Cue.handgun_weapon_equip_Cue") },
-		{ TEXT("Shotgun"),      0.0f, TEXT("/Game/FreeWeaponSounds/Cue/Shotgun/Foley/shotgun_weapon_equip_Cue.shotgun_weapon_equip_Cue") },
 	};
 }
 

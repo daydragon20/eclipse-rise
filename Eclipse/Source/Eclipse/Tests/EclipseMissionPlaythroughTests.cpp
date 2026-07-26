@@ -3154,7 +3154,7 @@ bool FEclipseWeaponSoundSetsLoadAndTailIsBraked::RunTest(const FString& Paramete
 	Harness.Idle(0.5f);
 
 	Report(*this, TEXT("geladen wapenfamilies"), static_cast<float>(Audio->GetWeaponSoundFamilyCount()), TEXT(""),
-		TEXT("uit FreeWeaponSounds"));
+		TEXT("alleen de families die een wapen in DT_Weapons echt gebruikt"));
 	Report(*this, TEXT("schotvarianten AssaultRifle"),
 		static_cast<float>(Audio->GetWeaponSoundVariantCount(TEXT("AssaultRifle"))), TEXT(""));
 	Report(*this, TEXT("schotvarianten Handgun"),

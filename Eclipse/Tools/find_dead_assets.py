@@ -36,11 +36,28 @@ TOOLS = ROOT / "Tools"
 # Alleen mappen waar de code zijn assets bij PAD laadt. Character-, materiaal- en
 # texturemappen horen hier niet: die worden vanuit data of vanuit andere assets
 # gerefereerd, en dan zegt "de naam staat in geen enkele .cpp" niets.
+# ALLEEN Audio, en dat is 26-07 avond opnieuw vastgesteld na het te hebben
+# geprobeerd. De twee packs die die dag binnenkwamen (FreeWeaponSounds,
+# Footsteps_Volume_02) worden bij pad geladen, maar met een SAMENGESTELD pad:
+#
+#     FString::Printf(TEXT(".../Cue/%s/Gunshots/%s_gunshot_%02d_Cue..."), ...)
+#
+# Dan staat er geen enkel letterlijk pad in de bron, ook niet van de map, en een
+# tekstsweep verklaarde dertien cues dood die elke seconde afspelen. Een sweep die
+# over-meldt is net zo onbruikbaar als een die te weinig meldt.
+#
+# Wat die packs WEL dekt: de runtime-meting. Eclipse.Mission.Playthrough.
+# WeaponSoundSetsLoadAndTailIsBraked en FootstepsKnowTheirSurface tellen hoeveel
+# varianten er echt geladen zijn — dat is sterker dan tekst zoeken, want het meet
+# het laden zelf.
 LOOK_IN = ("Audio",)
 
 # Alleen cues: die worden door code bij pad geladen. Een ruw golfbestand zit in
 # zijn cue en hoort daar niet los te staan.
+# De oude eigen audio heet Cue_*; de twee packs noemen hun cues anders (een
+# _Cue-SUFFIX). Beide vormen tellen, want beide worden bij pad geladen.
 NAME_PREFIX = "Cue_"
+NAME_SUFFIX = "_Cue"
 
 # Binnen die mappen nog steeds overslaan: gegenereerde audio is per definitie
 # hash-genoemd en wordt via het manifest gevonden, niet bij naam.
@@ -70,7 +87,7 @@ def main() -> int:
             continue
         if any(skip in relative.parts for skip in SKIP_DIRS):
             continue
-        if not asset.stem.startswith(NAME_PREFIX):
+        if not (asset.stem.startswith(NAME_PREFIX) or asset.stem.endswith(NAME_SUFFIX)):
             continue
         checked += 1
         # Het PAD zoals de engine het kent (/Game/<map>/<naam>), niet de losse
