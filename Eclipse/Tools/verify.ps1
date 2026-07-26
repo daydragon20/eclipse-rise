@@ -86,8 +86,19 @@ if (-not $SkipShots) {
     # Alleen de SPELERregel per moment. De volledige meting is acht regels per
     # opname en dan leest niemand hem meer — en een rapport dat niemand leest is
     # precies wat deze hele laag moest vervangen. De rest staat in het log.
+    # De ronde oordeelt nu ook zelf waar dat kan: wordt de speler getekend, vult
+    # hij een echt stuk beeld, staat hij in het frame. Die controles meten in
+    # SCHERMruimte, en dat is precies het verschil dat de suite niet kan zien.
+    $Wrong = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "PLAYSHOT \d+ FOUT\]"
+    if ($Wrong) {
+        Write-Host ""
+        Write-Host "DE OPNAMERONDE VOND FOUTEN:"
+        $Wrong | ForEach-Object { Write-Host "  $(($_.Line -replace '^.*Error: ', ''))" }
+        $Failures += "opnameronde: $($Wrong.Count) fout(en) in het frame"
+    }
+
     Write-Host ""
-    Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "SPELER|PLAYSHOT \d+ (WAPEN|DRAAI)\]" |
+    Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "SPELER|PLAYSHOT \d+ (WAPEN|DRAAI|SILHOUET)\]" |
         ForEach-Object { ($_.Line -replace '^.*Display: ', '') }
 }
 

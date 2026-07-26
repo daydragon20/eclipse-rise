@@ -338,6 +338,57 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				Weapon != nullptr ? Weapon->GetMagazineSize() : -1,
 				Weapon != nullptr ? Weapon->GetAmmoInMagazine() : -1);
 
+			// HARDE UITSPRAKEN OVER WAT ER IN HET FRAME STAAT.
+			//
+			// De opnameronde leverde tot nu alleen beelden, en een beeld beoordeelt
+			// zichzelf niet. Deze drie controles zijn precies de dingen die vandaag
+			// misgingen en die geen enkele logica-test kon zien — ze meten in
+			// SCHERMRUIMTE en niet in wereldruimte, want dat is het verschil tussen
+			// "de code klopt" en "je ziet iets".
+			//
+			// De ronde stopt er niet voor: hij logt FOUT-regels en draait door, want
+			// een halve ronde levert minder bewijs op dan een volledige met een fout
+			// erin. verify.ps1 valt op die regels.
+			FVector2D FeetScreen = FVector2D::ZeroVector;
+			FVector2D HeadScreen = FVector2D::ZeroVector;
+			const FVector Feet = Body->GetActorLocation() - FVector(0, 0, Bounds.BoxExtent.Z);
+			const FVector Head = Body->GetActorLocation() + FVector(0, 0, Bounds.BoxExtent.Z);
+			const bool bFeet = Controller->ProjectWorldLocationToScreen(Feet, FeetScreen);
+			const bool bHead = Controller->ProjectWorldLocationToScreen(Head, HeadScreen);
+			const float SilhouettePixels = (bFeet && bHead) ? FMath::Abs(HeadScreen.Y - FeetScreen.Y) : 0.0f;
+
+			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SILHOUET] %.0f px hoog in een frame van %d px"),
+				ShotIndex, SilhouettePixels, ViewportY);
+
+			// 1. Wordt hij getekend? Dit is de vraag waar het gisteren op stukliep:
+			//    bounds konden kloppen terwijl de renderer hem oversloeg.
+			if (!Mesh->WasRecentlyRendered(0.2f))
+			{
+				UE_LOG(LogEclipse, Error, TEXT("[PLAYSHOT %d FOUT] de speler wordt NIET getekend"), ShotIndex);
+			}
+
+			// 2. Neemt hij een echt stuk beeld in? Een ingeklapt personage haalt
+			//    dit niet: bij de additieve idle-take was de omvang 1,0 cm, en dat
+			//    is in schermruimte een handvol pixels. Een tiende van de
+			//    beeldhoogte is ruim onder wat een lichaam op 312 cm afstand hoort
+			//    te vullen, dus dit slaat geen normale situatie af.
+			const float MinimumPixels = static_cast<float>(ViewportY) * 0.1f;
+			if (SilhouettePixels < MinimumPixels)
+			{
+				UE_LOG(LogEclipse, Error,
+					TEXT("[PLAYSHOT %d FOUT] de speler is maar %.0f px hoog, minder dan %.0f — ingeklapt of buiten beeld?"),
+					ShotIndex, SilhouettePixels, MinimumPixels);
+			}
+
+			// 3. Staat hij in beeld? Een lichaam dat correct getekend wordt maar
+			//    buiten het frame valt, bewijst niets over wat de speler ziet.
+			if (!bOnScreen || Screen.X < 0.0f || Screen.X > ViewportX || Screen.Y < 0.0f || Screen.Y > ViewportY)
+			{
+				UE_LOG(LogEclipse, Error,
+					TEXT("[PLAYSHOT %d FOUT] de speler staat op (%.0f,%.0f) en dat valt buiten het frame"),
+					ShotIndex, Screen.X, Screen.Y);
+			}
+
 			const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
 			const float ViewYaw = static_cast<float>(Controller->GetControlRotation().Yaw);
 			UE_LOG(LogEclipse, Display,
