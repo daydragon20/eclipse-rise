@@ -2261,6 +2261,82 @@ bool FEclipseHeavyMissionSpawnsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// De TERUGVAL: een missie zonder geauthorde batches houdt zijn vier vijanden.
+//
+// Dit is de tweede helft van dezelfde koppeling en het stuk dat stil kan
+// verdwijnen. M1.1 authordt geen spawns, dus hij hoort op de graybox-standaard
+// te blijven — vier bij het primaire doel, exact de opstelling waarop álle
+// speelrondes en alle feel-metingen van de nacht van 25→26 juli gedaan zijn.
+// Breekt die terugval, dan staat M1.1 ineens leeg en klopt geen van die
+// metingen meer, terwijl er niets rood wordt: een lege missie is nog steeds
+// speelbaar en loopt netjes naar de debrief.
+//
+// Geschreven omdat ik de terugval een uur geleden zelf schreef en hem alleen
+// bewéérd had. Dat was de derde ongemeten claim van dat uur, en de regel na de
+// derde is: stoppen met repareren en gaan zoeken.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDefaultSpawnFallbackTest,
+	"Eclipse.Playthrough.AMissionWithoutSpawnsKeepsItsFour",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseDefaultSpawnFallbackTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* MissionSub = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	if (!TestNotNull(TEXT("terugval: strategie"), Strategy) || !TestNotNull(TEXT("terugval: prep"), Prep)
+		|| !TestNotNull(TEXT("terugval: missie"), MissionSub))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("terugval: M1.1 geselecteerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error))
+		|| !TestTrue(FString::Printf(TEXT("terugval: gelanceerd (%s)"), *Error), Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	// Zonder deze regel bewijst de telling hieronder niets: als M1.1 óók batches
+	// zou krijgen, meet dit de geauthorde weg en niet de terugval.
+	TestEqual(TEXT("terugval: M1.1 authordt inderdaad geen spawns (anders test dit het verkeerde pad)"),
+		MissionSub->GetActiveEnemySpawns().Num(), 0);
+
+	int32 Hostiles = 0;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		const AEclipseCharacter* Body = *It;
+		if (Body != nullptr && Body != Harness.Body && !Body->IsPlayerSide())
+		{
+			++Hostiles;
+		}
+	}
+	Report(*this, TEXT("vijanden in M1.1"), Hostiles, TEXT(""),
+		TEXT("4 — de graybox-standaard waarop de hele nacht gemeten is"));
+	TestEqual(TEXT("terugval: een missie zonder batches houdt zijn vier vijanden"), Hostiles, 4);
+
+	Harness.Shutdown();
+	return true;
+}
+
 // Elke geauthorde spawnbatch moet ook echt vijanden kunnen opleveren.
 //
 // Geschiedenis, want die verklaart de vorm van deze test. Vanochtend vroeg was
