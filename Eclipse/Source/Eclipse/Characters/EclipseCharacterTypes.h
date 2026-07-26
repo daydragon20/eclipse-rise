@@ -566,6 +566,17 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> HitReactAnim;
 
+	/**
+	 * Hurken en opstaan (locomotie-audit 26-07, punt 13). Zonder deze take
+	 * verspringt het lichaam tussen staand en gehurkt zonder tussenbeweging — de
+	 * capsule krimpt, de pose knipt. SciFiCharacter levert Crouch_to_Stand; die
+	 * wordt beide kanten op gebruikt, want een omgekeerd afgespeelde opstaanpose
+	 * bestaat niet in de pack en de beweging is kort genoeg om te lezen als
+	 * "houding wisselt".
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> CrouchTransitionAnim;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	TSoftObjectPtr<UAnimSequence> DeathAnim;
 

@@ -90,6 +90,7 @@ AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer
 	CameraBoom->SetupAttachment(GetCapsuleComponent());
 	CameraBoom->TargetArmLength = ThirdPersonArmLength;
 	CameraBoom->SocketOffset = FVector(0.0f, 55.0f, 65.0f);
+	BaseCameraSocketZ = 65.0f;
 	// The boom follows where the player LOOKS; the camera then just rides its end.
 	// Both true would double-apply control rotation and the view would swing twice
 	// as fast as the stick.
@@ -606,7 +607,37 @@ void AEclipseCharacter::RefreshCameraTargets()
 void AEclipseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	UpdateLandingDip(DeltaSeconds);
 	UpdateCameraBlend(DeltaSeconds);
+}
+
+void AEclipseCharacter::UpdateLandingDip(float DeltaSeconds)
+{
+	if (LandingDipSecondsLeft <= 0.0f || CameraBoom == nullptr)
+	{
+		return;
+	}
+
+	LandingDipSecondsLeft = FMath::Max(LandingDipSecondsLeft - DeltaSeconds, 0.0f);
+	// Sin-envelope, net als de eenmalige poses: meteen omlaag, dan terug. Een
+	// lineaire terugloop leest als een lift, een sin als een veer.
+	const float Alpha = 1.0f - (LandingDipSecondsLeft / 0.22f);
+	const float Dip = LandingDipSecondsLeft > 0.0f
+		? LandingDipCm * FMath::Sin(FMath::Clamp(Alpha, 0.0f, 1.0f) * PI)
+		: 0.0f;
+
+	// NIET zelf de socket schrijven. Eerste versie deed dat, en de dip mat 0,0 cm:
+	// UpdateCameraBlend interpoleert diezelfde Z elke tick terug naar zijn eigen
+	// doel en zette daarna de tick uit. Twee schrijvers op één waarde is altijd
+	// een verliezer, en dat was ik. De dip is nu een OPTELLING die de blend zelf
+	// toepast — zie het eind van UpdateCameraBlend.
+	CurrentDipCm = Dip;
+
+	if (LandingDipSecondsLeft <= 0.0f)
+	{
+		LandingDipCm = 0.0f;
+		CurrentDipCm = 0.0f;
+	}
 }
 
 void AEclipseCharacter::UpdateCameraBlend(float DeltaSeconds)
@@ -648,12 +679,19 @@ void AEclipseCharacter::UpdateCameraBlend(float DeltaSeconds)
 	const float RiseRate = ViewToggleBlendTime > KINDA_SMALL_NUMBER
 		? FMath::Max(CommandModeCameraRise, 1.0f) / ViewToggleBlendTime : BIG_NUMBER;
 	FVector Offset = CameraBoom->SocketOffset;
-	Offset.Z = FMath::FInterpConstantTo(Offset.Z, BaseSocketOffsetZ + TargetRise, DeltaSeconds, RiseRate);
+	// Vanaf de ONGEDIPTE hoogte interpoleren, anders trekt de dip het doel mee en
+	// komt de camera na een sprong lager te hangen dan hij begon.
+	Offset.Z = FMath::FInterpConstantTo(Offset.Z + CurrentDipCm, BaseSocketOffsetZ + TargetRise, DeltaSeconds, RiseRate);
+	const float SettledZ = Offset.Z;
+	Offset.Z -= CurrentDipCm;
 	CameraBoom->SocketOffset = Offset;
 
-	if (FMath::IsNearlyEqual(CameraBoom->TargetArmLength, TargetArmLength, 0.5f)
+	// De landingsdip houdt de tick in leven: zonder deze voorwaarde zet de blend
+	// zichzelf uit zodra hij klaar is en bevriest de camera halverwege de dip.
+	if (LandingDipSecondsLeft <= 0.0f
+		&& FMath::IsNearlyEqual(CameraBoom->TargetArmLength, TargetArmLength, 0.5f)
 		&& FMath::IsNearlyEqual(ViewCamera->FieldOfView, TargetFOV, 0.1f)
-		&& FMath::IsNearlyEqual(Offset.Z, BaseSocketOffsetZ + TargetRise, 0.5f))
+		&& FMath::IsNearlyEqual(SettledZ, BaseSocketOffsetZ + TargetRise, 0.5f))
 	{
 		SetActorTickEnabled(false);
 	}
@@ -820,6 +858,7 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"));
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"));
+	LocomotionSet.CrouchTransition = ResolveClip(BodyDef.CrouchTransitionAnim, TEXT("crouch-transition"));
 
 	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();
 	if (Tier >= EEclipseLocomotionTier::OneGait)
@@ -896,8 +935,43 @@ void AEclipseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, ui
 	}
 }
 
+void AEclipseCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	// 0,3 s: de capsule krimpt onmiddellijk, dus de pose moet het verschil
+	// overbruggen zonder de speler te laten wachten. Halve piek — dit is een
+	// houdingswissel, geen klap.
+	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f);
+	PlaceHeadHitboxOnCapsule(); // gehurkt zit het hoofd lager
+}
+
+void AEclipseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f);
+	PlaceHeadHitboxOnCapsule();
+}
+
 void AEclipseCharacter::Landed(const FHitResult& Hit)
 {
+	// LANDINGSDIP (locomotie-audit 26-07, punt 12). Er is geen landingstake in de
+	// packs, dus het lichaam kan niet door de knieën. Wat wél kan zonder assets is
+	// de CAMERA laten zakken — dat is precies wat Borderlands doet, en het leest
+	// als gewicht dat aankomt.
+	//
+	// Geschaald met de valsnelheid: van een stoeprand stappen hoort niet hetzelfde
+	// te voelen als van een dak springen. Boven de 1200 cm/s (ruim een verdieping)
+	// loopt hij niet verder op, anders duikt de camera bij een lange val door de
+	// vloer.
+	const float FallSpeed = FMath::Abs(static_cast<float>(GetVelocity().Z));
+	if (FallSpeed > 300.0f)
+	{
+		LandingDipCm = FMath::GetMappedRangeValueClamped(
+			FVector2f(300.0f, 1200.0f), FVector2f(2.0f, 12.0f), FallSpeed);
+		LandingDipSecondsLeft = 0.22f;
+		SetActorTickEnabled(true);
+	}
+
 	Super::Landed(Hit);
 	LeftGroundAtSeconds = -1.0;
 

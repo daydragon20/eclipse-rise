@@ -91,6 +91,10 @@ struct FEclipseLocomotionSet
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> HitReact = nullptr;
 
+	/** Hurken/opstaan (26-07, audit punt 13). */
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> CrouchTransition = nullptr;
+
 	// Blend anchors, mirrored from DA_CharacterTuning (GDD 14.2 — feel numbers
 	// are data). The defaults here are the LOCKED feel targets
 	// (phase0/graybox_feel_targets.md §2) so a body that never sees a tuning

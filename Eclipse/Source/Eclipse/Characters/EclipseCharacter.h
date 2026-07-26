@@ -222,6 +222,8 @@ public:
 	void RequestJump();
 
 	virtual void Landed(const FHitResult& Hit) override;
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PrevCustomMode = 0) override;
 	virtual bool CanJumpInternal_Implementation() const override;
 
@@ -279,6 +281,14 @@ private:
 	void PlaceHeadHitboxOnCapsule();
 
 	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight);
+
+	/** Landingsdip (audit punt 12): hoeveel de camera zakt en hoe lang nog. */
+	float LandingDipCm = 0.0f;
+	float LandingDipSecondsLeft = 0.0f;
+	float BaseCameraSocketZ = 65.0f;
+	float CurrentDipCm = 0.0f;
+
+	void UpdateLandingDip(float DeltaSeconds);
 	bool bAiming = false;
 	bool bCameraLagSuspended = false;
 

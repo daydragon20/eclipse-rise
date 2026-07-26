@@ -1273,6 +1273,61 @@ bool FEclipseCameraPitchCollapseTest::RunTest(const FString& Parameters)
 // pack (gemeten: vijf van de negen lichamen hebben niet eens zijcycli). Wat op
 // ELK lichaam moet gelden is dat het mechanisme aanslaat, piekt en weer uitdooft
 // — een klap die blijft hangen is net zo fout als een die nooit komt.
+// Landen kost gewicht (locomotie-audit 26-07, punt 12).
+//
+// De audit vond dat landen niets deed: je raakt de grond en loopt door, zonder
+// demping en zonder animatie. Er is geen landingstake in de packs, dus het
+// lichaam kan niet door de knieën — maar de CAMERA kan zakken, en dat is precies
+// wat Borderlands doet. Het leest als massa die aankomt.
+//
+// Gemeten op de socket-offset van de boom en niet op "er gebeurt iets": een dip
+// die niet terugkomt is een camera die naar de vloer zakt.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLandingDipTest,
+	"Eclipse.Feel.Layer2.LandingHasWeight",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseLandingDipTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	USpringArmComponent* Boom = Harness.Body->FindComponentByClass<USpringArmComponent>();
+	if (!TestNotNull(TEXT("landing: de camera-boom bestaat"), Boom))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	const float RestingZ = Boom->SocketOffset.Z;
+
+	Harness.Press(TEXT("Jump"));
+	// Tot het hoogste punt en weer omlaag; 128 cm sprong is ~0,6 s heen en terug.
+	float LowestZ = RestingZ;
+	const double Start = Harness.ElapsedSeconds;
+	while (Harness.ElapsedSeconds - Start < 1.5)
+	{
+		Harness.Step();
+		LowestZ = FMath::Min(LowestZ, Boom->SocketOffset.Z);
+	}
+
+	const float Dip = RestingZ - LowestZ;
+	Report(*this, TEXT("landingsdip"), Dip, TEXT("cm"), TEXT("> 0 = de camera zakt bij het raken van de grond"));
+	Report(*this, TEXT("camera-hoogte na de landing"), Boom->SocketOffset.Z, TEXT("cm"),
+		*FString::Printf(TEXT("terug op %.0f"), RestingZ));
+
+	TestTrue(FString::Printf(TEXT("landing: de camera zakt merkbaar (%.1f cm)"), Dip), Dip > 1.0f);
+	TestTrue(TEXT("landing: en komt volledig terug (anders zakt de camera elke sprong verder weg)"),
+		FMath::IsNearlyEqual(Boom->SocketOffset.Z, RestingZ, 0.1f));
+
+	Harness.Shutdown();
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseHitAndShootPosesTest,
 	"Eclipse.Feel.Layer2.ShootingAndBeingHitChangeThePose",
 	EclipseFeelTest::TestFlags)
