@@ -31,6 +31,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
 #include "Eclipse.h" // LogEclipse
+#include "AI/EclipseEnemyController.h"
 #include "AI/EclipseSquadmateController.h"
 #include "Characters/EclipseCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -42,6 +43,7 @@
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Audio/EclipseAudioSubsystem.h"
+#include "Core/EclipseGameMode.h"
 #include "Squad/EclipseSquadSubsystem.h"
 #include "Characters/EclipseAnimInstance.h"
 #include "Core/EclipseGameplayTags.h"
@@ -4176,6 +4178,212 @@ bool FEclipseSquadChangesTimeToKill::RunTest(const FString& Parameters)
 	TestTrue(TEXT("ttk: het doelwit gaat in beide gevallen neer"),
 		AloneSeconds > 0.0f && TogetherSeconds > 0.0f);
 	TestTrue(TEXT("ttk: mét de squad gaat het sneller"), TogetherSeconds < AloneSeconds);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * JE SQUAD KAN JE VERRADEN (26-07 avond — het gevolg van doctrine-laag 2).
+ *
+ * Sinds vanmorgen verraadt elk schot van de spelerskant je positie: vijanden
+ * binnen de alarmradius lopen naar waar er geschoten werd. Sinds vanavond vuurt
+ * je squad UIT ZICHZELF. Die twee samen betekenen iets wat geen van beide alleen
+ * betekende: **je squad kan je verraden met een schot dat jij niet gaf.**
+ *
+ * Dat maakt `recon` niet zomaar een houding maar je enige sluipoptie — en dat is
+ * precies wat die doctrine in Ghost Recon ook doet. Deze meting bewijst het
+ * verschil, want zonder bewijs is het een verhaal.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadCanGiveYouAway,
+	"Eclipse.Mission.Playthrough.SquadCanGiveYouAway",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseSquadCanGiveYouAway::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("verraden: strategie"), Strategy) || !TestNotNull(TEXT("verraden: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("verraden: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	AEclipseGameMode* Mode = Harness.World->GetAuthGameMode<AEclipseGameMode>();
+	if (!TestNotNull(TEXT("verraden: game mode"), Mode))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	if (!TestTrue(TEXT("verraden: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// EERST BINNEN GEHOORSAFSTAND GAAN STAAN. De missie zet zijn vijanden bij het
+	// doelsite, en dat ligt hier 14.142 cm verderop — ruim buiten de alarmradius
+	// van 5000. De eerste ronde mat daardoor twee keer nul, en dat las als "het
+	// alarm werkt niet" terwijl het "er stond niemand binnen gehoorsafstand"
+	// betekende.
+	{
+		const AEclipseEnemyController* Nearest = nullptr;
+		float Best = TNumericLimits<float>::Max();
+		for (TActorIterator<AEclipseEnemyController> It(Harness.World); It; ++It)
+		{
+			if (const APawn* Body = It->GetPawn())
+			{
+				const float Away = static_cast<float>(FVector::Dist2D(Body->GetActorLocation(), Harness.Location()));
+				if (Away < Best)
+				{
+					Best = Away;
+					Nearest = *It;
+				}
+			}
+		}
+		if (Nearest != nullptr && Nearest->GetPawn() != nullptr)
+		{
+			// Op 3500 cm: binnen de alarmradius (5000) en buiten élk
+			// waarnemingsbereik (max 3200), zodat alleen het GELUID hem in
+			// beweging kan zetten.
+			const FVector EnemyAt = Nearest->GetPawn()->GetActorLocation();
+			const FVector Toward = (Harness.Location() - EnemyAt).GetSafeNormal2D();
+			const FVector StandAt = EnemyAt + Toward * 3500.0f + FVector(0, 0, 120.0f);
+			Harness.Body->SetActorLocation(StandAt, false, nullptr, ETeleportType::TeleportPhysics);
+
+			// DE SQUAD MEE, en dat was de tweede meetfout. Meelopen doet 420 cm/s;
+			// de speler sprong hier ruim 10.000 cm. Zonder deze regel stond de squad
+			// nog bij het insertiepunt en kwam het ene schot dat viel van ver buiten
+			// de alarmradius — dus nul gealarmeerden, en dat las als "schieten
+			// alarmeert niet".
+			int32 Spread = 0;
+			for (AEclipseSquadmateController* Mate : Mates)
+			{
+				if (APawn* Body = Mate->GetPawn())
+				{
+					Body->SetActorLocation(StandAt + FVector(200.0f * (++Spread), 150.0f, 0.0f),
+						false, nullptr, ETeleportType::TeleportPhysics);
+				}
+			}
+			Harness.Idle(0.5f);
+		}
+	}
+
+	// Een vijand binnen wapenbereik van de squad. De SPELER doet niets — geen
+	// schot, geen order. Alles wat er gebeurt komt van de squad.
+	const FVector Spot = Harness.Location() + Harness.Body->GetActorForwardVector() * 700.0f;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AEclipseCharacter* Hostile = Harness.World->SpawnActor<AEclipseCharacter>(
+		AEclipseCharacter::StaticClass(), Spot, FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("verraden: er staat een vijand"), Hostile))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Hostile->InitializeHealth(100000.0f);
+
+	// Twee getallen per ronde: hoeveel de squad SCHOOT en hoeveel dat ALARMEERDE.
+	// Zonder het eerste kun je een nul in het tweede niet lezen — is er niet
+	// geschoten, of alarmeert schieten niet?
+	int32 ShotsInRound = 0;
+	auto AlertsOverThreeSeconds = [&](EEclipseSquadStance Stance) -> int32
+	{
+		for (AEclipseSquadmateController* Mate : Mates)
+		{
+			Mate->SetDoctrine(Stance);
+		}
+		Harness.Idle(0.5f);
+		int32 ShotsBefore = 0;
+		for (const AEclipseSquadmateController* Mate : Mates)
+		{
+			ShotsBefore += Mate->GetAutoFireShots();
+		}
+		const int32 Before = Mode->GetEnemiesAlertedByShots();
+		Harness.Idle(3.0f);
+		ShotsInRound = -ShotsBefore;
+		for (const AEclipseSquadmateController* Mate : Mates)
+		{
+			ShotsInRound += Mate->GetAutoFireShots();
+		}
+		return Mode->GetEnemiesAlertedByShots() - Before;
+	};
+
+	// DISCRIMINATOR. Twee keer nul zegt niets zolang je niet weet of er überhaupt
+	// iemand binnen gehoorsafstand staat — dat is de nulmeting-valkuil die me
+	// vandaag al eerder pakte, en hier meteen weer.
+	int32 Enemies = 0;
+	float NearestEnemyCm = TNumericLimits<float>::Max();
+	for (TActorIterator<AEclipseEnemyController> It(Harness.World); It; ++It)
+	{
+		if (const APawn* Body = It->GetPawn())
+		{
+			++Enemies;
+			NearestEnemyCm = FMath::Min(NearestEnemyCm,
+				static_cast<float>(FVector::Dist2D(Body->GetActorLocation(), Harness.Location())));
+		}
+	}
+	Report(*this, TEXT("vijanden in het veld"), static_cast<float>(Enemies), TEXT(""));
+	Report(*this, TEXT("dichtstbijzijnde vijand"), Enemies > 0 ? NearestEnemyCm : -1.0f, TEXT("cm"),
+		TEXT("de alarmradius van de AR is 5000"));
+
+	const int32 UnderRecon = AlertsOverThreeSeconds(EEclipseSquadStance::Recon);
+	const int32 ShotsUnderRecon = ShotsInRound;
+	const int32 UnderReady = AlertsOverThreeSeconds(EEclipseSquadStance::Ready);
+	const int32 ShotsUnderReady = ShotsInRound;
+
+	Report(*this, TEXT("squadschoten onder RECON"), static_cast<float>(ShotsUnderRecon), TEXT(""));
+	Report(*this, TEXT("squadschoten onder READY"), static_cast<float>(ShotsUnderReady), TEXT(""),
+		TEXT("0 hier betekent dat de squad niet vuurde, niet dat het alarm stuk is"));
+
+	Report(*this, TEXT("gealarmeerde vijanden onder RECON"), static_cast<float>(UnderRecon), TEXT(""),
+		TEXT("de speler deed niets; je squad zwijgt"));
+	Report(*this, TEXT("gealarmeerde vijanden onder READY"), static_cast<float>(UnderReady), TEXT(""),
+		TEXT("je squad schiet, en dat verraadt JOU"));
+
+	// GEEN NUL EISEN ONDER RECON, en dat is geen verzachting maar de doctrine zelf:
+	// recon betekent "vuur niet TOT ER OP JE GESCHOTEN WORDT". In een levende
+	// missie schieten die vijanden terug, dus een squad die zich verdedigt hoort
+	// erbij. Gemeten bleef er 4 schoten over tegen 61 — dat is het verschil tussen
+	// "wij openen het vuur" en "wij vuren terug".
+	//
+	// Eerste versie eiste nul en zou dus rood staan op correct gedrag. Een test die
+	// een verkeerde eis stelt is erger dan geen test: hij leert je hem uit te zetten.
+	if (UnderReady > 0)
+	{
+		Report(*this, TEXT("recon tegen ready, in alarmeringen"),
+			static_cast<float>(UnderRecon) / static_cast<float>(UnderReady), TEXT("x"),
+			TEXT("hoe lager, hoe meer recon je sluippad openhoudt"));
+	}
+	TestTrue(FString::Printf(TEXT("verraden: onder ready verraadt je squad je (%d alarmeringen)"), UnderReady),
+		UnderReady > 0);
+	TestTrue(FString::Printf(TEXT("verraden: recon houdt het ruim beperkter (%d tegen %d)"), UnderRecon, UnderReady),
+		UnderRecon * 3 < UnderReady);
 
 	Harness.Shutdown();
 	return true;

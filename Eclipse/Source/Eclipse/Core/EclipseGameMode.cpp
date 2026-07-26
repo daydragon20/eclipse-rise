@@ -123,6 +123,7 @@ void AEclipseGameMode::OnShotFired(FGameplayTag EventTag, const FInstancedStruct
 	// Het schot zet OOK het alarm aan: gehoord worden is verraden worden. De latch
 	// is idempotent, dus dit botst niet met het alarm-op-eerste-waarneming — wie
 	// eerst is, is eerst, en een tweede hoorn is geen nieuw feit.
+	EnemiesAlertedByShots += Alerted;
 	if (Alerted > 0)
 	{
 		if (UGameInstance* GameInstance = GetGameInstance())

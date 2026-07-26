@@ -318,6 +318,22 @@ AEclipseCharacter* AEclipseSquadmateController::FindHostileInRange() const
 	return Nearest;
 }
 
+void AEclipseSquadmateController::SetDoctrine(EEclipseSquadStance Stance)
+{
+	CurrentStance = Stance;
+
+	// RECON ZET DE WAPENS METEEN STIL. Zonder deze regel loopt de vuurlus door tot
+	// de volgende doelselectie (een halve seconde later) en vuurt de squad er nog
+	// drie tot vier af — gemeten 4 schoten, goed voor 16 gealarmeerde vijanden.
+	// Voor een kader dat je gebruikt OM te sluipen is een halve seconde naschot
+	// precies het verschil tussen wel en niet gezien worden.
+	if (Stance == EEclipseSquadStance::Recon)
+	{
+		GetWorldTimerManager().ClearTimer(AutoFireTimer);
+		AutoTarget = nullptr;
+	}
+}
+
 void AEclipseSquadmateController::UpdateEngagement()
 {
 	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());

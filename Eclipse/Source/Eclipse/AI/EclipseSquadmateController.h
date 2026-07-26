@@ -63,7 +63,7 @@ public:
 	 * De doctrine zetten (26-07 avond, laag 4). Geldt METEEN en blijft gelden tot
 	 * je hem wisselt — het is een kader, geen orderparameter.
 	 */
-	void SetDoctrine(EEclipseSquadStance Stance) { CurrentStance = Stance; }
+	void SetDoctrine(EEclipseSquadStance Stance);
 	EEclipseSquadStance GetDoctrine() const { return CurrentStance; }
 
 	/**

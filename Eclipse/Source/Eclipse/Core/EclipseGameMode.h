@@ -20,6 +20,10 @@ class ECLIPSE_API AEclipseGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	/** Diagnostiek: vijanden die door een schot van de spelerskant in beweging kwamen. */
+	int32 GetEnemiesAlertedByShots() const { return EnemiesAlertedByShots; }
+
+
 	AEclipseGameMode();
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -79,6 +83,16 @@ private:
 
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
+
+	/**
+	 * Hoe vaak een schot van de spelerskant een vijand in beweging zette.
+	 *
+	 * Bestaat sinds 26-07 avond om één vraag te kunnen meten die de squad-doctrine
+	 * opriep: nu je squad UIT ZICHZELF vuurt, verraadt hij jou. Elk schot van de
+	 * spelerskant alarmeert, en dat geldt net zo goed voor het schot dat jij niet
+	 * gaf. Dat maakt `recon` niet zomaar een houding maar je enige sluipoptie.
+	 */
+	int32 EnemiesAlertedByShots = 0;
 
 	/** Een schot vertalen naar wie het hoort (26-07, punt 1). */
 	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
