@@ -15,10 +15,13 @@ Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
 van met een groene bar — zie het morgenrapport hieronder.
 
-**Eén ding dat ik NIET heb kunnen aantonen:** ik heb nog geen screenshot waarop ik
-zelf heb gezien dat je personage er staat. De opnamelaag is gebouwd maar levert nog
-geen beeld op (zie taak 1). De bewijzen hieronder zijn metingen op de mesh, niet op
-een frame.
+**En nu ook op beeld.** De opnameronde levert plaatjes op, ik heb ze bekeken, en op
+opname 5 — waar alle andere lichamen verborgen zijn — staat jouw personage alleen
+in het frame: rechtop, volle hoogte, normale verhoudingen. Dat is de aanwijzing die
+gisteren ontbrak.
+
+Op datzelfde beeld vond ik meteen een fout die geen enkele meting ooit had kunnen
+vinden. Zie hieronder.
 
 ---
 
@@ -33,16 +36,43 @@ een frame.
 | **2948 stille afgewezen animaties → 0.** Onze eigen skeletpoort vergeleek op gelijkheid terwijl de engine de geleende takes al accepteerde. En het koppelscript had ze nooit opgeslagen: `save_asset(pad)` schreef niets en meldde geen fout. | 0 afwijzingen in de hele suite |
 | **Stil falen maakt de bar nu ROOD.** Elke degradatie — afgewezen animatie, niet-geladen cue, ontbrekende pose — telt mee, en een test eist nul in een echte missie. | 0 degradaties |
 | **Alle negen lichamen hebben een schietpose en een klap** (was: vijf lichamen met nul van de vijf poses). | 34 → 10 ontbrekende poses; wat rest is de reload van Belica |
+| **De aankleedfiguren waren reuzen.** Alleen op een beeld te vinden; zie hieronder. | 328,4 → 180,0 cm, naast een speler van 189,6 cm |
 
 ### Wat ik heb GEZIEN op screenshots
 
-**Niets.** Dat is de eerlijke stand. De opnamelaag draait wel als code maar heeft
-nog geen beeld opgeleverd: in de automation-run bestaat `HighResShot` niet (geen
-viewport), en de `-game`-variant die ik daarvoor bouwde (`-EclipseShotPlay`) heeft
-nog geen PNG geschreven. Taak 1 hieronder maakt dat af.
+De opnameronde werkte niet omdat ik hem een **verzonnen mapnaam** gaf
+(`L_Kessara_Graybox`; het district heet `GrayboxDistrict`). De engine meldde
+"Failed to load package" en stopte — en ik las die regel niet, want ik keek naar de
+map met screenshots in plaats van naar het log. Precies de fout die jij aanwees:
+niet kijken waar het antwoord staat.
 
-Wat ik in plaats daarvan heb: metingen die precies jouw twee waarnemingen dekken
-(omvang stilstaand/rennend, bewegende botten, meshschaal). Die staan hierboven.
+Wat er nu op staat, met eigen ogen bekeken:
+
+1. **Jouw personage staat er, rechtop en compleet.** Ik kon eerst niet aanwijzen
+   welke van de vier figuren jij was, dus heb ik er een vijfde opname bij gebouwd
+   waarop álle andere lichamen verborgen zijn. Wat overblijft, ben jij — volle
+   hoogte, normale verhoudingen, netjes getekend. De renderer bevestigt het:
+   `GETEKEND=1` op alle vier de momenten.
+2. **Het district ziet er als ECLIPSE uit.** Cel-shading met contourlijnen, de
+   skyline in silhouet tegen een oranje horizon, het oog-op-driehoek billboard, de
+   gele wegmarkering. Dit is de eerste keer dat ik de stijl echt zie werken.
+3. **DE VONDST: er liepen reuzen rond.** Naast jouw personage van 189,6 cm stond
+   een aankleedfiguur van **328,4 cm** — 1,7x, ruim drie meter, en hij vulde het
+   halve frame. Alle zes de Quaternius-figuren zijn zo (314–328 cm): dat pack is
+   niet op de schaal van de mannequin geauthord.
+
+   Geen enkele meting had dit kunnen vinden, en dat is geen pech. Alle controles
+   stonden **op de speler**, en de speler klopte. Deze fout bestaat pas als je twee
+   lichamen naast elkaar ziet — en dus pas op een beeld.
+
+   Gerepareerd door de hoogte te normaliseren (niet met een vast getal, zodat het
+   volgende pack zichzelf corrigeert): alle zes staan nu op 180,0 cm. Nagekeken op
+   een nieuwe opname — ze staan naast elkaar op menselijke maat.
+
+**Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
+laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
+elkaar botsen die twee stijlen. Dat is een art-directie keuze (ÉÉN-STIJL-WET) en
+geen bug, dus die laat ik aan jou.
 
 ### Wat wacht er op jou
 
@@ -58,23 +88,31 @@ Wat ik in plaats daarvan heb: metingen die precies jouw twee waarnemingen dekken
 
 ## OPDRACHT VOOR VANNACHT, in volgorde
 
-### 1. MAAK DE SCREENSHOTLAAG AF — dit vóór alles
+### 1. DE OPNAMERONDE STAAT — bouw hem uit
 
-De owner: *"Als je niet op een screenshot kunt aanwijzen dat mijn personage er
-staat en meebeweegt, is het niet af."*
+Draaien met:
 
-Er staat een `-EclipseShotPlay`-modus in `EclipseGameMode` die vier momenten
-opneemt (stilstaand, lopend, vurend, weer stilstaand) en de speler daarbij zelf
-laat lopen en vuren. Hij schrijft nog geen bestand. Zoek uit waarom — kandidaten:
-de `-game`-run start niet (controleer het mappad), of `HighResShot` heeft een
-viewport nodig die er in deze aanroep niet is. `FScreenshotRequest::RequestScreenshot`
-rechtstreeks aanroepen is het alternatief.
+```
+UnrealEditor-Cmd.exe Eclipse.uproject /Game/Maps/GrayboxDistrict -game -windowed ^
+    -resx=1280 -resy=720 -nosplash -NoLiveCoding -EclipseShotPlay ^
+    -EclipseStartMission=TransitCheckpoint
+```
 
-Als er beeld is: **kijk er zelf naar** met de Read-tool en schrijf op wat je ziet.
-Daarna harde asserties waar het kan (schermvulling, verschil tussen twee frames
-tijdens lopen, silhouethoogte over de tijd).
+Vijf opnames in `Saved/Screenshots/WindowsEditor/`: stilstaand, lopend, lopend en
+vurend, weer stilstaand, en één waarop alleen de speler zichtbaar is. Elke opname
+heeft een `[PLAYSHOT n MEET]`-regel met naam, schaal, hoogte, afstand,
+schermpositie en `GETEKEND` per lichaam.
 
-Deze ronde hoort daarna bij ELKE landing te draaien, naast de suite.
+**KIJK ER ZELF NAAR** met de Read-tool en schrijf op wat je ziet. Dat is de hele
+opdracht — de reuzen stonden er al twee dagen en geen enkele meting zag ze.
+
+Uitbouwen, in deze volgorde:
+- Deze ronde bij ELKE landing draaien, naast de suite.
+- Nog geen assertie op wat de opnames tonen. `NobodyIsAGiant` is de eerste die uit
+  een beeld is geboren; zoek de volgende (silhouethoogte over de tijd, verschil
+  tussen twee frames tijdens lopen).
+- Wat ik NIET op de beelden zag en wel verwachtte: **geen wapen in iemands handen**
+  en **geen HUD**. Uitzoeken of dat klopt of ontbreekt.
 
 ### 2. TURN-IN-PLACE AFMAKEN
 

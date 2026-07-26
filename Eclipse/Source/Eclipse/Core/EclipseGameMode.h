@@ -94,6 +94,12 @@ private:
 	/** Duwt elke tick beweging/vuur door zodat de opnames een LOPEND spel vangen. */
 	void DrivePlayShotInput();
 
+	/** Hangt een naam en een maat aan elke vorm in het frame; zonder dit is een screenshot een vermoeden. */
+	void MeasurePlayShot(int32 ShotIndex);
+
+	/** De aankleedfiguren zijn geen EclipseCharacter; zonder deze meting blijven ze buiten beeld van elke controle. */
+	void MeasureDressingFigures(int32 ShotIndex);
+
 	/**
 	 * Playtest shortcut (13.2 owner finding): -EclipseStartMission=<RegionId>
 	 * selects that region's offer and auto-launches, so a feel-gauntlet run does

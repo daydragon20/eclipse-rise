@@ -32,6 +32,7 @@
 #include "AssetRegistry/IAssetRegistry.h"
 #include "Eclipse.h" // LogEclipse
 #include "AI/EclipseEnemyController.h"
+#include "Animation/SkeletalMeshActor.h"
 #include "AI/EclipseSquadmateController.h"
 #include "Characters/EclipseCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -4690,6 +4691,109 @@ bool FEclipseThePlayerIsActuallyOnScreen::RunTest(const FString& Parameters)
 	Report(*this, TEXT("botten die in 0,35 s bewogen"), static_cast<float>(MovedBones), TEXT(""),
 		*FString::Printf(TEXT("van %d; 0 = een standbeeld dat door het district glijdt"), PoseA.Num()));
 	TestTrue(TEXT("zichtbaar: de pose beweegt echt"), MovedBones > 0);
+
+	Harness.Shutdown();
+	return true;
+}
+
+/**
+ * NIEMAND IS EEN REUS.
+ *
+ * Gevonden op het eerste echte spelbeeld, 26-07: naast een speler van 189,6 cm
+ * stond een aankleedfiguur van 328,4 cm. Ruim drie meter, 1,7x de speler, en hij
+ * vulde het halve frame.
+ *
+ * Geen enkele bestaande test kon dit vinden, en dat is geen toeval. Alle
+ * metingen stonden OP DE SPELER, en de speler klopte — 189,6 cm, schaal 1,0,
+ * netjes getekend. De fout bestaat pas als je twee lichamen naast elkaar zet.
+ * Dat is precies waar de owner op wees: "je tests bewijzen dat de code doet wat
+ * de code zegt, niet dat het resultaat zichtbaar wordt."
+ *
+ * Deze test zet de verhouding vast, zodat het volgende pack dat op een andere
+ * schaal is geauthord de bar rood maakt in plaats van als reus het district in
+ * te lopen.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseNobodyIsAGiant,
+	"Eclipse.Mission.Playthrough.NobodyIsAGiant",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseNobodyIsAGiant::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Missie starten en laten lopen, en niet alleen het harnas opstarten. Zonder
+	// een getikte pose staan de bounds van de speler op 0,0 cm en meet je de
+	// verhouding tegen niets — een test die dan rood wordt, wijst naar de
+	// verkeerde fout.
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipseStrategySubsystem>() : nullptr;
+	UEclipsePrepSubsystem* Prep = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipsePrepSubsystem>() : nullptr;
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("reus: missie gelanceerd (%s)"), *Error),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	const USkeletalMeshComponent* PlayerMesh = Harness.Body != nullptr ? Harness.Body->GetMesh() : nullptr;
+	if (!TestNotNull(TEXT("reus: de speler heeft een mesh"), PlayerMesh))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	const float PlayerHeight = PlayerMesh->Bounds.BoxExtent.Z * 2.0f;
+	TestTrue(FString::Printf(TEXT("reus: de speler zelf is menselijk (%.1f cm)"), PlayerHeight),
+		PlayerHeight > 150.0f && PlayerHeight < 220.0f);
+
+	// De aankleedfiguren zijn ASkeletalMeshActor en GEEN EclipseCharacter, dus
+	// elke controle die over "lichamen" ging liep straal langs ze heen.
+	int32 Checked = 0;
+	float Tallest = 0.0f;
+	FString TallestName;
+	for (TActorIterator<ASkeletalMeshActor> It(Harness.World); It; ++It)
+	{
+		const ASkeletalMeshActor* Figure = *It;
+		const USkeletalMeshComponent* Mesh = Figure != nullptr ? Figure->GetSkeletalMeshComponent() : nullptr;
+		if (Mesh == nullptr || Mesh->GetSkeletalMeshAsset() == nullptr)
+		{
+			continue;
+		}
+		++Checked;
+		const float Height = Mesh->Bounds.BoxExtent.Z * 2.0f;
+		if (Height > Tallest)
+		{
+			Tallest = Height;
+			TallestName = Mesh->GetSkeletalMeshAsset()->GetName();
+		}
+	}
+
+	// Een nulmeting is geen bevinding: als er geen figuur staat bewijst deze test
+	// niets, en dan hoort hij dat te zeggen in plaats van groen te worden.
+	if (!TestTrue(TEXT("reus: er staat minstens een aankleedfiguur om te meten"), Checked > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// 1,35x laat ruimte voor een bewuste zware silhouet, en sluit de 1,7x uit die
+	// er stond.
+	const float Limit = PlayerHeight * 1.35f;
+	TestTrue(FString::Printf(TEXT("reus: de langste van %d figuren is %s op %.1f cm, speler %.1f cm (grens %.1f cm)"),
+			Checked, *TallestName, Tallest, PlayerHeight, Limit),
+		Tallest <= Limit);
 
 	Harness.Shutdown();
 	return true;

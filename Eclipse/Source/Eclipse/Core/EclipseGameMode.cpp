@@ -4,6 +4,7 @@
 #include "AI/EclipseSquadmateController.h"
 #include "Base/EclipsePrepSubsystem.h"
 #include "Base/EclipsePrepTypes.h"
+#include "Animation/SkeletalMeshActor.h"
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipseClassLogic.h"
@@ -270,12 +271,120 @@ void AEclipseGameMode::DrivePlayShotInput()
 	}
 }
 
+void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
+{
+	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	if (Controller == nullptr)
+	{
+		return;
+	}
+
+	// Een beeld alleen is niet genoeg: op een screenshot zie je DAT er een figuur
+	// groeit, niet WELKE actor het is of met hoeveel. Deze regels hangen een naam
+	// en een maat aan elke vorm in het frame, zodat de beoordeling van het beeld
+	// een bevinding wordt in plaats van een vermoeden.
+	//
+	// Schermpositie staat erbij omdat dat de enige manier is om "de gele links"
+	// aan een actor te koppelen zonder te gokken.
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	Controller->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	// Zonder de vensterafmeting zijn de schermcoordinaten hieronder onvertaalbaar
+	// naar de PNG, en dan wijs je alsnog met je vinger naar het verkeerde figuur.
+	int32 ViewportX = 0;
+	int32 ViewportY = 0;
+	Controller->GetViewportSize(ViewportX, ViewportY);
+	UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d MEET] venster=%dx%d"), ShotIndex, ViewportX, ViewportY);
+
+	const APawn* PlayerPawn = Controller->GetPawn();
+	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
+	{
+		const AEclipseCharacter* Body = *It;
+		const USkeletalMeshComponent* Mesh = Body != nullptr ? Body->GetMesh() : nullptr;
+		if (Mesh == nullptr)
+		{
+			continue;
+		}
+
+		FVector2D Screen = FVector2D::ZeroVector;
+		const bool bOnScreen = Controller->ProjectWorldLocationToScreen(Body->GetActorLocation(), Screen);
+		const FBoxSphereBounds Bounds = Mesh->Bounds;
+		const FVector MeshScale = Mesh->GetComponentScale();
+
+		// GETEKEND is het enige woord dat telt. Bounds, schaal en schermpositie
+		// kunnen alle drie kloppen terwijl de renderer het lichaam overslaat —
+		// dat is precies het gat waar de owner op wees: "je tests bewijzen dat de
+		// code doet wat de code zegt, niet dat het resultaat zichtbaar wordt".
+		// WasRecentlyRendered() vraagt het aan de renderer zelf.
+		UE_LOG(LogEclipse, Display,
+			TEXT("[PLAYSHOT %d MEET] %s%s  schaal=%.3f  hoogte=%.1fcm  afstand=%.0fcm  scherm=%s(%.0f,%.0f)  zichtbaar=%d verborgen=%d eigenaarzietniet=%d GETEKEND=%d"),
+			ShotIndex,
+			*Body->GetName(),
+			Body == PlayerPawn ? TEXT(" <-SPELER") : TEXT(""),
+			MeshScale.Z,
+			Bounds.BoxExtent.Z * 2.0f,
+			FVector::Dist(CameraLocation, Body->GetActorLocation()),
+			bOnScreen ? TEXT("") : TEXT("BUITEN "),
+			Screen.X, Screen.Y,
+			Mesh->IsVisible() ? 1 : 0,
+			Mesh->bHiddenInGame ? 1 : 0,
+			Mesh->bOwnerNoSee ? 1 : 0,
+			Mesh->WasRecentlyRendered(0.2f) ? 1 : 0);
+	}
+}
+
+void AEclipseGameMode::MeasureDressingFigures(int32 ShotIndex)
+{
+	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	if (Controller == nullptr)
+	{
+		return;
+	}
+
+	// De aankleedfiguren zijn GEEN AEclipseCharacter, dus de meting hierboven ziet
+	// ze niet. Op het eerste echte spelbeeld bleken ze de speler te overtreffen —
+	// een fout die geen enkele meting op de speler ooit had kunnen vinden, omdat
+	// hij pas bestaat als je twee lichamen NAAST elkaar ziet.
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	Controller->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	for (TActorIterator<ASkeletalMeshActor> It(GetWorld()); It; ++It)
+	{
+		const ASkeletalMeshActor* Figure = *It;
+		const USkeletalMeshComponent* Mesh = Figure != nullptr ? Figure->GetSkeletalMeshComponent() : nullptr;
+		if (Mesh == nullptr || Mesh->GetSkeletalMeshAsset() == nullptr)
+		{
+			continue;
+		}
+		const float Distance = FVector::Dist(CameraLocation, Figure->GetActorLocation());
+		if (Distance > 3000.0f)
+		{
+			continue;
+		}
+		UE_LOG(LogEclipse, Display,
+			TEXT("[PLAYSHOT %d AANKLEDING] %s  hoogte=%.1fcm  schaal=%.2f  afstand=%.0fcm  GETEKEND=%d"),
+			ShotIndex,
+			*Mesh->GetSkeletalMeshAsset()->GetName(),
+			Mesh->Bounds.BoxExtent.Z * 2.0f,
+			Mesh->GetComponentScale().Z,
+			Distance,
+			Mesh->WasRecentlyRendered(0.2f) ? 1 : 0);
+	}
+}
+
 void AEclipseGameMode::AdvancePlayShotRound()
 {
 	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
 	if (Controller == nullptr)
 	{
 		return;
+	}
+	if (PlayShotStep >= 1 && PlayShotStep <= 5)
+	{
+		MeasurePlayShot(PlayShotStep);
+		MeasureDressingFigures(PlayShotStep);
 	}
 
 	// Elke stap: eerst de TOESTAND zetten, dan één stap later de opname. Zo staat
@@ -305,6 +414,27 @@ void AEclipseGameMode::AdvancePlayShotRound()
 	case 4:
 		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 4] weer stilstaand"));
+		// Vijfde opname met ALLE ANDERE lichamen verborgen. Zonder dit blijft
+		// "mijn personage staat er" een vermoeden: op een frame met vier figuren
+		// kun je niet aanwijzen welke van jou is, en een meting die de actor
+		// noemt zegt niets over de vorm die je ziet.
+		//
+		// Eerst geprobeerd als het omgekeerde — de speler weghalen en het
+		// verschil zoeken. Dat werkte niet: de squad loopt door tussen twee
+		// opnames, dus twee frames verschillen sowieso en het verschil bewijst
+		// niets. Overhouden is ondubbelzinnig waar weglaten dat niet is.
+		for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
+		{
+			AEclipseCharacter* Body = *It;
+			if (Body != nullptr && Body != Controller->GetPawn() && Body->GetMesh() != nullptr)
+			{
+				Body->GetMesh()->SetVisibility(false, true);
+			}
+		}
+		break;
+	case 5:
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 5] alleen de SPELER zichtbaar — wat hier staat, is jouw personage"));
 		break;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));

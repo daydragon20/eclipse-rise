@@ -1530,6 +1530,35 @@ void BuildDistrict(UWorld& World)
 			}
 			USkeletalMeshComponent* Component = Actor->GetSkeletalMeshComponent();
 			Component->SetSkeletalMesh(Mesh);
+
+			// OP MAAT BRENGEN. Deze packs zijn niet op de schaal van de mannequin
+			// geauthord: gemeten op het eerste echte spelbeeld stond er een
+			// BlueSoldier van 328,4 cm naast een speler van 189,6 cm — 1,7x, een
+			// reus van ruim drie meter die het halve frame vulde.
+			//
+			// Geen enkele meting op de speler had dit kunnen vinden: de speler
+			// klopte. De fout bestaat pas als je twee lichamen NAAST elkaar ziet,
+			// en dus pas op een beeld. Precies het gat waar de owner op wees.
+			//
+			// Genormaliseerd en niet met een vast getal: elk pack heeft zijn eigen
+			// maat, en de volgende die erbij komt hoort zichzelf te corrigeren in
+			// plaats van deze regel opnieuw te breken.
+			const float AuthoredHeight = Component->Bounds.BoxExtent.Z * 2.0f;
+			if (AuthoredHeight > KINDA_SMALL_NUMBER)
+			{
+				const float TargetHeight = 180.0f;
+				const float Correction = TargetHeight / AuthoredHeight;
+				// Alleen ingrijpen bij een ECHT verschil; een figuur die al klopt
+				// hoort niet door afrondruis een schaal te krijgen.
+				if (FMath::Abs(1.0f - Correction) > 0.05f)
+				{
+					Component->SetWorldScale3D(FVector(Correction));
+					UE_LOG(LogEclipse, Display,
+						TEXT("Graybox: figuur %s stond op %.1f cm — op maat gebracht naar %.0f cm (schaal %.3f)."),
+						*Mesh->GetName(), AuthoredHeight, TargetHeight, Correction);
+				}
+			}
+
 			if (UAnimSequence* Idle = LoadObject<UAnimSequence>(nullptr, Figure.AnimPath))
 			{
 				Component->SetAnimationMode(EAnimationMode::AnimationSingleNode);
