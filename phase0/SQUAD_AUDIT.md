@@ -46,9 +46,21 @@ antwoord ja; het maakt teamgenoten tot medespelers in plaats van gereedschap.
 
 **Dat is bewust een owner-vraag en niet iets wat ik stilletjes aanzet.** Drie
 soldaten die uit zichzelf vuren is de grootste balansverschuiving die er op tafel
-ligt — groter dan kopschoten of de vijandopstelling. En het raakt de identiteit
-van het spel: een squad die alles zelf doet, maakt het commando-systeem
-overbodig.
+ligt — groter dan kopschoten of de vijandopstelling.
+
+> **CORRECTIE 26-07 avond.** Hier stond ook: "een squad die alles zelf doet, maakt
+> het commando-systeem overbodig." Dat is fout, en de owner wees het meteen aan:
+> *"Dit maakt Command Mode belangrijker, niet overbodig: ik stuur intentie, geen
+> voetstappen."*
+>
+> Mijn zin klopt alleen als commando's VOETSTAPPEN zijn — het XCOM-model, order
+> per soldaat. Zijn ze DOCTRINE, dan gebeurt het omgekeerde: hoe competenter de
+> squad, hoe meer een kaderwissel oplevert. In Full Spectrum Warrior is het team
+> maximaal competent en is de commandolaag het hele spel.
+>
+> Het ontwerp staat in [SQUAD_DOCTRINE.md](SQUAD_DOCTRINE.md). Punt 4, 5 en 6
+> hierboven zijn daarmee geen owner-vraag meer maar de BASISLAAG — de owner heeft
+> ze beantwoord met "dat is geen feature die je aanzet, dat is de basis".
 
 ## Wat er vandaag al uit voortkwam
 
@@ -59,10 +71,10 @@ waarneming verstopt.
 
 ## Aanbeveling
 
-1. **Beslis over 4/5/6 als één vraag**, niet los. Mijn advies: **autonoom vuren
-   JA, meelopen JA, dekking zoeken nee.** De eerste twee maken je squad een
-   medespeler; de derde vraagt een cover-systeem dat er niet is en dat je volgens
-   punt 15 van de gevechts-audit ook niet wilt.
+1. ~~**Beslis over 4/5/6 als één vraag**~~ — **beantwoord 26-07 avond.** Alle drie
+   ja, en niet als keuze maar als basis. Mijn advies hierboven ("dekking zoeken
+   nee") is ingetrokken: ik redeneerde vanuit "wat kost het te bouwen" in plaats
+   van vanuit "wat doet een getrainde soldaat". Zie [SQUAD_DOCTRINE.md](SQUAD_DOCTRINE.md).
 2. **Als 4 ja wordt, meet dan opnieuw wat een gevecht kost.** Drie extra schutters
    halveert de tijd waarin een groep vijanden valt, en alle getallen in de
    gevechts-audit zijn zonder hen gemeten.
