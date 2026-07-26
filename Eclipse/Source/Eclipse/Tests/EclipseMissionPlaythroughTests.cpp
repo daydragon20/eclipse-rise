@@ -1836,4 +1836,116 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Wijst elk objective naar een plek die echt bestaat?
+//
+// De speelronde vond vannacht een objective zonder voltooiingspad. De naaste
+// verwant daarvan is een objective dat naar een vak wijst dat NIET in het
+// district staat: dan is de missie evenmin uit te spelen, alleen merk je het pas
+// als je ernaartoe loopt en er niets gebeurt.
+//
+// Geen data-validator maar een GEDRAGSTEST, en dat is bewust: de vakkenlijst
+// staat in de graybox-builder (C++), niet in data. Een validator zou die lijst
+// moeten dupliceren en dat is precies het soort tweede waarheid dat vannacht zes
+// keer misging. De gebouwde wereld is de bron; deze test vraagt het aan de wereld.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseObjectiveSitesExistTest,
+	"Eclipse.Playthrough.EveryObjectivePointsAtASiteThatExists",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseObjectiveSitesExistTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	// De drie geleverde missies, elk via de regio die hem aanbiedt.
+	const TPair<const TCHAR*, const TCHAR*> Runs[] = {
+		{ TEXT("TransitCheckpoint"), TEXT("M1.1 / checkpoint") },
+		{ TEXT("WorkerHousing"),     TEXT("rescue / residentieel") },
+		// FoundryRow en niet Underworks: die laatste is bij campagnestart al in
+		// handen van de speler ("Region is already player-held"), dus daar valt geen
+		// missie te selecteren. Vijfde keer vannacht dat mijn opstelling de fout was
+		// en niet de code — vandaar deze regel, zodat de volgende het niet opnieuw
+		// probeert.
+		{ TEXT("FoundryRow"),        TEXT("sabotage / industrieel") },
+	};
+
+	int32 ObjectivesChecked = 0;
+
+	for (const TPair<const TCHAR*, const TCHAR*>& Run : Runs)
+	{
+		FHarness::FOptions Options;
+		Options.bRealGameMode = true;
+
+		FHarness Harness;
+		if (!Harness.Start(*this, Options))
+		{
+			Harness.Shutdown();
+			return false;
+		}
+
+		UGameInstance* GameInstance = Harness.GameInstance;
+		UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+		UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+		UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+		// NIET ELKE MISSIE IS OP DAG 1 BEREIKBAAR, en dat is spelregel en geen fout:
+		// de campagne laat je alleen naar regio's die aan speler-gebied grenzen
+		// (GDD 3.1 regel 1). Underworks is bij aanvang al van jou en FoundryRow ligt
+		// er niet naast, dus de sabotagemissie valt op dag 1 buiten bereik. Dat
+		// MELDEN in plaats van er rood op gaan — anders zou deze test de speler
+		// verwijten dat de campagne werkt zoals hij hoort.
+		FString Error;
+		const bool bSelected = Strategy != nullptr && Strategy->SelectMission(Run.Key, Error);
+		if (!bSelected)
+		{
+			AddInfo(FString::Printf(TEXT("vakken: %s is op dag 1 niet te kiezen (%s) — niet gecontroleerd"),
+				Run.Value, *Error));
+			Harness.Shutdown();
+			continue;
+		}
+		if (!TestTrue(FString::Printf(TEXT("vakken: %s gelanceerd (%s)"), Run.Value, *Error),
+				Prep != nullptr && Prep->AutoLaunch(Error)))
+		{
+			Harness.Shutdown();
+			continue; // andere missies alsnog controleren — één mislukte start mag de rest niet blinderen
+		}
+		Harness.Idle(0.3f);
+
+		// Welke vaknamen dragen de actoren in de GEBOUWDE wereld?
+		TSet<FName> SitesInWorld;
+		for (TActorIterator<AActor> It(Harness.World); It; ++It)
+		{
+			for (const FName& Tag : It->Tags)
+			{
+				SitesInWorld.Add(Tag);
+			}
+		}
+
+		for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
+		{
+			if (Objective.TargetId.IsNone())
+			{
+				continue; // objectives zonder plek bestaan legitiem (bv. tellers)
+			}
+			++ObjectivesChecked;
+			TestTrue(FString::Printf(TEXT("vakken: %s — objective '%s' wijst naar '%s' en dat vak staat er"),
+					Run.Value, *Objective.ObjectiveId.ToString(), *Objective.TargetId.ToString()),
+				SitesInWorld.Contains(Objective.TargetId));
+		}
+		AddInfo(FString::Printf(TEXT("vakken: %s — %d objectives, %d getagde plekken in de wereld"),
+			Run.Value, Mission->GetActiveObjectives().Num(), SitesInWorld.Num()));
+
+		Harness.Shutdown();
+	}
+
+	Report(*this, TEXT("objectives gecontroleerd over alle geleverde missies"), ObjectivesChecked, TEXT(""),
+		TEXT("> 0 — anders controleert deze test niets"));
+	// Ondergrens op wat er WEL bereikbaar was: twee missies met samen vier
+	// objectives die een plek noemen. Zakt dat, dan is er een missie stil
+	// onbereikbaar geworden en dekt deze test minder dan hij lijkt te dekken.
+	TestTrue(FString::Printf(TEXT("vakken: er zijn minstens vier objectives gecontroleerd (%d)"), ObjectivesChecked),
+		ObjectivesChecked >= 4);
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
