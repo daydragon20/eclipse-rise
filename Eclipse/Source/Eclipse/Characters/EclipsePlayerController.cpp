@@ -708,6 +708,8 @@ void AEclipsePlayerController::SetupInputComponent()
 		EclipseTestGuide::EEclipseGuideSignal Signal;
 		/** Deze actie DOET alleen iets terwijl Command Mode vastgehouden wordt. */
 		bool bNeedsCommandMode = false;
+		/** ...en deze juist alleen DAARBUITEN (LT deelt zich met "vorige soldaat"). */
+		bool bBlockedByCommandMode = false;
 	};
 	const FGuideSignalBinding GuideSignals[] = {
 		{ MoveAction,          EclipseTestGuide::EEclipseGuideSignal::Move },
@@ -717,7 +719,11 @@ void AEclipsePlayerController::SetupInputComponent()
 		{ SprintToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Sprint },
 		{ CrouchAction,        EclipseTestGuide::EEclipseGuideSignal::Crouch },
 		{ JumpAction,          EclipseTestGuide::EEclipseGuideSignal::Jump },
-		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim },
+		// LT is mikken in het veld en "vorige soldaat" tijdens de hold; HandleAimStart
+		// keert terug als de modus vast staat. Zonder deze vlag vinkt de gids "Mikken"
+		// af op een druk die in werkelijkheid de SELECTIE verzette — hij zou dus een
+		// andere handeling bevestigen dan de stap beschrijft.
+		{ AimAction,           EclipseTestGuide::EEclipseGuideSignal::Aim,         false, true },
 		{ ToggleViewAction,    EclipseTestGuide::EEclipseGuideSignal::ToggleView },
 		{ CommandHoldAction,   EclipseTestGuide::EEclipseGuideSignal::CommandMode },
 		{ SelectNextAction,    EclipseTestGuide::EEclipseGuideSignal::SelectNext,  true },
@@ -740,8 +746,9 @@ void AEclipsePlayerController::SetupInputComponent()
 		}
 		const EclipseTestGuide::EEclipseGuideSignal Signal = Binding.Signal;
 		const bool bNeedsCommandMode = Binding.bNeedsCommandMode;
+		const bool bBlockedByCommandMode = Binding.bBlockedByCommandMode;
 		Input->BindActionValueLambda(Binding.Action, ETriggerEvent::Started,
-			[this, Signal, bNeedsCommandMode](const FInputActionValue&)
+			[this, Signal, bNeedsCommandMode, bBlockedByCommandMode](const FInputActionValue&)
 		{
 			// De gids vinkte af op de TOETSDRUK, niet op het effect. Vier van deze
 			// acties doen buiten Command Mode niets (CycleSoldierSelection,
@@ -752,9 +759,14 @@ void AEclipsePlayerController::SetupInputComponent()
 			//
 			// Een gids die zichzelf afvinkt terwijl het beschreven effect uitblijft,
 			// is erger dan geen detectie: hij spreekt de speler tegen.
-			if (bNeedsCommandMode && (CommandMode == nullptr || !CommandMode->IsHeld()))
+			const bool bCommandHeld = CommandMode != nullptr && CommandMode->IsHeld();
+			if (bNeedsCommandMode && !bCommandHeld)
 			{
 				return;
+			}
+			if (bBlockedByCommandMode && bCommandHeld)
+			{
+				return; // de druk deed iets anders dan deze stap beschrijft
 			}
 			if (MissionHud != nullptr && MissionHud->IsInViewport())
 			{
