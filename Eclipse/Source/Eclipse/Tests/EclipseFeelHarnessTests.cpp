@@ -199,6 +199,18 @@ bool FEclipseFeelLayer2LocomotionTest::RunTest(const FString& Parameters)
 	UCharacterMovementComponent* Movement = Harness.Body->GetCharacterMovement();
 	const float RunSpeed = Movement->MaxWalkSpeed;
 
+	// EERST OP DE GROND. De pawn wordt boven de vloer gespawnd, en wie meteen begint
+	// te meten meet een vallend personage — dat kostte vannacht drie andere metingen
+	// (de ANI-09-hoogte, de pitch-controle en de stickrespons). De getallen hieronder
+	// klopten toevallig al, maar "toevallig" is geen dekking: deze regel maakt de
+	// aanname expliciet en de meting reproduceerbaar vanaf een gecontroleerde stand.
+	Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 1.0, [&Harness]()
+	{
+		return Harness.Body->GetCharacterMovement()->IsMovingOnGround() && Harness.SpeedCm() < 1.0f;
+	});
+	TestTrue(TEXT("laag 2: de meting begint met beide voeten op de grond"),
+		Harness.Body->GetCharacterMovement()->IsMovingOnGround());
+
 	// --- 1. tijd tot topsnelheid -------------------------------------------
 	// UE's grondversnelling is lineair, dus dit is exact narekenbaar:
 	// t = MaxWalkSpeed / MaxAcceleration. Dat maakt de meting een echte toets op
