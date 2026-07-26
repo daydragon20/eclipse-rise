@@ -47,12 +47,40 @@ public:
 	 */
 	int32 GetStingRequestCount() const { return StingRequestCount; }
 
+	/**
+	 * Diagnostic: barks die daadwerkelijk een stem hebben aangevraagd, en barks
+	 * die de rem tegenhield. Zelfde reden als StingRequestCount — zo kan de
+	 * testlaag bewijzen dat de koppeling werkt zonder geluidskaart.
+	 */
+	int32 GetBarkRequestCount() const { return BarkRequestCount; }
+	int32 GetBarkSuppressedCount() const { return BarkSuppressedCount; }
+
+	/**
+	 * De rem, in seconden per soldaat (owner-beslissing 26-07: 2 s). Vier orders
+	 * achter elkaar mogen geen vier stemmen over elkaar heen worden; per SOLDAAT
+	 * en niet globaal, want twee man die tegelijk antwoorden is juist het geluid
+	 * van een squad die meedoet.
+	 */
+	static constexpr float BarkCooldownSeconds = 2.0f;
+
 private:
 	void OnMissionCompleted(FGameplayTag EventTag, const FInstancedStruct& Payload);
+	void OnOrderAnswered(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Bus we subscribed on; weak so teardown order during shutdown cannot dangle. */
 	TWeakObjectPtr<UEclipseEventBusSubsystem> BoundBus;
 	FEclipseEventSubscriptionHandle MissionCompletedHandle;
+	FEclipseEventSubscriptionHandle OrderAckHandle;
+	FEclipseEventSubscriptionHandle OrderRefusedHandle;
+
+	/** Laatste bark per soldaat (wereldseconden) — de rem van BarkCooldownSeconds. */
+	TMap<FGuid, double> LastBarkSeconds;
+	int32 BarkRequestCount = 0;
+	int32 BarkSuppressedCount = 0;
+
+	/** 14.3.5-missers houden zich tot een regel, net als de sting hierboven. */
+	bool bWarnedMissingBarkLine = false;
+	bool bWarnedMissingVoiceAsset = false;
 
 	/** Lazily resolved sting; the tried-flag keeps a 14.3.5 miss to one log line. */
 	UPROPERTY(Transient)

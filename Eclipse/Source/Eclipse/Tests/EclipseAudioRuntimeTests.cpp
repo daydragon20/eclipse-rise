@@ -43,12 +43,13 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 
 	Audio->BindToBus(*Bus);
 	TestTrue(TEXT("Bound after BindToBus"), Audio->IsBoundToBus());
-	TestEqual(TEXT("Exactly one live subscription"), Bus->GetSubscriptionCount(), 1);
+	// Drie: de missie-sting plus de twee order-antwoorden (barks, 26-07).
+	TestEqual(TEXT("Drie live subscriptions: sting + ack + refused"), Bus->GetSubscriptionCount(), 3);
 
 	// Re-bind must swap, not stack — a leaked second subscription would double
 	// every sting.
 	Audio->BindToBus(*Bus);
-	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 1);
+	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 3);
 
 	// Completed is consumed; the world-less context skips playback but still
 	// counts the request (the 14.3.5 degradation path this test rides on).
@@ -73,6 +74,70 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 	Audio->UnbindFromBus();
 	TestEqual(TEXT("Double unbind stays clean"), Bus->GetSubscriptionCount(), 0);
 
+	return true;
+}
+
+// De rem op de squad-barks (owner-beslissing 26-07: 2 s per soldaat).
+//
+// Waarom juist de rem en niet het geluid: of er echt iets klinkt hangt af van
+// gegenereerde audio op schijf, en dat is per machine anders — een test die
+// daarop asserteert gaat rood op de verkeerde machine. De rem is wél
+// deterministisch, en hij is het enige stuk waar een fout stil doorwerkt: te
+// hard remmen maakt de squad stom, niet remmen levert vier stemmen over elkaar.
+//
+// De onderdrukkingsteller telt VOOR al het laadwerk, dus deze test meet de rem
+// zelf en niet de audio-pijplijn.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadBarkCooldownTest,
+	"Eclipse.Audio.Subsystem.SquadBarksHaveABrake",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProductFilter)
+
+bool FEclipseSquadBarkCooldownTest::RunTest(const FString& Parameters)
+{
+	UGameInstance* OuterGameInstance = NewObject<UGameInstance>(GEngine);
+	UEclipseEventBusSubsystem* Bus = NewObject<UEclipseEventBusSubsystem>(OuterGameInstance);
+	UEclipseAudioSubsystem* Audio = NewObject<UEclipseAudioSubsystem>(OuterGameInstance);
+	Audio->BindToBus(*Bus);
+
+	auto Ack = [](const FGuid& Soldier)
+	{
+		FEclipseSquadEventPayload Payload;
+		Payload.SoldierId = Soldier;
+		Payload.Order = FName(TEXT("EEclipseSquadOrder::MoveTo"));
+		Payload.BarkLine = TEXT("Copy. Moving up.");
+		return FInstancedStruct::Make(Payload);
+	};
+
+	// Vaste ids: het geheugen zit per soldaat, dus twee verschillende mannen
+	// mogen elkaar niet remmen.
+	const FGuid SoldierOne(0x11111111, 0x2222, 0x3333, 0x44444444);
+	const FGuid SoldierTwo(0x55555555, 0x6666, 0x7777, 0x88888888);
+
+	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierOne));
+	const int32 AfterFirst = Audio->GetBarkSuppressedCount();
+	TestEqual(TEXT("bark: het eerste antwoord van een soldaat wordt niet geremd"), AfterFirst, 0);
+
+	// Vier orders achter elkaar, exact het geval waar de rem voor is.
+	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierOne));
+	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierOne));
+	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierOne));
+
+	// Nul zou hier betekenen dat de rem niet bestaat; drie dat hij alles slikt na
+	// de eerste. Alleen als de eerste door mocht kan dit getal 3 zijn.
+	TestEqual(TEXT("bark: drie snelle vervolgorders van dezelfde soldaat worden geremd (2 s)"),
+		Audio->GetBarkSuppressedCount(), 3);
+
+	// De rem is PER soldaat: een tweede man die tegelijk antwoordt is juist het
+	// geluid van een squad die meedoet, en mag niet weggeremd worden.
+	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierTwo));
+	TestEqual(TEXT("bark: een ANDERE soldaat wordt niet geremd door de eerste"),
+		Audio->GetBarkSuppressedCount(), 3);
+
+	// Losgekoppeld = stil, net als de sting.
+	Audio->UnbindFromBus();
+	const int32 Before = Audio->GetBarkSuppressedCount();
+	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierOne));
+	TestEqual(TEXT("bark: na loskoppelen komt er niets meer binnen"),
+		Audio->GetBarkSuppressedCount(), Before);
 	return true;
 }
 
