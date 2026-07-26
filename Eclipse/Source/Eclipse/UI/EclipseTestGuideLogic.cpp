@@ -43,7 +43,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::DirectPick,
 			  TEXT("ook met Command Mode vast: de soldaat onder je kruis wordt 'target:'; wijs je niemand aan, dan blijft de vorige selectie staan") },
 			{ EEclipseGuideSignal::Order,
-			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup") },
+			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup. Het antwoord komt als TEKST; de ingesproken zinnen bestaan wel maar zijn nog niet aangesloten — bekend, geen bug") },
 			{ EEclipseGuideSignal::Stance,
 			  TEXT("HOUD Command Mode vast (LB / Q) — daarbuiten doet Y niets. 'stance:' wisselt ready <-> aggressive. LET OP: dat is vandaag alleen een REGEL die omschakelt; je squad vecht er nog niet anders door. Op toetsenbord: druk J") }
 		};
