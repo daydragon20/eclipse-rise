@@ -1631,4 +1631,82 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Wat koopt hurken je? (LOC-06, de laatste ongemeten bewegingstoestand.)
+//
+// Laag 1 controleert dat MaxWalkSpeedCrouched = 150 op het component staat, en
+// sinds vannacht staat bCanCrouch aan zodat de toets niet meer dood is. Maar wat
+// de speler ERVAN MERKT stond nergens: hoe traag word je, hoe laag kom je, en
+// hoe lang duurt het zakken. Dat zijn de drie dingen waarop je beoordeelt of
+// hurken de moeite waard is — zeker zolang er nog geen stealth-systeem is dat
+// het beloont.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCrouchTest,
+	"Eclipse.Feel.Layer2.CrouchCostsSpeedAndBuysHeight",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseCrouchTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UCharacterMovementComponent* Movement = Harness.Body->GetCharacterMovement();
+	const float StandingHalfHeight = Harness.Body->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const float StandingEyeZ = Harness.Body->SampleFeelState().SocketOffsetZ + StandingHalfHeight;
+
+	// Eerst staand op topsnelheid, zodat de vergelijking eerlijk is.
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 3.0, [&Harness]()
+	{
+		return Harness.SpeedCm() >= Harness.Tuning->RunSpeed - 2.0f;
+	});
+	const float StandingSpeed = Harness.SpeedCm();
+
+	// Hurken is een toggle: één klik, en vooruit blijven duwen.
+	Harness.PressWhileMovingForward(TEXT("Crouch"));
+	const double CrouchStart = Harness.ElapsedSeconds;
+	double DownAfter = -1.0;
+	while (Harness.ElapsedSeconds - CrouchStart < 2.0)
+	{
+		Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), Harness.StepSeconds);
+		if (DownAfter < 0.0 && Harness.Body->bIsCrouched)
+		{
+			DownAfter = Harness.ElapsedSeconds - CrouchStart;
+		}
+		if (DownAfter >= 0.0 && Harness.SpeedCm() <= Harness.Tuning->CrouchSpeed + 2.0f)
+		{
+			break;
+		}
+	}
+	const float CrouchedSpeed = Harness.SpeedCm();
+	const float CrouchedHalfHeight = Harness.Body->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	Report(*this, TEXT("snelheid staand"), StandingSpeed, TEXT("cm/s"));
+	Report(*this, TEXT("snelheid gehurkt"), CrouchedSpeed, TEXT("cm/s"),
+		*FString::Printf(TEXT("tuning CrouchSpeed = %.0f"), Harness.Tuning->CrouchSpeed));
+	Report(*this, TEXT("dat is nog"), StandingSpeed > 0.0f ? CrouchedSpeed / StandingSpeed * 100.0f : 0.0f, TEXT("%"),
+		TEXT("van je rensnelheid"));
+	Report(*this, TEXT("capsule staand"), StandingHalfHeight * 2.0f, TEXT("cm"));
+	Report(*this, TEXT("capsule gehurkt"), CrouchedHalfHeight * 2.0f, TEXT("cm"));
+	Report(*this, TEXT("je komt lager met"), (StandingHalfHeight - CrouchedHalfHeight) * 2.0f, TEXT("cm"),
+		TEXT("dit bepaalt achter welke dekking je past"));
+	Report(*this, TEXT("gehurkt na"), DownAfter, TEXT("s"), TEXT("-1 = nooit gehurkt"));
+
+	TestTrue(TEXT("hurken: je hurkt daadwerkelijk"), Harness.Body->bIsCrouched);
+	TestTrue(FString::Printf(TEXT("hurken: je wordt écht trager (%.0f -> %.0f cm/s)"), StandingSpeed, CrouchedSpeed),
+		CrouchedSpeed < StandingSpeed * 0.6f);
+	// De hoogtewinst is wat hurken RUIMTELIJK oplevert; zonder verschil is het
+	// alleen een snelheidsstraf en koop je er niets voor terug.
+	TestTrue(FString::Printf(TEXT("hurken: je komt écht lager (%.0f -> %.0f cm)"),
+			StandingHalfHeight * 2.0f, CrouchedHalfHeight * 2.0f),
+		CrouchedHalfHeight < StandingHalfHeight - 5.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

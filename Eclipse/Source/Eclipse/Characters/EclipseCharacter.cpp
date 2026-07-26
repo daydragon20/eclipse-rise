@@ -142,6 +142,9 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
 	Movement->MaxWalkSpeed = Tuning->RunSpeed;
 	Movement->MaxWalkSpeedCrouched = Tuning->CrouchSpeed;
+	// Zonder deze regel bleef de gehurkte capsule op de engine-default van 40
+	// (80 cm) staan — kruiphoogte, niet hurkhoogte. Zie het veld voor de afweging.
+	Movement->SetCrouchedHalfHeight(Tuning->CrouchedHalfHeightCm);
 	// Feel-audit: alles hieronder stond op de engine-default omdat het nooit was
 	// gezet. Die defaults zijn niet voor een third-person shooter bedoeld — Epic's
 	// eigen template overschrijft ze allemaal — en samen zijn ze de reden dat lopen

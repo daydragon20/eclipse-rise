@@ -36,6 +36,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Movement", meta = (ClampMin = 0))
 	float CrouchSpeed = 150.0f;
 
+	/**
+	 * Halve capsulehoogte gehurkt, in cm. De ENGINE-default is 40 (dus 80 cm
+	 * totaal) en die stond hier nooit tegenover een keuze — precies zoals de rest
+	 * van het bewegingscomponent bij de feel-audit.
+	 *
+	 * 80 cm is geen hurkhoogte maar kruiphoogte: tegen een staande capsule van
+	 * 176 cm zak je 96 cm, oftewel 55%. Een mens die door de knieën gaat verliest
+	 * ongeveer 30%. Op 62 (124 cm) is dat 30% en past de houding bij de animatie
+	 * die er straks op komt — en het scheelt of je ergens onderdoor past die als
+	 * dekking bedoeld is.
+	 * [CONVENTIE + meting; zie Eclipse.Feel.Layer2.CrouchCostsSpeedAndBuysHeight.]
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Locomotie", meta = (ClampMin = 30, ClampMax = 88))
+	float CrouchedHalfHeightCm = 62.0f;
+
 	// ---- Feel-audit 2026-07-25, gebied LOCOMOTIE + SPRONG -------------------
 	// Bevinding: van het CharacterMovementComponent werden alleen MaxWalkSpeed en
 	// MaxWalkSpeedCrouched gezet. Al het andere stond op de ENGINE-default, en die
