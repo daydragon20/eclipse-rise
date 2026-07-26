@@ -96,6 +96,12 @@ window.PROGRESS_DATA = {
       "Optie 3: laten staan tot er een medic-flow met eigen barks is",
       "Zeg welke, dan bouw ik het schema plus de validator en zet er een test op"
     ] },
+    { titel: "Stance wisselt wel, maar je squad vecht er niet anders door", prio: "later", waarom: "Gevonden door te controleren of de knop iets DOET in plaats van of hij bestaat: de soldaat slaat de stance op (CurrentStance) en leest hem daarna nergens meer. In de code staat het eerlijk ('stored for the feel pass; no behavior split in Phase 1'), maar in de gids stond het niet - je drukt Y, de HUD-regel springt van ready naar aggressive, en er verandert verder niets. Dat is dezelfde valkuil als de dode bukk-toets, alleen met zichtbare feedback erbij, wat het juist misleidender maakt. De gidsstap zegt het nu hardop: je controleert of de regel omschakelt, niet of het gedrag verandert.", stappen: [
+      "Niets kapot: dit is een fase-1-placeholder die netjes als zodanig in de code staat",
+      "De vraag is wanneer je de gedragssplitsing wilt. Voor de hand ligt: aggressive = eerder vuren en dichter op de vijand, ready = vuur pas terug",
+      "Mijn aanbeveling: pas na de feedback-laag (item 8). Een squad die anders vecht is alleen te beoordelen als je ziet en hoort dat er gevochten wordt",
+      "Zolang het zo is, is de eerlijke tekst de fix - niet het gedrag stilletjes verzinnen"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",
