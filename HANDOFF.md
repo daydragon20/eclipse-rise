@@ -243,13 +243,12 @@ Wat aantoonbaar beter is: het personage verandert niet meer van grootte als je v
 
 Waar ik terughoudend ben: de rest is vier tuningwaarden en één camera-klem. Ze halen het onnatuurlijke eraf; ze voegen nog niets toe. De vijf kanalen waarmee Gears zijn snelheidsgevoel koopt — camera zakken, shake, blur, ademhaling, niet kunnen vuren — hebben we er nul van. Zolang §8 FEEDBACK leeg is, blijft schieten "de vijand valt om" in plaats van "ik raakte hem". Dat is het volgende grote ding, en het is echt bouwen, geen afstellen.
 
-**Wat er ná dat eerste oordeel nog bij kwam, en het beeld iets verschuift.** Ik schreef hierboven "de rest is vier tuningwaarden en één camera-klem". Dat klopte op dat moment; daarna is de audit van *beredeneerd* naar *gemeten* gegaan, en dat leverde drie dingen op die je moet weten:
+**Dat oordeel moet ik corrigeren, en het was te bescheiden.** Ik schreef hierboven "de rest is vier tuningwaarden en één camera-klem". Daarna ging de audit van *beredeneerd* naar *gemeten*, en vier dingen veranderden het beeld:
 
-- **De vijand-AI is niet kapot — hij deed alleen nooit mee.** Loop je zijn bereik in, dan ziet hij je op 2442 cm, komt 1097 cm naar je toe en legt je in **2,50 s** van vol naar neer. Mijn eigen speelronde won juist dóór dat te vermijden, waardoor de hele vijandkant ongetest bleef terwijl alles groen stond.
-- **Eén audit-rij was zelf fout, en had tot een verkeerde reparatie geleid.** De pitch-limieten zouden "bij −70 in de grond duiken" — gemeten gebeurt daar niets, en zit het probleem aan de andere kant: omhoog kijken duwt de camera van 300 naar 84 cm. De voorgestelde fix zou niets hebben opgelost.
+- **De camera bewoog helemaal niet** bij 1e persoon, mikken en Command Mode. Drie dingen die je elke minuut gebruikt, allemaal dood, allemaal met een correct gezet doel. Geen afstelling maar een reparatie — en het eerste wat je gaat merken.
+- **De vijand-AI is niet kapot; hij deed alleen nooit mee.** Loop je zijn bereik in, dan ziet hij je op 2442 cm, komt 1097 cm naar je toe en legt je in **2,50 s** van vol naar neer. Mijn eigen speelronde won juist dóór dat te vermijden, waardoor de hele vijandkant ongetest bleef terwijl alles groen stond.
+- **Eén audit-rij was zelf fout** en had tot een verkeerde reparatie geleid: de pitch-limieten zouden "bij −70 in de grond duiken", maar gemeten gebeurt daar niets — het zit aan de andere kant, waar omhoog kijken de camera van 300 naar 84 cm duwt.
 - **Drie dingen die stil gebeurden zijn nu luid** (missie-einde, neergaan, geweigerde orders). Het tweede is het vervelendste geweest: wie na een sessie de logs opende, kon niet eens zien dát hij was doodgegaan.
-
-**En ik moet mijn eigen oordeel hierboven corrigeren.** Ik schreef dat de rest "vier tuningwaarden en één camera-klem" was. Dat was te bescheiden: **de camera bewoog helemaal niet** bij 1e persoon, mikken en Command Mode. Drie dingen die je elke minuut gebruikt, allemaal dood, allemaal met een correct gezet doel. Dat is geen afstelling maar een reparatie, en het is het eerste wat je gaat merken.
 
 Daarnaast zijn er drie dingen bijgekomen die **niet** kapot zijn maar wel ontbreken, en die samen verklaren waarom vechten leeg aanvoelt: kopschoten doen niets (de trace raakt de capsule), het alarm kan tijdens spelen niet afgaan (de enige aanroep is een console-commando), en twee van je drie squad-klassen hebben geen signature verb. Alle drie zijn eerlijk gelabeld in de code als aanstaand werk — maar van buiten zie je alleen dat er niets gebeurt.
 
