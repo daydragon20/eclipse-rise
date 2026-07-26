@@ -859,15 +859,29 @@ bool FEclipsePresenceDoesNotDestroyTest::RunTest(const FString& Parameters)
 		Mission->GetCompletedObjectiveIds().Contains(DestroyObjectiveId));
 
 	// Presence-typen blijven werken zoals ze deden — de gate mag niet te breed zijn.
+	//
+	// GETELD, niet aangenomen: deze lus stond hier als "ReachLocation OF
+	// CollectItem", en las daardoor als dekking van beide. M1.1 heeft geen
+	// CollectItem, dus die helft draaide NOOIT — een assert in een tak die niet
+	// bestaat is dekking op papier. De teller hieronder maakt zichtbaar wat er
+	// werkelijk langskwam, en de assert erop zorgt dat een lege lus niet meer
+	// stilletjes voor een geslaagde test doorgaat.
+	int32 PresenceObjectivesChecked = 0;
 	for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
 	{
 		if (Objective.Type == EEclipseObjectiveType::ReachLocation || Objective.Type == EEclipseObjectiveType::CollectItem)
 		{
+			++PresenceObjectivesChecked;
 			Mission->NotifySiteEntered(Objective.TargetId);
 			TestTrue(FString::Printf(TEXT("pin: aanwezigheid vervult '%s' wél"), *Objective.ObjectiveId.ToString()),
 				Mission->GetCompletedObjectiveIds().Contains(Objective.ObjectiveId));
 		}
 	}
+	AddInfo(FString::Printf(TEXT("pin: %d presence-objectives in deze missie gecontroleerd"), PresenceObjectivesChecked));
+	TestTrue(TEXT("pin: er is minstens één presence-objective gecontroleerd (anders is deze lus lege dekking)"),
+		PresenceObjectivesChecked > 0);
+	// CollectItem zit NIET in M1.1 en wordt daarom apart gedekt door
+	// Eclipse.Playthrough.CollectItemIsCompletableInAShippedMission (MT_Rescue).
 
 	GameInstance->Shutdown();
 	return true;
