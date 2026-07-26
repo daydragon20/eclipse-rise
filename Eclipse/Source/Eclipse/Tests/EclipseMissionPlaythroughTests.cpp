@@ -1441,4 +1441,150 @@ bool FEclipseCollectItemObjectiveTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Een gevallen soldaat weigert, en zegt waaróm.
+//
+// Van de vier weigerredenen is InvalidTarget elders end-to-end gedekt en is
+// NoRoute vannacht live voorgekomen (de squad weigerde bij insertie toen hij 93 m
+// verderop stond). Downed was nog nooit door de hele keten gegaan, terwijl het de
+// reden is die er voor de SPELER het meest toe doet: je geeft een order, er
+// gebeurt niets, en je moet kunnen horen dat het komt doordat die man neerligt.
+// De regel in de beslislogica zegt dat ook met zoveel woorden — "de speler moet
+// zich nooit afvragen waarom er niemand bewoog".
+//
+// Geen id-naar-pawn-koppeling nodig: door ALLE squadmates neer te leggen wijst
+// elk ingezet soldaat-id per definitie naar een gevallen lichaam.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDownedSoldierRefusesTest,
+	"Eclipse.Playthrough.ADownedSoldierRefusesAndSaysWhy",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseDownedSoldierRefusesTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (!TestNotNull(TEXT("neer: strategie"), Strategy) || !TestNotNull(TEXT("neer: prep"), Prep)
+		|| !TestNotNull(TEXT("neer: missie"), Mission) || !TestNotNull(TEXT("neer: eventbus"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("neer: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	// Alle squadmates neerleggen. De speler zelf blijft staan — die geeft de order.
+	int32 Downed = 0;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Character = *It;
+		if (Character != nullptr && Character != Harness.Body && Character->IsPlayerSide() && !Character->IsDowned())
+		{
+			Character->ApplyDamage(9999.0f, nullptr, TEXT("TestSetup"));
+			Downed += Character->IsDowned() ? 1 : 0;
+		}
+	}
+	Report(*this, TEXT("squadmates neergelegd"), Downed, TEXT(""), TEXT("> 0 — anders test dit niets"));
+	if (!TestTrue(TEXT("neer: er ligt minstens één squadmate neer"), Downed > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	int32 Acks = 0;
+	int32 Refusals = 0;
+	FName Reason = NAME_None;
+	FString Bark;
+	FEclipseEventSubscriptionHandle Handle = Bus->Subscribe(
+		FGameplayTag::RequestGameplayTag(TEXT("Event.Squad")),
+		FEclipseEventNativeDelegate::CreateLambda(
+			[&Acks, &Refusals, &Reason, &Bark](FGameplayTag Tag, const FInstancedStruct& Payload)
+		{
+			const FString Name = Tag.ToString();
+			if (Name.Contains(TEXT("Acknowledged"))) { ++Acks; }
+			else if (Name.Contains(TEXT("Refused")))
+			{
+				++Refusals;
+				if (const FEclipseSquadEventPayload* Squad = Payload.GetPtr<FEclipseSquadEventPayload>())
+				{
+					Reason = Squad->Reason;
+					Bark = Squad->BarkLine;
+				}
+			}
+		}));
+
+	UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>();
+	const TArray<FGuid> Deployed = Mission->GetDeployedSoldierIds();
+	if (!TestNotNull(TEXT("neer: squad-subsysteem"), Squad)
+		|| !TestTrue(TEXT("neer: er is een soldaat om iets aan te vragen"), Deployed.Num() > 0))
+	{
+		Bus->Unsubscribe(Handle);
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Alle vier de orders proberen. Hold vraagt van alle orders het minst — alleen
+	// bewustzijn — dus als zelfs DIE weigert, komt het door de toestand van de
+	// soldaat en niet door de opdracht. De andere drie zijn er om te horen WAT hij
+	// zegt: de barkpool hangt aan het ORDERTYPE en niet aan de reden, dus dit is
+	// de plek waar zichtbaar wordt of dat een probleem is.
+	const TPair<EEclipseSquadOrder, const TCHAR*> Orders[] = {
+		{ EEclipseSquadOrder::Hold,        TEXT("Hold") },
+		{ EEclipseSquadOrder::MoveTo,      TEXT("MoveTo") },
+		{ EEclipseSquadOrder::Regroup,     TEXT("Regroup") },
+		{ EEclipseSquadOrder::FocusTarget, TEXT("FocusTarget") },
+	};
+	for (const TPair<EEclipseSquadOrder, const TCHAR*>& Case : Orders)
+	{
+		Acks = 0;
+		Refusals = 0;
+		Reason = NAME_None;
+		Bark.Reset();
+
+		const bool bProcessed = Squad->IssueOrder(Deployed[0], Case.Value == nullptr ? EEclipseSquadOrder::Hold : Case.Key,
+			Harness.Location(), nullptr);
+		Harness.Idle(0.15f);
+
+		TestTrue(FString::Printf(TEXT("neer: '%s' is beoordeeld en niet stil weggevallen"), Case.Value), bProcessed);
+		TestEqual(FString::Printf(TEXT("neer: '%s' krijgt precies één antwoord"), Case.Value), Acks + Refusals, 1);
+		TestEqual(FString::Printf(TEXT("neer: '%s' wordt geweigerd"), Case.Value), Refusals, 1);
+		TestEqual(FString::Printf(TEXT("neer: '%s' weigert met reden Downed"), Case.Value),
+			Reason, FName(TEXT("EEclipseOrderRefusalReason::Downed")));
+		TestTrue(FString::Printf(TEXT("neer: '%s' komt met een hoorbare zin"), Case.Value), !Bark.IsEmpty());
+		AddInfo(FString::Printf(TEXT("neer: op '%s' zegt een GEVALLEN soldaat: \"%s\""), Case.Value, *Bark));
+	}
+	Bus->Unsubscribe(Handle);
+
+	// GEEN assert op de INHOUD van die zinnen, en dat is bewust. De reden in de
+	// payload klopt (Downed), maar de zin komt uit de pool van het ORDERTYPE, dus
+	// een gevallen soldaat antwoordt met "Can't hold here." — dat wijst de speler
+	// naar een plaatsingsprobleem terwijl de man neerligt. Reden-specifieke zinnen
+	// vragen een veld in DT_SquadOrderDefs en dus een ontwerpbesluit; dat staat in
+	// het owner-lijstje. Asserteren dat de zin het woord "neer" bevat zou vandaag
+	// rood zijn, en op rood landen mag niet.
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

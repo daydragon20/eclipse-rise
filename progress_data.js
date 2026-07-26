@@ -90,6 +90,12 @@ window.PROGRESS_DATA = {
       "Als je verwacht dat Volgende/Onder-kruis ook in het veld werken (bijvoorbeeld om snel iemand te selecteren voor een order), zeg het - dat is een kleine wijziging",
       "Er staat nu een test op die het gedrag vastpint, dus als we het veranderen valt hij om en gaat de tabel automatisch mee"
     ] },
+    { titel: "Een neergeschoten soldaat zegt 'geen route, baas' — vier keer de verkeerde reden", prio: "gauw", waarom: "Gemeten door de squad neer te leggen en dan alle vier de orders te geven. Het SYSTEEM heeft het goed: de weigering komt door, met reden Downed in de payload. Maar de ZIN die je hoort komt uit de barkpool van het ordertype en niet van de reden, dus je krijgt: Hold -> 'Can't hold here.' / MoveTo -> 'No route, boss.' / Regroup -> 'Route's cut.' / FocusTarget -> 'Can't see the target.' Alle vier wijzen je naar een plaatsings- of zichtprobleem terwijl de man doodbloedt. Dat is precies het tegenovergestelde van wat de code zelf als regel opschrijft: de speler moet zich nooit afvragen waarom er niemand bewoog. Ik heb niets gewijzigd - reden-specifieke zinnen vragen een veld in DT_SquadOrderDefs en dus jouw besluit over het schema.", stappen: [
+      "Optie 1 (mijn voorkeur): een apart veld voor Downed-zinnen. Die reden geldt voor ALLE orders identiek, dus een pool volstaat - iets als 'I'm hit!' of 'Can't move, I'm down.'",
+      "Optie 2: per weigerreden een eigen pool. Netter, maar vier keer zoveel schrijfwerk en de andere drie redenen leveren nu al passende zinnen",
+      "Optie 3: laten staan tot er een medic-flow met eigen barks is",
+      "Zeg welke, dan bouw ik het schema plus de validator en zet er een test op"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",
