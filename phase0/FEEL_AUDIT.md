@@ -33,6 +33,31 @@ kolom zegt waar het bewijs staat.
 | Wapen (tempo, bereik, kopschot) | **gemeten; twee getallen kloppen niet** | 14 schoten/2 s ✓ · bereik 4700 i.p.v. 5000 · kopschot doet niets |
 | §8 FEEDBACK (shake, recoil, hitmarkers) | **bestaat niet** | grootste openstaande post (owner, §4 punt 8) |
 
+## Wat §8 FEEDBACK moet weten vóór het gebouwd wordt
+
+Vier dingen die deze nacht boven kwamen en die de bouwer van de feedback-laag gaan
+raken. Geen ontwerpkeuzes — feiten die je liever vooraf kent dan halverwege.
+
+1. **`bInheritRoll` staat aan op de spring arm.** Vandaag onschadelijk, want de
+   control rotation heeft geen roll. Zodra camera-shake roll gebruikt, roteert de
+   **hele boom** mee in plaats van alleen het beeld. Zet die vlag uit vóór de
+   eerste shake, niet erna.
+2. **De camera-blend werkt sinds 26-07 pas echt** (`bCanEverTick` stond uit, zie
+   §1 van HANDOFF). Hij loopt op constante SNELHEID, niet op constante tijd, en
+   hij erft de tijddilatatie: in Command Mode duurt dezelfde beweging ruim drie
+   keer zo lang. Een shake die daar bovenop komt, komt dus in een systeem dat al
+   aan de camera trekt.
+3. **Richten en wapenbereik hangen aan de camera.** De hitscan vertrekt uit
+   `GetPlayerViewPoint()`, dus élke camerabeweging verplaatst je kogel. Gemeten
+   gevolg dat er nu al is: mikken trekt de boom in van 300 naar 165 cm en verlengt
+   daarmee je effectieve bereik met ~135 cm. Een shake die de camera beweegt,
+   beweegt je schot mee — dat is een ontwerpkeuze, maar wel eentje die je bewust
+   moet maken.
+4. **Er is geen enkel event om een hitmarker aan op te hangen.** `Fire()` geeft een
+   bool terug die de aanroeper weggooit, en er is geen `Event.Combat.*`. Een
+   hitmarker vraagt dus eerst een feit op de bus, en dat is meteen het haakje voor
+   geluid en haptiek (de audio-subsystem is al een pure bus-consument).
+
 ## De vondst die het meeste verklaart
 
 Van het `CharacterMovementComponent` werden **vier** dingen gezet: `MaxWalkSpeed`,
