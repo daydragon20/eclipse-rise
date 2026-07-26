@@ -25,6 +25,7 @@
 #include "Misc/CommandLine.h"
 #include "Scalability.h"
 #include "TimerManager.h"
+#include "UnrealClient.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Squad/EclipseSquadSubsystem.h"
 #include "Squad/EclipseSquadTypes.h"
@@ -326,6 +327,17 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		// WasRecentlyRendered() vraagt het aan de renderer zelf.
 		if (Body == PlayerPawn)
 		{
+			// Wapenstatus erbij. Op het eerste beeld met UI stond er geen
+			// munitieteller en hield niemand een wapen vast, en er vielen nul
+			// schoten — drie waarnemingen die één oorzaak kunnen hebben. Dit
+			// zegt welke.
+			const UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d WAPEN] component=%d magazijn=%d munitie=%d"),
+				ShotIndex,
+				Weapon != nullptr ? 1 : 0,
+				Weapon != nullptr ? Weapon->GetMagazineSize() : -1,
+				Weapon != nullptr ? Weapon->GetAmmoInMagazine() : -1);
+
 			const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
 			const float ViewYaw = static_cast<float>(Controller->GetControlRotation().Yaw);
 			UE_LOG(LogEclipse, Display,
@@ -398,7 +410,7 @@ void AEclipseGameMode::AdvancePlayShotRound()
 	{
 		return;
 	}
-	if (PlayShotStep >= 1 && PlayShotStep <= 7)
+	if (PlayShotStep >= 1 && PlayShotStep <= 8)
 	{
 		MeasurePlayShot(PlayShotStep);
 		MeasureDressingFigures(PlayShotStep);
@@ -482,6 +494,17 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		bPlayShotTurning = false;
 		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 7] uitgedraaid — lichaam hoort weer met de camera mee te staan"));
+		break;
+	case 8:
+		// MET DE UI EROP. HighResShot tekent alleen de 3D-scene; de HUD is een
+		// UMG-widget en valt er buiten. Op de eerste zes beelden stond dus geen
+		// munitieteller, en ik had dat bijna als ontbrekende HUD gerapporteerd —
+		// een bevinding die niet over de game ging maar over mijn meetmethode.
+		//
+		// FScreenshotRequest met bShowUI neemt de widgets wel mee, dus dit beeld
+		// beantwoordt de vraag in plaats van hem open te laten.
+		FScreenshotRequest::RequestScreenshot(TEXT("PlayShot_MetUI"), /*bShowUI*/ true, /*bAddFilenameSuffix*/ false);
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 8] zelfde beeld MET de HUD erop"));
 		break;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));

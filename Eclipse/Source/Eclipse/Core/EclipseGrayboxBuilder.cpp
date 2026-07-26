@@ -2429,6 +2429,19 @@ void BuildDistrict(UWorld& World)
 			SunComponent->SetLightColor(FLinearColor(1.0f, 0.87f, 0.70f));
 			SunComponent->SetAtmosphereSunLight(true);
 			SunComponent->SetVolumetricScatteringIntensity(2.0f);
+			// WELKE ZON DE ZON IS, met zoveel woorden. Het district heeft twee
+			// directionele lampen (deze en de fill hieronder), en dan moet de
+			// forward-shading weten welke de leidende is. Zonder die keuze pakt
+			// de engine er zelf een "op algehele helderheid" en zet daar een
+			// GELE WAARSCHUWING OVER HET SCHERM — gevonden op het eerste beeld
+			// dat de UI meenam, en dus iets wat de owner tijdens het spelen
+			// gewoon over zijn scherm zou zien lopen.
+			//
+			// De fallback koos hier waarschijnlijk goed, maar "waarschijnlijk
+			// goed omdat hij toevallig helderder is" is geen keuze. Zodra iemand
+			// de fill-intensiteit aanpast kantelt het beeld zonder dat iemand
+			// iets aan de belichting deed.
+			SunComponent->ForwardShadingPriority = 10;
 			// SM5 laptop: the CSM path blankets the 200x-scaled ground slab in
 			// shadow no matter the caster set (passes 5-16 forensics) — sun ships
 			// shadowless there. SM6: VSM shadows return; the unlit district cannot
@@ -2475,6 +2488,8 @@ void BuildDistrict(UWorld& World)
 			FillComponent->SetLightColor(FLinearColor(0.55f, 0.65f, 0.85f));
 			FillComponent->SetCastShadows(false);
 			FillComponent->SetAtmosphereSunLight(false);
+			// Nadrukkelijk lager dan de zon: dit is tegenlicht, geen tweede zon.
+			FillComponent->ForwardShadingPriority = 0;
 		}
 	}
 
