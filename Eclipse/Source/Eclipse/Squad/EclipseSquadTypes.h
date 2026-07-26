@@ -72,9 +72,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 1))
 	int32 MaxDeployed = 4;
 
+	/**
+	 * NIET GELEZEN. Passief meelopen bestaat niet: de squad beweegt alleen op een
+	 * order (8.4 — orders zijn beloftes). Verzamelen gaat via Regroup, en díé
+	 * radius (RegroupAcceptanceRadius hieronder) wordt wel gebruikt.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
 	float FollowDistance = 400.0f;
 
+	/** NIET GELEZEN — er is geen dekkingzoekgedrag; het district bouwt wel dekking. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
 	float CoverSearchRadius = 800.0f;
 

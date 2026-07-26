@@ -57,6 +57,11 @@ struct FEclipseStoryMissionRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Story")
 	FText BriefingText;
 
+	/**
+	 * NIET GELEZEN. BriefingText hierboven komt wél in het spel terecht (als
+	 * ContextLine op het missieaanbod), maar zonder naam ervoor — de briefing
+	 * leest dus als tekst van niemand.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Story")
 	FName BriefingSpeaker;
 };

@@ -82,7 +82,16 @@ struct FEclipseObjectiveDef
 	int32 OptionalRewardIntel = 0;
 };
 
-/** One enemy spawn batch (consumed by the graybox level wiring). */
+/**
+ * Eén vijand-spawnbatch. NOG NIET AANGESLOTEN — hier stond "consumed by the
+ * graybox level wiring", maar niets leest deze struct. De vijanden in een missie
+ * komen uit een vaste lus van VIER in AEclipseGameMode::SpawnMissionActors, die
+ * de rijen van DT_EnemyArchetypes afwisselt en ze naast het primaire doel zet.
+ *
+ * Gevolg voor wie een missie authordt: vul je hier "6 Enforcers op SiteB" in, dan
+ * krijg je nog steeds vier gemengde vijanden bij het hoofddoel, zonder enige
+ * waarschuwing. Alle drie de velden zijn dood, Count incluis.
+ */
 USTRUCT(BlueprintType)
 struct FEclipseEnemySpawnSet
 {
