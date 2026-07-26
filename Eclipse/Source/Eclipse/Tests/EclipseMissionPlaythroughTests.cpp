@@ -32,6 +32,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/EclipsePlayerController.h"
+#include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
@@ -1582,6 +1583,114 @@ bool FEclipseDownedSoldierRefusesTest::RunTest(const FString& Parameters)
 	// vragen een veld in DT_SquadOrderDefs en dus een ontwerpbesluit; dat staat in
 	// het owner-lijstje. Asserteren dat de zin het woord "neer" bevat zou vandaag
 	// rood zijn, en op rood landen mag niet.
+
+	Harness.Shutdown();
+	return true;
+}
+
+// Vuurt het wapen op de snelheid die in de data staat?
+//
+// FireInterval (0,15 s = 6,7 schoten per seconde) is nooit gemeten. Het wapen
+// bewaakt hem zelf met `Now - LastFireTimeSeconds < FireInterval`, en Fire() is
+// gebonden aan Triggered — dus terwijl je de trekker vasthoudt, wordt hij elk
+// frame aangeroepen en moet die poort het tempo bepalen. Als die poort niet
+// klopt, schiet je op framerate.
+//
+// Gemeten aan de UITKOMST en niet aan het aantal aanroepen: hoeveel leven verliest
+// een doelwit in twee seconden vuren, gedeeld door de schade per schot. Dat telt
+// de schoten die echt vertrokken zijn.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseFireRateTest,
+	"Eclipse.Feel.Layer2.WeaponFiresAtTheAuthoredRate",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseFireRateTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	// ECHTE game mode plus een gelanceerde missie, want het wapen komt uit
+	// DT_Weapons en wordt door de game mode aangehangen. Een wapen dat de test
+	// zelf aanmaakt zou zijn eigen getallen meten in plaats van de geleverde.
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("vuurtempo: strategie"), Strategy) || !TestNotNull(TEXT("vuurtempo: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("vuurtempo: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UEclipseHitscanWeaponComponent* Weapon = Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (!TestNotNull(TEXT("vuurtempo: de speler heeft een wapen"), Weapon))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	const float FireInterval = Weapon->GetFireInterval();
+	const float ShotDamage = Weapon->GetDamage();
+	Report(*this, TEXT("vuurinterval uit de data"), FireInterval, TEXT("s"),
+		*FString::Printf(TEXT("= %.2f schoten/s"), FireInterval > 0.0f ? 1.0f / FireInterval : 0.0f));
+
+	// Een doelwit met veel leven, recht vooruit en ruim binnen bereik.
+	const FVector TargetLocation = Harness.Location() + Harness.Body->GetActorForwardVector() * 800.0f;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AEclipseCharacter* Target = Harness.World->SpawnActor<AEclipseCharacter>(
+		AEclipseCharacter::StaticClass(), TargetLocation, FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("vuurtempo: er staat een doelwit"), Target))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Target->InitializeHealth(100000.0f);
+	Harness.Idle(0.2f);
+
+	Harness.AimAt(Target->GetActorLocation());
+	Harness.Idle(0.1f);
+
+	const float HealthBefore = Target->GetHealth();
+	const double Start = Harness.ElapsedSeconds;
+	constexpr double FireSeconds = 2.0;
+	while (Harness.ElapsedSeconds - Start < FireSeconds)
+	{
+		Harness.Inject(TEXT("Fire"), true);
+		Harness.Step();
+	}
+	const double Elapsed = Harness.ElapsedSeconds - Start;
+	const float DamageDealt = HealthBefore - Target->GetHealth();
+
+	// Kop- en rompschoten verschillen in schade, dus het aantal schoten volgt niet
+	// zomaar uit de totale schade. Daarom delen door de schade van het schot dat
+	// we ook echt maken: op borsthoogte gemikt = rompschade.
+	const float ShotsFired = ShotDamage > 0.0f ? DamageDealt / ShotDamage : 0.0f;
+	const float MeasuredRate = Elapsed > 0.0 ? ShotsFired / static_cast<float>(Elapsed) : 0.0f;
+
+	Report(*this, TEXT("schade in 2 s vuren"), DamageDealt, TEXT("hp"));
+	Report(*this, TEXT("dat zijn schoten"), ShotsFired, TEXT(""));
+	Report(*this, TEXT("gemeten vuurtempo"), MeasuredRate, TEXT("schoten/s"),
+		*FString::Printf(TEXT("data zegt %.2f"), FireInterval > 0.0f ? 1.0f / FireInterval : 0.0f));
+
+	TestTrue(TEXT("vuurtempo: er is überhaupt geschoten"), ShotsFired >= 1.0f);
+	// 10% marge: de laatste schot-poort valt zelden precies op het einde van het
+	// venster, en de stapgrootte kwantiseert.
+	const float Authored = FireInterval > 0.0f ? 1.0f / FireInterval : 0.0f;
+	TestTrue(FString::Printf(TEXT("vuurtempo: het tempo IS het geschreven tempo (%.2f tegen %.2f schoten/s)"),
+			MeasuredRate, Authored),
+		FMath::Abs(MeasuredRate - Authored) <= Authored * 0.10f);
 
 	Harness.Shutdown();
 	return true;

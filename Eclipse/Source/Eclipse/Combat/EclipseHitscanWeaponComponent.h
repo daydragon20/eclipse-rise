@@ -30,6 +30,8 @@ public:
 	bool Fire(const FVector& ViewLocation, const FVector& ViewDirection, FName Cause);
 
 	float GetDamage() const { return Weapon.Damage; }
+	/** Seconden tussen twee schoten — de poort die het vuurtempo bepaalt. */
+	float GetFireInterval() const { return Weapon.FireInterval; }
 
 private:
 	FEclipseWeaponRow Weapon;

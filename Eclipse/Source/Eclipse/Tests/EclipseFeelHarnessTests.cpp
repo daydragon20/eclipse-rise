@@ -23,6 +23,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Combat/EclipseHitscanWeaponComponent.h"
 #include "GameFramework/InputSettings.h"
 #include "HAL/IConsoleManager.h"
 #include "Misc/AutomationTest.h"
