@@ -33,7 +33,7 @@ verzonnen getal.
 | 9 | **Terugslag** | Altijd iets, ook bij lage cadans | **Geen.** Het kruis beweegt niet bij vuren | **Omissie** |
 | 10 | **Munitie en herladen** | Altijd | **Geen.** Oneindig vuur, geen magazijn | **Omissie, of bewust Fase 2+** |
 | 11 | **Wapenwissel** | Altijd minstens twee wapens | **Eén wapen.** Daarom kreeg RB vandaag een andere taak | Keuze voor nu, met een plek gereserveerd |
-| 12 | **Geluid bij een schot** | Altijd | Er is een audiolaag en een schot-event; **geen wapengeluid** | **Omissie** |
+| 12 | **Geluid bij een schot** | Altijd | **Klinkt sinds 26-07**, op de plek van het schot. De cue lag al in de repo en werd door niemand afgespeeld | **Was een omissie, dezelfde dag gerepareerd** |
 | 13 | **Dood van een vijand** | Death-animatie of ragdoll | **Death-take speelt** ✓; geen ragdoll | Keuze — een take is voorspelbaarder dan physics |
 | 14 | **Schade aan de speler zichtbaar** | Schermrand, richtingsindicator, geluid | Alleen de HUD-balk; **geen richtingsindicator** | **Omissie** |
 | 15 | **Dekking** | Gears heeft een dekkingssysteem; Division/Borderlands niet | Geen systeem, wel dekkingsgeometrie in het district | Keuze — past bij Division/Borderlands |
@@ -43,7 +43,12 @@ verzonnen getal.
 
 ## De rode draad
 
-**Vier van de vijf omissies gaan over FEEDBACK, niet over mechaniek.** Het gevecht
+**Vier van de vijf omissies gingen over FEEDBACK, niet over mechaniek.** Eén ervan
+(12, wapengeluid) is dezelfde dag gerepareerd toen bleek dat het geen smaakvraag
+was maar een dood asset: `Cue_SFX_Weapon_RebelRifle_Shot_01` lag al in de repo.
+Wat er nóg ligt en niemand afspeelt: `Cue_SFX_Impact_BulletMetal_01` en twee
+voetstapcues. De impactcue vraagt een treffer-event dat er nog niet is; de
+voetstappen vragen anim-notifies. Het gevecht
 rékent goed — de schade klopt, de cadans klopt, kopschoten werken sinds vandaag,
 de vijand reageert. Wat ontbreekt is dat de speler het te horen of te zien krijgt:
 geen hitmarker (4), geen kopschot-signaal (5), geen wapengeluid (12), geen

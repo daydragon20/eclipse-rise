@@ -46,12 +46,13 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 	Audio->BindToBus(*Bus);
 	TestTrue(TEXT("Bound after BindToBus"), Audio->IsBoundToBus());
 	// Drie: de missie-sting plus de twee order-antwoorden (barks, 26-07).
-	TestEqual(TEXT("Drie live subscriptions: sting + ack + refused"), Bus->GetSubscriptionCount(), 3);
+	// Vier: sting, de twee order-antwoorden, en het wapengeluid (26-07).
+	TestEqual(TEXT("Vier live subscriptions: sting + ack + refused + schot"), Bus->GetSubscriptionCount(), 4);
 
 	// Re-bind must swap, not stack — a leaked second subscription would double
 	// every sting.
 	Audio->BindToBus(*Bus);
-	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 3);
+	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 4);
 
 	// Completed is consumed; the world-less context skips playback but still
 	// counts the request (the 14.3.5 degradation path this test rides on).
@@ -63,6 +64,18 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 	Bus->Broadcast(EclipseTags::Event_Mission_Failed, EclipseAudioRuntimeTest::MakeMissionPayload(TEXT("M_Audio"), false));
 	Bus->Broadcast(EclipseTags::Event_Mission_Started, EclipseAudioRuntimeTest::MakeMissionPayload(TEXT("M_Audio"), false));
 	TestEqual(TEXT("Failed/Started do not request the sting"), Audio->GetStingRequestCount(), 1);
+
+	// Het schot-event komt aan als GELUIDSVERZOEK, ook zonder audio-apparaat: de
+	// teller telt de verzoeken en niet de speaker, net als de sting hierboven.
+	// Zonder deze regel zou "het wapen klinkt nu" een bewering zijn.
+	{
+		FEclipseCombatEventPayload Shot;
+		Shot.Origin = FVector(100.0f, 0.0f, 0.0f);
+		Shot.AlertRadiusCm = 5000.0f;
+		Shot.bPlayerSide = true;
+		Bus->Broadcast(EclipseTags::Event_Combat_ShotFired, FInstancedStruct::Make(Shot));
+		TestEqual(TEXT("Een schot vraagt om geluid"), Audio->GetShotSoundCount(), 1);
+	}
 
 	Audio->UnbindFromBus();
 	TestFalse(TEXT("Unbound after UnbindFromBus"), Audio->IsBoundToBus());

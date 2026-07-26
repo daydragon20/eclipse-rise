@@ -23,6 +23,19 @@ namespace
 	constexpr float MissionCompleteStingVolume = 0.9f;
 
 	const TCHAR* MissionCompleteStingPath = TEXT("/Game/Audio/Music/MUS_Sting_MissionComplete_Resistance_01.MUS_Sting_MissionComplete_Resistance_01");
+
+	/**
+	 * Wapengeluid (gevechts-audit 26-07, punt 12). De cue ligt sinds de audio-import
+	 * in de repo en werd door niemand afgespeeld — betaalde, geïmporteerde audio
+	 * die nooit klonk, dezelfde klasse als de acht squad-zinnen.
+	 *
+	 * 0,7 en niet 0,9 zoals de sting: een schot klinkt vaak (6,67 keer per seconde
+	 * bij automatisch vuur) en de sting één keer per missie. Wat één keer indruk
+	 * moet maken mag luider dan wat je honderd keer hoort.
+	 */
+	constexpr float WeaponShotVolume = 0.7f;
+
+	const TCHAR* WeaponShotCuePath = TEXT("/Game/Audio/SFX/Cue_SFX_Weapon_RebelRifle_Shot_01.Cue_SFX_Weapon_RebelRifle_Shot_01");
 }
 
 void UEclipseAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -68,6 +81,14 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		EclipseTags::Event_Squad_OrderRefused,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnOrderAnswered),
 		FEclipseSquadEventPayload::StaticStruct());
+
+	// Wapengeluid (gevechts-audit punt 12). Het schot-event bestaat sinds vanochtend
+	// en vuurt bij elk schot dat de cadans passeert, raak of mis — precies het feit
+	// waar een schotgeluid aan hoort te hangen.
+	ShotFiredHandle = Bus.Subscribe(
+		EclipseTags::Event_Combat_ShotFired,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnShotFired),
+		FEclipseCombatEventPayload::StaticStruct());
 }
 
 void UEclipseAudioSubsystem::UnbindFromBus()
@@ -77,12 +98,44 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 		Bus->Unsubscribe(MissionCompletedHandle);
 		Bus->Unsubscribe(OrderAckHandle);
 		Bus->Unsubscribe(OrderRefusedHandle);
+		Bus->Unsubscribe(ShotFiredHandle);
 	}
 	MissionCompletedHandle = FEclipseEventSubscriptionHandle();
 	OrderAckHandle = FEclipseEventSubscriptionHandle();
 	OrderRefusedHandle = FEclipseEventSubscriptionHandle();
+	ShotFiredHandle = FEclipseEventSubscriptionHandle();
 	LastBarkSeconds.Reset();
 	BoundBus = nullptr;
+}
+
+void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Shot = Payload.GetPtr<FEclipseCombatEventPayload>();
+	if (Shot == nullptr)
+	{
+		return;
+	}
+
+	++ShotSoundCount;
+
+	if (!bTriedLoadWeaponShot)
+	{
+		bTriedLoadWeaponShot = true;
+		WeaponShotCue = LoadObject<USoundBase>(nullptr, WeaponShotCuePath);
+		if (WeaponShotCue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Audio: wapencue %s ontbreekt — schieten blijft stil (14.3.5)."), WeaponShotCuePath);
+		}
+	}
+
+	// Op de PLEK van het schot en niet 2D: je moet kunnen horen dat er naast je
+	// geschoten wordt, en straks waar vandaan. Het feit draagt zijn oorsprong al,
+	// precies waarvoor die in het event zit.
+	if (WeaponShotCue != nullptr && GetWorld() != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, WeaponShotCue, Shot->Origin, WeaponShotVolume);
+	}
 }
 
 void UEclipseAudioSubsystem::OnOrderAnswered(FGameplayTag EventTag, const FInstancedStruct& Payload)

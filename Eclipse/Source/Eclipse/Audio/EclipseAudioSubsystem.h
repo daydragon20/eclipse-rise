@@ -47,6 +47,9 @@ public:
 	 */
 	int32 GetStingRequestCount() const { return StingRequestCount; }
 
+	/** Diagnostiek voor de testlaag: hoeveel schoten om geluid vroegen. */
+	int32 GetShotSoundCount() const { return ShotSoundCount; }
+
 	/**
 	 * Diagnostic: barks die daadwerkelijk een stem hebben aangevraagd, en barks
 	 * die de rem tegenhield. Zelfde reden als StingRequestCount — zo kan de
@@ -66,12 +69,14 @@ public:
 private:
 	void OnMissionCompleted(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnOrderAnswered(FGameplayTag EventTag, const FInstancedStruct& Payload);
+	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Bus we subscribed on; weak so teardown order during shutdown cannot dangle. */
 	TWeakObjectPtr<UEclipseEventBusSubsystem> BoundBus;
 	FEclipseEventSubscriptionHandle MissionCompletedHandle;
 	FEclipseEventSubscriptionHandle OrderAckHandle;
 	FEclipseEventSubscriptionHandle OrderRefusedHandle;
+	FEclipseEventSubscriptionHandle ShotFiredHandle;
 
 	/** Laatste bark per soldaat (wereldseconden) — de rem van BarkCooldownSeconds. */
 	TMap<FGuid, double> LastBarkSeconds;
@@ -88,4 +93,11 @@ private:
 	bool bTriedLoadSting = false;
 
 	int32 StingRequestCount = 0;
+
+	/** Diagnostiek: schoten die om geluid vroegen (zelfde reden als StingRequestCount). */
+	int32 ShotSoundCount = 0;
+
+	UPROPERTY(Transient)
+	TObjectPtr<USoundBase> WeaponShotCue;
+	bool bTriedLoadWeaponShot = false;
 };
