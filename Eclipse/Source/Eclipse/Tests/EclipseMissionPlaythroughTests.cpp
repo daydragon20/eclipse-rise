@@ -53,6 +53,7 @@
 #include "Squad/EclipseSquadSubsystem.h"
 #include "Squad/EclipseSquadTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
+#include "Strategy/EclipseRegionGraphAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseStrategySubsystem.h"
 #include "Tests/EclipseFeelHarness.h"
@@ -1945,6 +1946,105 @@ bool FEclipseObjectiveSitesExistTest::RunTest(const FString& Parameters)
 	TestTrue(FString::Printf(TEXT("vakken: er zijn minstens vier objectives gecontroleerd (%d)"), ObjectivesChecked),
 		ObjectivesChecked >= 4);
 
+	return true;
+}
+
+// Is elke regio ooit te bereiken?
+//
+// De vakkentest hierboven liep erop stuk dat de sabotagemissie op dag 1 buiten
+// bereik ligt — de campagne laat je alleen naar regio's die aan speler-gebied
+// grenzen (GDD 3.1 regel 1). Dat is spelregel, maar het roept de zwaardere vraag
+// op: is elke regio ooit te bereiken? Een regio die nergens aan vastzit, is een
+// missie die niemand ooit speelt, en dat zie je aan de data niet af.
+//
+// Vandaag klopt het: vanuit Underworks (speler-gebied bij aanvang) kom je via
+// TransitCheckpoint bij FoundryRow en CommsRelay, en via WorkerHousing bij
+// SupplyDepot. Deze test houdt dat vast — hij gaat rood zodra iemand een regio
+// toevoegt zonder verbinding, of een verbinding weghaalt die de enige was.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEveryRegionReachableTest,
+	"Eclipse.Playthrough.EveryRegionIsReachableFromTheStart",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness; // Report()
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	const UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(
+		nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (!TestNotNull(TEXT("bereik: campagne"), Campaign) || !TestNotNull(TEXT("bereik: DA_CampaignSetup"), Setup))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	Campaign->StartNewCampaign(Setup);
+
+	// De LINKS staan in de graaf-asset, niet in de campagnestaat — die laatste
+	// kent alleen eigenaar en onrust per regio. Vandaar de graaf als bron.
+	const UEclipseRegionGraphAsset* Graph = Setup->RegionGraph.LoadSynchronous();
+	if (!TestNotNull(TEXT("bereik: de regiograaf"), Graph))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	const TArray<FEclipseRegionDefinition>& Regions = Graph->Regions;
+	if (!TestTrue(TEXT("bereik: er zijn regio's"), Regions.Num() > 0))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// Startpunt: alles wat de speler bij aanvang al heeft.
+	TSet<FName> Reached;
+	TArray<FName> Frontier;
+	for (const FEclipseRegionDefinition& Region : Regions)
+	{
+		if (Region.StartingOwner == EEclipseRegionOwner::Player)
+		{
+			Reached.Add(Region.RegionId);
+			Frontier.Add(Region.RegionId);
+		}
+	}
+	Report(*this, TEXT("regio's in handen bij aanvang"), Reached.Num(), TEXT(""), TEXT("> 0 — anders begin je nergens"));
+	if (!TestTrue(TEXT("bereik: de speler begint ergens"), Reached.Num() > 0))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// Golf voor golf de buren erbij, precies zoals de campagne je laat oprukken.
+	while (Frontier.Num() > 0)
+	{
+		const FName Current = Frontier.Pop();
+		const FEclipseRegionDefinition* State = Regions.FindByPredicate(
+			[&Current](const FEclipseRegionDefinition& R) { return R.RegionId == Current; });
+		if (State == nullptr)
+		{
+			continue;
+		}
+		for (const FName& Neighbour : State->ConnectedRegionIds)
+		{
+			if (!Reached.Contains(Neighbour))
+			{
+				Reached.Add(Neighbour);
+				Frontier.Add(Neighbour);
+			}
+		}
+	}
+
+	Report(*this, TEXT("regio's bereikbaar vanaf het begin"), Reached.Num(), TEXT(""),
+		*FString::Printf(TEXT("van %d in de graaf"), Regions.Num()));
+
+	for (const FEclipseRegionDefinition& Region : Regions)
+	{
+		TestTrue(FString::Printf(TEXT("bereik: '%s' is ooit te bereiken"), *Region.RegionId.ToString()),
+			Reached.Contains(Region.RegionId));
+	}
+
+	GameInstance->Shutdown();
 	return true;
 }
 
