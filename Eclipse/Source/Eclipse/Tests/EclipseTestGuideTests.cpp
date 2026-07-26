@@ -115,7 +115,18 @@ bool FEclipseGuideStepListTest::RunTest(const FString& Parameters)
 	// states (and the M1.1 gauntlet asserts): the guide never invents a value.
 	const FEclipseGuideStep& Debrief = Steps[ControlStepCount + SystemStepCount - 1];
 	TestTrue(TEXT("Debrief step quotes the documented base reward"), Debrief.Expectation.Contains(TEXT("+50 credits")));
-	TestTrue(TEXT("Debrief step quotes the documented no-casualty bonus"), Debrief.Expectation.Contains(TEXT("+20 materiaal")));
+	// Deze assert eiste tot 26-07 dat de stap de +20-bonus BELOOFT. Gemeten betaalt
+	// die bonus niet uit: hij hangt aan een optioneel objective dat voltooid moet
+	// worden, en niets voltooit het (er is geen vak en geen doelwit — het is een
+	// voorwaarde, geen taak). De speelronde bevestigt het: nul gewonden, 25
+	// materiaal in plaats van 45.
+	//
+	// De assert bewaakte dus een belofte die het spel niet kan waarmaken. Nu eist
+	// hij het omgekeerde: de stap moet zeggen dat de bonus NIET komt, zodat de
+	// tester niet gaat zoeken naar een fout die er niet is. Zodra de bonus wél
+	// uitbetaalt, valt deze regel om en hoort de tekst mee te veranderen.
+	TestTrue(TEXT("Debrief step is eerlijk over de niet-uitbetaalde stretch-bonus"),
+		Debrief.Expectation.Contains(TEXT("+20 stretch-bonus")) && Debrief.Expectation.Contains(TEXT("komt NIET")));
 	TestTrue(TEXT("Debrief step states the region does not flip"), Debrief.Expectation.Contains(TEXT("NIET van eigenaar")));
 	return true;
 }

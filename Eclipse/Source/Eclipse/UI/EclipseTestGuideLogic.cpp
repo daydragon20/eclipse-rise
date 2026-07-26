@@ -79,7 +79,7 @@ namespace EclipseTestGuide
 			{ TEXT("Debrief betaalt en faalt"),
 			  TEXT("console ~: Eclipse.Mission.ForceEnd win"),
 			  TEXT("toetsenbord nodig (console)"),
-			  TEXT("+50 credits en +25 materiaal, +20 materiaal extra als niemand neerging, dag 1 -> dag 2, regio wisselt NIET van eigenaar (Eclipse.Economy.Report)") }
+			  TEXT("+50 credits en +25 materiaal, dag 1 -> dag 2, regio wisselt NIET van eigenaar (Eclipse.Economy.Report). De +20 stretch-bonus voor nul gewonden komt NIET: dat objective moet voltooid worden en niets doet dat — bekend, geen bug") }
 		};
 
 		/** Deel 3: the questions themselves come from the 13.2 checklist; only the "how do I answer this honestly" line is new. */
