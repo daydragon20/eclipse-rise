@@ -42,7 +42,7 @@ erbij, en het vijfde (0,000 s) komt uit het harnas.*
 | 8 | **Spreiding** | Altijd iets: heupvuur ruimer dan mikken | **Geen.** Elk schot gaat exact naar het kruis | **Omissie** |
 | 9 | **Terugslag** | Altijd iets, ook bij lage cadans | **Geen.** Het kruis beweegt niet bij vuren | **Omissie** |
 | 10 | **Munitie en herladen** | Altijd | **Geen.** Oneindig vuur, geen magazijn | **Omissie, of bewust Fase 2+** |
-| 11 | **Wapenwissel** | Altijd minstens twee wapens | **Eén wapen.** Daarom kreeg RB vandaag een andere taak | Keuze voor nu, met een plek gereserveerd |
+| 11 | **Wapenwissel** | Altijd minstens twee wapens | **Correctie op mijn eigen melding van 26-07.** Er ZIJN twee wapens in `DT_Weapons` (`AR_Foundry` en `Sidearm_Scrap`), maar de game mode rust je uit met `FirstRowOf` — de tweede is voor niemand bereikbaar. En je drie loadouts (`DT_LoadoutOptions`) worden netjes opgesomd en gekozen, maar de keuze bereikt het wapen nooit: de loadout-rij draagt een tag, geen wapen | **Omissie in de bedrading, met een ontwerpvraag erin** |
 | 12 | **Geluid bij een schot** | Altijd | **Klinkt sinds 26-07**, op de plek van het schot. De cue lag al in de repo en werd door niemand afgespeeld | **Was een omissie, dezelfde dag gerepareerd** |
 | 13 | **Dood van een vijand** | Death-animatie of ragdoll | **Death-take speelt** ✓; geen ragdoll | Keuze — een take is voorspelbaarder dan physics |
 | 14 | **Schade aan de speler zichtbaar** | Schermrand, richtingsindicator, geluid | Alleen de HUD-balk. **Maar de assets liggen er al**: `Screen_Damage_Indicator` bevat `WBP_DamageIndicator` en `T_BloodOverlay`, en geen enkele regel gameplay roept ze aan | **Omissie — en een verworven pack die dood ligt** |
@@ -101,5 +101,9 @@ gevecht. Wel voorbereid: de hitmarker kan via de bestaande HUD en het bestaande
    `WBP_DamageIndicator` en een bloedoverlay. Er is niets aangeroepen. Dit is dus
    geen inkoop maar aansluitwerk — het enige wat het van de owner vraagt is een
    blik op hóé het eruitziet, want dat kan ik niet beoordelen.
-4. **Impactgeluid** — de cue ligt klaar, maar er is nog geen treffer-event om hem
-   aan te hangen. Klein werk zodra dat er is.
+4. **Impactgeluid** — gedaan op 26-07; deze regel stond hier nog van vóór die fix.
+5. **Loadout laten meetellen.** Je kiest er een in de prep-fase en het verandert
+   niets. Twee dingen zitten in de weg en ze zijn ongelijk van aard: de tweede
+   wapenrij is puur bedrading (`FirstRowOf` pakt altijd de eerste), maar WELK
+   wapen bij welke loadout hoort staat nergens — de rij draagt een tag en geen
+   wapenverwijzing. Dat tweede is een ontwerpkeuze en daarom ligt dit bij jou.

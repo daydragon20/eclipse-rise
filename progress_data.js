@@ -46,6 +46,12 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Je loadout-keuze verandert niets, en er is een tweede wapen dat niemand kan dragen", prio: "gauw", waarom: "CORRECTIE op wat ik je vanochtend zei. Ik gaf als reden om RB niet aan wapenwissel te hangen: 'er is geen tweede wapen'. Dat klopt niet. DT_Weapons heeft er twee — AR_Foundry en Sidearm_Scrap — maar de game mode rust je uit met de EERSTE rij, altijd. De tweede is voor niemand bereikbaar. Erger: je drie loadouts (Loadout_Scavenged, Loadout_Rifle, Loadout_MediumArmor) worden in de prep-fase netjes opgesomd en je kunt er een kiezen, en die keuze bereikt het wapen nooit. Je kiest dus iets wat niets doet.", stappen: [
+      "Twee dingen zitten in de weg, en ze zijn ongelijk van aard",
+      "1. FirstRowOf pakt altijd de eerste wapenrij — dat is pure bedrading en die kan ik zo weghalen",
+      "2. Maar WELK wapen bij welke loadout hoort staat nergens: de loadout-rij draagt een gameplay-tag en geen wapenverwijzing. Dat is een ontwerpkeuze, en daarom ligt dit bij jou",
+      "Zeg welk wapen bij welke loadout hoort (of 'verzin het maar') en ik sluit het aan, inclusief de wapenwissel op RB waar de tak al voor klaarstaat"
+    ] },
     { titel: "SPEEL ÉÉN SESSIE — dit vervangt de drie losse speel-items", prio: "nu", waarom: "Er stonden drie aparte speel-opdrachten op deze lijst, met een notitie erboven dat ze bij één sessie horen. Dat is een omweg; nu is het één item. Start met SPEEL_ECLIPSE.bat, druk F3, en de game leidt je er zelf doorheen. In één sessie van ongeveer een uur lever je alles wat geen enkele test kan geven.", stappen: [
       "1. DE SCHAAL-BUG (F9). Blijf rennen en kijk of er iets meeschaalt met je snelheid. Dit is de enige vraag die ik principieel niet kan beantwoorden — ik heb de camera-lag geklemd en meet 0,00% verschil tussen rennen en sprinten, maar of JIJ het nog ziet weet alleen jij",
       "2. HET GEVECHT (nieuw sinds 26-07). Kopschoten doen 2,5x, dus je time-to-kill halveert van 4 kogels naar 2 — voelt dat goed of goedkoop? Je eerste schot verraadt je: vijanden binnen 50 m lopen naar de plek waar je schoot, ook bij een misser. En je hoort het nu: schot, inslag (harder bij een kopschot) en voetstappen",
