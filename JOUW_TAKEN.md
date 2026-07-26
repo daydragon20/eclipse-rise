@@ -279,3 +279,23 @@ configuratie die de plugin zelf ongeldig noemt. Dat is nu gezet.
 kan een gamepad niet headless indrukken, dus dit is het enige stuk dat ik niet zelf
 kan afvinken. Werkt het nog steeds niet, dan weten we dat het hier níét aan lag —
 ook dat is winst.
+
+## Lichtronde 1 ligt klaar om te beoordelen (26-07 laat)
+
+Je vroeg om één review-ronde voordat er meer armaturen bijkomen. Die staat er:
+zeven frames op 1920×1080 in `Eclipse/Saved/Screenshots/WindowsEditor/`
+(HighresScreenshot00227 t/m 00233). Mijn eigen oordeel staat in
+[phase0/LICHTRONDE_REVIEW.md](phase0/LICHTRONDE_REVIEW.md).
+
+Kort: de cel-shading werkt, maar **de armaturen lezen niet als lampen** — ze
+gloeien zonder lichtplas eronder, dus ze zien eruit als zelflichtende kratten. En
+daardoor leest de helderheid-hiërarchie (extractie 16 / sites 10 / routes 6) op
+commando-afstand niet: alle ambervlakken lijken even helder. Wat wél opvalt is de
+gele schijf bij extractie, en die is met VORM gemaakt, niet met helderheid.
+
+Twee vragen voor jou, allebei ontwerpkeuzes en geen bugs:
+- Mag een armatuur licht **werpen** (een plas op de grond) in plaats van alleen te
+  gloeien?
+- Wil je de rangorde op vorm bouwen in plaats van alleen op helderheid?
+
+Tot je erover hebt besloten komen er geen armaturen bij.
