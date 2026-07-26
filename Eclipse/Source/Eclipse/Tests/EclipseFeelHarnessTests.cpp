@@ -138,14 +138,27 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 			Boom->ProbeSize >= Harness.Body->GetCapsuleComponent()->GetScaledCapsuleRadius() * 0.55f);
 		CheckFloat(TEXT("camera-lag snelheid"), Boom->CameraLagSpeed, T.CameraLagSpeed);
 		// De regressiebewaker voor de duurste vondst van de nacht. De camera-blend
-	// vraagt zichzelf aan met SetActorTickEnabled(true), en dat is een NO-OP als
-	// bCanEverTick uit staat — precies wat er stond. Drie zichtbare features waren
-	// daardoor dood terwijl alles groen was en de code klopte. Deze regel kost
-	// niets en vangt exact die terugval.
-	TestTrue(TEXT("laag 1: de camera-blend KAN zijn tick krijgen (bCanEverTick staat aan)"),
-		Harness.Body->PrimaryActorTick.bCanEverTick);
-	TestFalse(TEXT("laag 1: maar hij tikt niet uit zichzelf (12.4: alleen tijdens een blend)"),
-		Harness.Body->PrimaryActorTick.bStartWithTickEnabled);
+		// vraagt zichzelf aan met SetActorTickEnabled(true), en dat is een NO-OP als
+		// bCanEverTick uit staat — precies wat er stond. Drie zichtbare features waren
+		// daardoor dood terwijl alles groen was en de code klopte. Deze regel kost
+		// niets en vangt exact die terugval.
+		TestTrue(TEXT("laag 1: de camera-blend KAN zijn tick krijgen (bCanEverTick staat aan)"),
+			Harness.Body->PrimaryActorTick.bCanEverTick);
+		TestFalse(TEXT("laag 1: maar hij tikt niet uit zichzelf (12.4: alleen tijdens een blend)"),
+			Harness.Body->PrimaryActorTick.bStartWithTickEnabled);
+
+		// Command Mode draait exact hetzelfde patroon (uit staan, aanzetten tijdens
+		// de hold) op een component in plaats van een actor. Vandaag klopt het; de
+		// bewaker staat er omdat de camera bewees dat dit patroon stil kan sneuvelen
+		// en niets rood maakt. Het hele codebestand is hierop nagelopen — dit zijn
+		// de enige twee plekken die om hun eigen tick vragen.
+		if (UActorComponent* Cmd = Harness.Controller->FindComponentByClass<UEclipseCommandModeComponent>())
+		{
+			TestTrue(TEXT("laag 1: Command Mode KAN zijn tick krijgen (bCanEverTick staat aan)"),
+				Cmd->PrimaryComponentTick.bCanEverTick);
+			TestFalse(TEXT("laag 1: maar hij tikt niet buiten de hold (12.4)"),
+				Cmd->PrimaryComponentTick.bStartWithTickEnabled);
+		}
 
 	CheckFloat(TEXT("camera-lag klem (S1)"), Boom->CameraLagMaxDistance, T.CameraLagMaxDistance);
 		TestTrue(TEXT("laag 1: de camera-lag-klem is gezet (zonder klem schaalt het personage met snelheid — S1)"),
