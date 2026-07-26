@@ -33,6 +33,14 @@ kolom zegt waar het bewijs staat.
 | Wapen (tempo, bereik, kopschot) | **gemeten; twee getallen kloppen niet** | 14 schoten/2 s ✓ · bereik 4700 i.p.v. 5000 · kopschot doet niets |
 | §8 FEEDBACK (shake, recoil, hitmarkers) | **bestaat niet** | grootste openstaande post (owner, §4 punt 8) |
 
+**Vier gaten die buiten deze tabel vallen maar samen verklaren waarom vechten leeg
+voelt** — ze staan uitgewerkt in HANDOFF §1 en §4 en horen hier alleen als
+verwijzing, niet als tweede versie: kopschoten doen niets (de trace raakt de
+capsule), het alarm kan tijdens spelen niet afgaan (alleen een console-commando
+roept het aan), twee van de drie squad-klassen hebben geen signature verb, en er
+staan acht ingesproken squad-zinnen klaar die nooit worden afgespeeld. Die laatste
+is het goedkoopst te verhelpen: de opnames én het stemsysteem bestaan al.
+
 ## Wat §8 FEEDBACK moet weten vóór het gebouwd wordt
 
 Vier dingen die deze nacht boven kwamen en die de bouwer van de feedback-laag gaan
