@@ -1788,6 +1788,23 @@ bool FEclipseRemainingDefaultsTest::RunTest(const FString& Parameters)
 	Note(TEXT("LedgeCheckThreshold"), Movement->LedgeCheckThreshold, 4.0f,
 		TEXT("hoe ver over een rand je mag hangen voor je valt"));
 
+	// Zelfde vraag, ander component. Van de spring arm zijn er vier gezet (lag,
+	// klem, probe, collision); de rest is nooit bekeken. Camera-ROTATIElag is de
+	// interessantste: zonder die lag klapt de camera op je stick, en bijna elke
+	// derde-persoons-game zet er een beetje op.
+	if (USpringArmComponent* Boom = Harness.Body->FindComponentByClass<USpringArmComponent>())
+	{
+		Note(TEXT("bEnableCameraRotationLag"), Boom->bEnableCameraRotationLag ? 1.0f : 0.0f, 0.0f,
+			TEXT("0 = de camera volgt je kijkrichting zonder enige naloop"));
+		Note(TEXT("CameraRotationLagSpeed"), Boom->CameraRotationLagSpeed, 10.0f,
+			TEXT("alleen van belang als de vlag hierboven aanstaat"));
+		Note(TEXT("bInheritPitch"), Boom->bInheritPitch ? 1.0f : 0.0f, 1.0f, TEXT("boom kantelt mee omhoog/omlaag"));
+		Note(TEXT("bInheritYaw"), Boom->bInheritYaw ? 1.0f : 0.0f, 1.0f, TEXT("boom draait mee links/rechts"));
+		Note(TEXT("bInheritRoll"), Boom->bInheritRoll ? 1.0f : 0.0f, 1.0f, TEXT("boom rolt mee — zelden gewenst"));
+		Note(TEXT("bDrawDebugLagMarkers"), Boom->bDrawDebugLagMarkers ? 1.0f : 0.0f, 0.0f,
+			TEXT("debug-markers; hoort uit te staan in een build"));
+	}
+
 	Report(*this, TEXT("nog op de engine-default"), StillDefault, TEXT(""),
 		TEXT("geen assert: een default kan de juiste waarde zijn, maar hij hoort gekozen te zijn"));
 
