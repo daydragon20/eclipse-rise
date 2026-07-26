@@ -32,8 +32,8 @@ dat er expliciet bij in plaats van dat er een getal verschijnt.
 | 9 | **Sprint in** | Ramp van 0,1–0,2 s | 0,150 s | Keuze |
 | 10 | **Sprint uit** | Meestal sneller dan erin | 0,042 s — **3,6× sneller dan erin** | Keuze, maar scherp: zie aanbeveling |
 | 11 | **Springen** | — | 127,5 cm hoog; coyote 0,110 s; buffer 0,150 s | Keuze, met bron |
-| 12 | **Landen** | Landingsdemping of -animatie | Geen van beide: je raakt de grond en loopt door | **Omissie** |
-| 13 | **Hurken** | Snelheidsstraf + overgangsanimatie | 150 cm/s en capsule 124 cm ✓; **geen overgangsanimatie** terwijl `Crouch_to_Stand_Rifle_Hip` in de pack zit | **Omissie, oplosbaar** |
+| 12 | **Landen** | Landingsdemping of -animatie | Camera-dip van **4,3 cm** bij een normale sprong, geschaald met de valsnelheid; komt exact terug op 65 | **Was een omissie, dezelfde dag gerepareerd** |
+| 13 | **Hurken** | Snelheidsstraf + overgangsanimatie | 150 cm/s, capsule 124 cm, en sinds vandaag een overgang van 0,3 s op half gewicht (de hoofd-hitbox zakt mee) | **Was een omissie, dezelfde dag gerepareerd** |
 | 14 | **Mikken tijdens bewegen** | Vrijwel altijd een snelheidsstraf (Division ~0,6×, Gears loopt je automatisch langzamer) | **Geen enkele straf** — je sprint even hard met je vizier op | **Omissie** |
 | 15 | **Animatie per overgang** | Aparte take per overgang | Alleen idle/gang/klap/schot; geen start-, stop-, land- of draaitake | **Omissie, grotendeels assetwerk** |
 
@@ -43,13 +43,15 @@ dat er expliciet bij in plaats van dat er een getal verschijnt.
 
 **Vandaag gedaan:** 1 (oriëntatie), 5 (drempel van 90°).
 
-**Eerstvolgend, zonder jouw beslissing nodig:**
-- **13 — hurk-overgang.** De take bestaat (`Crouch_to_Stand_Rifle_Hip`), het slot
-  voor eenmalige poses bestaat sinds vandaag (schot en klap gebruiken het). Dit is
-  aansluitwerk van dezelfde soort.
-- **12 — landen.** Zelfde slot, maar er is geen landingstake in de packs. Wat wél
-  kan zonder assets: een korte camera-dip bij het raken van de grond. Dat is wat
-  Borderlands doet en het leest als gewicht.
+**Vandaag gedaan:** 1 (oriëntatie), 5 (drempel van 90°), 12 (landingsdip), 13
+(hurk-overgang). Van de vijf omissies in ronde 1 zijn er dus vier weg; de vijfde
+(14, mikken kost geen snelheid) vraagt een owner-beslissing.
+
+**Wat ronde 1 daarmee leert over de methode:** twee van die vier waren pas
+zichtbaar dóór een andere fix van diezelfde ochtend. Het oriëntatiemodel maakte
+punt 5 zichtbaar (draaien in stilstand was geen vraag zolang het lichaam zijn
+looprichting volgde), en het overlay-slot voor schot en klap maakte punt 13
+goedkoop. Daarom is dit een dagelijkse ronde en geen lijst.
 
 ## Wat jouw beslissing vraagt
 
