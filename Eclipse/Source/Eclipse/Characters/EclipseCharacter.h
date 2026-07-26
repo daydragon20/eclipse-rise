@@ -261,6 +261,10 @@ public:
 	virtual bool CanJumpInternal_Implementation() const override;
 
 private:
+	/** 14.3.5-melding over een ontbrekende eenmalige pose; houdt zich tot één regel. */
+	bool bWarnedMissingOneShotPose = false;
+
+
 	void HandleHealthChanged(const struct FOnAttributeChangeData& Data);
 
 	/** Animation half of ApplyBodyDef: resolve the row's takes against the mesh's

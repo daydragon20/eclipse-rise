@@ -86,6 +86,27 @@ al aan (`FillFrom` laat Walk terugvallen op Run en andersom), dus de validator
 eiste data die de code met opzet zelf invult. Nu eist hij per RICHTING dat er in
 minstens één tempo iets staat — dat is de regel die de code echt volgt.
 
+### Ronde 2, tweede aanvulling: de speler mist een herlaadpose
+
+| # | Onderdeel | Nu |
+|---|---|---|
+| 15 | **Animatie per overgang** | Herladen is er als SYSTEEM (veld, pipeline, pose-aanroep) maar **de speler heeft de take niet**: ParagonLtBelica levert nul reload-animaties. Herladen is dus hoorbaar (vier foley-fasen) en leesbaar (de HUD zegt HERLADEN) maar niet zichtbaar |
+
+**Lenen kan hier niet.** Het compatibele-skelettentrucje van vanavond werkt tussen
+de SciFi-packs omdat die allemaal een kopie van `UE4_Mannequin_Skeleton` dragen.
+Belica draagt haar eigen `Belica_Skeleton` — andere botten, dus retargeting en
+geen koppeling.
+
+**En dat maakt het een RUIL, geen defect.** Belica heeft de draaitakes die
+SciFiCharacter niet heeft; SciFiCharacter heeft de herlaad- en wandeltakes die
+Belica niet heeft. Welke van de twee de speler is, is een owner-keuze en staat in
+het kliklijstje. Mijn advies: laten staan tot hij gespeeld heeft — draaien zie je
+constant, herladen twee keer per gevecht.
+
+**Wat er wel veranderd is:** een ontbrekende eenmalige pose meldt zich nu. Hij
+degradeerde stil, wat betekende dat je het pas merkte door ernaar te kijken. Eén
+regel per lichaam, want een schietpose valt 6,67 keer per seconde.
+
 ## De stand na ronde 2
 
 Van de vier omissies uit ronde 1 zijn er twee weg (14 en deels 15), één is een

@@ -209,6 +209,21 @@ void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, flo
 {
 	if (Clip == nullptr)
 	{
+		// LUID DEGRADEREN (14.3.5), en dat was hier stil. Een ontbrekende eenmalige
+		// pose is geen crash maar wel een gat dat je ZIET: de speler herlaadt en zijn
+		// armen bewegen niet. Belica (het spelerslichaam) heeft bijvoorbeeld geen
+		// enkele reload-take — nul in het hele pack — en dat merkte niets.
+		//
+		// Eén regel per lichaam en niet per aanroep: een schietpose valt 6,67 keer
+		// per seconde, en dan is een waarschuwing een logbom in plaats van een
+		// bevinding.
+		if (!bWarnedMissingOneShotPose)
+		{
+			bWarnedMissingOneShotPose = true;
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Animatie: %s mist een eenmalige pose (schot/klap/herladen/draai) — die handeling is hoorbaar en leesbaar, maar niet ZICHTBAAR."),
+				*GetName());
+		}
 		return;
 	}
 	if (UEclipseAnimInstance* Anim = Cast<UEclipseAnimInstance>(GetMesh() != nullptr ? GetMesh()->GetAnimInstance() : nullptr))

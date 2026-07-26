@@ -147,6 +147,12 @@ window.PROGRESS_DATA = {
       "Druk Y tijdens Command Mode: dat cycelt door recon / ready / overwatch / aggressive, en die gelden meteen voor de hele squad",
       "Vraag jezelf een ding af: is dit gevecht nog spannend, of doet je squad het werk?"
     ] },
+    { titel: "Welk lichaam is de speler? Beide packs missen iets anders", prio: "later", waarom: "Je speelt Belica (ParagonLtBelica), gekozen omdat dat de rijkste animatieset heeft. Vanavond bleek dat die set twee gaten heeft die je ZELF ziet: ze heeft geen enkele wandelcyclus (alleen jog) en geen enkele herlaad-take. Herladen is dus hoorbaar (vier foley-fasen) en leesbaar (HUD zegt HERLADEN), maar je armen bewegen niet. De SciFi-packs hebben die takes wel, maar missen juist de draai-animaties die ik vanavond aansloot. Belica draagt bovendien haar eigen Paragon-skelet, dus lenen kan hier niet - dat trucje werkte alleen tussen de SciFi-packs onderling.", stappen: [
+      "MIJN ADVIES: laten zoals het is tot je gespeeld hebt. Draaien zie je constant, herladen twee keer per gevecht",
+      "Wil je het anders: 'speler wordt een SciFi-soldaat' - dan krijg je herladen en wandelen, en verlies je turn-in-place",
+      "Of: 'zoek een reload-take die op Belica past' - dat is retargeting-werk, geen kwestie van aansluiten",
+      "Er staat sinds vanavond een waarschuwing in het log als een lichaam een pose mist, dus dit soort gaten meldt zich voortaan zelf"
+    ] },
     { titel: "Drie zinnen laten inspreken? Je squad handelt nu zelf en zegt er niets bij", prio: "gauw", waarom: "Sinds vanavond vuurt je squad uit zichzelf, zoekt dekking en herlaadt. Elke order krijgt een gesproken antwoord, maar alles wat ze OP EIGEN INITIATIEF doen is stil - en dat is precies waar Ghost Recon en Division het hardst op leunen. Er staan tien zinnen in de cache en geen enkele past. Nieuwe laten maken kost een betaalde ElevenLabs-aanroep, dus dat is jouw beslissing en niet die van mij. Ik heb de goedkope helft wel gedaan: er staat nu een regel in het log als een soldaat op eigen initiatief het vuur opent, zodat je na een ronde kunt zien wie je verraadde.", stappen: [
       "MIJN VOORSTEL: drie korte zinnen per stem, zes in totaal. 'Contact.' (hij opent het vuur), 'Taking fire!' (hij zoekt dekking), 'Reloading!' (magazijn leeg)",
       "Waarom deze drie: het zijn de enige drie momenten waarop een soldaat iets doet dat JOU raakt zonder dat jij het vroeg",
