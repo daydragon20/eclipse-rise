@@ -42,7 +42,16 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] / "Source" / "Eclipse"
+# BEIDE MODULES, en dat was een blinde vlek tot 26-07 avond. De sweep keek alleen
+# in Source/Eclipse, dus elk veld dat door de VALIDATOR gelezen wordt (die in
+# EclipseEditor staat) meldde zich als dood. RoleSummary stond zo op de lijst
+# terwijl er letterlijk een validator op staat.
+#
+# Zelfde klasse als de vorige blinde vlek van deze tool: hij keek alleen naar
+# scalars en miste elke TArray. Een sweep die te veel meldt is net zo onbruikbaar
+# als een die te weinig meldt — je leert hem negeren.
+SOURCE_ROOT = Path(__file__).resolve().parents[1] / "Source"
+ROOT = SOURCE_ROOT / "Eclipse"
 
 # Het type-alternatief is expres breed: de eerste versie van deze sweep keek alleen
 # naar getallen en namen, en miste daardoor EnemySpawns — een TArray, en juist de
@@ -70,7 +79,7 @@ def fields_in(header: Path) -> list:
 
 
 def main() -> int:
-    sources = [p for p in ROOT.rglob("*.cpp")] + [p for p in ROOT.rglob("*.h")]
+    sources = [p for p in SOURCE_ROOT.rglob("*.cpp")] + [p for p in SOURCE_ROOT.rglob("*.h")]
     bodies = {p: p.read_text(encoding="utf-8", errors="replace") for p in sources}
 
     dead = []

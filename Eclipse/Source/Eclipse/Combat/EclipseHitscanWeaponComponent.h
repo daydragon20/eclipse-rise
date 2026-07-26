@@ -85,6 +85,8 @@ public:
 	float GetReloadSeconds() const { return Weapon.ReloadSeconds; }
 	int32 GetReloadCount() const { return ReloadCount; }
 
+	float GetFalloffStartCm() const { return Weapon.FalloffStartCm; }
+	float GetFalloffMinFraction() const { return Weapon.FalloffMinFraction; }
 	float GetRecoilPitchDegrees() const { return Weapon.RecoilPitchDegrees; }
 	float GetRecoilRecoveryDegreesPerSecond() const { return Weapon.RecoilRecoveryDegreesPerSecond; }
 

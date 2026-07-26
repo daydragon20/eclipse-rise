@@ -343,6 +343,27 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 			Head != nullptr ? FVector::Dist(FMath::ClosestPointOnSegment(Centre, ViewLocation, End), Centre) : -1.0f,
 			bHeadshot ? 1 : 0);
 	}
+	// SCHADE-AFVAL (26-07 avond, punt 4 — en een gat dat de dode-veldensweep
+	// vond). FalloffStartCm en FalloffMinFraction stonden sinds vanmiddag in
+	// DT_Weapons, met een uitleg erboven die zei wat ze deden, en er was geen
+	// regel code die ze las. Ik had het als kenmerk opgeschreven en niet gebouwd.
+	//
+	// Lineair tussen de twee grenzen: op FalloffStartCm nog volle schade, op
+	// RangeCm nog FalloffMinFraction daarvan. Lineair en niet met een curve, want
+	// een curve is een tweede stel getallen die niemand heeft afgesteld — en dit
+	// is precies het verschil dat een DMR van een SMG maakt zonder aan één
+	// schadegetal te komen.
+	if (Weapon.FalloffStartCm > 0.0f && Weapon.RangeCm > Weapon.FalloffStartCm)
+	{
+		const float Distance = static_cast<float>(FVector::Dist(ViewLocation, Hit.ImpactPoint));
+		if (Distance > Weapon.FalloffStartCm)
+		{
+			const float Span = Weapon.RangeCm - Weapon.FalloffStartCm;
+			const float Past = FMath::Clamp((Distance - Weapon.FalloffStartCm) / Span, 0.0f, 1.0f);
+			Damage *= FMath::Lerp(1.0f, Weapon.FalloffMinFraction, Past);
+		}
+	}
+
 	if (bHeadshot)
 	{
 		Damage *= Weapon.HeadshotMultiplier;

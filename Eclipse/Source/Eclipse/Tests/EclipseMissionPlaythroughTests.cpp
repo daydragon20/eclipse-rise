@@ -1806,12 +1806,36 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 	// binnen en net buiten die grens beantwoordt het.
 	{
 		const float Range = Weapon->GetRangeCm();
+		// De teller waar DamageAt en DamageAiming hieronder op leest, en de inschrijving die hem
+		// vult. Alleen treffers waarvan de SCHUTTER de speler is tellen mee.
+		float PlayerDamage = 0.0f;
+		int32 ProbeShots = 0;
+		FEclipseEventSubscriptionHandle HitHandle;
+		UEclipseEventBusSubsystem* HitBus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+		if (HitBus != nullptr)
+		{
+			AEclipseCharacter* PlayerBody = Harness.Body;
+			HitHandle = HitBus->Subscribe(EclipseTags::Event_Combat_HitLanded,
+				FEclipseEventNativeDelegate::CreateLambda(
+					[&PlayerDamage, PlayerBody](FGameplayTag, const FInstancedStruct& Payload)
+					{
+						const FEclipseCombatEventPayload* Landed = Payload.GetPtr<FEclipseCombatEventPayload>();
+						if (Landed != nullptr && Landed->Shooter.Get() == PlayerBody)
+						{
+							PlayerDamage += Landed->Damage;
+						}
+					}),
+				FEclipseCombatEventPayload::StaticStruct());
+		}
+
 		auto DamageAt = [&](float DistanceCm) -> float
 		{
 			Target->SetActorLocation(Harness.Location() + Harness.Body->GetActorForwardVector() * DistanceCm);
 			Harness.Idle(0.2f);
 			Harness.AimAt(Target->GetActorLocation());
-			const float Before = Target->GetHealth();
+			// De schade van de SPELER, niet die aan het doelwit: de squad vuurt sinds
+			// vanavond mee en dit doelwit staat binnen zijn bereik.
+			PlayerDamage = 0.0f;
 			// Ruim over één vuurinterval heen, zodat de poort zeker opengaat.
 	const double Start2 = Harness.ElapsedSeconds;
 			while (Harness.ElapsedSeconds - Start2 < FireInterval * 3.0)
@@ -1819,8 +1843,55 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 				Harness.Inject(TEXT("Fire"), true);
 				Harness.Step();
 			}
-			return Before - Target->GetHealth();
+			return PlayerDamage;
 		};
+
+		// SCHADE-AFVAL, en dit is de meting die er tot vanavond niet was. De velden
+		// stonden in de data mét een uitleg, en het wapen las ze nergens — gevonden
+		// door de dode-veldensweep, niet door een test.
+		//
+		// PRECIES ÉÉN SCHOT per afstand, en vóór de reeks hieronder. De eerste
+		// versie hing achter die reeks en mat twee keer nul: het magazijn was leeg
+		// geschoten. En de reeks zelf vuurt drie vuurintervallen lang, dus daar
+		// landen er één tot drie — 22, 38, 15, 46 hp achter elkaar, waar je geen
+		// afval in kunt lezen.
+		auto OneShotDamageAt = [&](float DistanceCm) -> float
+		{
+			Target->SetActorLocation(Harness.Location() + Harness.Body->GetActorForwardVector() * DistanceCm);
+			Harness.Idle(0.2f);
+			for (int32 Correction = 0; Correction < 10; ++Correction)
+			{
+				Harness.AimAt(Target->GetActorLocation());
+				Harness.Step();
+			}
+			if (Weapon->IsReloading() || Weapon->GetAmmoInMagazine() < 2)
+			{
+				Weapon->StartReload(TEXT("TestTopUp"));
+				Harness.Idle(Weapon->GetReloadSeconds() + 0.3f);
+			}
+			Harness.Idle(FireInterval * 4.0f); // reeks breken: eerste schot is zuiver
+			PlayerDamage = 0.0f;
+			Harness.Inject(TEXT("Fire"), true);
+			Harness.Step();
+			Harness.Idle(0.1f);
+			return PlayerDamage;
+		};
+
+		{
+			const float Near = OneShotDamageAt(Weapon->GetFalloffStartCm() * 0.5f);
+			const float Far = OneShotDamageAt(Range * 0.90f);
+			Report(*this, TEXT("schade binnen de afvalgrens"), Near, TEXT("hp"),
+				*FString::Printf(TEXT("afval begint op %.0f cm"), Weapon->GetFalloffStartCm()));
+			Report(*this, TEXT("schade op 90%% van het bereik"), Far, TEXT("hp"),
+				*FString::Printf(TEXT("data zegt daar nog ~%.0f%%"), Weapon->GetFalloffMinFraction() * 100.0f));
+			if (Near > 0.0f && Far > 0.0f)
+			{
+				Report(*this, TEXT("verhouding ver/dichtbij"), Far / Near, TEXT("x"));
+				TestTrue(FString::Printf(TEXT("afval: ver doet minder dan dichtbij (%.0f tegen %.0f hp)"), Far, Near),
+					Far < Near);
+			}
+			TestTrue(TEXT("afval: er is überhaupt schade om te vergelijken"), Near > 0.0f);
+		}
 
 		// Een REEKS afstanden, want één meting die nul geeft zegt niet waar de grens
 		// ligt. De eerste versie prikte op 95% en 110% en kreeg twee keer nul; dat
@@ -1857,28 +1928,6 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		Target->SetActorLocation(Harness.Location() + Harness.Body->GetActorForwardVector() * 600.0f);
 		Harness.Idle(0.2f);
 		const float TargetHalfHeight = Target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-
-		// De teller waar DamageAiming hieronder op leest, en de inschrijving die hem
-		// vult. Alleen treffers waarvan de SCHUTTER de speler is tellen mee.
-		float PlayerDamage = 0.0f;
-		int32 ProbeShots = 0;
-		FEclipseEventSubscriptionHandle HitHandle;
-		UEclipseEventBusSubsystem* HitBus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
-		if (HitBus != nullptr)
-		{
-			AEclipseCharacter* PlayerBody = Harness.Body;
-			HitHandle = HitBus->Subscribe(EclipseTags::Event_Combat_HitLanded,
-				FEclipseEventNativeDelegate::CreateLambda(
-					[&PlayerDamage, PlayerBody](FGameplayTag, const FInstancedStruct& Payload)
-					{
-						const FEclipseCombatEventPayload* Landed = Payload.GetPtr<FEclipseCombatEventPayload>();
-						if (Landed != nullptr && Landed->Shooter.Get() == PlayerBody)
-						{
-							PlayerDamage += Landed->Damage;
-						}
-					}),
-				FEclipseCombatEventPayload::StaticStruct());
-		}
 
 		auto DamageAiming = [&](float ZOffset) -> float
 		{

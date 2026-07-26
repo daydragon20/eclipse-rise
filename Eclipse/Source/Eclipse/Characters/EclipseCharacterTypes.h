@@ -878,7 +878,20 @@ struct FEclipseWeaponRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 0))
 	float ReadySeconds = 0.5f;
 
-	/** Kogels per trekkerbeweging (hagel > 1). */
+	/**
+	 * Kogels per trekkerbeweging (hagel > 1). **NIET GELEZEN** — bewust, en met
+	 * een datum erbij zodat het niet stilletjes blijft liggen (26-07 avond).
+	 *
+	 * Geen van de vier verscheepte wapens heeft er meer dan één, dus aansluiten
+	 * zou betekenen dat ik de vuurweg — spreiding, terugslag, magazijn, afval —
+	 * openbreek voor gedrag dat vandaag niemand gebruikt. Het veld staat er omdat
+	 * het bij het profiel hoort dat Borderlands en Fortnite allebei hebben, en het
+	 * wordt aangesloten op de dag dat er een hagelwapen komt.
+	 *
+	 * De terugslag hoort dan per TREKKERBEWEGING te blijven en niet per kogel, en
+	 * het magazijn telt één ronde af — anders kost één schot met acht korrels acht
+	 * patronen.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel", meta = (ClampMin = 1))
 	int32 PelletsPerShot = 1;
 
