@@ -48,13 +48,14 @@ verzonnen getal.
 was maar een dood asset: `Cue_SFX_Weapon_RebelRifle_Shot_01` lag al in de repo.
 Wat er nóg ligt en niemand afspeelt: `Cue_SFX_Impact_BulletMetal_01` en twee
 voetstapcues. De impactcue vraagt een treffer-event dat er nog niet is; de
-voetstappen vragen anim-notifies. Het gevecht
-rékent goed — de schade klopt, de cadans klopt, kopschoten werken sinds vandaag,
-de vijand reageert. Wat ontbreekt is dat de speler het te horen of te zien krijgt:
-geen hitmarker (4), geen kopschot-signaal (5), geen wapengeluid (12), geen
-richting waar de klap vandaan kwam (14).
+voetstappen vragen anim-notifies.
 
-Dat is één samenhangend gat en geen vier losse klusjes. Het verklaart ook waarom
+**De drie die overblijven horen bij elkaar.** Het gevecht rékent goed — de schade
+klopt, de cadans klopt, kopschoten werken sinds vandaag, de vijand flincht, en je
+hóórt het schot. Wat nog ontbreekt is de bevestiging dat je RAAKT: geen hitmarker
+(4), geen kopschot-signaal (5), geen richting waar de klap vandaan kwam (14).
+
+Dat is één samenhangend gat en geen drie losse klusjes. Het verklaart ook waarom
 vechten leeg aanvoelde toen alles nog groen stond: elk systeem deed zijn werk in
 stilte.
 
@@ -63,20 +64,26 @@ het kruis gaat, elke keer, op 6,67 schoten per seconde, is geen wapen maar een
 laserpointer. Dit hoort bij dezelfde beslissing als de aim-snelheidsstraf uit de
 locomotie-audit: allebei geven ze mikken een prijs.
 
-## Wat ik zelf kan doen zonder beslissing
+## Wat ik zelf gedaan heb, en waar het ophoudt
 
-Niets van deze lijst zonder de owner. **Feedback is smaak-gevoelig** (hoe groot,
-hoe luid, hoe lang) en **spreiding/terugslag verandert elk gevecht**. Wat ik wél
-kan is de goedkoopste stap voorbereiden zodra hij ja zegt: de hitmarker gaat via
-de bestaande HUD en het bestaande `Event.Combat.ShotFired`, dus daar is geen nieuw
-systeem voor nodig.
+**Gedaan:** 3 (kopschoten), 6 (hit-reactie), 7 (schietpose), 12 (wapengeluid).
+Die vier hadden gemeen dat er geen smaakvraag in zat: de multiplier stond al in de
+data, de takes lagen al in de packs, en de cue lag al in de repo. Ze waren dood,
+niet onbeslist.
+
+**Waar het ophoudt.** De rest vraagt een oordeel dat niet van mij is. Hoe groot en
+hoe luid een hitmarker moet zijn is smaak; spreiding en terugslag veranderen elk
+gevecht. Wel voorbereid: de hitmarker kan via de bestaande HUD en het bestaande
+`Event.Combat.ShotFired`, dus daar is geen nieuw systeem voor nodig.
 
 ## Aanbeveling, in volgorde
 
 1. **Hitmarker** — kleinste ingreep, grootste verschil. Zonder bevestiging weet je
-   niet of je mist of dat de vijand veel leven heeft.
-2. **Wapengeluid** — de audiolaag en het schot-event bestaan allebei al.
-3. **Spreiding + terugslag** — samen met de aim-snelheidsstraf; het is één
-   ontwerpvraag ("wat kost schieten?").
-4. **Richtingsindicator bij schade** — pas zinvol als je vaker geraakt wordt dan
+   niet of je mist of dat de vijand veel leven heeft. Een eigen vorm bij een
+   kopschot lost meteen punt 5 op.
+2. **Spreiding + terugslag** — samen met de aim-snelheidsstraf uit de
+   locomotie-audit; het is één ontwerpvraag: *wat kost schieten?*
+3. **Richtingsindicator bij schade** — pas zinvol als je vaker geraakt wordt dan
    nu.
+4. **Impactgeluid** — de cue ligt klaar, maar er is nog geen treffer-event om hem
+   aan te hangen. Klein werk zodra dat er is.
