@@ -4010,4 +4010,126 @@ bool FEclipseClassVerbsFireWithoutBeingCalled::RunTest(const FString& Parameters
 	return true;
 }
 
+
+/**
+ * WAT DE SQUAD AAN EEN GEVECHT TOEVOEGT (owner-opdracht 26-07 avond, punt 1 —
+ * laag 6 van zes: "meet opnieuw wat een gevecht kost").
+ *
+ * Elk getal in de gevechts-audit is gemeten met een squad die niets deed. Sinds
+ * vanavond vuren er drie mee, en dat verandert de time-to-kill fundamenteel.
+ *
+ * A/B en geen SOM, en dat verschil is de hele reden dat deze meting bestaat: ik
+ * kán 154 hp/s en 196 hp/s bij elkaar optellen en er een tijd uit rekenen, maar
+ * een som gaat uit van perfect vuren zonder één gemist frame en ziet er net zo
+ * overtuigend uit als een meting. De doctrine van laag 4 maakt de A/B mogelijk:
+ * onder RECON zwijgt de squad, onder READY vuurt hij mee. Zelfde opstelling,
+ * zelfde doelwit, één knop verschil.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadChangesTimeToKill,
+	"Eclipse.Mission.Playthrough.SquadChangesTimeToKill",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseSquadChangesTimeToKill::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("ttk: strategie"), Strategy) || !TestNotNull(TEXT("ttk: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("ttk: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	if (!TestTrue(TEXT("ttk: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UEclipseHitscanWeaponComponent* Weapon = Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (!TestNotNull(TEXT("ttk: de speler heeft een wapen"), Weapon))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Eén ronde: doelwit met 300 hp (ongeveer twee Troopers), squad op de gegeven
+	// doctrine, speler vuurt continu. Meet hoe lang het duurt tot hij neer is.
+	auto SecondsToDown = [&](EEclipseSquadStance Stance) -> float
+	{
+		for (AEclipseSquadmateController* Mate : Mates)
+		{
+			Mate->SetDoctrine(Stance);
+		}
+		Harness.Idle(0.5f);
+
+		const FVector Spot = Harness.Location() + Harness.Body->GetActorForwardVector() * 700.0f;
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AEclipseCharacter* Dummy = Harness.World->SpawnActor<AEclipseCharacter>(
+			AEclipseCharacter::StaticClass(), Spot, FRotator::ZeroRotator, Params);
+		if (Dummy == nullptr)
+		{
+			return -1.0f;
+		}
+		Dummy->InitializeHealth(300.0f);
+		Harness.AimAt(Dummy->GetActorLocation());
+		Harness.Idle(0.1f);
+
+		const double Start = Harness.ElapsedSeconds;
+		while (Harness.ElapsedSeconds - Start < 12.0 && !Dummy->IsDowned())
+		{
+			Harness.Inject(TEXT("Fire"), true);
+			Harness.Step();
+		}
+		const float Taken = static_cast<float>(Harness.ElapsedSeconds - Start);
+		Dummy->Destroy();
+		Harness.Idle(0.5f);
+		return Dummy != nullptr && Taken < 12.0f ? Taken : -1.0f;
+	};
+
+	const float AloneSeconds = SecondsToDown(EEclipseSquadStance::Recon);
+	const float TogetherSeconds = SecondsToDown(EEclipseSquadStance::Ready);
+
+	Report(*this, TEXT("300 hp neer met de speler ALLEEN"), AloneSeconds, TEXT("s"),
+		TEXT("squad op recon: die zwijgt"));
+	Report(*this, TEXT("300 hp neer MET de squad erbij"), TogetherSeconds, TEXT("s"),
+		TEXT("squad op ready"));
+	if (AloneSeconds > 0.0f && TogetherSeconds > 0.0f)
+	{
+		Report(*this, TEXT("de squad maakt het gevecht korter met een factor"),
+			AloneSeconds / TogetherSeconds, TEXT("x"),
+			TEXT("hier hangt de hele gevechtsbalans aan"));
+	}
+
+	TestTrue(TEXT("ttk: het doelwit gaat in beide gevallen neer"),
+		AloneSeconds > 0.0f && TogetherSeconds > 0.0f);
+	TestTrue(TEXT("ttk: mét de squad gaat het sneller"), TogetherSeconds < AloneSeconds);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

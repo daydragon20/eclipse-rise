@@ -78,6 +78,41 @@ de rijen die VERANDERD zijn staan hier; de rest staat onveranderd in ronde 1.*
 
 ---
 
+## Ronde 3 — 26-07-2026, laat op de avond: de squad vecht mee
+
+*Ronde 2 sloot af met "punt 11 is de laatste omissie". Die is dezelfde avond nog
+gedicht (loadouts), en daarna kwam er iets bij dat elk getal in dit document
+raakt: de squad vuurt sinds vanavond uit zichzelf.*
+
+**Alle getallen in ronde 1 zijn gemeten met een squad die niets deed.** Dat staat
+er nu bij, want zonder die zin liegen ze.
+
+| # | Onderdeel | Ronde 1 (squad zweeg) | Nu (squad vecht mee) |
+|---|---|---|---|
+| 1 | **Time-to-kill, speler → vijand** | 100 hp valt in 0,65 s | **300 hp valt in 0,758 s.** Dezelfde 300 hp kost de speler alléén **2,108 s** |
+| 11 | **Wapenwissel** | Vier wapens, drie onbereikbaar | **Gedicht.** Loadout geeft primair + sidearm, RB wisselt, elk slot houdt zijn magazijn |
+
+**De squad maakt een gevecht 2,78× korter.** Dat is geen som maar een A/B: zelfde
+opstelling, zelfde doelwit van 300 hp, één verschil — de doctrine. Onder `recon`
+zwijgt de squad, onder `ready` vuurt hij mee. Dat de doctrine-laag die meting
+mogelijk maakte, is een prettig neveneffect van in lagen bouwen.
+
+### Wat dat betekent
+
+| Vraag | Antwoord |
+|---|---|
+| Is het gevecht nu te makkelijk? | **Waarschijnlijk.** Een factor 2,78 is groot. Maar dit is precies het soort ding dat je moet VOELEN — ik kan meten dat het sneller is, niet of het lekker is |
+| Moeten de vijanden sterker? | **Niet zomaar.** Het genre-antwoord is meer vijanden of betere posities, niet meer hp: een kogelspons voelt nooit goed. De vijandopstelling per missie bestaat sinds vanmorgen en is de knop die hierbij hoort |
+| Is de speler nu overbodig? | **Nee.** Hij levert nog steeds ~36% van de schade in dit gevecht (2,108 tegen 0,758 betekent dat de squad ongeveer 1,8× de speler doet). En de doctrine is van hem |
+
+### De rode draad na drie rondes
+
+De zestien punten uit ronde 1 hadden zes omissies. **Er is er nul over.**
+
+Wat ervoor in de plaats komt is geen lijst gaten meer maar een balansvraag, en
+dat is een ander soort werk: van "dit ontbreekt" naar "dit is te sterk". Die
+vraag kan ik niet in mijn eentje beantwoorden — hij hoort in een speelronde.
+
 ## De stand na ronde 2
 
 **Van de zestien punten uit ronde 1 waren er zes een omissie. Er is er nog één
