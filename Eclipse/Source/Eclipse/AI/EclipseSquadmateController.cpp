@@ -378,6 +378,21 @@ void AEclipseSquadmateController::UpdateEngagement()
 
 	bKillzoneEngaged = false;
 	AEclipseCharacter* Target = FindHostileInRange();
+
+	// EEN CONTACT MELDEN, één keer per engagement en niet per schot. Sinds de
+	// squad uit zichzelf vuurt, kan hij je positie weggeven met een schot dat jij
+	// niet gaf — en dan hoort er ergens te staan WIE er begon. Bij 6,67 schoten per
+	// seconde zou een regel per kogel dat juist onleesbaar maken.
+	//
+	// In het log en niet op de HUD: er is nog geen berichtenkanaal in beeld, en er
+	// een bouwen overlapt met de stem-vraag die bij de owner ligt (barks kosten een
+	// betaalde generatie). Dit is de goedkope helft die vandaag al waarde heeft.
+	if (Target != nullptr && !AutoTarget.IsValid())
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[SQUAD Contact] %s opent op eigen initiatief het vuur (%s) — dat verraadt de groep."),
+			*GetName(), *Target->GetName());
+	}
 	AutoTarget = Target;
 	if (bKillzoneEngaged)
 	{

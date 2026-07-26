@@ -49,6 +49,7 @@ Gears heeft AI-teamgenoten zonder commandolaag en is hier maar half bruikbaar.
 |---|---|---|---|---|
 | 13 | **Rules of engagement** | Ghost Recon: recon / assault / suppress | Vier: `recon` (vuurt niet tot er op hem geschoten wordt), `ready`, `overwatch`, `aggressive` | Keuze — de set van de referentie plus het kamikaze-kader van de owner |
 | 14 | **Een order blijft een belofte, óók onder de nieuwe basis** | Impliciet in het hele genre | Bij ALLE DRIE de basislagen wint een staande order: meelopen 0 verplaatsingen, dekking 0 zoektochten, 0 cm afdrijving | **Dit is de belangrijkste rij van de tabel** |
+| 15 | **Zegt de squad iets als hij UIT ZICHZELF handelt?** | Ghost Recon en Division leunen er zwaar op: "contact", "taking fire", "reloading" | **Nee.** Elke ORDER krijgt een gesproken antwoord (8 van 8), maar autonoom vuren, dekking zoeken en herladen zijn stil | **Nieuwe omissie, en hij ontstond vanavond** — er staat sinds vandaag een logregel bij een contact, maar dat is diagnose en geen spel |
 
 ---
 
@@ -60,6 +61,13 @@ sterk is. Waar wij achterlopen: de squad doet niets uit zichzelf."*
 **Dat is weg.** Alle drie de punten die daar onder vielen zijn gebouwd, en de
 klasse-verbs en de stance erbij. Van de twaalf punten uit ronde 1 waren er vier
 een omissie; er is er **nul** over.
+
+**Maar er kwam er één bij, en dat hoort een audit te doen.** Rij 15: de squad
+handelt nu uit zichzelf en zegt er niets bij. Rij 1 van ronde 1 vierde dat elke
+order een antwoord krijgt — precies daarom valt het op dat alles wat ze
+ONGEVRAAGD doen stil is. Dat is geen bouwfout: de tien gecachte zinnen passen geen
+van alle, en nieuwe laten maken kost een betaalde generatie. Het staat als keuze
+in het kliklijstje, met drie zinnen als voorstel.
 
 Wat ervoor in de plaats komt is dezelfde vraag als bij het gevecht: niet "wat
 ontbreekt" maar **"is dit nu te sterk"**. De squad maakt een gevecht 2,78× korter

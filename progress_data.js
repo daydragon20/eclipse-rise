@@ -147,6 +147,12 @@ window.PROGRESS_DATA = {
       "Druk Y tijdens Command Mode: dat cycelt door recon / ready / overwatch / aggressive, en die gelden meteen voor de hele squad",
       "Vraag jezelf een ding af: is dit gevecht nog spannend, of doet je squad het werk?"
     ] },
+    { titel: "Drie zinnen laten inspreken? Je squad handelt nu zelf en zegt er niets bij", prio: "gauw", waarom: "Sinds vanavond vuurt je squad uit zichzelf, zoekt dekking en herlaadt. Elke order krijgt een gesproken antwoord, maar alles wat ze OP EIGEN INITIATIEF doen is stil - en dat is precies waar Ghost Recon en Division het hardst op leunen. Er staan tien zinnen in de cache en geen enkele past. Nieuwe laten maken kost een betaalde ElevenLabs-aanroep, dus dat is jouw beslissing en niet die van mij. Ik heb de goedkope helft wel gedaan: er staat nu een regel in het log als een soldaat op eigen initiatief het vuur opent, zodat je na een ronde kunt zien wie je verraadde.", stappen: [
+      "MIJN VOORSTEL: drie korte zinnen per stem, zes in totaal. 'Contact.' (hij opent het vuur), 'Taking fire!' (hij zoekt dekking), 'Reloading!' (magazijn leeg)",
+      "Waarom deze drie: het zijn de enige drie momenten waarop een soldaat iets doet dat JOU raakt zonder dat jij het vroeg",
+      "Zeg 'ja, die drie' - dan zet ik ze in de seed en genereer ik ze in een keer",
+      "Of zeg 'nee' / 'later' - dan blijft het bij de logregel, en dat is geen defect"
+    ] },
     { titel: "Een audiobestand dat nu overbodig is - weggooien of houden?", prio: "later", waarom: "Cue_SFX_Foot_Metal_01 was de losse metaal-voetstap. Sinds vanavond komt metaal uit Footsteps_Volume_02 (zes varianten in plaats van een), dus deze cue wordt door niets meer aangeroepen. Weggooien is jouw beslissing en niet die van mij: het is betaalde audio. Hij kost verder niets, dus 'laten liggen' is ook een prima antwoord - dan zet ik er een regel bij zodat de sweep hem niet elke keer opnieuw meldt.", stappen: [
       "Zeg 'weg' of 'laten liggen'",
       "Meer is er niet aan"
