@@ -2164,6 +2164,103 @@ bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Speelt een missie MET geauthorde spawns, en telt wat er echt staat.
+//
+// Dit gat heb ik zelf gemaakt en meteen weer gedicht. Op 26-07 sloot ik
+// EnemySpawns aan, waarmee drie missies van vier vijanden naar hun eigen
+// opstelling gingen — en elke bestaande speelronde start TransitCheckpoint, de
+// enige missie ZONDER geauthorde spawns. De zwaarste wijziging van de ochtend
+// werd dus door geen enkele ronde aangeraakt.
+//
+// Wat deze test wel en niet doet. Wel: de missie via het echte laadpad starten
+// en de vijanden TELLEN die er komen te staan, tegen wat het sjabloon vraagt.
+// Niet: hem uitspelen of oordelen of het te zwaar is. Of vijf vijanden op een
+// site eerlijk is, is balans, en balans hoort de owner te spelen — een test die
+// daar een grens op zet, pint zijn ontwerp vast met mijn smaak.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseHeavyMissionSpawnsTest,
+	"Eclipse.Playthrough.AMissionWithAuthoredSpawnsPlacesThem",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseHeavyMissionSpawnsTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* MissionSub = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	if (!TestNotNull(TEXT("zwaar: strategie"), Strategy) || !TestNotNull(TEXT("zwaar: prep"), Prep)
+		|| !TestNotNull(TEXT("zwaar: missie"), MissionSub))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// WorkerHousing biedt de rescue aan, en die authordt twee batches. Underworks
+	// en Transit vallen af: de eerste is bij campagnestart al van de speler, de
+	// tweede is M1.1 zonder spawns. Dat is vannacht drie keer uitgezocht en staat
+	// hier zodat de volgende het niet opnieuw hoeft te doen.
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("zwaar: missie op WorkerHousing geselecteerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("WorkerHousing"), Error))
+		|| !TestTrue(FString::Printf(TEXT("zwaar: gelanceerd (%s)"), *Error), Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	// Wat het sjabloon vraagt, gelezen via dezelfde weg als de game mode.
+	int32 Wanted = 0;
+	for (const FEclipseEnemySpawnSet& Set : MissionSub->GetActiveEnemySpawns())
+	{
+		Wanted += Set.Count;
+	}
+	Report(*this, TEXT("vijanden die het sjabloon vraagt"), Wanted, TEXT(""), TEXT("uit EnemySpawns"));
+
+	// Zonder dit is de test een tautologie: een missie zonder batches zou hem
+	// even groen maken als een die perfect spawnt. Exact de valkuil die vannacht
+	// twee andere bewakers stil hield.
+	if (!TestTrue(TEXT("zwaar: deze missie authordt uberhaupt spawns (anders bewijst de telling niets)"), Wanted > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	int32 Hostiles = 0;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		const AEclipseCharacter* Body = *It;
+		if (Body != nullptr && Body != Harness.Body && !Body->IsPlayerSide())
+		{
+			++Hostiles;
+		}
+	}
+	Report(*this, TEXT("vijanden die er echt staan"), Hostiles, TEXT(""), TEXT("geteld in de wereld"));
+	Report(*this, TEXT("verschil met de oude vaste lus"), Hostiles - 4, TEXT(""),
+		TEXT("tot 26-07 kreeg elke missie er precies 4"));
+
+	// De kern: vraagt het sjabloon om N, dan staan er N. Dit is het enige stuk
+	// van de koppeling dat tot nu toe alleen door een logregel bewezen werd, en
+	// een logregel is geen bewijs — dat was vannacht de duurste les.
+	TestEqual(TEXT("zwaar: er staan precies zoveel vijanden als het sjabloon vraagt"), Hostiles, Wanted);
+
+	Harness.Shutdown();
+	return true;
+}
+
 // Elke geauthorde spawnbatch moet ook echt vijanden kunnen opleveren.
 //
 // Geschiedenis, want die verklaart de vorm van deze test. Vanochtend vroeg was
@@ -2234,6 +2331,22 @@ bool FEclipseAuthoredSpawnsAreConsumedTest::RunTest(const FString& Parameters)
 			continue;
 		}
 		TotalBatches += Mission->EnemySpawns.Num();
+
+		// Per missie en niet alleen als totaal. Ik meldde de owner eerst "15
+		// vijanden in plaats van 4", en dat leest als een verdrievoudiging pér
+		// missie terwijl het het totaal over drie missies is. Een optelsom die als
+		// per-stuk leest, is een verkeerd balansgetal.
+		int32 ThisMission = 0;
+		for (const FEclipseEnemySpawnSet& Set : Mission->EnemySpawns)
+		{
+			ThisMission += Set.Count;
+		}
+		if (ThisMission > 0)
+		{
+			AddInfo(FString::Printf(TEXT("spawns: '%s' zet %d vijanden neer (was 4 tot 26-07, dus %+d)"),
+				*Data.AssetName.ToString(), ThisMission, ThisMission - 4));
+		}
+
 		for (const FEclipseEnemySpawnSet& Set : Mission->EnemySpawns)
 		{
 			TotalEnemies += Set.Count;
@@ -2254,6 +2367,39 @@ bool FEclipseAuthoredSpawnsAreConsumedTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("geauthorde spawnbatches"), TotalBatches, TEXT(""), TEXT("over alle missies"));
 	Report(*this, TEXT("vijanden die die batches vragen"), TotalEnemies, TEXT(""),
 		TEXT("de game mode plaatst er sinds 26-07 precies dit aantal"));
+
+	// Hoeveel optionals hangen aan een conditie, en aan welke? Sinds het alarm op
+	// de eerste waarneming zit (26-07) is dat geen boekhouding meer maar een
+	// balansfeit: een bRequiresNoAlarm-optional is vanaf nu alleen haalbaar als je
+	// de hele missie ONGEZIEN doet.
+	//
+	// Uit de ASSETS gemeten en niet uit de setup-scripts. Dat onderscheid kostte
+	// vanochtend een verkeerde conclusie: de scripts authoren geen EnemySpawns,
+	// dus noteerde ik "nog niets ingevuld" — en de assets bleken er vijf te
+	// hebben, in de editor gezet.
+	int32 NoAlarmOptionals = 0;
+	int32 NoCasualtyOptionals = 0;
+	for (const FAssetData& Data : Found)
+	{
+		const UEclipseMissionAsset* Mission = Cast<UEclipseMissionAsset>(Data.GetAsset());
+		if (Mission == nullptr)
+		{
+			continue;
+		}
+		for (const FEclipseObjectiveDef& Objective : Mission->Objectives)
+		{
+			if (!Objective.bOptional)
+			{
+				continue;
+			}
+			NoAlarmOptionals += Objective.bRequiresNoAlarm ? 1 : 0;
+			NoCasualtyOptionals += Objective.bRequiresNoCasualties ? 1 : 0;
+		}
+	}
+	Report(*this, TEXT("optionals die stilte eisen"), NoAlarmOptionals, TEXT(""),
+		TEXT("kosten je sinds 26-07 elke detectie; 0 = het alarm kost vandaag nog niets"));
+	Report(*this, TEXT("optionals die nul gewonden eisen"), NoCasualtyOptionals, TEXT(""),
+		TEXT("betalen sinds 26-07 uit zonder dat iets ze hoeft af te vinken"));
 	return true;
 }
 
