@@ -912,7 +912,62 @@ void AEclipsePlayerController::PlayerTick(float DeltaSeconds)
 	// achter op de speler — 16 ms, en dat is de prijs voor de volgorde hierboven.
 	bLookedThisFrame = false;
 
+	UpdateBodyTurn();
+
 	Super::PlayerTick(DeltaSeconds);
+}
+
+void AEclipsePlayerController::UpdateBodyTurn()
+{
+	// Ver genoeg wegkijken draait het lichaam alsnog mee (locomotie-audit 26-07).
+	//
+	// Sinds het camera-relatieve model volgt het lichaam de camera alleen tijdens
+	// bewegingsinvoer — dat voorkomt voetslip bij elk klein kijkbeweginkje. Maar
+	// zonder bovengrens kun je stilstaand 180 graden van je eigen lichaam
+	// wegkijken, en dat is erger dan de slip die het moest vermijden: je personage
+	// staat dan letterlijk over zijn schouder te kijken.
+	//
+	// 90 graden is waar de referentie het ook legt. Gears en The Division draaien
+	// het lichaam bij ongeveer een kwartslag na, met een draai-animatie erbij.
+	//
+	// CORRECTIE 26-07 avond. Hier stond "die animatie zit niet in de packs
+	// (nagekeken: geen enkele Turn_*-take)". Dat was fout, en het is het soort fout
+	// dat zich vastzet: ik keek in SciFiCharacter, maar de SPELER is Belica, en
+	// ParagonLtBelica levert Idle_Turn_90_Left/Right, Idle_Turn_180_Left/Right en
+	// drie TurnInPlace-varianten. Een "bestaat niet" hoort te zeggen WAAR er
+	// gekeken is — anders leest een verkeerde bevinding als iets wat al onderzocht
+	// is, en blijft deze drempel op 90 staan om een reden die niet bestaat.
+	//
+	// Tot de takes zijn aangesloten schuiven de voeten een fractie bij een
+	// kwartslag of meer; nooit tijdens het kleine corrigeren waar dit model voor
+	// gemaakt is. Zodra ze erin zitten kan de drempel omlaag.
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+	{
+		const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
+		const float ViewYaw = static_cast<float>(GetControlRotation().Yaw);
+		const float Apart = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYaw, ViewYaw));
+		if (Apart > IdleTurnThresholdDegrees)
+		{
+			// DE DRAAIPOSE ERBIJ (26-07 avond, punt 7). Alleen op het moment dat de
+			// drempel gepasseerd wordt, niet elk frame daarna: anders herstart de
+			// take zichzelf zestig keer per seconde en bevriest hij.
+			if (!bBodyTurning)
+			{
+				bBodyTurning = true;
+				const float Signed = FMath::FindDeltaAngleDegrees(BodyYaw, ViewYaw);
+				Body->PlayTurnPose(Signed > 0.0f);
+			}
+			Body->SetOrientationFollowsCameraNow(true);
+		}
+		else if (Apart < IdleTurnThresholdDegrees * 0.5f)
+		{
+			// Ruim onder de drempel: de draai is af en een volgende mag weer.
+			// Hysterese, want precies op de drempel zou hij bij elke trilling
+			// opnieuw willen starten.
+			bBodyTurning = false;
+		}
+	}
+
 }
 
 void AEclipsePlayerController::ApplyRecoil(float DeltaSeconds)
@@ -1063,39 +1118,6 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 {
 	// Zelf kijken pauzeert het terugslagherstel (zie PlayerTick).
 	bLookedThisFrame = true;
-
-	// Ver genoeg wegkijken draait het lichaam alsnog mee (locomotie-audit 26-07).
-	//
-	// Sinds het camera-relatieve model volgt het lichaam de camera alleen tijdens
-	// bewegingsinvoer — dat voorkomt voetslip bij elk klein kijkbeweginkje. Maar
-	// zonder bovengrens kun je stilstaand 180 graden van je eigen lichaam
-	// wegkijken, en dat is erger dan de slip die het moest vermijden: je personage
-	// staat dan letterlijk over zijn schouder te kijken.
-	//
-	// 90 graden is waar de referentie het ook legt. Gears en The Division draaien
-	// het lichaam bij ongeveer een kwartslag na, met een draai-animatie erbij.
-	//
-	// CORRECTIE 26-07 avond. Hier stond "die animatie zit niet in de packs
-	// (nagekeken: geen enkele Turn_*-take)". Dat was fout, en het is het soort fout
-	// dat zich vastzet: ik keek in SciFiCharacter, maar de SPELER is Belica, en
-	// ParagonLtBelica levert Idle_Turn_90_Left/Right, Idle_Turn_180_Left/Right en
-	// drie TurnInPlace-varianten. Een "bestaat niet" hoort te zeggen WAAR er
-	// gekeken is — anders leest een verkeerde bevinding als iets wat al onderzocht
-	// is, en blijft deze drempel op 90 staan om een reden die niet bestaat.
-	//
-	// Tot de takes zijn aangesloten schuiven de voeten een fractie bij een
-	// kwartslag of meer; nooit tijdens het kleine corrigeren waar dit model voor
-	// gemaakt is. Zodra ze erin zitten kan de drempel omlaag.
-	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
-	{
-		const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
-		const float ViewYaw = static_cast<float>(GetControlRotation().Yaw);
-		const float Apart = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYaw, ViewYaw));
-		if (Apart > IdleTurnThresholdDegrees)
-		{
-			Body->SetOrientationFollowsCameraNow(true);
-		}
-	}
 
 	const FVector2D Axis = Value.Get<FVector2D>();
 	const int32 InvertOverride = CVarEclipseInvertLookY.GetValueOnGameThread();

@@ -233,6 +233,19 @@ void AEclipseCharacter::PlayReloadPose(float Seconds)
 	PlayOneShotPose(LocomotionSet.Reload, FMath::Max(Seconds, 0.1f), 0.85f);
 }
 
+void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
+{
+	UAnimSequence* Clip = bTurningRight ? LocomotionSet.TurnRight : LocomotionSet.TurnLeft;
+	if (Clip == nullptr)
+	{
+		return; // geen take voor dit lichaam: draaien zonder animatie, zoals voorheen
+	}
+	// Half gewicht: draaien is een beweging van het onderlichaam en mag een
+	// schietpose of een klap niet overrulen. En de duur uit de take zelf, want
+	// die weet hoe lang hij is.
+	PlayOneShotPose(Clip, FMath::Max(Clip->GetPlayLength(), 0.15f), 0.85f);
+}
+
 void AEclipseCharacter::PlayHitReactPose()
 {
 	// 0,25 s en vol gewicht. De referentie (Gears, Division, Destiny) zit op
@@ -868,6 +881,8 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"));
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"));
 	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"));
+	LocomotionSet.TurnLeft = ResolveClip(BodyDef.TurnLeftAnim, TEXT("draai links"));
+	LocomotionSet.TurnRight = ResolveClip(BodyDef.TurnRightAnim, TEXT("draai rechts"));
 	LocomotionSet.CrouchTransition = ResolveClip(BodyDef.CrouchTransitionAnim, TEXT("crouch-transition"));
 
 	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();

@@ -112,6 +112,10 @@ HITREACT_KEYWORDS = ("hit_react", "hitreact", "impact", "flinch", "hit")
 # Herladen (26-07 avond). "hip" boven "ironsights": de speler herlaadt meestal
 # zonder te mikken, en de heupvariant leest ook als je wel mikt.
 RELOAD_KEYWORDS = ("reload_rifle_hip", "reload_rifle", "reload_pistol", "reload")
+# Draaien op de plek (26-07 avond, punt 7). De kwartslag boven de halve: een
+# 90-take dekt het geval dat vaak voorkomt, een 180 is de uitzondering.
+TURNLEFT_KEYWORDS = ("idle_turn_90_left", "turn_90_left", "turn_left", "turninplace_left")
+TURNRIGHT_KEYWORDS = ("idle_turn_90_right", "turn_90_right", "turn_right", "turninplace_right")
 SHOOT_KEYWORDS = ("fire_rifle_hip", "fire_rifle", "primary_fire", "shoot", "fire", "attack")
 DEATH_KEYWORDS = ("death", "die", "dead")
 
@@ -176,6 +180,8 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     death = pick_anim(anim_pack, DEATH_KEYWORDS)
     hit_react = pick_anim(anim_pack, HITREACT_KEYWORDS)
     reload = pick_anim(anim_pack, RELOAD_KEYWORDS)
+    turn_left = pick_anim(anim_pack, TURNLEFT_KEYWORDS)
+    turn_right = pick_anim(anim_pack, TURNRIGHT_KEYWORDS)
     crouch_trans = pick_directional(anim_pack, CROUCHTRANS_KEYWORDS, ("crouch",))
     walk_back = pick_directional(anim_pack, WALK_STEMS, BACK_KEYS)
     walk_left = pick_directional(anim_pack, WALK_STEMS, LEFT_KEYS)
@@ -199,11 +205,11 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     if not idle:
         unreal.log_warning(f"{row_name}: geen idle-take in {anim_pack} — deze body krijgt geen pose")
     lit, shade = TINTS.get(row_name, ((0.20, 0.20, 0.22), (0.07, 0.07, 0.09)))
-    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}","{hit_react}","{reload}","{crouch_trans}",'
+    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}","{hit_react}","{reload}","{turn_left}","{turn_right}","{crouch_trans}",'
                 f'"{walk_back}","{walk_left}","{walk_right}","{run_back}","{run_left}","{run_right}",true,'
                 f'{color(lit)},{color(shade)},1.0,-90.0,-90.0')
 
-csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,HitReactAnim,ReloadAnim,CrouchTransitionAnim,"
+csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,HitReactAnim,ReloadAnim,TurnLeftAnim,TurnRightAnim,CrouchTransitionAnim,"
             "WalkBackAnim,WalkLeftAnim,WalkRightAnim,RunBackAnim,RunLeftAnim,RunRightAnim,bToonRestyle,"
             "TintLit,TintShade,MeshScale,MeshZOffset,MeshYaw\n" + "\n".join(rows))
 

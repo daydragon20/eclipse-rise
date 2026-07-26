@@ -160,7 +160,25 @@ private:
 	 * 90 graden, zoals Gears en The Division. Lager kan zodra er een
 	 * draai-animatie in de packs zit; nu zouden de voeten te vaak schuiven.
 	 */
-	static constexpr float IdleTurnThresholdDegrees = 90.0f;
+	/**
+	 * Bij hoeveel graden verschil tussen kijk- en lichaamsrichting het lichaam
+	 * meedraait (punt 7).
+	 *
+	 * 26-07 avond OMLAAG van 90 naar 60. De 90 stond er omdat ik dacht dat er geen
+	 * draai-animatie bestond; die is er wel (ParagonLtBelica levert
+	 * Idle_Turn_90_Left/Right), dus de reden voor de hoge drempel is weg.
+	 *
+	 * 60 en niet lager: de take is een kwartslag, en het lichaam draait hier een
+	 * variabel aantal graden. Hoe dichter de gedraaide hoek bij de 90 van de take
+	 * ligt, hoe minder je het verschil ziet — maar wachten tot 90 betekent dat je
+	 * eerst een halve slag over je schouder staat te kijken. 60 is waar die twee
+	 * elkaar raken, en het ligt in de band waar Gears en The Division het ook
+	 * leggen (45-90).
+	 */
+	static constexpr float IdleTurnThresholdDegrees = 60.0f;
+
+	/** Loopt er een draai? Voorkomt dat de take zichzelf elk frame herstart. */
+	bool bBodyTurning = false;
 
 	/**
 	 * TERUGSLAG (owner-opdracht 26-07 avond, punt 4). Het wapen duwt je kruis
@@ -174,6 +192,16 @@ private:
 
 
 	void ApplyRecoil(float DeltaSeconds);
+
+	/**
+	 * Draait het lichaam bij als de kijkrichting te ver van het lichaam af staat
+	 * (punt 7). ELK FRAME en niet in HandleLook, en dat is de reparatie van
+	 * 26-07 avond: die versie las de rotatie van vóór de flick, dus bij één snelle
+	 * muisbeweging kwam er nooit een tweede kijkgebeurtenis die het verschil zag.
+	 * Het FEIT is "kijkrichting en lichaam staan ver uit elkaar", niet "er kwam
+	 * kijkinvoer binnen".
+	 */
+	void UpdateBodyTurn();
 
 	float PendingRecoilKickPitch = 0.0f;
 	float PendingRecoilKickYaw = 0.0f;

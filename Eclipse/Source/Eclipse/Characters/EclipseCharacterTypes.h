@@ -595,6 +595,20 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	TSoftObjectPtr<UAnimSequence> ReloadAnim;
 
 	/**
+	 * Draaien op de plek (26-07 avond, punt 7). Een kwartslag links en rechts.
+	 *
+	 * De speler is Belica en die levert `Idle_Turn_90_Left/Right`; de SciFi-packs
+	 * hebben ze niet. Ontbreken ze, dan draait het lichaam nog steeds mee en
+	 * schuiven de voeten een fractie — hetzelfde gedrag als vóór vanavond, en
+	 * dat is de juiste terugval (14.3.5: luid degraderen, niet stilvallen).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> TurnLeftAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> TurnRightAnim;
+
+	/**
 	 * Hurken en opstaan (locomotie-audit 26-07, punt 13). Zonder deze take
 	 * verspringt het lichaam tussen staand en gehurkt zonder tussenbeweging — de
 	 * capsule krimpt, de pose knipt. SciFiCharacter levert Crouch_to_Stand; die

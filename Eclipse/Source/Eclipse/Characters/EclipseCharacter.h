@@ -134,6 +134,13 @@ public:
 	 */
 	void PlayReloadPose(float Seconds);
 
+	/**
+	 * Speel de draaipose (26-07 avond, punt 7). De DUUR komt uit de take zelf en
+	 * niet uit een getal van mij: een draai die korter wordt afgekapt dan hij is,
+	 * ziet er erger uit dan geen draai.
+	 */
+	void PlayTurnPose(bool bTurningRight);
+
 	/** De hoofd-hitbox, of null als dit lichaam geen hoofd-socket heeft. */
 	const USphereComponent* GetHeadHitbox() const { return HeadHitbox; }
 

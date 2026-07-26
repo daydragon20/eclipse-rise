@@ -2336,4 +2336,71 @@ bool FEclipseRemainingDefaultsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * TURN-IN-PLACE (owner-opdracht 26-07, punt 7 — afgemaakt op de avond).
+ *
+ * Ik verklaarde dit 's ochtends dood met "geen enkele pack heeft een
+ * draai-animatie". Ik had alleen in SciFiCharacter gekeken; de SPELER is Belica,
+ * en ParagonLtBelica levert Idle_Turn_90_Left/Right plus drie TurnInPlace-takes.
+ *
+ * Drie dingen: de take bereikt het lichaam, boven de drempel draait het lichaam
+ * mee, en eronder blijft het staan. Dat laatste is het punt van een drempel —
+ * zonder ondergrens draait je personage mee met elke trilling van je hand.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseTurnInPlaceFollowsTheCamera,
+	"Eclipse.Feel.Layer2.TurnInPlaceFollowsTheCamera",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseTurnInPlaceFollowsTheCamera::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// De muistak, om dezelfde reden als bij de 180-omkering: dit is één flick, en
+	// op de stick is kijken graden per seconde.
+	EclipseFeelTest::FForceGamepadScope Mouse(0);
+
+	// Stilstaan. Turn-in-place gaat over draaien ZONDER te lopen.
+	Harness.Idle(0.5f);
+
+	auto BodySweepAfterFlick = [&Harness](float Degrees) -> float
+	{
+		const float Before = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+		Harness.Inject(TEXT("Look"), FVector2D(Degrees / Harness.Tuning->MouseLookScale, 0.0f));
+		Harness.Step();
+		Harness.Idle(1.2f); // de draai laten aflopen
+		return FMath::Abs(FMath::FindDeltaAngleDegrees(Before, static_cast<float>(Harness.Body->GetActorRotation().Yaw)));
+	};
+
+	// --- onder de drempel: het lichaam blijft staan -------------------------
+	const float SmallSweep = BodySweepAfterFlick(40.0f);
+	Report(*this, TEXT("lichaam gedraaid na een flick van 40 gr"), SmallSweep, TEXT("gr"),
+		TEXT("hoort ~0 te zijn: onder de drempel kijk je met je hoofd"));
+
+	// --- boven de drempel: het lichaam volgt --------------------------------
+	// Terug naar recht vooruit, dan een flick die de drempel wél haalt.
+	Harness.Inject(TEXT("Look"), FVector2D(-40.0f / Harness.Tuning->MouseLookScale, 0.0f));
+	Harness.Step();
+	Harness.Idle(1.2f);
+
+	const float BigSweep = BodySweepAfterFlick(75.0f);
+	Report(*this, TEXT("lichaam gedraaid na een flick van 75 gr"), BigSweep, TEXT("gr"),
+		TEXT("drempel staat op 60"));
+
+	TestTrue(FString::Printf(TEXT("turn-in-place: onder de drempel blijft het lichaam staan (%.0f gr)"), SmallSweep),
+		SmallSweep < 15.0f);
+	TestTrue(FString::Printf(TEXT("turn-in-place: boven de drempel draait het lichaam mee (%.0f gr)"), BigSweep),
+		BigSweep > 40.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

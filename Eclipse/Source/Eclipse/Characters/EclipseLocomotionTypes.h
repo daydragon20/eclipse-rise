@@ -95,6 +95,17 @@ struct FEclipseLocomotionSet
 	UPROPERTY()
 	TObjectPtr<UAnimSequence> Reload = nullptr;
 
+	/**
+	 * Draaien op de plek (26-07 avond, punt 7). ParagonLtBelica levert
+	 * Idle_Turn_90_Left/Right; ik verklaarde ze 's ochtends ten onrechte
+	 * onbestaand door in de verkeerde pack te kijken.
+	 */
+	UPROPERTY()
+	TObjectPtr<UAnimSequence> TurnLeft = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UAnimSequence> TurnRight = nullptr;
+
 	/** Hurken/opstaan (26-07, audit punt 13). */
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> CrouchTransition = nullptr;
