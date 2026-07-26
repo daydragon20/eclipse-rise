@@ -833,7 +833,7 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 			AddInfo(FString::Printf(TEXT("event gevuurd: %s"), *Tag.ToString()));
 		}
 		Report(*this, TEXT("verschillende events gevuurd in deze missie"), Fired.Num(), TEXT(""),
-			TEXT("van de 29 in de catalogus — de rest vuurt buiten een missie of nergens"));
+			TEXT("de rest vuurt buiten een missie — sinds 26-07 is gemeten dat ELK gecatalogiseerd event ergens afgaat"));
 
 		// Zelfde principe één laag lager: welke objective-TYPES kwamen langs? Ook
 		// dat is dekking die je alleen ziet als de ronde het zelf zegt. M1.1 heeft
