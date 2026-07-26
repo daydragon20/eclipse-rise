@@ -421,6 +421,7 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 - Save contract: `12_technical_design.md` §12.3.
 - Performance budgets: `12_technical_design.md` §12.4.
 - Visual target + hardware reality: `15_visual_quality_charter.md`.
+- **Alle gemeten feel-waarden opzoeken:** `python Eclipse/Tools/show_measurements.py [woord]` — leest het laatste testlog en toont de metingen per test (174 stuks). Bijvoorbeeld `… sprint` of `… camera`. Het houdt geen eigen kopie bij, dus het kan niet verouderen ten opzichte van de tests; draai de suite als je verse cijfers wilt.
 
 ---
 
