@@ -63,9 +63,21 @@ staat, is in dit district geen lamp maar een lichtgekleurd blok — hij zit dan 
 dezelfde luminantieband als de muur ernaast. De behuizing hoort juist wél in de
 gewone lit-band, anders gloeit het metaal mee en verdwijnt de vorm.
 
-Dus per armatuur **twee materiaalslots**: behuizing door de toon-master (15.5:
-basistexture wordt luminantie-detail, palet bepaalt de kleur), emissief deel in de
-Glow-band. Dat is precies de één-stijl-wet toepassen op een PBR-pack, niet ernaast.
+**Correctie op mezelf, na in het pack te kijken in plaats van het aan te nemen.**
+Ik schreef hier eerst "per armatuur twee materiaalslots". Dat klopt niet: het pack
+levert **17 meshes, 17 materialen en 17 emissive-TEXTUREN** — één materiaal per
+armatuur, met de scheiding tussen behuizing en lichtvlak *in de textuur*. De
+emissive map is zwart waar het metaal zit en fel waar de lamp zit.
+
+Dat is beter nieuws dan twee slots, want de toon-master heeft de twee ingangen die
+je dan nodig hebt al: `AlbedoTex` (wordt luminantie-detail, 15.5) en `MaskTex`.
+Eén materiaal-instantie per armatuur, twee texturen erin, palet bepaalt de kleur.
+
+**Wat ik nog moet nakijken en niet kan zonder editor:** of `MaskTex` in de
+toon-master de Glow-band kan aansturen of alleen albedo mengt (hij wordt nu
+gebruikt voor de olievlek-decals en de plein-apron). Als het tweede zo is, is er
+één materiaal-ingang bij nodig — een halve dag, geen nieuw systeem. Dat is de
+enige open technische vraag in dit plan.
 
 **De opbouw, uit de referentie (RayTracedCinematicLightin) — de OPBOUW, niet de techniek:**
 
