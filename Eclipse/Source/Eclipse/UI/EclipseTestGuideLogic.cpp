@@ -29,7 +29,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Crouch,
 			  TEXT("je zakt 52 cm (176 -> 124 cm) en gaat naar 150 cm/s. Beide zijn recent gerepareerd — de toets was dood en je zakte daarna te diep. Gebeurt er niets of voelt de hoogte raar: zeg het") },
 			{ EEclipseGuideSignal::Jump,
-			  TEXT("je komt van de grond. Deze actie bestond tot vandaag helemaal niet — er was geen JumpAction in het project") },
+			  TEXT("je komt 127 cm omhoog en bent ruim een seconde in de lucht. Twee dingen die je niet ZIET maar wel merkt: springen mag nog 0,11 s nadat je van een rand liep, en een druk 0,15 s vóór de landing wordt onthouden. Voelt een gemiste sprong oneerlijk, dan zijn dat de vensters om aan te draaien") },
 			{ EEclipseGuideSignal::Aim,
 			  TEXT("de camera trekt in van 300 naar 165 cm en de FOV versmalt van 80 naar 64. Bijeffect dat je zult merken: je reikt mikkend ~135 cm VERDER, want de kogel vertrekt vanaf de camera. LET OP: op de controller mikt LT alleen BUITEN Command Mode; tijdens de Q/LB-hold is LT 'vorige soldaat'") },
 			{ EEclipseGuideSignal::ToggleView,
