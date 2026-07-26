@@ -75,6 +75,13 @@ Dat dit pas om half drie 's nachts boven kwam, komt doordat geen enkele test ooi
 
 **Het hele project is daarna op dit patroon nagelopen** (elke plek die een tick aan- of uitzet tegen de vlag die bepaalt of dat kán): vier plekken, en het personage was de enige foute. Het wapen en de objective-trigger staan bewust en consequent op "nooit tikken", en de Command Mode-component gebruikt exact het juiste patroon — `bCanEverTick = true` mét `bStartWithTickEnabled = false`. Dat is wrang: **het goede voorbeeld stond al in de component die op ditzelfde personage zit**, twee bestanden verderop.
 
+**En toen het wapen zelf, waar drie getallen stonden die niemand had nagemeten.** Het vuurtempo klopt: 14 schoten in 2 s tegen de geschreven 0,15 s interval — het eerste schot is gratis, daarna dertien op tempo. De andere twee niet:
+
+- **Je bereik is 47 m, niet de 50 die in de data staat.** Gemeten raak je tot 4700 cm en mis je op 4900. De kogel vertrekt vanaf de **camera**, en die staat 300 cm achter je, dus een deel van het bereikbudget gaat op achter je rug. Bijkomend: tijdens het mikken trekt de camera in tot 165 cm, dus dan reik je ~135 cm **verder**. Mikken verlengt je wapen, en dat staat in geen enkel getal.
+- **Kopschoten doen niets.** 22 hp op de borst, 22 hp op het hoofd. De regel vermenigvuldigt met 2,5 als de geraakte bone "head" heet, maar de trace loopt op `ECC_Pawn` en raakt dus de capsule — en die heeft geen bones. Het code-commentaar noemt dat een graybox-beperking; dat is te mild, want ook met echte skeletten blokkeert de capsule eerst. **Structureel, niet tijdelijk.**
+
+Allebei bewust **niet** gerepareerd: het zijn precies de getallen waar jouw openstaande balansvraag over gaat, en die verplaatsen terwijl jij hem beantwoordt is onbehoorlijk. Eerst kiezen, dan repareren.
+
 **Drie stiltes, en de sweep die erop volgde.** Je opdracht vroeg te noteren of er iets stils gebeurt dat luid had moeten zijn. Dat bleek geen bijvangst maar een categorie:
 
 1. **Een missie logde haar start wel en haar einde niet.** Zie hieronder — dit vond de speelronde.
