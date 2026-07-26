@@ -536,9 +536,13 @@ struct FEclipseBodyDefRow : public FTableRowBase
 
 /**
  * Named story-character slot (DT_NamedCharacters — step-3 MetaHuman pipeline).
- * The owner authors MH_<Name> in MetaHuman Creator (phase0/metahuman_recipes.md);
- * until that asset exists the slot dresses itself from FallbackBodyDef, so the
- * missing face never blocks missions or dialogue wiring (GDD 14.3.5).
+ * The owner authors MH_<Name> in MetaHuman Creator (phase0/metahuman_recipes.md).
+ *
+ * NOG NIET AANGESLOTEN — deze comment beschreef tot 26-07 in tegenwoordige tijd
+ * een terugval ("dresses itself from FallbackBodyDef") die nergens gebeurt: geen
+ * enkele regel C++ laadt DT_NamedCharacters, ook al bestaat het asset en staat
+ * het veld op FEclipseCampaignSetupAsset. Wie een rij invult ziet dus niets.
+ * De vorm ligt klaar; de laadstap is stap 3 en die is niet gezet.
  */
 USTRUCT(BlueprintType)
 struct FEclipseNamedCharacterRow : public FTableRowBase
@@ -552,11 +556,11 @@ struct FEclipseNamedCharacterRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	TSoftObjectPtr<USkeletalMesh> MetaHumanMesh;
 
-	/** DT_BodyDefs row that stands in while the MetaHuman is absent. */
+	/** DT_BodyDefs row die moet instaan zolang de MetaHuman ontbreekt (nog niet gelezen). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	FName FallbackBodyDef;
 
-	/** Rebel / Dominion — drives tint and bark selection later (GDD 08/16). */
+	/** Rebel / Dominion — bedoeld voor tint en bark-keuze (GDD 08/16; nog niet gelezen). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Named")
 	FName Faction;
 };

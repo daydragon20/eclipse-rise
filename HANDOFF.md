@@ -340,7 +340,7 @@ naast het scherm.
 
 **Wat de nacht van 25→26 juli aan de wachtrij heeft toegevoegd** (uitgewerkt in §1 en §4 hierboven — hier alleen de kop, zodat deze lijst niet zijn eigen tweede versie wordt):
 
-- **Zes mechanismen die bestaan maar tijdens spelen niet bereikbaar zijn:** de camera-blend (gerepareerd), kopschoten, het alarm, twee klasse-verbs, acht ingesproken squad-zinnen, en de +20-stretchbonus. Alleen de eerste is gefixt; de rest vraagt een ontwerpbeslissing en staat in §4.
+- **Zeven mechanismen die bestaan maar tijdens spelen niet bereikbaar zijn:** de camera-blend (gerepareerd), kopschoten, het alarm, twee klasse-verbs, acht ingesproken squad-zinnen, de +20-stretchbonus, en `DT_NamedCharacters` (het asset bestaat, het veld staat op de campagne-setup, maar geen enkele regel C++ laadt de tabel — wie daar een naam invult ziet niets). Alleen de eerste is gefixt; de rest vraagt een ontwerpbeslissing en staat in §4. De zevende vond ik door de omgekeerde vraag te stellen: niet "welke code mist een aanroep" maar **"welk tuningveld kan de owner verdraaien zonder dat iets het leest"** — dat leverde precies twee dode velden op, allebei in die tabel.
 - **Het goedkoopste werk dat er ligt** is de barks aansluiten: opnames én stemsysteem bestaan al, het is één consument op de eventbus. Let op de mismatch in de woordenlijst (§4 punt 19).
 - **De grootste post blijft §8 FEEDBACK**, en er ligt nu een blok *"wat §8 moet weten voordat het gebouwd wordt"* in `phase0/FEEL_AUDIT.md` met vier gemeten valkuilen.
 - **De feel-audit is van beredeneerd naar gemeten gegaan.** De eindstand-tabel bovenaan dat document zegt per gebied wat er staat en waar het bewijs zit; twee rijen bleken bij het nameten zélf fout.
