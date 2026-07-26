@@ -1187,4 +1187,157 @@ bool FEclipseSquadRefusalIsAnAnswerTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Elk ordertype krijgt precies één antwoord — alle vier, in een echte missie.
+//
+// Van de vier orders (MoveTo, FocusTarget, Hold, Regroup) draaide er tot nu toe
+// één end-to-end: de speelronde geeft MoveTo. FocusTarget kwam er via de
+// weigeringstest bij, maar alleen op zijn afwijzende tak. Hold en Regroup waren
+// NOOIT in een levende missie gegeven — de beslisregels zijn als pure functie
+// getest, de weg erboven niet.
+//
+// Dat is dezelfde soort gat als bij de weigeringen: alles groen, halve
+// woordenschat onbeproefd. Deze test geeft alle vier de orders aan een echte
+// squad en controleert het contract dat GDD 8.4 stelt: elke order krijgt precies
+// één antwoord, nooit nul (stilte) en nooit twee (dubbel geboekt).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEveryOrderIsAnsweredTest,
+	"Eclipse.Playthrough.EveryOrderTypeGetsExactlyOneAnswer",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseEveryOrderIsAnsweredTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (!TestNotNull(TEXT("orders: strategie"), Strategy) || !TestNotNull(TEXT("orders: prep"), Prep)
+		|| !TestNotNull(TEXT("orders: missie"), Mission) || !TestNotNull(TEXT("orders: eventbus"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("orders: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	int32 Acks = 0;
+	int32 Refusals = 0;
+	FName LastReason = NAME_None;
+	FString LastBark;
+	FEclipseEventSubscriptionHandle Handle = Bus->Subscribe(
+		FGameplayTag::RequestGameplayTag(TEXT("Event.Squad")),
+		FEclipseEventNativeDelegate::CreateLambda(
+			[&Acks, &Refusals, &LastReason, &LastBark](FGameplayTag Tag, const FInstancedStruct& Payload)
+		{
+			const FString Name = Tag.ToString();
+			const FEclipseSquadEventPayload* Squad = Payload.GetPtr<FEclipseSquadEventPayload>();
+			if (Name.Contains(TEXT("Acknowledged")))
+			{
+				++Acks;
+				if (Squad != nullptr) { LastBark = Squad->BarkLine; }
+			}
+			else if (Name.Contains(TEXT("Refused")))
+			{
+				++Refusals;
+				if (Squad != nullptr) { LastReason = Squad->Reason; LastBark = Squad->BarkLine; }
+			}
+		}));
+
+	UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>();
+	const TArray<FGuid> Deployed = Mission->GetDeployedSoldierIds();
+	if (!TestNotNull(TEXT("orders: squad-subsysteem"), Squad)
+		|| !TestTrue(TEXT("orders: er is een soldaat"), Deployed.Num() > 0))
+	{
+		Bus->Unsubscribe(Handle);
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Een ECHTE vijand als doelwit, want FocusTarget met niets is de weigertak en
+	// die is elders al gedekt. Hier gaat het om de andere kant.
+	AActor* Hostile = nullptr;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		if (*It != Harness.Body && !It->IsPlayerSide() && !It->IsDowned())
+		{
+			Hostile = *It;
+			break;
+		}
+	}
+	TestNotNull(TEXT("orders: er is een vijand om op te richten"), Hostile);
+
+	struct FOrderCase
+	{
+		EEclipseSquadOrder Order;
+		const TCHAR* Name;
+		AActor* Target;
+	};
+	const FVector Nearby = Harness.Location() + FVector(600.0f, 0.0f, 0.0f);
+	const FOrderCase Cases[] = {
+		{ EEclipseSquadOrder::MoveTo,      TEXT("MoveTo"),      nullptr },
+		{ EEclipseSquadOrder::Hold,        TEXT("Hold"),        nullptr },
+		{ EEclipseSquadOrder::Regroup,     TEXT("Regroup"),     nullptr },
+		{ EEclipseSquadOrder::FocusTarget, TEXT("FocusTarget"), Hostile },
+	};
+
+	for (const FOrderCase& Case : Cases)
+	{
+		const int32 AcksBefore = Acks;
+		const int32 RefusalsBefore = Refusals;
+		LastReason = NAME_None;
+		LastBark.Reset();
+
+		const bool bProcessed = Squad->IssueOrder(Deployed[0], Case.Order, Nearby, Case.Target);
+		Harness.Idle(0.2f);
+
+		const int32 NewAcks = Acks - AcksBefore;
+		const int32 NewRefusals = Refusals - RefusalsBefore;
+
+		TestTrue(FString::Printf(TEXT("orders: '%s' is beoordeeld en niet stil weggevallen"), Case.Name), bProcessed);
+		// HET contract uit GDD 8.4, en het enige dat voor alle vier hetzelfde is:
+		// nul antwoorden is stilte, twee is dubbel geboekt. Of het ja of nee wordt
+		// hangt van de wereld af en wordt daarom gerapporteerd, niet vastgepind.
+		TestEqual(FString::Printf(TEXT("orders: '%s' krijgt precies één antwoord"), Case.Name),
+			NewAcks + NewRefusals, 1);
+
+		AddInfo(FString::Printf(TEXT("order '%s': %s%s%s"), Case.Name,
+			NewAcks > 0 ? TEXT("bevestigd") : NewRefusals > 0 ? TEXT("geweigerd") : TEXT("GEEN ANTWOORD"),
+			LastReason.IsNone() ? TEXT("") : *FString::Printf(TEXT(" (reden: %s)"), *LastReason.ToString()),
+			LastBark.IsEmpty() ? TEXT("") : *FString::Printf(TEXT(" — \"%s\""), *LastBark)));
+
+		// Een antwoord zonder tekst is voor de speler nog steeds stilte: hij hoort
+		// niets en ziet alleen dat er iets of niets gebeurt.
+		TestTrue(FString::Printf(TEXT("orders: '%s' komt met een hoorbare zin"), Case.Name), !LastBark.IsEmpty());
+	}
+
+	Bus->Unsubscribe(Handle);
+	Report(*this, TEXT("orders gegeven"), UE_ARRAY_COUNT(Cases), TEXT(""));
+	Report(*this, TEXT("bevestigingen"), Acks, TEXT(""));
+	Report(*this, TEXT("weigeringen"), Refusals, TEXT(""), TEXT("mag, maar nooit stil"));
+	TestEqual(TEXT("orders: het totaal aantal antwoorden is gelijk aan het aantal orders"),
+		Acks + Refusals, static_cast<int32>(UE_ARRAY_COUNT(Cases)));
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
