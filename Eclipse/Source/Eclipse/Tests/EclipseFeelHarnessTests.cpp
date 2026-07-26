@@ -1298,23 +1298,31 @@ bool FEclipseAirControlTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-// Stance werkt alleen ín Command Mode — en dat stond nergens.
+// Vier controls doen buiten Command Mode NIETS, en de tabel zei dat bij één.
 //
-// ToggleHeldStance() keert meteen terug als Command Mode niet vastgehouden
-// wordt. Y indrukken in het veld doet dus NIETS, stil. De controletabel die de
-// speler tijdens het spelen leest, zei alleen "Stance / Alt vasthouden / Y" —
-// terwijl twee andere rijen hun context wél noemen ("LT (buiten Command Mode)",
-// "LT (tijdens Command Mode)"). Precies de dode-toets-verwarring van bukken,
-// alleen dan half: de toets leeft, maar niet waar je hem indrukt.
+// Stance was de vondst; de sweep erna liet zien dat het een familie is. Elk van
+// deze vier gaat door een handler die meteen terugkeert als Command Mode niet
+// vastgehouden wordt (`if (!State.bHeld) return;`):
 //
-// Deze test pint het GEDRAG vast, niet de tekst. Verandert iemand later de regel
-// zodat stance overal werkt, dan valt deze test om en wordt de tekst meegenomen
-// — andersom zou een test op de tekst juist de verbetering blokkeren.
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseStanceNeedsCommandModeTest,
-	"Eclipse.Feel.Input.StanceOnlyAnswersInsideCommandMode",
+//   Stance (Y / Alt)          ToggleHeldStance
+//   Volgende (RB / Tab)       CycleSoldierSelection(+1)
+//   Vorige (LT / scroll neer) CycleSoldierSelection(-1)
+//   Onder kruis (X / E)       PickSoldierUnderReticle
+//
+// In de F2-tabel die de speler tijdens het spelen leest, stond die voorwaarde
+// bij precies één kolom van één rij ("LT (tijdens Command Mode)"). Bij de rest
+// niet, dus je drukt RB of X in het veld en er gebeurt stil niets — dezelfde
+// verwarring als de dode bukk-toets, alleen half: de toets leeft, maar niet waar
+// je hem indrukt.
+//
+// Deze test pint het GEDRAG vast en niet de tekst. Maakt iemand later een van
+// deze controls overal werkend, dan valt deze test om en wordt de tabel
+// meegenomen; een test op de tekst zou juist die verbetering blokkeren.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCommandModeGateTest,
+	"Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode",
 	EclipseFeelTest::TestFlags)
 
-bool FEclipseStanceNeedsCommandModeTest::RunTest(const FString& Parameters)
+bool FEclipseCommandModeGateTest::RunTest(const FString& Parameters)
 {
 	using namespace EclipseFeelHarness;
 
@@ -1326,33 +1334,53 @@ bool FEclipseStanceNeedsCommandModeTest::RunTest(const FString& Parameters)
 	}
 
 	UEclipseCommandModeComponent* CommandMode = Harness.Controller->FindComponentByClass<UEclipseCommandModeComponent>();
-	if (!TestNotNull(TEXT("stance: de Command Mode-component bestaat"), CommandMode))
+	if (!TestNotNull(TEXT("commandmode: de component bestaat"), CommandMode))
 	{
 		Harness.Shutdown();
 		return false;
 	}
+	TestFalse(TEXT("commandmode: staat niet aan bij aanvang"), CommandMode->IsHeld());
 
-	const EEclipseSquadStance Before = CommandMode->GetHeldStance();
+	// --- 1. buiten de modus mag geen van de vier iets veranderen -------------
+	const EEclipseSquadStance StanceBefore = CommandMode->GetHeldStance();
+	const FGuid SelectedBefore = CommandMode->GetSelectedSoldier();
 
-	// 1. Buiten Command Mode: indrukken hoort niets te doen.
-	Harness.Press(TEXT("StanceToggle"));
-	Harness.Idle(0.1f);
-	TestTrue(TEXT("stance: buiten Command Mode verandert Y niets"), CommandMode->GetHeldStance() == Before);
+	for (const TCHAR* Action : { TEXT("StanceToggle"), TEXT("SelectNext"), TEXT("SelectPrev"), TEXT("DirectPick") })
+	{
+		Harness.Press(Action);
+		Harness.Idle(0.05f);
+	}
 
-	// 2. Command Mode vasthouden en dan pas drukken.
-	Harness.Inject(TEXT("CommandHold"), true);
-	Harness.Step();
-	Harness.Inject(TEXT("CommandHold"), true);
-	Harness.Inject(TEXT("StanceToggle"), true);
-	Harness.Step();
-	Harness.Inject(TEXT("CommandHold"), true);
-	Harness.Step();
+	TestTrue(TEXT("commandmode: buiten de modus verandert de stance niet"),
+		CommandMode->GetHeldStance() == StanceBefore);
+	TestTrue(TEXT("commandmode: buiten de modus verandert de selectie niet"),
+		CommandMode->GetSelectedSoldier() == SelectedBefore);
 
-	const EEclipseSquadStance Inside = CommandMode->GetHeldStance();
-	AddInfo(FString::Printf(TEXT("stance: %s -> %s met Command Mode vast"),
-		Before == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready"),
-		Inside == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready")));
-	TestTrue(TEXT("stance: ín Command Mode wisselt Y wél"), Inside != Before);
+	// --- 2. binnen de modus hoort er wél iets te gebeuren --------------------
+	// Command Mode is een HOLD: elke tick opnieuw injecteren, anders leest
+	// Enhanced Input de eerstvolgende stille tick als loslaten.
+	auto HoldCommandMode = [&Harness](const TCHAR* AlsoPress)
+	{
+		for (int32 Tick = 0; Tick < 4; ++Tick)
+		{
+			Harness.Inject(TEXT("CommandHold"), true);
+			if (AlsoPress != nullptr && Tick == 1)
+			{
+				Harness.Inject(AlsoPress, true);
+			}
+			Harness.Step();
+		}
+	};
+
+	HoldCommandMode(nullptr);
+	TestTrue(TEXT("commandmode: LB/Q vasthouden zet de modus aan"), CommandMode->IsHeld());
+
+	HoldCommandMode(TEXT("StanceToggle"));
+	const EEclipseSquadStance StanceInside = CommandMode->GetHeldStance();
+	AddInfo(FString::Printf(TEXT("commandmode: stance %s -> %s met de modus vast"),
+		StanceBefore == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready"),
+		StanceInside == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready")));
+	TestTrue(TEXT("commandmode: ín de modus wisselt de stance wél"), StanceInside != StanceBefore);
 
 	Harness.Shutdown();
 	return true;

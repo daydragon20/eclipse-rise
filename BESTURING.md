@@ -46,6 +46,15 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |
 | Stance | Alt **ingedrukt houden terwijl je de order geeft** | Y (togglen) | pad: `ToggleHeldStance` · toetsenbord: **geen actie en geen binding** — `IssueSquadOrder` pollt `IsInputKeyDown(LeftAlt)` op het moment van geven |
 
+
+> **Vier controls doen buiten Command Mode niets, en dat stond er niet bij.**
+> Stance, Volgende, Vorige en Onder-kruis gaan alle vier door een handler die
+> meteen terugkeert als Command Mode niet vastgehouden wordt. In de F2-tabel
+> stond die voorwaarde bij precies één kolom van één rij; nu bij alle vier.
+> Je drukte dus RB of X in het veld en er gebeurde stil niets. Het gedrag zelf
+> is niet gewijzigd — alleen benoemd — en vastgepind door
+> `Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode`.
+
 **LT doet twee dingen en dat is bewust.** Buiten Command Mode is LT mikken (de
 genre-conventie); tijdens de Q/LB-hold is LT "vorige soldaat". Beide handlers
 splitsen op `CommandMode->IsHeld()`. Dat is géén tweede modus-systeem — SPEC-P2-07

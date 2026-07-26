@@ -175,15 +175,22 @@ namespace EclipseGauntletOverlay
 			{ TEXT("Mikken"),       TEXT("RMB"),               TEXT("LT (buiten Command Mode)") },
 			{ TEXT("1e/3e persoon"),TEXT("C"),                 TEXT("geen (R3 ging per ongeluk af)") },
 			{ TEXT("Command Mode"), TEXT("Q vasthouden"),      TEXT("LB vasthouden") },
-			{ TEXT("Volgende"),     TEXT("Tab of scroll op"),  TEXT("RB") },
-			{ TEXT("Vorige"),       TEXT("scroll neer"),       TEXT("LT (tijdens Command Mode)") },
-			{ TEXT("Onder kruis"),  TEXT("E"),                 TEXT("X") },
+			{ TEXT("Volgende"),     TEXT("Tab / scroll op (tijdens Command Mode)"), TEXT("RB (tijdens Command Mode)") },
+			{ TEXT("Vorige"),       TEXT("scroll neer (tijdens Command Mode)"),     TEXT("LT (tijdens Command Mode)") },
+			{ TEXT("Onder kruis"),  TEXT("E (tijdens Command Mode)"),               TEXT("X (tijdens Command Mode)") },
 			{ TEXT("Orders"),       TEXT("1 2 3 4"),           TEXT("D-pad") },
+			// VIER rijen noemen hun context, want alle vier gaan door een handler die
+			// meteen terugkeert als Command Mode niet vast staat (`if (!State.bHeld)
+			// return;`): stance, volgende, vorige en onder-kruis. Tot vannacht stond
+			// die voorwaarde bij precies één kolom van één rij, dus je drukte RB of X
+			// in het veld en er gebeurde stil niets. Vastgepind door
+			// Eclipse.Feel.Input.CommandModeControlsAreSilentOutsideTheMode.
+			//
 			// Beide kolommen noemen hun CONTEXT, want stance werkt nergens anders:
 			// ToggleHeldStance() keert meteen terug als Command Mode niet vast staat,
 			// en op toetsenbord wordt LeftAlt gepollt op het moment van de order zelf.
 			// Zonder die toevoeging drukt de speler Y in het veld en gebeurt er stil
-			// niets — vastgepind door Eclipse.Feel.Input.StanceOnlyAnswersInsideCommandMode.
+			// niets.
 			{ TEXT("Stance"),       TEXT("Alt vast bij de order"), TEXT("Y (tijdens Command Mode)") }
 		};
 	}
