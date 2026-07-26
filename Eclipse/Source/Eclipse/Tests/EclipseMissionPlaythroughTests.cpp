@@ -190,12 +190,28 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	// M1.1-Gauntlet in EclipseMissionM1Tests.
 	int32 CreditsRewarded = 0;
 	int32 MaterialsRewarded = 0;
+	// De stretchbonus komt onder een EIGEN reden binnen ("OptionalObjective"), en
+	// dat is precies waarom dit uur lang onzichtbaar was: de teller hierboven
+	// filtert op "MissionReward" en zag hem dus nooit, ook niet toen hij wél
+	// betaald werd. Een meting die de helft van de uitbetaling wegfiltert leest
+	// als "de bonus komt niet" terwijl er niets mis is met de bonus.
+	int32 OptionalMaterials = 0;
 	FEclipseEventSubscriptionHandle RewardHandle = Bus->Subscribe(
 		EclipseTags::Event_Economy_ResourcesChanged,
-		FEclipseEventNativeDelegate::CreateLambda([&CreditsRewarded, &MaterialsRewarded](FGameplayTag, const FInstancedStruct& Payload)
+		FEclipseEventNativeDelegate::CreateLambda([&CreditsRewarded, &MaterialsRewarded, &OptionalMaterials](FGameplayTag, const FInstancedStruct& Payload)
 		{
 			const FEclipseEconomyEventPayload* Economy = Payload.GetPtr<FEclipseEconomyEventPayload>();
-			if (Economy == nullptr || Economy->Reason != TEXT("MissionReward"))
+			if (Economy == nullptr)
+			{
+				return;
+			}
+			if (Economy->Reason == TEXT("OptionalObjective")
+				&& Economy->ResourceType == EclipseTags::Resource_Materials.GetTag())
+			{
+				OptionalMaterials += Economy->Delta;
+				return;
+			}
+			if (Economy->Reason != TEXT("MissionReward"))
 			{
 				return;
 			}
@@ -771,6 +787,22 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("wallet-delta credits (dagtick meegerekend)"), CreditsAfter - CreditsBefore, TEXT(""), TEXT("ter informatie, geen criterium"));
 	TestTrue(FString::Printf(TEXT("speelronde: de dag is opgeschoven (%d -> %d)"), DayBefore, DayAfter), DayAfter > DayBefore);
 	TestEqual(TEXT("speelronde: de missie keerde de materialen van de rij uit"), MaterialsRewarded, 25);
+
+	// De +20 voor een ronde zonder gewonden (owner-beslissing 26-07). Tot vandaag
+	// hing die aan een optional die VOLTOOID moest zijn terwijl niets hem kon
+	// voltooien — het is een voorwaarde, geen taak. De HUD toonde een stretch-doel
+	// dat nooit afvinkte en de bonus kwam nooit binnen.
+	//
+	// Asserteren op de voorwaarde en niet blind op 20: ging er iemand neer, dan
+	// HOORT hij nul te zijn. Anders zou deze test bij een zware ronde rood gaan om
+	// precies de reden waarom het ontwerp klopt.
+	const bool bEveryoneStanding = !Mission->HasAnyCasualtyThisRun();
+	Report(*this, TEXT("stretchbonus materialen"), OptionalMaterials, TEXT(""),
+		TEXT("+20 als iedereen staande bleef, anders 0"));
+	TestEqual(bEveryoneStanding
+			? TEXT("speelronde: iedereen bleef staan, dus de +20-stretchbonus is uitbetaald")
+			: TEXT("speelronde: er ging iemand neer, dus de stretchbonus is terecht NIET uitbetaald"),
+		OptionalMaterials, bEveryoneStanding ? 20 : 0);
 	TestEqual(TEXT("speelronde: de missie keerde de credits van de rij uit"), CreditsRewarded, 50);
 
 	// Regiostaat: M1.1 mag de wereld NIET flippen (SPEC-P2-04 besluit 6 — M1.3 is

@@ -58,7 +58,28 @@ void EvaluateOptionalObjectives(
 		// Conditions and rewards are read only on optionals (SPEC-P2-04): a
 		// mandatory objective can never pay a stretch bonus, and alarm never
 		// fails a mission (GDD 11.4) — the void below is the whole price.
-		if (!Objective.bOptional || !CompletedIds.Contains(Objective.ObjectiveId))
+		if (!Objective.bOptional)
+		{
+			continue;
+		}
+
+		// VOORWAARDE-OBJECTIVES vinken zichzelf af (owner-beslissing 26-07).
+		//
+		// Een optional met een conditie-vlag en GEEN doelwit is geen taak maar een
+		// voorwaarde: "Bring everyone home standing" heeft niets om te bereiken, te
+		// pakken of om te leggen. Tot vandaag moest hij tóch voltooid worden om uit
+		// te betalen, en niets voltooide hem — de HUD toonde een stretch-doel dat
+		// nooit afvinkte en de +20 materiaal kwam nooit binnen (gemeten: nul
+		// gewonden, 25 in plaats van 45).
+		//
+		// De regel staat hier en niet op een nieuw veld: TargetId leeg + minstens
+		// één conditie IS de definitie van een voorwaarde, en die is af te lezen
+		// uit de data die er al staat. Decision 5 verbiedt nieuwe objective-verbs;
+		// conditie-vlaggen zijn juist het precedent.
+		const bool bHasCondition = Objective.bRequiresNoAlarm || Objective.bRequiresNoCasualties;
+		const bool bIsConditionObjective = bHasCondition && Objective.TargetId.IsNone();
+
+		if (!bIsConditionObjective && !CompletedIds.Contains(Objective.ObjectiveId))
 		{
 			continue; // an optional never attempted is simply absent — not "missed"
 		}
