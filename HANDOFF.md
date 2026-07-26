@@ -338,6 +338,13 @@ over de feel van Command Mode, en het **13.2-antwoord** ("spelen testers vrijwil
 tweede ronde?"). De game begeleidt die sessie nu zelf via F3, dus er hoeft geen document
 naast het scherm.
 
+**Wat de nacht van 25→26 juli aan de wachtrij heeft toegevoegd** (uitgewerkt in §1 en §4 hierboven — hier alleen de kop, zodat deze lijst niet zijn eigen tweede versie wordt):
+
+- **Zes mechanismen die bestaan maar tijdens spelen niet bereikbaar zijn:** de camera-blend (gerepareerd), kopschoten, het alarm, twee klasse-verbs, acht ingesproken squad-zinnen, en de +20-stretchbonus. Alleen de eerste is gefixt; de rest vraagt een ontwerpbeslissing en staat in §4.
+- **Het goedkoopste werk dat er ligt** is de barks aansluiten: opnames én stemsysteem bestaan al, het is één consument op de eventbus. Let op de mismatch in de woordenlijst (§4 punt 19).
+- **De grootste post blijft §8 FEEDBACK**, en er ligt nu een blok *"wat §8 moet weten voordat het gebouwd wordt"* in `phase0/FEEL_AUDIT.md` met vier gemeten valkuilen.
+- **De feel-audit is van beredeneerd naar gemeten gegaan.** De eindstand-tabel bovenaan dat document zegt per gebied wat er staat en waar het bewijs zit; twee rijen bleken bij het nameten zélf fout.
+
 **Openstaand ná die sessie, in volgorde:**
 1. Dressing-iteratie 3 afmaken — pool-compositing (multiply in plaats van over),
    bloom/halo, en de contactschaduw-rok afleiden van de HOOGTE in plaats van de
