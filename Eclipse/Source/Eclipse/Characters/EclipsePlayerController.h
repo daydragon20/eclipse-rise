@@ -139,6 +139,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<UEclipseMissionHudWidget> MissionHud;
 
+	/**
+	 * Hoe ver je mag wegkijken voor het lichaam meedraait (locomotie-audit 26-07).
+	 * 90 graden, zoals Gears en The Division. Lager kan zodra er een
+	 * draai-animatie in de packs zit; nu zouden de voeten te vaak schuiven.
+	 */
+	static constexpr float IdleTurnThresholdDegrees = 90.0f;
+
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
 
 	/** Command Mode wrapper (SPEC-P2-02): dilation + selection; owns nothing of the order path. */

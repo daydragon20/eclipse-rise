@@ -958,6 +958,31 @@ UInputAction* AEclipsePlayerController::FindInputAction(FName ActionName) const
 
 void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 {
+	// Ver genoeg wegkijken draait het lichaam alsnog mee (locomotie-audit 26-07).
+	//
+	// Sinds het camera-relatieve model volgt het lichaam de camera alleen tijdens
+	// bewegingsinvoer — dat voorkomt voetslip bij elk klein kijkbeweginkje. Maar
+	// zonder bovengrens kun je stilstaand 180 graden van je eigen lichaam
+	// wegkijken, en dat is erger dan de slip die het moest vermijden: je personage
+	// staat dan letterlijk over zijn schouder te kijken.
+	//
+	// 90 graden is waar de referentie het ook legt. Gears en The Division draaien
+	// het lichaam bij ongeveer een kwartslag na, met een draai-animatie erbij. Die
+	// animatie zit niet in de packs (nagekeken: geen enkele Turn_*-take), dus de
+	// voeten schuiven een fractie. Dat gebeurt alleen bij een kwartslag of meer,
+	// en nooit tijdens het kleine corrigeren waar dit model voor gemaakt is.
+	// De draai-animatie staat als owner-item; zodra hij er is kan de drempel omlaag.
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+	{
+		const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
+		const float ViewYaw = static_cast<float>(GetControlRotation().Yaw);
+		const float Apart = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYaw, ViewYaw));
+		if (Apart > IdleTurnThresholdDegrees)
+		{
+			Body->SetOrientationFollowsCameraNow(true);
+		}
+	}
+
 	const FVector2D Axis = Value.Get<FVector2D>();
 	const int32 InvertOverride = CVarEclipseInvertLookY.GetValueOnGameThread();
 	const bool bInvert = InvertOverride < 0 ? bInvertLookY : (InvertOverride > 0);
