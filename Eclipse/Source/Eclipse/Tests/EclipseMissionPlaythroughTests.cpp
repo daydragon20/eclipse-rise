@@ -795,6 +795,25 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		}
 		Report(*this, TEXT("verschillende events gevuurd in deze missie"), Fired.Num(), TEXT(""),
 			TEXT("van de 29 in de catalogus — de rest vuurt buiten een missie of nergens"));
+
+		// Zelfde principe één laag lager: welke objective-TYPES kwamen langs? Ook
+		// dat is dekking die je alleen ziet als de ronde het zelf zegt. M1.1 heeft
+		// geen CollectItem; die wordt apart gedekt door de MT_Rescue-test, en zonder
+		// deze regel is dat gat onzichtbaar.
+		TSet<uint8> TypesSeen;
+		FString TypeList;
+		for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
+		{
+			if (!TypesSeen.Contains(static_cast<uint8>(Objective.Type)))
+			{
+				TypesSeen.Add(static_cast<uint8>(Objective.Type));
+				TypeList += (TypeList.IsEmpty() ? TEXT("") : TEXT(", "))
+					+ UEnum::GetValueAsString(Objective.Type).RightChop(FString(TEXT("EEclipseObjectiveType::")).Len());
+			}
+		}
+		AddInfo(FString::Printf(TEXT("objective-types in deze missie: %s"), *TypeList));
+		Report(*this, TEXT("objective-types uitgeoefend"), TypesSeen.Num(), TEXT(""),
+			TEXT("van de 4 — CollectItem zit niet in M1.1 en wordt apart gedekt"));
 	}
 
 	Report(*this, TEXT("ticks in deze ronde"), Harness.StepCount, TEXT(""));
