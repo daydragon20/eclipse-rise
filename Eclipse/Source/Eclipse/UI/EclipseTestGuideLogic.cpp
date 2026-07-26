@@ -31,7 +31,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Jump,
 			  TEXT("je komt van de grond. Deze actie bestond tot vandaag helemaal niet — er was geen JumpAction in het project") },
 			{ EEclipseGuideSignal::Aim,
-			  TEXT("de camera trekt in en de FOV versmalt zolang je hem vasthoudt. LET OP: op de controller mikt LT alleen BUITEN Command Mode; tijdens de Q/LB-hold is LT 'vorige soldaat'") },
+			  TEXT("de camera trekt in van 300 naar 165 cm en de FOV versmalt van 80 naar 64. Bijeffect dat je zult merken: je reikt mikkend ~135 cm VERDER, want de kogel vertrekt vanaf de camera. LET OP: op de controller mikt LT alleen BUITEN Command Mode; tijdens de Q/LB-hold is LT 'vorige soldaat'") },
 			{ EEclipseGuideSignal::ToggleView,
 			  TEXT("de camera schuift in ~0,1 s naar je ogen en terug. In 1e persoon verdwijnt alleen je HOOFD — armen, wapen en benen blijven zichtbaar. Zie je je hoofd nog: zeg het (dan mist het skelet zijn head-bone)") },
 			{ EEclipseGuideSignal::CommandMode,
