@@ -16,11 +16,15 @@ kwam uit precies deze vraag; de rest van de lijst hoorde erbij.
 Waar een referentie geen publiek cijfer heeft staat dat er, in plaats van een
 verzonnen getal.
 
-*Eén correctie op mezelf: rij 1 stond eerst als een SOM (22 hp × 6,67 schoten/s)
+*Twee correcties op mezelf. Rij 1 stond eerst als een SOM (22 hp × 6,67 schoten/s)
 en niet als een meting, terwijl deze kop belooft dat alles gemeten is. Het harnas
 meet de uitkomst rechtstreeks — 308 hp in 2 s aanhoudend vuur — en dat getal ligt
 er nu. Een som ziet er net zo overtuigend uit als een meting en is het niet: hij
-gaat uit van perfect vuren zonder een enkel gemist frame.*
+gaat uit van perfect vuren zonder een enkel gemist frame. En rij 2 noemde
+**2,50 s** zonder te zeggen waar hij vandaan kwam; dat is het verschil van twee
+gemeten momenten en dat staat er nu bij. Van de vijf vetgedrukte getallen in deze
+drie audits is er één rechtstreeks gemeten, zijn er drie afgeleid met de stap
+erbij, en het vijfde (0,000 s) komt uit het harnas.*
 
 ---
 
@@ -29,7 +33,7 @@ gaat uit van perfect vuren zonder een enkel gemist frame.*
 | # | Onderdeel | Referentie | Wij (gemeten) | Oordeel |
 |---|---|---|---|---|
 | 1 | **Time-to-kill, speler → vijand** | Division ~1–2 s op gelijk niveau; Gears ~0,5–1 s | **Gemeten: 308 hp in 2 s aanhoudend vuur** = 154 hp/s, dus 100 hp valt in **0,65 s**. Met kopschoten (×2,5) **0,26 s** | Keuze — zit in de band |
-| 2 | **Time-to-kill, vijand → speler** | Vrijwel altijd trager dan andersom (de speler moet kunnen reageren) | **2,50 s** van vol naar neer | Keuze — 4× ruimer dan andersom, dat is gezond |
+| 2 | **Time-to-kill, vijand → speler** | Vrijwel altijd trager dan andersom (de speler moet kunnen reageren) | **2,50 s** van vol naar neer — het verschil van twee gemeten momenten in de speelronde (eerste schade op 28,5 s, neer op 31,0 s) | Keuze — bijna 4× ruimer dan andersom, dat is gezond |
 | 3 | **Kopschoten** | ×1,5 tot ×3 | **×2,50** gemeten (44 → 110 hp) | Was een omissie, **vandaag gerepareerd** |
 | 4 | **Bevestiging dát je raakt** | Universeel: hitmarker, schadegetal, impactgeluid of alle drie | **Inslaggeluid sinds 26-07** (luider dan het schot, want dit is het signaal dat telt). Nog geen kruisje en geen getal | **Half — het oor weet het nu, het oog nog niet** |
 | 5 | **Kopschot voelbaar anders** | Eigen hitmarker-vorm en/of eigen geluid | **Een kopschot klinkt 1,35× harder.** Een eigen cue zou beter zijn maar ligt er niet | **Half — hoorbaar, nog niet zichtbaar** |
