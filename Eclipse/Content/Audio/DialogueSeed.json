@@ -16,10 +16,26 @@
       "elevenLabsVoiceId": "TxGEqnHWrfWFTfGW9XjX",
       "modelId": "eleven_multilingual_v2",
       "lines": [
-        { "lineId": "Bark_Ack_Move_A", "emotion": "Confident", "text": "Copy. Moving up." },
-        { "lineId": "Bark_Ack_Hold_A", "emotion": "Calm", "text": "Holding position." },
-        { "lineId": "Bark_Refuse_NoRoute_A", "emotion": "Urgent", "text": "Negative, I can't find a route." },
-        { "lineId": "Bark_Refuse_Pinned_A", "emotion": "Afraid", "text": "Can't move, I'm pinned down!" }
+        {
+          "lineId": "Bark_Ack_Move_A",
+          "emotion": "Confident",
+          "text": "Copy. Moving up."
+        },
+        {
+          "lineId": "Bark_Ack_Hold_A",
+          "emotion": "Calm",
+          "text": "Holding position."
+        },
+        {
+          "lineId": "Bark_Refuse_NoRoute_A",
+          "emotion": "Urgent",
+          "text": "Negative, I can't find a route."
+        },
+        {
+          "lineId": "Bark_Ack_Focus_A",
+          "emotion": "Confident",
+          "text": "Eyes on. Engaging."
+        }
       ]
     },
     {
@@ -29,10 +45,31 @@
       "elevenLabsVoiceId": "21m00Tcm4TlvDq8ikWAM",
       "modelId": "eleven_multilingual_v2",
       "lines": [
-        { "lineId": "Bark_Ack_Move_B", "emotion": "Confident", "text": "On my way." },
-        { "lineId": "Bark_Ack_Regroup_B", "emotion": "Calm", "text": "Falling back to you." },
-        { "lineId": "Bark_Refuse_NoShot_B", "emotion": "Urgent", "text": "No shot from here." },
-        { "lineId": "Bark_Down_B", "emotion": "Sad", "text": "I'm hit. Someone patch me up." }
+        {
+          "lineId": "Bark_Ack_Move_B",
+          "emotion": "Confident",
+          "text": "On my way."
+        },
+        {
+          "lineId": "Bark_Ack_Regroup_B",
+          "emotion": "Calm",
+          "text": "Falling back to you."
+        },
+        {
+          "lineId": "Bark_Refuse_NoShot_B",
+          "emotion": "Urgent",
+          "text": "No shot from here."
+        },
+        {
+          "lineId": "Bark_Down_B",
+          "emotion": "Sad",
+          "text": "I'm hit. Someone patch me up."
+        },
+        {
+          "lineId": "Bark_Refuse_InvalidTarget_B",
+          "emotion": "Urgent",
+          "text": "That's not a target."
+        }
       ]
     }
   ]

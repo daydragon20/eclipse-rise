@@ -190,6 +190,9 @@ bool FEclipseSquadBarksHaveAudioTest::RunTest(const FString& Parameters)
 		{ TEXT("weiger NoRoute"),    EEclipseVoiceEmotion::Urgent,    TEXT("Negative, I can't find a route.") },
 		{ TEXT("weiger NoShot"),     EEclipseVoiceEmotion::Urgent,    TEXT("No shot from here.") },
 		{ TEXT("weiger Downed"),     EEclipseVoiceEmotion::Sad,       TEXT("I'm hit. Someone patch me up.") },
+		// De twee die 26-07 geschreven zijn omdat ze ontbraken (owner-opdracht).
+		{ TEXT("ack FocusTarget"),   EEclipseVoiceEmotion::Confident, TEXT("Eyes on. Engaging.") },
+		{ TEXT("weiger InvalidTarget"), EEclipseVoiceEmotion::Urgent, TEXT("That's not a target.") },
 	};
 
 	int32 Playable = 0;

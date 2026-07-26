@@ -114,12 +114,14 @@ void UEclipseAudioSubsystem::OnOrderAnswered(FGameplayTag EventTag, const FInsta
 	//   MoveTo        -> Bark_Ack_Move        (beide stemmen)
 	//   Hold          -> Bark_Ack_Hold        (alleen A)
 	//   Regroup       -> Bark_Ack_Regroup     (alleen B)
-	//   FocusTarget   -> ONTBREEKT            (geen ack ingesproken)
+	//   FocusTarget   -> Bark_Ack_Focus       (alleen A; geschreven 26-07)
 	//   NoRoute       -> Bark_Refuse_NoRoute  (alleen A)
 	//   NoLineOfSight -> Bark_Refuse_NoShot   (alleen B; andere naam, zelfde reden)
-	//   InvalidTarget -> ONTBREEKT            (geen weigering ingesproken)
+	//   InvalidTarget -> Bark_Refuse_Invalid  (alleen B; geschreven 26-07)
 	//   Downed        -> Bark_Down            (alleen B)
-	//   (wees: Bark_Refuse_Pinned_A hoort bij geen enkele weigerreden)
+	// De wees Bark_Refuse_Pinned_A is 26-07 uit de seed gehaald: "pinned down"
+	// belooft suppressie, en die mechaniek bestaat niet. De opname blijft op
+	// schijf staan — betaalde audio weggooien is een owner-beslissing.
 	//
 	// Ontbreekt de zin, dan zwijgt de soldaat op het scherm niet: de tekstbark
 	// staat er los van. Alleen de stem blijft weg, en dat wordt één keer gemeld.
@@ -155,6 +157,11 @@ void UEclipseAudioSubsystem::OnOrderAnswered(FGameplayTag EventTag, const FInsta
 			LineText = TEXT("I'm hit. Someone patch me up.");
 			Emotion = EEclipseVoiceEmotion::Sad;
 		}
+		else if (Reason == TEXT("InvalidTarget"))
+		{
+			LineText = TEXT("That's not a target.");
+			Emotion = EEclipseVoiceEmotion::Urgent;
+		}
 	}
 	else
 	{
@@ -174,6 +181,11 @@ void UEclipseAudioSubsystem::OnOrderAnswered(FGameplayTag EventTag, const FInsta
 			LineText = TEXT("Falling back to you.");
 			Emotion = EEclipseVoiceEmotion::Calm;
 		}
+		else if (Order == TEXT("FocusTarget"))
+		{
+			LineText = TEXT("Eyes on. Engaging.");
+			Emotion = EEclipseVoiceEmotion::Confident;
+		}
 	}
 
 	// De rem gaat aan zodra vaststaat DAT deze soldaat antwoordt — niet pas als
@@ -192,8 +204,7 @@ void UEclipseAudioSubsystem::OnOrderAnswered(FGameplayTag EventTag, const FInsta
 		{
 			bWarnedMissingBarkLine = true;
 			UE_LOG(LogEclipse, Warning,
-				TEXT("Audio: geen ingesproken zin voor deze order/reden — de soldaat antwoordt alleen op het scherm (14.3.5). ")
-				TEXT("Ontbrekend: een ack op FocusTarget en een weigering op InvalidTarget."));
+				TEXT("Audio: geen ingesproken zin voor deze order/reden — de soldaat antwoordt alleen op het scherm (14.3.5)."));
 		}
 		return;
 	}
