@@ -3,6 +3,112 @@
 
 ---
 
+# AVONDRAPPORT — 26 juli 2026
+
+**Bar: build ✓ (-NoUba) · 143/143 tests · validatie 5 validators / 0 fouten.**
+
+## Geland vanavond
+
+| | Gemeten |
+|---|---|
+| **Terugslag.** Het schot duwt je kruis omhoog en het zakt vanzelf terug met de stabiliteit uit het profiel. Het herstel stopt zodra je zelf kijkt — anders vecht het spel tegen je eigen correctie in. | Klim **0,500°** (data zegt 0,50), na 1 s rust **0,000°** |
+| **Elk wapen klinkt anders, en niet als een loop.** Drie schotvarianten per familie, keuze is "nooit dezelfde als net". | **0 herhalingen** in 1000 trekkingen, verdeling 348/332/320 |
+| **Een schot heeft ruimte.** De nagalm klinkt bij het openende schot van een serie, niet bij elke kogel. | 14 schoten in 2 s → **4 nagalmen** |
+| **De demper is een keuze geworden.** De sidearm alarmeert tot 1200 cm in plaats van 2500 — onder de waarnemingsafstand van een vijand, dus hij verraadt je alleen aan wie je toch al zag. | Validator bewaakt de eis, niet het getal |
+| **Voetstappen weten waar je op staat.** Het district hád geen oppervlaktetypes; die zijn er nu, met physical materials en een trace op het moment van de stap. | Plein **beton**, bovenop een dekkingsblok **metaal** (op hoogte 210 cm) |
+
+## Wat ik van jou wil horen — het LICHTPLAN
+
+Je vroeg één review-ronde voor ik honderd armaturen neerzet. Dit is die ronde.
+
+**Eerst het antwoord op je vraag over emissive, want die verandert alles.**
+
+De toon-pipeline heeft twee banden en dat is geen detail:
+
+- Bijna alles in het district draait op **M_EclipseToonLit** met `EmissiveScale = 1`.
+  BaseColor is albedo; de echte lichten leveren de energie.
+- De **Glow**-familie draait op **M_EclipseToon** (unlit) met `EmissiveScale = 10`,
+  en is bovendien boven 1.0 geauthord (2.2 / 1.0 / 0.3). Dat is de *lichtbron-band*
+  en hij ligt daarmee ruwweg een factor 22 boven de albedoband.
+
+**Wat dat betekent voor de 17 armaturen:** hun emissieve delen horen in de
+Glow-band, niet in de gewone toon-band. Een fixture die op `EmissiveScale = 1`
+staat, is in dit district geen lamp maar een lichtgekleurd blok — hij zit dan in
+dezelfde luminantieband als de muur ernaast. De behuizing hoort juist wél in de
+gewone lit-band, anders gloeit het metaal mee en verdwijnt de vorm.
+
+Dus per armatuur **twee materiaalslots**: behuizing door de toon-master (15.5:
+basistexture wordt luminantie-detail, palet bepaalt de kleur), emissief deel in de
+Glow-band. Dat is precies de één-stijl-wet toepassen op een PBR-pack, niet ernaast.
+
+**De opbouw, uit de referentie (RayTracedCinematicLightin) — de OPBOUW, niet de techniek:**
+
+1. **Poelen, geen dekking.** Het leerproject verlicht ruimtes met een handvol sterke
+   bronnen en laat het donker ertussen staan. Kessara heeft nu één zon en een
+   uniforme dressing; wat ontbreekt is dus niet "meer licht" maar **contrast**.
+2. **Hiërarchie in helderheid.** Eén bron is de sterkste in beeld, de rest zit er
+   meetbaar onder. Dat is dezelfde regel als het palet al volgt.
+3. **Gemotiveerde bronnen.** Elk licht heeft een zichtbare armatuur. Dat is wat dit
+   pack levert en wat het district nu mist.
+
+**Wat ik wil doen, in deze volgorde:**
+
+| | Waar | Hoeveel | Waarom |
+|---|---|---|---|
+| 1 | **Doelsites** (ControlPost, AlarmRelay, Crane, Pens, Extraction) | 5 bakens | Een doel dat oplicht is leesbaar vanaf de andere kant van het plein. Dit is navigatie, geen dressing |
+| 2 | **De routes ertussen** | ~8 wandarmaturen | De poelen die de referentie maakt; ertussen mag het donker blijven |
+| 3 | **De extractiezone** | 1 sterkste bron | De hiërarchie: dit is het helderste punt in het district |
+| 4 | Rest van het district | pas na jouw oordeel | — |
+
+Dat zijn **14 armaturen, niet 100.** Eerst één ronde vaste-camera screenshots door
+de art-review, dan pas breed.
+
+**Wat ik van je nodig heb:** ja/nee op deze volgorde, en of je de bakens bij de
+doelsites een eigen kleur wilt (mijn advies: nee — één palet, en de hiërarchie
+komt uit helderheid, zoals de referentie het doet).
+
+## Wat nog steeds op je wacht
+
+### Voorstel: elementaire schade — mijn advies is NEE, en hier is waarom
+
+Je zei: niet bouwen, zet een voorstel neer en ik beslis. Dit is het voorstel.
+
+**Wat het in Borderlands is.** Vuur/zuur/schok/ontploffing zijn daar geen extra
+schadegetal maar een *counter-systeem*: elk vijandtype heeft een gezondheidsbalk
+van een soort (vlees, pantser, schild) en elk element telt anders tegen elke
+soort. Vuur verbrandt vlees, zuur vreet pantser, schok breekt schilden. Daar komt
+de hele wapenjacht van dat spel uit voort: je draagt drie wapens omdat je drie
+soorten tegenkomt.
+
+**Wat het kost om het echt te doen.** Drie dingen die ECLIPSE geen van drieën
+heeft:
+1. **Soorten gezondheid.** Nu is er één balk. Zonder pantser en schilden telt een
+   element tegen niets — dan is vuur gewoon "meer schade" met een kleurtje.
+2. **Statuseffecten over tijd.** Branden, corroderen, verlamd zijn. Dat is een
+   effect-systeem per personage plus HUD ervoor, en het raakt de squad-AI (loopt
+   een brandende vijand nog naar dekking?).
+3. **Zichtbaarheid.** In Borderlands zie je aan de vijand wat er gebeurt. Bij ons
+   is dat vier extra materiaal-toestanden door de toon-pipeline.
+
+**Waarom ik nee adviseer.** Niet omdat het te veel werk is, maar omdat het het
+verkeerde probleem oplost. De wapens verschillen sinds vandaag al op negen assen
+(schade, tempo, magazijn, afval, spreiding heup/mik/beweging, terugslag,
+stabiliteit, handling, kopschot) — en er staat nu een demper tegenover die je
+alarmradius meer dan halveert. Dat is al meer keuze dan je in een gevecht kunt
+gebruiken. Een tiende as toevoegen maakt de negen niet scherper.
+
+**Wat ik in plaats daarvan zou doen als je die kant op wilt:** geef vijanden
+*pantser* (één extra soort, geen vier), en laat één wapenveld dat doorboren. Dan
+heb je de counter-gedachte van Borderlands met één as in plaats van vier, en het
+past in DT_Weapons als één veld. Dat is een dag werk, niet een week.
+
+**Beslis: nee (mijn advies) / ja, volledig / het pantser-alternatief.**
+- **Spelen.** Er is sinds vanmorgen terugslag, spreiding, kopschoten, nieuwe
+  vijandopstelling en drie lagen geluid bij gekomen. Ik kan meten dát ze werken;
+  of het *lekker* is, kan ik niet meten.
+
+---
+
 # DAGRAPPORT — 26 juli 2026, bijgewerkt 12:25
 
 **Bar: build ✓ (-NoUba) · 137/137 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
