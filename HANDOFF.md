@@ -5,7 +5,7 @@
 
 # DAGRAPPORT — 26 juli 2026, bijgewerkt 11:30
 
-**Bar: build ✓ (-NoUba) · 135/135 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
+**Bar: build ✓ (-NoUba) · 136/136 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
 
 ## Wat werkt er nu dat gisteren niet werkte
 
@@ -22,6 +22,7 @@
 | **De +20 voor een ronde zonder gewonden betaalt uit.** | **20 materiaal** gemeten; was 0 |
 | **Geen dode knoppen meer op RB en X.** RB wisselt buiten Command Mode het camerastandpunt (de pad kón dat helemaal niet meer), X geeft een snelle hergroepeer-order. LT is weer alleen mikken. | — |
 | **Het alarm gaat af bij de eerste waarneming.** | Zie waarschuwing hieronder |
+| **Je squad houdt een order vol.** "Richt op dat doelwit" vuurde precies één kogel en zweeg daarna — de order bleef staan, maar niets voerde hem opnieuw uit. Vijanden hadden wél een denkbeurt, squadmates niet. | **14 schoten in 2 seconden** waar het er **1** was |
 | **Je hoort het gevecht.** Schot, inslag en voetstappen — alle drie lagen de cues ongebruikt in de repo. | Schot 0,7 · inslag 0,85 (luider, want dat is het signaal dat je *raakt*) · **een kopschot klinkt 1,35× harder** · voetstap elke 140 cm |
 
 ## Wat wacht er op jou
@@ -57,6 +58,13 @@ toeval en toeval is geen methode: `find_dead_fields.py` (tuningvelden die niets
 leest) en `find_dead_assets.py` (audiocues die niemand afspeelt). Die laatste heb
 ik twee keer moeten versmallen — de eerste versie trapte op een comment, de tweede
 meldde 24 valse doden. De scope staat nu in de docstring.
+
+**Er ligt nu één vraag die groter is dan alle andere.** De squad-audit
+([phase0/SQUAD_AUDIT.md](phase0/SQUAD_AUDIT.md)) vond dat je squad *niets* uit
+zichzelf doet: geen autonoom vuren, geen meelopen, geen dekking. Dat zijn drie
+punten maar één beslissing, en hij is groter dan kopschoten of de
+vijandopstelling — een squad die alles zelf doet maakt je commando-systeem
+overbodig. Mijn advies staat erbij; ik heb hem bewust niet aangezet.
 
 **De volledige locomotie-audit staat in [phase0/LOCOMOTIE_AUDIT.md](phase0/LOCOMOTIE_AUDIT.md)** — vijftien onderdelen, elk getal gemeten, met per punt of het een keuze of een omissie is. Die ronde hoort aan het eind van elke dag opnieuw te draaien.
 
