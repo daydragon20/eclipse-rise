@@ -177,6 +177,7 @@ void AEclipseGameMode::StartPlay()
 
 #if !UE_BUILD_SHIPPING
 	SetupShotRig();
+	SetupPlayShotRound();
 	StartMissionFromCommandLine();
 #endif
 }
@@ -221,6 +222,98 @@ void AEclipseGameMode::StartMissionFromCommandLine()
 #endif
 
 #if !UE_BUILD_SHIPPING
+void AEclipseGameMode::SetupPlayShotRound()
+{
+	if (!FParse::Param(FCommandLine::Get(), TEXT("EclipseShotPlay")))
+	{
+		return;
+	}
+
+	// Volle kwaliteit, zelfde reden als bij de review-ronde: een beoordeling mag
+	// niet afhangen van wat deze laptop autodetecteert.
+	Scalability::FQualityLevels Quality;
+	Quality.SetFromSingleQualityLevel(3);
+	Scalability::SetQualityLevels(Quality);
+
+	// 5 s voordat de eerste opname valt: streaming en belichting moeten settelen,
+	// anders beoordeel je een half geladen frame.
+	GetWorldTimerManager().SetTimer(PlayShotTimer, this, &AEclipseGameMode::AdvancePlayShotRound,
+		2.0f, /*bLoop*/ true, /*FirstDelay*/ 5.0f);
+	// De invoerduw loopt sneller: bewegingsinvoer moet elke tick binnenkomen,
+	// anders staat hij op het moment van de opname alweer stil.
+	GetWorldTimerManager().SetTimer(PlayShotDriveTimer, this, &AEclipseGameMode::DrivePlayShotInput,
+		0.02f, /*bLoop*/ true);
+	UE_LOG(LogEclipse, Display, TEXT("PlayShot: armed — opnames vanuit de speler tijdens het spelen."));
+}
+
+void AEclipseGameMode::DrivePlayShotInput()
+{
+	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
+	if (Body == nullptr)
+	{
+		return;
+	}
+	if (bPlayShotWalking)
+	{
+		// Rechtdoor, camera-relatief — precies wat de speler doet.
+		const FRotator YawOnly(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+		Body->AddMovementInput(FRotationMatrix(YawOnly).GetUnitAxis(EAxis::X), 1.0f);
+	}
+	if (bPlayShotFiring)
+	{
+		if (UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>())
+		{
+			const FVector Origin = Body->GetPawnViewLocation();
+			Weapon->Fire(Origin, Controller->GetControlRotation().Vector(), TEXT("PlayShot"));
+		}
+	}
+}
+
+void AEclipseGameMode::AdvancePlayShotRound()
+{
+	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	if (Controller == nullptr)
+	{
+		return;
+	}
+
+	// Elke stap: eerst de TOESTAND zetten, dan één stap later de opname. Zo staat
+	// het personage al in de houding die beoordeeld moet worden.
+	switch (PlayShotStep)
+	{
+	case 0:
+		bPlayShotWalking = false;
+		bPlayShotFiring = false;
+		break;
+	case 1:
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 1] stilstaand, net gespawnd"));
+		bPlayShotWalking = true;
+		break;
+	case 2:
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 2] tijdens lopen"));
+		bPlayShotFiring = true;
+		break;
+	case 3:
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 3] lopend en vurend"));
+		bPlayShotWalking = false;
+		bPlayShotFiring = false;
+		break;
+	case 4:
+		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 4] weer stilstaand"));
+		break;
+	default:
+		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));
+		Controller->ConsoleCommand(TEXT("quit"));
+		return;
+	}
+	++PlayShotStep;
+}
+
 void AEclipseGameMode::SetupShotRig()
 {
 	if (!FParse::Param(FCommandLine::Get(), TEXT("EclipseShot")))

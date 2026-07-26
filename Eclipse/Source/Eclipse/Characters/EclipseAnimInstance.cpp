@@ -416,9 +416,20 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 		Samples.Add({ RunClip, Blend.RunWeight, GaitPhase * RunClip->GetPlayLength(), true });
 	}
 
-	// De overlay bovenop: de gangposes maken ruimte, zodat het totaal 1 blijft en
-	// de klap niet optelt bij een al volledige pose.
-	if (OneShot != nullptr && FAnimWeight::IsRelevant(OneShotWeight))
+	// De overlay bovenop. TWEE WEGEN, want een eenmalige pose mag additief zijn en
+	// dan mag hij juist NIET als volledige pose meegeblend worden:
+	//
+	//   volledig  de gangposes maken ruimte, zodat het totaal 1 blijft
+	//   additief  hij wordt ná de blend OPGETELD — een klap is per definitie een
+	//             verschil bovenop je gangpose, en zo zijn ze ook geauthord
+	//
+	// Gevonden 26-07 21:30: de hit-react van de packs is additief. Als volledige
+	// pose gesampeld liet hij het personage bij elke treffer inklappen — dezelfde
+	// fout die de additieve idle bij stilstand maakte, maar dan kort genoeg om
+	// niet op te vallen. De test die "de klap heeft gewicht" mat, was groen op dat
+	// kapotte gedrag.
+	const bool bOneShotIsAdditive = OneShot != nullptr && OneShot->IsValidAdditive();
+	if (OneShot != nullptr && FAnimWeight::IsRelevant(OneShotWeight) && !bOneShotIsAdditive)
 	{
 		for (FEclipseLocomotionSample& Sample : Samples)
 		{
@@ -427,16 +438,21 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 		Samples.Add({ OneShot, OneShotWeight, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false });
 	}
 
-	if (Samples.Num() == 0)
+	if (Samples.Num() == 0 && !bOneShotIsAdditive)
 	{
 		// Ref pose. Not a failure path worth logging per frame — ApplyBodyDef
 		// already said, once, which clip was missing and why (GDD 14.3.5).
 		return true;
 	}
-
+	// Geen gangpose maar wel een additieve overlay? Dan is de ref-pose de basis
+	// waar hij bovenop komt, en slaan we de blend hieronder over.
 	FAnimationPoseData OutputPoseData(Output);
-	SampleInto(Samples[0], OutputPoseData);
-	float AccumulatedWeight = Samples[0].Weight;
+	float AccumulatedWeight = 0.0f;
+	if (Samples.Num() > 0)
+	{
+		SampleInto(Samples[0], OutputPoseData);
+		AccumulatedWeight = Samples[0].Weight;
+	}
 
 	for (int32 Index = 1; Index < Samples.Num(); ++Index)
 	{
@@ -456,6 +472,25 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 		}
 		FAnimationRuntime::BlendTwoPosesTogetherInPlace(OutputPoseData, ScratchPoseData, AccumulatedWeight / NextWeight);
 		AccumulatedWeight = NextWeight;
+	}
+
+	// De additieve overlay erbovenop, ná de gangblend.
+	if (bOneShotIsAdditive && FAnimWeight::IsRelevant(OneShotWeight))
+	{
+		FCompactPose AdditivePose;
+		AdditivePose.SetBoneContainer(&Output.Pose.GetBoneContainer());
+		FBlendedCurve AdditiveCurve;
+		AdditiveCurve.InitFrom(Output.Curve);
+		UE::Anim::FStackAttributeContainer AdditiveAttributes;
+		FAnimationPoseData AdditivePoseData = { AdditivePose, AdditiveCurve, AdditiveAttributes };
+
+		const FEclipseLocomotionSample AdditiveSample{
+			OneShot, 1.0f, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false };
+		SampleInto(AdditiveSample, AdditivePoseData);
+
+		FAnimationPoseData OutputForAdd(Output);
+		FAnimationRuntime::AccumulateAdditivePose(OutputForAdd, AdditivePoseData, OneShotWeight,
+			OneShot->GetAdditiveAnimType());
 	}
 
 	Output.Pose.NormalizeRotations();

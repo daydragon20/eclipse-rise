@@ -763,6 +763,28 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 	MeshComponent->SetRelativeRotation(FRotator(0.0f, BodyDef.MeshYaw, 0.0f));
 	MeshComponent->SetRelativeScale3D(FVector(BodyDef.MeshScale));
 
+	// DE POSE MOET ALTIJD TIKKEN, ook als de mesh niet gerenderd wordt.
+	//
+	// Gevonden 26-07 21:30 met de nieuwe zichtbaarheidscontrole: nul van de 123
+	// botten bewoog in 0,35 s en de bounding box was 1 cm hoog. De standaard van
+	// USkeletalMeshComponent is "tik de pose alleen als je gerenderd wordt", en
+	// dan bevriest een personage dat de renderer even niet meetelt — en met een
+	// bevroren pose klapt ook zijn omvang in, waardoor hij helemaal wegvalt.
+	//
+	// Voor ECLIPSE kan dat sowieso niet: de hoofd-hitbox hangt aan een BOT
+	// (26-07, kopschoten). Een lichaam waarvan de botten niet bijwerken, heeft
+	// zijn hoofd op de plek van vorig frame — dus dit is niet alleen een
+	// zichtbaarheidskwestie maar ook een raakbaarheidskwestie.
+	MeshComponent->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+
+	// EN GEEN UPDATE-RATE-OPTIMALISATIE. URO knijpt de animatie-updates af voor wat
+	// de renderer weinig ziet, en interpoleert ertussen. Voor een spel waarin een
+	// HITBOX aan een bot hangt is dat geen prestatiewinst maar een
+	// correctheidsprobleem: een kopschot zou dan op een geïnterpoleerde schedel
+	// landen. En het is de tweede verdachte voor het personage dat bij stilstand
+	// verdwijnt — gemeten omvang 182,9 cm rennend tegen 1,0 cm stilstaand.
+	MeshComponent->bEnableUpdateRateOptimizations = false;
+
 	// De kopschot-hitbox op de hoofdbot hangen (26-07, punt 2). Hier en niet in de
 	// constructor: pas met een mesh is er een skelet om aan te hechten.
 	//
@@ -847,7 +869,13 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	// USkeleton asset, and a clip evaluated against a foreign skeleton does not
 	// throw — it produces a mangled pose. So a mismatch is rejected loudly and
 	// the body drops one rung instead of being quietly broken (GDD 14.3.5).
-	auto ResolveClip = [this, MeshSkeleton](const TSoftObjectPtr<UAnimSequence>& SoftClip, const TCHAR* SlotName) -> UAnimSequence*
+	// bAllowAdditive: eenmalige poses (klap, schot, herladen, draai) MOGEN additief
+	// zijn — een klap is per definitie een verschil bovenop je gangpose, en zo zijn
+	// ze in de packs ook geauthord. Locomotie mag het NOOIT: die is de basispose
+	// zelf, en additief sampelen laat het personage inklappen (26-07: de owner zag
+	// zijn personage verdwijnen bij stilstand).
+	auto ResolveClip = [this, MeshSkeleton](const TSoftObjectPtr<UAnimSequence>& SoftClip, const TCHAR* SlotName,
+		bool bAllowAdditive = false) -> UAnimSequence*
 	{
 		if (SoftClip.IsNull())
 		{
@@ -862,6 +890,25 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 				*GetName(), SlotName, *SoftClip.ToString());
 			return nullptr;
 		}
+		// ADDITIEVE TAKES WEIGEREN. Een additieve animatie is een VERSCHIL ten
+		// opzichte van een basispose, geen pose op zich. Sample je hem als volledige
+		// pose, dan vallen alle botten naar de oorsprong en klapt het personage in.
+		//
+		// Gevonden 26-07 21:30: de owner meldde "bij stilstand is het personage
+		// helemaal weg". Gemeten omvang 182,9 cm rennend tegen 1,0 cm stilstaand, en
+		// de idle van ParagonLtBelica heet gewoon "Idle" maar is additief. Bij
+		// stilstand heeft die clip gewicht 1,0 — vandaar dat het alleen daar te zien
+		// was.
+		if (Clip->IsValidAdditive() && !bAllowAdditive)
+		{
+			EclipseDegradation::Note(TEXT("animatie is additief"),
+				FString::Printf(TEXT("%s: %s (%s)"), *GetName(), SlotName, *SoftClip.ToString()));
+			UE_LOG(LogEclipse, Warning,
+				TEXT("%s: %s take %s is ADDITIEF en kan geen volledige pose zijn — geweigerd (GDD 14.3.5)."),
+				*GetName(), SlotName, *SoftClip.ToString());
+			return nullptr;
+		}
+
 		if (!EclipseLocomotion::IsUsableOn(Clip->GetSkeleton(), MeshSkeleton))
 		{
 			EclipseDegradation::Note(TEXT("animatie afgewezen op skelet"),
@@ -910,12 +957,12 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	FillFrom(LocomotionSet.RunLeft, LocomotionSet.WalkLeft);
 	FillFrom(LocomotionSet.RunRight, LocomotionSet.WalkRight);
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
-	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"));
-	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"));
-	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"));
+	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"), /*bAllowAdditive=*/true);
+	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"), /*bAllowAdditive=*/true);
+	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"), /*bAllowAdditive=*/true);
 	bBodyDefApplied = true;
-	LocomotionSet.TurnLeft = ResolveClip(BodyDef.TurnLeftAnim, TEXT("draai links"));
-	LocomotionSet.TurnRight = ResolveClip(BodyDef.TurnRightAnim, TEXT("draai rechts"));
+	LocomotionSet.TurnLeft = ResolveClip(BodyDef.TurnLeftAnim, TEXT("draai links"), /*bAllowAdditive=*/true);
+	LocomotionSet.TurnRight = ResolveClip(BodyDef.TurnRightAnim, TEXT("draai rechts"), /*bAllowAdditive=*/true);
 	LocomotionSet.CrouchTransition = ResolveClip(BodyDef.CrouchTransitionAnim, TEXT("crouch-transition"));
 
 	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();

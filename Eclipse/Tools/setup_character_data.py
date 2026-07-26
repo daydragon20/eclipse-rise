@@ -31,6 +31,29 @@ def obj_path(asset):
     return f"{asset.package_name}.{asset.asset_name}"
 
 
+def is_additive(asset):
+    """Is dit een additieve take? Die kan geen volledige pose zijn.
+
+    Een additieve animatie is een VERSCHIL ten opzichte van een basispose. Sample
+    je hem als volledige pose, dan vallen alle botten naar de oorsprong. Dat is op
+    26-07 gebeurd: ParagonLtBelica's take heet gewoon "Idle" en is additief, dus
+    het personage verdween bij stilstand (gemeten omvang 1,0 cm tegen 182,9 cm
+    rennend).
+
+    De naamfilter ving dit niet: NOT_BASE_TAKE bevat "additive", maar deze heet
+    niet zo. Een naam is een aanwijzing; het asset weet het zelf.
+    """
+    loaded = unreal.EditorAssetLibrary.load_asset(obj_path(asset))
+    if loaded is None:
+        return False
+    # Python kent is_valid_additive() niet; het additieve TYPE staat wel als
+    # property op het asset. AAT_None betekent "gewone pose".
+    try:
+        return loaded.get_editor_property("additive_anim_type") != unreal.AdditiveAnimationType.AAT_NONE
+    except Exception:  # noqa: BLE001 - een asset zonder die property is geen additive
+        return False
+
+
 # Variants that are never the base locomotion take. Without this list the old
 # "first name that contains the keyword" picker gave the Player a BACKWARD jog
 # (Jog_Bwd matched "walk"->"run"->"jog") and gave Veil a crouched backward walk,
@@ -44,7 +67,7 @@ NOT_BASE_TAKE = (
 )
 
 
-def pick_directional(path, wanted, direction_keys, allow=()):
+def pick_directional(path, wanted, direction_keys, allow=(), allow_additive=False):
     """Zoek de richtingsvariant van een gangcyclus (26-07, punt 8).
 
     pick_anim() SLUIT richtingen expliciet uit - het zoekt de basis-take en
@@ -75,11 +98,13 @@ def pick_directional(path, wanted, direction_keys, allow=()):
                 continue
             if any(bad in name for bad in stance_or_technical):
                 continue
+            if not allow_additive and is_additive(asset):
+                continue
             return obj_path(asset)
     return ""
 
 
-def pick_anim(path, wanted):
+def pick_anim(path, wanted, allow_additive=False):
     """First take matching a keyword from `wanted` (priority order) that is not
     a direction/stance/technical variant. Ties break on the SHORTEST name, so
     `Idle` wins over `Idle_Relaxed` and `Jog_Fwd` over `Jog_Fwd_Downhill`."""
@@ -90,6 +115,13 @@ def pick_anim(path, wanted):
             if keyword not in name:
                 continue
             if any(bad in name for bad in NOT_BASE_TAKE):
+                continue
+            # ADDITIEF MAG BIJ EENMALIGE POSES. Een klap of een schotpose is per
+            # definitie een verschil bovenop je gangpose, en zo zijn ze in de packs
+            # ook geauthord — de proxy telt ze sinds 26-07 additief op. Voor
+            # LOCOMOTIE mag het nooit: die is de basispose zelf, en additief
+            # sampelen laat het personage inklappen.
+            if not allow_additive and is_additive(asset):
                 continue
             return obj_path(asset)
     return ""
@@ -197,7 +229,7 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
         continue
     donor = DONOR_PACKS.get(anim_pack)
 
-    def take(keywords):
+    def take(keywords, allow_additive=False):
         """Zoek de take in het eigen pack, en anders bij de donor.
 
         26-07 avond, tweede ronde: de donor werd eerst alleen voor RICHTINGEN
@@ -209,18 +241,18 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
         Dezelfde donor, dezelfde compatibele skeletten; alleen was de regel maar
         op de helft van de velden toegepast.
         """
-        found = pick_anim(anim_pack, keywords)
+        found = pick_anim(anim_pack, keywords, allow_additive)
         if found or donor is None:
             return found
-        return pick_anim(donor, keywords)
+        return pick_anim(donor, keywords, allow_additive)
 
     idle = take(IDLE_KEYWORDS)
     walk = take(WALK_KEYWORDS)
     run = take(RUN_KEYWORDS)
-    shoot = take(SHOOT_KEYWORDS)
+    shoot = take(SHOOT_KEYWORDS, allow_additive=True)
     death = take(DEATH_KEYWORDS)
-    hit_react = take(HITREACT_KEYWORDS)
-    reload = take(RELOAD_KEYWORDS)
+    hit_react = take(HITREACT_KEYWORDS, allow_additive=True)
+    reload = take(RELOAD_KEYWORDS, allow_additive=True)
     # DRAAITAKES VIA pick_directional, niet via pick_anim. Die laatste SLUIT
     # richtingswoorden expliciet uit (NOT_BASE_TAKE bevat "left" en "right"), want
     # hij zoekt de basis-take. Een draai IS een richting, dus hij vond nooit iets:

@@ -2498,6 +2498,15 @@ bool FEclipseFocusFireIsSustainedTest::RunTest(const FString& Parameters)
 			break;
 		}
 	}
+	if (Hostile != nullptr)
+	{
+		// HET DOELWIT MOET HET OVERLEVEN, anders meet deze test iets anders dan hij
+		// beweert. Sinds de squad vanavond uit zichzelf vuurt, gaat het doelwit
+		// binnen een seconde neer en eindigt de order — en dan telt de test hoe
+		// SNEL hij viel in plaats van of de order werd volgehouden. Gemeten
+		// schommelde hij daardoor tussen 2 en 14 schoten in dezelfde bar.
+		Hostile->InitializeHealth(100000.0f);
+	}
 	if (!TestNotNull(TEXT("focus: er is een squadmate"), Mate)
 		|| !TestNotNull(TEXT("focus: er is een vijand"), Hostile))
 	{
@@ -4482,6 +4491,205 @@ bool FEclipseNothingDegradesSilently::RunTest(const FString& Parameters)
 	}
 
 	TestEqual(TEXT("degradatie: niets valt stil terug in een echte missie"), Degradations, 0);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * IS ER IETS TE ZIEN? (owner-opdracht 26-07, 21:30, punt 3.)
+ *
+ * Zijn woorden: *"Je speelronde meet uitkomsten en die kunnen groen zijn terwijl
+ * er niets te zien is. Ik wil per ronde weten: staat het personage in beeld,
+ * speelt er een animatie, klopt zijn schaal."*
+ *
+ * Dat is de laag die ontbrak. "De missie is voltooid" bewees dat de LOGICA liep,
+ * niet dat er iets op het scherm stond — en op 26-07 waren allebei zijn
+ * waarnemingen precies daar: het personage schaalde mee met zijn snelheid, en bij
+ * stilstand was het weg.
+ *
+ * Headless kan er niets gerenderd worden, dus dit meet wat BEPAALT of er iets in
+ * beeld komt: een zichtbare component, een echte mesh, een niet-ontaarde bounding
+ * box, de geauthorde schaal, en een pose die tussen twee frames verandert. Alle
+ * vijf zijn nul-of-onzin als het personage weg is.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseThePlayerIsActuallyOnScreen,
+	"Eclipse.Mission.Playthrough.ThePlayerIsActuallyOnScreen",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseThePlayerIsActuallyOnScreen::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("zichtbaar: missie gelanceerd (%s)"), *Error),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	USkeletalMeshComponent* Mesh = Harness.Body->GetMesh();
+	if (!TestNotNull(TEXT("zichtbaar: het lichaam heeft een mesh-component"), Mesh))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// SCHERMOPNAMES VANUIT DE SPELER (owner-opdracht 26-07, 22:00).
+	//
+	// De getallen hieronder bewijzen dat er iets te tekenen is; ze bewijzen niet
+	// dat het er goed uitziet. Daarvoor moet er iemand kijken, en dat kan alleen
+	// als er een plaatje ligt. Vier momenten: net gespawnd, tijdens lopen, tijdens
+	// vuren, en aan het eind.
+	//
+	// Onder -nullrhi is dit een no-op — dan is er geen renderer en dus geen frame.
+	// De ronde die de owner beoordeelt draait daarom ZONDER die vlag; de suite
+	// blijft headless en meet de getallen.
+	int32 ShotIndex = 0;
+	auto Capture = [&Harness, &ShotIndex](const TCHAR* Moment)
+	{
+		if (APlayerController* PC = Harness.World->GetFirstPlayerController())
+		{
+			PC->ConsoleCommand(FString::Printf(TEXT("HighResShot 1280x720")));
+			UE_LOG(LogEclipse, Display, TEXT("[SHOT %d] %s"), ++ShotIndex, Moment);
+		}
+		// Twee ticks: de opname wordt aan het EIND van een frame afgehandeld.
+		Harness.Step();
+		Harness.Step();
+	};
+
+	// --- 1. staat er een mesh IN, en is hij zichtbaar? -----------------------
+	const bool bHasAsset = Mesh->GetSkeletalMeshAsset() != nullptr;
+	Report(*this, TEXT("mesh-asset aanwezig"), bHasAsset ? 1.0f : 0.0f, TEXT(""),
+		TEXT("0 = een onzichtbare capsule, hoe groen de rest ook is"));
+	TestTrue(TEXT("zichtbaar: er zit een skeletal mesh in"), bHasAsset);
+	TestTrue(TEXT("zichtbaar: de mesh staat aan"), Mesh->IsVisible());
+
+	Capture(TEXT("net gespawnd, stilstaand"));
+
+	// --- 2. de SCHAAL, stilstaand ------------------------------------------
+	// De owner zag zijn personage MEEGROEIEN met zijn snelheid. Dus meten bij
+	// stilstand én tijdens rennen, en eisen dat het dezelfde is.
+	Harness.Idle(0.5f);
+	const FVector ScaleStill = Mesh->GetComponentScale();
+	const FBoxSphereBounds BoundsStill = Mesh->Bounds;
+	Report(*this, TEXT("meshschaal stilstaand"), static_cast<float>(ScaleStill.X), TEXT("x"));
+	Report(*this, TEXT("hoogte van de bounding box stilstaand"),
+		static_cast<float>(BoundsStill.BoxExtent.Z * 2.0f), TEXT("cm"),
+		TEXT("0 = niets om te tekenen"));
+	// GEEN ASSERTIE op deze eerste meting: vlak na de start kan de eerste pose-tick
+	// nog niet doorgekomen zijn, en dan meet je het opstarten in plaats van het
+	// spel. De harde eis staat bij 3b, ná het rennen.
+
+	// --- 3. de SCHAAL, rennend ---------------------------------------------
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 2.0, []() { return false; });
+	Capture(TEXT("tijdens lopen"));
+	const FVector ScaleRunning = Mesh->GetComponentScale();
+	const FBoxSphereBounds BoundsRunning = Mesh->Bounds;
+	Report(*this, TEXT("meshschaal rennend"), static_cast<float>(ScaleRunning.X), TEXT("x"),
+		TEXT("moet gelijk zijn aan stilstaand"));
+	Report(*this, TEXT("hoogte van de bounding box rennend"),
+		static_cast<float>(BoundsRunning.BoxExtent.Z * 2.0f), TEXT("cm"));
+
+	TestTrue(FString::Printf(TEXT("zichtbaar: de schaal verandert niet met snelheid (%.3f tegen %.3f)"),
+			ScaleRunning.X, ScaleStill.X),
+		ScaleRunning.Equals(ScaleStill, 0.001f));
+	TestTrue(TEXT("zichtbaar: hij heeft rennend nog steeds een tekenbare omvang"),
+		BoundsRunning.BoxExtent.Z > 1.0f);
+
+	// --- 3b. EN WEER STILSTAAN ---------------------------------------------
+	// De owner ziet zijn personage verdwijnen bij stilstand. De eerste meting
+	// hierboven staat vlak na de start, en dan kan een omvang van 1 cm ook betekenen
+	// dat de eerste pose-tick nog niet doorgekomen is. Nog één keer stilstaan ná het
+	// rennen scheidt die twee: blijft hij dan groot, dan was het opstarten; klapt hij
+	// terug, dan is stilstand zelf het probleem.
+	// Even vuren, want een schietpose is het derde ding dat hij wil zien.
+	{
+		const double FireStart = Harness.ElapsedSeconds;
+		while (Harness.ElapsedSeconds - FireStart < 0.6)
+		{
+			Harness.Inject(TEXT("Fire"), true);
+			Harness.Step();
+		}
+	}
+	Capture(TEXT("tijdens vuren"));
+
+	Harness.Idle(1.5f);
+	Capture(TEXT("weer stilstaand"));
+	const FBoxSphereBounds BoundsStillAgain = Mesh->Bounds;
+
+	// Discriminator: HEEFT dit lichaam een idle-clip? Zonder idle staat er bij
+	// stilstand geen enkele pose-sample in de blend, en dan valt de proxy terug op
+	// de ref-pose. Als de omvang dán inklapt, ligt het aan die terugval en niet aan
+	// stilstand op zich.
+	if (const UEclipseAnimInstance* AnimForTier = Cast<UEclipseAnimInstance>(Mesh->GetAnimInstance()))
+	{
+		const FEclipseLocomotionSet& Set = AnimForTier->GetLocomotionSet();
+		Report(*this, TEXT("idle-clip aanwezig"), Set.Idle != nullptr ? 1.0f : 0.0f, TEXT(""),
+			TEXT("0 = bij stilstand staat er geen enkele sample in de blend"));
+		Report(*this, TEXT("wandel/ren-clip aanwezig"),
+			(Set.Walk != nullptr ? 1.0f : 0.0f) + (Set.Run != nullptr ? 1.0f : 0.0f), TEXT(""));
+		if (Set.Idle != nullptr)
+		{
+			// IS DE IDLE ADDITIEF? Een additieve take sampelen als volledige pose
+			// geeft bijna-nul transforms: alle botten vallen op de oorsprong en het
+			// personage klapt in. Dat zou precies verklaren waarom het alleen bij
+			// STILSTAND gebeurt — daar heeft de idle gewicht 1,0.
+			AddInfo(FString::Printf(TEXT("GEMETEN  idle-clip                                %s"),
+				*Set.Idle->GetName()));
+			AddInfo(FString::Printf(TEXT("GEMETEN  idle is additief                         %s"),
+				Set.Idle->IsValidAdditive() ? TEXT("JA — dit is de oorzaak") : TEXT("nee")));
+			AddInfo(FString::Printf(TEXT("GEMETEN  idle lengte                              %.2f s"),
+				Set.Idle->GetPlayLength()));
+		}
+	}
+	Report(*this, TEXT("hoogte van de bounding box ná stilstaan"),
+		static_cast<float>(BoundsStillAgain.BoxExtent.Z * 2.0f), TEXT("cm"),
+		TEXT("klapt hij hier in, dan is stilstand zelf het probleem"));
+	TestTrue(FString::Printf(TEXT("zichtbaar: hij blijft stilstaand zichtbaar (%.1f cm)"),
+			BoundsStillAgain.BoxExtent.Z * 2.0f),
+		BoundsStillAgain.BoxExtent.Z > 50.0f);
+
+	// --- 4. BEWEEGT de pose? -----------------------------------------------
+	// Een bevroren pose is net zo onzichtbaar als geen pose: je ziet een standbeeld
+	// door het district glijden. Twee frames vergelijken op de botruimte.
+	const UEclipseAnimInstance* Anim = Cast<UEclipseAnimInstance>(Mesh->GetAnimInstance());
+	TestNotNull(TEXT("zichtbaar: er draait een anim-instance"), Anim);
+
+	const TArray<FTransform> PoseA = Mesh->GetBoneSpaceTransforms();
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 0.35, []() { return false; });
+	const TArray<FTransform> PoseB = Mesh->GetBoneSpaceTransforms();
+
+	int32 MovedBones = 0;
+	for (int32 Index = 0; Index < FMath::Min(PoseA.Num(), PoseB.Num()); ++Index)
+	{
+		if (!PoseA[Index].GetLocation().Equals(PoseB[Index].GetLocation(), 0.01f)
+			|| !PoseA[Index].GetRotation().Equals(PoseB[Index].GetRotation(), 0.001f))
+		{
+			++MovedBones;
+		}
+	}
+	Report(*this, TEXT("botten die in 0,35 s bewogen"), static_cast<float>(MovedBones), TEXT(""),
+		*FString::Printf(TEXT("van %d; 0 = een standbeeld dat door het district glijdt"), PoseA.Num()));
+	TestTrue(TEXT("zichtbaar: de pose beweegt echt"), MovedBones > 0);
 
 	Harness.Shutdown();
 	return true;

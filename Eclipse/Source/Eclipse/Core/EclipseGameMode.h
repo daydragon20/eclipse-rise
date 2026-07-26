@@ -68,6 +68,33 @@ private:
 	int32 ShotRigStep = 0;
 
 	/**
+	 * SPEELRONDE MET OPNAMES (owner-opdracht 26-07, 22:00).
+	 *
+	 * De vaste review-camera's hierboven beoordelen de KUNST. Deze ronde
+	 * beoordeelt of het SPEL er is: staat mijn personage in beeld, beweegt hij
+	 * mee, klopt zijn schaal. Vanuit de speler, tijdens het spelen, op vaste
+	 * momenten — en er kijkt daarna iemand naar.
+	 *
+	 * Aanleiding, de owner letterlijk: *"Je speelronde meet uitkomsten en die
+	 * kunnen groen zijn terwijl er niets te zien is."* Op 26-07 waren 152 tests
+	 * groen terwijl het personage bij stilstand onzichtbaar was.
+	 *
+	 * Aparte vlag en niet in -EclipseShot: die teleporteert naar overzichts-
+	 * camera's en zet de pawn op vliegen. Hier moet hij juist gewoon lopen.
+	 */
+	void SetupPlayShotRound();
+	void AdvancePlayShotRound();
+
+	FTimerHandle PlayShotTimer;
+	FTimerHandle PlayShotDriveTimer;
+	int32 PlayShotStep = 0;
+	bool bPlayShotWalking = false;
+	bool bPlayShotFiring = false;
+
+	/** Duwt elke tick beweging/vuur door zodat de opnames een LOPEND spel vangen. */
+	void DrivePlayShotInput();
+
+	/**
 	 * Playtest shortcut (13.2 owner finding): -EclipseStartMission=<RegionId>
 	 * selects that region's offer and auto-launches, so a feel-gauntlet run does
 	 * not start with hub clicks. Drives the same SelectMission -> AutoLaunch seam
