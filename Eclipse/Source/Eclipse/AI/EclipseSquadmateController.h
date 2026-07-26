@@ -50,8 +50,11 @@ public:
 	/** Diagnostiek: schoten zonder order — het bewijs dat laag 2 draait. */
 	int32 GetAutoFireShots() const { return AutoFireShots; }
 
+	/** Diagnostiek: verplaatsingen naar dekking onder vuur — het bewijs van laag 3. */
+	int32 GetCoverRuns() const { return CoverRuns; }
+
 	/** Start de basislaag: meelopen. Aangeroepen zodra de soldaat een lichaam heeft. */
-	void BeginFollowing(float FollowDistanceCm);
+	void BeginFollowing(float FollowDistanceCm, float CoverSearchRadiusCm);
 
 	/**
 	 * Apply this soldier's resolved class kit (SPEC-P2-01). Pure data over the
@@ -142,6 +145,28 @@ private:
 	 * apart van laag 1, met een eigen meting.
 	 */
 	void UpdateEngagement();
+
+	/**
+	 * DEKKING ZOEKEN ONDER VUUR (26-07 avond, punt 1 — laag 3 van zes).
+	 *
+	 * De owner: "als er op ze geschoten wordt volgen ze hun training: dekking
+	 * zoeken, verplaatsen, dekkingsvuur." `CoverSearchRadius` stond in de data met
+	 * een comment die zei dat er geen dekkingzoekgedrag was.
+	 *
+	 * Op het TREFFER-feit en niet op een klok: dekking zoeken is een reactie, geen
+	 * gewoonte. Een soldaat die elke halve seconde nadenkt over dekking loopt
+	 * heen en weer; een die het doet als er op hem geschoten wordt, reageert.
+	 */
+	void HandleHitTaken(AEclipseCharacter* Shooter, float Amount);
+
+	/** Tot wanneer een verse dekkingszoektocht niet nog eens mag starten. */
+	double CoverCooldownUntil = -1.0;
+
+	/** Zoekstraal uit DA_SquadTuning; 0 = geen dekkingzoekgedrag. */
+	float CoverSearchRadius = 0.0f;
+
+	/** Diagnostiek: hoe vaak deze soldaat onder vuur naar dekking vertrok. */
+	int32 CoverRuns = 0;
 	void ContinueAutoFire();
 
 	FTimerHandle AutoFireTimer;

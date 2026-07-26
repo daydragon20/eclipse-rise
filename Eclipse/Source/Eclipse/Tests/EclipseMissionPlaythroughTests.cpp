@@ -3674,4 +3674,104 @@ bool FEclipseSquadFiresWithoutBeingTold::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * DEKKING ONDER VUUR (owner-opdracht 26-07 avond, punt 1 — laag 3 van zes).
+ *
+ * "als er op ze geschoten wordt volgen ze hun training: dekking zoeken,
+ * verplaatsen, dekkingsvuur." `CoverSearchRadius` stond in de data met een
+ * comment die zei dat er geen dekkingzoekgedrag was.
+ *
+ * Twee dingen: er MOET beweging komen van een treffer, en een staande order moet
+ * dat nog steeds winnen — dat laatste is wat "orders zijn beloftes" betekent op
+ * het moment dat het pijn doet.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadTakesCoverUnderFire,
+	"Eclipse.Mission.Playthrough.SquadTakesCoverUnderFire",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseSquadTakesCoverUnderFire::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("dekking: strategie"), Strategy) || !TestNotNull(TEXT("dekking: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("dekking: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	if (!TestTrue(TEXT("dekking: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	AEclipseSquadmateController* Mate = Mates[0];
+	AEclipseCharacter* MateBody = Cast<AEclipseCharacter>(Mate->GetPawn());
+	if (!TestNotNull(TEXT("dekking: de soldaat heeft een lichaam"), MateBody))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// --- een treffer zet hem in beweging ------------------------------------
+	const FVector Before = MateBody->GetActorLocation();
+	const int32 RunsBefore = Mate->GetCoverRuns();
+	// Schade uit de richting van de speler: dat is de dreigingsrichting waar de
+	// dekkingsscorer op zoekt.
+	MateBody->ApplyDamage(5.0f, Harness.Body, TEXT("TestIncoming"));
+	Harness.Idle(2.0f);
+
+	const float Moved = static_cast<float>(FVector::Dist2D(MateBody->GetActorLocation(), Before));
+	Report(*this, TEXT("dekkingszoektochten na één treffer"),
+		static_cast<float>(Mate->GetCoverRuns() - RunsBefore), TEXT(""));
+	Report(*this, TEXT("afgelegde afstand na de treffer"), Moved, TEXT("cm"));
+
+	TestTrue(TEXT("dekking: een treffer zet hem in beweging"), Mate->GetCoverRuns() > RunsBefore);
+
+	// --- maar een Hold-order wint --------------------------------------------
+	Harness.Idle(2.5f); // de rem laten aflopen
+	Mate->ExecuteOrder(EEclipseSquadOrder::Hold, MateBody->GetActorLocation(), nullptr);
+	const int32 RunsUnderOrder = Mate->GetCoverRuns();
+	const FVector HeldAt = MateBody->GetActorLocation();
+
+	MateBody->ApplyDamage(5.0f, Harness.Body, TEXT("TestIncoming"));
+	Harness.Idle(2.0f);
+
+	const float HeldDrift = static_cast<float>(FVector::Dist2D(MateBody->GetActorLocation(), HeldAt));
+	Report(*this, TEXT("dekkingszoektochten tijdens Hold"),
+		static_cast<float>(Mate->GetCoverRuns() - RunsUnderOrder), TEXT(""),
+		TEXT("een order is een belofte, ook onder vuur (8.4)"));
+	Report(*this, TEXT("afdrijving tijdens Hold"), HeldDrift, TEXT("cm"));
+
+	TestEqual(TEXT("dekking: een Hold-order houdt hem staan, ook onder vuur"),
+		Mate->GetCoverRuns() - RunsUnderOrder, 0);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

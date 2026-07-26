@@ -697,7 +697,9 @@ void AEclipseGameMode::SpawnMissionActors()
 			// stond in DA_SquadTuning met een comment die zei dat hij niet gelezen
 			// werd; dit is de regel die dat waar maakt. Niet als optie: de owner
 			// noemde meelopen expliciet basisgedrag, geen feature.
-			Controller->BeginFollowing(SquadTuning != nullptr ? SquadTuning->FollowDistance : 400.0f);
+			Controller->BeginFollowing(
+				SquadTuning != nullptr ? SquadTuning->FollowDistance : 400.0f,
+				SquadTuning != nullptr ? SquadTuning->CoverSearchRadius : 800.0f);
 			SpawnedMissionActors.Add(Controller);
 		}
 		SpawnedMissionActors.Add(Body);

@@ -1058,6 +1058,14 @@ void AEclipseCharacter::ApplyDamage(float Amount, AEclipseCharacter* DamageInsti
 	// schade komt ook van andere kanten — melee, en straks vallen of vuur. Wie
 	// geraakt wordt hoort te reageren, ongeacht waardoor.
 	PlayHitReactPose();
+
+	// "Er wordt op me geschoten" is een FEIT dat dit lichaam overkomt, en het is
+	// wat een getrainde soldaat in beweging zet (26-07 avond, doctrine laag 3).
+	// Hier en niet in het wapen, om dezelfde reden als de klap hierboven: schade
+	// komt straks ook van melee, vallen of vuur, en dekking zoeken hoort daar
+	// net zo goed op te volgen.
+	OnHitTaken.Broadcast(DamageInstigator, Amount);
+
 	// PLACEHOLDER(GDD 12.1): direct attribute write until damage GameplayEffects
 	// land with the ability pass — the IncomingDamage meta attribute is already
 	// in place as their landing zone (PostGameplayEffectExecute).

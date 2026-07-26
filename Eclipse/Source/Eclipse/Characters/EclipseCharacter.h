@@ -19,6 +19,18 @@ class USpringArmComponent;
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEclipseCharacterDownedDelegate, AEclipseCharacter* /*Character*/, FName /*Cause*/);
 
 /**
+ * Er is op dit lichaam geraakt (26-07 avond, squad-doctrine laag 3). Draagt de
+ * schutter mee, want "dekking zoeken" heeft een richting nodig: dekking tussen
+ * jou en de kogel, niet zomaar het dichtstbijzijnde blok.
+ *
+ * Hier en niet op de bus: dit is een feit over ÉÉN lichaam en de enige luisteraar
+ * is zijn eigen controller. De bus is voor feiten die subsystemen aangaan (12.2);
+ * een delegate op de actor is voor wat de actor zelf overkomt — precies zoals
+ * OnDowned hierboven.
+ */
+DECLARE_MULTICAST_DELEGATE_TwoParams(FEclipseCharacterHitDelegate, AEclipseCharacter* /*Shooter*/, float /*Amount*/);
+
+/**
  * One instant of "how big is my character on screen, and why" (feel-audit S1).
  *
  * The owner's symptom — "mijn personage schaalt met snelheid" — has exactly four
@@ -175,6 +187,9 @@ public:
 
 	/** Fired once when health reaches zero; mission/squad wiring listens (SPEC-P1-06/07 pipeline). */
 	FEclipseCharacterDownedDelegate OnDowned;
+
+	/** Er is op dit lichaam geraakt; de squad-AI zoekt hierop dekking (laag 3). */
+	FEclipseCharacterHitDelegate OnHitTaken;
 
 	/**
 	 * First/third-person toggle (owner request 2026-07-25, C on keyboard / R3 on

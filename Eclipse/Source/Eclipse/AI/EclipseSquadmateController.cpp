@@ -178,9 +178,19 @@ APawn* AEclipseSquadmateController::GetLeaderPawn() const
 	return Player != nullptr ? Player->GetPawn() : nullptr;
 }
 
-void AEclipseSquadmateController::BeginFollowing(float FollowDistanceCm)
+void AEclipseSquadmateController::BeginFollowing(float FollowDistanceCm, float CoverSearchRadiusCm)
 {
 	FollowDistance = FMath::Max(FollowDistanceCm, 100.0f);
+	CoverSearchRadius = FMath::Max(CoverSearchRadiusCm, 0.0f);
+
+	// Op het treffer-feit van het eigen lichaam. RemoveAll eerst, want een
+	// controller kan een tweede lichaam krijgen en twee inschrijvingen zouden
+	// twee dekkingszoektochten per kogel opleveren.
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+	{
+		Body->OnHitTaken.RemoveAll(this);
+		Body->OnHitTaken.AddUObject(this, &AEclipseSquadmateController::HandleHitTaken);
+	}
 	// Elke halve seconde. Een soldaat die op 420 cm/s loopt legt daarin 210 cm af,
 	// ruim binnen de speling van een volgafstand van 400 — vaker kijken zou alleen
 	// meer padberekeningen kosten en niets veranderen aan wat je ziet.
@@ -340,6 +350,56 @@ void AEclipseSquadmateController::ContinueAutoFire()
 	const float Interval = Weapon != nullptr ? FMath::Max(Weapon->GetFireInterval(), 0.05f) : 0.15f;
 	GetWorldTimerManager().SetTimer(AutoFireTimer, this,
 		&AEclipseSquadmateController::ContinueAutoFire, Interval, /*bLoop*/ false);
+}
+
+void AEclipseSquadmateController::HandleHitTaken(AEclipseCharacter* Shooter, float /*Amount*/)
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	UWorld* World = GetWorld();
+	if (Body == nullptr || World == nullptr || Body->IsDowned() || CoverSearchRadius <= 0.0f)
+	{
+		return;
+	}
+
+	// EEN STAANDE ORDER WINT, net als bij het meelopen. Zet je iemand op een
+	// positie, dan blijft hij daar ook als er op hem geschoten wordt — dat is wat
+	// "orders zijn beloftes" (8.4) betekent op het moment dat het pijn doet.
+	if (bHasStandingOrder
+		&& (CurrentOrder == EEclipseSquadOrder::Hold || CurrentOrder == EEclipseSquadOrder::MoveTo))
+	{
+		return;
+	}
+	if (TriageTarget.IsValid())
+	{
+		return;
+	}
+
+	// EEN REM. Onder automatisch vuur komen er zes treffers per seconde binnen, en
+	// zonder rem zou elke kogel een nieuwe padberekening starten — dan staat de
+	// soldaat te trillen in plaats van dekking te zoeken. Twee seconden is lang
+	// genoeg om ergens aan te komen en kort genoeg om op een nieuwe dreiging te
+	// reageren.
+	const double Now = World->GetTimeSeconds();
+	if (Now < CoverCooldownUntil)
+	{
+		return;
+	}
+	CoverCooldownUntil = Now + 2.0;
+
+	// Dekking TUSSEN mij en de schutter. SelectCoverPointNear scoort al op de
+	// dreigingsrichting; het enige nieuwe is dat we hem hier vanuit de eigen
+	// positie aanroepen in plaats van vanuit een geordend punt.
+	const FVector Anchor = Body->GetActorLocation();
+	const FVector CoverPoint = SelectCoverPointNear(Anchor);
+	if (FVector::DistSquared2D(CoverPoint, Anchor) > FMath::Square(CoverSearchRadius))
+	{
+		return; // niets bruikbaars binnen de zoekstraal: blijven staan en terugvuren
+	}
+
+	if (MoveToLocation(CoverPoint, /*AcceptanceRadius*/ 80.0f) == EPathFollowingRequestResult::RequestSuccessful)
+	{
+		++CoverRuns;
+	}
 }
 
 void AEclipseSquadmateController::HandlePawnDowned()
