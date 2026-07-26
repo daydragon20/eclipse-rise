@@ -25,7 +25,6 @@ Uitvoer is de bron; schrijf het getal niet over in een document (zie de docstrin
 van find_dead_fields.py voor waarom dat zes keer is misgegaan).
 """
 
-import re
 import sys
 from pathlib import Path
 
@@ -37,7 +36,11 @@ TOOLS = ROOT / "Tools"
 # Alleen mappen waar de code zijn assets bij PAD laadt. Character-, materiaal- en
 # texturemappen horen hier niet: die worden vanuit data of vanuit andere assets
 # gerefereerd, en dan zegt "de naam staat in geen enkele .cpp" niets.
-LOOK_IN = ("Audio", "Data", "Maps", "Abilities")
+LOOK_IN = ("Audio",)
+
+# Alleen cues: die worden door code bij pad geladen. Een ruw golfbestand zit in
+# zijn cue en hoort daar niet los te staan.
+NAME_PREFIX = "Cue_"
 
 # Binnen die mappen nog steeds overslaan: gegenereerde audio is per definitie
 # hash-genoemd en wordt via het manifest gevonden, niet bij naam.
@@ -67,16 +70,23 @@ def main() -> int:
             continue
         if any(skip in relative.parts for skip in SKIP_DIRS):
             continue
+        if not asset.stem.startswith(NAME_PREFIX):
+            continue
         checked += 1
-        if not re.search(rf"\b{re.escape(asset.stem)}\b", blob):
+        # Het PAD zoals de engine het kent (/Game/<map>/<naam>), niet de losse
+        # naam. Zo telt alleen een echte laadverwijzing mee en niet een comment
+        # die de naam noemt — zie de docstring voor waarom dat onderscheid deze
+        # sweep maakt of breekt.
+        game_path = "/Game/" + relative.with_suffix("").as_posix()
+        if game_path not in blob:
             dead.append(relative.as_posix())
 
-    print(f"{checked} assets gecontroleerd in {', '.join(LOOK_IN)}.")
+    print(f"{checked} audiocues gecontroleerd.")
     if not dead:
-        print("Geen dode assets — alles wat hier ligt wordt ergens bij naam genoemd.")
+        print("Geen dode assets — elk /Game-pad hier wordt ergens geladen.")
         return 0
 
-    print(f"\n{len(dead)} die door geen enkele .cpp/.h/.py/.ini bij naam genoemd worden:\n")
+    print(f"\n{len(dead)} waarvan het /Game-pad nergens in de code staat:\n")
     for item in dead:
         print(f"  {item}")
     print("\nElk is óf aan te sluiten óf weg te halen. Betaalde audio weggooien is")
