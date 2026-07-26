@@ -322,7 +322,13 @@ TArray<FString> UEclipseCommandModeComponent::GetDebugLines() const
 	TArray<FString> Lines;
 	if (!State.bHeld)
 	{
-		Lines.Add(TEXT("command: idle (hold Q / pad LB)"));
+		// DE DOCTRINE STAAT ER OOK BUITEN DE MODUS (26-07 avond). Sinds vanavond
+		// verandert hij echt gedrag en geldt hij door tot je hem wisselt — dus als
+		// je hem alleen ziet terwijl je LB vasthoudt, kun je niet weten waarom je
+		// squad zich anders gedraagt dan je verwacht. Een kader dat je niet ziet is
+		// geen kader maar een verrassing.
+		Lines.Add(FString::Printf(TEXT("command: idle (hold Q / pad LB)  ·  doctrine: %s"),
+			EclipseSquad::StanceLabel(HeldStance)));
 		return Lines;
 	}
 
@@ -331,12 +337,12 @@ TArray<FString> UEclipseCommandModeComponent::GetDebugLines() const
 		ResolveDilationFactor(),
 		FPlatformTime::Seconds() - State.EnteredWallSeconds,
 		State.OrdersIssuedWhileHeld));
-	Lines.Add(FString::Printf(TEXT("  target: %s  stance: %s"),
+	Lines.Add(FString::Printf(TEXT("  target: %s  doctrine: %s"),
 		State.SelectedSoldier.IsValid() && Squad != nullptr && Squad->IsRegisteredSquadmate(State.SelectedSoldier)
 			? *State.SelectedSoldier.ToString().Left(8)
 			: TEXT("ALL"),
 		EclipseSquad::StanceLabel(HeldStance)));
-	Lines.Add(TEXT("  Tab/RB next · scroll/LT prev · E/X pick · Y stance · 1-4/D-pad order"));
+	Lines.Add(TEXT("  Tab/RB next · scroll/LT prev · E/X pick · Y doctrine · 1-4/D-pad order"));
 	return Lines;
 }
 

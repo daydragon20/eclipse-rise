@@ -7,6 +7,8 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Misc/AutomationTest.h"
+#include "Squad/EclipseSquadTypes.h"
+#include "Characters/EclipseCommandModeComponent.h"
 #include "Squad/EclipseCommandLogic.h"
 #include "Squad/EclipseCommandModeTuning.h"
 
@@ -142,6 +144,43 @@ bool FEclipseCommandTuningDefaultsTest::RunTest(const FString& Parameters)
 	// veld, dus de GDD-regel 4.1.1 is meegecorrigeerd in plaats van de code.
 	TestEqual(TEXT("Sync-strike cap 4 (Stage B data)"), Defaults->MaxSyncStrikeMarks, 4);
 	TestEqual(TEXT("Pick range matches the aim-reach fallback"), Defaults->SoldierSelectMaxRangeCm, 10000.0f);
+	return true;
+}
+
+
+/**
+ * DE DOCTRINE IS ALTIJD ZICHTBAAR (26-07 avond).
+ *
+ * Sinds de doctrine echt gedrag verandert en doorloopt tot je hem wisselt, moet
+ * je hem ook kunnen zien als je LB NIET vasthoudt. Anders gedraagt je squad zich
+ * anders dan je verwacht en is er niets op het scherm dat uitlegt waarom — een
+ * kader dat je niet ziet is geen kader maar een verrassing.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDoctrineIsVisibleOutsideCommandMode,
+	"Eclipse.Command.DoctrineIsVisibleOutsideCommandMode",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProductFilter)
+
+bool FEclipseDoctrineIsVisibleOutsideCommandMode::RunTest(const FString& Parameters)
+{
+	UEclipseCommandModeComponent* Command = NewObject<UEclipseCommandModeComponent>(GetTransientPackage());
+	if (!TestNotNull(TEXT("doctrine-regel: component"), Command))
+	{
+		return false;
+	}
+
+	// Niet vastgehouden: de "idle"-regel.
+	const TArray<FString> Idle = Command->GetDebugLines();
+	if (!TestTrue(TEXT("doctrine-regel: er staat een regel"), Idle.Num() > 0))
+	{
+		return false;
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  regel buiten Command Mode: %s"), *Idle[0]));
+
+	TestTrue(TEXT("doctrine-regel: hij noemt de doctrine ook buiten de modus"),
+		Idle[0].Contains(TEXT("doctrine")));
+	TestTrue(TEXT("doctrine-regel: en welke het is"),
+		Idle[0].Contains(EclipseSquad::StanceLabel(Command->GetHeldStance())));
+
 	return true;
 }
 
