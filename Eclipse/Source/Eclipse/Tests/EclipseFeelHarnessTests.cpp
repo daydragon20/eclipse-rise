@@ -950,6 +950,11 @@ bool FEclipseGuideNumbersMatchTuningTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("gids: er is een hurk-stap"), !CrouchText.IsEmpty());
 	TestTrue(*FString::Printf(TEXT("gids: de hurk-stap noemt de getunede hurksnelheid (%.0f)"), T.CrouchSpeed),
 		MentionsNumber(CrouchText, T.CrouchSpeed));
+	// De hurkstap noemt sinds de capsule-fix ook een HOOGTE, en dat is een met de
+	// hand geschreven getal dat van de tuning afhangt — precies waarvoor deze
+	// bewaker bestaat. Verandert CrouchedHalfHeightCm, dan moet de tekst mee.
+	TestTrue(*FString::Printf(TEXT("gids: de hurk-stap noemt de getunede hurkhoogte (%.0f cm)"), T.CrouchedHalfHeightCm * 2.0f),
+		MentionsNumber(CrouchText, T.CrouchedHalfHeightCm * 2.0f));
 
 	// En de kop van de gids toont de kijkwaarden; die regel wordt uit dezelfde
 	// members gebouwd die de handler gebruikt, dus hij kan niet verouderen — maar
