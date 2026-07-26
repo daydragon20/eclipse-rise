@@ -22,6 +22,7 @@
 #include "Strategy/EclipseStrategySubsystem.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
+#include "Misc/FileHelper.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Characters/EclipseCommandModeComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -2843,6 +2844,121 @@ bool FEclipseWhichTakesCouldFillTheGapsTest::RunTest(const FString& Parameters)
 	{
 		AddInfo(TEXT("GEMETEN  skeletten: niet te vergelijken (speler- of donorskelet niet geladen)"));
 	}
+
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// BESTURING.md tegen het knoppenschema
+// ---------------------------------------------------------------------------
+//
+// De owner leest BESTURING.md als hij wil weten wat een knop doet. Op 26-07 stond
+// daar in de conventietabel dat herladen "niet bestaat in dit project" en dat de
+// wapenwissel "niet bestaat" — terwijl beide diezelfde dag gebouwd waren. Drie
+// beschrijvingen van dezelfde knoppen (code, F2-tabel, dit document) liepen uit
+// elkaar en niets zag het.
+//
+// Deze test leest het bestand en eist dat de ECLIPSE-kolom voor elke padknop de
+// handeling NOEMT die het schema eraan hangt. Geen zinsontleding: alleen "komt de
+// naam van de handeling voor in de cel van die knop".
+//
+// Bewust NIET een set-vergelijking over het hele bestand. Eerste opzet telde welke
+// knoppen er ergens genoemd worden, en die was meteen rood op R3 — dat staat er
+// vier keer, elke keer om uit te leggen dat hij er BEWUST af is. Een test die rood
+// wordt op een correct document is erger dan geen test: die leer je negeren.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBesturingMatchesTheSchemeTest,
+	"Eclipse.Feel.Input.BesturingMatchesTheScheme",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseBesturingMatchesTheSchemeTest::RunTest(const FString& Parameters)
+{
+	const FString DocPath = FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), TEXT("BESTURING.md")));
+	FString Doc;
+	if (!TestTrue(FString::Printf(TEXT("besturing: %s is leesbaar"), *DocPath),
+			FFileHelper::LoadFileToString(Doc, *DocPath)))
+	{
+		return false;
+	}
+
+	// Alleen de rijen van de conventietabel: die beginnen met "| <knop> |". Elders
+	// in het document staat proza over dezelfde knoppen, en dat hoort vrij te
+	// blijven.
+	TArray<FString> Lines;
+	Doc.ParseIntoArrayLines(Lines);
+
+	// Alleen echte KNOPPEN. Sticks en het d-pad staan in het schema als groep
+	// ("linkerstick", "D-pad") en in de conventietabel niet als eigen rij — die
+	// eisen zou de test rood maken op een document dat klopt.
+	const TSet<FString> RealButtons = { TEXT("LT"), TEXT("RT"), TEXT("LB"), TEXT("RB"),
+		TEXT("A"), TEXT("B"), TEXT("X"), TEXT("Y"), TEXT("L3"), TEXT("R3") };
+
+	TMap<FString, TArray<FString>> Expected;
+	for (const EclipseGauntletOverlay::FEclipseBinding& Binding : EclipseGauntletOverlay::GetBindings())
+	{
+		if (Binding.Pad == nullptr)
+		{
+			continue;
+		}
+		FString Button = FString(Binding.Pad);
+		FString Rest;
+		Button.Split(TEXT(" "), &Button, &Rest);
+		if (!RealButtons.Contains(Button))
+		{
+			continue;
+		}
+		Expected.FindOrAdd(Button).AddUnique(FString(Binding.Action));
+	}
+
+	int32 Checked = 0;
+	for (const TPair<FString, TArray<FString>>& Pair : Expected)
+	{
+		const FString RowPrefix = FString::Printf(TEXT("| %s |"), *Pair.Key);
+		const FString* Row = Lines.FindByPredicate(
+			[&RowPrefix](const FString& Line) { return Line.StartsWith(RowPrefix); });
+		if (!TestNotNull(*FString::Printf(TEXT("besturing: de conventietabel heeft een rij voor %s"), *Pair.Key), Row))
+		{
+			continue;
+		}
+		++Checked;
+
+		// ALLEEN DE ECLIPSE-KOLOM, niet de hele rij. Eerste versie zocht in de
+		// hele regel en kon daardoor niet rood worden: de laatste kolom legt uit
+		// WAAROM een knop doet wat hij doet en noemt die handeling dus sowieso.
+		// De falsificatie (de oude, foute X-cel teruggezet) bleef groen, en dat
+		// is precies de dekking-die-er-niet-is waar een assert nooit op mag
+		// leunen.
+		//
+		// Kolom 3: "" | Knop | Conventie | ECLIPSE | Afwijking
+		TArray<FString> Columns;
+		Row->ParseIntoArray(Columns, TEXT("|"), /*InCullEmpty*/ false);
+		if (!TestTrue(*FString::Printf(TEXT("besturing: de rij voor %s heeft vier kolommen"), *Pair.Key),
+				Columns.Num() >= 4))
+		{
+			continue;
+		}
+		const FString Claim = Columns[3];
+
+		for (const FString& Action : Pair.Value)
+		{
+			// Alleen het eerste woord van de handeling: het schema schrijft
+			// "Herladen (vol: hergroeperen)" en het document hoeft die haakjes
+			// niet over te nemen om te kloppen.
+			FString Word = Action;
+			FString Tail;
+			Word.Split(TEXT(" "), &Word, &Tail);
+			TestTrue(*FString::Printf(
+					TEXT("besturing: de ECLIPSE-kolom van %s noemt '%s' — het schema hangt die handeling eraan.  Cel:%s"),
+					*Pair.Key, *Word, *Claim),
+				Claim.Contains(Word));
+		}
+	}
+
+	// Zonder discriminator zegt "alles klopt" niets: als er nul rijen gevonden
+	// waren, was deze test net zo groen.
+	TestTrue(FString::Printf(TEXT("besturing: er zijn %d knoprijen gevonden om te controleren"), Checked),
+		Checked >= 5);
 
 	return true;
 }

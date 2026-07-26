@@ -165,15 +165,21 @@ toggle. Dat vraagt een instellingenmenu, en dat is SPEC-P2-07.
 | LT | mikken | **altijd mikken** | 26-07: de overlading met "vorige soldaat" is weg. Een moduskeuze op een trigger is in dit genre ongebruikelijk — Division en Gears houden de triggers heilig, want een analoge slag druk je half per ongeluk. Selectie cycelt nu één kant op met RB en wrapt rond |
 | A | springen | springen | — |
 | B | hurken | hurken | — |
-| X | herladen / interact | soldaat onder richtkruis | **Afwijking.** Herladen bestaat niet in dit project; X is de dichtstbijzijnde "interact met wat je aanwijst" |
-| Y | wapen/gadget wisselen | stance togglen | **Afwijking.** Wapenwissel bestaat niet; stance is de gadget-achtige modifier die we wél hebben |
-| LB | wapen wisselen | **Command Mode vasthouden** | **Bewuste afwijking, jouw vraag.** Zie hieronder |
-| RB | wapen wisselen | volgende soldaat | Volgt LB: tijdens de hold is dit de natuurlijke buur |
+| X | herladen / interact | **te voet: Herladen · Command Mode: Onder kruis** | Volgt de conventie sinds 26-07. Hier stond dat "herladen niet bestaat in dit project" — dat klopte tot die dag, en daarna niet meer: er is een magazijn van 30, een herlaadbeurt van 2,2 s en vier foley-fasen. De regel bleef staan omdat niemand hem naast de code legde |
+| Y | wapen/gadget wisselen | **Command Mode: Doctrine cyclen** | **Afwijking.** De wapenwissel die hier "bestaat niet" heette, bestaat sinds 26-07 wél — maar hij ligt op RB, want een bumper laat je duim op de rechterstick tijdens een vuurgevecht. Y draagt de doctrine, die sinds diezelfde dag echt gedrag stuurt |
+| LB | wapen wisselen | **Command Mode vasthouden** | **Bewuste afwijking, jouw vraag.** Zie hieronder — de wapenwissel zit op RB |
+| RB | wapen wisselen | **te voet: Wapenwissel · Command Mode: Volgende soldaat** | Volgt de conventie én LB: tijdens de hold is "volgende soldaat" de natuurlijke buur, en erbuiten doet hij wat het genre van deze knop verwacht |
 | L3 | sprint | sprint | — |
 | R3 | melee of camera | **niets** | Was 1e/3e persoon; eraf omdat je hem per ongeluk raakt met je richtstick |
 | D-pad | snelacties | orders 1–4 | — |
 | View | kaart / scorebord | testgids | Debug-tier; een kaart bestaat nog niet |
 | Menu | pauze | gids bevestigen | Debug-tier; pauze bestaat nog niet |
+
+> **Deze tabel wordt bewaakt.** `Eclipse.Feel.Input.BesturingMatchesTheScheme` legt de
+> ECLIPSE-kolom hierboven naast `EclipseGauntletOverlay::GetBindings()` en wordt rood
+> als ze uit elkaar lopen. Aanleiding: op 26-07 stond hier dat herladen en
+> wapenwissel "niet bestaan in dit project", terwijl beide diezelfde dag gebouwd
+> waren. Drie beschrijvingen van dezelfde knoppen liepen uit elkaar en niets zag het.
 
 **LB blijft Command Mode, en dat is een ontwerpkeuze, geen luiheid.** Drie redenen.
 Command Mode is de kernmechaniek van ECLIPSE — het is niet één actie tussen andere,
