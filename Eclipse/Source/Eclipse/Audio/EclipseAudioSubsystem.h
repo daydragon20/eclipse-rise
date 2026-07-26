@@ -8,6 +8,61 @@
 class USoundBase;
 
 /**
+ * Eén wapenfamilie of één oppervlak: de varianten die erbij horen.
+ *
+ * USTRUCT met UPROPERTY-arrays, en dat is geen ceremonie maar de reden dat dit
+ * bestand op 26-07 om 21:01 crashte. Als gewone struct in een gewone TMap ziet de
+ * garbage collector deze TObjectPtr-referenties NIET: hij ruimt de cues op terwijl
+ * de maps er nog naar wijzen, en de eerste voetstap daarna speelt vrijgegeven
+ * geheugen af (EXCEPTION_ACCESS_VIOLATION in PlayFootstep).
+ *
+ * De bug zat er vanaf het bouwen van de voetstappen; hij werd zichtbaar toen er
+ * MINDER geluid geladen bleef (alleen de twee gebruikte wapenfamilies), want toen
+ * viel de race de verkeerde kant op. Dat is precies waarom dit soort fout geen
+ * enkele logica-test haalt: de code is correct, alleen het geheugen niet.
+ */
+USTRUCT()
+struct FEclipseSoundVariantSet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<USoundBase>> Shots;
+
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<USoundBase>> Suppressed;
+
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<USoundBase>> Tails;
+
+	/** Welke variant het laatst klonk — om hem niet meteen te herhalen. */
+	int32 LastShotIndex = -1;
+	int32 LastTailIndex = -1;
+};
+
+/** Eén fase van een herlaadbeurt: wanneer, en welk geluid. */
+USTRUCT()
+struct FEclipseFoleyStep
+{
+	GENERATED_BODY()
+
+	float Fraction = 0.0f;
+
+	UPROPERTY(Transient)
+	TObjectPtr<USoundBase> Cue = nullptr;
+};
+
+/** De fasen van één familie; een eigen struct omdat een TMap geen TArray-waarde met UPROPERTY kan dragen. */
+USTRUCT()
+struct FEclipseFoleyChain
+{
+	GENERATED_BODY()
+
+	UPROPERTY(Transient)
+	TArray<FEclipseFoleyStep> Steps;
+};
+
+/**
  * Runtime audio consumer (GDD 16.7/16.12): subscribes to gameplay facts on the
  * event bus and answers them with sound. Audio is a pure consumer by contract —
  * it emits no events and owns no gameplay state (EventCatalog: it appears only
@@ -67,6 +122,16 @@ public:
 	void PlayFootstep(const FVector& Location, uint8 SurfaceType, float Volume);
 	int32 GetFootstepSoundCount() const { return FootstepSoundCount; }
 	int32 GetFootstepVariantCount(uint8 SurfaceType) const;
+
+	/**
+	 * Hoeveel cues in de banken nog een GELDIG object zijn.
+	 *
+	 * Bestaat omdat een telling het niet bewijst: een TArray houdt zijn lengte ook
+	 * als de garbage collector de objecten eronder heeft opgeruimd. Alleen dit
+	 * getal zakt als de referenties niet beschermd zijn — en dat is precies wat de
+	 * crash van 26-07 21:01 was.
+	 */
+	int32 CountLiveCues() const;
 
 	/** Foley-stappen die echt gepland zijn — het bewijs dat de keten loopt. */
 	int32 GetReloadFoleyCount() const { return ReloadFoleyCount; }
@@ -139,19 +204,9 @@ private:
 	 * nagalmen. Als SET en niet als losse velden, want de keuze "welke variant nu"
 	 * is precies wat een set moet kunnen en een veld niet.
 	 */
-	struct FWeaponSoundSet
-	{
-		TArray<TObjectPtr<USoundBase>> Shots;
-		TArray<TObjectPtr<USoundBase>> Suppressed;
-		TArray<TObjectPtr<USoundBase>> Tails;
-
-		/** Welke variant het laatst klonk — om hem niet meteen te herhalen. */
-		int32 LastShotIndex = -1;
-		int32 LastTailIndex = -1;
-	};
-
 	/** Familienaam (DT_Weapons.SoundFamily) → set. Gevuld bij Initialize. */
-	TMap<FName, FWeaponSoundSet> WeaponSoundSets;
+	UPROPERTY(Transient)
+	TMap<FName, FEclipseSoundVariantSet> WeaponSoundSets;
 
 	void LoadWeaponSoundSets();
 
@@ -172,19 +227,17 @@ private:
 	 */
 	void LoadReloadFoley();
 
-	struct FFoleyStep
-	{
-		float Fraction = 0.0f;
-		TObjectPtr<USoundBase> Cue;
-	};
-	TMap<FName, TArray<FFoleyStep>> ReloadFoley;
+	UPROPERTY(Transient)
+	TMap<FName, FEclipseFoleyChain> ReloadFoley;
 	int32 ReloadFoleyCount = 0;
 
 	/** Het geluid van een wapen dat je optilt, per familie. */
+	UPROPERTY(Transient)
 	TMap<FName, TObjectPtr<USoundBase>> WeaponEquipCues;
 	int32 EquipSoundCount = 0;
 
-	TMap<uint8, FWeaponSoundSet> FootstepBanks;
+	UPROPERTY(Transient)
+	TMap<uint8, FEclipseSoundVariantSet> FootstepBanks;
 	int32 FootstepSoundCount = 0;
 
 

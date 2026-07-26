@@ -82,7 +82,27 @@ EEclipseLocomotionTier EclipseLocomotion::ClassifyTier(bool bHasIdle, bool bHasW
 
 bool EclipseLocomotion::IsUsableOn(const USkeleton* ClipSkeleton, const USkeleton* MeshSkeleton)
 {
-	return ClipSkeleton != nullptr && ClipSkeleton == MeshSkeleton;
+	if (ClipSkeleton == nullptr || MeshSkeleton == nullptr)
+	{
+		return false;
+	}
+	if (ClipSkeleton == MeshSkeleton)
+	{
+		return true;
+	}
+
+	// COMPATIBELE SKELETTEN TELLEN OOK (26-07 avond, en dit was het ontbrekende
+	// stuk). Elk pack levert zijn eigen kopie van UE4_Mannequin_Skeleton: andere
+	// assets, dezelfde botten. Tools/link_compatible_skeletons.py knoopt ze aan
+	// elkaar zodat een anim-arm pack de takes van een donor mag afspelen.
+	//
+	// Deze poort vergeleek nog op GELIJKHEID, dus de engine accepteerde de takes
+	// en ECLIPSE gooide ze er meteen weer uit: 2948 "REJECTED"-regels in één
+	// suite-run, en negen lichamen die volgens de datatabel compleet waren maar in
+	// het spel geen schietpose hadden. De validator was groen en het spel niet —
+	// precies het gat tussen "staat in de data" en "gebeurt in het spel".
+	return MeshSkeleton->IsCompatibleForEditor(ClipSkeleton)
+		|| ClipSkeleton->IsCompatibleForEditor(MeshSkeleton);
 }
 
 namespace
@@ -512,9 +532,18 @@ void UEclipseAnimInstance::UpdateFootsteps(float SpeedOnGround)
 		return;
 	}
 
+	// DE POSITIE ÉÉN KEER PAKKEN, hier waar het lichaam nog aantoonbaar leeft.
+	//
+	// Crash gevonden 26-07 avond: EXCEPTION_ACCESS_VIOLATION in deze functie,
+	// op een dereferentie NA de trace. Deze anim-instance tikt op de werkthread-
+	// kant van de animatie-update, en bij afbraak van een missie kan het lichaam
+	// tussen de controle bovenaan en het gebruik onderaan verdwijnen. Eén keer
+	// uitlezen en daarna alleen nog die waarde gebruiken haalt dat raam weg.
+	const FVector FootLocation = Body->GetActorLocation();
+
 	uint8 Surface = 0;
 	{
-		const FVector Feet = Body->GetActorLocation();
+		const FVector Feet = FootLocation;
 		const float Reach = Body->GetSimpleCollisionHalfHeight() + 40.0f;
 		FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseFootstep), /*bTraceComplex=*/false, Body);
 		Params.bReturnPhysicalMaterial = true;
@@ -531,7 +560,7 @@ void UEclipseAnimInstance::UpdateFootsteps(float SpeedOnGround)
 		if (UEclipseAudioSubsystem* Audio = GameInstance->GetSubsystem<UEclipseAudioSubsystem>())
 		{
 			LastFootstepSurface = Surface;
-			Audio->PlayFootstep(Body->GetActorLocation(), Surface, 0.45f);
+			Audio->PlayFootstep(FootLocation, Surface, 0.45f);
 			return;
 		}
 	}
@@ -540,7 +569,7 @@ void UEclipseAnimInstance::UpdateFootsteps(float SpeedOnGround)
 	// lopen niet stil valt in contexten die geen subsysteem hebben.
 	if (FootstepCue != nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, FootstepCue, Body->GetActorLocation(), 0.45f);
+		UGameplayStatics::PlaySoundAtLocation(this, FootstepCue, FootLocation, 0.45f);
 	}
 }
 

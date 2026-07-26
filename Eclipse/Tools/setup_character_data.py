@@ -44,7 +44,7 @@ NOT_BASE_TAKE = (
 )
 
 
-def pick_directional(path, wanted, direction_keys):
+def pick_directional(path, wanted, direction_keys, allow=()):
     """Zoek de richtingsvariant van een gangcyclus (26-07, punt 8).
 
     pick_anim() SLUIT richtingen expliciet uit - het zoekt de basis-take en
@@ -55,8 +55,17 @@ def pick_directional(path, wanted, direction_keys):
     Zelfde prioriteitsregel en dezelfde kortste-naam-tiebreak, alleen met de
     richting als extra eis en zonder de richtingsuitsluiting."""
     anims = sorted(find_assets(path, "AnimSequence"), key=lambda a: len(str(a.asset_name)))
-    stance_or_technical = tuple(b for b in NOT_BASE_TAKE
-                                if b not in ("bwd", "back", "_lt", "_rt", "left", "right"))
+    # De richtingswoorden gaan uit de uitsluitingslijst, plus wat de aanroeper
+    # expliciet toelaat.
+    #
+    # Dat laatste is 26-07 avond nodig gebleken voor de DRAAITAKES: "turn" staat
+    # zelf in NOT_BASE_TAKE (het is normaal een overgang en geen basis-take), dus
+    # Idle_Turn_90_Left werd altijd afgewezen — óók toen ik er expliciet om vroeg.
+    # Gemeten stond "draaien" bij alle negen lichamen als ontbrekend, terwijl
+    # ParagonLtBelica er vier levert. Een filter dat te veel wegneemt is net zo
+    # stil als een dat niets doet.
+    skip = ("bwd", "back", "_lt", "_rt", "left", "right") + tuple(allow)
+    stance_or_technical = tuple(b for b in NOT_BASE_TAKE if b not in skip)
     for keyword in wanted:
         for asset in anims:
             name = str(asset.asset_name).lower()
@@ -186,16 +195,48 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     if not mesh:
         unreal.log_warning(f"{row_name}: geen skeletal mesh in {mesh_pack} — rij overgeslagen")
         continue
-    idle = pick_anim(anim_pack, IDLE_KEYWORDS)
-    walk = pick_anim(anim_pack, WALK_KEYWORDS)
-    run = pick_anim(anim_pack, RUN_KEYWORDS)
-    shoot = pick_anim(anim_pack, SHOOT_KEYWORDS)
-    death = pick_anim(anim_pack, DEATH_KEYWORDS)
-    hit_react = pick_anim(anim_pack, HITREACT_KEYWORDS)
-    reload = pick_anim(anim_pack, RELOAD_KEYWORDS)
-    turn_left = pick_anim(anim_pack, TURNLEFT_KEYWORDS)
-    turn_right = pick_anim(anim_pack, TURNRIGHT_KEYWORDS)
-    crouch_trans = pick_directional(anim_pack, CROUCHTRANS_KEYWORDS, ("crouch",))
+    donor = DONOR_PACKS.get(anim_pack)
+
+    def take(keywords):
+        """Zoek de take in het eigen pack, en anders bij de donor.
+
+        26-07 avond, tweede ronde: de donor werd eerst alleen voor RICHTINGEN
+        gebruikt. Een meting over alle negen lichamen liet zien dat vijf ervan
+        NUL van de vijf eenmalige poses hadden — geen schietpose, geen klap, geen
+        herlaadbeweging. Die vijf zijn precies de anim-arme packs. Vijanden
+        schoten en incasseerden dus zonder dat er iets bewoog.
+
+        Dezelfde donor, dezelfde compatibele skeletten; alleen was de regel maar
+        op de helft van de velden toegepast.
+        """
+        found = pick_anim(anim_pack, keywords)
+        if found or donor is None:
+            return found
+        return pick_anim(donor, keywords)
+
+    idle = take(IDLE_KEYWORDS)
+    walk = take(WALK_KEYWORDS)
+    run = take(RUN_KEYWORDS)
+    shoot = take(SHOOT_KEYWORDS)
+    death = take(DEATH_KEYWORDS)
+    hit_react = take(HITREACT_KEYWORDS)
+    reload = take(RELOAD_KEYWORDS)
+    # DRAAITAKES VIA pick_directional, niet via pick_anim. Die laatste SLUIT
+    # richtingswoorden expliciet uit (NOT_BASE_TAKE bevat "left" en "right"), want
+    # hij zoekt de basis-take. Een draai IS een richting, dus hij vond nooit iets:
+    # gemeten stond "draaien" bij alle negen lichamen als ontbrekend, óók bij de
+    # speler — terwijl ParagonLtBelica er vier levert.
+    turn_left = pick_directional(anim_pack, ("idle_turn", "turn"), LEFT_KEYS, allow=("turn",))
+    turn_right = pick_directional(anim_pack, ("idle_turn", "turn"), RIGHT_KEYS, allow=("turn",))
+    if not turn_left and donor is not None:
+        turn_left = pick_directional(donor, ("idle_turn", "turn"), LEFT_KEYS, allow=("turn",))
+    if not turn_right and donor is not None:
+        turn_right = pick_directional(donor, ("idle_turn", "turn"), RIGHT_KEYS, allow=("turn",))
+    # Zelfde valkuil als bij de draaitakes: "crouch" staat in NOT_BASE_TAKE, dus
+    # Crouch_to_Stand werd afgewezen terwijl er expliciet om gevraagd werd.
+    crouch_trans = pick_directional(anim_pack, CROUCHTRANS_KEYWORDS, ("crouch",), allow=("crouch",))
+    if not crouch_trans and donor is not None:
+        crouch_trans = pick_directional(donor, CROUCHTRANS_KEYWORDS, ("crouch",), allow=("crouch",))
     # LENEN VAN DE DONOR als het eigen pack de richting niet heeft (26-07 avond).
     #
     # Vijf van de negen lichamen hadden geen zijwaartse cyclus en schoven dus
@@ -205,8 +246,6 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     # verkeerde conclusie: het zijn verschillende assets met dezelfde BOTTEN, en
     # daar heeft UE5 CompatibleSkeletons voor. Tools/link_compatible_skeletons.py
     # legt die verbanden; hier wordt er gebruik van gemaakt.
-    donor = DONOR_PACKS.get(anim_pack)
-
     def directional(stems, keys):
         take = pick_directional(anim_pack, stems, keys)
         if take or donor is None:

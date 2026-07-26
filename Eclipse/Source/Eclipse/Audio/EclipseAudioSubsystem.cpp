@@ -300,7 +300,7 @@ void UEclipseAudioSubsystem::LoadWeaponSoundSets()
 	// zwaarste tick — een hapering precies bij de eerste knal van een gevecht.
 	for (const FWeaponSoundFamilyDef& Def : WeaponSoundFamilies)
 	{
-		FWeaponSoundSet Set;
+		FEclipseSoundVariantSet Set;
 
 		auto LoadInto = [](TArray<TObjectPtr<USoundBase>>& Into, const FString& Path)
 		{
@@ -335,6 +335,7 @@ void UEclipseAudioSubsystem::LoadWeaponSoundSets()
 			// 14.3.5: luid degraderen. Een familie zonder schoten betekent dat het
 			// pack er niet is, en dan hoort dat één keer hardop gezegd te worden in
 			// plaats van dat vuren stilletjes stil blijft.
+			EclipseDegradation::Note(TEXT("geluid ontbreekt"), TEXT("zie de logregel hieronder"));
 			UE_LOG(LogEclipse, Warning,
 				TEXT("Audio: wapenfamilie %s heeft geen schotcues — die wapens vallen terug op de losse cue."),
 				Def.Family);
@@ -387,7 +388,7 @@ namespace
 
 int32 UEclipseAudioSubsystem::GetWeaponSoundVariantCount(FName Family) const
 {
-	const FWeaponSoundSet* Set = WeaponSoundSets.Find(Family);
+	const FEclipseSoundVariantSet* Set = WeaponSoundSets.Find(Family);
 	return Set != nullptr ? Set->Shots.Num() : 0;
 }
 
@@ -395,7 +396,7 @@ void UEclipseAudioSubsystem::LoadFootstepBanks()
 {
 	for (const FFootstepBankDef& Def : FootstepBankDefs)
 	{
-		FWeaponSoundSet Bank;
+		FEclipseSoundVariantSet Bank;
 		for (int32 Index = 1; Index <= Def.Count; ++Index)
 		{
 			const FString Path = FString::Printf(
@@ -409,6 +410,7 @@ void UEclipseAudioSubsystem::LoadFootstepBanks()
 
 		if (Bank.Shots.Num() == 0)
 		{
+			EclipseDegradation::Note(TEXT("geluid ontbreekt"), TEXT("zie de logregel hieronder"));
 			UE_LOG(LogEclipse, Warning,
 				TEXT("Audio: voetstapbank %s is leeg — lopen op dat oppervlak blijft stil (14.3.5)."),
 				Def.Prefix);
@@ -425,7 +427,7 @@ void UEclipseAudioSubsystem::PlayFootstep(const FVector& Location, uint8 Surface
 		return;
 	}
 
-	FWeaponSoundSet* Bank = FootstepBanks.Find(SurfaceType);
+	FEclipseSoundVariantSet* Bank = FootstepBanks.Find(SurfaceType);
 	if (Bank == nullptr)
 	{
 		// Onbekend oppervlak: op de straat-bank. Stil vallen zou erger zijn, want
@@ -447,9 +449,28 @@ void UEclipseAudioSubsystem::PlayFootstep(const FVector& Location, uint8 Surface
 	}
 }
 
+int32 UEclipseAudioSubsystem::CountLiveCues() const
+{
+	int32 Live = 0;
+	auto CountSet = [&Live](const FEclipseSoundVariantSet& Set)
+	{
+		for (const TObjectPtr<USoundBase>& Cue : Set.Shots)      { Live += IsValid(Cue) ? 1 : 0; }
+		for (const TObjectPtr<USoundBase>& Cue : Set.Suppressed) { Live += IsValid(Cue) ? 1 : 0; }
+		for (const TObjectPtr<USoundBase>& Cue : Set.Tails)      { Live += IsValid(Cue) ? 1 : 0; }
+	};
+	for (const TPair<FName, FEclipseSoundVariantSet>& Pair : WeaponSoundSets) { CountSet(Pair.Value); }
+	for (const TPair<uint8, FEclipseSoundVariantSet>& Pair : FootstepBanks)   { CountSet(Pair.Value); }
+	for (const TPair<FName, FEclipseFoleyChain>& Pair : ReloadFoley)
+	{
+		for (const FEclipseFoleyStep& Step : Pair.Value.Steps) { Live += IsValid(Step.Cue) ? 1 : 0; }
+	}
+	for (const TPair<FName, TObjectPtr<USoundBase>>& Pair : WeaponEquipCues) { Live += IsValid(Pair.Value) ? 1 : 0; }
+	return Live;
+}
+
 int32 UEclipseAudioSubsystem::GetFootstepVariantCount(uint8 SurfaceType) const
 {
-	const FWeaponSoundSet* Bank = FootstepBanks.Find(SurfaceType);
+	const FEclipseSoundVariantSet* Bank = FootstepBanks.Find(SurfaceType);
 	return Bank != nullptr ? Bank->Shots.Num() : 0;
 }
 
@@ -460,11 +481,12 @@ void UEclipseAudioSubsystem::LoadReloadFoley()
 		USoundBase* Cue = LoadObject<USoundBase>(nullptr, Def.Path);
 		if (Cue == nullptr)
 		{
+			EclipseDegradation::Note(TEXT("geluid ontbreekt"), TEXT("zie de logregel hieronder"));
 			UE_LOG(LogEclipse, Warning,
 				TEXT("Audio: foley %s ontbreekt — die fase van het herladen blijft stil (14.3.5)."), Def.Path);
 			continue;
 		}
-		ReloadFoley.FindOrAdd(FName(Def.Family)).Add({ Def.Fraction, Cue });
+		ReloadFoley.FindOrAdd(FName(Def.Family)).Steps.Add({ Def.Fraction, Cue });
 	}
 
 	for (const FReloadFoleyDef& Def : WeaponEquipDefs)
@@ -502,8 +524,8 @@ void UEclipseAudioSubsystem::OnWeaponSwapped(FGameplayTag EventTag, const FInsta
 
 int32 UEclipseAudioSubsystem::GetReloadFoleyStepCount(FName Family) const
 {
-	const TArray<FFoleyStep>* Steps = ReloadFoley.Find(Family);
-	return Steps != nullptr ? Steps->Num() : 0;
+	const FEclipseFoleyChain* Chain = ReloadFoley.Find(Family);
+	return Chain != nullptr ? Chain->Steps.Num() : 0;
 }
 
 void UEclipseAudioSubsystem::OnReloadStarted(FGameplayTag EventTag, const FInstancedStruct& Payload)
@@ -515,8 +537,8 @@ void UEclipseAudioSubsystem::OnReloadStarted(FGameplayTag EventTag, const FInsta
 		return;
 	}
 
-	const TArray<FFoleyStep>* Steps = ReloadFoley.Find(Reload->WeaponSoundFamily);
-	if (Steps == nullptr)
+	const FEclipseFoleyChain* Chain = ReloadFoley.Find(Reload->WeaponSoundFamily);
+	if (Chain == nullptr)
 	{
 		return;
 	}
@@ -530,7 +552,7 @@ void UEclipseAudioSubsystem::OnReloadStarted(FGameplayTag EventTag, const FInsta
 	const FVector Fallback = Reload->Origin;
 	const float Duration = FMath::Max(Reload->DurationSeconds, 0.05f);
 
-	for (const FFoleyStep& Step : *Steps)
+	for (const FEclipseFoleyStep& Step : Chain->Steps)
 	{
 		USoundBase* Cue = Step.Cue;
 		if (Cue == nullptr)
@@ -579,7 +601,7 @@ void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstanced
 		return;
 	}
 
-	FWeaponSoundSet* Set = WeaponSoundSets.Find(Shot->WeaponSoundFamily);
+	FEclipseSoundVariantSet* Set = WeaponSoundSets.Find(Shot->WeaponSoundFamily);
 	if (Set == nullptr)
 	{
 		// Terugval op de losse cue: een wapen zonder (of met een onbekende) familie

@@ -262,7 +262,16 @@ public:
 
 private:
 	/** 14.3.5-melding over een ontbrekende eenmalige pose; houdt zich tot één regel. */
-	bool bWarnedMissingOneShotPose = false;
+	/**
+	 * Welke eenmalige poses al gemeld zijn als ontbrekend. Per POSE en niet één
+	 * vlag voor alles: een lichaam kan er twee missen, en dan wil je ze allebei
+	 * horen. Nog steeds hooguit één regel per pose per lichaam, want een
+	 * schietpose valt 6,67 keer per seconde.
+	 */
+	TSet<FString> WarnedMissingPoses;
+
+	/** Is dit lichaam ooit aangekleed? Een kale capsule mist zijn poses met reden. */
+	bool bBodyDefApplied = false;
 
 
 	void HandleHealthChanged(const struct FOnAttributeChangeData& Data);
@@ -323,7 +332,7 @@ private:
 	/** Hoofd-hitbox op de capsule zetten (terugval voor lichamen zonder mesh). */
 	void PlaceHeadHitboxOnCapsule();
 
-	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight);
+	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, const TCHAR* PoseName);
 
 	/** Landingsdip (audit punt 12): hoeveel de camera zakt en hoe lang nog. */
 	float LandingDipCm = 0.0f;

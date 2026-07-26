@@ -2312,4 +2312,68 @@ bool FEclipseTurnInPlaceFollowsTheCamera::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * WELK LICHAAM MIST WELKE POSE (26-07 avond).
+ *
+ * De runtime meldt sinds vanavond een ontbrekende eenmalige pose, en over de hele
+ * suite kwamen er tientallen regels uit: 42× "schieten", 58× "klap", 12×
+ * "herladen". Dat zijn losse meldingen op willekeurige actor-namen — je weet
+ * daarmee dát er gaten zijn en niet WAAR.
+ *
+ * Deze meting leest de tabel zelf en zet er een overzicht van neer. Als METING en
+ * niet als eis: welke takes een pack levert is geen defect maar een eigenschap
+ * van dat pack, en welk lichaam de speler is, is een owner-keuze. Een bar die
+ * rood staat op iets wat niemand kan repareren, leert je hem te negeren.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseWhichBodiesMissWhichPoses,
+	"Eclipse.Feel.Input.WhichBodiesMissWhichPoses",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseWhichBodiesMissWhichPoses::RunTest(const FString& Parameters)
+{
+	const UDataTable* Bodies = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_BodyDefs.DT_BodyDefs"));
+	if (!TestNotNull(TEXT("poses: DT_BodyDefs"), Bodies))
+	{
+		return false;
+	}
+
+	int32 MissingTotal = 0;
+	int32 Complete = 0;
+	Bodies->ForeachRow<FEclipseBodyDefRow>(TEXT("PoseSweep"),
+		[this, &MissingTotal, &Complete](const FName& RowName, const FEclipseBodyDefRow& Row)
+		{
+			TArray<FString> Missing;
+			if (Row.ShootAnim.IsNull())            { Missing.Add(TEXT("schieten")); }
+			if (Row.HitReactAnim.IsNull())         { Missing.Add(TEXT("klap")); }
+			if (Row.ReloadAnim.IsNull())           { Missing.Add(TEXT("herladen")); }
+			if (Row.CrouchTransitionAnim.IsNull()) { Missing.Add(TEXT("hurken")); }
+			if (Row.TurnLeftAnim.IsNull() || Row.TurnRightAnim.IsNull()) { Missing.Add(TEXT("draaien")); }
+
+			MissingTotal += Missing.Num();
+			if (Missing.Num() == 0)
+			{
+				++Complete;
+			}
+			AddInfo(FString::Printf(TEXT("GEMETEN  %-14s %d/5 poses  %s"),
+				*RowName.ToString(), 5 - Missing.Num(),
+				Missing.Num() == 0 ? TEXT("(compleet)") : *FString::Join(Missing, TEXT(", "))));
+		});
+
+	AddInfo(FString::Printf(TEXT("GEMETEN  lichamen met alle vijf de poses          %d"), Complete));
+	AddInfo(FString::Printf(TEXT("GEMETEN  ontbrekende poses in totaal             %d"), MissingTotal));
+
+	// De enige harde eis: ELK lichaam moet een schietpose hebben. Alles in dit
+	// spel schiet — vijanden, squad en speler — en een schutter zonder houding is
+	// het eerste wat je ziet. De rest is pack-afhankelijk en staat als meting.
+	Bodies->ForeachRow<FEclipseBodyDefRow>(TEXT("PoseSweepShoot"),
+		[this](const FName& RowName, const FEclipseBodyDefRow& Row)
+		{
+			TestFalse(FString::Printf(TEXT("poses: %s heeft een schietpose"), *RowName.ToString()),
+				Row.ShootAnim.IsNull());
+		});
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

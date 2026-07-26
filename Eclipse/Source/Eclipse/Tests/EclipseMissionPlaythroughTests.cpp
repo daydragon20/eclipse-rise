@@ -4411,4 +4411,80 @@ bool FEclipseSquadCanGiveYouAway::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+/**
+ * STIL FALEN MAAKT DE BAR ROOD (owner-opdracht 26-07, 21:30).
+ *
+ * Zijn woorden: *"~24 uur werk, 152 groene tests, en toen ik de game startte was
+ * er op het eerste gezicht niets veranderd."* Drie lagen tussen de code en het
+ * scherm waren stuk en geen enkele test werd rood: de skeletpoort wees 2948
+ * animaties af, de garbage collector ruimde de geluiden op, en het personage
+ * verdween.
+ *
+ * Dit is de test die dat had moeten vangen. Hij draait een echte missie en eist
+ * dat er NUL degradaties zijn — geen afgewezen animatie, geen ontbrekende cue,
+ * geen overgeslagen pose. Een waarschuwing in een log dat niemand leest is geen
+ * luid falen; het is stil falen met een alibi.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseNothingDegradesSilently,
+	"Eclipse.Mission.Playthrough.NothingDegradesSilently",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseNothingDegradesSilently::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	// Vanaf hier tellen. Alles wat eerder in de suite gebeurde is niet van deze
+	// missie, en een teller die over tests heen loopt wijst naar de verkeerde.
+	EclipseDegradation::Reset();
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("degradatie: missie gelanceerd (%s)"), *Error),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Even spelen: lopen, kijken, vuren. Alles wat een lichaam aankleedt en een
+	// geluid aanraakt moet minstens één keer gedraaid hebben.
+	Harness.Idle(1.0f);
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 3.0, []() { return false; });
+	const double Start = Harness.ElapsedSeconds;
+	while (Harness.ElapsedSeconds - Start < 2.0)
+	{
+		Harness.Inject(TEXT("Fire"), true);
+		Harness.Step();
+	}
+	Harness.Idle(1.0f);
+
+	const int32 Degradations = EclipseDegradation::Count();
+	Report(*this, TEXT("stille degradaties in één missie"), static_cast<float>(Degradations), TEXT(""),
+		TEXT("moet 0 zijn — elke andere waarde is iets dat de speler NIET ziet"));
+	for (const FString& Line : EclipseDegradation::Report())
+	{
+		AddInfo(FString::Printf(TEXT("GEMETEN  %s"), *Line));
+	}
+
+	TestEqual(TEXT("degradatie: niets valt stil terug in een echte missie"), Degradations, 0);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

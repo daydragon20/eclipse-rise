@@ -296,4 +296,86 @@ bool FEclipseWeaponSoundVariantsNeverRepeatTest::RunTest(const FString& Paramete
 	return true;
 }
 
+
+/**
+ * DE GELUIDEN OVERLEVEN EEN GARBAGE COLLECT (owner-diagnose 26-07, 21:01).
+ *
+ * De crash: EXCEPTION_ACCESS_VIOLATION in PlayFootstep. De oorzaak was niet de
+ * logica maar het GEHEUGEN — de banken lagen in gewone TMaps met gewone structs,
+ * dus de garbage collector zag de TObjectPtr-referenties niet, ruimde de cues op,
+ * en de eerste voetstap daarna speelde vrijgegeven geheugen af.
+ *
+ * De bug zat er vanaf het bouwen van de voetstappen. Hij werd pas zichtbaar toen
+ * er MINDER geluid geladen bleef, want toen viel de race de verkeerde kant op.
+ * Precies daarom moet dit een test zijn en geen zorgvuldigheid: het is niet te
+ * zien aan de code, alleen aan het moment.
+ *
+ * De test forceert een volledige GC-pass tussen laden en afspelen. Zonder
+ * USTRUCT/UPROPERTY op de banken haalt hij het niet.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSoundBanksSurviveGarbageCollection,
+	"Eclipse.Audio.Subsystem.SoundBanksSurviveGarbageCollection",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProductFilter)
+
+bool FEclipseSoundBanksSurviveGarbageCollection::RunTest(const FString& Parameters)
+{
+	// STERKE REFERENTIES op de subsystemen zelf. In het spel houdt de
+	// subsystem-collectie ze vast; hier houdt niemand ze vast, dus een volledige
+	// purge ruimde het AUDIOSUBSYSTEEM op en crashte de test op zijn eigen
+	// opstelling. Dat is geen productfout maar wel precies de valkuil waar deze
+	// test over gaat: wat niemand vasthoudt, verdwijnt.
+	TStrongObjectPtr<UGameInstance> OuterGameInstance(NewObject<UGameInstance>(GEngine));
+	TStrongObjectPtr<UEclipseAudioSubsystem> AudioKeep(NewObject<UEclipseAudioSubsystem>(OuterGameInstance.Get()));
+	TStrongObjectPtr<UEclipseEventBusSubsystem> BusKeep(NewObject<UEclipseEventBusSubsystem>(OuterGameInstance.Get()));
+	UEclipseAudioSubsystem* Audio = AudioKeep.Get();
+	UEclipseEventBusSubsystem* Bus = BusKeep.Get();
+	if (!TestNotNull(TEXT("gc: audiosubsysteem"), Audio) || !TestNotNull(TEXT("gc: bus"), Bus))
+	{
+		return false;
+	}
+	// Binden laadt de banken (zelfde pad als in het spel).
+	Audio->BindToBus(*Bus);
+
+	// HET GETAL DAT HET BEWIJST: hoeveel cues nog een GELDIG object zijn. Een
+	// telling van array-lengtes zou dit niet vangen — een TArray houdt zijn lengte
+	// ook als de objecten eronder zijn opgeruimd, en dan is de crash pas bij het
+	// afspelen te zien.
+	const int32 LiveBefore = Audio->CountLiveCues();
+	const int32 RifleBefore = Audio->GetWeaponSoundVariantCount(TEXT("AssaultRifle"));
+	const int32 MetalBefore = Audio->GetFootstepVariantCount(1);
+	AddInfo(FString::Printf(TEXT("GEMETEN  varianten vóór de GC-pass                rifle %d, metaal %d"),
+		RifleBefore, MetalBefore));
+
+	if (!TestTrue(TEXT("gc: er is überhaupt iets geladen om kwijt te raken"), RifleBefore > 0 && MetalBefore > 0))
+	{
+		return false;
+	}
+
+	// DE PASS ZELF. Purge=true dwingt het opruimen af in plaats van het te plannen;
+	// zonder dat zou de test kunnen slagen omdat er toevallig nog niets geruimd is.
+	CollectGarbage(RF_NoFlags, /*bFullPurge=*/true);
+
+	const int32 RifleAfter = Audio->GetWeaponSoundVariantCount(TEXT("AssaultRifle"));
+	const int32 MetalAfter = Audio->GetFootstepVariantCount(1);
+	AddInfo(FString::Printf(TEXT("GEMETEN  varianten ná de GC-pass                  rifle %d, metaal %d"),
+		RifleAfter, MetalAfter));
+
+	const int32 LiveAfter = Audio->CountLiveCues();
+	AddInfo(FString::Printf(TEXT("GEMETEN  geldige cues vóór/ná de GC-pass          %d / %d"), LiveBefore, LiveAfter));
+
+	TestEqual(TEXT("gc: de wapenbank houdt zijn aantal"), RifleAfter, RifleBefore);
+	TestEqual(TEXT("gc: de voetstapbank houdt zijn aantal"), MetalAfter, MetalBefore);
+	// DIT is de assertie die zonder USTRUCT/UPROPERTY omvalt.
+	TestEqual(TEXT("gc: geen enkele cue is opgeruimd"), LiveAfter, LiveBefore);
+	TestTrue(TEXT("gc: er waren überhaupt cues om te beschermen"), LiveBefore > 0);
+
+	// En daadwerkelijk AFSPELEN na de pass — dat is waar het crashte. Zonder wereld
+	// keert PlayFootstep netjes terug; het gaat hier om het aanraken van de cues.
+	Audio->PlayFootstep(FVector::ZeroVector, 1, 0.45f);
+	AddInfo(TEXT("GEMETEN  een voetstap ná de GC-pass is zonder crash afgespeeld"));
+
+	Audio->UnbindFromBus();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

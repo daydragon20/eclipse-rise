@@ -205,7 +205,7 @@ bool AEclipseCharacter::ShotLineHitsHead(const FVector& Start, const FVector& En
 	return FVector::DistSquared(Closest, Centre) <= FMath::Square(HeadHitbox->GetScaledSphereRadius());
 }
 
-void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight)
+void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, const TCHAR* PoseName)
 {
 	if (Clip == nullptr)
 	{
@@ -217,12 +217,25 @@ void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, flo
 		// Eén regel per lichaam en niet per aanroep: een schietpose valt 6,67 keer
 		// per seconde, en dan is een waarschuwing een logbom in plaats van een
 		// bevinding.
-		if (!bWarnedMissingOneShotPose)
+		// ALLEEN VOOR AANGEKLEDE LICHAMEN. Een capsule die nooit een body def kreeg
+		// (testdummies, doelwitten) heeft per definitie geen enkele pose, en dat is
+		// geen bevinding maar de opstelling. Zonder deze poort vuurde de
+		// waarschuwing 42 keer per suite-run op iets wat niemand hoeft te
+		// repareren — en dan leest niemand hem meer.
+		if (!bBodyDefApplied)
 		{
-			bWarnedMissingOneShotPose = true;
+			return;
+		}
+
+		// De NAAM erbij, anders moet je alsnog gaan zoeken welke van de vier het is.
+		if (!WarnedMissingPoses.Contains(PoseName))
+		{
+			WarnedMissingPoses.Add(PoseName);
+			EclipseDegradation::Note(TEXT("pose ontbreekt"),
+				FString::Printf(TEXT("%s: %s"), *GetName(), PoseName));
 			UE_LOG(LogEclipse, Warning,
-				TEXT("Animatie: %s mist een eenmalige pose (schot/klap/herladen/draai) — die handeling is hoorbaar en leesbaar, maar niet ZICHTBAAR."),
-				*GetName());
+				TEXT("Animatie: %s mist de pose '%s' — die handeling is hoorbaar en leesbaar, maar niet ZICHTBAAR."),
+				*GetName(), PoseName);
 		}
 		return;
 	}
@@ -237,7 +250,7 @@ void AEclipseCharacter::PlayShootPose()
 	// 0,12 s: korter dan het vuurinterval (0,15) zodat automatisch vuur een
 	// doorlopende beweging geeft in plaats van een pose die zichzelf steeds
 	// herstart en daardoor bevriest.
-	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f);
+	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f, TEXT("schieten"));
 }
 
 void AEclipseCharacter::PlayReloadPose(float Seconds)
@@ -245,7 +258,7 @@ void AEclipseCharacter::PlayReloadPose(float Seconds)
 	// Half gewicht, net als de schietpose: herladen is een handeling van de armen
 	// en mag de looppose niet overrulen. Wie herlaadt terwijl hij rent, moet nog
 	// steeds rennen.
-	PlayOneShotPose(LocomotionSet.Reload, FMath::Max(Seconds, 0.1f), 0.85f);
+	PlayOneShotPose(LocomotionSet.Reload, FMath::Max(Seconds, 0.1f), 0.85f, TEXT("herladen"));
 }
 
 void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
@@ -258,7 +271,7 @@ void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
 	// Half gewicht: draaien is een beweging van het onderlichaam en mag een
 	// schietpose of een klap niet overrulen. En de duur uit de take zelf, want
 	// die weet hoe lang hij is.
-	PlayOneShotPose(Clip, FMath::Max(Clip->GetPlayLength(), 0.15f), 0.85f);
+	PlayOneShotPose(Clip, FMath::Max(Clip->GetPlayLength(), 0.15f), 0.85f, TEXT("draaien"));
 }
 
 void AEclipseCharacter::PlayHitReactPose()
@@ -267,7 +280,7 @@ void AEclipseCharacter::PlayHitReactPose()
 	// 0,2-0,35 s voor een flinch; korter leest als ruis, langer onderbreekt het
 	// vuurgevecht. Vol gewicht omdat dit een VIJAND is die je neerschiet: dat is
 	// waar de klap gezien wordt, en daar mag hij duidelijk zijn.
-	PlayOneShotPose(LocomotionSet.HitReact, 0.25f, 1.0f);
+	PlayOneShotPose(LocomotionSet.HitReact, 0.25f, 1.0f, TEXT("klap"));
 }
 
 void AEclipseCharacter::NotifyControllerChanged()
@@ -843,12 +856,16 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 		UAnimSequence* Clip = SoftClip.LoadSynchronous();
 		if (Clip == nullptr)
 		{
+			EclipseDegradation::Note(TEXT("animatie niet geladen"),
+				FString::Printf(TEXT("%s: %s (%s)"), *GetName(), SlotName, *SoftClip.ToString()));
 			UE_LOG(LogEclipse, Warning, TEXT("%s: %s take %s did not load — locomotion drops a rung (GDD 14.3.5)."),
 				*GetName(), SlotName, *SoftClip.ToString());
 			return nullptr;
 		}
 		if (!EclipseLocomotion::IsUsableOn(Clip->GetSkeleton(), MeshSkeleton))
 		{
+			EclipseDegradation::Note(TEXT("animatie afgewezen op skelet"),
+				FString::Printf(TEXT("%s: %s (%s)"), *GetName(), SlotName, *SoftClip.ToString()));
 			UE_LOG(LogEclipse, Warning,
 				TEXT("%s: %s take %s is authored for skeleton %s but this body wears %s — REJECTED, locomotion drops a rung (GDD 14.3.5)."),
 				*GetName(), SlotName, *Clip->GetName(),
@@ -896,6 +913,7 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"));
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"));
 	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"));
+	bBodyDefApplied = true;
 	LocomotionSet.TurnLeft = ResolveClip(BodyDef.TurnLeftAnim, TEXT("draai links"));
 	LocomotionSet.TurnRight = ResolveClip(BodyDef.TurnRightAnim, TEXT("draai rechts"));
 	LocomotionSet.CrouchTransition = ResolveClip(BodyDef.CrouchTransitionAnim, TEXT("crouch-transition"));
@@ -981,14 +999,14 @@ void AEclipseCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHe
 	// 0,3 s: de capsule krimpt onmiddellijk, dus de pose moet het verschil
 	// overbruggen zonder de speler te laten wachten. Halve piek — dit is een
 	// houdingswissel, geen klap.
-	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f);
+	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"));
 	PlaceHeadHitboxOnCapsule(); // gehurkt zit het hoofd lager
 }
 
 void AEclipseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
-	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f);
+	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"));
 	PlaceHeadHitboxOnCapsule();
 }
 

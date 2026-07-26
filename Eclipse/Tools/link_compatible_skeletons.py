@@ -62,8 +62,27 @@ for target_pack, donor_pack in DONORS.items():
         continue
 
     target.add_compatible_skeleton(donor)
-    eal.save_asset(target_path)
+
+    # modify() + save_loaded_asset, en NIET save_asset(pad). Dat laatste schreef
+    # niets: het asset stond niet als gewijzigd gemarkeerd, dus de save sloeg hem
+    # over — en meldde geen fout. Dit script rapporteerde daardoor "5 koppelingen"
+    # terwijl er nul op schijf stonden, en de runtime wees 2948 animaties af.
+    #
+    # Vandaar ook de controle hieronder: opnieuw laden en TELLEN. Een tool die
+    # zegt dat hij iets deed zonder het na te kijken, is precies de stille fout
+    # die hij moest opruimen.
+    target.modify()
+    if not eal.save_loaded_asset(target):
+        unreal.log_warning(f"COMPAT {target_pack}: opslaan MISLUKT")
+        continue
+
+    check = eal.load_asset(target_path)
+    stored = check.get_editor_property("compatible_skeletons") if check else []
+    if len(stored) == 0:
+        unreal.log_warning(f"COMPAT {target_pack}: na opslaan nog steeds leeg — de koppeling houdt niet")
+        continue
+
     linked += 1
-    unreal.log(f"COMPAT {target_pack} <- {donor_pack}")
+    unreal.log(f"COMPAT {target_pack} <- {donor_pack} (nagekeken: {len(stored)} in de lijst)")
 
 unreal.log(f"COMPAT klaar: {linked} nieuwe koppelingen van {len(DONORS)}")
