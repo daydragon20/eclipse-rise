@@ -100,3 +100,38 @@ maar ze zijn **niet urgent**: zolang de armaturen helemaal niet oplichten, valt 
 over hun helderheid niets te beslissen. Eerst uitzoeken waarom het emissive-vlak
 donker blijft.
 
+---
+
+## Vier hypotheses uitgesloten, één over
+
+Nadat vaststond dát de armaturen donker zijn, is de oorzaak stap voor stap
+ingeperkt. Elke stap is een meting, geen redenering:
+
+| # | Hypothese | Proef | Uitkomst |
+|---|---|---|---|
+| 1 | een asset ontbreekt | per armatuur mesh / basis / emissive gelogd | **alle dertien ok** |
+| 2 | de master kent de parameters niet | `GetTextureParameterValue` / `GetScalarParameterValue` bevragen | `EmissiveMaskTex=ja`, `GlowGain=ja` |
+| 3 | de gain staat te laag | alle armaturen op **200** (12,5× de hoogste geauthorde waarde) | **geen zichtbaar verschil** |
+| 4 | de UV-modus leest het masker verkeerd | `UVMode` van 1 naar **0** | **geen zichtbaar verschil** |
+
+Hypothese 2 was de meest waarschijnlijke en de goedkoopste: `SetTextureParameterValue`
+doet **stil niets** als de naam niet op de master staat — geen fout, geen
+waarschuwing. Dan "slaagt" elke regel terwijl er niets aankomt. Die staat nu
+permanent in de log-regel, want het is het soort fout dat zich anders herhaalt.
+
+**Wat overblijft: de materiaalgraaf zelf.** `EmissiveMaskTex` bestaat als
+parameter, maar niets bewijst dat hij ook op de emissive-uitgang is aangesloten.
+`M_EclipseToonFixture` is door een script gemaakt (`Tools/create_fixture_material.py`);
+een parameter aanmaken en hem daadwerkelijk verbinden zijn twee dingen, en alleen
+het eerste is hier aantoonbaar gebeurd.
+
+Dat is dezelfde vorm als het koppelscript van vanochtend, dat vijf skeletkoppelingen
+meldde en er nul opsloeg: **een script dat zegt dat het iets deed, zonder na te
+kijken.**
+
+**Volgende stap:** de graaf van `M_EclipseToonFixture` inspecteren — is de
+`EmissiveMaskTex`-sample verbonden met Emissive, of hangt hij los in de graaf? Eén
+detail uit de proeven wijst die kant op: op twee armaturen is bij hoge gain een
+flinterdun amber randje te zien. Er komt dús iets door, maar op een minuscuul deel
+van de mesh.
+

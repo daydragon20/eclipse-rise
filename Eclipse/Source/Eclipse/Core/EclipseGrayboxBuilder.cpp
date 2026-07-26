@@ -1200,12 +1200,31 @@ void BuildDistrict(UWorld& World)
 				// Zelfde vorm als de proplogregel ernaast (slots/tex/mid): zeg per
 				// object welke ingang aankwam, zodat een ontbrekende niet als
 				// "ziet er donker uit" hoeft te worden geraden.
+				// EN OF DE PARAMETERS ÜBERHAUPT BESTAAN op deze master.
+				// SetTextureParameterValue en SetScalarParameterValue doen STIL
+				// NIETS als de naam er niet in zit: geen fout, geen waarschuwing,
+				// gewoon een no-op. Alle regels hierboven "slagen" dan terwijl er
+				// niets aankomt — en dat is precies de vorm die verklaart waarom
+				// dertien armaturen met emissive=ok toch pikdonker zijn.
+				UTexture* ProbeTex = nullptr;
+				float ProbeGain = -1.0f;
+				const bool bHasEmissiveParam = Mid->GetTextureParameterValue(FMaterialParameterInfo(TEXT("EmissiveMaskTex")), ProbeTex);
+				const bool bHasGainParam = Mid->GetScalarParameterValue(FMaterialParameterInfo(TEXT("GlowGain")), ProbeGain);
+
 				UE_LOG(LogEclipse, Display,
-					TEXT("Graybox: armatuur %s  mesh=ok  basis=%s  emissive=%s  gain=%.1f"),
+					TEXT("Graybox: armatuur %s  mesh=ok  basis=%s  emissive=%s  gain=%.1f  |  master kent EmissiveMaskTex=%s GlowGain=%s"),
 					Label,
 					LoadObject<UTexture>(nullptr, BasePath) != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"),
 					LoadObject<UTexture>(nullptr, EmissivePath) != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"),
-					GlowGain);
+					GlowGain,
+					bHasEmissiveParam ? TEXT("ja") : TEXT("NEE"),
+					bHasGainParam ? TEXT("ja") : TEXT("NEE"));
+
+				if (!bHasEmissiveParam || !bHasGainParam)
+				{
+					UE_LOG(LogEclipse, Warning,
+						TEXT("Graybox: M_EclipseToonFixture mist een lichtparameter — de armaturen blijven donker hoe hoog de gain ook staat (14.3.5)."));
+				}
 				for (int32 Slot = 0; Slot < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++Slot)
 				{
 					Actor->GetStaticMeshComponent()->SetMaterial(Slot, Mid);
