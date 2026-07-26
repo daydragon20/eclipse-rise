@@ -36,6 +36,20 @@ namespace
 	constexpr float WeaponShotVolume = 0.7f;
 
 	const TCHAR* WeaponShotCuePath = TEXT("/Game/Audio/SFX/Cue_SFX_Weapon_RebelRifle_Shot_01.Cue_SFX_Weapon_RebelRifle_Shot_01");
+
+	/**
+	 * Inslag (gevechts-audit punt 4). Lag net als de schotcue ongebruikt in de
+	 * repo — er was geen feit dat "raak" betekende, want ShotFired vuurt ook bij
+	 * een misser. Sinds HitLanded bestaat is dat er wel.
+	 *
+	 * Luider dan het schot (0,85 tegen 0,7) en dat is de hele pointe: dit is het
+	 * enige signaal dat je RAAKT. In elke shooter is die bevestiging belangrijker
+	 * dan het schot zelf, want zonder haar weet je niet of je mist of dat de
+	 * vijand veel leven heeft.
+	 */
+	constexpr float ImpactVolume = 0.85f;
+
+	const TCHAR* ImpactCuePath = TEXT("/Game/Audio/SFX/Cue_SFX_Impact_BulletMetal_01.Cue_SFX_Impact_BulletMetal_01");
 }
 
 void UEclipseAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -89,6 +103,10 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		EclipseTags::Event_Combat_ShotFired,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnShotFired),
 		FEclipseCombatEventPayload::StaticStruct());
+	HitLandedHandle = Bus.Subscribe(
+		EclipseTags::Event_Combat_HitLanded,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnHitLanded),
+		FEclipseCombatEventPayload::StaticStruct());
 }
 
 void UEclipseAudioSubsystem::UnbindFromBus()
@@ -99,11 +117,13 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 		Bus->Unsubscribe(OrderAckHandle);
 		Bus->Unsubscribe(OrderRefusedHandle);
 		Bus->Unsubscribe(ShotFiredHandle);
+		Bus->Unsubscribe(HitLandedHandle);
 	}
 	MissionCompletedHandle = FEclipseEventSubscriptionHandle();
 	OrderAckHandle = FEclipseEventSubscriptionHandle();
 	OrderRefusedHandle = FEclipseEventSubscriptionHandle();
 	ShotFiredHandle = FEclipseEventSubscriptionHandle();
+	HitLandedHandle = FEclipseEventSubscriptionHandle();
 	LastBarkSeconds.Reset();
 	BoundBus = nullptr;
 }
@@ -135,6 +155,38 @@ void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstanced
 	if (WeaponShotCue != nullptr && GetWorld() != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, WeaponShotCue, Shot->Origin, WeaponShotVolume);
+	}
+}
+
+void UEclipseAudioSubsystem::OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Landed = Payload.GetPtr<FEclipseCombatEventPayload>();
+	if (Landed == nullptr)
+	{
+		return;
+	}
+
+	++HitSoundCount;
+
+	if (!bTriedLoadImpact)
+	{
+		bTriedLoadImpact = true;
+		ImpactCue = LoadObject<USoundBase>(nullptr, ImpactCuePath);
+		if (ImpactCue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Audio: inslagcue %s ontbreekt — treffers blijven stil (14.3.5)."), ImpactCuePath);
+		}
+	}
+
+	// Een kopschot klinkt harder. Dat is de goedkoopste manier om punt 5 uit de
+	// audit half op te lossen: je hóórt het verschil, ook zonder hitmarker. Een
+	// eigen cue zou beter zijn, maar die ligt er niet en er een genereren is een
+	// owner-beslissing (dat kost een API-aanroep).
+	if (ImpactCue != nullptr && GetWorld() != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactCue, Landed->Origin,
+			Landed->bHeadshot ? ImpactVolume * 1.35f : ImpactVolume);
 	}
 }
 

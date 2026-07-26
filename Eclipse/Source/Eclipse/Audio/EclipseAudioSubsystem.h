@@ -49,6 +49,7 @@ public:
 
 	/** Diagnostiek voor de testlaag: hoeveel schoten om geluid vroegen. */
 	int32 GetShotSoundCount() const { return ShotSoundCount; }
+	int32 GetHitSoundCount() const { return HitSoundCount; }
 
 	/**
 	 * Diagnostic: barks die daadwerkelijk een stem hebben aangevraagd, en barks
@@ -70,6 +71,7 @@ private:
 	void OnMissionCompleted(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnOrderAnswered(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
+	void OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Bus we subscribed on; weak so teardown order during shutdown cannot dangle. */
 	TWeakObjectPtr<UEclipseEventBusSubsystem> BoundBus;
@@ -77,6 +79,7 @@ private:
 	FEclipseEventSubscriptionHandle OrderAckHandle;
 	FEclipseEventSubscriptionHandle OrderRefusedHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
+	FEclipseEventSubscriptionHandle HitLandedHandle;
 
 	/** Laatste bark per soldaat (wereldseconden) — de rem van BarkCooldownSeconds. */
 	TMap<FGuid, double> LastBarkSeconds;
@@ -100,4 +103,11 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<USoundBase> WeaponShotCue;
 	bool bTriedLoadWeaponShot = false;
+
+	/** Treffers die om geluid vroegen. */
+	int32 HitSoundCount = 0;
+
+	UPROPERTY(Transient)
+	TObjectPtr<USoundBase> ImpactCue;
+	bool bTriedLoadImpact = false;
 };

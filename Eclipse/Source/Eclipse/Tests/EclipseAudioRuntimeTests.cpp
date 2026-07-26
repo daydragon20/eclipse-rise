@@ -46,13 +46,13 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 	Audio->BindToBus(*Bus);
 	TestTrue(TEXT("Bound after BindToBus"), Audio->IsBoundToBus());
 	// Drie: de missie-sting plus de twee order-antwoorden (barks, 26-07).
-	// Vier: sting, de twee order-antwoorden, en het wapengeluid (26-07).
-	TestEqual(TEXT("Vier live subscriptions: sting + ack + refused + schot"), Bus->GetSubscriptionCount(), 4);
+	// Vijf: sting, de twee order-antwoorden, het schot en de treffer (26-07).
+	TestEqual(TEXT("Vijf live subscriptions: sting + ack + refused + schot + treffer"), Bus->GetSubscriptionCount(), 5);
 
 	// Re-bind must swap, not stack — a leaked second subscription would double
 	// every sting.
 	Audio->BindToBus(*Bus);
-	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 4);
+	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 5);
 
 	// Completed is consumed; the world-less context skips playback but still
 	// counts the request (the 14.3.5 degradation path this test rides on).
@@ -75,6 +75,17 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 		Shot.bPlayerSide = true;
 		Bus->Broadcast(EclipseTags::Event_Combat_ShotFired, FInstancedStruct::Make(Shot));
 		TestEqual(TEXT("Een schot vraagt om geluid"), Audio->GetShotSoundCount(), 1);
+
+		// En een TREFFER is een eigen feit met een eigen geluid. Zonder dit
+		// onderscheid zou een misser even luid klinken als een raak schot, en dan
+		// weet je nog steeds niet of je raakt.
+		FEclipseCombatEventPayload Landed;
+		Landed.Origin = FVector(120.0f, 0.0f, 0.0f);
+		Landed.bHeadshot = true;
+		Landed.Damage = 55.0f;
+		Bus->Broadcast(EclipseTags::Event_Combat_HitLanded, FInstancedStruct::Make(Landed));
+		TestEqual(TEXT("Een treffer vraagt om een eigen geluid"), Audio->GetHitSoundCount(), 1);
+		TestEqual(TEXT("...en telt niet mee als schot"), Audio->GetShotSoundCount(), 1);
 	}
 
 	Audio->UnbindFromBus();

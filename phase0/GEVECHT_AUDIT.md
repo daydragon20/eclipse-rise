@@ -25,8 +25,8 @@ verzonnen getal.
 | 1 | **Time-to-kill, speler → vijand** | Division ~1–2 s op gelijk niveau; Gears ~0,5–1 s | 22 hp/schot op 6,67 schoten/s tegen 100 hp = **~0,6 s**; met kopschoten **~0,3 s** | Keuze — zit in de band |
 | 2 | **Time-to-kill, vijand → speler** | Vrijwel altijd trager dan andersom (de speler moet kunnen reageren) | **2,50 s** van vol naar neer | Keuze — 4× ruimer dan andersom, dat is gezond |
 | 3 | **Kopschoten** | ×1,5 tot ×3 | **×2,50** gemeten (44 → 110 hp) | Was een omissie, **vandaag gerepareerd** |
-| 4 | **Bevestiging dát je raakt** | Universeel: hitmarker, schadegetal, impactgeluid of alle drie | **Niets.** Geen kruisje, geen getal, geen geluid | **Omissie — de zwaarste van deze lijst** |
-| 5 | **Kopschot voelbaar anders** | Eigen hitmarker-vorm en/of eigen geluid | Alleen de schade verschilt | **Omissie** (volgt uit 4) |
+| 4 | **Bevestiging dát je raakt** | Universeel: hitmarker, schadegetal, impactgeluid of alle drie | **Inslaggeluid sinds 26-07** (luider dan het schot, want dit is het signaal dat telt). Nog geen kruisje en geen getal | **Half — het oor weet het nu, het oog nog niet** |
+| 5 | **Kopschot voelbaar anders** | Eigen hitmarker-vorm en/of eigen geluid | **Een kopschot klinkt 1,35× harder.** Een eigen cue zou beter zijn maar ligt er niet | **Half — hoorbaar, nog niet zichtbaar** |
 | 6 | **Reactie van het slachtoffer** | Flinch-animatie | **Hit-reactie van 0,25 s**, gewicht 0,995 gemeten | Was een omissie, **vandaag gerepareerd** |
 | 7 | **Reactie van de schutter** | Schiethouding / terugslag | **Schietpose van 0,12 s** ✓; **geen terugslag** | Half — zie 9 |
 | 8 | **Spreiding** | Altijd iets: heupvuur ruimer dan mikken | **Geen.** Elk schot gaat exact naar het kruis | **Omissie** |
@@ -46,9 +46,11 @@ verzonnen getal.
 **Vier van de vijf omissies gingen over FEEDBACK, niet over mechaniek.** Eén ervan
 (12, wapengeluid) is dezelfde dag gerepareerd toen bleek dat het geen smaakvraag
 was maar een dood asset: `Cue_SFX_Weapon_RebelRifle_Shot_01` lag al in de repo.
-Wat er nóg ligt en niemand afspeelt: `Cue_SFX_Impact_BulletMetal_01` en twee
-voetstapcues. De impactcue vraagt een treffer-event dat er nog niet is; de
-voetstappen vragen anim-notifies.
+Daarna gold hetzelfde voor `Cue_SFX_Impact_BulletMetal_01`: die lag er ook, en
+miste alleen een feit om aan te hangen — `ShotFired` vuurt immers óók bij een
+misser. Met `Event.Combat.HitLanded` erbij klinkt een treffer nu, en een kopschot
+1,35× harder. Wat er nóg dood ligt: twee voetstapcues, en die vragen
+anim-notifies.
 
 **De drie die overblijven horen bij elkaar.** Het gevecht rékent goed — de schade
 klopt, de cadans klopt, kopschoten werken sinds vandaag, de vijand flincht, en je
@@ -66,7 +68,8 @@ locomotie-audit: allebei geven ze mikken een prijs.
 
 ## Wat ik zelf gedaan heb, en waar het ophoudt
 
-**Gedaan:** 3 (kopschoten), 6 (hit-reactie), 7 (schietpose), 12 (wapengeluid).
+**Gedaan:** 3 (kopschoten), 6 (hit-reactie), 7 (schietpose), 12 (wapengeluid), en de
+helft van 4 en 5 (inslaggeluid, luider bij een kopschot).
 Die vier hadden gemeen dat er geen smaakvraag in zat: de multiplier stond al in de
 data, de takes lagen al in de packs, en de cue lag al in de repo. Ze waren dood,
 niet onbeslist.
@@ -78,9 +81,9 @@ gevecht. Wel voorbereid: de hitmarker kan via de bestaande HUD en het bestaande
 
 ## Aanbeveling, in volgorde
 
-1. **Hitmarker** — kleinste ingreep, grootste verschil. Zonder bevestiging weet je
-   niet of je mist of dat de vijand veel leven heeft. Een eigen vorm bij een
-   kopschot lost meteen punt 5 op.
+1. **Hitmarker** — nu de kleinste stap die overblijft: je hóórt sinds vandaag dat
+   je raakt, je ziet het nog niet. `Event.Combat.HitLanded` draagt al of het een
+   kopschot was en hoeveel schade er landde, dus de HUD hoeft alleen te tekenen.
 2. **Spreiding + terugslag** — samen met de aim-snelheidsstraf uit de
    locomotie-audit; het is één ontwerpvraag: *wat kost schieten?*
 3. **Richtingsindicator bij schade** — pas zinvol als je vaker geraakt wordt dan

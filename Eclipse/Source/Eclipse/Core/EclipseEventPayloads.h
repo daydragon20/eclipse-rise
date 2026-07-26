@@ -161,6 +161,14 @@ struct FEclipseCombatEventPayload
 	/** True als de schutter aan spelerskant staat. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	bool bPlayerSide = false;
+
+	/** HitLanded: was het een kopschot? Nodig voor eigen feedback per treffersoort. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bHeadshot = false;
+
+	/** HitLanded: hoeveel schade er geland is (na de kopschot-multiplier). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float Damage = 0.0f;
 };
 
 /** Event.Squad.* — order/soldier facts in-mission (SPEC-P1-06). */

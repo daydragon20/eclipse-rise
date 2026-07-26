@@ -121,5 +121,28 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 
 	HitCharacter->ApplyDamage(Damage, Cast<AEclipseCharacter>(GetOwner()),
 		bHeadshot ? FName(*(Cause.ToString() + TEXT("_Head"))) : Cause);
+
+	// De TREFFER als eigen feit (26-07). ShotFired vuurt ook bij een misser — dat
+	// is precies de bedoeling daar — dus er was geen enkel feit dat "je hebt iets
+	// geraakt" betekent. Daardoor lag Cue_SFX_Impact_BulletMetal_01 sinds de
+	// audio-import ongebruikt in de repo: er was niets om hem aan te hangen.
+	//
+	// Draagt of het een kopschot was en hoeveel schade er landde, want dat is wat
+	// feedback nodig heeft om onderscheid te maken. De hitmarker die de owner
+	// overweegt kan hier zonder verdere aanpassing aan.
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
+		{
+			const AEclipseCharacter* ShooterBody = Cast<AEclipseCharacter>(GetOwner());
+			FEclipseCombatEventPayload Landed;
+			Landed.Shooter = GetOwner();
+			Landed.Origin = Hit.ImpactPoint;
+			Landed.bPlayerSide = ShooterBody != nullptr && ShooterBody->IsPlayerSide();
+			Landed.bHeadshot = bHeadshot;
+			Landed.Damage = Damage;
+			Bus->Broadcast(EclipseTags::Event_Combat_HitLanded, FInstancedStruct::Make(Landed));
+		}
+	}
 	return true;
 }
