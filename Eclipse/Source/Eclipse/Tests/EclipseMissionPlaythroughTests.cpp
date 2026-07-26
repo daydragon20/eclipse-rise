@@ -2702,6 +2702,55 @@ bool FEclipseDefaultSpawnFallbackTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Hoeveel rijen heeft een tabel, en hoeveel kan de code er bereiken?
+//
+// Twee keer op één dag heb ik het SETUP-SCRIPT vertrouwd in plaats van het asset,
+// en twee keer klopte dat niet: EnemySpawns leek leeg volgens de scripts en had er
+// vijf in de assets, en DT_Weapons leek twee rijen te hebben en heeft er vier.
+// Beide keren met de hand gevonden. Dit is dezelfde controle, maar dan elke ronde.
+//
+// De tellingen staan als Report en niet als assert: een tabel mag groeien. Wat WEL
+// vastgeklemd is, is het GAT — vier wapenrijen waarvan de game mode er één pakt
+// (FirstRowOf). Voegt iemand een vijfde toe of sluit iemand de loadout aan, dan
+// gaat deze test rood en moet de melding aan de owner mee. Dat is precies de
+// bedoeling: het getal mag veranderen, maar niet stil.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseTableRowsAreReachableTest,
+	"Eclipse.Playthrough.EveryTableRowCanBeReached",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseTableRowsAreReachableTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	auto CountRows = [this](const TCHAR* Path, const TCHAR* Label) -> int32
+	{
+		const UDataTable* Table = LoadObject<UDataTable>(nullptr, Path);
+		if (!TestNotNull(*FString::Printf(TEXT("tabellen: %s is geladen"), Label), Table))
+		{
+			return 0;
+		}
+		const int32 Rows = Table->GetRowMap().Num();
+		Report(*this, *FString::Printf(TEXT("rijen in %s"), Label), Rows, TEXT(""), TEXT(""));
+		return Rows;
+	};
+
+	const int32 Weapons = CountRows(TEXT("/Game/Data/DT_Weapons.DT_Weapons"), TEXT("DT_Weapons"));
+	CountRows(TEXT("/Game/Data/DT_LoadoutOptions.DT_LoadoutOptions"), TEXT("DT_LoadoutOptions"));
+	CountRows(TEXT("/Game/Data/DT_EnemyArchetypes.DT_EnemyArchetypes"), TEXT("DT_EnemyArchetypes"));
+	CountRows(TEXT("/Game/Data/DT_BodyDefs.DT_BodyDefs"), TEXT("DT_BodyDefs"));
+	CountRows(TEXT("/Game/Data/DT_SquadOrderDefs.DT_SquadOrderDefs"), TEXT("DT_SquadOrderDefs"));
+
+	// De klem op het bekende gat. AEclipseGameMode gebruikt FirstRowOf voor het
+	// spelerwapen, dus precies één rij is bereikbaar hoeveel je er ook authordt.
+	Report(*this, TEXT("wapenrijen die de speler NIET kan dragen"), Weapons - 1, TEXT(""),
+		TEXT("FirstRowOf pakt er één; de rest is onbereikbaar tot de loadout gekoppeld is"));
+	TestEqual(TEXT("tabellen: nog steeds vier wapens waarvan er één bereikbaar is ")
+		TEXT("(verandert dit, dan is de loadout-koppeling gemaakt of er is een wapen bij — beide moeten naar de owner)"),
+		Weapons, 4);
+
+	return true;
+}
+
 // Elke geauthorde spawnbatch moet ook echt vijanden kunnen opleveren.
 //
 // Geschiedenis, want die verklaart de vorm van deze test. Vanochtend vroeg was
