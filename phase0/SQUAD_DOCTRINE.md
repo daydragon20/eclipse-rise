@@ -135,6 +135,32 @@ voetstappen zijn, dan maakt autonomie ze overbodig. Maar als commando's
 meer een kaderwissel oplevert. In Full Spectrum Warrior is het team maximaal
 competent en is de commandolaag het hele spel.
 
-## Status
+## Wat het ontwerp niet voorzag, en wat het beter maakte
 
-Ontwerp vastgelegd 26-07 avond, nog niets gebouwd. Volgende taak na loadouts.
+**Recon werd het sluippad, en dat volgde uit twee dingen die apart landden.**
+Sinds de ochtend alarmeert elk schot van de SPELERSKANT de vijanden binnen de
+radius; sinds de avond vuurt de squad uit zichzelf. Samen: **je squad kan je
+verraden met een schot dat jij niet gaf.** Gemeten in een echte missie, terwijl de
+speler niets doet:
+
+| Doctrine | Squadschoten in 3 s | Gealarmeerde vijanden |
+|---|---|---|
+| `recon` | 4 | 16 |
+| `ready` | 59 | 240 |
+
+Verhouding 0,067. Recon maakt je niet onzichtbaar — het houdt je sluippad open
+tot iemand het eerste schot lost, en daarna verdedigt je squad zich gewoon. Dat
+is precies wat de Ghost Recon-ROE belooft, en het was geen ontwerpdoel: het viel
+eruit omdat de twee lagen elkaar raakten.
+
+**En recon zweeg niet meteen.** De vuurlus liep door tot de volgende
+doelselectie, een halve seconde later: drie tot vier naschoten, goed voor zestien
+gealarmeerde vijanden. Voor een kader dat je gebruikt om te sluipen is dat het
+verschil tussen wel en niet gezien worden. `SetDoctrine` stopt de lus nu direct —
+"een kader geldt meteen" moet ook gelden voor de trekker.
+
+## Status: GEBOUWD, 26-07 avond
+
+Alle zes de lagen geland en gemeten, elk in een eigen commit. De hermeting van
+het gevecht (laag 6) staat in [GEVECHT_AUDIT.md](GEVECHT_AUDIT.md) ronde 3: de
+squad maakt een gevecht **2,78× korter**.
