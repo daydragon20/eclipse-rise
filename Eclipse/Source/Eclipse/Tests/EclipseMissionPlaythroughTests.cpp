@@ -1340,4 +1340,91 @@ bool FEclipseEveryOrderIsAnsweredTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Het vierde objective-type, dat nog nooit gedraaid had.
+//
+// Van de vier types (ReachLocation, DestroyTarget, CollectItem, ExtractSquad)
+// komen er drie langs in M1.1 en dus in de speelronde. CollectItem staat alleen
+// in MT_Rescue, en die missie is nog nooit gestart door een test. Erger: de
+// bestaande presence-test loopt over "objectives van het type ReachLocation of
+// CollectItem" in M1.1 — en omdat M1.1 er geen CollectItem heeft, was die helft
+// van die assert LEEG. Dekking die breder leek dan hij was.
+//
+// Deze test start MT_Rescue echt (via de residentiële regio die hem aanbiedt) en
+// legt het CollectItem-pad af.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCollectItemObjectiveTest,
+	"Eclipse.Playthrough.CollectItemIsCompletableInAShippedMission",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseCollectItemObjectiveTest::RunTest(const FString& Parameters)
+{
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	const UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(
+		nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (!TestNotNull(TEXT("collect: DA_CampaignSetup"), Setup))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	Campaign->StartNewCampaign(Setup);
+
+	// WorkerHousing is de residentiële regio, en het residentiële aanbod is
+	// MT_Rescue — de enige geleverde missie met een CollectItem-objective.
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("collect: WorkerHousing geselecteerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("WorkerHousing"), Error))
+		|| !TestTrue(FString::Printf(TEXT("collect: gelanceerd (%s)"), *Error), Prep->AutoLaunch(Error)))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	FName CollectSite = NAME_None;
+	FName CollectObjectiveId = NAME_None;
+	for (const FEclipseObjectiveDef& Objective : Mission->GetActiveObjectives())
+	{
+		if (Objective.Type == EEclipseObjectiveType::CollectItem)
+		{
+			CollectSite = Objective.TargetId;
+			CollectObjectiveId = Objective.ObjectiveId;
+			break;
+		}
+	}
+
+	// Als dit faalt is de test zelf waardeloos geworden (verkeerde regio, of het
+	// type is uit de data verdwenen) — dat moet luid, niet als stille pass.
+	if (!TestTrue(TEXT("collect: deze missie heeft echt een CollectItem-objective"), !CollectObjectiveId.IsNone()))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	AddInfo(FString::Printf(TEXT("collect: '%s' hangt aan site '%s'"),
+		*CollectObjectiveId.ToString(), *CollectSite.ToString()));
+
+	TestFalse(TEXT("collect: hij staat nog niet af voordat je er bent"),
+		Mission->GetCompletedObjectiveIds().Contains(CollectObjectiveId));
+
+	// Negatieve controle EERST: een ander vak binnenlopen mag dit objective niet
+	// vullen. Zonder die controle bewijst de regel hieronder alleen dat er íéts
+	// afvinkt, niet dat het aan het juiste vak hangt.
+	Mission->NotifySiteEntered(TEXT("Site_Extraction_NietDitVak"));
+	TestFalse(TEXT("collect: een ander vak vult dit objective NIET"),
+		Mission->GetCompletedObjectiveIds().Contains(CollectObjectiveId));
+
+	// Dit is precies wat de trigger doet als je het vak binnenloopt. CollectItem
+	// MAG op aanwezigheid — anders dan DestroyTarget, dat daarop geweigerd wordt.
+	Mission->NotifySiteEntered(CollectSite);
+	TestTrue(TEXT("collect: het vak binnenlopen vult het objective"),
+		Mission->GetCompletedObjectiveIds().Contains(CollectObjectiveId));
+
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
