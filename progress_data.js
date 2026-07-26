@@ -115,6 +115,12 @@ window.PROGRESS_DATA = {
       "Optie 3: de vermenigvuldiger uit de data halen zolang hij niet werkt, zodat niemand erop rekent",
       "Mijn aanbeveling: optie 3 nu (eerlijk houden), optie 1 wanneer het gevecht aan de beurt is - niet eerder, want het is pas te beoordelen als je ziet en hoort dat je raak schiet"
     ] },
+    { titel: "Het alarm kan tijdens spelen niet afgaan — betrapt worden bestaat nog niet", prio: "gauw", waarom: "Gemeten in de ronde waarin vier vijanden je zien en van vol naar neer schieten: het alarm blijft op 0. De enige plek die NotifyAlarmRaised() aanroept is een console-commando. Dat is EERLIJK in de code gelabeld ('Gauntlet surface until enemy alert code lands'), dus het is geen bug maar een ontbrekende schakel - alleen is die van buiten onzichtbaar, en de rest van het systeem doet alsof hij er is: de missie houdt een alarm-latch bij, de debrief rekent er anders mee af (spook-optionals vervallen) en de HUD heeft er een eigen sub-fase voor. Praktisch betekent het dat sluipen geen faalstand heeft: je kunt niet betrapt worden op een manier waar de game op reageert.", stappen: [
+      "De vraag is niet OF hij gekoppeld moet worden maar WAARAAN: zien ze je, of pas als er geschoten wordt, of als er een lichaam gevonden wordt?",
+      "Mijn aanbeveling: eerste contact van een vijand die je waarneemt. Dat is er al (ik heb die waarneming vannacht gemeten op 2442 cm) en het is een regel die je kunt uitleggen",
+      "Let op de gevolgen: zodra het alarm werkt, verlies je spook-optionals bij elke keer dat je gezien wordt. Dat maakt de missie meteen strenger",
+      "Ik heb het niet gekoppeld: wanneer een alarm afgaat is een ontwerpbeslissing, geen tuningwaarde"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",

@@ -1058,6 +1058,15 @@ bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("speler neer na"), DownedAt, TEXT("s"), TEXT("-1 = bleef staan"));
 	Report(*this, TEXT("verste dat een vijand van zijn spawn kwam"), FurthestHostileMove, TEXT("cm"));
 	Report(*this, TEXT("missie gefaald op"), MissionFailedAt, TEXT("s"), TEXT("-1 = niet gefaald"));
+
+	// Het alarm: gaat er iets escaleren als vier vijanden je zien en neerschieten?
+	// De missie houdt een alarm-latch bij, de debrief rekent er anders door af en
+	// de HUD toont een eigen sub-fase — maar het ENIGE wat NotifyAlarmRaised()
+	// aanroept is een console-commando. Deze ronde is het bewijs: als vier
+	// schutters je van vol naar neer brengen en het alarm blijft uit, dan bestaat
+	// er geen enkele speelbare weg naartoe.
+	Report(*this, TEXT("alarm geslagen"), MissionSub->IsAlarmRaised() ? 1.0f : 0.0f, TEXT(""),
+		TEXT("0 terwijl je gezien én neergeschoten bent = geen enkel spelpad zet het alarm aan"));
 	if (FirstDamageAt >= 0.0f && DownedAt >= 0.0f)
 	{
 		// Time-to-death vanaf de eerste treffer: dit is het getal dat zegt hoeveel
