@@ -58,8 +58,14 @@ De missie is gepind op **TransitCheckpoint** en heet intern `MT_M11`.
    → **Verwacht, en dit is de kern van de test:**
    - **+50 credits en +25 materiaal** (check met `Eclipse.Economy.Report`; de
      ledger-regels dragen de reden `MissionReward`)
-   - **+20 materiaal extra** als niemand neerging — de bonus met reden
-     `OptionalObjective`
+   - ~~**+20 materiaal extra** als niemand neerging~~ — **KOMT NIET (gemeten 26-07).**
+     Die bonus hangt aan het optionele objective `Obj_M11_NoCasualties`, en de
+     debrief betaalt alleen optionals uit die in `CompletedObjectiveIds` staan.
+     Niets voltooit dat objective: er is geen vak om binnen te lopen en geen
+     doelwit om neer te halen — het is een *voorwaarde*, geen taak. De speelronde
+     bevestigt het: nul gewonden, 25 materiaal in plaats van 45. Wil je hem toch
+     zien uitbetalen, dan moet je hem er zelf bij voltooien met
+     `Eclipse.Mission.CompleteObjective Obj_M11_NoCasualties`.
    - **dag 1 → dag 2** (elke missie kost een dag, winst of verlies)
    - **Transit Checkpoint verandert NIET van eigenaar** — M1.1 verzet geen grens;
      dat doet pas M1.3 via de liberation-instantie
@@ -71,6 +77,12 @@ Herhaal 1-5, maar laat onderweg iemand neergaan (of gebruik
 `Eclipse.Roster.Kill <index>` vóór de debrief), en dan `ForceEnd win`:
 → **Verwacht:** de 50 C en 25 M komen wél, de **+20 M niet**. De bonus is een latch
 over de hele run: wie neerging telt mee, óók als hij daarna gestabiliseerd is.
+
+> **LET OP (26-07): deze proef onderscheidt op dit moment niets.** De +20 komt óók
+> niet als er géén gewonden vallen, want het objective wordt nooit voltooid (zie
+> hierboven). Wil je de latch echt zien werken, voltooi hem dan expliciet met
+> `Eclipse.Mission.CompleteObjective Obj_M11_NoCasualties` — mét gewonden vervalt
+> hij dan, zonder gewonden betaalt hij +20. Dát is de proef die wél iets zegt.
 
 ### Het verliespad
 
