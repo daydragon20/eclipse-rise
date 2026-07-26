@@ -56,6 +56,8 @@ De oorzaak is één regel in de constructor: `bCanEverTick = false`, terwijl de 
 
 Dat dit pas om half drie 's nachts boven kwam, komt doordat geen enkele test ooit vroeg wat er ná een druk op de knop *gebeurt* — alleen of de binding bestond. Het is de scherpste versie van de les die vannacht vier keer terugkwam.
 
+**Het hele project is daarna op dit patroon nagelopen** (elke plek die een tick aan- of uitzet tegen de vlag die bepaalt of dat kán): vier plekken, en het personage was de enige foute. Het wapen en de objective-trigger staan bewust en consequent op "nooit tikken", en de Command Mode-component gebruikt exact het juiste patroon — `bCanEverTick = true` mét `bStartWithTickEnabled = false`. Dat is wrang: **het goede voorbeeld stond al in de component die op ditzelfde personage zit**, twee bestanden verderop.
+
 **Drie stiltes, en de sweep die erop volgde.** Je opdracht vroeg te noteren of er iets stils gebeurt dat luid had moeten zijn. Dat bleek geen bijvangst maar een categorie:
 
 1. **Een missie logde haar start wel en haar einde niet.** Zie hieronder — dit vond de speelronde.
