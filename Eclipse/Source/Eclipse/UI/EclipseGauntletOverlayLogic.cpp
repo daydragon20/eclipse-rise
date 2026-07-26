@@ -255,4 +255,13 @@ namespace EclipseGauntletOverlay
 		default:                                 return EEclipseGauntletAnswer::Unanswered;
 		}
 	}
+
+	FEclipseHitMarker MakeHitMarker(bool bHeadshot)
+	{
+		FEclipseHitMarker Marker;
+		Marker.Glyph = bHeadshot ? TEXT("×") : TEXT("+");
+		Marker.Colour = bHeadshot ? FLinearColor(1.0f, 0.35f, 0.15f) : FLinearColor::White;
+		Marker.Seconds = 0.12f;
+		return Marker;
+	}
 }

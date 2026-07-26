@@ -1,5 +1,11 @@
 #include "UI/EclipseMissionHudWidget.h"
 
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Core/EclipseGameplayTags.h"
+#include "Core/EclipseEventPayloads.h"
+#include "Characters/EclipseCharacter.h"
+#include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 #include "Characters/EclipseCommandModeComponent.h"
 #include "Components/HorizontalBox.h"
@@ -88,14 +94,83 @@ namespace
 	}
 }
 
+void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
+{
+	Super::NativeTick(Geometry, DeltaSeconds);
+
+	// Alleen werk als er iets te doven valt. Deze widget tikt toch al voor Slate;
+	// een timer per treffer zou bij 6,67 schoten per seconde meer kosten dan dit.
+	if (HitMarkerSecondsLeft > 0.0f)
+	{
+		HitMarkerSecondsLeft -= DeltaSeconds;
+		if (HitMarkerSecondsLeft <= 0.0f && HitMarker != nullptr)
+		{
+			HitMarker->SetVisibility(ESlateVisibility::Hidden);
+
+	// De richtingsindicator komt uit een pack die al in het project ligt en die
+	// niemand aanriep (`Screen_Damage_Indicator`, gevonden 26-07). Een
+	// Blueprint-widget, dus laden via zijn gegenereerde klasse.
+	//
+	// Ontbreekt hij, dan blijft de rest van de HUD gewoon werken en zegt hij dat
+	// één keer — dit is decoratie die je mist, geen systeem dat stukgaat (14.3.5).
+	if (UClass* IndicatorClass = LoadClass<UUserWidget>(nullptr,
+			TEXT("/Game/Screen_Damage_Indicator/UI/WBP_DamageIndicator.WBP_DamageIndicator_C")))
+	{
+		DamageIndicator = CreateWidget<UUserWidget>(GetOwningPlayer(), IndicatorClass);
+		if (DamageIndicator != nullptr)
+		{
+			if (UCanvasPanelSlot* IndicatorSlot = Canvas->AddChildToCanvas(DamageIndicator))
+			{
+				// Vult het hele scherm en draait om zijn midden: de pack tekent zijn
+				// eigen pijl/rand, wij bepalen alleen de hoek.
+				IndicatorSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+				IndicatorSlot->SetOffsets(FMargin(0.0f));
+			}
+			DamageIndicator->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+			DamageIndicator->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: WBP_DamageIndicator niet gevonden — je ziet niet uit welke richting je geraakt wordt (14.3.5)."));
+	}
+		}
+	}
+
+	if (DamageIndicatorSecondsLeft > 0.0f)
+	{
+		DamageIndicatorSecondsLeft -= DeltaSeconds;
+		if (DamageIndicatorSecondsLeft <= 0.0f && DamageIndicator != nullptr)
+		{
+			DamageIndicator->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
 void UEclipseMissionHudWidget::NativeConstruct()
 {
 	using namespace EclipseGauntletOverlay;
 
 	Super::NativeConstruct();
 
+	// CANVAS als wortel, met de bestaande tekstlijst linksboven erin (26-07).
+	//
+	// De HUD was een verticale doos tekstregels en verder niets — er is zelfs geen
+	// richtkruis-widget; het kruis dat je ziet is de muiscursor. Voor
+	// trefferfeedback moet er iets in het MIDDEN van het scherm kunnen staan, en
+	// dat kan een verticale doos niet. Een canvas kan het wel en verandert niets
+	// aan de tekstregels: die krijgen gewoon hun eigen slot linksboven.
+	Canvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("MissionHudCanvas"));
+	WidgetTree->RootWidget = Canvas;
+
 	Root = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MissionHudRoot"));
-	WidgetTree->RootWidget = Root;
+	if (UCanvasPanelSlot* RootSlot = Canvas->AddChildToCanvas(Root))
+	{
+		RootSlot->SetAutoSize(true);
+		RootSlot->SetAnchors(FAnchors(0.0f, 0.0f));
+		RootSlot->SetPosition(FVector2D(12.0f, 12.0f));
+	}
 
 	if (!IsDebugHudAllowed())
 	{
@@ -107,6 +182,25 @@ void UEclipseMissionHudWidget::NativeConstruct()
 
 	LiveBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	Root->AddChildToVerticalBox(LiveBox);
+
+	// De hitmarker: één tekstblok in het midden, onzichtbaar tot er iets geraakt
+	// wordt. Tekst en geen afbeelding, en dat is een bewuste beperking — er ligt
+	// geen hitmarker-textuur in het project, en er een verzinnen zou betekenen dat
+	// ik iets teken. Een '+' die kort oplicht doet precies wat een hitmarker moet
+	// doen: bevestigen DAT je raakte, zonder je blik van het doel te halen.
+	HitMarker = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("HitMarker"));
+	if (UCanvasPanelSlot* MarkerSlot = Canvas->AddChildToCanvas(HitMarker))
+	{
+		MarkerSlot->SetAutoSize(true);
+		// Anker in het midden van het scherm; de offset centreert het teken zelf.
+		MarkerSlot->SetAnchors(FAnchors(0.5f, 0.5f));
+		MarkerSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+		MarkerSlot->SetPosition(FVector2D::ZeroVector);
+	}
+	FSlateFontInfo MarkerFont = HitMarker->GetFont();
+	MarkerFont.Size = 28;
+	HitMarker->SetFont(MarkerFont);
+	HitMarker->SetVisibility(ESlateVisibility::Hidden);
 
 	// A mount is a fresh run: the widget is cached by the controller and
 	// re-constructed per mission, exactly like the two automatic tallies reset per
@@ -138,6 +232,14 @@ void UEclipseMissionHudWidget::NativeConstruct()
 				FGameplayTag::RequestGameplayTag(Family),
 				FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnAnyFact)));
 		}
+
+		// De treffer krijgt een EIGEN abonnement en niet de familie-route, want hij
+		// mag geen volledige herbouw van de tekstlijst veroorzaken: er wordt tot
+		// 6,67 keer per seconde geraakt, en OnAnyFact tekent alles opnieuw.
+		EventHandles.Add(Bus->Subscribe(
+			EclipseTags::Event_Combat_HitLanded,
+			FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnHitLanded),
+			FEclipseCombatEventPayload::StaticStruct()));
 	}
 
 	// The gauntlet block on demand, so a session where the panel stayed closed can
@@ -243,6 +345,80 @@ void UEclipseMissionHudWidget::NativeDestruct()
 bool UEclipseMissionHudWidget::IsDebugHudAllowed()
 {
 	return !FParse::Param(FCommandLine::Get(), TEXT("EclipseShot"));
+}
+
+void UEclipseMissionHudWidget::ShowDamageFrom(const FVector& ImpactPoint)
+{
+	const APlayerController* Owner = GetOwningPlayer();
+	const APawn* MyPawn = Owner != nullptr ? Owner->GetPawn() : nullptr;
+	if (MyPawn == nullptr || DamageIndicator == nullptr)
+	{
+		return;
+	}
+
+	// De hoek TUSSEN waar je kijkt en waar de klap vandaan kwam, in graden. Op de
+	// KIJKRICHTING en niet op de lichaamsrichting: de indicator hangt aan je
+	// scherm, en je scherm is je camera. Sinds het camera-relatieve model van
+	// vanochtend lopen die twee bovendien uiteen.
+	const FVector ToImpact = (ImpactPoint - MyPawn->GetActorLocation()).GetSafeNormal2D();
+	const FVector Facing = Owner->GetControlRotation().Vector().GetSafeNormal2D();
+	const float Angle = FMath::RadiansToDegrees(FMath::Atan2(
+		FVector::CrossProduct(Facing, ToImpact).Z,
+		FVector::DotProduct(Facing, ToImpact)));
+
+	DamageIndicator->SetRenderTransformAngle(Angle);
+	DamageIndicator->SetVisibility(ESlateVisibility::HitTestInvisible);
+	// 1,2 s: lang genoeg om je hoofd om te draaien, kort genoeg om niet te blijven
+	// hangen als je al reageerde. Ruimer dan de hitmarker, want die bevestigt iets
+	// wat je zelf deed en deze vertelt je iets wat je nog niet wist.
+	DamageIndicatorSecondsLeft = 1.2f;
+}
+
+void UEclipseMissionHudWidget::OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Landed = Payload.GetPtr<FEclipseCombatEventPayload>();
+	if (Landed == nullptr || HitMarker == nullptr)
+	{
+		return;
+	}
+
+	const APlayerController* Owner = GetOwningPlayer();
+	const APawn* MyPawn = Owner != nullptr ? Owner->GetPawn() : nullptr;
+	if (MyPawn == nullptr)
+	{
+		return;
+	}
+
+	// GERAAKT WORDEN: waar kwam het vandaan? (owner-opdracht 26-07 avond, punt 2.)
+	// Hetzelfde feit draagt zowel de schutter als het slachtoffer, dus hier is
+	// geen tweede mechanisme voor nodig.
+	if (Landed->Victim.Get() == MyPawn)
+	{
+		ShowDamageFrom(Landed->Origin);
+		return;
+	}
+
+	// Alleen schoten van de SPELER. Zonder deze poort licht je kruis op als je
+	// squad iemand raakt, en dan bevestigt de marker niet meer jóuw schot — dan is
+	// hij ruis in plaats van feedback.
+	const AEclipseCharacter* Shooter = Cast<AEclipseCharacter>(Landed->Shooter.Get());
+	if (Shooter == nullptr || Shooter != MyPawn)
+	{
+		return;
+	}
+
+	// Eigen VORM en KLEUR bij een kopschot (owner-opdracht 26-07 avond, punt 2).
+	// Vorm én kleur, niet alleen kleur: kleur alleen is voor een deel van de
+	// spelers geen onderscheid, en een X leest ook in je ooghoek anders dan een +.
+	// De KEUZE staat in EclipseGauntletOverlay::MakeHitMarker, puur en toetsbaar;
+	// hier staat alleen het tekenen. Zie die functie voor waarom vorm én kleur
+	// verschillen en waarom de duur korter is dan het vuurinterval.
+	const EclipseGauntletOverlay::FEclipseHitMarker Marker =
+		EclipseGauntletOverlay::MakeHitMarker(Landed->bHeadshot);
+	HitMarker->SetText(FText::FromString(Marker.Glyph));
+	HitMarker->SetColorAndOpacity(FSlateColor(Marker.Colour));
+	HitMarker->SetVisibility(ESlateVisibility::HitTestInvisible);
+	HitMarkerSecondsLeft = Marker.Seconds;
 }
 
 void UEclipseMissionHudWidget::OnAnyFact(FGameplayTag /*EventTag*/, const FInstancedStruct& /*Payload*/)

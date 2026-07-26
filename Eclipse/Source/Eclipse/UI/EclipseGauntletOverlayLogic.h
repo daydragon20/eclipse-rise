@@ -135,4 +135,30 @@ namespace EclipseGauntletOverlay
 
 	/** Unanswered -> Good -> Bad -> Unanswered: one key per row, no text entry (owner request). */
 	ECLIPSE_API EEclipseGauntletAnswer CycleAnswer(EEclipseGauntletAnswer Answer);
+
+	/**
+	 * Hoe de trefferbevestiging eruitziet (owner-opdracht 26-07 avond, punt 2).
+	 *
+	 * Puur, zodat het toetsbaar is zonder viewport: de widget-laag die dit tekent
+	 * heeft geen enkele test, en juist dáár zaten vandaag twee bugs. Wat hier
+	 * beslist wordt — welk teken, welke kleur, hoe lang — is het deel dat stil kan
+	 * veranderen; het tekenen zelf is één SetText.
+	 */
+	struct FEclipseHitMarker
+	{
+		FString Glyph;
+		FLinearColor Colour = FLinearColor::White;
+		float Seconds = 0.0f;
+	};
+
+	/**
+	 * VORM én kleur verschillen bij een kopschot, niet alleen kleur: kleur alleen
+	 * is voor een deel van de spelers geen onderscheid, en een × leest ook in je
+	 * ooghoek anders dan een +.
+	 *
+	 * De duur is korter dan het vuurinterval (0,15 s), zodat aanhoudend vuur een
+	 * KNIPPERENDE marker geeft. Een marker die blijft staan meldt dat er ooit een
+	 * treffer was; een die knippert telt ze.
+	 */
+	ECLIPSE_API FEclipseHitMarker MakeHitMarker(bool bHeadshot);
 }

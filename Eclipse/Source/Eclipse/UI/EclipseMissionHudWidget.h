@@ -39,6 +39,7 @@ class ECLIPSE_API UEclipseMissionHudWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& Geometry, float DeltaSeconds) override;
 	virtual void NativeDestruct() override;
 
 	/**
@@ -87,6 +88,7 @@ public:
 	void EmitVerdictSummary();
 
 private:
+	void OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnAnyFact(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Rebuild the live sections only (objectives, orders, Command Mode state). */
@@ -125,6 +127,26 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> Root;
+
+	/** Canvas-wortel: draagt de tekstlijst linksboven en de hitmarker in het midden. */
+	UPROPERTY()
+	TObjectPtr<class UCanvasPanel> Canvas;
+
+	/** Trefferbevestiging in het schermmidden; verborgen tot er iets geraakt wordt. */
+	UPROPERTY()
+	TObjectPtr<class UTextBlock> HitMarker;
+
+	/** Hoe lang de marker nog zichtbaar blijft (seconden). */
+	float HitMarkerSecondsLeft = 0.0f;
+
+	/** Richtingsindicator uit Screen_Damage_Indicator; null als de pack ontbreekt. */
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> DamageIndicator;
+
+	float DamageIndicatorSecondsLeft = 0.0f;
+
+	/** Draai de indicator naar de plek waar de klap vandaan kwam. */
+	void ShowDamageFrom(const FVector& ImpactPoint);
 
 	/** Objectives + squad orders + Command Mode state: the per-fact rebuild lives in here and nowhere else. */
 	UPROPERTY()

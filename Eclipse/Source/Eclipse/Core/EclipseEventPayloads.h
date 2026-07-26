@@ -169,6 +169,16 @@ struct FEclipseCombatEventPayload
 	/** HitLanded: hoeveel schade er geland is (na de kopschot-multiplier). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	float Damage = 0.0f;
+
+	/**
+	 * HitLanded: WIE er geraakt is. Nodig om te weten of JIJ het was, en dan waar
+	 * de klap vandaan kwam — de schutterpositie zit al in dit feit.
+	 *
+	 * Hier en niet in een tweede event: er bestond al een feit dat "iemand is
+	 * geraakt" betekent, en dat had alleen het slachtoffer niet bij zich.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	TWeakObjectPtr<AActor> Victim;
 };
 
 /** Event.Squad.* — order/soldier facts in-mission (SPEC-P1-06). */

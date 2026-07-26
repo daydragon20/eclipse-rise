@@ -141,6 +141,7 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 			Landed.bPlayerSide = ShooterBody != nullptr && ShooterBody->IsPlayerSide();
 			Landed.bHeadshot = bHeadshot;
 			Landed.Damage = Damage;
+			Landed.Victim = HitCharacter;
 			Bus->Broadcast(EclipseTags::Event_Combat_HitLanded, FInstancedStruct::Make(Landed));
 		}
 	}

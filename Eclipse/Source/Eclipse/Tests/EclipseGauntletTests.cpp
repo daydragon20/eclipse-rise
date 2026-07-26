@@ -371,4 +371,35 @@ bool FEclipseGauntletPanelContentTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+// De trefferbevestiging (owner-opdracht 26-07 avond, punt 2).
+//
+// De widget die dit tekent heeft geen enkele test — dat gat is bekend en staat in
+// HANDOFF §5. Daarom is de KEUZE eruit getrokken: welk teken, welke kleur, hoe
+// lang. Dat is het deel dat stil kan veranderen; het tekenen zelf is één SetText.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseHitMarkerTest,
+	"Eclipse.Gauntlet.HitMarkerTellsHeadFromBody",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProductFilter)
+
+bool FEclipseHitMarkerTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseGauntletOverlay;
+
+	const FEclipseHitMarker Body = MakeHitMarker(/*bHeadshot*/ false);
+	const FEclipseHitMarker Head = MakeHitMarker(/*bHeadshot*/ true);
+
+	// VORM verschilt, niet alleen kleur. Kleur alleen is voor een deel van de
+	// spelers geen onderscheid, en dit is de enige bevestiging dat je raakte.
+	TestNotEqual(TEXT("hitmarker: kop en romp hebben een ANDER teken"), Head.Glyph, Body.Glyph);
+	TestNotEqual(TEXT("hitmarker: en een andere kleur"), Head.Colour.ToString(), Body.Colour.ToString());
+	TestFalse(TEXT("hitmarker: er staat altijd een teken"), Body.Glyph.IsEmpty() || Head.Glyph.IsEmpty());
+
+	// Korter dan het vuurinterval (0,15 s), anders blijft hij bij aanhoudend vuur
+	// staan en meldt hij dat er OOIT een treffer was in plaats van ze te tellen.
+	TestTrue(FString::Printf(TEXT("hitmarker: dooft binnen het vuurinterval (%.2f s tegen 0,15)"), Body.Seconds),
+		Body.Seconds > 0.0f && Body.Seconds < 0.15f);
+	TestEqual(TEXT("hitmarker: kop en romp staan even lang"), Head.Seconds, Body.Seconds);
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
