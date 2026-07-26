@@ -133,11 +133,25 @@ schermpositie en `GETEKEND` per lichaam.
 **KIJK ER ZELF NAAR** met de Read-tool en schrijf op wat je ziet. Dat is de hele
 opdracht — de reuzen stonden er al twee dagen en geen enkele meting zag ze.
 
+**De ronde oordeelt ook zelf**, met vier controles die in SCHERMruimte meten — het
+verschil tussen "de code klopt" en "je ziet iets". Alle vier gefalsificeerd op de
+echte historische bug:
+
+| Controle | Goede stand | Faalt bij |
+|---|---|---|
+| wordt de speler getekend | ja, op alle 9 momenten | ingeklapt personage (meshschaal 0,02) |
+| silhouethoogte in pixels | 476–506 px van 720 | idem, valt terug naar 10 px |
+| staat hij in het frame | ja | camera losgekoppeld |
+| schuift het uitzicht bij lopen | 227–260 cm | invoer die het beeld niet haalt (0 cm) |
+
+`verify.ps1` valt op die regels met exitcode 1. De ronde stopt er niet voor: hij
+logt en draait door, want een halve ronde levert minder bewijs op dan een
+volledige met een fout erin.
+
 Uitbouwen, in deze volgorde:
 - Deze ronde bij ELKE landing draaien, naast de suite.
-- Nog geen assertie op wat de opnames tonen. `NobodyIsAGiant` is de eerste die uit
-  een beeld is geboren; zoek de volgende (silhouethoogte over de tijd, verschil
-  tussen twee frames tijdens lopen).
+- `NobodyIsAGiant` is de enige assertie in de SUITE die uit een beeld geboren is;
+  de vier hierboven draaien alleen in de ronde. Zoek de volgende.
 - De opname met UI (moment 8) gaat via `FScreenshotRequest` met `bShowUI`, want
   `HighResShot` tekent alleen de 3D-scene. **Ook dat pakt de UMG-laag niet mee** —
   de HUD mount aantoonbaar wel. Wie de HUD op beeld wil, moet een andere weg

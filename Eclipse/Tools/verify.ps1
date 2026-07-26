@@ -98,7 +98,7 @@ if (-not $SkipShots) {
     }
 
     Write-Host ""
-    Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "SPELER|PLAYSHOT \d+ (WAPEN|DRAAI|SILHOUET)\]" |
+    Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "SPELER|PLAYSHOT \d+ (WAPEN|DRAAI|SILHOUET|BEWEGING)\]" |
         ForEach-Object { ($_.Line -replace '^.*Display: ', '') }
 }
 

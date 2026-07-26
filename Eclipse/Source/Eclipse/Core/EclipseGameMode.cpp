@@ -305,6 +305,26 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 	Controller->GetViewportSize(ViewportX, ViewportY);
 	UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d MEET] venster=%dx%d"), ShotIndex, ViewportX, ViewportY);
 
+	// KOMT BEWEGING IN HET BEELD AAN? Moment 2 en 3 zijn de loopmomenten, en
+	// tussen die twee hoort het uitzicht verschoven te zijn. Zonder deze controle
+	// zou een speler die wel invoer krijgt maar niet beweegt (of een camera die
+	// losgekoppeld is) negen keurige opnames opleveren van hetzelfde plaatje.
+	//
+	// Op de camera en niet op de pawn: het gaat er hier om of de beweging het
+	// SCHERM haalt, niet of er een getal in het bewegingscomponent verandert.
+	if (ShotIndex == 3)
+	{
+		const float Moved = FVector::Dist(CameraLocation, PlayShotLastCamera);
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 3 BEWEGING] uitzicht %.0f cm verschoven sinds moment 2"), Moved);
+		if (Moved < 50.0f)
+		{
+			UE_LOG(LogEclipse, Error,
+				TEXT("[PLAYSHOT 3 FOUT] het uitzicht schoof maar %.0f cm op tussen twee loopmomenten — beweging bereikt het beeld niet"),
+				Moved);
+		}
+	}
+	PlayShotLastCamera = CameraLocation;
+
 	const APawn* PlayerPawn = Controller->GetPawn();
 	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
 	{

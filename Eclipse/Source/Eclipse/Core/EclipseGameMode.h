@@ -92,6 +92,9 @@ private:
 	bool bPlayShotFiring = false;
 	bool bPlayShotTurning = false;
 
+	/** Waar de camera stond bij de vorige opname; om te zien of beweging het beeld haalt. */
+	FVector PlayShotLastCamera = FVector::ZeroVector;
+
 	/** Duwt elke tick beweging/vuur door zodat de opnames een LOPEND spel vangen. */
 	void DrivePlayShotInput();
 
