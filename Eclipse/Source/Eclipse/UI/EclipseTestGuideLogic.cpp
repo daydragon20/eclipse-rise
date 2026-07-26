@@ -19,7 +19,7 @@ namespace EclipseTestGuide
 
 		const FGuideControlDetail GuideControlDetails[ControlStepCount] = {
 			{ EEclipseGuideSignal::Move,
-			  TEXT("je pion loopt en de camera volgt; de HUD-kop staat op MISSION ACTIVE. LET OP het apparaatverschil: met een stick geeft een halve uitslag een halve snelheid (lineair), maar WASD zijn digitaal — op toetsenbord ren je dus altijd 420 en kun je niet wandelen") },
+			  TEXT("je pion loopt en de camera volgt; de HUD-kop staat op MISSION ACTIVE. Met een stick is halve uitslag halve snelheid; op toetsenbord ren je altijd 420 (wandelen kan daar niet)") },
 			{ EEclipseGuideSignal::Look,
 			  TEXT("het beeld draait mee; stick-kijken is nog framerate-gebonden (PLACEHOLDER GDD 8.1)") },
 			{ EEclipseGuideSignal::Fire,
@@ -27,13 +27,13 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Sprint,
 			  TEXT("je moet merkbaar sneller gaan: 420 -> 650 cm/s. LET OP, dit verschilt per apparaat sinds 26-07: Shift is een HOLD (terug bij loslaten), L3 is een TOGGLE — één klik start hem, en hij blijft aan tot je ophoudt met vooruit duwen, mikt, vuurt of nog eens L3 drukt") },
 			{ EEclipseGuideSignal::Crouch,
-			  TEXT("je zakt 52 cm (van 176 naar 124 cm hoog) en gaat naar 150 cm/s. Twee dingen zijn hier recent gerepareerd: de toets was dood (bCanCrouch stond uit) en je zakte daarna veel te diep — 80 cm is kruiphoogte, niet hurkhoogte. Gebeurt er niets of voelt de hoogte raar, zeg het") },
+			  TEXT("je zakt 52 cm (176 -> 124 cm) en gaat naar 150 cm/s. Beide zijn recent gerepareerd — de toets was dood en je zakte daarna te diep. Gebeurt er niets of voelt de hoogte raar: zeg het") },
 			{ EEclipseGuideSignal::Jump,
 			  TEXT("je komt van de grond. Deze actie bestond tot vandaag helemaal niet — er was geen JumpAction in het project") },
 			{ EEclipseGuideSignal::Aim,
 			  TEXT("de camera trekt in en de FOV versmalt zolang je hem vasthoudt. LET OP: op de controller mikt LT alleen BUITEN Command Mode; tijdens de Q/LB-hold is LT 'vorige soldaat'") },
 			{ EEclipseGuideSignal::ToggleView,
-			  TEXT("de camera schuift in ~0,1s naar je ogen en terug naar over-de-schouder (gemeten; de tuningwaarde noemt 0,2 s maar dat is de tijd voor de LANGSTE camerasprong, niet voor deze). In 1e persoon verdwijnt alleen je HOOFD — armen, wapen en benen blijven zichtbaar (jouw eigen playtest: 'ik zie letterlijk niets van mezelf' was de oude versie). Zie je je hoofd nog, dan mist het skelet zijn 'head'-bone en staat dat als waarschuwing in de log") },
+			  TEXT("de camera schuift in ~0,1 s naar je ogen en terug. In 1e persoon verdwijnt alleen je HOOFD — armen, wapen en benen blijven zichtbaar. Zie je je hoofd nog: zeg het (dan mist het skelet zijn head-bone)") },
 			{ EEclipseGuideSignal::CommandMode,
 			  TEXT("de wereld vertraagt naar 30%; de HUD toont 'COMMAND MODE  x0.30' en loslaten zet hem exact terug op 1.0") },
 			{ EEclipseGuideSignal::SelectNext,
@@ -45,7 +45,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Order,
 			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup") },
 			{ EEclipseGuideSignal::Stance,
-			  TEXT("HOUD EERST Command Mode vast (LB / Q) — daarbuiten doet Y niets. Dan wisselt 'stance:' ready <-> aggressive. LET OP: de stance wordt vandaag alleen ONTHOUDEN en getoond — je squad vecht er nog niet anders door (fase 1, geen gedragssplitsing). Je controleert hier dus of de regel omschakelt, niet of het gedrag verandert. Alleen de pad-Y is detecteerbaar: op toetsenbord is Alt een modifier bij de order zelf, dus druk daar J") }
+			  TEXT("HOUD Command Mode vast (LB / Q) — daarbuiten doet Y niets. 'stance:' wisselt ready <-> aggressive. LET OP: dat is vandaag alleen een REGEL die omschakelt; je squad vecht er nog niet anders door. Op toetsenbord: druk J") }
 		};
 
 		/** One judgement row: no detection, the tester's word settles it. */
