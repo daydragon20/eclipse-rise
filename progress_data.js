@@ -44,6 +44,18 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Drie van je vier missies beschrijven vijanden die er nooit komen", prio: "nu", waarom: "Gevonden om 07:20 met een omgekeerde vraag: niet 'welke code mist een aanroep' maar 'welke knop kun jij verdraaien zonder dat er iets gebeurt'. MT_Assault, MT_Rescue en MT_Sabotage vullen EnemySpawns in — welk archetype, hoeveel, op welk site — en niets leest dat veld. Elke missie krijgt in plaats daarvan vier gemengde vijanden uit een vaste lus, naast het primaire doel. Je missieontwerp staat dus in de data en komt niet in het spel.", stappen: [
+      "Beslis: aansluiten of weghalen. Half laten staan is de slechtste optie, want zolang de data er staat leest hij als waarheid",
+      "Mijn advies: AANSLUITEN — de data beschrijft al wat je bedoelde, dus het is grotendeels leeswerk in SpawnMissionActors",
+      "Maar besef wat het doet: aantal, type en plaats van vijanden veranderen in drie missies tegelijk, dus de moeilijkheid schuift in één klap. Dat wil je gespeeld beoordelen, niet gemeten",
+      "De test Eclipse.Playthrough.AuthoredEnemySpawnsWouldActuallySpawn klemt het op 5 batches: er kan niets stil bij komen, en haal je ze weg dan gaat hij rood",
+      "Volledige uitleg in HANDOFF sectie 4, rij 21"
+    ] },
+    { titel: "Je vuurt en het lichaam beweegt niet — er is nooit een schietanimatie", prio: "later", waarom: "Elk lichaam heeft een ShootAnim geauthord (setup_character_data.py vult hem), maar er wordt nergens een schietanimatie afgespeeld: de lichamen draaien idle of een gangbeweging, en vuren verandert de pose niet. Dit hoort in hetzelfde rijtje als kopschoten die niets doen en het alarm dat niet af kan gaan — samen verklaren ze waarom vechten leeg voelt.", stappen: [
+      "Dit is de goedkoopste van die drie: de take staat er al, hij wordt alleen niet gespeeld",
+      "Ik heb hem niet aangesloten omdat je moet KIJKEN of de animatie klopt op deze lichamen — de gangbewegingen komen uit gemengde packs en dat gaat vaker mis. Meten kan ik het niet",
+      "Zeg 'schietanimatie aansluiten' en ik bouw hem, dan beoordeel jij de eerste ronde"
+    ] },
     { titel: "De camera bewoog NOOIT bij 1e persoon, mikken of Command Mode — nu wel", prio: "nu", waarom: "Gevonden om half drie 's nachts, en het was al die tijd onzichtbaar. De gids belooft dat de camera bij 1e persoon in ~0,2 s naar je ogen schuift en dat mikken hem intrekt. Gemeten bleef alles staan: 300,00 cm en 80 graden, onveranderd. De oorzaak is een regel in de constructor (bCanEverTick=false) terwijl de blend zichzelf aanvraagt met SetActorTickEnabled(true) — dat doet niets op een actor waarvan de tickfunctie nooit geregistreerd is. De code las volkomen correct en het DOEL werd elke keer netjes gezet; er bewoog alleen nooit iets naartoe. Drie dingen die jij ziet waren dood: 1e/3e persoon, mikken, en de Command Mode-uitzoom.", stappen: [
       "Druk C: je zou nu vloeiend naar je ogen moeten schuiven (boom 300 -> 0) en weer terug",
       "Houd RMB of LT vast: de camera trekt in naar 165 cm en de FOV versmalt van 80 naar 64",
