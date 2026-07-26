@@ -576,6 +576,13 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	int32 FiringTicks = 0;
 	int32 HostilesDowned = 0;
 	bool bReachedPost = false;
+	// Hoe dicht is de speler ooit bij een vijand geweest? Dat getal legt een
+	// DEKKINGSGAT vast in plaats van het te verbergen: deze ronde wint door buiten
+	// hun waarnemingsbereik te blijven, dus de vijand-AI (naderen, dekking zoeken,
+	// terugvuren) wordt hier niet uitgeoefend. Zolang dit getal boven hun
+	// waarnemingsbereik blijft, is die kant van het gevecht ONGETEST, en dat hoort
+	// zichtbaar te zijn in plaats van impliciet.
+	float ClosestHostileEver = TNumericLimits<float>::Max();
 	{
 		const int32 MaxSteps = FMath::RoundToInt(120.0f / Options.StepSeconds);
 		const int32 ProgressWindow = FMath::RoundToInt(0.5f / Options.StepSeconds);
@@ -596,6 +603,7 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 			AEclipseCharacter* Hostile = FindNearestHostile();
 			const float HostileDistance = Hostile != nullptr
 				? FVector::Dist(Hostile->GetActorLocation(), Harness.Location()) : TNumericLimits<float>::Max();
+			ClosestHostileEver = FMath::Min(ClosestHostileEver, HostileDistance);
 
 			if (Hostile != nullptr && HostileDistance <= EngageRangeCm)
 			{
@@ -700,6 +708,9 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("afgelegde weg naar het controlepost"), FVector::Dist2D(Harness.Location(), StartLocation), TEXT("cm"));
 	Report(*this, TEXT("resterende afstand tot het site"), FVector::Dist2D(Harness.Location(), SiteControlPost), TEXT("cm"));
 	Report(*this, TEXT("ticks waarin gevuurd is"), FiringTicks, TEXT(""), TEXT("> 0 — er MOET geschoten worden"));
+	Report(*this, TEXT("dichtste nadering tot een vijand"),
+		ClosestHostileEver == TNumericLimits<float>::Max() ? -1.0f : ClosestHostileEver, TEXT("cm"),
+		TEXT("boven hun waarnemingsbereik (2500-3000) = de vijand-AI is deze ronde ONGETEST"));
 	TestFalse(TEXT("speelronde: de speler overleefde het vuurgevecht"), Harness.Body->IsDowned());
 	TestTrue(TEXT("speelronde: er is daadwerkelijk gevuurd"), FiringTicks > 0);
 
