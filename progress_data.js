@@ -149,6 +149,10 @@ window.PROGRESS_DATA = {
       "Druk Y tijdens Command Mode: dat cycelt door recon / ready / overwatch / aggressive, en die gelden meteen voor de hele squad",
       "Vraag jezelf een ding af: is dit gevecht nog spannend, of doet je squad het werk?"
     ] },
+    { titel: "Een audiobestand dat nu overbodig is - weggooien of houden?", prio: "later", waarom: "Cue_SFX_Foot_Metal_01 was de losse metaal-voetstap. Sinds vanavond komt metaal uit Footsteps_Volume_02 (zes varianten in plaats van een), dus deze cue wordt door niets meer aangeroepen. Weggooien is jouw beslissing en niet die van mij: het is betaalde audio. Hij kost verder niets, dus 'laten liggen' is ook een prima antwoord - dan zet ik er een regel bij zodat de sweep hem niet elke keer opnieuw meldt.", stappen: [
+      "Zeg 'weg' of 'laten liggen'",
+      "Meer is er niet aan"
+    ] },
     { titel: "Drie besluiten die klaarliggen in HANDOFF", prio: "gauw", waarom: "Alle drie volledig uitgewerkt met mijn advies erbij, zodat ja of nee volstaat. Ze staan bovenaan HANDOFF.md onder AVONDRAPPORT.", stappen: [
       "LICHTPLAN: 14 armaturen in drie rondes (doelsites, routes, extractie) in plaats van 100 in een klap. AANBEVELING: ja, en de bakens in het bestaande palet houden -- hierarchie uit helderheid, niet uit kleur",
       "ELEMENTAIRE SCHADE (vuur/zuur/schok): AANBEVELING: nee. Het is een counter-systeem op drie soorten gezondheidsbalk en wij hebben er een. Alternatief in HANDOFF: geef vijanden pantser en laat een wapenveld dat doorboren -- dezelfde gedachte op een as in plaats van vier",
