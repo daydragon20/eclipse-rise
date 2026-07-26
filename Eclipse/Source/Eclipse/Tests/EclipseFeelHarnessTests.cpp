@@ -18,6 +18,7 @@
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Characters/EclipseCommandModeComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -1502,6 +1503,7 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("mikken: FOV-versmalling"), Third.FieldOfView - Ads.FieldOfView, TEXT("gr"));
 
 	// --- Command Mode-uitzoom -----------------------------------------------
+	UEclipseCommandModeComponent* CommandMode = Harness.Controller->FindComponentByClass<UEclipseCommandModeComponent>();
 	// Dit getal stond als open vraag op de owner-lijst ("de code zegt 73%, de GDD
 	// zegt 15%") en was tot vannacht ONMEETBAAR voor hem: de blend liep niet, dus
 	// hij heeft nooit enige uitzoom gezien. Nu wel, dus hier het echte getal.
@@ -1517,11 +1519,25 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 
 		const double HoldStart = Harness.ElapsedSeconds;
 		double CommandBlendSeconds = -1.0;
+		// Splits de duur in twee stukken: hoe lang tot de MODUS aangaat, en hoe lang
+		// de camera daarna doet. Zonder die splitsing is "0,267 s" één getal met
+		// twee mogelijke oorzaken — precies de fout die vannacht drie keer geld
+		// kostte.
+		double ModeOnAfter = -1.0;
+		double TargetMovedAfter = -1.0;
 		while (Harness.ElapsedSeconds - HoldStart < 0.8)
 		{
 			Harness.Inject(TEXT("CommandHold"), true);
 			Harness.Step();
 			const FEclipseFeelSample Now = Harness.Body->SampleFeelState();
+			if (ModeOnAfter < 0.0 && CommandMode != nullptr && CommandMode->IsHeld())
+			{
+				ModeOnAfter = Harness.ElapsedSeconds - HoldStart;
+			}
+			if (TargetMovedAfter < 0.0 && Now.BoomTargetArmLength > FromHere + 1.0f)
+			{
+				TargetMovedAfter = Harness.ElapsedSeconds - HoldStart;
+			}
 			if (CommandBlendSeconds < 0.0 && Now.BoomTargetArmLength > FromHere + 1.0f
 				&& Now.BoomArmLength >= Now.BoomTargetArmLength - 0.5f)
 			{
@@ -1530,16 +1546,35 @@ bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
 		}
 		const FEclipseFeelSample Command = Harness.Body->SampleFeelState();
 		// TWEE DUREN NAAST ELKAAR, en ze zijn niet gelijk: de 1e-persoons-overgang
-		// meet 0,100 s en deze 0,267 s. Het commentaar bij UpdateCameraBlend zegt
-		// dat de overgang "altijd even lang duurt zodat de speler hem leert", en dat
-		// is dus niet wat er gebeurt.
+		// meet 0,100 s en deze 0,267 s, terwijl deze een KORTERE afstand aflegt
+		// (220 cm tegen 300 cm). Bij een constante snelheid hoort dat andersom.
 		//
-		// WAT IK NIET WEET, en dat hoort erbij: waaróm deze 0,267 s duurt. Bij een
-		// constante snelheid zou de kortere sprong (300->520 = 220 cm) juist SNELLER
-		// moeten zijn dan de langere (300->0 = 300 cm), en dat is precies andersom.
-		// Ik heb de meting schoongemaakt (vertrekpunt geverifieerd op 300,00 cm), dus
-		// het getal klopt; de verklaring ontbreekt. Niet weggeredeneerd en geen
-		// mechanisme verzonnen — dit is een meting die om een vervolg vraagt.
+		// UITGEZOCHT, en niet door te redeneren maar door de duur op te splitsen.
+		// De modus staat na één tick aan (0,008 s) en het doel verspringt meteen,
+		// dus de vertraging zit in de blend zelf. De verklaring is de dilatatie
+		// hierboven: Command Mode zet de wereld op 0,30, en de blend rekent met een
+		// gedilateerde delta. 220 cm bij 2600 cm/s is 0,085 s SPEELTIJD, en dat is
+		// 0,28 s echte tijd — wat binnen de meetruis gelijk is aan de 0,258 s die
+		// hier gemeten wordt.
+		//
+		// Dus: de uitzoom die de modus inleidt erft de slow-motion die diezelfde
+		// modus aanzet. Coherent (alles vertraagt samen), maar het betekent wel dat
+		// het kaderen een KWART SECONDE echte tijd kost in plaats van 85 ms, en dat
+		// hoort de owner te weten bij zijn keuze over hoe ver die uitzoom moet gaan.
+		//
+		// Wat hoe dan ook niet klopt is het commentaar bij UpdateCameraBlend: dat
+		// zegt dat de overgang "altijd even lang duurt zodat de speler hem leert".
+		// De laatste verdachte, en meteen de verklaring: Command Mode vertraagt de
+		// wereld. De blend rekent met een GEDILATEERDE delta, dus hij loopt in
+		// echte tijd net zoveel trager als de slow-motion diep is.
+		Report(*this, TEXT("Command Mode: tijddilatatie"),
+			UGameplayStatics::GetGlobalTimeDilation(Harness.World), TEXT("x"),
+			TEXT("de blend erft deze factor"));
+		Report(*this, TEXT("Command Mode: modus staat aan na"), ModeOnAfter, TEXT("s"));
+		Report(*this, TEXT("Command Mode: doel verspringt na"), TargetMovedAfter, TEXT("s"));
+		Report(*this, TEXT("Command Mode: camera onderweg"),
+			CommandBlendSeconds >= 0.0 && TargetMovedAfter >= 0.0 ? CommandBlendSeconds - TargetMovedAfter : -1.0, TEXT("s"),
+			TEXT("dit is het stuk dat de blend zelf kost"));
 		Report(*this, TEXT("Command Mode: duur van de overgang"), CommandBlendSeconds, TEXT("s"),
 			TEXT("vergelijk met de 1e-persoons-overgang: gelijk = constante tijd, ongelijk = constante snelheid"));
 		const float PullbackPct = Third.BoomArmLength > 0.0f

@@ -445,8 +445,18 @@ void AEclipseCharacter::UpdateCameraBlend(float DeltaSeconds)
 		return;
 	}
 
-	// Constant-rate blend over ViewToggleBlendTime rather than an exponential
-	// ease: the toggle must always take the same time, so the player learns it.
+	// Constant-rate blend over ViewToggleBlendTime rather than an exponential ease.
+	//
+	// LET OP: dit commentaar beweerde dat de overgang "altijd even lang duurt zodat
+	// de speler hem leert". Dat is niet wat een constante SNELHEID doet — de tijd
+	// schaalt met de afstand. Gemeten: de 1e-persoons-sprong (300 cm) kost 0,100 s
+	// en de Command Mode-sprong (220 cm) 0,258 s. Die tweede is bovendien trager
+	// dan zijn afstand suggereert omdat Command Mode de wereld op 0,30 zet en deze
+	// blend met een gedilateerde delta rekent — hij erft dus de slow-motion die de
+	// modus zelf aanzet. Zie Eclipse.Feel.Camera.ViewToggleAndAdsActuallyMoveTheCamera.
+	//
+	// Niets aan gewijzigd: welke van de twee (constante tijd of constante snelheid)
+	// beter voelt, is een ontwerpkeuze en staat op de owner-lijst.
 	const float ArmRate = ViewToggleBlendTime > KINDA_SMALL_NUMBER
 		? FMath::Max(ThirdPersonArmLength, CommandModeArmLength) / ViewToggleBlendTime
 		: BIG_NUMBER;
