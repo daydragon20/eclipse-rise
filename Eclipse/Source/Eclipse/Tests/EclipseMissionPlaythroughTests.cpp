@@ -760,6 +760,27 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("vijanden neergehaald"), HostilesDowned, TEXT(""), TEXT("minstens het doelwit"));
 	TestTrue(TEXT("speelronde: er ging minstens één vijand neer"), HostilesDowned > 0);
 
+	// WAT HET DE SQUAD KOSTTE (26-07 avond). Vóór vanavond stonden ze stil te
+	// kijken en gingen ze dus nooit neer; sinds ze uit zichzelf vuren, staan ze in
+	// het vuurgevecht en kunnen ze vallen. Dat is de andere helft van de
+	// balansverschuiving die de gevechts-audit op 2,78× zet: het gaat sneller, maar
+	// het kost je nu ook mensen.
+	//
+	// Als METING en niet als eis: hoeveel er hoort te vallen is een balansvraag en
+	// die is van de owner. Een getal dat er niet staat kan hij niet beoordelen.
+	int32 SquadStanding = 0;
+	int32 SquadDown = 0;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		if (const AEclipseCharacter* Body = Cast<AEclipseCharacter>(It->GetPawn()))
+		{
+			Body->IsDowned() ? ++SquadDown : ++SquadStanding;
+		}
+	}
+	Report(*this, TEXT("squadleden nog overeind"), static_cast<float>(SquadStanding), TEXT(""));
+	Report(*this, TEXT("squadleden neergegaan"), static_cast<float>(SquadDown), TEXT(""),
+		TEXT("vóór 26-07 avond was dit altijd 0: ze vochten niet mee"));
+
 	// --- 4. het objective is af DOOR TE SCHIETEN ----------------------------
 	Harness.Idle(0.3f);
 	TestTrue(TEXT("speelronde: 'take out the patrol leader' is af — door te schieten, niet door erlangs te lopen"),

@@ -97,6 +97,20 @@ opstelling, zelfde doelwit van 300 hp, één verschil — de doctrine. Onder `re
 zwijgt de squad, onder `ready` vuurt hij mee. Dat de doctrine-laag die meting
 mogelijk maakte, is een prettig neveneffect van in lagen bouwen.
 
+### En wat het de squad kost
+
+| | Gemeten in de verscheepte speelronde |
+|---|---|
+| Squadleden nog overeind | **3 van 3** |
+| Squadleden neergegaan | **0** |
+
+Vóór vanavond kon dit getal niet anders dan nul zijn: ze vochten niet mee. Nu
+staan ze in het vuurgevecht en kunnen ze vallen — en in deze ronde vallen ze niet.
+
+Dat heeft een neveneffect dat de moeite waard is: **de +20 voor een ronde zonder
+gewonden is eindelijk te VERLIEZEN.** Tot vandaag was hij gratis, want er stond
+niemand in de vuurlinie. Een bonus die je niet kunt mislopen is geen bonus.
+
 ### Wat dat betekent
 
 | Vraag | Antwoord |
