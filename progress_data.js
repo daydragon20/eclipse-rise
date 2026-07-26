@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-26 02:00",
+  bijgewerkt: "2026-07-26 02:15",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -58,6 +58,13 @@ window.PROGRESS_DATA = {
       "Onderweg is ook een echte navigatiebug gevonden en gefixt: er waren nul navigatiegrenzen, dus er kon nooit een navmesh bestaan. Dat was nodig maar niet genoeg — de spawnpositie was de rest",
       "Kijk bij het spelen of je squad naast je staat als de missie begint en of hij op je orders reageert. Twee asserts bewaken het nu, maar jouw ogen zijn de laatste controle",
       "Er is niets te kiezen. Dit staat hier omdat ik je een vraag had gesteld die ik moest intrekken"
+    ] },
+    { titel: "Je kunt elke vijand doodschieten zonder dat hij je ooit ziet — balansvraag", prio: "gauw", waarom: "Gevonden doordat mijn geautomatiseerde speler het uit zichzelf ging doen: hij vuurt vanaf 42 meter, en dat is de enige manier om met 100 HP tegen vier schutters te winnen. Jouw wapen (AR_Foundry) reikt 50 meter; de vijand neemt je pas waar op 25 tot 30 meter. Die asymmetrie van 60 tot 100 procent maakt op afstand blijven de dominante en risicoloze strategie, en dekking zoeken zinloos. Het is geen bug — het zijn twee getallen die niet op elkaar zijn afgestemd. LET OP: ik heb dit eerst verkeerd gemeld als 'de vijanden bewegen niet'. Dat was mijn testopstelling, niet de game; ze bewegen niet omdat ze nooit iemand zien. Die melding is ingetrokken.", stappen: [
+      "Vraag: mag out-ranging zo sterk zijn? In Borderlands en Gears komt de vijand op je af zodra je schiet — geluid telt daar mee, bij ons alleen zicht",
+      "Optie 1: waarneming omhoog (DT_EnemyArchetypes, PerceptionRadius 2500-3000)",
+      "Optie 2: wapenbereik omlaag (DT_Weapons, RangeCm 5000)",
+      "Optie 3: laten zoals het is — sluipschuttersgedrag belonen is een geldige keuze, maar zeg het dan bewust",
+      "Ik heb niets gewijzigd: dit is balans en dus jouw terrein. Zeg een optie en ik reken hem door met de speelronde"
     ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
