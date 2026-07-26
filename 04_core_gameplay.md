@@ -20,7 +20,7 @@ Third-person, cover-centric, weighty-but-responsive (reference feel: The Last of
 | Sprint-slide | Into cover or through low gaps | Signature kinetic verb; feels like a soldier, not an acrobat |
 | Environmental hazards | Heat (Tarsis), cold (Vel'Naar), vacuum/low-g (Krad-9) modify stamina, health regen, jump rules | Planets must *play* different, not just look different (Pillar: worlds as pressure) |
 
-**Camera:** over-shoulder, swappable shoulder, FOV 90 default; pulls back ~15% when commanding squad (command mode), forward on aim.
+**Camera:** over-shoulder, swappable shoulder, FOV 90 default; pulls back to **520 cm boom (+73% van de 300 cm basis)** when commanding squad (command mode), forward on aim. *(Owner-beslissing 26-07: de eerdere ~15% is nooit gespeeld — de camera-blend liep tot 25-07 helemaal niet, dus die 15% is nooit door iemand beoordeeld. De 520 is bewust geauthord om het commando-veld te kunnen lezen en is wél gespeeld. De waarde staat in `DA_CharacterTuning::CommandModeArmLength`; dat is sinds vandaag de enige plek.)*
 
 ### 4.1.2 Combat (player-level summary; full design in Part 8)
 

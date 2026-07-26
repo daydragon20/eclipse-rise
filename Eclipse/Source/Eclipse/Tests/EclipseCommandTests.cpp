@@ -134,7 +134,12 @@ bool FEclipseCommandTuningDefaultsTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("Tactician 0.0 = pause, data-ready"), Defaults->TacticianDilationFactor, 0.0f);
 	TestEqual(TEXT("Stage A enters on a hard cut"), Defaults->EnterBlendSeconds, 0.0f);
 	TestEqual(TEXT("Stage A exits on a hard cut"), Defaults->ExitBlendSeconds, 0.0f);
-	TestEqual(TEXT("Camera pullback 15% (4.1.1, applied Stage B)"), Defaults->CameraPullbackPercent, 15.0f);
+	// CameraPullbackPercent is 26-07 verwijderd (owner-beslissing: de 73% blijft).
+	// Het was een dode knop naast een levende: de uitzoom loopt via
+	// DA_CharacterTuning::CommandModeArmLength, en die staat op 520 cm. Twee velden
+	// voor één effect, waarvan de gedocumenteerde de stille was — precies het
+	// patroon dat deze sessie 23 keer heeft opgeleverd. Eén waarheid betekent één
+	// veld, dus de GDD-regel 4.1.1 is meegecorrigeerd in plaats van de code.
 	TestEqual(TEXT("Sync-strike cap 4 (Stage B data)"), Defaults->MaxSyncStrikeMarks, 4);
 	TestEqual(TEXT("Pick range matches the aim-reach fallback"), Defaults->SoldierSelectMaxRangeCm, 10000.0f);
 	return true;

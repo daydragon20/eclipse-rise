@@ -32,17 +32,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.0))
 	float ExitBlendSeconds = 0.0f;
 
-	/**
-	 * De 4.1.1 camerawijziging (locked decision 6). LET OP — dit veld wordt vandaag
-	 * NIET gelezen, maar de camera trekt wél terug: dat loopt via
-	 * FEclipseCharacterTuning::CommandModeArmLength (300 -> 520 cm, gemeten +73,3%).
-	 * Er staan dus twee knoppen op hetzelfde effect, de dode zegt 15% en de levende
-	 * doet 73,3%. Wie hier 15 leest denkt dat de camera nog niet meebeweegt.
-	 * Samenvoegen of dit veld weghalen is een owner-beslissing (HANDOFF sectie 4).
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.0, ClampMax = 50.0))
-	float CameraPullbackPercent = 15.0f;
-
 	/** Direct-pick reach for soldier selection under the reticle. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 100.0))
 	float SoldierSelectMaxRangeCm = 10000.0f;
