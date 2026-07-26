@@ -3,9 +3,9 @@
 
 ---
 
-# DAGRAPPORT — 26 juli 2026, 10:40
+# DAGRAPPORT — 26 juli 2026, bijgewerkt 11:30
 
-**Bar: build ✓ (-NoUba) · 134/134 tests · validatie 4 validators / 0 fouten · catalog 30/30.**
+**Bar: build ✓ (-NoUba) · 135/135 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
 
 ## Wat werkt er nu dat gisteren niet werkte
 
@@ -22,6 +22,7 @@
 | **De +20 voor een ronde zonder gewonden betaalt uit.** | **20 materiaal** gemeten; was 0 |
 | **Geen dode knoppen meer op RB en X.** RB wisselt buiten Command Mode het camerastandpunt (de pad kón dat helemaal niet meer), X geeft een snelle hergroepeer-order. LT is weer alleen mikken. | — |
 | **Het alarm gaat af bij de eerste waarneming.** | Zie waarschuwing hieronder |
+| **Je hoort het gevecht.** Schot, inslag en voetstappen — alle drie lagen de cues ongebruikt in de repo. | Schot 0,7 · inslag 0,85 (luider, want dat is het signaal dat je *raakt*) · **een kopschot klinkt 1,35× harder** · voetstap elke 140 cm |
 
 ## Wat wacht er op jou
 
@@ -41,6 +42,21 @@
 **Assetwerk — hier houdt aansluitwerk op:**
 - **Geen enkele pack heeft een draai-animatie.** Punt 7 is daarom half: het lichaam draait mee boven 90° (zoals Gears en Division), maar de voeten schuiven. Zoals afgesproken stop ik daar — dit is assetwerk.
 - **Vijf van je negen lichamen hebben geen zijcycli.** De vier richtingen zitten in één pack; je lichamen komen uit vijf. De speler krijgt er 3 van de 6. Er is een kruislingse terugval, maar voor die vijf is er niets om op terug te vallen: die moonwalken bij achteruit en strafen.
+
+**Na 10:40 kwam daar dit bij, en het hing allemaal aan één vraag.** Ik heb de
+audit-methode ook op het gevecht losgelaten
+([phase0/GEVECHT_AUDIT.md](phase0/GEVECHT_AUDIT.md), zestien punten), en de rode
+draad daar was scherp: **vier van de vijf omissies gingen over FEEDBACK, niet over
+mechaniek.** Het gevecht rékende goed en deed dat in stilte. Drie van die vier
+bleken bij natrekken geen keuze maar een dóód asset — de cues lagen al in de repo
+en er was niets dat ze afspeelde. Die zijn aangesloten. Wat overblijft is de
+hitmarker: je hóórt sinds vandaag dat je raakt, je ziet het nog niet.
+
+Daar zijn twee gereedschappen uit voortgekomen, want ik vond die geluiden bij
+toeval en toeval is geen methode: `find_dead_fields.py` (tuningvelden die niets
+leest) en `find_dead_assets.py` (audiocues die niemand afspeelt). Die laatste heb
+ik twee keer moeten versmallen — de eerste versie trapte op een comment, de tweede
+meldde 24 valse doden. De scope staat nu in de docstring.
 
 **De volledige locomotie-audit staat in [phase0/LOCOMOTIE_AUDIT.md](phase0/LOCOMOTIE_AUDIT.md)** — vijftien onderdelen, elk getal gemeten, met per punt of het een keuze of een omissie is. Die ronde hoort aan het eind van elke dag opnieuw te draaien.
 
