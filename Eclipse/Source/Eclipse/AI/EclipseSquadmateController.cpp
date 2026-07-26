@@ -2,6 +2,7 @@
 
 #include "Characters/EclipseCharacter.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "TimerManager.h"
 #include "Eclipse.h"
 #include "EngineUtils.h"
 #include "Navigation/PathFollowingComponent.h" // EPathFollowingRequestResult (AIController.h only forward-declares it)
@@ -110,13 +111,19 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 	case EEclipseSquadOrder::FocusTarget:
 	{
 		SetFocus(TargetActor);
-		AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
-		UEclipseHitscanWeaponComponent* Weapon = Body != nullptr ? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
-		if (Weapon != nullptr && TargetActor != nullptr)
-		{
-			const FVector Origin = Body->GetPawnViewLocation();
-			Weapon->Fire(Origin, TargetActor->GetActorLocation() - Origin, TEXT("SquadFocusFire"));
-		}
+		// EEN ORDER IS EEN BELOFTE (GDD 8.4), en tot 26-07 werd deze gebroken:
+		// "richt op dat doelwit" vuurde precies EEN kogel, op het moment van de
+		// order, en daarna niets meer. De order bleef staan in CurrentOrder, maar
+		// er was niets dat hem opnieuw uitvoerde — squadmates hebben, anders dan
+		// vijanden, geen denkbeurt.
+		//
+		// Nu houdt een timer hem vast zolang de order staat en het doelwit leeft.
+		// Bewust NIET meer dan dat: autonoom vuren op alles wat ze zien is een
+		// ontwerpbeslissing (drie extra schutters verandert elk gevecht) en die is
+		// niet aan mij. Dit herstelt alleen de belofte die je al gaf.
+		FocusTargetActor = TargetActor;
+		FocusFireShots = 0;
+		ContinueFocusFire();
 		break;
 	}
 	default:
@@ -124,6 +131,42 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 	}
 
 	return Decision;
+}
+
+void AEclipseSquadmateController::ContinueFocusFire()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	AActor* Target = FocusTargetActor.Get();
+	const AEclipseCharacter* TargetBody = Cast<AEclipseCharacter>(Target);
+
+	// Stoppen zodra de belofte niet meer geldt: andere order, doelwit weg of
+	// neer, of deze soldaat zelf neer. Alle vier zijn redenen om te zwijgen, en
+	// geen ervan is een fout — daarom geen waarschuwing.
+	if (Body == nullptr || Body->IsDowned() || Target == nullptr
+		|| CurrentOrder != EEclipseSquadOrder::FocusTarget
+		|| (TargetBody != nullptr && TargetBody->IsDowned()))
+	{
+		GetWorldTimerManager().ClearTimer(FocusFireTimer);
+		FocusTargetActor = nullptr;
+		return;
+	}
+
+	UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (Weapon != nullptr)
+	{
+		const FVector Origin = Body->GetPawnViewLocation();
+		if (Weapon->Fire(Origin, Target->GetActorLocation() - Origin, TEXT("SquadFocusFire")))
+		{
+			++FocusFireShots;
+		}
+	}
+
+	// Op het vuurinterval van het wapen zelf, niet op een eigen getal: de poort in
+	// Fire() bepaalt toch al het tempo, en een tweede klok ernaast zou daar tegenin
+	// werken.
+	const float Interval = Weapon != nullptr ? FMath::Max(Weapon->GetFireInterval(), 0.05f) : 0.15f;
+	GetWorldTimerManager().SetTimer(FocusFireTimer, this,
+		&AEclipseSquadmateController::ContinueFocusFire, Interval, /*bLoop*/ false);
 }
 
 void AEclipseSquadmateController::HandlePawnDowned()

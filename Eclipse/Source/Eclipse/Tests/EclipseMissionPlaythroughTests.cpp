@@ -31,6 +31,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
 #include "Eclipse.h" // LogEclipse
+#include "AI/EclipseSquadmateController.h"
 #include "Characters/EclipseCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -2292,6 +2293,155 @@ bool FEclipseHeavyMissionSpawnsTest::RunTest(const FString& Parameters)
 	// van de koppeling dat tot nu toe alleen door een logregel bewezen werd, en
 	// een logregel is geen bewijs — dat was vannacht de duurste les.
 	TestEqual(TEXT("zwaar: er staan precies zoveel vijanden als het sjabloon vraagt"), Hostiles, Wanted);
+
+	Harness.Shutdown();
+	return true;
+}
+
+// Een FocusTarget-order is een belofte, geen enkel schot (GDD 8.4).
+//
+// Gevonden bij een audit van de squad, en het is de grootste asymmetrie die deze
+// sessie heeft opgeleverd: VIJANDEN hebben een denkbeurt op een timer — waarnemen,
+// naderen, vuren, elke vuurinterval opnieuw — en SQUADMATES hadden er geen enkele.
+// Ze reageerden één keer op een order en zwegen daarna. "Richt op dat doelwit"
+// leverde precies één kogel op, terwijl de order gewoon bleef staan.
+//
+// In een vuurgevecht betekende dat: vier vijanden schieten aanhoudend, en je drie
+// soldaten staan erbij.
+//
+// Deze test meet de UITKOMST over tijd, want dat is waar het verschil zit: hoeveel
+// schoten er vallen terwijl de order staat, niet of de functie bestaat.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseFocusFireIsSustainedTest,
+	"Eclipse.Playthrough.AFocusOrderKeepsFiring",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseFocusFireIsSustainedTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestTrue(TEXT("focus: missie gelanceerd"),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	// Een squadmate en een vijand vinden, en de vijand binnen bereik zetten. Zonder
+	// dat laatste meet deze test of het wapen bereik heeft, niet of de order
+	// volgehouden wordt.
+	AEclipseSquadmateController* Mate = nullptr;
+	AEclipseCharacter* Hostile = nullptr;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mate = *It;
+		break;
+	}
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Body = *It;
+		if (Body != nullptr && Body != Harness.Body && !Body->IsPlayerSide() && !Body->IsDowned())
+		{
+			Hostile = Body;
+			break;
+		}
+	}
+	if (!TestNotNull(TEXT("focus: er is een squadmate"), Mate)
+		|| !TestNotNull(TEXT("focus: er is een vijand"), Hostile))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const APawn* MateBody = Mate->GetPawn();
+	if (!TestNotNull(TEXT("focus: de squadmate heeft een lichaam"), MateBody))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Hostile->SetActorLocation(MateBody->GetActorLocation() + FVector(800.0f, 0.0f, 0.0f), /*bSweep*/ false);
+	Harness.Idle(0.3f);
+
+	const float HealthBefore = Hostile->GetHealth();
+	Mate->ExecuteOrder(EEclipseSquadOrder::FocusTarget, Hostile->GetActorLocation(), Hostile);
+
+	// Twee seconden. Bij een vuurinterval van 0,15 s zijn dat er ruim tien als de
+	// order wordt volgehouden, en precies één als hij dat niet wordt.
+	Harness.Idle(2.0f);
+
+	const int32 Shots = Mate->GetFocusFireShots();
+	const float Damage = HealthBefore - Hostile->GetHealth();
+
+	// WIE is er geraakt? De teller telt alleen gelukte treffers, dus "14 schoten
+	// en 0 schade op het doelwit" kan niet allebei waar zijn tenzij er iets ANDERS
+	// geraakt wordt. Zonder deze discriminator zou ik gaan gissen — en dat is deze
+	// sessie al drie keer de verkeerde kant op gegaan.
+	float FriendlyHealth = 0.0f;
+	float OtherHostileHealth = 0.0f;
+	int32 Friends = 0;
+	int32 FriendlyFireVictims = 0;
+	int32 OtherHostiles = 0;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		const AEclipseCharacter* Body = *It;
+		if (Body == nullptr || Body == Hostile)
+		{
+			continue;
+		}
+		if (Body->IsPlayerSide())
+		{
+			FriendlyHealth += Body->GetHealth();
+			++Friends;
+			// De oorzaak op het lichaam is de enige harde discriminator tussen
+			// "de vijand schoot hem" en "onze eigen squadmate schoot hem".
+			if (Body->GetLastDamageCause() == FName(TEXT("SquadFocusFire")))
+			{
+				++FriendlyFireVictims;
+			}
+		}
+		else
+		{
+			OtherHostileHealth += Body->GetHealth();
+			++OtherHostiles;
+		}
+	}
+	// Vol leven is 100 per lichaam; alles daaronder betekent dat er op geschoten is.
+	Report(*this, TEXT("leven van de EIGEN kant"), FriendlyHealth, TEXT("hp"),
+		*FString::Printf(TEXT("%d lichamen, vol = %d"), Friends, Friends * 100));
+	Report(*this, TEXT("leven van ANDERE vijanden"), OtherHostileHealth, TEXT("hp"),
+		*FString::Printf(TEXT("%d lichamen, vol = %d"), OtherHostiles, OtherHostiles * 100));
+	Report(*this, TEXT("eigen mensen geraakt door onze squadmate"), FriendlyFireVictims, TEXT(""),
+		TEXT("> 0 = het wapen kent geen vriend of vijand"));
+	Report(*this, TEXT("schoten op een staand FocusTarget-order"), Shots, TEXT(""),
+		TEXT("1 = de order werd niet volgehouden"));
+	// 0 hp op het AANGEWEZEN doelwit is hier geen fout, en die uitleg hoort erbij
+	// omdat het getal anders alarmerend leest. De vijanden staan geclusterd, dus
+	// een kogel raakt wie er in de schootslijn staat — gemeten ging er 100 hp af
+	// bij een ANDERE vijand terwijl er nul eigen mensen geraakt werden. Het wapen
+	// is een hitscan zonder doorschot, geen geleid projectiel.
+	Report(*this, TEXT("schade op het aangewezen doelwit"), Damage, TEXT("hp"),
+		TEXT("0 kan kloppen: er stond een andere vijand in de schootslijn"));
+
+	TestTrue(FString::Printf(
+			TEXT("focus: de order wordt VOLGEHOUDEN en is niet één schot (gemeten %d schoten)"), Shots),
+		Shots > 3);
 
 	Harness.Shutdown();
 	return true;

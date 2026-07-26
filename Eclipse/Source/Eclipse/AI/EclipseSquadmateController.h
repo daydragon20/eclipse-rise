@@ -41,6 +41,9 @@ public:
 
 	EEclipseSquadOrder GetCurrentOrder() const { return CurrentOrder; }
 
+	/** Diagnostiek: hoeveel schoten deze soldaat op zijn FocusTarget-order heeft gelost. */
+	int32 GetFocusFireShots() const { return FocusFireShots; }
+
 	/**
 	 * Apply this soldier's resolved class kit (SPEC-P2-01). Pure data over the
 	 * shared body (GDD 12.3): modulates order execution (push distance, cover
@@ -78,6 +81,16 @@ private:
 	void FinishTriage();
 
 	EEclipseSquadOrder CurrentOrder = EEclipseSquadOrder::Hold;
+
+	/**
+	 * Het doelwit van een lopende FocusTarget-order, plus de klok die hem
+	 * uitvoert (26-07). Zie ContinueFocusFire voor waarom dit er is.
+	 */
+	TWeakObjectPtr<AActor> FocusTargetActor;
+	FTimerHandle FocusFireTimer;
+	int32 FocusFireShots = 0;
+
+	void ContinueFocusFire();
 
 	/** Last move stance (SPEC-P1-06 stub; no behavior split yet — PLACEHOLDER in the enum). */
 	EEclipseSquadStance CurrentStance = EEclipseSquadStance::Ready;

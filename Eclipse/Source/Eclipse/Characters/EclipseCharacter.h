@@ -260,6 +260,12 @@ private:
 
 	FGuid SoldierId;
 	FName LastDamageCause;
+
+public:
+	/** Waaraan dit lichaam het laatst schade opliep (testlaag: wie schoot wie). */
+	FName GetLastDamageCause() const { return LastDamageCause; }
+
+private:
 	bool bDowned = false;
 
 	// Camera state. Defaults mirror the tuning asset's defaults so a pawn that
