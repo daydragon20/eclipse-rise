@@ -5,9 +5,9 @@
 
 # OCHTENDRAPPORT — nacht 25→26 juli 2026
 
-**Bar bij elke commit: build ✓ (-NoUba) · tests **110/110** (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog 29/29.** Alles tussen `26edd65` en `HEAD` is van deze nacht, alles gepusht — `git log 26edd65..HEAD` is de lijst, en dat is met opzet de enige lijst. Hier stonden eerst zeventien hashes opgesomd; die opsomming liep achter zodra er een commit bijkwam en las tóch als compleet. Dezelfde valkuil als de tellingen die hieronder drie keer beschreven staan, en de oplossing is dezelfde: verwijs naar de bron in plaats van hem over te schrijven. In thema's: het harnas (laag 1 + 2) · de speelronde · S1/S2/S3 · de feel-audit (remmen, richting, camera-probe, sprong-vergevingsvensters, traversal, pitch-demping) · de navigatie · drie bewakers op de beschrijvingen.
+**Bar bij elke commit: build ✓ (-NoUba) · de VOLLEDIGE testsuite groen (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog gedocumenteerd = geïmplementeerd.** Het exacte testaantal staat bewust niet meer in deze regel — het groeide vannacht van 107 naar ruim 115 en de regel liep er drie keer op achter. Het staat wél in de commit-message van elke ronde, waar het niet kán verouderen. Alles tussen `26edd65` en `HEAD` is van deze nacht, alles gepusht — `git log 26edd65..HEAD` is de lijst, en dat is met opzet de enige lijst. Hier stonden eerst zeventien hashes opgesomd; die opsomming liep achter zodra er een commit bijkwam en las tóch als compleet. Dezelfde valkuil als de tellingen die hieronder drie keer beschreven staan, en de oplossing is dezelfde: verwijs naar de bron in plaats van hem over te schrijven. In thema's: het harnas (laag 1 + 2) · de speelronde · S1/S2/S3 · de feel-audit (remmen, richting, camera-probe, sprong-vergevingsvensters, traversal, pitch-demping) · de navigatie · drie bewakers op de beschrijvingen.
 
-*Deze regel is één keer verouderd geraakt tijdens de nacht — hij stond op 109 tests en negentien commits terwijl het er 110 en meer waren. Gecorrigeerd, en de commitlijst noemt nu een bereik in plaats van een telling, want een telling die met elke commit verandert gaat per definitie liegen. Precies het patroon dat hieronder zes keer beschreven staat, en het trof dus ook dit rapport.*
+*Deze regel is drie keer verouderd geraakt tijdens de nacht — eerst op 109 tests en negentien commits, daarna nog twee keer terwijl de suite doorgroeide. Twee keer heb ik hem bijgewerkt; de derde keer heb ik de telling eruit gehaald, want bijwerken bestrijdt het symptoom. Een getal dat met elke commit verandert en met de hand wordt onderhouden, gaat per definitie liegen. Precies het patroon dat hieronder zes keer beschreven staat — en het trof dus drie keer het rapport dat erover gaat.*
 
 ## 1. Wat is af en gemeten — met de getallen
 
@@ -165,6 +165,14 @@ Wat aantoonbaar beter is: het personage verandert niet meer van grootte als je v
 **En je squad doet iets.** Dat is geen tuning maar een systeem dat werkte-op-papier en niet-in-de-game: hij weigerde elke order met een keurige, beredeneerde weigering — het contract was intact, alleen kon hij nergens komen. Dat is precies het soort defect dat een groene testsuite niet vindt en een speler meteen ziet.
 
 Waar ik terughoudend ben: de rest is vier tuningwaarden en één camera-klem. Ze halen het onnatuurlijke eraf; ze voegen nog niets toe. De vijf kanalen waarmee Gears zijn snelheidsgevoel koopt — camera zakken, shake, blur, ademhaling, niet kunnen vuren — hebben we er nul van. Zolang §8 FEEDBACK leeg is, blijft schieten "de vijand valt om" in plaats van "ik raakte hem". Dat is het volgende grote ding, en het is echt bouwen, geen afstellen.
+
+**Wat er ná dat eerste oordeel nog bij kwam, en het beeld iets verschuift.** Ik schreef hierboven "de rest is vier tuningwaarden en één camera-klem". Dat klopte op dat moment; daarna is de audit van *beredeneerd* naar *gemeten* gegaan, en dat leverde drie dingen op die je moet weten:
+
+- **De vijand-AI is niet kapot — hij deed alleen nooit mee.** Loop je zijn bereik in, dan ziet hij je op 2442 cm, komt 1097 cm naar je toe en legt je in **2,50 s** van vol naar neer. Mijn eigen speelronde won juist dóór dat te vermijden, waardoor de hele vijandkant ongetest bleef terwijl alles groen stond.
+- **Eén audit-rij was zelf fout, en had tot een verkeerde reparatie geleid.** De pitch-limieten zouden "bij −70 in de grond duiken" — gemeten gebeurt daar niets, en zit het probleem aan de andere kant: omhoog kijken duwt de camera van 300 naar 84 cm. De voorgestelde fix zou niets hebben opgelost.
+- **Drie dingen die stil gebeurden zijn nu luid** (missie-einde, neergaan, geweigerde orders). Het tweede is het vervelendste geweest: wie na een sessie de logs opende, kon niet eens zien dát hij was doodgegaan.
+
+Wat daarmee nog steeds waar is: het onnatuurlijke is eraf, er is nog niets toegevoegd. §8 FEEDBACK blijft leeg, en dat blijft het volgende grote ding.
 
 En één ding dat niet over feel gaat maar wel over vertrouwen: de missie speelt zichzelf nu uit, van start tot debrief, met asserts op de uitkomst. Dat vond in de eerste ronde meteen een objective dat afging zonder dat er geschoten was — met een volledig groene testsuite eromheen. Elke fix die vannacht landde is daarna opnieuw uitgespeeld als bewijs dat er niets brak.
 
