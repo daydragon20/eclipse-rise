@@ -1,4 +1,7 @@
 #include "UI/EclipseTestGuideLogic.h"
+#include "Eclipse.h"
+#include "Misc/Paths.h"
+#include "HAL/FileManager.h"
 
 namespace EclipseTestGuide
 {
@@ -129,12 +132,72 @@ namespace EclipseTestGuide
 		}
 	}
 
+	FString FindLastSessionDate()
+	{
+		// Het eindrapport heet EclipseGauntletR3_JJJJMMDD_UUMMSS.txt en gaat naar
+		// Saved/Logs. Het NIEUWSTE bestand is dus de vorige sessie, en zijn naam
+		// draagt de datum al — geen bestand hoeven openen.
+		TArray<FString> Reports;
+		IFileManager::Get().FindFiles(Reports, *(FPaths::ProjectLogDir() / TEXT("EclipseGauntletR3_*.txt")), true, false);
+		if (Reports.Num() == 0)
+		{
+			return FString(); // eerste sessie: alles tonen
+		}
+		Reports.Sort();
+		const FString Newest = Reports.Last();
+
+		// "EclipseGauntletR3_20260726_174501.txt" -> "2026-07-26"
+		int32 Underscore = INDEX_NONE;
+		if (!Newest.FindChar(TEXT('_'), Underscore) || Newest.Len() < Underscore + 9)
+		{
+			return FString();
+		}
+		const FString Stamp = Newest.Mid(Underscore + 1, 8);
+		if (Stamp.Len() != 8 || !Stamp.IsNumeric())
+		{
+			return FString();
+		}
+		const FString Date = FString::Printf(TEXT("%s-%s-%s"), *Stamp.Left(4), *Stamp.Mid(4, 2), *Stamp.Right(2));
+
+		// Eén keer per sessie hardop zeggen waarop er gefilterd wordt. GetGuideSteps
+		// draait bij elke verversing van het paneel, dus zonder deze vlag zou het een
+		// regel per frame worden — en dan is het geen diagnose meer maar ruis.
+		static bool bAnnounced = false;
+		if (!bAnnounced)
+		{
+			bAnnounced = true;
+			UE_LOG(LogEclipse, Display,
+				TEXT("Gids: vorige sessie was %s (%s) — alleen wijzigingen daarna staan in deel 1."),
+				*Date, *Newest);
+		}
+		return Date;
+	}
+
 	int32 GetChangeStepCount()
 	{
-		// Alles wat na het NIEUWSTE eindrapport in Saved/Logs geland is. Geen
-		// rapport = eerste sessie = alles tonen. De datum in de tabel is ISO, dus
-		// een tekstvergelijking is ook een datumvergelijking.
-		return UE_ARRAY_COUNT(GuideChanges);
+		// Alles wat NA het nieuwste eindrapport geland is. De datums in de tabel
+		// zijn ISO, dus een tekstvergelijking IS een datumvergelijking — dat is de
+		// hele reden dat ze zo geschreven staan.
+		//
+		// Deze functie stond hier tot vlak na het bouwen als "return
+		// UE_ARRAY_COUNT(GuideChanges)", met een comment erboven die beloofde dat
+		// hij op het rapport filterde. Dat is precies het soort belofte-in-een-
+		// comment waar ik vandaag drie keer over gestruikeld ben, dus nu doet hij
+		// het echt.
+		const FString Since = FindLastSessionDate();
+		if (Since.IsEmpty())
+		{
+			return UE_ARRAY_COUNT(GuideChanges);
+		}
+		int32 Count = 0;
+		for (const FGuideChange& Change : GuideChanges)
+		{
+			if (FString(Change.Date) > Since)
+			{
+				++Count;
+			}
+		}
+		return Count;
 	}
 
 	int32 GetGuideStepCount()
@@ -148,8 +211,13 @@ namespace EclipseTestGuide
 		Steps.Reserve(GetGuideStepCount());
 
 		// ---- deel 1: wat er veranderd is sinds je vorige sessie ---------------
+		const FString Since = FindLastSessionDate();
 		for (const FGuideChange& Change : GuideChanges)
 		{
+			if (!Since.IsEmpty() && FString(Change.Date) <= Since)
+			{
+				continue; // die kende hij al toen hij vorige keer speelde
+			}
 			FEclipseGuideStep& Step = Steps.AddDefaulted_GetRef();
 			Step.Part = EEclipseGuidePart::Controls;
 			Step.Label = TEXT("VERANDERD");
