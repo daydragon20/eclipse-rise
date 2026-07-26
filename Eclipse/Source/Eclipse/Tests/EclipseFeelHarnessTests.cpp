@@ -1704,6 +1704,42 @@ bool FEclipseCrouchTest::RunTest(const FString& Parameters)
 	const float StandingHalfHeight = Harness.Body->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	const float StandingEyeZ = Harness.Body->SampleFeelState().SocketOffsetZ + StandingHalfHeight;
 
+	// Loopt er eigenlijk een WANDELBAND tussen stilstand en rennen? De tuning heeft
+	// een WalkSpeed van 180, maar het bewegingscomponent mikt altijd op RunSpeed —
+	// die 180 wordt alleen door de ANIMATIE gelezen, als ankerpunt voor de
+	// loop/ren-blend. Bereikbaar is hij dus alleen met een deels uitgeslagen stick.
+	// Dat is meteen een apparaatverschil: WASD zijn digitale toetsen (waarde 1,0),
+	// dus op toetsenbord bestaat wandelen niet.
+	//
+	// LET OP WAAR DIT STAAT: de eerste versie mat dit NA het hurken, en las toen
+	// 60 cm/s bij 40% uitslag — waaruit ik een responscurve afleidde die er niet
+	// is. Gehurkt is het maximum 150, dus 0,4 x 150 = 60 en dat is kaarsrecht
+	// lineair. De opstelling was fout, niet de code. Daarom staat dit blok nu vóór
+	// het hurken.
+	{
+		// Een REEKS uitslagen, want één punt zegt niets over een curve — en er zit
+		// er een op: 40% stick gaf 60 cm/s waar lineair 168 zou horen.
+		float PartialSpeed = 0.0f;
+		for (const float Deflection : { 0.2f, 0.4f, 0.6f, 0.8f, 1.0f })
+		{
+			Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, Deflection), 1.5);
+			const float Speed = Harness.SpeedCm();
+			if (FMath::IsNearlyEqual(Deflection, 0.4f))
+			{
+				PartialSpeed = Speed;
+			}
+			AddInfo(FString::Printf(TEXT("stickrespons: %.0f%% uitslag -> %.0f cm/s (%.0f%% van je rensnelheid)"),
+				Deflection * 100.0f, Speed, Harness.Tuning->RunSpeed > 0.0f ? Speed / Harness.Tuning->RunSpeed * 100.0f : 0.0f));
+			Harness.Idle(0.3f);
+		}
+		Report(*this, TEXT("snelheid bij 40% stickuitslag"), PartialSpeed, TEXT("cm/s"),
+			*FString::Printf(TEXT("tuning WalkSpeed = %.0f — alleen met een analoge stick te halen"),
+				Harness.Tuning->WalkSpeed));
+		TestTrue(FString::Printf(TEXT("laag 2: een halve stickuitslag geeft een tussensnelheid (%.0f cm/s)"), PartialSpeed),
+			PartialSpeed > Harness.Tuning->MinAnalogWalkSpeed && PartialSpeed < Harness.Tuning->RunSpeed - 20.0f);
+		Harness.Idle(0.4f);
+	}
+
 	// Eerst staand op topsnelheid, zodat de vergelijking eerlijk is.
 	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 3.0, [&Harness]()
 	{
