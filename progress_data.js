@@ -46,6 +46,14 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "SPEEL ÉÉN SESSIE — dit vervangt de drie losse speel-items", prio: "nu", waarom: "Er stonden drie aparte speel-opdrachten op deze lijst, met een notitie erboven dat ze bij één sessie horen. Dat is een omweg; nu is het één item. Start met SPEEL_ECLIPSE.bat, druk F3, en de game leidt je er zelf doorheen. In één sessie van ongeveer een uur lever je alles wat geen enkele test kan geven.", stappen: [
+      "1. DE SCHAAL-BUG (F9). Blijf rennen en kijk of er iets meeschaalt met je snelheid. Dit is de enige vraag die ik principieel niet kan beantwoorden — ik heb de camera-lag geklemd en meet 0,00% verschil tussen rennen en sprinten, maar of JIJ het nog ziet weet alleen jij",
+      "2. HET GEVECHT (nieuw sinds 26-07). Kopschoten doen 2,5x, dus je time-to-kill halveert van 4 kogels naar 2 — voelt dat goed of goedkoop? Je eerste schot verraadt je: vijanden binnen 50 m lopen naar de plek waar je schoot, ook bij een misser. En je hoort het nu: schot, inslag (harder bij een kopschot) en voetstappen",
+      "3. DE BEWEGING (nieuw sinds 26-07). Duw achteruit: hij hoort naar de camera te blijven kijken en achteruit te lopen, niet om te draaien. Kijk stilstaand ver rond: boven een kwartslag draait hij mee, en dan schuiven de voeten — dat is de ontbrekende draai-animatie",
+      "4. DE MISSIE. Speel Assault of Sabotage, niet alleen M1.1: die twee hebben nu hun eigen vijandopstelling (6 en 4 in plaats van vier op een hoop bij het hoofddoel)",
+      "5. R3-VERDICT + 13.2. De gids vraagt ze aan het eind zelf. Voelt Command Mode als sneller denken of als een menu openen, en wil je vrijwillig een tweede ronde?",
+      "Zeg daarna gewoon wat je zag. Losse zinnen zijn genoeg — ik haal de rest uit de logs"
+    ] },
     { titel: "Mag je squad iets doen zonder dat je het zegt? Eén vraag in drie vormen", prio: "nu", waarom: "Uit de squad-audit (phase0/SQUAD_AUDIT.md). Je squad doet vandaag NIETS uit zichzelf: geen autonoom vuur, geen meelopen, geen dekking zoeken. In Mass Effect, Ghost Recon en The Division doen teamgenoten dat allemaal wel — het is wat hen medespelers maakt in plaats van gereedschap. De drie velden staan er zelfs al (FollowDistance, CoverSearchRadius) maar worden door niets gelezen. Dit is de grootste balansverschuiving die er op tafel ligt, groter dan kopschoten of de vijandopstelling, en hij raakt de identiteit van het spel: een squad die alles zelf doet maakt je commando-systeem overbodig. Daarom zet ik hem niet stilletjes aan.", stappen: [
       "Mijn advies: autonoom vuren JA, meelopen JA, dekking zoeken NEE (dat laatste vraagt een cover-systeem dat er niet is en dat je volgens de gevechts-audit ook niet wilt)",
       "Beslis het als EEN vraag, niet los — ze hangen samen",
@@ -58,12 +66,6 @@ window.PROGRESS_DATA = {
       "Zeg 'hitmarker' en ik doe het; het gaat via de bestaande HUD en het bestaande schot-event, niet via een nieuw systeem",
       "LET OP: dit is er één van VIER. Ik heb een gevechts-audit gedaan (phase0/GEVECHT_AUDIT.md) en vier van de vijf omissies gaan over FEEDBACK, niet over mechaniek: geen hitmarker, geen kopschot-signaal, geen wapengeluid, en geen richting waar de klap vandaan kwam. Dat is één samenhangend gat, en het verklaart waarom vechten leeg aanvoelt terwijl elk systeem groen staat — ze doen allemaal hun werk in stilte",
       "Tweede groep in die audit: er is geen spreiding en geen terugslag. Een hitscan die op 6,67 schoten per seconde exact naar het kruis gaat is geen wapen maar een laserpointer. Dat hoort bij dezelfde vraag als de mikstraf: wat kost schieten?"
-    ] },
-    { titel: "Speel het gevechtsblok en oordeel — meten kan ik het niet", prio: "nu", waarom: "Drie dingen die vandaag geland zijn veranderen hoe een gevecht speelt, en geen van drieën is met een getal te beoordelen. (1) Kopschoten werken echt: 44 hp romp tegen 110 hp hoofd, dus je time-to-kill halveert van 4 kogels naar 2. Dat was de bedoeling, maar jij moet voelen of het klopt. (2) Je eerste schot verraadt je: vijanden binnen 5000 cm lopen naar de plek waar geschoten werd, ook bij een misser. Sluipen blijft mogelijk, precies één schot lang. (3) De vijandopstelling is anders van vorm — groepen op het site dat de missie noemt in plaats van vier op een hoop bij het hoofddoel. Het aantal schuift nauwelijks: Assault +2, Rescue +1, Sabotage +0.", stappen: [
-      "Speel M1.1 en daarna Assault of Sabotage — die laatste twee zijn het meest veranderd",
-      "Let op de time-to-kill: voelt 2 kogels op het hoofd goed of goedkoop?",
-      "Let op het schot-alarm: kun je nog iets stiekem doen, of is één schot meteen alles?",
-      "LET OP: het alarm zelf kost je vandaag NIETS. Nagemeten uit de assets: er is geen enkele optional die stilte eist. Speel er dus niet omheen alsof er straf op staat"
     ] },
     { titel: "Kost mikken snelheid? Vandaag niet — mijn advies is 0,6x", prio: "nu", waarom: "Uit de locomotie-audit (punt 14). Je sprint vandaag even hard met je vizier op als zonder. In dit genre is een snelheidsstraf tijdens mikken vrijwel universeel — Division zit rond 0,6x, Gears vertraagt je automatisch. Zonder straf is er geen enkele reden om ooit NIET te mikken, en dan is mikken geen keuze meer maar een gratis verbetering.", stappen: [
       "Mijn advies: doen, 0,6x",
@@ -80,16 +82,6 @@ window.PROGRESS_DATA = {
       "Houd RMB of LT vast: de camera trekt in naar 165 cm en de FOV versmalt van 80 naar 64",
       "Houd Q of LB vast: de Command Mode-uitzoom doet het nu ook — en daarom is mijn eerdere vraag over 73% versus 15% opnieuw aan jou. Je hebt die uitzoom nooit gezien, dus oordeel nu pas",
       "Alleen je HOOFD verdwijnt in 1e persoon, niet je hele lichaam — dat is bewust zo sinds jouw playtest, en de gidstekst zei nog het oude"
-    ] },
-    { titel: "Speel de nieuwe build — drie dingen zijn veranderd en ik heb je oordeel nodig", prio: "nu", waarom: "LEES EERST DIT: er staan vier speel-items in deze lijst en ze horen bij EEN sessie, niet bij vier. Begin met F3 (de game begeleidt je zelf), houd dit item ernaast voor de drie symptomen, en de andere twee zijn dingen om onderweg te controleren — je squad, en de camera die nu pas beweegt. Je hoeft dus niet vier keer op te starten. --- Je drie symptomen zijn alle drie afgehandeld en gemeten (zie 'wat jij deed'). Er staat nu ook een testharnas dat de game zelf speelt: laag 1 controleert of de tuning aankomt, laag 2 injecteert input en meet, en de missie M1.1 speelt zichzelf uit van start tot debrief. Bar: de volledige suite groen, 0 fouten (het exacte aantal groeit elke ronde en hoort daarom niet in een tekst die blijft staan). Wat ik niet kan meten is hoe het VOELT, en op drie punten stuurt jouw antwoord het vervolg.", stappen: [
-      "SCHAALT HET NOG? Druk F9 terwijl je langzaam loopt en nog eens terwijl je sprint. NIEUW sinds 03:40: je hoeft geen getallen meer te onthouden — de tweede druk toont zelf het VERSCHIL in een aparte regel, groen als het binnen de ruis blijft en rood met de tekst SCHAALT MEE als de schijnbare grootte meer dan 2% verandert. Dat is precies de vraag, dus je hoeft alleen te kijken welke kleur er staat. Gemeten door mij: 8,4% naar 0,00%",
-      "KIJKEN IS 2,5x TRAGER. Dat is geen smaakwijziging maar een reparatie: de engine vermenigvuldigde je getunede 240 gr/s stil met 2,5, dus je draaide 600 gr/s terwijl overal '1,50 s per 360' stond. Nu is dat écht 1,50 s. Te traag? Zeg het, dan is het één getal",
-      "SPRINT OP L3 IS EEN TOGGLE. Eén klik start hem; hij stopt als je ophoudt met vooruit duwen, als je mikt, als je vuurt, of als je nog eens L3 drukt. Schuin sturen stopt hem niet",
-      "HURKEN DOET HET (Ctrl / B). Die toets was dood — de vlag die hurken toestaat stond nergens aan — en toen hij eenmaal werkte zakte je veel te diep: 80 cm is kruiphoogte. Nu 124 cm, dus je zakt 52 in plaats van 96. Kijk of je achter dekking past en of het zakken natuurlijk voelt",
-      "ACHTERUIT IS NU 15% TRAGER dan vooruit (was even snel) en stoppen kost 150 ms in plaats van 83 ms — er is massa die tot stilstand komt",
-      "LET OP: SPEEL_ECLIPSE.bat klopt op vier punten niet meer. Ik raak jouw bestand niet aan — zeg 'bat bijwerken' en ik doe het in één keer. Precies wat er scheelt, nagelopen om 03:40: (1) SPRINT staat als één regel terwijl het per apparaat verschilt — Shift is hold, L3 is toggle met vier uitstappen; (2) F9 ontbreekt helemaal, terwijl dat de toets is waarmee je de schaal-bug controleert; (3) STANCE staat er zonder de voorwaarde dat hij alleen ín Command Mode werkt, én zonder dat hij vandaag nog niets aan het gedrag verandert; (4) HURKEN mag erbij dat je nu 52 cm zakt in plaats van 96. De 1e/3e-persoonsregel is inmiddels wél goed. De geverifieerde lijst staat intussen in BESTURING.md",
-      "KIJK OF JE SQUAD JE VOLGT. Ze weigerden tot vannacht ELKE verplaatsingsorder met 'no route', en de oorzaak is gemeten: er waren nul navigatiegrenzen, dus er kon nooit een navmesh bestaan. Dat is gerepareerd (het district maakt nu zijn eigen grens). Of het gENOEG is kan ik headless niet bewijzen — jouw ronde wel",
-      "Zeg daarna gewoon wat je voelde. Losse zinnen zijn genoeg"
     ] },
     { titel: "Je squad loopt weer — en de oorzaak was iets anders dan ik je een uur geleden vroeg", prio: "nu", waarom: "Ik heb je vannacht een A/B-keuze voorgelegd over wanneer een order geweigerd mag worden. Die vraag vervalt: ik had hem niet moeten stellen voordat ik wist waarom het pad onvolledig was. De echte oorzaak is gevonden en gefixt, en er is niets meer te beslissen. Je squad spawnde 93 METER van je vandaan bij elke missiestart — de game mode las je positie voordat je naar het insertiepunt was verplaatst, en beide luisteren naar hetzelfde event. Daardoor kon geen enkele soldaat je bereiken, en weigerde hij elke order terecht met 'no route'. Alles wat je als 'mijn squad doet niets' zag, komt daaruit voort.", stappen: [
       "GEMETEN NA DE FIX: verste squadmate van 9282 naar 317 cm, pad naar het orderpunt van 48% naar 100%, weigeringen van 3 naar 0",
@@ -148,13 +140,6 @@ window.PROGRESS_DATA = {
       "Klik 'Add to Project' (NIET alleen Download) -> kies Eclipse",
       "Als er geen 'Add to Project' staat: zeg het, dan zoek ik een andere route",
       "Zeg daarna: 'lightpack staat erin'"
-    ] },
-    { titel: "SPELEN — de game begeleidt je zelf (F3). Levert R3-verdict en 13.2 in één sessie", prio: "nu", waarom: "de twee dingen die geen enkele test kan geven: voelt Command Mode goed (R3, beslist of Stage B mag starten) en wil je vrijwillig een tweede ronde (13.2, sluit Fase 1 af). De game vertelt per stap wat je moet doen én waaraan je ziet dat het klopt.", stappen: [
-      "Start de game en druk F3 — de testgids opent met 23 stappen in drie delen",
-      "Deel 1 (14 controls): doe wat er staat; de meeste stappen vinken zichzelf af zodra je de toets gebruikt. J = gehaald, N = sla over",
-      "Deel 2 (4 systeem-oordelen) + deel 3 (de 5 vragen uit 13.2): J = goed/ja, N = niet goed/nee",
-      "F2 geeft daarnaast de gauntlet-overlay met de vijf R3-criteria live. LET OP, gerepareerd om 05:40: drie van die vijf vullen zichzelf NIET — targeting wacht op F4 (deze pick was schoon) en F5 (dit was een mis-pick), comfort op F6, vertrouwen op F7. Zonder die toetsen blijven ze op 'nog niet gemeten' staan hoe lang je ook speelt, en dat leest als een defect terwijl het op jouw oordeel wacht. De toetsen staan nu in de kop van het paneel zelf, dus je hoeft ze niet te onthouden",
-      "Aan het eind staat er een kopieerbare samenvatting in Saved/Logs — plak die hier"
     ] },
   ],
 
