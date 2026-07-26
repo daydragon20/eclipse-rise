@@ -1,6 +1,6 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-26 13:30",
+    "generatedAt":  "2026-07-26 14:00",
     "tests":  {
                   "ok":  110,
                   "failed":  0,
@@ -9,62 +9,62 @@ window.PROGRESS_AUTO = {
               },
     "commits":  [
                     {
-                        "hash":  "a114ca6",
-                        "date":  "26-07 13:28",
-                        "msg":  "[Repo] Dagrapport bijgewerkt met wat er na 10:40 bij kwam"
+                        "hash":  "554716d",
+                        "date":  "26-07 13:55",
+                        "msg":  "[Docs] De richtingsindicator uit de gevechts-audit ligt al in het project"
                     },
                     {
-                        "hash":  "1f7d0df",
-                        "date":  "26-07 13:27",
-                        "msg":  "[Tools] find_dead_assets twee keer bijgesteld; de scope is de hele waarde van dit gereedschap"
+                        "hash":  "b2f9467",
+                        "date":  "26-07 13:53",
+                        "msg":  "[Repo] Drie speel-items samengevoegd tot ├⌐├⌐n sessie"
                     },
                     {
-                        "hash":  "a8b7d8b",
-                        "date":  "26-07 13:24",
-                        "msg":  "[Tools+Audio] find_dead_assets.py, en de laatste twee dode geluiden aangesloten"
+                        "hash":  "47012e5",
+                        "date":  "26-07 13:52",
+                        "msg":  "[Repo] Bereik-asymmetrie: van open balansvraag naar afgehandeld, met de restvraag apart"
                     },
                     {
-                        "hash":  "d4ea195",
-                        "date":  "26-07 13:17",
-                        "msg":  "[Combat] Treffers klinken nu, en een kopschot klinkt harder"
+                        "hash":  "c5a0a57",
+                        "date":  "26-07 13:51",
+                        "msg":  "[Repo] Zeven verouderde items uit het kliklijstje: ze vroegen om beslissingen die al genomen zijn"
                     },
                     {
-                        "hash":  "5cc3521",
-                        "date":  "26-07 13:10",
-                        "msg":  "[Docs] Gevechts-audit consistent gemaakt na de wapengeluid-reparatie"
+                        "hash":  "3b93a73",
+                        "date":  "26-07 13:49",
+                        "msg":  "[Tests] Speelronde nagelopen na alle wijzigingen van vandaag; ├⌐├⌐n verouderde verwachting weg"
                     },
                     {
-                        "hash":  "00d36a3",
-                        "date":  "26-07 13:10",
-                        "msg":  "[Audio] Wapengeluid aangesloten: de cue lag al in de repo en werd nooit afgespeeld"
+                        "hash":  "9be5000",
+                        "date":  "26-07 13:46",
+                        "msg":  "[Repo] Squad-reparatie en de grote openstaande vraag in het dagrapport"
                     },
                     {
-                        "hash":  "5b4b8d9",
-                        "date":  "26-07 13:05",
-                        "msg":  "[Docs] Gevechts-audit tegen de genre-standaard, ronde 1"
+                        "hash":  "fa16597",
+                        "date":  "26-07 13:45",
+                        "msg":  "[Docs] Squad-audit: sterk waar het genre zwak is, zwak waar het genre sterk is"
                     },
                     {
-                        "hash":  "b623952",
-                        "date":  "26-07 13:02",
-                        "msg":  "[UI] F2-controletabel meegenomen: het laatste spelervlak dat nog de oude knoppen noemde"
+                        "hash":  "0416bde",
+                        "date":  "26-07 13:43",
+                        "msg":  "[Squad] Een FocusTarget-order wordt volgehouden: 1 schot werd er 14"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (15 uur geleden)"
+                            "caption":  "Laatste run - beeld 1 (16 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (15 uur geleden)"
+                            "caption":  "Laatste run - beeld 2 (16 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (15 uur geleden)"
+                            "caption":  "Laatste run - beeld 3 (16 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (15 uur geleden)"
+                            "caption":  "Laatste run - beeld 4 (16 uur geleden)"
                         }
                     ],
     "werk":  {
@@ -104,14 +104,14 @@ window.PROGRESS_AUTO = {
                                }
                            ],
                  "heleGamePct":  8,
-                 "dataAge":  "25 min geleden",
-                 "dataStamp":  "2026-07-26 13:05"
+                 "dataAge":  "4 min geleden",
+                 "dataStamp":  "2026-07-26 13:55"
              },
     "tempo":  {
-                  "vandaag":  209,
-                  "week":  423,
-                  "laatsteCommit":  "2026-07-26 13:28",
-                  "laatsteAge":  "2 min geleden"
+                  "vandaag":  218,
+                  "week":  432,
+                  "laatsteCommit":  "2026-07-26 13:55",
+                  "laatsteAge":  "5 min geleden"
               }
 };
 
