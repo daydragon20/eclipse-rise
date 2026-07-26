@@ -37,6 +37,7 @@ namespace EclipseTags
 	// Squad (SPEC-P1-06; SPEC-P2-01 class facts)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderIssued)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderAcknowledged)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combat_ShotFired)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderRefused)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierDowned)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierStabilized)

@@ -8,6 +8,7 @@
 #include "Characters/EclipseClassLogic.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Core/EclipseGrayboxBuilder.h"
 #include "Eclipse.h"
@@ -82,6 +83,65 @@ void AEclipseGameMode::InitGame(const FString& MapName, const FString& Options, 
 	}
 }
 
+void AEclipseGameMode::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Shot = Payload.GetPtr<FEclipseCombatEventPayload>();
+	UWorld* World = GetWorld();
+	if (Shot == nullptr || World == nullptr || Shot->AlertRadiusCm <= 0.0f)
+	{
+		return;
+	}
+
+	// Alleen schoten van de SPELERSKANT alarmeren. Een vijand die vuurt heeft je al
+	// gezien, en zijn eigen schoten door de hele groep laten cascaderen zou van één
+	// waarneming een district-brede opstand maken — dat is een moeilijkheidskeuze
+	// die de owner niet gevraagd heeft. De knop staat klaar als hij hem wil.
+	if (!Shot->bPlayerSide)
+	{
+		return;
+	}
+
+	const float RadiusSquared = FMath::Square(Shot->AlertRadiusCm);
+	int32 Alerted = 0;
+	for (TActorIterator<AEclipseEnemyController> It(World); It; ++It)
+	{
+		AEclipseEnemyController* Enemy = *It;
+		const APawn* Body = Enemy != nullptr ? Enemy->GetPawn() : nullptr;
+		if (Body == nullptr)
+		{
+			continue;
+		}
+		if (FVector::DistSquared(Body->GetActorLocation(), Shot->Origin) > RadiusSquared)
+		{
+			continue;
+		}
+		Enemy->NotifyGunshotHeard(Shot->Origin);
+		++Alerted;
+	}
+
+	// Het schot zet OOK het alarm aan: gehoord worden is verraden worden. De latch
+	// is idempotent, dus dit botst niet met het alarm-op-eerste-waarneming — wie
+	// eerst is, is eerst, en een tweede hoorn is geen nieuw feit.
+	if (Alerted > 0)
+	{
+		if (UGameInstance* GameInstance = GetGameInstance())
+		{
+			if (UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>())
+			{
+				Mission->NotifyAlarmRaised();
+			}
+		}
+	}
+
+	if (!bLoggedFirstShotAlert && Alerted > 0)
+	{
+		bLoggedFirstShotAlert = true;
+		UE_LOG(LogEclipse, Display,
+			TEXT("Schot gehoord door %d vijand(en) binnen %.0f cm — ze lopen naar de plek waar geschoten werd, niet naar de speler."),
+			Alerted, Shot->AlertRadiusCm);
+	}
+}
+
 void AEclipseGameMode::StartPlay()
 {
 	Super::StartPlay();
@@ -94,6 +154,14 @@ void AEclipseGameMode::StartPlay()
 		MissionEventsHandle = Bus->Subscribe(
 			FGameplayTag::RequestGameplayTag(TEXT("Event.Mission")),
 			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnMissionLifecycle));
+
+		// Schoten vertalen naar wie ze hoort (26-07, punt 1). Hier en niet in het
+		// wapen: het wapen hoort niet te weten dat er vijanden bestaan, en de game
+		// mode kent de gespawnde actoren al.
+		ShotFiredHandle = Bus->Subscribe(
+			EclipseTags::Event_Combat_ShotFired,
+			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnShotFired),
+			FEclipseCombatEventPayload::StaticStruct());
 	}
 
 	// A mission already running at boot (e.g. after a load) still populates.

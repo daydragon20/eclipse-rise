@@ -78,4 +78,11 @@ private:
 	TArray<TObjectPtr<AActor>> SpawnedMissionActors;
 
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
+	FEclipseEventSubscriptionHandle ShotFiredHandle;
+
+	/** Een schot vertalen naar wie het hoort (26-07, punt 1). */
+	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/** Eén regel over het eerste gehoorde schot; daarna zwijgt het. */
+	bool bLoggedFirstShotAlert = false;
 };

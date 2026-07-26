@@ -27,6 +27,17 @@ public:
 
 	void ApplyArchetype(const FEclipseEnemyArchetypeRow& Row);
 
+	/**
+	 * Er is geschoten binnen gehoorsafstand (26-07, punt 1).
+	 *
+	 * Wat hij krijgt is de LAATST BEKENDE POSITIE, niet waar je nu bent — een
+	 * momentopname van waar de loop stond. Dat is het model van The Division, en
+	 * het is precies wat een sniper zijn afstandsvoordeel laat houden: ze komen
+	 * kijken waar je WAS, en jij kunt er weg zijn. Blijf je staan, dan vinden ze
+	 * je alsnog, en dat hoort ook.
+	 */
+	void NotifyGunshotHeard(const FVector& ShotOrigin);
+
 private:
 	/** One perception/attack beat; cadence = archetype fire interval (timer, never tick — GDD 14.2). */
 	void SenseAndAct();
@@ -41,4 +52,11 @@ private:
 
 	/** Idem voor het eerste moment dat hij iemand ziet. */
 	bool bLoggedFirstContact = false;
+
+	/** Laatst gehoorde schot; wordt gewist zodra hij er is of iemand ziet. */
+	FVector InvestigateLocation = FVector::ZeroVector;
+	bool bHasInvestigateLocation = false;
+
+	/** Eén regel over de eerste onderzoekspoging. */
+	bool bLoggedInvestigate = false;
 };

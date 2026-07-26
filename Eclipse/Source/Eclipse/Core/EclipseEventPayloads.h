@@ -134,6 +134,35 @@ struct FEclipseMissionEventPayload
 	bool bAuthoredSubPhase = false;
 };
 
+/**
+ * Event.Combat.ShotFired — er is geschoten (26-07, punt 1).
+ *
+ * Het FEIT is de loop die knalt, niet de kogel die aankomt: een gemist schot
+ * verraadt je precies zo goed als een raak schot. Dat is ook wat Borderlands en
+ * The Division doen — het geluid komt van de muzzle.
+ */
+USTRUCT(BlueprintType)
+struct FEclipseCombatEventPayload
+{
+	GENERATED_BODY()
+
+	/** Wie schoot. Nodig om zijn eigen kant niet op zichzelf te laten reageren. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	TWeakObjectPtr<AActor> Shooter;
+
+	/** Waar de loop stond op het moment van vuren — de laatst bekende positie. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FVector Origin = FVector::ZeroVector;
+
+	/** Hoe ver dit wapen te horen is (DT_Weapons). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float AlertRadiusCm = 0.0f;
+
+	/** True als de schutter aan spelerskant staat. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bPlayerSide = false;
+};
+
 /** Event.Squad.* — order/soldier facts in-mission (SPEC-P1-06). */
 USTRUCT(BlueprintType)
 struct FEclipseSquadEventPayload

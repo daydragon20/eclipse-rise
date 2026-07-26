@@ -26,6 +26,22 @@ void AEclipseEnemyController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
+void AEclipseEnemyController::NotifyGunshotHeard(const FVector& ShotOrigin)
+{
+	// Een vijand die al iemand ziet heeft niets aan een gerucht: zijn doel is
+	// beter dan de plek waar het knalde.
+	if (FindNearestVisibleHostile() != nullptr)
+	{
+		return;
+	}
+
+	// Nieuwe schoten overschrijven oude. Dat is bewust: het laatste schot is de
+	// verste plek waar de speler aantoonbaar wás, en achter een verouderd spoor
+	// aanlopen terwijl er net opnieuw geknald is, leest als domme AI.
+	InvestigateLocation = ShotOrigin;
+	bHasInvestigateLocation = true;
+}
+
 void AEclipseEnemyController::ApplyArchetype(const FEclipseEnemyArchetypeRow& Row)
 {
 	Archetype = Row;
@@ -77,9 +93,37 @@ void AEclipseEnemyController::SenseAndAct()
 	AEclipseCharacter* Target = FindNearestVisibleHostile();
 	if (Target == nullptr)
 	{
+		// Niemand in zicht — maar misschien wél iets gehoord (26-07, punt 1).
+		// Onderzoeken gaat vóór stilstaan: dat is het verschil tussen een vijand
+		// die je schot negeert en een die komt kijken.
+		if (bHasInvestigateLocation)
+		{
+			const float Remaining = static_cast<float>(
+				FVector::Dist2D(Body->GetActorLocation(), InvestigateLocation));
+			if (Remaining <= Archetype.EngageRange)
+			{
+				// Aangekomen en niets gevonden: het spoor is koud. Zonder deze regel
+				// blijft hij eeuwig op een plek staan waar allang niemand meer is.
+				bHasInvestigateLocation = false;
+				StopMovement();
+				return;
+			}
+			const EPathFollowingRequestResult::Type Result = MoveToLocation(InvestigateLocation, Archetype.EngageRange);
+			if (!bLoggedInvestigate)
+			{
+				bLoggedInvestigate = true;
+				UE_LOG(LogEclipse, Display,
+					TEXT("Vijand %s: onderzoekt het schot op %.0f cm — MoveToLocation gaf %s."),
+					*GetNameSafe(GetPawn()), Remaining, *UEnum::GetValueAsString(Result));
+			}
+			return;
+		}
 		StopMovement(); // idle; patrol routes are level content (SPEC-P1-05 graybox pass)
 		return;
 	}
+
+	// Zien wint van horen: wie je ziet, hoeft niet meer te zoeken.
+	bHasInvestigateLocation = false;
 
 	SetFocus(Target);
 	// De uitkomstcode meelezen, want AAIController::MoveTo houdt zijn faalreden

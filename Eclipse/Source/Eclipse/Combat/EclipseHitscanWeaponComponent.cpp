@@ -1,6 +1,13 @@
 #include "Combat/EclipseHitscanWeaponComponent.h"
 
 #include "Characters/EclipseCharacter.h"
+#include "Core/EclipseEventBusSubsystem.h"
+#include "Core/EclipseEventPayloads.h"
+#include "Core/EclipseGameplayTags.h"
+#include "Engine/GameInstance.h"
+#include "StructUtils/InstancedStruct.h"
+
+#include "Characters/EclipseCharacter.h"
 #include "Engine/World.h"
 
 UEclipseHitscanWeaponComponent::UEclipseHitscanWeaponComponent()
@@ -27,6 +34,31 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 		return false;
 	}
 	LastFireTimeSeconds = Now;
+
+	// HET SCHOT VERRAADT JE (owner-opdracht 26-07, punt 1).
+	//
+	// Hier en niet na de trace, en dat is de hele pointe: een GEMIST schot maakt
+	// evenveel lawaai als een rake. Dat is ook wat de referentie doet — in
+	// Borderlands en The Division komt het geluid van de loop, niet van de inslag.
+	// Stond dit onder de trace, dan zou missen gratis zijn en zou de hele mechaniek
+	// omgekeerd werken: hoe slechter je schiet, hoe stiller je bent.
+	//
+	// De bus en niet rechtstreeks de AI aanroepen: het wapen hoort niet te weten
+	// dat er vijanden bestaan (12.2 rule 2). De game mode luistert en vertaalt het
+	// feit naar wie het hoort.
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
+		{
+			const AEclipseCharacter* Shooter = Cast<AEclipseCharacter>(GetOwner());
+			FEclipseCombatEventPayload Shot;
+			Shot.Shooter = GetOwner();
+			Shot.Origin = ViewLocation;
+			Shot.AlertRadiusCm = Weapon.GunshotAlertRadiusCm;
+			Shot.bPlayerSide = Shooter != nullptr && Shooter->IsPlayerSide();
+			Bus->Broadcast(EclipseTags::Event_Combat_ShotFired, FInstancedStruct::Make(Shot));
+		}
+	}
 
 	FHitResult Hit;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseHitscan), /*bTraceComplex*/ false, GetOwner());

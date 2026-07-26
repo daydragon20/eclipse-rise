@@ -711,6 +711,24 @@ struct FEclipseWeaponRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 0.05))
 	float FireInterval = 0.15f;
 
+	/**
+	 * Hoe ver dit wapen te HOREN is (owner-opdracht 26-07, punt 1: het eerste
+	 * schot verraadt je).
+	 *
+	 * Waarom 5000 en niet het zichtbereik: geluid hoort verder te dragen dan zicht,
+	 * anders verandert schieten niets aan wat de vijand al wist. De waarneming van
+	 * een vijand is 2500 cm (DT_EnemyArchetypes), dus dit is precies het dubbele —
+	 * sluipen op 30 m blijft mogelijk, maar precies één schot lang.
+	 *
+	 * Per wapen bedoeld: een sniper hoort luider te zijn dan een AR en een demper
+	 * stiller. Dat is de knop waarmee je dat afstelt.
+	 *
+	 * Referentie: The Division en Borderlands doen allebei radius-alarm vanaf de
+	 * loop. Gears heeft geen stealth en is hier geen bruikbare referentie.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 0))
+	float GunshotAlertRadiusCm = 5000.0f;
+
 	/** Locational damage stub (GDD 8.2): headshot multiplier. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 1))
 	float HeadshotMultiplier = 2.5f;

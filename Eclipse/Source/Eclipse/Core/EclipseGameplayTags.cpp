@@ -23,6 +23,7 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderIssued, "Event.Squad.OrderIssued", "Player issued a squad order (SPEC-P1-06).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderAcknowledged, "Event.Squad.OrderAcknowledged", "Squadmate accepted an order with a bark line; silence is forbidden (GDD 9.5).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_ShotFired, "Event.Combat.ShotFired", "Er is geschoten: oorsprong plus de geluidsradius van het wapen. Raak of mis maakt niet uit — de loop maakt het lawaai (26-07, punt 1).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderRefused, "Event.Squad.OrderRefused", "Squadmate refused an order with a reason; silent failure is a release blocker (GDD 8.4).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierDowned, "Event.Squad.SoldierDowned", "A squadmate went down in mission; resolution to dead/wounded happens at debrief (SPEC-P1-06/07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierStabilized, "Event.Squad.SoldierStabilized", "A downed squadmate was stabilized inside the data-driven window - the Medic save that turns permadeath into a wound (SPEC-P2-01, GDD 4.2.5).")

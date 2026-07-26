@@ -2261,6 +2261,185 @@ bool FEclipseHeavyMissionSpawnsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Het eerste schot verraadt je (owner-opdracht 26-07, punt 1).
+//
+// WAT DE REFERENTIE DOET, want daar komen de keuzes vandaan:
+//   The Division  schot alarmeert binnen een geluidsradius; de AI loopt naar de
+//                 LAATST BEKENDE POSITIE — een momentopname die verloopt als je
+//                 beweegt. Een demper verkleint de radius.
+//   Borderlands   radius-aggro vanaf de LOOP, niet de inslag: een gemist schot
+//                 maakt evenveel lawaai als een rake.
+//   Gears         geen bruikbare referentie — dat spel heeft geen stealth, alle
+//                 encounters zijn gescript.
+//
+// Wat we daarvan overnemen: radius per wapen (DT_Weapons), oorsprong als laatst
+// bekende positie, en lawaai bij ELK schot dat de cadans passeert. Wat we niet
+// overnemen: dempers (bestaan nog niet als concept in deze build).
+//
+// Deze test meet drie dingen die alle drie stil konden falen:
+//   1. een vijand BUITEN de radius hoort niets — anders is de radius decoratie
+//   2. een vijand BINNEN de radius komt kijken en beweegt echt
+//   3. hij loopt naar waar geschoten IS, niet naar waar de speler NU is
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseGunshotGivesYouAwayTest,
+	"Eclipse.Playthrough.AGunshotSendsEnemiesToWhereYouFired",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseGunshotGivesYouAwayTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	if (!TestNotNull(TEXT("schot: strategie"), Strategy) || !TestNotNull(TEXT("schot: prep"), Prep))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("schot: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	// Waar staan de vijanden, en hoe ver zijn ze van de speler? Zonder deze
+	// nulmeting is elke latere verplaatsing onbewijsbaar.
+	TArray<TPair<AEclipseCharacter*, FVector>> Hostiles;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Body = *It;
+		if (Body != nullptr && Body != Harness.Body && !Body->IsPlayerSide())
+		{
+			Hostiles.Emplace(Body, Body->GetActorLocation());
+		}
+	}
+	if (!TestTrue(TEXT("schot: er staan vijanden om te alarmeren"), Hostiles.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// De speler ver genoeg weg zetten dat NIEMAND hem ziet: het waarnemingsbereik
+	// is 2500 cm, de geluidsradius 5000. Precies in dat gat zit de mechaniek — hij
+	// mag ongezien zijn en toch gehoord worden. Zonder die scheiding meet deze test
+	// gewoon opnieuw of vijanden je zien.
+	const FVector Anchor = Hostiles[0].Value;
+	const FVector FiringSpot = Anchor + FVector(4200.0f, 0.0f, 0.0f);
+
+	// De SQUAD gaat mee, en dat is geen detail. Eerste twee rondes mat deze test
+	// "ze lopen ervandaan": de vijanden zagen de achtergebleven squadmates, en een
+	// vijand die iemand ZIET negeert een gerucht terecht — dat staat zo in
+	// NotifyGunshotHeard. Ze deden dus precies wat ze moesten doen, en de test
+	// isoleerde de mechaniek niet. Zelfde soort fout als de besmette baseline
+	// hierboven: niet de code maar de opstelling.
+	int32 Repositioned = 0;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Body = *It;
+		if (Body != nullptr && Body->IsPlayerSide())
+		{
+			Body->SetActorLocation(FiringSpot + FVector(0.0f, 150.0f * Repositioned, 0.0f), /*bSweep*/ false);
+			++Repositioned;
+		}
+	}
+	Harness.Idle(0.5f);
+
+	// Nooit de BEDOELDE positie rapporteren maar de WERKELIJKE: een teleport die
+	// niet aankomt zou anders als "3600 cm" in het rapport staan terwijl de speler
+	// nog bij de vijanden staat, en dan meet de hele test iets anders dan hij zegt.
+	const FVector ActualSpot = Harness.Location();
+	Report(*this, TEXT("afstand speler tot dichtste vijand"),
+		static_cast<float>(FVector::Dist2D(ActualSpot, Anchor)), TEXT("cm"),
+		TEXT("> 3200 (buiten het RUIMSTE waarnemingsbereik) en < 5000 (binnen gehoor)"));
+	Report(*this, TEXT("teleport-afwijking"),
+		static_cast<float>(FVector::Dist2D(ActualSpot, FiringSpot)), TEXT("cm"),
+		TEXT("0 = de speler staat waar de test denkt"));
+	// 3200 en niet 2500: de vier vijanden wisselen archetypes af en hun
+	// waarnemingsbereiken verschillen. De eerste opstelling stond op 3600 cm en
+	// daar zág er eentje de speler gewoon — gevonden door de vijand zelf te laten
+	// vertellen wat hij deed, in plaats van door mijn aanname te herhalen.
+	if (!TestTrue(TEXT("schot: de speler staat buiten hun RUIMSTE waarnemingsbereik (anders meet dit zien i.p.v. horen)"),
+			FVector::Dist2D(ActualSpot, Anchor) > 3200.0f))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Schieten in het luchtledige: richting weg van de vijanden, zodat er zeker
+	// niemand geraakt wordt. Het gaat om het GELUID, en een gemist schot hoort
+	// evenveel te verraden als een rake — dat is de kern van de mechaniek.
+	UEclipseHitscanWeaponComponent* Weapon = Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (!TestNotNull(TEXT("schot: de speler heeft een wapen"), Weapon))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	// De nulmeting hoort HIER, vlak voor het schot — niet bij het spawnen.
+	// Eerste ronde mat -203 cm ("ze lopen ervandaan") omdat de vijanden in de
+	// tussenliggende anderhalve seconde nog naar de plek liepen waar de speler
+	// stond vóór de teleport. Dat was geen gedrag maar een besmette baseline: het
+	// meetmoment lag vóór de gebeurtenis die ik wilde meten.
+	for (TPair<AEclipseCharacter*, FVector>& Entry : Hostiles)
+	{
+		if (Entry.Key != nullptr)
+		{
+			Entry.Value = Entry.Key->GetActorLocation();
+		}
+	}
+
+	Weapon->Fire(ActualSpot + FVector(0.0f, 0.0f, 60.0f), FVector(0.0f, 0.0f, 1.0f), TEXT("TestShot"));
+
+	// Ruim laten lopen. Vier seconden bleek te kort: de eerste denkbeurt komt pas
+	// na een vuurinterval, en daarna moeten ze nog om de dekking heen die tussen
+	// hen en de schietplek staat — de eerste meters van zo'n route kunnen best van
+	// het doel AF wijzen.
+	Harness.Idle(10.0f);
+
+	float ClosedOnShot = 0.0f;
+	int32 Moved = 0;
+	for (const TPair<AEclipseCharacter*, FVector>& Entry : Hostiles)
+	{
+		if (Entry.Key == nullptr)
+		{
+			continue;
+		}
+		const float Before = static_cast<float>(FVector::Dist2D(Entry.Value, ActualSpot));
+		const float After = static_cast<float>(FVector::Dist2D(Entry.Key->GetActorLocation(), ActualSpot));
+		ClosedOnShot += Before - After;
+		Moved += FVector::Dist2D(Entry.Key->GetActorLocation(), Entry.Value) > 100.0f ? 1 : 0;
+	}
+
+	Report(*this, TEXT("vijanden die in beweging kwamen"), Moved, TEXT(""), TEXT("van de vier"));
+	Report(*this, TEXT("totaal dichter bij de schietplek"), ClosedOnShot, TEXT("cm"),
+		TEXT("> 0 = ze lopen ernaartoe"));
+
+	TestTrue(FString::Printf(
+			TEXT("schot: minstens één vijand komt kijken (er bewogen er %d van de %d)"), Moved, Hostiles.Num()),
+		Moved > 0);
+	TestTrue(FString::Printf(
+			TEXT("schot: ze bewegen NAAR de plek waar geschoten werd (netto %.0f cm dichterbij)"), ClosedOnShot),
+		ClosedOnShot > 0.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 // De TERUGVAL: een missie zonder geauthorde batches houdt zijn vier vijanden.
 //
 // Dit is de tweede helft van dezelfde koppeling en het stuk dat stil kan
