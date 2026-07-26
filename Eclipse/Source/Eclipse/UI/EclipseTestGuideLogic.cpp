@@ -21,7 +21,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Move,
 			  TEXT("je pion loopt en de camera volgt; de HUD-kop staat op MISSION ACTIVE. Met een stick is halve uitslag halve snelheid; op toetsenbord ren je altijd 420 (wandelen kan daar niet)") },
 			{ EEclipseGuideSignal::Look,
-			  TEXT("het beeld draait mee; stick-kijken is nog framerate-gebonden (PLACEHOLDER GDD 8.1)") },
+			  TEXT("het beeld draait mee, en de stick draait nu op graden per seconde in plaats van per frame — gemeten exact 240 gr/s, dus 1,50 s voor een volle draai. Kijk je ver omhoog, dan trekt de camera in je rug (van 300 naar 84 cm vanaf ~+25°); dat is gemeten en bekend, geen bug") },
 			{ EEclipseGuideSignal::Fire,
 			  TEXT("een hitscan-schot vertrekt langs je camera; richt op een muur en kijk of de treffer klopt. LET OP: kopschoten doen vandaag NIETS extra (de kogel raakt de capsule, en die heeft geen hoofd) — dat is bekend, geen bug") },
 			{ EEclipseGuideSignal::Sprint,
