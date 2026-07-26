@@ -45,7 +45,7 @@ namespace EclipseTestGuide
 			{ EEclipseGuideSignal::Order,
 			  TEXT("onder '-- squad orders --' springt de order om: 1 MoveTo, 2 FocusTarget, 3 Hold, 4 Regroup") },
 			{ EEclipseGuideSignal::Stance,
-			  TEXT("'stance:' wisselt ready <-> aggressive. Alleen de pad-Y is detecteerbaar: op toetsenbord is Alt een modifier bij de order zelf, dus druk daar J") }
+			  TEXT("HOUD EERST Command Mode vast (LB / Q) — daarbuiten doet Y niets. Dan wisselt 'stance:' ready <-> aggressive. Alleen de pad-Y is detecteerbaar: op toetsenbord is Alt een modifier bij de order zelf, dus druk daar J") }
 		};
 
 		/** One judgement row: no detection, the tester's word settles it. */

@@ -179,7 +179,12 @@ namespace EclipseGauntletOverlay
 			{ TEXT("Vorige"),       TEXT("scroll neer"),       TEXT("LT (tijdens Command Mode)") },
 			{ TEXT("Onder kruis"),  TEXT("E"),                 TEXT("X") },
 			{ TEXT("Orders"),       TEXT("1 2 3 4"),           TEXT("D-pad") },
-			{ TEXT("Stance"),       TEXT("Alt vasthouden"),    TEXT("Y") }
+			// Beide kolommen noemen hun CONTEXT, want stance werkt nergens anders:
+			// ToggleHeldStance() keert meteen terug als Command Mode niet vast staat,
+			// en op toetsenbord wordt LeftAlt gepollt op het moment van de order zelf.
+			// Zonder die toevoeging drukt de speler Y in het veld en gebeurt er stil
+			// niets — vastgepind door Eclipse.Feel.Input.StanceOnlyAnswersInsideCommandMode.
+			{ TEXT("Stance"),       TEXT("Alt vast bij de order"), TEXT("Y (tijdens Command Mode)") }
 		};
 	}
 

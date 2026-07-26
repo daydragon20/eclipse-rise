@@ -17,6 +17,7 @@
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipsePlayerController.h"
+#include "Characters/EclipseCommandModeComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -1292,6 +1293,66 @@ bool FEclipseAirControlTest::RunTest(const FString& Parameters)
 	// sturing PRETTIG is, is smaak en krijgt dus geen bovengrens.
 	TestTrue(FString::Printf(TEXT("sprong: je kunt in de lucht echt sturen (%.2f cm opzij)"), Steered - Drift),
 		Steered - Drift > 25.0);
+
+	Harness.Shutdown();
+	return true;
+}
+
+// Stance werkt alleen ín Command Mode — en dat stond nergens.
+//
+// ToggleHeldStance() keert meteen terug als Command Mode niet vastgehouden
+// wordt. Y indrukken in het veld doet dus NIETS, stil. De controletabel die de
+// speler tijdens het spelen leest, zei alleen "Stance / Alt vasthouden / Y" —
+// terwijl twee andere rijen hun context wél noemen ("LT (buiten Command Mode)",
+// "LT (tijdens Command Mode)"). Precies de dode-toets-verwarring van bukken,
+// alleen dan half: de toets leeft, maar niet waar je hem indrukt.
+//
+// Deze test pint het GEDRAG vast, niet de tekst. Verandert iemand later de regel
+// zodat stance overal werkt, dan valt deze test om en wordt de tekst meegenomen
+// — andersom zou een test op de tekst juist de verbetering blokkeren.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseStanceNeedsCommandModeTest,
+	"Eclipse.Feel.Input.StanceOnlyAnswersInsideCommandMode",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseStanceNeedsCommandModeTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UEclipseCommandModeComponent* CommandMode = Harness.Controller->FindComponentByClass<UEclipseCommandModeComponent>();
+	if (!TestNotNull(TEXT("stance: de Command Mode-component bestaat"), CommandMode))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const EEclipseSquadStance Before = CommandMode->GetHeldStance();
+
+	// 1. Buiten Command Mode: indrukken hoort niets te doen.
+	Harness.Press(TEXT("StanceToggle"));
+	Harness.Idle(0.1f);
+	TestTrue(TEXT("stance: buiten Command Mode verandert Y niets"), CommandMode->GetHeldStance() == Before);
+
+	// 2. Command Mode vasthouden en dan pas drukken.
+	Harness.Inject(TEXT("CommandHold"), true);
+	Harness.Step();
+	Harness.Inject(TEXT("CommandHold"), true);
+	Harness.Inject(TEXT("StanceToggle"), true);
+	Harness.Step();
+	Harness.Inject(TEXT("CommandHold"), true);
+	Harness.Step();
+
+	const EEclipseSquadStance Inside = CommandMode->GetHeldStance();
+	AddInfo(FString::Printf(TEXT("stance: %s -> %s met Command Mode vast"),
+		Before == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready"),
+		Inside == EEclipseSquadStance::Aggressive ? TEXT("aggressive") : TEXT("ready")));
+	TestTrue(TEXT("stance: ín Command Mode wisselt Y wél"), Inside != Before);
 
 	Harness.Shutdown();
 	return true;
