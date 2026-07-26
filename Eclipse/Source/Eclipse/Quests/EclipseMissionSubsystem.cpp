@@ -99,13 +99,16 @@ void UEclipseMissionSubsystem::OnLaunchRequested(FGameplayTag EventTag, const FI
 	}
 }
 
-void UEclipseMissionSubsystem::ResolveMissionSpec(FName TemplateId, TArray<FEclipseObjectiveDef>& OutObjectives, bool& bOutProgressRegion) const
+void UEclipseMissionSubsystem::ResolveMissionSpec(FName TemplateId, TArray<FEclipseObjectiveDef>& OutObjectives, bool& bOutProgressRegion,
+	TArray<FEclipseEnemySpawnSet>& OutEnemySpawns) const
 {
+	OutEnemySpawns.Reset();
 	const FString AssetPath = FString::Printf(TEXT("/Game/Data/Missions/%s.%s"), *TemplateId.ToString(), *TemplateId.ToString());
 	if (const UEclipseMissionAsset* Asset = Cast<UEclipseMissionAsset>(FSoftObjectPath(AssetPath).TryLoad()))
 	{
 		OutObjectives = Asset->Objectives;
 		bOutProgressRegion = Asset->bProgressRegionOnSuccess;
+		OutEnemySpawns = Asset->EnemySpawns;
 		return;
 	}
 
@@ -142,7 +145,7 @@ bool UEclipseMissionSubsystem::StartMission(const TArray<FGuid>& SquadSoldierIds
 	}
 
 	ResetRuntime();
-	ResolveMissionSpec(PendingTemplateId, ActiveObjectives, bProgressRegionOnSuccess);
+	ResolveMissionSpec(PendingTemplateId, ActiveObjectives, bProgressRegionOnSuccess, ActiveEnemySpawns);
 	DeployedSoldierIds = SquadSoldierIds;
 
 	Phase = EEclipseMissionPhase::Insertion;

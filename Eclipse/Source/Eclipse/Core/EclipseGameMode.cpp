@@ -560,9 +560,12 @@ void AEclipseGameMode::SpawnMissionActors()
 		SpawnedMissionActors.Add(Body);
 	}
 
-	// PLACEHOLDER(SPEC-P1-05): enemy placement reads the mission asset's spawn
-	// sets in the content pass; presence below cycles through ALL archetype rows
-	// (step-2: per-archetype stats + bodies) so the mix is visible today.
+	// Vijandplaatsing leest sinds 26-07 de spawnsets van het missiesjabloon
+	// (owner-beslissing). Daarvoor stond hier een vaste lus van vier die de
+	// archetype-rijen afwisselde, en die negeerde stil wat drie van de vier
+	// missies in EnemySpawns hadden staan: welk archetype, hoeveel, op welk site.
+	// Wie "6 Enforcers op SiteB" authordde kreeg vier gemengde vijanden bij het
+	// hoofddoel en geen enkel signaal dat zijn data was weggegooid.
 	int32 EnemyIndex = 0;
 	const FVector PrimarySite = FindSiteLocation(TEXT("Site_ControlPost"), PlayerLocation + FVector(3000.0f, 0.0f, 0.0f));
 
@@ -590,14 +593,99 @@ void AEclipseGameMode::SpawnMissionActors()
 		}
 	}
 
-	for (int32 Index = 0; Index < 4; ++Index)
+	// De plaatsingslijst: één ingang per vijand, opgebouwd uit de geauthorde
+	// batches. Eerst de lijst bouwen en dan pas spawnen, zodat de spawnlus zelf
+	// niets hoeft te weten van waar zijn rij vandaan komt.
+	struct FPlacement
 	{
-		const FEclipseEnemyArchetypeRow* RowForEnemy = !ArchetypeRows.IsEmpty()
-			? ArchetypeRows[Index % ArchetypeRows.Num()].Value : ArchetypeRow;
-		const FName RowName = !ArchetypeRows.IsEmpty()
-			? ArchetypeRows[Index % ArchetypeRows.Num()].Key : FName(TEXT("Enforcer"));
+		const FEclipseEnemyArchetypeRow* Row = nullptr;
+		FName RowName;
+		FVector Location = FVector::ZeroVector;
+	};
+	TArray<FPlacement> Placements;
 
-		AEclipseCharacter* Enemy = SpawnBodyNear(PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f), FString::Printf(TEXT("%s_%d"), *RowName.ToString(), Index));
+	auto ArchetypeByName = [&ArchetypeRows](FName Wanted) -> const FEclipseEnemyArchetypeRow*
+	{
+		for (const TPair<FName, const FEclipseEnemyArchetypeRow*>& Pair : ArchetypeRows)
+		{
+			if (Pair.Key == Wanted)
+			{
+				return Pair.Value;
+			}
+		}
+		return nullptr;
+	};
+
+	const TArray<FEclipseEnemySpawnSet>& AuthoredSpawns = Mission->GetActiveEnemySpawns();
+	for (const FEclipseEnemySpawnSet& Set : AuthoredSpawns)
+	{
+		// Onbekende archetype-id: luid melden en de batch overslaan, niet stil een
+		// andere vijand neerzetten (14.3.5). Een missie die vraagt om Enforcers en
+		// er Snipers krijgt is erger dan een missie die er geen krijgt, want het
+		// eerste ziet er goed uit.
+		const FEclipseEnemyArchetypeRow* Row = ArchetypeByName(Set.ArchetypeId);
+		if (Row == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("EnemySpawns: archetype '%s' staat niet in DT_EnemyArchetypes — batch van %d overgeslagen."),
+				*Set.ArchetypeId.ToString(), Set.Count);
+			continue;
+		}
+
+		// Site onbekend? FindSiteLocation valt terug op de meegegeven positie, dus
+		// dat is al fail-forward — maar het hoort wel gezegd te worden.
+		const bool bHasSite = !Set.SpawnSiteId.IsNone();
+		const FVector Anchor = bHasSite
+			? FindSiteLocation(Set.SpawnSiteId, PrimarySite)
+			: PrimarySite;
+		if (bHasSite && Anchor.Equals(PrimarySite))
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("EnemySpawns: site '%s' niet gevonden — de %d %s staan bij het primaire doel."),
+				*Set.SpawnSiteId.ToString(), Set.Count, *Set.ArchetypeId.ToString());
+		}
+
+		for (int32 InSet = 0; InSet < Set.Count; ++InSet)
+		{
+			Placements.Add({ Row, Set.ArchetypeId,
+				Anchor + FVector(300.0f * InSet, 200.0f * (InSet % 2), 0.0f) });
+		}
+	}
+
+	if (Placements.IsEmpty())
+	{
+		// Geen geauthorde batches (M1.1 heeft ze niet) = de graybox-standaard van
+		// vier bij het hoofddoel. Bewust behouden: een missie zonder spawnset moet
+		// speelbaar blijven, en dit is de opstelling waarop alle speelrondes van
+		// vannacht gemeten zijn.
+		if (!AuthoredSpawns.IsEmpty())
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("EnemySpawns: %d batch(es) geauthord maar geen enkele bruikbaar — terug op de standaard van vier."),
+				AuthoredSpawns.Num());
+		}
+		for (int32 Index = 0; Index < 4; ++Index)
+		{
+			const FEclipseEnemyArchetypeRow* RowForEnemy = !ArchetypeRows.IsEmpty()
+				? ArchetypeRows[Index % ArchetypeRows.Num()].Value : ArchetypeRow;
+			const FName RowName = !ArchetypeRows.IsEmpty()
+				? ArchetypeRows[Index % ArchetypeRows.Num()].Key : FName(TEXT("Enforcer"));
+			Placements.Add({ RowForEnemy, RowName,
+				PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f) });
+		}
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Display, TEXT("EnemySpawns: %d vijanden uit %d geauthorde batch(es)."),
+			Placements.Num(), AuthoredSpawns.Num());
+	}
+
+	for (int32 Index = 0; Index < Placements.Num(); ++Index)
+	{
+		const FEclipseEnemyArchetypeRow* RowForEnemy = Placements[Index].Row;
+		const FName RowName = Placements[Index].RowName;
+
+		AEclipseCharacter* Enemy = SpawnBodyNear(Placements[Index].Location, FString::Printf(TEXT("%s_%d"), *RowName.ToString(), Index));
 		if (Enemy == nullptr)
 		{
 			continue;

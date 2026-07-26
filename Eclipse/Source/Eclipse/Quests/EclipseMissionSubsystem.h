@@ -64,6 +64,14 @@ public:
 	/** Active objective list (HUD/debug display; empty outside a run). */
 	const TArray<FEclipseObjectiveDef>& GetActiveObjectives() const { return ActiveObjectives; }
 
+	/**
+	 * Geauthorde vijandbatches van de lopende missie; leeg = de game mode plaatst
+	 * zijn graybox-standaard. Hier en niet in de game mode, omdat het sjabloon al
+	 * door ResolveMissionSpec geladen wordt — een tweede lader zou een tweede
+	 * waarheid worden.
+	 */
+	const TArray<FEclipseEnemySpawnSet>& GetActiveEnemySpawns() const { return ActiveEnemySpawns; }
+
 	/** Completed objective ids (HUD tick marks). */
 	const TArray<FName>& GetCompletedObjectiveIds() const { return CompletedObjectiveIds; }
 
@@ -136,7 +144,8 @@ private:
 	void UnregisterConsoleCommands();
 
 	/** Resolve the mission asset for a template; missing content synthesizes a default spec (GDD 14.3.5). */
-	void ResolveMissionSpec(FName TemplateId, TArray<FEclipseObjectiveDef>& OutObjectives, bool& bOutProgressRegion) const;
+	void ResolveMissionSpec(FName TemplateId, TArray<FEclipseObjectiveDef>& OutObjectives, bool& bOutProgressRegion,
+		TArray<FEclipseEnemySpawnSet>& OutEnemySpawns) const;
 
 	EEclipseMissionPhase Phase = EEclipseMissionPhase::None;
 
@@ -148,6 +157,7 @@ private:
 
 	/** Active-run state. */
 	TArray<FEclipseObjectiveDef> ActiveObjectives;
+	TArray<FEclipseEnemySpawnSet> ActiveEnemySpawns;
 	TArray<FName> CompletedObjectiveIds;
 	TArray<FGuid> DeployedSoldierIds;
 	TMap<FGuid, FName> DownedSoldiers;

@@ -2121,26 +2121,21 @@ bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-// Een val die vandaag nog dicht is, en die luid moet worden op het moment dat de
-// owner erin stapt (14.3.5).
+// Elke geauthorde spawnbatch moet ook echt vijanden kunnen opleveren.
 //
-// UEclipseMissionAsset::EnemySpawns ziet eruit als de knop waarmee je bepaalt
-// welke vijanden waar staan — drie velden, netjes geclampt, met een comment die
-// zei dat de graybox-wiring hem consumeerde. Niets leest hem. De vijanden komen
-// uit een vaste lus van VIER in AEclipseGameMode::SpawnMissionActors, die de
-// rijen van DT_EnemyArchetypes afwisselt en ze naast het primaire doel neerzet.
+// Geschiedenis, want die verklaart de vorm van deze test. Vanochtend vroeg was
+// UEclipseMissionAsset::EnemySpawns dood: drie van de vier missies vulden hem in
+// (Assault 2 batches, Rescue 2, Sabotage 1, M1.1 geen) en de game mode zette
+// stil een vaste lus van vier neer. Die missies beschreven dus een opstelling
+// die nooit gebeurde. Deze test klemde toen het bekende getal vast zodat er niets
+// stil bij kon komen.
 //
-// En het is geen toekomstig risico: DRIE van de vier verscheepte missies vullen
-// het veld al in (Assault 2 batches, Rescue 2, Sabotage 1, M1.1 geen). Die
-// missies beschrijven dus een vijandopstelling die nooit gebeurt. Ik ontdekte
-// dat met deze test zelf — de setup-scripts authoren geen spawns, dus de eerste
-// conclusie ("nog niets ingevuld") was fout; de assets zijn in de editor gevuld.
-//
-// Aansluiten verandert vijandaantallen en dus de moeilijkheid van elke missie:
-// een ontwerpbeslissing, geen reparatie. Daarom staat de bevinding in HANDOFF §4
-// en klemt deze test het BEKENDE getal vast. Groen zolang de situatie is wat er
-// beschreven staat; rood zodra iemand er data bij zet (dan wordt er méér stil
-// genegeerd) of weghaalt (dan is de beslissing genomen en moet deze tekst mee).
+// Op owner-beslissing is de koppeling er nu (26-07), en daarmee verandert wat
+// deze test moet bewaken: niet meer "hoeveel wordt er genegeerd" maar "kan elke
+// batch landen". Een ArchetypeId die niet in DT_EnemyArchetypes staat levert nu
+// een lege batch op — luid gemeld, maar nog steeds nul vijanden waar de missie
+// er om vroeg. Dat is precies het soort stille afwijking waar vannacht de hele
+// sessie over ging, dus het hoort rood te zijn en niet alleen luid.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseAuthoredSpawnsAreConsumedTest,
 	"Eclipse.Playthrough.AuthoredEnemySpawnsWouldActuallySpawn",
 	EclipsePlaythrough::TestFlags)
@@ -2170,7 +2165,24 @@ bool FEclipseAuthoredSpawnsAreConsumedTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
+	// De archetype-namen die de game mode kan vinden. Zelfde bron, zelfde sleutel:
+	// als deze test een naam goedkeurt die de spawner niet kent, keurt hij niets.
+	TSet<FName> KnownArchetypes;
+	if (const UDataTable* Archetypes = LoadObject<UDataTable>(
+			nullptr, TEXT("/Game/Data/DT_EnemyArchetypes.DT_EnemyArchetypes")))
+	{
+		for (const TPair<FName, uint8*>& Row : Archetypes->GetRowMap())
+		{
+			KnownArchetypes.Add(Row.Key);
+		}
+	}
+	if (!TestTrue(TEXT("spawns: DT_EnemyArchetypes is geladen en heeft rijen"), KnownArchetypes.Num() > 0))
+	{
+		return false;
+	}
+
 	int32 TotalBatches = 0;
+	int32 TotalEnemies = 0;
 	for (const FAssetData& Data : Found)
 	{
 		const UEclipseMissionAsset* Mission = Cast<UEclipseMissionAsset>(Data.GetAsset());
@@ -2179,27 +2191,26 @@ bool FEclipseAuthoredSpawnsAreConsumedTest::RunTest(const FString& Parameters)
 			continue;
 		}
 		TotalBatches += Mission->EnemySpawns.Num();
-		if (Mission->EnemySpawns.Num() > 0)
+		for (const FEclipseEnemySpawnSet& Set : Mission->EnemySpawns)
 		{
-			// Display en geen Warning: de suite draait met warnings-as-errors en dit
-			// is een vastgelegde toestand, geen nieuw defect. De luidheid zit in de
-			// tekst en in het feit dat het getal geklemd staat.
-			UE_LOG(LogEclipse, Display,
-				TEXT("EnemySpawns: '%s' authordt %d batch(es) die NIET gelezen worden — ")
-				TEXT("de vijanden komen uit een vaste lus van vier in AEclipseGameMode."),
-				*Data.AssetName.ToString(), Mission->EnemySpawns.Num());
+			TotalEnemies += Set.Count;
+			TestTrue(FString::Printf(
+					TEXT("spawns: '%s' vraagt om archetype '%s' en dat staat in DT_EnemyArchetypes ")
+					TEXT("(zo niet: de batch levert NUL vijanden op waar de missie er %d wil)"),
+					*Data.AssetName.ToString(), *Set.ArchetypeId.ToString(), Set.Count),
+				KnownArchetypes.Contains(Set.ArchetypeId));
+
+			// Een batch van 0 is geen data maar een vergissing: hij leest als "hier
+			// staan vijanden" en levert er geen.
+			TestTrue(FString::Printf(TEXT("spawns: '%s' vraagt om minstens 1 vijand in de batch '%s'"),
+					*Data.AssetName.ToString(), *Set.ArchetypeId.ToString()),
+				Set.Count > 0);
 		}
 	}
 
-	Report(*this, TEXT("ingevulde spawnbatches"), TotalBatches, TEXT(""),
-		TEXT("3 van de 4 missies; geen ervan wordt gelezen"));
-
-	// De klem op de bekende toestand. Verandert dit getal, dan is er iets gebeurd
-	// wat iemand moet weten: er is data bij gekomen die stil genegeerd wordt, of
-	// de knoop is doorgehakt en dan hoort de uitleg hierboven mee te veranderen.
-	TestEqual(TEXT("spawns: nog steeds precies de vastgelegde 5 genegeerde batches ")
-		TEXT("(zie HANDOFF §4 — aansluiten of weghalen is een owner-beslissing)"),
-		TotalBatches, 5);
+	Report(*this, TEXT("geauthorde spawnbatches"), TotalBatches, TEXT(""), TEXT("over alle missies"));
+	Report(*this, TEXT("vijanden die die batches vragen"), TotalEnemies, TEXT(""),
+		TEXT("de game mode plaatst er sinds 26-07 precies dit aantal"));
 	return true;
 }
 
