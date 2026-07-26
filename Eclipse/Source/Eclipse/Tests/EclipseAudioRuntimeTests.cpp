@@ -7,6 +7,8 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Audio/EclipseAudioSubsystem.h"
+#include "Audio/EclipseCharacterVoiceData.h"
+#include "Audio/EclipseDialogueVoiceSubsystem.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
@@ -138,6 +140,73 @@ bool FEclipseSquadBarkCooldownTest::RunTest(const FString& Parameters)
 	Bus->Broadcast(EclipseTags::Event_Squad_OrderAcknowledged, Ack(SoldierOne));
 	TestEqual(TEXT("bark: na loskoppelen komt er niets meer binnen"),
 		Audio->GetBarkSuppressedCount(), Before);
+	return true;
+}
+
+// Kan de squad ECHT praten, of heb ik alleen een koppeling gebouwd?
+//
+// De rem-test hierboven bewijst de knijper en met opzet niet het geluid. Daarmee
+// bleef de belangrijkste claim onbewezen: ik meldde de owner "de stemmen zijn
+// aangesloten" terwijl geen enkele test aanraakte of er een clip bestaat voor de
+// zinnen die de handler opvraagt. Dat is exact het patroon van deze hele sessie —
+// een correct gezet doel is geen bewijs van effect.
+//
+// De handler speelt ALLEEN wat al gegenereerd is (laten genereren kost een
+// betaalde API-aanroep, en dat is geld van de owner). Dus als tekst óf emotie óf
+// stem niet exact matcht met wat er in de cache staat, blijft het stil — zonder
+// dat er iets kapot is. Deze test controleert die drie tegelijk, via dezelfde
+// IsLineCached die de handler gebruikt.
+//
+// Asserteerbaar en niet alleen rapporteerbaar omdat de 17 clips en het manifest
+// in de repo staan: op elke kloon van dit project geldt dezelfde uitkomst.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadBarksHaveAudioTest,
+	"Eclipse.Audio.Subsystem.EveryWiredBarkHasAClip",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProductFilter)
+
+bool FEclipseSquadBarksHaveAudioTest::RunTest(const FString& Parameters)
+{
+	UGameInstance* OuterGameInstance = NewObject<UGameInstance>(GEngine);
+	UEclipseDialogueVoiceSubsystem* Voices = NewObject<UEclipseDialogueVoiceSubsystem>(OuterGameInstance);
+	Voices->Initialize(*(new FSubsystemCollection<UGameInstanceSubsystem>()));
+
+	const UEclipseCharacterVoiceData* VoiceA = LoadObject<UEclipseCharacterVoiceData>(
+		nullptr, TEXT("/Game/Audio/DA_Voice_SquadA.DA_Voice_SquadA"));
+	const UEclipseCharacterVoiceData* VoiceB = LoadObject<UEclipseCharacterVoiceData>(
+		nullptr, TEXT("/Game/Audio/DA_Voice_SquadB.DA_Voice_SquadB"));
+	if (!TestNotNull(TEXT("stem: DA_Voice_SquadA bestaat"), VoiceA)
+		|| !TestNotNull(TEXT("stem: DA_Voice_SquadB bestaat"), VoiceB))
+	{
+		return false;
+	}
+
+	// Exact de zes regels die EclipseAudioSubsystem::OnOrderAnswered opvraagt.
+	// Wijkt deze lijst af van die handler, dan meet deze test de verkeerde dingen —
+	// daarom staat de handler-naam erbij en niet alleen de zin.
+	struct FWired { const TCHAR* When; EEclipseVoiceEmotion Emotion; const TCHAR* Text; };
+	const FWired Wired[] = {
+		{ TEXT("ack MoveTo"),        EEclipseVoiceEmotion::Confident, TEXT("Copy. Moving up.") },
+		{ TEXT("ack Hold"),          EEclipseVoiceEmotion::Calm,      TEXT("Holding position.") },
+		{ TEXT("ack Regroup"),       EEclipseVoiceEmotion::Calm,      TEXT("Falling back to you.") },
+		{ TEXT("weiger NoRoute"),    EEclipseVoiceEmotion::Urgent,    TEXT("Negative, I can't find a route.") },
+		{ TEXT("weiger NoShot"),     EEclipseVoiceEmotion::Urgent,    TEXT("No shot from here.") },
+		{ TEXT("weiger Downed"),     EEclipseVoiceEmotion::Sad,       TEXT("I'm hit. Someone patch me up.") },
+	};
+
+	int32 Playable = 0;
+	for (const FWired& Line : Wired)
+	{
+		const bool bA = Voices->IsLineCached(VoiceA, Line.Emotion, Line.Text);
+		const bool bB = Voices->IsLineCached(VoiceB, Line.Emotion, Line.Text);
+		Playable += (bA || bB) ? 1 : 0;
+		TestTrue(FString::Printf(
+				TEXT("bark-audio: '%s' klinkt echt — er is een clip voor \"%s\" (stem A=%d, B=%d). ")
+				TEXT("Nul betekent stilte in het spel zonder dat er iets kapot is: tekst, emotie of stem wijkt af van de cache"),
+				Line.When, Line.Text, bA ? 1 : 0, bB ? 1 : 0),
+			bA || bB);
+	}
+
+	AddInfo(FString::Printf(TEXT("bark-audio: %d van de %d aangesloten zinnen hebben een clip"),
+		Playable, UE_ARRAY_COUNT(Wired)));
 	return true;
 }
 
