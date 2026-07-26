@@ -250,7 +250,12 @@ zag zijn geen bug maar een keuze, en die is van jou:
   hetzelfde frame vloeken die twee. Hun maat heb ik wel gerepareerd — ze stonden
   op 328 cm naast jouw 190 cm. Wat wil je: de figuren vervangen, jouw personage
   stileren, of laten staan tot de art-pass?
-- **Geen wapen te zien, en geen HUD.** Op geen enkel beeld houdt iemand een wapen
-  vast, ook niet op het frame waar er geschoten wordt, en er staat geen kruisje of
-  munitieteller in beeld. Ik weet nog niet of dat ontbreekt of dat het zo hoort in
-  deze bouw — zeg het als jij het wel verwacht had, dan zoek ik het eerst uit.
+- **Geen wapen in de handen.** Dit is het enige echte van de drie dingen die ik
+  eerst meldde. Het schot valt en de munitie loopt (30 → 19, elf schoten gemeten),
+  maar er hangt nergens een wapenmesh aan een bot — in de hele module hangt maar
+  één ding aan het skelet, en dat is de hoofd-hitbox. Wil je dat ik daar een model
+  aan koppel, of wacht dat op de art-pass?
+
+  *De HUD ontbrak niet: die mount netjes en de teller hoort zichtbaar te zijn. Dat
+  hij niet op mijn beelden staat, komt doordat screenshots de UMG-laag niet
+  meenemen — mijn meetmethode, geen bug. Idem "nul schoten": verkeerd zoekwoord.*

@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `b37d3c9`
+## VEILIG TE SPELEN: JA, commit `d3bcaa1`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -69,10 +69,23 @@ Wat er nu op staat, met eigen ogen bekeken:
    volgende pack zichzelf corrigeert): alle zes staan nu op 180,0 cm. Nagekeken op
    een nieuwe opname — ze staan naast elkaar op menselijke maat.
 
+4. **Turn-in-place, ook op beeld.** De ronde draait de camera 100 graden via
+   dezelfde weg als je muis en legt het midden en het eind vast. Gemeten: camera
+   118,7 gr en lichaam 118,7 gr; daarna 238,7 tegen 238,7. Op het frame staat de
+   speler alleen in beeld, van achteren, meegedraaid.
+5. **Een gele engine-waarschuwing liep over het scherm** — twee directionele
+   lampen streden om "de" zon en de engine koos zelf op helderheid. Nu expliciet
+   (zon 10, fill 0); 0 waarschuwingen in het log en weg van het beeld.
+
+**Twee dingen die ik eerst als bug meldde en die van MIJ waren, niet van de game:**
+"nul schoten" kwam van een verkeerd zoekwoord (gemeten: 30 → 19 munitie, elf
+schoten) en de ontbrekende HUD is de opnamemethode. Beide teruggenomen.
+
 **Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
 laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
 elkaar botsen die twee stijlen. Dat is een art-directie keuze (ÉÉN-STIJL-WET) en
-geen bug, dus die laat ik aan jou.
+geen bug, dus die laat ik aan jou. En er hangt **nergens een wapenmesh** — het
+schot valt, maar er is geen model in de handen.
 
 ### Wat wacht er op jou
 
@@ -111,13 +124,16 @@ Uitbouwen, in deze volgorde:
 - Nog geen assertie op wat de opnames tonen. `NobodyIsAGiant` is de eerste die uit
   een beeld is geboren; zoek de volgende (silhouethoogte over de tijd, verschil
   tussen twee frames tijdens lopen).
-- Wat ik NIET op de beelden zag en wel verwachtte: **geen wapen in iemands handen**
-  en **geen HUD**. Uitzoeken of dat klopt of ontbreekt.
+- De opname met UI (moment 8) gaat via `FScreenshotRequest` met `bShowUI`, want
+  `HighResShot` tekent alleen de 3D-scene. **Ook dat pakt de UMG-laag niet mee** —
+  de HUD mount aantoonbaar wel. Wie de HUD op beeld wil, moet een andere weg
+  zoeken; reken er tot die tijd niet op dat een lege hoek iets bewijst.
 
-### 2. TURN-IN-PLACE AFMAKEN
+### 2. ~~TURN-IN-PLACE~~ — STAAT, zie het morgenrapport
 
-De takes zijn aangesloten en de drempel staat op 60 graden, maar het is nooit op
-een frame gezien. Bewijs het met de laag uit taak 1.
+Gemeten en op beeld. Wat er nog ligt: de drempel van 60 graden is bij deze
+bemonstering niet zichtbaar (het lichaam is bij elke opname al bijgedraaid). Als
+je die grens wilt beoordelen, moet de ronde dichter bemonsteren dan elke 2 s.
 
 ### 3. HET KNOPPENSCHEMA PER MODUS (punt 7)
 
