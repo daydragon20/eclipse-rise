@@ -214,6 +214,24 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		// them afterwards, so a drifting line count would write into thin air.
 		TestEqual(TEXT("Header + twenty steps + tally"), Lines.Num(), GuidePanelLineCount);
 
+		// BREEDTE, en niet alleen hoogte. Het paneel rendert de actieve stap op één
+		// regel; een lange verwachting loopt dus van het scherm af in plaats van te
+		// wrappen. Dat is 26-07 gebeurd: ik breidde vier stapteksten uit met wat ik
+		// gemeten had en de langste kwam op 435 tekens. Onzichtbaar in elke test,
+		// want de hoogte klopte nog.
+		//
+		// De grens is gemeten en niet verzonnen: de langste samengestelde regel is
+		// na het inkorten ~200 tekens, en 260 laat ruimte voor een langere stapnaam
+		// zonder dat er iets buiten beeld valt. Wie meer wil vertellen, zet het in
+		// BESTURING.md — de gids is een LIVE hulpmiddel, geen naslagwerk.
+		constexpr int32 MaxPanelLineChars = 260;
+		for (const FString& Line : Lines)
+		{
+			TestTrue(*FString::Printf(TEXT("Paneelregel past op het scherm (%d tekens, max %d): '%s'"),
+					Line.Len(), MaxPanelLineChars, *Line.Left(60)),
+				Line.Len() <= MaxPanelLineChars);
+		}
+
 		TestTrue(TEXT("The header counts within its part"), Lines[0].Contains(TEXT("stap 1/14")));
 		TestTrue(TEXT("The header names the part"), Lines[0].Contains(TEXT("deel 1: controls")));
 		TestTrue(TEXT("The header names the hide key"), Lines[0].Contains(TEXT("[F3]")));
