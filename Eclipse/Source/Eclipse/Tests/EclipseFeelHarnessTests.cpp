@@ -137,7 +137,17 @@ bool FEclipseFeelLayer1Test::RunTest(const FString& Parameters)
 		TestTrue(TEXT("laag 1: de camera-probe is minstens zo groot als de capsule-radius (CAM-06)"),
 			Boom->ProbeSize >= Harness.Body->GetCapsuleComponent()->GetScaledCapsuleRadius() * 0.55f);
 		CheckFloat(TEXT("camera-lag snelheid"), Boom->CameraLagSpeed, T.CameraLagSpeed);
-		CheckFloat(TEXT("camera-lag klem (S1)"), Boom->CameraLagMaxDistance, T.CameraLagMaxDistance);
+		// De regressiebewaker voor de duurste vondst van de nacht. De camera-blend
+	// vraagt zichzelf aan met SetActorTickEnabled(true), en dat is een NO-OP als
+	// bCanEverTick uit staat — precies wat er stond. Drie zichtbare features waren
+	// daardoor dood terwijl alles groen was en de code klopte. Deze regel kost
+	// niets en vangt exact die terugval.
+	TestTrue(TEXT("laag 1: de camera-blend KAN zijn tick krijgen (bCanEverTick staat aan)"),
+		Harness.Body->PrimaryActorTick.bCanEverTick);
+	TestFalse(TEXT("laag 1: maar hij tikt niet uit zichzelf (12.4: alleen tijdens een blend)"),
+		Harness.Body->PrimaryActorTick.bStartWithTickEnabled);
+
+	CheckFloat(TEXT("camera-lag klem (S1)"), Boom->CameraLagMaxDistance, T.CameraLagMaxDistance);
 		TestTrue(TEXT("laag 1: de camera-lag-klem is gezet (zonder klem schaalt het personage met snelheid — S1)"),
 			Boom->CameraLagMaxDistance > 0.0f);
 		TestTrue(TEXT("laag 1: de boom botst met muren"), Boom->bDoCollisionTest);
