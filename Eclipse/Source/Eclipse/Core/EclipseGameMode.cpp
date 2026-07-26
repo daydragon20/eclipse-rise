@@ -348,6 +348,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 	PlayShotLastCamera = CameraLocation;
 
 	const APawn* PlayerPawn = Controller->GetPawn();
+	int32 SquadDrawnNearby = 0;
 	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
 	{
 		const AEclipseCharacter* Body = *It;
@@ -367,6 +368,17 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		// dat is precies het gat waar de owner op wees: "je tests bewijzen dat de
 		// code doet wat de code zegt, niet dat het resultaat zichtbaar wordt".
 		// WasRecentlyRendered() vraagt het aan de renderer zelf.
+		// MEEGEKOMEN, EN TE ZIEN. De suite bewijst dat de squad volgt: de verste
+		// soldaat gaat van 2326 naar 779 cm. Dat is wereldruimte, en precies het
+		// soort bewijs waarvan vandaag bleek dat het niets zegt over het scherm.
+		// Een squad die volgt maar nooit in beeld komt, is voor de speler geen
+		// squad. Alleen lichamen die de renderer ECHT getekend heeft tellen mee.
+		if (Body != PlayerPawn && Mesh->WasRecentlyRendered(0.2f)
+			&& FVector::Dist(CameraLocation, Body->GetActorLocation()) < 1500.0f)
+		{
+			++SquadDrawnNearby;
+		}
+
 		if (Body == PlayerPawn)
 		{
 			// Wapenstatus erbij. Op het eerste beeld met UI stond er geen
@@ -453,6 +465,24 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 			Mesh->bHiddenInGame ? 1 : 0,
 			Mesh->bOwnerNoSee ? 1 : 0,
 			Mesh->WasRecentlyRendered(0.2f) ? 1 : 0);
+	}
+
+	ReportSquadInFrame(ShotIndex, SquadDrawnNearby);
+}
+
+void AEclipseGameMode::ReportSquadInFrame(int32 ShotIndex, int32 DrawnNearby)
+{
+	UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SQUAD] %d lichamen getekend binnen 15 m"),
+		ShotIndex, DrawnNearby);
+
+	// Alleen op moment 4 een harde eis: dat is NA het lopen, dus daar moet blijken
+	// dat ze zijn meegekomen. Op moment 1 staan ze er sowieso (net gespawnd) en
+	// vanaf moment 5 zijn ze bewust verborgen voor de isolatie-opname — een eis
+	// daar zou rood worden op iets wat ik zelf doe.
+	if (ShotIndex == 4 && DrawnNearby == 0)
+	{
+		UE_LOG(LogEclipse, Error,
+			TEXT("[PLAYSHOT 4 FOUT] na het lopen staat er geen enkel ander lichaam in beeld — de squad is niet meegekomen"));
 	}
 }
 

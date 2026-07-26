@@ -104,6 +104,9 @@ private:
 	/** De aankleedfiguren zijn geen EclipseCharacter; zonder deze meting blijven ze buiten beeld van elke controle. */
 	void MeasureDressingFigures(int32 ShotIndex);
 
+	/** Staat er na het lopen nog iemand van je squad in beeld? Wereldruimte bewijst dat niet. */
+	void ReportSquadInFrame(int32 ShotIndex, int32 DrawnNearby);
+
 	/**
 	 * Playtest shortcut (13.2 owner finding): -EclipseStartMission=<RegionId>
 	 * selects that region's offer and auto-launches, so a feel-gauntlet run does
