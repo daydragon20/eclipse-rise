@@ -1,6 +1,7 @@
 #include "Combat/EclipseHitscanWeaponComponent.h"
 
 #include "Characters/EclipseCharacter.h"
+#include "Characters/EclipsePlayerController.h"
 #include "Eclipse.h"
 #include "Components/SphereComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
@@ -115,6 +116,18 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 		}
 	}
 	++ConsecutiveShots;
+
+	// Terugslag naar de BESTUURDER, niet naar het wapen: het kruis moet omhoog, en
+	// dat is een eigenschap van kijken. Alleen voor de speler — een vijand die
+	// zijn eigen mikpunt omhoog duwt zou alleen zichzelf in de weg zitten.
+	if (const AEclipseCharacter* ShooterBody = Cast<AEclipseCharacter>(GetOwner()))
+	{
+		if (AEclipsePlayerController* PC = Cast<AEclipsePlayerController>(ShooterBody->GetController()))
+		{
+			PC->AddRecoil(Weapon.RecoilPitchDegrees, Weapon.RecoilYawDegrees,
+				Weapon.RecoilRecoveryDegreesPerSecond);
+		}
+	}
 
 	FVector ShotDirection = ViewDirection.GetSafeNormal();
 	if (SpreadDegrees > 0.0f)

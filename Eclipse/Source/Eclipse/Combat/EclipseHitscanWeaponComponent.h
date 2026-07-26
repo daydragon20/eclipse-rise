@@ -46,6 +46,8 @@ public:
 	 * hoort vóór de gedragswijziging, niet erna.
 	 */
 	int32 GetShotsFired() const { return ShotsFired; }
+	float GetRecoilPitchDegrees() const { return Weapon.RecoilPitchDegrees; }
+	float GetRecoilRecoveryDegreesPerSecond() const { return Weapon.RecoilRecoveryDegreesPerSecond; }
 
 private:
 	int32 ShotsFired = 0;

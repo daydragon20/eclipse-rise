@@ -863,6 +863,74 @@ void AEclipsePlayerController::SetupInputComponent()
 	}
 }
 
+void AEclipsePlayerController::PlayerTick(float DeltaSeconds)
+{
+	// VÓÓR Super, en dat is het hele punt. APlayerController::TickActor wist
+	// RotationInput aan het EIND van de actor-tick, dus kijkinvoer die ná
+	// Super::PlayerTick wordt toegevoegd verdwijnt voordat hij ooit is toegepast.
+	// Eerst gemeten met het herstel erachter: twintig herstelstappen, en de
+	// kijkrichting bewoog geen duizendste.
+	ApplyRecoil(DeltaSeconds);
+
+	// De vlag hoort hier leeg: Super verwerkt hierna de invoer van dit frame en
+	// zet hem opnieuw als de speler zelf kijkt. Het herstel loopt dus één frame
+	// achter op de speler — 16 ms, en dat is de prijs voor de volgorde hierboven.
+	bLookedThisFrame = false;
+
+	Super::PlayerTick(DeltaSeconds);
+}
+
+void AEclipsePlayerController::ApplyRecoil(float DeltaSeconds)
+{
+	// Openstaande schoppen eerst. Een schot dat uit een timer komt (automatisch
+	// vuur) valt op een willekeurig moment in het frame, soms ná de tick van deze
+	// controller; door het als TEGOED te bewaren in plaats van meteen te duwen,
+	// landt elke schop even hard, ongeacht waar hij vandaan kwam.
+	if (!FMath::IsNearlyZero(PendingRecoilKickPitch) || !FMath::IsNearlyZero(PendingRecoilKickYaw))
+	{
+		AddPitchInput(PendingRecoilKickPitch);
+		AddYawInput(PendingRecoilKickYaw);
+		PendingRecoilKickPitch = 0.0f;
+		PendingRecoilKickYaw = 0.0f;
+		return;
+	}
+
+	// Herstel. Alleen als de speler NIET zelf kijkt: anders vecht het spel tegen
+	// zijn correctie in, en dan voelt terugslag als een defect in plaats van als
+	// een wapen dat trapt.
+	if (PendingRecoilPitch > KINDA_SMALL_NUMBER && !bLookedThisFrame && RecoilRecoveryRate > 0.0f)
+	{
+		const float Step = FMath::Min(PendingRecoilPitch, RecoilRecoveryRate * DeltaSeconds);
+		PendingRecoilPitch -= Step;
+		// Omlaag: de schop ging omhoog, dus het herstel gaat de andere kant op.
+		// In GRADEN, niet in muisschaal — AddPitchInput telt rechtstreeks bij de
+		// kijkrotatie op (nagemeten 26-07: 0,5 doorgeven gaf 0,500 graden).
+		AddPitchInput(-Step);
+	}
+}
+
+void AEclipsePlayerController::AddRecoil(float PitchDegrees, float YawDegrees, float RecoveryDegreesPerSecond)
+{
+	if (PitchDegrees <= 0.0f && YawDegrees <= 0.0f)
+	{
+		return;
+	}
+
+	PendingRecoilKickPitch += PitchDegrees;
+	if (YawDegrees > 0.0f)
+	{
+		// Horizontaal willekeurig binnen de uitslag: een vast patroon zou je uit je
+		// hoofd kunnen leren, en dan is het geen terugslag meer maar een dans.
+		PendingRecoilKickYaw += FMath::FRandRange(-YawDegrees, YawDegrees);
+	}
+
+	// Het onverwerkte deel wordt onthouden zodat het TERUG kan. Alleen de pitch:
+	// de zijwaartse tik is willekeurig en zou terugdraaien tot een tweede,
+	// even willekeurige beweging maken — dat leest als drift, niet als herstel.
+	PendingRecoilPitch += PitchDegrees;
+	RecoilRecoveryRate = RecoveryDegreesPerSecond;
+}
+
 void AEclipsePlayerController::HandleMove(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn();
@@ -958,6 +1026,9 @@ UInputAction* AEclipsePlayerController::FindInputAction(FName ActionName) const
 
 void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 {
+	// Zelf kijken pauzeert het terugslagherstel (zie PlayerTick).
+	bLookedThisFrame = true;
+
 	// Ver genoeg wegkijken draait het lichaam alsnog mee (locomotie-audit 26-07).
 	//
 	// Sinds het camera-relatieve model volgt het lichaam de camera alleen tijdens

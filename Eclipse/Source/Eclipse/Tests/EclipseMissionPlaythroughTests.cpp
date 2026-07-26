@@ -2900,4 +2900,87 @@ bool FEclipseAuthoredSpawnsAreConsumedTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+/**
+ * TERUGSLAG (owner-opdracht 26-07 avond, punt 4). Twee dingen moeten waar zijn en
+ * ze staan haaks op elkaar: het wapen moet je kruis omhoog DUWEN, en dat duwtje
+ * moet vanzelf TERUGZAKKEN. Zonder het eerste is stabiliteit een dood veld;
+ * zonder het tweede is terugslag alleen straf.
+ *
+ * Gemeten met de DMR, want die heeft de grootste uitslag in de data (1,8 graden)
+ * en het traagste herstel (3,0 graden/s) — als de klim daar niet te zien is, is
+ * hij nergens te zien.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseRecoilKicksAndRecovers,
+	"Eclipse.Mission.Playthrough.RecoilKicksAndRecovers",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseRecoilKicksAndRecovers::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("terugslag: strategie"), Strategy) || !TestNotNull(TEXT("terugslag: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("terugslag: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UEclipseHitscanWeaponComponent* Weapon = Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (!TestNotNull(TEXT("terugslag: de speler heeft een wapen"), Weapon))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const float KickDegrees = Weapon->GetRecoilPitchDegrees();
+	const float RecoveryRate = Weapon->GetRecoilRecoveryDegreesPerSecond();
+	Report(*this, TEXT("uitslag uit de data"), KickDegrees, TEXT("graden/schot"));
+	Report(*this, TEXT("herstel uit de data"), RecoveryRate, TEXT("graden/s"));
+
+	// --- 1. duwt het schot het kruis omhoog? -------------------------------
+	Harness.Idle(0.2f);
+	const float PitchBefore = Harness.Controller->GetControlRotation().Pitch;
+	Harness.Inject(TEXT("Fire"), true);
+	Harness.Step();
+	Harness.Inject(TEXT("Fire"), false);
+	Harness.Step();
+	const float PitchAfterShot = Harness.Controller->GetControlRotation().Pitch;
+
+	// Omhoog kijken is een POSITIEVE pitch in de besturing (de invoer wordt
+	// omgekeerd doorgegeven). Genormaliseerd, want 0/360 ligt er vlakbij.
+	const float Climb = FRotator::NormalizeAxis(PitchAfterShot - PitchBefore);
+	Report(*this, TEXT("gemeten klim na één schot"), Climb, TEXT("graden"),
+		*FString::Printf(TEXT("data zegt %.2f"), KickDegrees));
+	TestTrue(TEXT("terugslag: het schot duwt het kruis omhoog"), Climb > 0.05f);
+
+	// --- 2. zakt het vanzelf terug? ----------------------------------------
+	// Een halve seconde stilstaan zonder kijkinvoer. Bij 3,0 graden/s is dat
+	// ruim genoeg voor 1,8 graden — de klim hoort helemaal weg te zijn.
+	Harness.Idle(1.0f);
+	const float PitchAfterRest = Harness.Controller->GetControlRotation().Pitch;
+	const float Remaining = FRotator::NormalizeAxis(PitchAfterRest - PitchBefore);
+	Report(*this, TEXT("resterende klim na 1 s rust"), Remaining, TEXT("graden"));
+	TestTrue(TEXT("terugslag: het kruis zakt vanzelf terug"), FMath::Abs(Remaining) < FMath::Abs(Climb) * 0.5f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

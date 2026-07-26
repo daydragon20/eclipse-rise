@@ -54,10 +54,20 @@ public:
 	bool IsSprinting() const { return bSprinting; }
 	bool IsSprintLatched() const { return bSprintLatched; }
 
+	/**
+	 * TERUGSLAG (owner-opdracht 26-07 avond, punt 4). Het wapen duwt je kruis
+	 * omhoog; de stabiliteit uit DT_Weapons bepaalt hoe snel het terugzakt.
+	 * Aangeroepen door het wapencomponent, want alleen dat weet welk profiel er
+	 * vuurt.
+	 */
+	void AddRecoil(float PitchDegrees, float YawDegrees, float RecoveryDegreesPerSecond);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupInputComponent() override;
+	virtual void PlayerTick(float DeltaSeconds) override;
+
 
 private:
 	void HandleMove(const struct FInputActionValue& Value);
@@ -145,6 +155,25 @@ private:
 	 * draai-animatie in de packs zit; nu zouden de voeten te vaak schuiven.
 	 */
 	static constexpr float IdleTurnThresholdDegrees = 90.0f;
+
+	/**
+	 * TERUGSLAG (owner-opdracht 26-07 avond, punt 4). Het wapen duwt je kruis
+	 * omhoog; de stabiliteit uit DT_Weapons bepaalt hoe snel het terugzakt.
+	 *
+	 * Het onverwerkte deel wordt onthouden zodat het TERUG kan: zonder dat is
+	 * terugslag alleen straf, en "stabiliteit" een getal zonder betekenis. De
+	 * herstelbeweging stopt zodra jij zelf kijkt — anders vecht het spel tegen je
+	 * eigen correctie in, en dat is precies waar spelers terugslag om haten.
+	 */
+
+
+	void ApplyRecoil(float DeltaSeconds);
+
+	float PendingRecoilKickPitch = 0.0f;
+	float PendingRecoilKickYaw = 0.0f;
+	float PendingRecoilPitch = 0.0f;
+	float RecoilRecoveryRate = 0.0f;
+	bool bLookedThisFrame = false;
 
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
 
