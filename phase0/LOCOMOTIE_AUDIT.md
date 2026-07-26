@@ -39,6 +39,41 @@ dat er expliciet bij in plaats van dat er een getal verschijnt.
 
 ---
 
+## Ronde 2 — 26-07-2026, avond
+
+*Alleen de rijen die veranderd zijn. De rest staat onveranderd in ronde 1.*
+
+| # | Onderdeel | Ronde 1 | Nu | Oordeel |
+|---|---|---|---|---|
+| 5 | **Draaien in stilstand** | Drempel er, animatie niet | **Correctie op mezelf: de animatie BESTAAT.** Ik keek in SciFiCharacter, maar de speler is Belica — en ParagonLtBelica levert `Idle_Turn_90_Left/Right`, `Idle_Turn_180_Left/Right` en drie `TurnInPlace`-varianten | **Niet geblokkeerd. Ik had het ten onrechte doodverklaard** |
+| 14 | **Mikken tijdens bewegen** | Geen straf | **145 cm/s als PLAFOND**, niet als factor. Trager dan wandelen (180), zoals de owner besliste | Was een omissie, **gerepareerd** |
+| 15 | **Animatie per overgang** | Alleen idle/gang/klap/schot | Sinds vandaag ook **hurkovergang** en **herladen**; nog steeds geen start-, stop- of landtake | Half — en de draaitake is nu wél bereikbaar (zie 5) |
+
+**Nieuw punt dat ronde 1 niet had:**
+
+| # | Onderdeel | Referentie | Wij (gemeten) | Oordeel |
+|---|---|---|---|---|
+| 16 | **Hoor je waar je loopt?** | Universeel oppervlakgebonden voetstappen | **Beton op het plein, metaal op de dekkingsblokken**, zeven varianten per oppervlak. Er was geen enkel oppervlaktetype in het project | Was er niet, **vandaag gebouwd** |
+
+---
+
+## De stand na ronde 2
+
+Van de vier omissies uit ronde 1 zijn er twee weg (14 en deels 15), één is een
+**fout van mij gebleken** (5 — de animatie was er wel), en één is nog steeds
+assetwerk (3: vijf lichamen zonder zijcycli).
+
+**De les uit rij 5 is groter dan de rij zelf.** Ik verklaarde een taak dood op
+grond van een zoekopdracht in de verkeerde map, schreef dat als comment in de
+kijkcode ("nagekeken: geen enkele Turn_*-take"), en die comment werd daarna de
+reden dat de drempel op 90 graden bleef staan. Een verkeerde bevinding die zich
+vastzet in een comment is erger dan geen bevinding: hij ziet eruit als iets wat
+al onderzocht is.
+
+**Wat ik daaraan verander:** een "bestaat niet"-conclusie hoort te zeggen WAAR ik
+gekeken heb. "Geen Turn_*-take in SciFiCharacter" was waar geweest; "geen enkele
+Turn_*-take" was het niet.
+
 ## Wat ik hiervan zelf repareer
 
 **Vandaag gedaan:** 1 (oriëntatie), 5 (drempel van 90°), 12 (landingsdip), 13
