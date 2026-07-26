@@ -37,7 +37,7 @@ Vier dingen, want "de tests zijn groen" bewijst niet dat een document klopt.
 
 ## 1. Wat is af en gemeten — met de getallen
 
-**De testharnas draait.** Laag 1 leest na het spawnen de daadwerkelijk toegepaste waarden van het movement component en de camera en legt ze naast `DA_CharacterTuning` — 19 velden, allemaal gelijk. Laag 2 injecteert input via Enhanced Input, op dezelfde `UInputAction`-objecten die jouw controller aanstuurt, en meet over tijd. Alles headless, in de suite, elke ronde mee.
+**De testharnas draait.** Laag 1 leest na het spawnen de daadwerkelijk toegepaste waarden van het movement component en de camera en legt ze naast `DA_CharacterTuning` — élk veld dat wordt toegepast, allemaal gelijk. (Geen aantal hier: de lijst groeide vannacht mee met de tuning, en dit stond op 19 terwijl het er inmiddels meer zijn. De test is de bron.) Laag 2 injecteert input via Enhanced Input, op dezelfde `UInputAction`-objecten die jouw controller aanstuurt, en meet over tijd. Alles headless, in de suite, elke ronde mee.
 
 | Meting | Gemeten | Was | Referentie |
 |---|---|---|---|
