@@ -282,10 +282,26 @@ void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
 			Clip->IsValidAdditive() ? TEXT("ADDITIEF") : TEXT("volledige pose"),
 			Clip->GetPlayLength());
 	}
-	// Half gewicht: draaien is een beweging van het onderlichaam en mag een
-	// schietpose of een klap niet overrulen. En de duur uit de take zelf, want
-	// die weet hoe lang hij is.
-	PlayOneShotPose(Clip, FMath::Max(Clip->GetPlayLength(), 0.15f), 0.85f, TEXT("draaien"));
+	// NIET de lengte van de take, en dat is 26-07 laat gemeten.
+	//
+	// Idle_Turn_90_Right duurt 4,00 s. De gewichtscurve is sin(alpha*PI), dus het
+	// piekgewicht van 0,85 valt op t=2,00 s — precies waar de take al is
+	// uitgezakt (heuptwist 3,4 gr, tegen een piek van 34,8 gr rond t=0,80). En
+	// omdat een volledige pose de andere samples schaalt met 1-gewicht, zakt de
+	// loopcyclus daar terug naar 15%. Gevolg: na elke draai loop je seconden lang
+	// nauwelijks, terwijl de draaibeweging zelf op half gewicht voorbijkwam.
+	//
+	// Nagemeten over alle tien de Turn-takes in ParagonLtBelica: GEEN ENKELE
+	// draagt netto rotatie (0,0-3,5 gr). Het zijn voetenschuifels die bij een
+	// extern aangedreven draai horen — precies wat wij doen — maar ze zijn
+	// geauthord op 2,7 tot 5,0 s.
+	//
+	// 0,8 s is de bovenkant van waar de referentie een kwartslag-draai in
+	// stilstand legt (Gears, The Division: 0,4-0,8 s). De blend loopt op nul af,
+	// dus afkappen geeft geen sprong: sin(PI) is nul, ongeacht waar de take dan
+	// staat.
+	const float TurnPoseSeconds = FMath::Min(Clip->GetPlayLength(), 0.8f);
+	PlayOneShotPose(Clip, FMath::Max(TurnPoseSeconds, 0.15f), 0.85f, TEXT("draaien"));
 }
 
 void AEclipseCharacter::PlayHitReactPose()

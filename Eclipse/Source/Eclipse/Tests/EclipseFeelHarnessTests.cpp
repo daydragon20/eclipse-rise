@@ -20,6 +20,8 @@
 #include "Characters/EclipseAnimInstance.h"
 #include "EngineUtils.h"
 #include "Strategy/EclipseStrategySubsystem.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/IAssetRegistry.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Characters/EclipseCommandModeComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -2494,6 +2496,178 @@ bool FEclipseEveryPadButtonIsDescribedTest::RunTest(const FString& Parameters)
 		LeftTrigger.Num(), 1);
 
 	Harness.Shutdown();
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// Waar in de draaitake zit de draai?
+// ---------------------------------------------------------------------------
+//
+// Locomotie-audit ronde 3: Idle_Turn_90_Right is 4,00 s lang en de pose wordt
+// precies zo lang aangehouden, terwijl het lichaam zijn draai in een fractie
+// daarvan rond is. De referentie zit op 0,4-0,8 s voor een kwartslag.
+//
+// De audit liet het afkappunt bewust open, omdat het afhangt van WAAR in die
+// 4,00 s de rotatie zit — en dat was niet gemeten. Een getal kiezen zonder die
+// meting is precies de fout die de audit moet vinden. Dit is die meting: sampel
+// de heup over de duur van de take en kijk wanneer de draai af is.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseWhereIsTheTurnInTheTakeTest,
+	"Eclipse.Feel.Input.WhereIsTheTurnInTheTake",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseWhereIsTheTurnInTheTakeTest::RunTest(const FString& Parameters)
+{
+	const UDataTable* Bodies = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_BodyDefs.DT_BodyDefs"));
+	if (!TestNotNull(TEXT("draaitake: DT_BodyDefs"), Bodies))
+	{
+		return false;
+	}
+
+	const FEclipseBodyDefRow* PlayerRow = Bodies->FindRow<FEclipseBodyDefRow>(TEXT("Player"), TEXT("TurnTiming"));
+	if (!TestNotNull(TEXT("draaitake: rij Player"), PlayerRow))
+	{
+		return false;
+	}
+	UAnimSequence* Turn = PlayerRow->TurnRightAnim.LoadSynchronous();
+	if (!TestNotNull(TEXT("draaitake: de speler heeft een draaitake"), Turn))
+	{
+		return false;
+	}
+
+	const float Length = Turn->GetPlayLength();
+	AddInfo(FString::Printf(TEXT("GEMETEN  take %s duurt %.2f s"), *Turn->GetName(), Length));
+
+	// De HEUP draagt de draai bij een turn-in-place; de root staat bij deze takes
+	// meestal stil. Beide gemeten, want als de root wel meedraait telt die mee en
+	// zou alleen de heup een te kleine hoek geven.
+	const USkeleton* Skeleton = Turn->GetSkeleton();
+	if (!TestNotNull(TEXT("draaitake: skelet"), Skeleton))
+	{
+		return false;
+	}
+	const FReferenceSkeleton& RefSkeleton = Skeleton->GetReferenceSkeleton();
+	const int32 PelvisIndex = RefSkeleton.FindBoneIndex(TEXT("pelvis"));
+	if (!TestTrue(TEXT("draaitake: het skelet heeft een 'pelvis'"), PelvisIndex != INDEX_NONE))
+	{
+		return false;
+	}
+
+	auto YawOf = [Turn](int32 BoneIndex, float Time)
+	{
+		FTransform Atom;
+		Turn->GetBoneTransform(Atom, FSkeletonPoseBoneIndex(BoneIndex), static_cast<double>(Time), /*bUseRawData*/ true);
+		return static_cast<float>(Atom.GetRotation().Rotator().Yaw);
+	};
+
+	// WELK BOT DRAAGT DE DRAAI. Eerste versie mat alleen de heup en kreeg 0,0
+	// graden netto terug: de heup twist heen en weer (piek 34,8 gr rond t=0,80)
+	// en staat aan het eind weer recht. De netto draai zit dus ergens anders —
+	// bij een turn-in-place-take is dat de ROOT, als root motion.
+	//
+	// De discriminator in de eerste versie ving dat op ("anders draagt een ander
+	// bot de rotatie"). Zonder die regel had deze test 0,0 graden gerapporteerd
+	// en was dat als bevinding blijven staan.
+	const int32 RootIndex = 0;
+	const float RootNet = FMath::Abs(FMath::FindDeltaAngleDegrees(YawOf(RootIndex, 0.0f), YawOf(RootIndex, Length)));
+	const float PelvisNet = FMath::Abs(FMath::FindDeltaAngleDegrees(YawOf(PelvisIndex, 0.0f), YawOf(PelvisIndex, Length)));
+	AddInfo(FString::Printf(TEXT("GEMETEN  netto over de hele take: root %.1f gr, heup %.1f gr"), RootNet, PelvisNet));
+
+	const int32 CarrierIndex = RootNet >= PelvisNet ? RootIndex : PelvisIndex;
+	const TCHAR* CarrierName = RootNet >= PelvisNet ? TEXT("root") : TEXT("heup");
+	AddInfo(FString::Printf(TEXT("GEMETEN  de draai zit in: %s"), CarrierName));
+
+	auto YawAt = [&YawOf, CarrierIndex](float Time) { return YawOf(CarrierIndex, Time); };
+
+	const float StartYaw = YawAt(0.0f);
+	const float EndYaw = YawAt(Length);
+	const float TotalTurn = FMath::Abs(FMath::FindDeltaAngleDegrees(StartYaw, EndYaw));
+	AddInfo(FString::Printf(TEXT("GEMETEN  %s draait in totaal %.1f graden over de hele take"), CarrierName, TotalTurn));
+
+	// Wanneer is 90% van de draai gedaan? Dat is het afkappunt dat de audit zoekt.
+	float NinetyPercentAt = Length;
+	const int32 Samples = 40;
+	for (int32 Index = 0; Index <= Samples; ++Index)
+	{
+		const float Time = Length * static_cast<float>(Index) / static_cast<float>(Samples);
+		const float Turned = FMath::Abs(FMath::FindDeltaAngleDegrees(StartYaw, YawAt(Time)));
+		if (TotalTurn > 1.0f && Turned >= TotalTurn * 0.9f)
+		{
+			NinetyPercentAt = Time;
+			break;
+		}
+	}
+
+	// Elke tiende seconde in beeld, zodat het afkappunt niet op één getal rust.
+	for (int32 Index = 0; Index <= Samples; Index += 4)
+	{
+		const float Time = Length * static_cast<float>(Index) / static_cast<float>(Samples);
+		AddInfo(FString::Printf(TEXT("GEMETEN  t=%.2f s  gedraaid %.1f gr"),
+			Time, FMath::Abs(FMath::FindDeltaAngleDegrees(StartYaw, YawAt(Time)))));
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  90%% van de draai is klaar op t=%.2f s (%.0f%% van de take)"),
+		NinetyPercentAt, 100.0f * NinetyPercentAt / Length));
+
+	// Een nulmeting is geen bevinding: als de heup helemaal niet draait, meet ik
+	// het verkeerde bot en zegt het afkappunt hierboven niets.
+	// ALLE draaitakes van de speler langs dezelfde meetlat. De gekozen take
+	// blijkt netto niets te draaien, en dan is de vraag niet "welke duur" maar
+	// "bestaat er uberhaupt een take die WEL draait". Een "bestaat niet" moet
+	// zeggen waar je gekeken hebt, dus dit kijkt in het hele pack in plaats van
+	// naar de ene take die toevallig gekozen was.
+	IAssetRegistry& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+	TArray<FAssetData> Candidates;
+	Registry.GetAssetsByPath(TEXT("/Game/ParagonLtBelica"), Candidates, /*bRecursive*/ true);
+
+	int32 Turners = 0;
+	int32 Examined = 0;
+	for (const FAssetData& Candidate : Candidates)
+	{
+		if (Candidate.AssetClassPath != UAnimSequence::StaticClass()->GetClassPathName())
+		{
+			continue;
+		}
+		const FString Name = Candidate.AssetName.ToString();
+		if (!Name.Contains(TEXT("Turn")))
+		{
+			continue;
+		}
+		UAnimSequence* Take = Cast<UAnimSequence>(Candidate.GetAsset());
+		if (Take == nullptr || Take->GetSkeleton() == nullptr)
+		{
+			continue;
+		}
+		const int32 Pelvis = Take->GetSkeleton()->GetReferenceSkeleton().FindBoneIndex(TEXT("pelvis"));
+		if (Pelvis == INDEX_NONE)
+		{
+			continue;
+		}
+		++Examined;
+		const float TakeLength = Take->GetPlayLength();
+		auto NetOf = [Take, TakeLength](int32 Bone)
+		{
+			FTransform First;
+			FTransform Last;
+			Take->GetBoneTransform(First, FSkeletonPoseBoneIndex(Bone), 0.0, true);
+			Take->GetBoneTransform(Last, FSkeletonPoseBoneIndex(Bone), static_cast<double>(TakeLength), true);
+			return FMath::Abs(FMath::FindDeltaAngleDegrees(
+				static_cast<float>(First.GetRotation().Rotator().Yaw),
+				static_cast<float>(Last.GetRotation().Rotator().Yaw)));
+		};
+		const float Net = FMath::Max(NetOf(0), NetOf(Pelvis));
+		if (Net > 10.0f)
+		{
+			++Turners;
+		}
+		AddInfo(FString::Printf(TEXT("GEMETEN  %-34s %5.2f s  netto %5.1f gr%s"),
+			*Name, TakeLength, Net, Net > 10.0f ? TEXT("  <- DRAAIT") : TEXT("")));
+	}
+
+	// Zonder discriminator zegt "0 draaiende takes" niets: als er nul takes
+	// onderzocht zijn, is de uitkomst een eigenschap van de zoekopdracht.
+	TestTrue(TEXT("draaitake: er zijn draaitakes gevonden om te onderzoeken"), Examined > 0);
+	AddInfo(FString::Printf(TEXT("GEMETEN  %d van %d Turn-takes in ParagonLtBelica draaien netto"), Turners, Examined));
+
 	return true;
 }
 

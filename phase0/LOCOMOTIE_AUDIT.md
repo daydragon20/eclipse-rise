@@ -176,7 +176,57 @@ verificatie gaf, en punt 5 hieronder is er niet los van te zien.
 | 5 | **Draaien in stilstand** | Drempel er, take gevonden maar niet aangesloten | Drempel 60°, take resolvet, en op beeld: camera 118,4° / lichaam 118,4° / verschil 0,0°. De speler heeft de draaipose (`Idle_Turn_90_Right`, **volledige pose**, niet additief) | **Gesloten voor de speler** — met een kanttekening, zie hieronder |
 | 15 | **Animatie per overgang** | Idle/gang/klap/schot + hurkovergang + herladen | Ongewijzigd. Nog steeds geen start-, stop- of landtake | Half, ongewijzigd |
 
-### De kanttekening bij punt 5: de take duurt 4,00 seconden
+### CORRECTIE OP DEZE RONDE, een uur later
+
+Hierboven staat punt 5 als **"gesloten voor de speler"**. Dat was te snel, en de
+meting die het weerlegt is dezelfde avond gedaan.
+
+De grond onder "gesloten" was: camera 118,4° en lichaam 118,4°, dus het lichaam
+draait mee. Dat klopt — maar die rotatie komt van de **actor**, niet van de
+animatie. Ik heb de draai van het lichaam gemeten en daaruit geconcludeerd dat de
+draai-*animatie* werkte. Dat zijn twee dingen.
+
+Nagemeten in de take zelf: **geen van de tien `Turn`-takes in ParagonLtBelica
+draagt netto rotatie.**
+
+| Take | Duur | Netto draai |
+|---|---|---|
+| `Idle_Turn_90_Right` | 4,00 s | 0,0° |
+| `Idle_Turn_90_Left` | 3,00 s | 0,0° |
+| `Idle_Turn_180_Left` | 4,33 s | 1,1° |
+| `Idle_Turn_180_Right` | 2,67 s | 0,0° |
+| `Rmb_Targeting_TurnInPlace` | 0,60 s | 0,0° |
+| `Rmb_Targeting_TurnInPlace_180` | 0,60 s | 0,0° |
+| `Rmb_Targeting_Turn_toIdle` | 0,50 s | 3,5° |
+| `RMB_TurnInPlace_Fast/Slow/Zero` | 5,00 s | 0,1 / 0,0 / 0,0° |
+
+Dat is **geen defect in de takes**: dit is voetenschuifel-materiaal dat hoort bij
+een draai die van buitenaf wordt aangedreven — precies wat wij doen. De naam
+`Idle_Turn_90_Right` belooft alleen meer dan hij levert.
+
+**De eerste versie van deze meting mat alleen de heup en kreeg 0,0° terug.** Als
+daar geen discriminator in had gezeten ("anders draagt een ander bot de rotatie")
+was "de heup draait niet" als bevinding blijven staan, terwijl de vraag was *welk
+bot* hem draagt. Het antwoord bleek: geen van beide.
+
+### Het echte defect dat eronder lag: de loopcyclus zakt naar 15%
+
+De take is 4,00 s en de pose werd precies zo lang aangehouden. De gewichtscurve is
+`sin(alpha·π)`, dus het piekgewicht van 0,85 valt op **t = 2,00 s** — en daar is de
+take al uitgezakt (heuptwist 3,4°, tegen een piek van 34,8° rond t = 0,80).
+
+En omdat een volledige pose de andere samples schaalt met `1 − gewicht`, betekent
+dat: **na elke draai zakt je loopcyclus seconden lang terug naar 15%**, terwijl de
+draaibeweging zelf op half gewicht voorbijkwam. Precies omgekeerd aan de bedoeling.
+
+**Gerepareerd:** de duur is begrensd op **0,8 s** — de bovenkant van waar de
+referentie een kwartslag-draai in stilstand legt (Gears, The Division: 0,4–0,8 s).
+Afkappen geeft geen sprong, want de blend loopt sowieso op nul af (`sin(π)` = 0).
+
+Wat hiermee NIET is opgelost: de draai-animatie blijft een schuifel zonder eigen
+rotatie. Dat is inherent aan dit materiaal en niet met tuning te verhelpen.
+
+### De oorspronkelijke kanttekening bij punt 5
 
 `Idle_Turn_90_Right` is **4,00 s** lang, en de pose wordt precies zo lang
 aangehouden — `PlayOneShotPose` neemt de lengte van de take zelf. Het lichaam is
