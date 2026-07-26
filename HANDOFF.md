@@ -5,7 +5,7 @@
 
 # AVONDRAPPORT — 26 juli 2026
 
-**Bar: build ✓ (-NoUba) · 151/151 tests · validatie 6 validators / 0 fouten.**
+**Bar: build ✓ (-NoUba) · 152/152 tests · validatie 7 validators / 0 fouten · 0 onverklaarde dode velden.**
 
 ## Je hele lijst is af
 
@@ -27,6 +27,13 @@
    2,78× korter geworden en ik kan niet meten of dat lekker is.
 2. **Eén vaste-camera ronde** voor de armaturen, voordat er meer bij komen — dat
    was de afspraak, en ik houd me eraan.
+
+*Daarna doorgewerkt aan wat geen owner nodig had: de squad-audit op ronde 2 (van
+vier omissies naar nul), alle negen lichamen aan een zijwaartse cyclus geholpen
+(het was geen assetwerk — de skeletten zijn compatibel te maken), schade-afval
+gebouwd dat als kenmerk beschreven stond maar niet bestond, en de dode-veldensweep
+drie keer scherper gezet. Eindstand daar: 0 onverklaarde dode velden, 18 met een
+reden erboven.*
 
 
 ## Geland vanavond
