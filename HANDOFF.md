@@ -41,6 +41,8 @@ vinden. Zie hieronder.
 | **Na elke draai zakte je loopcyclus naar 15%.** De draaitake is 4,00 s en werd zo lang aangehouden; het piekgewicht viel op t=2,00 s waar de take al was uitgezakt. | Duur begrensd op 0,8 s (referentie 0,4–0,8 s) |
 | **LT deed nog steeds twee dingen.** De afschaffing van vanochtend was alleen in het commentaar, de tabel en BESTURING.md geland — de `MapKey` stond er nog. | LT draagt nu 1 actie in plaats van 2 |
 | **Een gele engine-waarschuwing liep over je scherm.** Twee directionele lampen streden om "de" zon. | 0 waarschuwingen in het log en weg van het beeld |
+| **Twee voetstapgeluiden bestonden niet.** De code vroeg zeven houtvarianten, het pack levert er vijf — en niets telde die mislukte laadpogingen, want de teller sloeg alleen aan bij een compleet lege bank. De aantallen stonden met de hand in de code; de lader telt nu zelf. | 2 mislukte laadpogingen per start → **0**; en vier van de zes oppervlakken hebben nu méér varianten |
+| **CommonUI draaide in een configuratie die de plugin zelf ongeldig noemt** — "Input routing will not function correctly", als ERROR, bij elke start. Mogelijk de oorzaak van jouw View-knop die niet aankwam. | 0 CommonUI-errors; **jij moet de View-knop nog testen** |
 
 ### Wat ik heb GEZIEN op screenshots
 
@@ -91,6 +93,13 @@ schoten) en de ontbrekende HUD is de opnamemethode. Beide teruggenomen.
    geometrie. Dat een Paragon-rig een mannequin-take schadeloos afspeelt, is niet
    uit een tabel af te lezen — daar moest een beeld voor komen.
 
+7. **Het draait ruim.** 8,4–9,7 ms per frame op jouw 1920×1080 — 103 tot 119 fps,
+   tegen een budget van 16,7 ms. Dit is het eerste tempo-getal uit een écht
+   gerenderd frame; de suite meet 0,80 ms game-thread, maar daar wordt niets
+   getekend.
+8. **Je squad komt mee in beeld**, en niet alleen in de logica: 2 tot 3 lichamen
+   die de renderer daadwerkelijk tekent binnen 15 m, ook na het lopen.
+
 **Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
 laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
 elkaar botsen die twee stijlen. Dat is een art-directie keuze (ÉÉN-STIJL-WET) en
@@ -101,6 +110,11 @@ schot valt, maar er is geen model in de handen.
 
 1. **Spelen** — en dat kan nu. Let vooral op: staat je personage stil goed in
    beeld, en klopt zijn maat als je gaat lopen?
+2. **Probeer de View-knop.** Die opende de gids niet, en de oorzaak lag
+   waarschijnlijk in een CommonUI-configuratie die nu gezet is. Ik kan een gamepad
+   niet headless indrukken, dus dit is het enige stuk dat ik niet zelf kan
+   afvinken. Werkt het nog steeds niet, dan weten we dat het hier níét aan lag —
+   ook dat is winst.
 2. **Drie zinnen laten inspreken** (squad-barks bij autonoom handelen) — kost een
    betaalde generatie, dus jouw keuze. Staat in het kliklijstje.
 3. **Vaste-camera ronde** voor de 13 armaturen voordat er meer bij komen.
