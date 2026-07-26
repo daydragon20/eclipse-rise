@@ -121,6 +121,12 @@ window.PROGRESS_DATA = {
       "Let op de gevolgen: zodra het alarm werkt, verlies je spook-optionals bij elke keer dat je gezien wordt. Dat maakt de missie meteen strenger",
       "Ik heb het niet gekoppeld: wanneer een alarm afgaat is een ontwerpbeslissing, geen tuningwaarde"
     ] },
+    { titel: "Twee van je drie squad-klassen doen niets bijzonders", prio: "later", waarom: "Gevonden door te tellen welke events er tijdens een volledige M1.1 vuren: 11 van de 29. De meeste van de rest horen bij de basis en de campagne, maar een viel op — het klasse-verb-event. Doorgezocht: van de drie signature verbs (Momentum voor Assault, Stabilize voor Medic, Killzone voor Sniper) heeft alleen STABILIZE een code-pad. De andere twee bestaan als tag-identiteit plus getal in DT_ClassDefs (de Sniper heeft zelfs een KillzoneRangeCm van 6000) maar er is geen enkele regel die ze afvuurt. In de code staat het eerlijk als aanstaand specwerk, maar van buiten zie je dat niet: je hebt een squad met drie klassen, en twee ervan gedragen zich als een gewone soldaat.", stappen: [
+      "Niets kapot: de medic werkt echt (auto-triage, met bark en event), en dat is de klasse die het meest opvalt als hij ontbreekt",
+      "De vraag is wanneer Momentum en Killzone aan de beurt zijn. Killzone hangt aan Command Mode (die uitzoom werkt nu pas sinds vannacht), dus daar is het moment logisch",
+      "Mijn aanbeveling: pas na de feedback-laag, net als de stance-splitsing. Een klasse die anders vecht is alleen te beoordelen als je ziet en hoort dat er gevochten wordt",
+      "Ik heb ze niet gebouwd: dat is specwerk met eigen ontwerpkeuzes, geen tuningronde"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",

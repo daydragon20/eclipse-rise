@@ -140,6 +140,20 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	}
 	TestTrue(FString::Printf(TEXT("speelronde: het district staat (%d insertiepunten)"), PlayerStarts), PlayerStarts > 0);
 
+	// --- welke van de 29 events vuren er ooit? ------------------------------
+	// De catalogus bewaakt dat elk gedocumenteerd event ook geïmplementeerd is,
+	// maar niet dat het ooit AFGAAT. Een event dat alleen vanuit een
+	// console-commando vertrekt telt daar mee als geïmplementeerd — zo bleef het
+	// alarm onopgemerkt. Deze ronde speelt M1.1 volledig uit, dus wat hier niet
+	// langskomt, komt in een normale missie niet langs.
+	TSet<FName> SeenEventTags;
+	FEclipseEventSubscriptionHandle AllHandle = Bus->Subscribe(
+		FGameplayTag::RequestGameplayTag(TEXT("Event")),
+		FEclipseEventNativeDelegate::CreateLambda([&SeenEventTags](FGameplayTag Tag, const FInstancedStruct&)
+		{
+			SeenEventTags.Add(Tag.GetTagName());
+		}));
+
 	// --- squad-feiten meeluisteren -----------------------------------------
 	FSquadWatch Watch;
 	FEclipseEventSubscriptionHandle SquadHandle = Bus->Subscribe(
@@ -771,6 +785,18 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 	// getal ook niet suggereren.
 	Report(*this, TEXT("game-thread per tick, gemiddeld"), Harness.AverageStepMs(), TEXT("ms"), TEXT("< 16.7 ms (60 fps-budget, 12.4)"));
 	Report(*this, TEXT("game-thread per tick, slechtste"), Harness.WorstStepMs, TEXT("ms"), TEXT("uitschieters horen bij spawns"));
+	Bus->Unsubscribe(AllHandle);
+	{
+		TArray<FName> Fired = SeenEventTags.Array();
+		Fired.Sort(FNameLexicalLess());
+		for (const FName& Tag : Fired)
+		{
+			AddInfo(FString::Printf(TEXT("event gevuurd: %s"), *Tag.ToString()));
+		}
+		Report(*this, TEXT("verschillende events gevuurd in deze missie"), Fired.Num(), TEXT(""),
+			TEXT("van de 29 in de catalogus — de rest vuurt buiten een missie of nergens"));
+	}
+
 	Report(*this, TEXT("ticks in deze ronde"), Harness.StepCount, TEXT(""));
 	Report(*this, TEXT("gesimuleerde speeltijd"), Harness.ElapsedSeconds, TEXT("s"));
 	TestTrue(FString::Printf(TEXT("speelronde: de game-thread blijft binnen het 60 fps-budget (%.2f ms gemiddeld)"),
