@@ -7,6 +7,11 @@
 
 **Bar: build ✓ (-NoUba) · 136/136 tests · validatie 4 validators / 0 fouten · catalog 31/31.**
 
+*Alle getallen hieronder zijn om 12:05 tegen verse metingen gelegd en klopten alle
+acht. Wil je het zelf nakijken: `python Eclipse/Tools/show_measurements.py [woord]`
+leest ze uit het laatste testlog, en dat is de bron — dit document houdt geen eigen
+kopie bij.*
+
 ## Wat werkt er nu dat gisteren niet werkte
 
 | | Gemeten |
