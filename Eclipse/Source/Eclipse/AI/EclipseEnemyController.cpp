@@ -1,4 +1,6 @@
 #include "AI/EclipseEnemyController.h"
+#include "Eclipse.h"
+#include "Navigation/PathFollowingComponent.h"
 
 #include "Characters/EclipseCharacter.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
@@ -78,7 +80,36 @@ void AEclipseEnemyController::SenseAndAct()
 	}
 
 	SetFocus(Target);
-	MoveToActor(Target, Archetype.EngageRange);
+	// De uitkomstcode meelezen, want AAIController::MoveTo houdt zijn faalreden
+	// voor zich (die gaat naar de VISUAL log). De speelronde meet dat de vijanden
+	// 0,00 cm bewegen terwijl deze regel wél draait; zonder de code erbij is niet
+	// te zien of hij faalt of denkt dat hij er al is. Eén regel, één keer per
+	// vijand per denkbeurt, alleen als er iets misgaat of niets gebeurt.
+	const EPathFollowingRequestResult::Type MoveResult = MoveToActor(Target, Archetype.EngageRange);
+	// Eén keer melden dát hij iemand ziet. Zonder deze regel is "de vijand beweegt
+	// niet" niet te onderscheiden van "de vijand heeft nooit iemand gezien" — en
+	// dat verschil bepaalt of het een defect is of een testopstelling die hem van
+	// buiten zijn waarnemingsbereik uitschakelt.
+	if (!bLoggedFirstContact)
+	{
+		bLoggedFirstContact = true;
+		UE_LOG(LogEclipse, Display, TEXT("Vijand %s: eerste contact op %.0f cm (waarnemingsbereik %.0f, engage-bereik %.0f)."),
+			*GetNameSafe(GetPawn()), GetPawn() != nullptr ? FVector::Dist(GetPawn()->GetActorLocation(), Target->GetActorLocation()) : -1.0f,
+			Archetype.PerceptionRadius, Archetype.EngageRange);
+	}
+
+	// EEN KEER per vijand, op Display. Verbose leek netter maar vraagt een extra
+	// console-commando en maakt het log onbruikbaar groot; een uitkomst die per
+	// denkbeurt herhaalt voegt na de eerste keer niets toe. Zelfde patroon als de
+	// gamepad-actuatieregels in de player controller.
+	if (MoveResult != EPathFollowingRequestResult::RequestSuccessful && !bLoggedMoveOutcome)
+	{
+		bLoggedMoveOutcome = true;
+		UE_LOG(LogEclipse, Display, TEXT("Vijand %s: MoveToActor gaf %s (afstand %.0f, engage-bereik %.0f)."),
+			*GetNameSafe(GetPawn()), *UEnum::GetValueAsString(MoveResult),
+			GetPawn() != nullptr ? FVector::Dist(GetPawn()->GetActorLocation(), Target->GetActorLocation()) : -1.0f,
+			Archetype.EngageRange);
+	}
 
 	if (UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>())
 	{

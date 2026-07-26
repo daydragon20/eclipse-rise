@@ -670,9 +670,11 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 		}
 	}
 
-	// Bewegen de VIJANDEN ook? Zij hadden net zo min navmesh als de squad, en een
-	// vijand die op zijn spawnplek blijft staan maakt van het gevecht een
-	// schiettent. De positie is vastgelegd vóór het oprukken; nu de vergelijking.
+	// Bewegen de VIJANDEN ook? Let op bij het lezen: 0 is hier de VERWACHTE uitkomst
+	// en geen defect. Deze ronde vuurt vanaf 4200 cm terwijl hun waarnemingsbereik
+	// 2500-3000 is, dus ze zien nooit iemand — bewezen met een eerste-contactregel
+	// die nul keer vuurde. Het getal staat er om de dag dat iemand de bereiken
+	// verandert: gaat de speler dichterbij vechten, dan hoort dit omhoog te gaan.
 	{
 		int32 Moved = 0;
 		float BestMove = 0.0f;
@@ -691,7 +693,7 @@ bool FEclipseMissionPlaythroughTest::RunTest(const FString& Parameters)
 			}
 		}
 		Report(*this, TEXT("vijanden die van hun spawnplek kwamen"), Moved, TEXT(""),
-			*FString::Printf(TEXT("van %d — stilstaande vijanden maken er een schiettent van"), HostileStartPositions.Num()));
+			*FString::Printf(TEXT("van %d — 0 betekent hier NIET 'kapot': deze ronde schakelt ze uit van buiten hun waarnemingsbereik, dus ze zien nooit iemand"), HostileStartPositions.Num()));
 		Report(*this, TEXT("grootste vijandbeweging"), BestMove, TEXT("cm"));
 	}
 

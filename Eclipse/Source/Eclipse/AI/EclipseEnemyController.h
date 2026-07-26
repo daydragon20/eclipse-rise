@@ -34,4 +34,11 @@ private:
 
 	FEclipseEnemyArchetypeRow Archetype;
 	FTimerHandle ThinkTimer;
+
+	/** Eén regel per vijand over een mislukte verplaatsing; daarna zwijgt hij.
+	 *  Een uitkomst die per denkbeurt herhaalt voegt na de eerste keer niets toe. */
+	bool bLoggedMoveOutcome = false;
+
+	/** Idem voor het eerste moment dat hij iemand ziet. */
+	bool bLoggedFirstContact = false;
 };
