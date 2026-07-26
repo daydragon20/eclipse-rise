@@ -818,12 +818,11 @@ void AEclipsePlayerController::SetupInputComponent()
 		{ SelectPrevAction,    EclipseTestGuide::EEclipseGuideSignal::SelectPrev,  true },
 		{ DirectPickAction,    EclipseTestGuide::EEclipseGuideSignal::DirectPick,  true },
 		{ StanceToggleAction,  EclipseTestGuide::EEclipseGuideSignal::Stance,      true },
-		// All four order keys answer the one "orders" step; the step is about the
-		// order path working, not about which of the four you happened to press.
-		{ OrderActions[0],     EclipseTestGuide::EEclipseGuideSignal::Order },
-		{ OrderActions[1],     EclipseTestGuide::EEclipseGuideSignal::Order },
-		{ OrderActions[2],     EclipseTestGuide::EEclipseGuideSignal::Order },
-		{ OrderActions[3],     EclipseTestGuide::EEclipseGuideSignal::Order }
+		// De vier orderknoppen staan hier NIET meer (26-07): ze lopen alle vier door
+		// IssueSquadOrder, en dat is nu de plek die het signaal meldt. Zouden ze
+		// hier blijven staan, dan meldde één druk twee keer — en NoteSignal roept
+		// AdvanceActive() aan, dus dat had niet "één keer te veel" gekost maar een
+		// overgeslagen gidsstap. Dat is precies de fout die deze gids moet vinden.
 	};
 
 	for (const FGuideSignalBinding& Binding : GuideSignals)
@@ -1376,6 +1375,23 @@ void AEclipsePlayerController::IssueSquadOrder(EEclipseSquadOrder Order)
 	if (Squad == nullptr)
 	{
 		return;
+	}
+
+	// De gids ziet ELKE order, niet alleen de vier d-pad-toetsen (26-07).
+	//
+	// Tweede geval van hetzelfde patroon als bij ToggleView, gevonden door na die
+	// eerste de rest van de tabel na te lopen in plaats van te wachten tot het
+	// opviel. Sinds X buiten Command Mode een hergroepeer-order geeft, liep die
+	// weg om de bindingtabel heen: je squad kwam naar je toe en de gidsstap
+	// "orders" bleef onafgevinkt.
+	//
+	// Hier, op het feit, en niet bij de knoppen. De vier d-pad-regels zijn uit de
+	// bindingtabel gehaald: ze lopen alle vier hierlangs, en twee meldingen op één
+	// druk zouden een gidsstap OVERSLAAN — NoteSignal roept AdvanceActive() aan.
+	// Dat had ik bijna over het hoofd gezien met "hooguit één keer te veel".
+	if (MissionHud != nullptr && MissionHud->IsInViewport())
+	{
+		MissionHud->NoteGuideSignal(EclipseTestGuide::EEclipseGuideSignal::Order);
 	}
 
 	FVector AimLocation = GetPawn() != nullptr ? GetPawn()->GetActorLocation() : FVector::ZeroVector;
