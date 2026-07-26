@@ -1386,4 +1386,112 @@ bool FEclipseCommandModeGateTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Twee camerabeloftes die de gids doet en die niemand had nagemeten.
+//
+// De F3-gids belooft bij '1e/3e persoon': "de camera schuift in ~0,2s naar je
+// ogen". Bij 'mikken': "de camera trekt in en de FOV versmalt zolang je hem
+// vasthoudt". Allebei staat er een getal of een richting in, en van allebei was
+// er geen enkele test — de controletabel controleerde alleen of de BINDING
+// bestond, niet of er iets gebeurt als je hem gebruikt.
+//
+// Bij het schrijven hiervan bleek de gidstekst voor 1e persoon bovendien
+// verouderd ("je ziet je eigen lichaam niet meer"), terwijl de code sinds de
+// playtest van de owner juist alleen het HOOFD verbergt. Die tekst is
+// gecorrigeerd; deze test meet wat er werkelijk gebeurt.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseViewAndAdsTest,
+	"Eclipse.Feel.Camera.ViewToggleAndAdsActuallyMoveTheCamera",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseViewAndAdsTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	const FEclipseFeelSample Third = Harness.Body->SampleFeelState();
+	Report(*this, TEXT("3e persoon: boomlengte"), Third.BoomArmLength, TEXT("cm"));
+	Report(*this, TEXT("3e persoon: FOV"), Third.FieldOfView, TEXT("gr"),
+		*FString::Printf(TEXT("tuning ThirdPersonFOV = %.0f"), Harness.Tuning->ThirdPersonFOV));
+
+	// --- 1e/3e persoon ------------------------------------------------------
+	Harness.Press(TEXT("ToggleView"));
+	// Ruim over de getunede blendtijd heen wachten, anders meet je het midden van
+	// de overgang en niet de bestemming.
+	Harness.Idle(Harness.Tuning->ViewToggleBlendTime * 3.0f);
+
+	// DISCRIMINATOR: is de toets aangekomen, of blendt de camera niet? Zonder deze
+	// regel leest "300 cm" als "de camera beweegt niet" terwijl de oorzaak net zo
+	// goed kan zijn dat de druk nooit bij de handler kwam.
+	AddInfo(FString::Printf(TEXT("beeld: na de druk staat IsFirstPerson op %s, en de boom wil naar %.1f cm"),
+		Harness.Body->IsFirstPerson() ? TEXT("WAAR") : TEXT("onwaar"),
+		Harness.Body->SampleFeelState().BoomTargetArmLength));
+
+	const FEclipseFeelSample First = Harness.Body->SampleFeelState();
+	Report(*this, TEXT("1e persoon: boomlengte"), First.BoomArmLength, TEXT("cm"),
+		TEXT("~0 = de camera zit op je ogen"));
+	// FirstPersonFOV staat op het personage en niet op DA_CharacterTuning (anders
+	// dan ThirdPersonFOV, dat wél getuned is) — hier dus de richting meten en de
+	// waarde rapporteren, niet vergelijken met een bron die er niet is.
+	Report(*this, TEXT("1e persoon: FOV"), First.FieldOfView, TEXT("gr"), TEXT("ruimer dan 3e persoon"));
+
+	TestTrue(FString::Printf(TEXT("beeld: 1e persoon haalt de boom in (%.1f -> %.1f cm)"),
+			Third.BoomArmLength, First.BoomArmLength),
+		First.BoomArmLength < Third.BoomArmLength - 50.0f);
+	TestTrue(FString::Printf(TEXT("beeld: 1e persoon verandert de FOV (%.1f -> %.1f gr)"),
+			Third.FieldOfView, First.FieldOfView),
+		!FMath::IsNearlyEqual(First.FieldOfView, Third.FieldOfView, 0.5f));
+
+	// De gids belooft dat alleen je HOOFD verdwijnt (armen/wapen/benen blijven).
+	// Dat is na de playtest bewust zo gebouwd, dus het hoort vastgepind te staan:
+	// een terugval naar "de hele mesh verbergen" zou hier omvallen.
+	if (USkeletalMeshComponent* Mesh = Harness.Body->GetMesh())
+	{
+		TestFalse(TEXT("beeld: in 1e persoon is je LICHAAM nog zichtbaar (alleen het hoofd gaat weg)"),
+			Mesh->bOwnerNoSee);
+	}
+
+	Harness.Press(TEXT("ToggleView"));
+	Harness.Idle(Harness.Tuning->ViewToggleBlendTime * 3.0f);
+	const FEclipseFeelSample BackToThird = Harness.Body->SampleFeelState();
+	Report(*this, TEXT("terug in 3e persoon: boomlengte"), BackToThird.BoomArmLength, TEXT("cm"),
+		TEXT("terug op de uitgangswaarde"));
+	TestEqual(TEXT("beeld: nog een druk brengt de camera exact terug"),
+		BackToThird.BoomArmLength, Third.BoomArmLength, 1.0f);
+
+	// --- mikken -------------------------------------------------------------
+	// Vasthouden, want ADS is een hold: één tick injecteren en loslaten zou de
+	// meting op het moment van loslaten doen.
+	const double AimStart = Harness.ElapsedSeconds;
+	while (Harness.ElapsedSeconds - AimStart < 0.6)
+	{
+		Harness.Inject(TEXT("Aim"), true);
+		Harness.Step();
+	}
+	const FEclipseFeelSample Ads = Harness.Body->SampleFeelState();
+	Report(*this, TEXT("mikken: boomlengte"), Ads.BoomArmLength, TEXT("cm"),
+		TEXT("korter dan heup = de camera trekt in"));
+	Report(*this, TEXT("mikken: FOV"), Ads.FieldOfView, TEXT("gr"), TEXT("smaller dan heup"));
+	Report(*this, TEXT("mikken: boom-inpull"), Third.BoomArmLength - Ads.BoomArmLength, TEXT("cm"));
+	Report(*this, TEXT("mikken: FOV-versmalling"), Third.FieldOfView - Ads.FieldOfView, TEXT("gr"));
+
+	// Richting, geen streefwaarde: hoeveel ADS moet inzoomen is smaak en staat als
+	// open vraag op de owner-lijst (AdsLookMultiplier). Dat het IETS doet is het
+	// minimum dat de gids belooft.
+	TestTrue(FString::Printf(TEXT("mikken: de camera trekt écht in (%.1f -> %.1f cm)"),
+			Third.BoomArmLength, Ads.BoomArmLength),
+		Ads.BoomArmLength < Third.BoomArmLength - 10.0f);
+	TestTrue(FString::Printf(TEXT("mikken: de FOV versmalt écht (%.1f -> %.1f gr)"),
+			Third.FieldOfView, Ads.FieldOfView),
+		Ads.FieldOfView < Third.FieldOfView - 1.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

@@ -54,8 +54,22 @@ AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer
 	// zelf niets voor heeft.
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UEclipseCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
-	// Event-driven by default (GDD 14.2): nothing here needs per-frame work.
-	PrimaryActorTick.bCanEverTick = false;
+	// Event-driven by default (GDD 14.2): nothing here needs per-frame work — but
+	// the camera blend DOES need a tick for the fraction of a second it runs, and
+	// bCanEverTick=false made that impossible.
+	//
+	// SetActorTickEnabled(true) is a no-op on an actor whose tick function was
+	// never registered, so RefreshCameraTargets() asked for a tick it could never
+	// get: TargetArmLength moved to 0 and the boom stayed at 300 forever. Dat trof
+	// drie dingen die de speler ziet — 1e/3e persoon, mikken, en de Command
+	// Mode-uitzoom — en alle drie zetten hun DOEL netjes, dus in de code leek het
+	// te kloppen.
+	//
+	// bCanEverTick=true met bStartWithTickEnabled=false houdt de bedoeling van
+	// 12.4 exact overeind: de tickfunctie bestaat, maar staat uit tot er een blend
+	// loopt, en UpdateCameraBlend zet hem zelf weer uit als hij klaar is.
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 
 	AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
 	HealthAttributes = CreateDefaultSubobject<UEclipseHealthAttributeSet>(TEXT("HealthAttributes"));
