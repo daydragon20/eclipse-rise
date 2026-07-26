@@ -145,6 +145,9 @@ public:
 	/** Eenmalige pose over de gang heen (schot of klap; 26-07). */
 	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight);
 
+	/** Diagnostiek: hoeveel voetstappen er gespeeld zijn (testlaag, geen speaker nodig). */
+	int32 GetFootstepCount() const { return FootstepCount; }
+
 	/**
 	 * Loopt er nu een eenmalige pose, en met welk gewicht? Alleen-lezen, voor de
 	 * testlaag: zonder dit is "de klap speelt" een bewering en geen meting — en
@@ -160,6 +163,16 @@ private:
 	float OneShotElapsed = 0.0f;
 	float OneShotDurationLeft = 0.0f;
 	float OneShotPeak = 0.0f;
+
+	/** Voetstappen op afgelegde afstand (26-07); 140 cm per stap, zie de .cpp. */
+	void UpdateFootsteps(float SpeedOnGround);
+	static constexpr float FootstepStrideCm = 140.0f;
+	float DistanceSinceFootstep = 0.0f;
+	int32 FootstepCount = 0;
+
+	UPROPERTY(Transient)
+	TObjectPtr<USoundBase> FootstepCue;
+	bool bTriedLoadFootstep = false;
 
 public:
 

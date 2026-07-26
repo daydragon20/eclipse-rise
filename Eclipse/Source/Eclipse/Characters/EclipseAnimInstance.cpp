@@ -1,4 +1,6 @@
 #include "Characters/EclipseAnimInstance.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Animation/AnimCurveTypes.h"
 #include "Animation/AnimNodeBase.h"
@@ -459,6 +461,61 @@ void UEclipseAnimInstance::PlayOneShotPose(UAnimSequence* Clip, float Duration, 
 	OneShotWeight = 0.0f;
 }
 
+void UEclipseAnimInstance::UpdateFootsteps(float SpeedOnGround)
+{
+	// VOETSTAPPEN OP AFGELEGDE AFSTAND (26-07). Cue_SFX_Foot_Asphalt_01 lag sinds
+	// de audio-import ongebruikt in de repo — dood, niet onbeslist.
+	//
+	// Op afstand en niet op de gangklok, want die leeft in de proxy op de
+	// werkthread en daar geluid uit afspelen is een datarace. Afstand geeft
+	// bovendien vanzelf het goede gedrag: sneller lopen is vaker een stap, en
+	// stilstaan is geen enkele.
+	//
+	// 140 cm per stap is een compromis en dat hoort erbij te staan: bij
+	// wandeltempo (180) geeft dat 1,3 stappen/s waar een mens er ~1,8 doet, bij
+	// renttempo (420) 3,0 waar een mens er ~2,7 doet. Eén vaste paslengte kan
+	// niet allebei kloppen zonder de paslengte met de snelheid te laten
+	// meeschalen, en dat is precies wat een echte gangklok met anim-notifies zou
+	// doen. Dit is de versie zonder notifies.
+	const AEclipseCharacter* Body = OwningBody.Get();
+	const UCharacterMovementComponent* Movement = Body != nullptr ? Body->GetCharacterMovement() : nullptr;
+	if (Body == nullptr || Movement == nullptr || Movement->IsFalling()
+		|| SpeedOnGround <= EclipseLocomotion::StandingSpeedThreshold)
+	{
+		// In de lucht of stilstaand telt er niets, en de teller wordt gewist zodat
+		// je na een sprong niet meteen een stap hoort omdat er nog wat op stond.
+		DistanceSinceFootstep = 0.0f;
+		return;
+	}
+
+	DistanceSinceFootstep += SpeedOnGround * GetDeltaSeconds();
+	if (DistanceSinceFootstep < FootstepStrideCm)
+	{
+		return;
+	}
+	DistanceSinceFootstep = 0.0f;
+	++FootstepCount;
+
+	if (!bTriedLoadFootstep)
+	{
+		bTriedLoadFootstep = true;
+		FootstepCue = LoadObject<USoundBase>(nullptr,
+			TEXT("/Game/Audio/SFX/Cue_SFX_Foot_Asphalt_01.Cue_SFX_Foot_Asphalt_01"));
+		if (FootstepCue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Audio: voetstapcue ontbreekt — lopen blijft stil (14.3.5)."));
+		}
+	}
+
+	// Alleen asfalt. Cue_SFX_Foot_Metal_01 ligt er ook, maar kiezen tussen de twee
+	// vraagt physical materials op de vloeren en die zijn er niet — dat is
+	// assetwerk en staat als bevinding in de gevechts-audit.
+	if (FootstepCue != nullptr && GetWorld() != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FootstepCue, Body->GetActorLocation(), 0.45f);
+	}
+}
+
 void UEclipseAnimInstance::SetLocomotionSet(const FEclipseLocomotionSet& InSet)
 {
 	LocomotionSet = InSet;
@@ -545,6 +602,8 @@ void UEclipseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsDowned = false;
 		MoveDirectionDegrees = 0.0f;
 	}
+
+	UpdateFootsteps(GroundSpeed);
 
 	const FEclipseLocomotionBlend NewBlend = EclipseLocomotion::ComputeBlend(GroundSpeed, LocomotionSet);
 	IdleWeight = NewBlend.IdleWeight;

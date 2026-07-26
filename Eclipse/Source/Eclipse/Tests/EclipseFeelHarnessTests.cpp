@@ -1282,6 +1282,88 @@ bool FEclipseCameraPitchCollapseTest::RunTest(const FString& Parameters)
 //
 // Gemeten op de socket-offset van de boom en niet op "er gebeurt iets": een dip
 // die niet terugkomt is een camera die naar de vloer zakt.
+// Lopen maakt geluid (gevechts-audit: het laatste dode geluid).
+//
+// Cue_SFX_Foot_Asphalt_01 lag sinds de audio-import ongebruikt in de repo. Nu
+// hangt hij aan de afgelegde AFSTAND — 140 cm per stap — en niet aan de gangklok,
+// want die leeft op de werkthread.
+//
+// De test meet de TELLER en niet de speaker, net als de sting en de barks: zonder
+// audio-apparaat telt het verzoek nog steeds. En hij meet twee dingen die
+// allebei stil konden falen: dat er stappen komen tijdens lopen, en dat er GEEN
+// stappen komen bij stilstand — een teller die altijd doortikt is net zo fout als
+// een die niets doet.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseFootstepsTest,
+	"Eclipse.Feel.Layer2.WalkingMakesFootsteps",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseFootstepsTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestTrue(TEXT("voetstap: missie gelanceerd (anders is er geen aangekleed lichaam)"),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	UEclipseAnimInstance* Anim = nullptr;
+	for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+	{
+		AEclipseCharacter* Body = *It;
+		if (Body == Harness.Body && Body->GetMesh() != nullptr)
+		{
+			Anim = Cast<UEclipseAnimInstance>(Body->GetMesh()->GetAnimInstance());
+		}
+	}
+	if (Anim == nullptr)
+	{
+		// De speler is niet altijd aangekleed; pak dan wie dat wél is.
+		for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+		{
+			AEclipseCharacter* Body = *It;
+			UEclipseAnimInstance* Candidate = Body != nullptr && Body->GetMesh() != nullptr
+				? Cast<UEclipseAnimInstance>(Body->GetMesh()->GetAnimInstance()) : nullptr;
+			if (Candidate != nullptr)
+			{
+				Anim = Candidate;
+				break;
+			}
+		}
+	}
+	if (!TestNotNull(TEXT("voetstap: er is een aangekleed lichaam"), Anim))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Stilstaan mag niets opleveren.
+	const int32 AtRest = Anim->GetFootstepCount();
+	Harness.Idle(1.0f);
+	TestEqual(TEXT("voetstap: stilstaan maakt geen stappen"), Anim->GetFootstepCount(), AtRest);
+
+	Harness.Shutdown();
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLandingDipTest,
 	"Eclipse.Feel.Layer2.LandingHasWeight",
 	EclipseFeelTest::TestFlags)
