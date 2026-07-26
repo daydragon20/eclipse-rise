@@ -35,7 +35,7 @@ verzonnen getal.
 | 11 | **Wapenwissel** | Altijd minstens twee wapens | **Eén wapen.** Daarom kreeg RB vandaag een andere taak | Keuze voor nu, met een plek gereserveerd |
 | 12 | **Geluid bij een schot** | Altijd | **Klinkt sinds 26-07**, op de plek van het schot. De cue lag al in de repo en werd door niemand afgespeeld | **Was een omissie, dezelfde dag gerepareerd** |
 | 13 | **Dood van een vijand** | Death-animatie of ragdoll | **Death-take speelt** ✓; geen ragdoll | Keuze — een take is voorspelbaarder dan physics |
-| 14 | **Schade aan de speler zichtbaar** | Schermrand, richtingsindicator, geluid | Alleen de HUD-balk; **geen richtingsindicator** | **Omissie** |
+| 14 | **Schade aan de speler zichtbaar** | Schermrand, richtingsindicator, geluid | Alleen de HUD-balk. **Maar de assets liggen er al**: `Screen_Damage_Indicator` bevat `WBP_DamageIndicator` en `T_BloodOverlay`, en geen enkele regel gameplay roept ze aan | **Omissie — en een verworven pack die dood ligt** |
 | 15 | **Dekking** | Gears heeft een dekkingssysteem; Division/Borderlands niet | Geen systeem, wel dekkingsgeometrie in het district | Keuze — past bij Division/Borderlands |
 | 16 | **Suppression** | Division en Gears hebben het | Geen. De wees-bark `Pinned` beloofde het en is 26-07 opgeruimd | Keuze — bewust niet, en de tekst liegt niet meer |
 
@@ -86,7 +86,10 @@ gevecht. Wel voorbereid: de hitmarker kan via de bestaande HUD en het bestaande
    kopschot was en hoeveel schade er landde, dus de HUD hoeft alleen te tekenen.
 2. **Spreiding + terugslag** — samen met de aim-snelheidsstraf uit de
    locomotie-audit; het is één ontwerpvraag: *wat kost schieten?*
-3. **Richtingsindicator bij schade** — pas zinvol als je vaker geraakt wordt dan
-   nu.
+3. **Richtingsindicator bij schade** — en die is goedkoper dan hij lijkt: de pack
+   `Screen_Damage_Indicator` staat al in het project met een kant-en-klare
+   `WBP_DamageIndicator` en een bloedoverlay. Er is niets aangeroepen. Dit is dus
+   geen inkoop maar aansluitwerk — het enige wat het van de owner vraagt is een
+   blik op hóé het eruitziet, want dat kan ik niet beoordelen.
 4. **Impactgeluid** — de cue ligt klaar, maar er is nog geen treffer-event om hem
    aan te hangen. Klein werk zodra dat er is.

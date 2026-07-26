@@ -64,6 +64,7 @@ window.PROGRESS_DATA = {
       "Mijn advies: een hitmarker op het kruis, met een duidelijk andere vorm of kleur bij een kopschot",
       "Dat is UI-werk dat je niet gevraagd hebt, dus ik heb het niet gebouwd",
       "Zeg 'hitmarker' en ik doe het; het gaat via de bestaande HUD en het bestaande schot-event, niet via een nieuw systeem",
+      "TWEEDE VONDST bij hetzelfde onderzoek: de pack Screen_Damage_Indicator staat AL in je project, met een kant-en-klare WBP_DamageIndicator en een bloedoverlay, en geen enkele regel roept ze aan. Dat is audit-punt 14 (je ziet niet uit welke richting je geraakt wordt) en het is dus geen inkoop maar aansluitwerk. Ik heb het niet gedaan omdat jij moet kijken hoe het eruitziet",
       "LET OP: dit is er één van VIER. Ik heb een gevechts-audit gedaan (phase0/GEVECHT_AUDIT.md) en vier van de vijf omissies gaan over FEEDBACK, niet over mechaniek: geen hitmarker, geen kopschot-signaal, geen wapengeluid, en geen richting waar de klap vandaan kwam. Dat is één samenhangend gat, en het verklaart waarom vechten leeg aanvoelt terwijl elk systeem groen staat — ze doen allemaal hun werk in stilte",
       "Tweede groep in die audit: er is geen spreiding en geen terugslag. Een hitscan die op 6,67 schoten per seconde exact naar het kruis gaat is geen wapen maar een laserpointer. Dat hoort bij dezelfde vraag als de mikstraf: wat kost schieten?"
     ] },
