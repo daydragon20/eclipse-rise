@@ -2038,6 +2038,41 @@ bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("regio's bereikbaar vanaf het begin"), Reached.Num(), TEXT(""),
 		*FString::Printf(TEXT("van %d in de graaf"), Regions.Num()));
 
+	// --- en biedt elke regiosoort ook echt zijn missie aan? -------------------
+	// Een aanbod dat aan een regiotype hangt dat NIET in de graaf voorkomt, is een
+	// missie die niemand ooit te zien krijgt. Andersom: een regiotype zonder
+	// aanbod levert een regio op die je kunt bevrijden maar nooit kunt aanvallen.
+	// Allebei zijn ze onzichtbaar in de data zelf.
+	if (const UDataTable* Offers = Graph->MissionOffers.LoadSynchronous())
+	{
+		TSet<uint8> TypesInGraph;
+		for (const FEclipseRegionDefinition& Region : Regions)
+		{
+			TypesInGraph.Add(static_cast<uint8>(Region.RegionType));
+		}
+		TSet<uint8> TypesWithOffer;
+		int32 OfferCount = 0;
+		Offers->ForeachRow<FEclipseMissionOfferRow>(TEXT("AanbodControle"),
+			[&TypesWithOffer, &OfferCount, this, &TypesInGraph](const FName&, const FEclipseMissionOfferRow& Row)
+			{
+				++OfferCount;
+				TypesWithOffer.Add(static_cast<uint8>(Row.RegionType));
+				TestTrue(FString::Printf(TEXT("aanbod: '%s' hangt aan een regiotype dat in de graaf voorkomt"),
+						*Row.TemplateId.ToString()),
+					TypesInGraph.Contains(static_cast<uint8>(Row.RegionType)));
+			});
+		Report(*this, TEXT("missie-aanbiedingen in de data"), OfferCount, TEXT(""));
+		Report(*this, TEXT("regiosoorten in de graaf"), TypesInGraph.Num(), TEXT(""),
+			*FString::Printf(TEXT("waarvan %d een aanbod hebben"), TypesWithOffer.Num()));
+		for (const uint8 Type : TypesInGraph)
+		{
+			TestTrue(FString::Printf(TEXT("aanbod: regiosoort %s heeft een missie om aan te bieden"),
+					*UEnum::GetValueAsString(static_cast<EEclipseRegionType>(Type))
+						.RightChop(FString(TEXT("EEclipseRegionType::")).Len())),
+				TypesWithOffer.Contains(Type));
+		}
+	}
+
 	for (const FEclipseRegionDefinition& Region : Regions)
 	{
 		TestTrue(FString::Printf(TEXT("bereik: '%s' is ooit te bereiken"), *Region.RegionId.ToString()),
