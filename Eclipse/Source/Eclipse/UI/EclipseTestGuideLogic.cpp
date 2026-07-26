@@ -19,7 +19,7 @@ namespace EclipseTestGuide
 
 		const FGuideControlDetail GuideControlDetails[ControlStepCount] = {
 			{ EEclipseGuideSignal::Move,
-			  TEXT("je pion loopt en de camera volgt; de HUD-kop staat op MISSION ACTIVE") },
+			  TEXT("je pion loopt en de camera volgt; de HUD-kop staat op MISSION ACTIVE. LET OP het apparaatverschil: met een stick geeft een halve uitslag een halve snelheid (lineair), maar WASD zijn digitaal — op toetsenbord ren je dus altijd 420 en kun je niet wandelen") },
 			{ EEclipseGuideSignal::Look,
 			  TEXT("het beeld draait mee; stick-kijken is nog framerate-gebonden (PLACEHOLDER GDD 8.1)") },
 			{ EEclipseGuideSignal::Fire,

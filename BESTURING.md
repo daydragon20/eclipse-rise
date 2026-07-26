@@ -31,7 +31,7 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Vuren | Linkermuisknop | RT | ja — `HandleFire` |
 | Mikken (ADS) | Rechtermuisknop | LT | ja — `HandleAimStart` / `HandleAimStop` |
 | Sprint | Shift (**vasthouden**) | L3 (**togglen**) | ja — `HandleSprintHold` / `HandleSprintToggle` |
-| Hurken | Ctrl | B | ja — `HandleCrouch` |
+| Hurken | Ctrl | B | 150 cm/s en je zakt 52 cm (van 176 naar 124 cm). Twee dingen zijn hier recent gerepareerd: de toets was dood (`bCanCrouch` stond uit) en je zakte daarna veel te diep — 80 cm is kruiphoogte, niet hurkhoogte |
 | Springen | Spatie | A | ja — `HandleJump` |
 | 1e/3e persoon | C | **geen** — R3 is er bewust af | ja — `HandleToggleView` (alleen op C) |
 
