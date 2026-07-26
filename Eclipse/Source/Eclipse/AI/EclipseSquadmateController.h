@@ -47,6 +47,9 @@ public:
 	/** Diagnostiek: verplaatsingen die uit MEELOPEN kwamen, niet uit een order. */
 	int32 GetFollowMoves() const { return FollowMoves; }
 
+	/** Diagnostiek: schoten zonder order — het bewijs dat laag 2 draait. */
+	int32 GetAutoFireShots() const { return AutoFireShots; }
+
 	/** Start de basislaag: meelopen. Aangeroepen zodra de soldaat een lichaam heeft. */
 	void BeginFollowing(float FollowDistanceCm);
 
@@ -126,6 +129,30 @@ private:
 	 * "de squad handelt zelf" en "de squad negeert je".
 	 */
 	void UpdateFollow();
+
+	/**
+	 * AUTONOOM VUREN (owner-opdracht 26-07 avond, punt 1 — laag 2 van zes).
+	 *
+	 * De owner: "ze vuren op wat ze zien". Tot vandaag vuurde een squadmate alleen
+	 * op een expliciete FocusTarget-order; zonder order stond hij ernaast te kijken
+	 * terwijl je beschoten werd.
+	 *
+	 * Dit is de grootste balansverschuiving die er ligt — drie extra schutters
+	 * halveert hoe lang een groep vijanden overeind blijft — en daarom landt hij
+	 * apart van laag 1, met een eigen meting.
+	 */
+	void UpdateEngagement();
+	void ContinueAutoFire();
+
+	FTimerHandle AutoFireTimer;
+	FTimerHandle EngagementTimer;
+	TWeakObjectPtr<AEclipseCharacter> AutoTarget;
+
+	/** De dichtstbijzijnde vijand binnen wapenbereik met zicht, of null. */
+	AEclipseCharacter* FindHostileInRange() const;
+
+	/** Diagnostiek: schoten die deze soldaat ZONDER order heeft gelost. */
+	int32 AutoFireShots = 0;
 
 	FTimerHandle FollowTimer;
 

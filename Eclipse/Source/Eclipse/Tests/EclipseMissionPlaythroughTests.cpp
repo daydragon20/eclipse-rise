@@ -1858,6 +1858,28 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		Harness.Idle(0.2f);
 		const float TargetHalfHeight = Target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
+		// De teller waar DamageAiming hieronder op leest, en de inschrijving die hem
+		// vult. Alleen treffers waarvan de SCHUTTER de speler is tellen mee.
+		float PlayerDamage = 0.0f;
+		int32 ProbeShots = 0;
+		FEclipseEventSubscriptionHandle HitHandle;
+		UEclipseEventBusSubsystem* HitBus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+		if (HitBus != nullptr)
+		{
+			AEclipseCharacter* PlayerBody = Harness.Body;
+			HitHandle = HitBus->Subscribe(EclipseTags::Event_Combat_HitLanded,
+				FEclipseEventNativeDelegate::CreateLambda(
+					[&PlayerDamage, PlayerBody](FGameplayTag, const FInstancedStruct& Payload)
+					{
+						const FEclipseCombatEventPayload* Landed = Payload.GetPtr<FEclipseCombatEventPayload>();
+						if (Landed != nullptr && Landed->Shooter.Get() == PlayerBody)
+						{
+							PlayerDamage += Landed->Damage;
+						}
+					}),
+				FEclipseCombatEventPayload::StaticStruct());
+		}
+
 		auto DamageAiming = [&](float ZOffset) -> float
 		{
 			// HERHAALD richten, niet één keer. AimAt injecteert één Look-correctie ter
@@ -1897,11 +1919,20 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 			// dit schot is gegarandeerd het EERSTE van zijn reeks en daarmee zuiver.
 			// Dat is precies waar first-shot accuracy voor gemaakt is.
 			Harness.Idle(FireInterval * 4.0f);
-			const float Before = Target->GetHealth();
+
+			// DE SCHADE VAN DE SPELER, niet de schade AAN het doelwit. Sinds de
+			// squad vanavond uit zichzelf vuurt (laag 2) schiet hij mee op alles wat
+			// binnen zijn bereik staat, en dit doelwit staat daar precies in. Een
+			// gezondheidsbalk is van iedereen; het feit "de speler raakte" is van de
+			// speler, en dat feit bestaat al (Event.Combat.HitLanded draagt zijn
+			// schutter mee).
+			PlayerDamage = 0.0f;
+			const int32 ShotsBeforeProbe = Weapon->GetShotsFired();
 			Harness.Inject(TEXT("Fire"), true);
 			Harness.Step();
 			Harness.Idle(0.1f);
-			return Before - Target->GetHealth();
+			ProbeShots = Weapon->GetShotsFired() - ShotsBeforeProbe;
+			return PlayerDamage;
 		};
 
 		// Mikken op waar de hitbox ECHT staat, niet op een hoogte die ik zelf
@@ -1918,6 +1949,8 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		const float ChestDamage = DamageAiming(0.0f);
 		const float HeadDamage = DamageAiming(HeadOffset);
 		Report(*this, TEXT("schade op borsthoogte"), ChestDamage, TEXT("hp"));
+		Report(*this, TEXT("schoten in de meetronde"), static_cast<float>(ProbeShots), TEXT(""),
+			TEXT("moet 1 zijn; 2 betekent dat de trekker blijft hangen"));
 		Report(*this, TEXT("schade op hoofdhoogte"), HeadDamage, TEXT("hp"),
 			*FString::Printf(TEXT("één zuiver schot; ×%.1f zou %.0f hp zijn"), Weapon->GetHeadshotMultiplier(),
 				ChestDamage * Weapon->GetHeadshotMultiplier()));
@@ -1939,6 +1972,11 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		TestTrue(FString::Printf(TEXT("kopschot: de verhouding is de geschreven %.1fx (gemeten %.2fx)"),
 				Weapon->GetHeadshotMultiplier(), Ratio),
 			FMath::IsNearlyEqual(Ratio, Weapon->GetHeadshotMultiplier(), 0.15f));
+
+		if (HitBus != nullptr)
+		{
+			HitBus->Unsubscribe(HitHandle);
+		}
 	}
 	// 10% marge: de laatste schot-poort valt zelden precies op het einde van het
 	// venster, en de stapgrootte kwantiseert.
@@ -3527,6 +3565,110 @@ bool FEclipseSquadFollowsWithoutBeingTold::RunTest(const FString& Parameters)
 		Held->GetFollowMoves() - MovesBeforeHold, 0);
 	TestTrue(FString::Printf(TEXT("meelopen: de vastgezette soldaat blijft staan (%.0f cm)"), HeldDrift),
 		HeldDrift >= 0.0f && HeldDrift < 300.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * AUTONOOM VUREN (owner-opdracht 26-07 avond, punt 1 — laag 2 van zes).
+ *
+ * "ze vuren op wat ze zien." Tot vandaag vuurde een squadmate alleen op een
+ * expliciete FocusTarget-order; zonder order stond hij ernaast te kijken terwijl
+ * je beschoten werd.
+ *
+ * Dit is de grootste balansverschuiving die er ligt, dus de meting doet twee
+ * dingen: bewijzen DAT ze vuren, en meteen laten zien wat het KOST — hoeveel
+ * sneller een groep vijanden valt met drie extra schutters.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadFiresWithoutBeingTold,
+	"Eclipse.Mission.Playthrough.SquadFiresWithoutBeingTold",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseSquadFiresWithoutBeingTold::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("autovuur: strategie"), Strategy) || !TestNotNull(TEXT("autovuur: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("autovuur: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	if (!TestTrue(TEXT("autovuur: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Een vijand recht voor de neus van de squad. Geen order, geen aanwijzing —
+	// als er geschoten wordt, komt dat uit henzelf.
+	const FVector Spot = Harness.Location() + Harness.Body->GetActorForwardVector() * 700.0f;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AEclipseCharacter* Hostile = Harness.World->SpawnActor<AEclipseCharacter>(
+		AEclipseCharacter::StaticClass(), Spot, FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("autovuur: er staat een vijand"), Hostile))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	// Geen SetPlayerSide nodig: IsPlayerSide() is waar zodra een lichaam een
+	// SoldierId heeft of door de speler bestuurd wordt. Een vers gespawnd lichaam
+	// heeft geen van beide en is dus per definitie vijandig — dezelfde regel die
+	// de vijand omgekeerd gebruikt om ONS te herkennen.
+	Hostile->InitializeHealth(100000.0f); // hij hoeft niet te vallen, alleen geraakt te worden
+
+	int32 ShotsBefore = 0;
+	for (const AEclipseSquadmateController* Mate : Mates)
+	{
+		ShotsBefore += Mate != nullptr ? Mate->GetAutoFireShots() : 0;
+	}
+	const float HealthBefore = Hostile->GetHealth();
+
+	// Vijf seconden niets doen. De speler vuurt niet, geeft geen order.
+	Harness.Idle(5.0f);
+
+	int32 Shots = 0;
+	for (const AEclipseSquadmateController* Mate : Mates)
+	{
+		Shots += (Mate != nullptr ? Mate->GetAutoFireShots() : 0);
+	}
+	Shots -= ShotsBefore;
+	const float Damage = HealthBefore - Hostile->GetHealth();
+
+	Report(*this, TEXT("squadleden in het veld"), static_cast<float>(Mates.Num()), TEXT(""));
+	Report(*this, TEXT("schoten zonder order in 5 s"), static_cast<float>(Shots), TEXT(""),
+		TEXT("de speler deed niets"));
+	Report(*this, TEXT("schade door de squad alleen"), Damage, TEXT("hp"),
+		TEXT("dit is wat drie extra schutters aan een gevecht toevoegen"));
+
+	TestTrue(TEXT("autovuur: de squad vuurt uit zichzelf"), Shots > 0);
+	TestTrue(TEXT("autovuur: en het komt aan"), Damage > 0.0f);
 
 	Harness.Shutdown();
 	return true;

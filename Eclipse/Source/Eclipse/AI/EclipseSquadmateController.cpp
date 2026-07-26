@@ -186,6 +186,10 @@ void AEclipseSquadmateController::BeginFollowing(float FollowDistanceCm)
 	// meer padberekeningen kosten en niets veranderen aan wat je ziet.
 	GetWorldTimerManager().SetTimer(FollowTimer, this,
 		&AEclipseSquadmateController::UpdateFollow, 0.5f, /*bLoop*/ true);
+	// Doelselectie op dezelfde klok. Het VUREN loopt daarna op het wapeninterval;
+	// dit bepaalt alleen elke halve seconde opnieuw op wie.
+	GetWorldTimerManager().SetTimer(EngagementTimer, this,
+		&AEclipseSquadmateController::UpdateEngagement, 0.5f, /*bLoop*/ true);
 }
 
 void AEclipseSquadmateController::UpdateFollow()
@@ -234,6 +238,108 @@ void AEclipseSquadmateController::UpdateFollow()
 	{
 		++FollowMoves;
 	}
+}
+
+AEclipseCharacter* AEclipseSquadmateController::FindHostileInRange() const
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	const UWorld* World = GetWorld();
+	if (Body == nullptr || World == nullptr)
+	{
+		return nullptr;
+	}
+	const UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (Weapon == nullptr)
+	{
+		return nullptr;
+	}
+
+	// Op WAPENBEREIK en niet op een eigen waarnemingsgetal: een soldaat die vuurt
+	// op iets wat hij niet kan raken, verraadt de squad voor niets. De vijand
+	// gebruikt hiervoor zijn PerceptionRadius, maar die staat voor "wanneer merk ik
+	// je op"; hier is de vraag "kan ik je raken".
+	AEclipseCharacter* Nearest = nullptr;
+	float NearestDistanceSquared = FMath::Square(Weapon->GetRangeCm());
+	for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
+	{
+		AEclipseCharacter* Candidate = *It;
+		// Vijanden = alles wat NIET aan spelerskant staat (dezelfde regel die de
+		// vijand omgekeerd gebruikt).
+		if (Candidate == Body || Candidate->IsDowned() || Candidate->IsPlayerSide())
+		{
+			continue;
+		}
+		const float DistanceSquared = FVector::DistSquared(Candidate->GetActorLocation(), Body->GetActorLocation());
+		if (DistanceSquared < NearestDistanceSquared && LineOfSightTo(Candidate))
+		{
+			NearestDistanceSquared = DistanceSquared;
+			Nearest = Candidate;
+		}
+	}
+	return Nearest;
+}
+
+void AEclipseSquadmateController::UpdateEngagement()
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	if (Body == nullptr || Body->IsDowned())
+	{
+		AutoTarget = nullptr;
+		GetWorldTimerManager().ClearTimer(AutoFireTimer);
+		return;
+	}
+
+	// Een FocusTarget-order heeft zijn eigen vuurlus; twee lussen op één wapen
+	// zouden elkaar in de cadanspoort staan te verdringen.
+	if (bHasStandingOrder && CurrentOrder == EEclipseSquadOrder::FocusTarget)
+	{
+		AutoTarget = nullptr;
+		return;
+	}
+
+	// Iemand overeind helpen gaat vóór schieten. Dat is niet alleen ontwerp maar
+	// ook de bestaande belofte: triage loopt al op zijn eigen beweging.
+	if (TriageTarget.IsValid())
+	{
+		AutoTarget = nullptr;
+		return;
+	}
+
+	AEclipseCharacter* Target = FindHostileInRange();
+	AutoTarget = Target;
+	if (Target != nullptr && !GetWorldTimerManager().IsTimerActive(AutoFireTimer))
+	{
+		ContinueAutoFire();
+	}
+}
+
+void AEclipseSquadmateController::ContinueAutoFire()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	AEclipseCharacter* Target = AutoTarget.Get();
+	if (Body == nullptr || Body->IsDowned() || Target == nullptr || Target->IsDowned())
+	{
+		GetWorldTimerManager().ClearTimer(AutoFireTimer);
+		AutoTarget = nullptr;
+		return;
+	}
+
+	UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (Weapon != nullptr)
+	{
+		const FVector Origin = Body->GetPawnViewLocation();
+		if (Weapon->Fire(Origin, Target->GetActorLocation() - Origin, TEXT("SquadAutoFire")))
+		{
+			++AutoFireShots;
+		}
+	}
+
+	// Op het vuurinterval van het wapen, zelfde reden als bij het volgehouden vuur:
+	// de poort in Fire() bepaalt het tempo al, en een tweede klok zou daar tegenin
+	// werken.
+	const float Interval = Weapon != nullptr ? FMath::Max(Weapon->GetFireInterval(), 0.05f) : 0.15f;
+	GetWorldTimerManager().SetTimer(AutoFireTimer, this,
+		&AEclipseSquadmateController::ContinueAutoFire, Interval, /*bLoop*/ false);
 }
 
 void AEclipseSquadmateController::HandlePawnDowned()
