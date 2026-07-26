@@ -5,6 +5,21 @@
 
 # OCHTENDRAPPORT — nacht 25→26 juli 2026
 
+## Als je één ding doet: start de build en druk **F3**
+
+De game loopt je dan zelf door alle controls, en elke stap zegt waaraan je ziet dat het klopt. Dit is wat er sinds jouw laatste sessie veranderd is, op volgorde van wat je het eerst merkt:
+
+1. **De camera doet dingen die je nog nooit gezien hebt.** 1e persoon (C), mikken (RMB/LT) en de Command Mode-uitzoom waren alle drie **dood** — het doel werd gezet, maar de camera bewoog nooit. Eén regel in de constructor. Nu: 1e persoon schuift in 0,1 s naar je ogen, mikken trekt in van 300 naar 165 cm, Command Mode zoomt uit naar 520.
+2. **Kijken is 2,5× trager**, en dat is een reparatie: de engine vermenigvuldigde je getunede waarde stil met 2,5.
+3. **Sprint op L3 is een toggle** met vier uitstappen; Shift blijft hold.
+4. **Hurken werkt** (de toets was dood) en je zakt nu 52 cm in plaats van 96 — 80 cm was kruiphoogte.
+5. **Je squad loopt mee** in plaats van elke order te weigeren.
+6. **Vier knoppen werken alleen ín Command Mode** (stance, volgende, vorige, onder-kruis). Dat stond nergens; nu wel.
+
+Wat ik níét kan meten is hoe het **voelt**. Daarvoor staan er veertien vragen in §4, elk met mijn aanbeveling erbij — maar er is er één die alleen jij kunt beantwoorden: **is de schaal-bug weg?**
+
+---
+
 **Bar bij elke commit: build ✓ (-NoUba) · de VOLLEDIGE testsuite groen (0 fail) · EclipseValidateData 4 validators / 0 fouten · catalog gedocumenteerd = geïmplementeerd.** Het exacte testaantal staat bewust niet meer in deze regel — het groeide vannacht van 107 naar ruim 115 en de regel liep er drie keer op achter. Het staat wél in de commit-message van elke ronde, waar het niet kán verouderen. Alles tussen `26edd65` en `HEAD` is van deze nacht, alles gepusht — `git log 26edd65..HEAD` is de lijst, en dat is met opzet de enige lijst. Hier stonden eerst zeventien hashes opgesomd; die opsomming liep achter zodra er een commit bijkwam en las tóch als compleet. Dezelfde valkuil als de tellingen die hieronder drie keer beschreven staan, en de oplossing is dezelfde: verwijs naar de bron in plaats van hem over te schrijven. In thema's: het harnas (laag 1 + 2) · de speelronde · S1/S2/S3 · de feel-audit (remmen, richting, camera-probe, sprong-vergevingsvensters, traversal, pitch-demping) · de navigatie · drie bewakers op de beschrijvingen.
 
 *Alle getallen in dit rapport zijn na de laatste wijziging opnieuw tegen een verse meetronde gelegd (02:40) en kloppen: remmen 0,150 s / 26,6 cm · achteruit 357 tegen 420 · 360° in 1,500 s · sprong 127,5 cm en 1,008 s · stoeprand 19,98 cm en kniehoogte 0,00 · coyote 0,110 s · buffer 0,150 s · S1 0,000%. Die controle deed ik omdat er sinds het schrijven een camerafix landde, en omdat een groene suite níét betekent dat de getallen in dit document nog kloppen — dat is precies het gat dat me vannacht twee keer betrapte.*
