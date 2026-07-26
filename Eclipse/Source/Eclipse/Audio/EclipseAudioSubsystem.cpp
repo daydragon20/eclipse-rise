@@ -114,13 +114,33 @@ namespace
 		int32 Count;
 	};
 
-	const FFootstepBankDef FootstepBankDefs[] = {
-		{ 1, TEXT("Footstep_Metal"),         6 },   // SurfaceType1 — loopvlak, rooster, dekplaat
-		{ 2, TEXT("Footstep_Shoe_On_Street"), 7 },  // SurfaceType2 — plein en straat
-		{ 3, TEXT("Footstep_Mud"),           7 },   // SurfaceType3
-		{ 4, TEXT("Foostep_Grass"),          7 },   // SurfaceType4 — pack-tikfout, met opzet
-		{ 5, TEXT("Footstep_Sand"),          7 },   // SurfaceType5
-		{ 6, TEXT("Footstep_Wood"),          7 },   // SurfaceType6
+	// GEEN AANTALLEN MEER. Hier stond per oppervlak een handgeschreven getal, en
+	// die zijn 26-07 laat nagemeten tegen wat het pack echt levert:
+	//
+	//   metaal 7 (code vroeg 6) · straat 9 (7) · modder 7 (7) · gras 14 (7)
+	//   zand 16 (7) · HOUT 5, en de code vroeg er 7
+	//
+	// Die laatste kostte twee mislukte laadpogingen bij elke start — zichtbaar in
+	// het log als "Failed to find object Footstep_Wood_06_Cue", en door NIETS
+	// geteld: de lader meldde alleen iets als een bank HELEMAAL leeg bleef. Vijf
+	// van de zeven ging stil door. Precies het stille falen met een alibi dat
+	// vandaag overal anders is opgeruimd.
+	//
+	// De rest van de getallen was de omgekeerde fout: van zestien zandvarianten
+	// speelden we er zeven, terwijl variatie het hele punt van een voetstapbank
+	// is.
+	//
+	// Een getal dat het bestandssysteem beschrijft hoort niet in code te staan —
+	// het loopt uit elkaar zodra het pack verandert en niemand ziet het. De lader
+	// telt nu zelf omhoog tot er geen cue meer is.
+	struct FFootstepBankDefSimple { uint8 SurfaceType; const TCHAR* Prefix; };
+	const FFootstepBankDefSimple FootstepBankDefs[] = {
+		{ 1, TEXT("Footstep_Metal")          },   // SurfaceType1 — loopvlak, rooster, dekplaat
+		{ 2, TEXT("Footstep_Shoe_On_Street") },   // SurfaceType2 — plein en straat
+		{ 3, TEXT("Footstep_Mud")            },   // SurfaceType3
+		{ 4, TEXT("Foostep_Grass")           },   // SurfaceType4 — pack-tikfout, met opzet
+		{ 5, TEXT("Footstep_Sand")           },   // SurfaceType5
+		{ 6, TEXT("Footstep_Wood")           },   // SurfaceType6
 	};
 
 	/** Waar het op valt als er geen physical material onder je voeten ligt. */
@@ -394,18 +414,27 @@ int32 UEclipseAudioSubsystem::GetWeaponSoundVariantCount(FName Family) const
 
 void UEclipseAudioSubsystem::LoadFootstepBanks()
 {
-	for (const FFootstepBankDef& Def : FootstepBankDefs)
+	for (const FFootstepBankDefSimple& Def : FootstepBankDefs)
 	{
 		FEclipseSoundVariantSet Bank;
-		for (int32 Index = 1; Index <= Def.Count; ++Index)
+		// Tellen tot er geen volgende meer is. De bovengrens is een noodrem tegen
+		// een eindeloze lus, geen verwachting: geen enkel pack levert er zoveel.
+		constexpr int32 MaxVariantsPerSurface = 64;
+		for (int32 Index = 1; Index <= MaxVariantsPerSurface; ++Index)
 		{
 			const FString Path = FString::Printf(
 				TEXT("/Game/Footsteps_Volume_02/Cues/%s_%02d_Cue.%s_%02d_Cue"),
 				Def.Prefix, Index, Def.Prefix, Index);
-			if (USoundBase* Cue = LoadObject<USoundBase>(nullptr, *Path))
+			// LoadObject met LOAD_NoWarn: de eerste ontbrekende IS het einde van
+			// de reeks en dus geen fout. Zonder die vlag schrijft de engine bij
+			// elke start zes "Failed to find object"-regels in het log — een
+			// waarschuwing die niets betekent leert je de andere te negeren.
+			USoundBase* Cue = LoadObject<USoundBase>(nullptr, *Path, nullptr, LOAD_NoWarn | LOAD_Quiet);
+			if (Cue == nullptr)
 			{
-				Bank.Shots.Add(Cue);
+				break;
 			}
+			Bank.Shots.Add(Cue);
 		}
 
 		if (Bank.Shots.Num() == 0)
@@ -416,6 +445,11 @@ void UEclipseAudioSubsystem::LoadFootstepBanks()
 				Def.Prefix);
 			continue;
 		}
+		// Hardop hoeveel varianten een oppervlak heeft. Een bank die van zestien
+		// naar twee zakt omdat iemand het pack opschoont, hoort zichtbaar te zijn
+		// vóór je het in het spel hoort.
+		UE_LOG(LogEclipse, Display, TEXT("Audio: voetstapbank %s heeft %d varianten."),
+			Def.Prefix, Bank.Shots.Num());
 		FootstepBanks.Add(Def.SurfaceType, MoveTemp(Bank));
 	}
 }
