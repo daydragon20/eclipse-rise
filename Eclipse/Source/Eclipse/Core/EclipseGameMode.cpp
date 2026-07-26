@@ -3,6 +3,7 @@
 #include "AI/EclipseEnemyController.h"
 #include "AI/EclipseSquadmateController.h"
 #include "Base/EclipsePrepSubsystem.h"
+#include "Base/EclipsePrepTypes.h"
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipseClassLogic.h"
@@ -551,7 +552,60 @@ void AEclipseGameMode::SpawnMissionActors()
 		{
 			PlayerBody->ApplyBodyDef(*PlayerBodyDef);
 		}
-		EnsureWeapon(*PlayerBody).ApplyWeaponRow(PlayerWeaponRow != nullptr ? *PlayerWeaponRow : DefaultWeaponRow);
+		// DE GEKOZEN LOADOUT BEPAALT JE WAPENS (26-07 avond, punt 5). Tot vandaag
+		// kreeg iedereen de eerste rij van DT_Weapons en waren drie van de vier
+		// wapens voor niemand bereikbaar — terwijl de loadout-keuze wél bestond,
+		// gevalideerd werd en verzonden. Dit is de schakel die ontbrak.
+		//
+		// Terugval op de eerste rij als de loadout geen wapens noemt: een missie
+		// zonder wapen is erger dan een missie met het verkeerde.
+		UEclipseHitscanWeaponComponent& PlayerWeapon = EnsureWeapon(*PlayerBody);
+		const FEclipseWeaponRow* Primary = nullptr;
+		const FEclipseWeaponRow* Sidearm = nullptr;
+		if (Mission != nullptr)
+		{
+			// Mission staat hierboven al opgezocht (regel ~461); nog een keer
+			// vragen zou een tweede naam voor hetzelfde object opleveren.
+			const FGameplayTag Chosen = Mission->GetActiveLoadoutTag();
+			// De tabel hangt aan DA_PrepTuning en niet aan de setup: de prep-laag
+			// is eigenaar van wat je kunt kiezen, en die eigenaar mag hier niet
+			// omzeild worden.
+			const UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+			const UDataTable* LoadoutTable = Prep != nullptr ? Prep->GetLoadoutTable() : nullptr;
+			const UDataTable* WeaponTable = Setup != nullptr ? Setup->Weapons.LoadSynchronous() : nullptr;
+			if (Chosen.IsValid() && LoadoutTable != nullptr && WeaponTable != nullptr)
+			{
+				LoadoutTable->ForeachRow<FEclipseLoadoutOptionRow>(TEXT("EquipLoadout"),
+					[&Primary, &Sidearm, &Chosen, WeaponTable](const FName&, const FEclipseLoadoutOptionRow& Option)
+					{
+						if (Option.LoadoutTag != Chosen)
+						{
+							return;
+						}
+						if (!Option.PrimaryWeapon.IsNone())
+						{
+							Primary = WeaponTable->FindRow<FEclipseWeaponRow>(Option.PrimaryWeapon, TEXT("Primary"));
+						}
+						if (!Option.SidearmWeapon.IsNone())
+						{
+							Sidearm = WeaponTable->FindRow<FEclipseWeaponRow>(Option.SidearmWeapon, TEXT("Sidearm"));
+						}
+					});
+			}
+		}
+
+		if (Primary == nullptr)
+		{
+			Primary = PlayerWeaponRow;
+		}
+		if (Primary != nullptr && Sidearm != nullptr)
+		{
+			PlayerWeapon.ApplyLoadout(*Primary, *Sidearm);
+		}
+		else
+		{
+			PlayerWeapon.ApplyWeaponRow(Primary != nullptr ? *Primary : DefaultWeaponRow);
+		}
 
 		// Player body down ends the run (bind once; RemoveAll guards re-entry dupes).
 		PlayerBody->OnDowned.RemoveAll(this);

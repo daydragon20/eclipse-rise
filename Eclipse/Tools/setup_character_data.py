@@ -109,6 +109,9 @@ WALK_KEYWORDS = ("walk_fwd", "thirdpersonwalk", "walk")
 RUN_KEYWORDS = ("jog_fwd", "thirdpersonrun", "sprint_fwd", "run", "jog")
 CROUCHTRANS_KEYWORDS = ("crouch_to_stand", "crouch_transition", "stand_to_crouch")
 HITREACT_KEYWORDS = ("hit_react", "hitreact", "impact", "flinch", "hit")
+# Herladen (26-07 avond). "hip" boven "ironsights": de speler herlaadt meestal
+# zonder te mikken, en de heupvariant leest ook als je wel mikt.
+RELOAD_KEYWORDS = ("reload_rifle_hip", "reload_rifle", "reload_pistol", "reload")
 SHOOT_KEYWORDS = ("fire_rifle_hip", "fire_rifle", "primary_fire", "shoot", "fire", "attack")
 DEATH_KEYWORDS = ("death", "die", "dead")
 
@@ -172,6 +175,7 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     shoot = pick_anim(anim_pack, SHOOT_KEYWORDS)
     death = pick_anim(anim_pack, DEATH_KEYWORDS)
     hit_react = pick_anim(anim_pack, HITREACT_KEYWORDS)
+    reload = pick_anim(anim_pack, RELOAD_KEYWORDS)
     crouch_trans = pick_directional(anim_pack, CROUCHTRANS_KEYWORDS, ("crouch",))
     walk_back = pick_directional(anim_pack, WALK_STEMS, BACK_KEYS)
     walk_left = pick_directional(anim_pack, WALK_STEMS, LEFT_KEYS)
@@ -195,11 +199,11 @@ for row_name, (mesh_pack, anim_pack) in BODIES.items():
     if not idle:
         unreal.log_warning(f"{row_name}: geen idle-take in {anim_pack} — deze body krijgt geen pose")
     lit, shade = TINTS.get(row_name, ((0.20, 0.20, 0.22), (0.07, 0.07, 0.09)))
-    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}","{hit_react}","{crouch_trans}",'
+    rows.append(f'{row_name},"{mesh}","{idle}","{walk}","{run}","{shoot}","{death}","{hit_react}","{reload}","{crouch_trans}",'
                 f'"{walk_back}","{walk_left}","{walk_right}","{run_back}","{run_left}","{run_right}",true,'
                 f'{color(lit)},{color(shade)},1.0,-90.0,-90.0')
 
-csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,HitReactAnim,CrouchTransitionAnim,"
+csv_body = ("---,Mesh,IdleAnim,WalkAnim,RunAnim,ShootAnim,DeathAnim,HitReactAnim,ReloadAnim,CrouchTransitionAnim,"
             "WalkBackAnim,WalkLeftAnim,WalkRightAnim,RunBackAnim,RunLeftAnim,RunRightAnim,bToonRestyle,"
             "TintLit,TintShade,MeshScale,MeshZOffset,MeshYaw\n" + "\n".join(rows))
 

@@ -1,6 +1,7 @@
 #include "EclipseDataValidators.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Base/EclipsePrepTypes.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Economy/EclipseEconomyDataAsset.h"
 #include "Engine/DataTable.h"
@@ -78,6 +79,77 @@ int32 ValidateRegionGraphAssets(TArray<FString>& OutErrors, int32& OutAssetsChec
 		{
 			OutErrors.Add(FString::Printf(TEXT("%s: region graph has no mission-offer table"), *AssetData.AssetName.ToString()));
 		}
+	}
+
+	return OutErrors.Num() - InitialErrors;
+}
+
+int32 ValidateLoadoutTables(TArray<FString>& OutErrors, int32& OutAssetsChecked)
+{
+	const int32 InitialErrors = OutErrors.Num();
+	OutAssetsChecked = 0;
+
+	// Alle wapenrijnamen die er zijn, uit ELKE wapentabel. Op naam en niet op één
+	// tabel: welke tabel er verscheept wordt is een setup-detail, en een loadout
+	// die naar een bestaand wapen wijst hoort te kloppen ongeacht waar dat wapen
+	// staat.
+	TSet<FName> KnownWeapons;
+	for (const FAssetData& AssetData : FindAssetsOfClass(UDataTable::StaticClass()))
+	{
+		const UDataTable* Table = Cast<UDataTable>(AssetData.GetAsset());
+		if (Table != nullptr && Table->GetRowStruct() == FEclipseWeaponRow::StaticStruct())
+		{
+			for (const FName& RowName : Table->GetRowNames())
+			{
+				KnownWeapons.Add(RowName);
+			}
+		}
+	}
+
+	for (const FAssetData& AssetData : FindAssetsOfClass(UDataTable::StaticClass()))
+	{
+		const UDataTable* Table = Cast<UDataTable>(AssetData.GetAsset());
+		if (Table == nullptr || Table->GetRowStruct() != FEclipseLoadoutOptionRow::StaticStruct())
+		{
+			continue;
+		}
+		++OutAssetsChecked;
+
+		Table->ForeachRow<FEclipseLoadoutOptionRow>(TEXT("ValidateLoadouts"),
+			[&OutErrors, &AssetData, &KnownWeapons](const FName& RowName, const FEclipseLoadoutOptionRow& Row)
+			{
+				const FString Where = FString::Printf(TEXT("%s: loadout '%s'"),
+					*AssetData.AssetName.ToString(), *RowName.ToString());
+
+				auto CheckWeapon = [&OutErrors, &Where, &KnownWeapons](FName Weapon, const TCHAR* Slot)
+				{
+					if (Weapon.IsNone())
+					{
+						OutErrors.Add(FString::Printf(
+							TEXT("%s noemt geen %s — dan val je terug op de eerste rij van DT_Weapons en doet je keuze niets"),
+							*Where, Slot));
+						return;
+					}
+					if (!KnownWeapons.Contains(Weapon))
+					{
+						OutErrors.Add(FString::Printf(
+							TEXT("%s noemt %s '%s' en dat wapen bestaat in geen enkele wapentabel"),
+							*Where, Slot, *Weapon.ToString()));
+					}
+				};
+				CheckWeapon(Row.PrimaryWeapon, TEXT("primair wapen"));
+				CheckWeapon(Row.SidearmWeapon, TEXT("sidearm"));
+
+				// Twee identieke slots betekent dat wisselen niets doet, en dat is
+				// erger dan geen tweede wapen: de knop reageert wel en er verandert
+				// niets.
+				if (!Row.PrimaryWeapon.IsNone() && Row.PrimaryWeapon == Row.SidearmWeapon)
+				{
+					OutErrors.Add(FString::Printf(
+						TEXT("%s heeft twee keer '%s' — dan reageert de wisselknop wel en verandert er niets"),
+						*Where, *Row.PrimaryWeapon.ToString()));
+				}
+			});
 	}
 
 	return OutErrors.Num() - InitialErrors;

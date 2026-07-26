@@ -48,7 +48,7 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Actie | Muis/toetsenbord | Controller | Handler |
 |---|---|---|---|
 | Activeren | Q vasthouden | LB vasthouden | ja — `CommandMode->OnHoldPressed/Released` |
-| Volgende soldaat | Tab / scroll omhoog | RB **tijdens de hold** (erbuiten: 1e/3e persoon) | ja — `CycleSoldierSelection(+1)` |
+| Volgende soldaat | Tab / scroll omhoog | RB **tijdens de hold** (erbuiten: WAPENWISSEL) | ja — `CycleSoldierSelection(+1)` |
 | Vorige soldaat | scroll omlaag | *(pad: geen — RB wrapt rond)* | ja op muis; **de LT-tak is 26-07 verwijderd**, zie hieronder |
 | Soldaat onder richtkruis | E | X | ja — `PickSoldierUnderReticle` |
 | Orders 1–4 | 1 2 3 4 | D-pad ↑ → ↓ ← | ja — `IssueSquadOrder` |
@@ -57,9 +57,17 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 
 > **Dit stond hier tot 26-07:** vier controls (stance, volgende, vorige,
 > onder-kruis) deden buiten Command Mode stil niets. Drie ervan zijn opgelost.
-> **RB** wisselt buiten de modus het camerastandpunt — dat vulde een echt gat,
-> want sinds R3 eraf ging kón de pad helemaal niet meer wisselen. **X** geeft
-> een snelle hergroepeer-order via het bestaande orderpad. **LT** is geen
+> **RB** wisselt buiten de modus van WAPEN (26-07 avond). Dat was tot die avond
+> het camerastandpunt; die ruil is bewust. Van wapen wisselen is een
+> gevechtshandeling die je tientallen keren per missie doet, 1e/3e persoon is een
+> voorkeur die je één keer zet — en een bumper is beter voor iets middenin een
+> vuurgevecht, want je duim blijft op de rechterstick. Het camerastandpunt houdt
+> **C** op het toetsenbord. Het genre legt de wapenwissel meestal op Y/Driehoek
+> (Division, Call of Duty, Gears, Destiny), maar Y draagt hier de stance.
+> **X** geeft
+> HERLADEN (**R** of **X**; buiten Command Mode). Valt er niets te herladen, dan
+> geeft dezelfde knop de snelle hergroepeer-order via het bestaande orderpad —
+> geen dode knop, ook niet als het magazijn vol is. **LT** is geen
 > moduskeuze meer (zie hieronder). **Y (stance) blijft dood**, met opzet: stance
 > verandert vandaag alleen de HUD-regel, en er iets anders op zetten zou
 > verbergen dat de stance zelf nog niet af is.

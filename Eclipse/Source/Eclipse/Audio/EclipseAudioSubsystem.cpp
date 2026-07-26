@@ -118,6 +118,51 @@ namespace
 
 	/** Waar het op valt als er geen physical material onder je voeten ligt. */
 	constexpr uint8 DefaultFootstepSurface = 2;
+
+	/**
+	 * DE HERLAADKETEN (owner-levering 26-07 avond).
+	 *
+	 * "Deze vier cues horen op de fasen van die animatie, niet als een enkel geluid
+	 * aan het begin." De VOLGORDE komt uit het pack zelf: die nummert zijn takes
+	 * (01 drop, 02 insert, 03 bolt), en dat is de handeling zoals hij echt gaat.
+	 * Het magazijn pakken zit ertussen, want je grijpt het nieuwe terwijl het oude
+	 * valt.
+	 *
+	 * De BREUKEN zijn van mij, en dat hoort erbij te staan: het pack levert geen
+	 * timing. Ze zijn zo gelegd dat de grendel vlak voor het einde valt — dat is
+	 * het moment waarop een speler weet dat hij weer kan schieten, en dat moment
+	 * hoort hoorbaar te zijn vóór het waar wordt, niet erna.
+	 */
+	struct FReloadFoleyDef
+	{
+		const TCHAR* Family;
+		float Fraction;
+		const TCHAR* Path;
+	};
+
+	const FReloadFoleyDef ReloadFoleyDefs[] = {
+		{ TEXT("AssaultRifle"), 0.10f, TEXT("/Game/FreeWeaponSounds/Cue/AssaultRifle/Foley/01_assault_rifle_reload_1_drop_the_mag_Cue.01_assault_rifle_reload_1_drop_the_mag_Cue") },
+		{ TEXT("AssaultRifle"), 0.32f, TEXT("/Game/FreeWeaponSounds/Cue/AssaultRifle/Foley/assault_rifle_mag_draw_Cue.assault_rifle_mag_draw_Cue") },
+		{ TEXT("AssaultRifle"), 0.58f, TEXT("/Game/FreeWeaponSounds/Cue/AssaultRifle/Foley/02_assault_rifle_reload_1_insert_the_mag_Cue.02_assault_rifle_reload_1_insert_the_mag_Cue") },
+		{ TEXT("AssaultRifle"), 0.85f, TEXT("/Game/FreeWeaponSounds/Cue/AssaultRifle/Foley/03_assault_rifle_reload_1_bolt_Cue.03_assault_rifle_reload_1_bolt_Cue") },
+
+		{ TEXT("Handgun"), 0.05f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/01_slide_lock_handgun_reload_1_Cue.01_slide_lock_handgun_reload_1_Cue") },
+		{ TEXT("Handgun"), 0.28f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/02_drop_the_mag_handgun_reload_1_Cue.02_drop_the_mag_handgun_reload_1_Cue") },
+		{ TEXT("Handgun"), 0.58f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/03_insert_the_mag_handgun_reload_1_Cue.03_insert_the_mag_handgun_reload_1_Cue") },
+		{ TEXT("Handgun"), 0.85f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/04_slide_release_handgun_reload_1_Cue.04_slide_release_handgun_reload_1_Cue") },
+
+		{ TEXT("Shotgun"), 0.20f, TEXT("/Game/FreeWeaponSounds/Cue/Shotgun/Foley/shotgun_reload_chambering_Cue.shotgun_reload_chambering_Cue") },
+		{ TEXT("Shotgun"), 0.75f, TEXT("/Game/FreeWeaponSounds/Cue/Shotgun/Foley/shotgun_reload_slide_action_Cue.shotgun_reload_slide_action_Cue") },
+	};
+
+	constexpr float ReloadFoleyVolume = 0.8f;
+
+	/** Het optillen van een wapen — het pack levert er één per familie. */
+	const FReloadFoleyDef WeaponEquipDefs[] = {
+		{ TEXT("AssaultRifle"), 0.0f, TEXT("/Game/FreeWeaponSounds/Cue/AssaultRifle/Foley/assault_rifle_weapon_equip_Cue.assault_rifle_weapon_equip_Cue") },
+		{ TEXT("Handgun"),      0.0f, TEXT("/Game/FreeWeaponSounds/Cue/Handgun/Foley/handgun_weapon_equip_Cue.handgun_weapon_equip_Cue") },
+		{ TEXT("Shotgun"),      0.0f, TEXT("/Game/FreeWeaponSounds/Cue/Shotgun/Foley/shotgun_weapon_equip_Cue.shotgun_weapon_equip_Cue") },
+	};
 }
 
 void UEclipseAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -188,6 +233,7 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		// bij het eerste schot of de eerste stap.
 		LoadWeaponSoundSets();
 		LoadFootstepBanks();
+		LoadReloadFoley();
 	}
 	if (!bTriedLoadImpact)
 	{
@@ -210,6 +256,14 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		EclipseTags::Event_Combat_HitLanded,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnHitLanded),
 		FEclipseCombatEventPayload::StaticStruct());
+	ReloadStartedHandle = Bus.Subscribe(
+		EclipseTags::Event_Combat_ReloadStarted,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnReloadStarted),
+		FEclipseCombatEventPayload::StaticStruct());
+	WeaponSwappedHandle = Bus.Subscribe(
+		EclipseTags::Event_Combat_WeaponSwapped,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnWeaponSwapped),
+		FEclipseCombatEventPayload::StaticStruct());
 }
 
 void UEclipseAudioSubsystem::UnbindFromBus()
@@ -221,12 +275,16 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 		Bus->Unsubscribe(OrderRefusedHandle);
 		Bus->Unsubscribe(ShotFiredHandle);
 		Bus->Unsubscribe(HitLandedHandle);
+		Bus->Unsubscribe(ReloadStartedHandle);
+		Bus->Unsubscribe(WeaponSwappedHandle);
 	}
 	MissionCompletedHandle = FEclipseEventSubscriptionHandle();
 	OrderAckHandle = FEclipseEventSubscriptionHandle();
 	OrderRefusedHandle = FEclipseEventSubscriptionHandle();
 	ShotFiredHandle = FEclipseEventSubscriptionHandle();
 	HitLandedHandle = FEclipseEventSubscriptionHandle();
+	ReloadStartedHandle = FEclipseEventSubscriptionHandle();
+	WeaponSwappedHandle = FEclipseEventSubscriptionHandle();
 	LastBarkSeconds.Reset();
 	BoundBus = nullptr;
 }
@@ -389,6 +447,113 @@ int32 UEclipseAudioSubsystem::GetFootstepVariantCount(uint8 SurfaceType) const
 {
 	const FWeaponSoundSet* Bank = FootstepBanks.Find(SurfaceType);
 	return Bank != nullptr ? Bank->Shots.Num() : 0;
+}
+
+void UEclipseAudioSubsystem::LoadReloadFoley()
+{
+	for (const FReloadFoleyDef& Def : ReloadFoleyDefs)
+	{
+		USoundBase* Cue = LoadObject<USoundBase>(nullptr, Def.Path);
+		if (Cue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("Audio: foley %s ontbreekt — die fase van het herladen blijft stil (14.3.5)."), Def.Path);
+			continue;
+		}
+		ReloadFoley.FindOrAdd(FName(Def.Family)).Add({ Def.Fraction, Cue });
+	}
+
+	for (const FReloadFoleyDef& Def : WeaponEquipDefs)
+	{
+		if (USoundBase* Cue = LoadObject<USoundBase>(nullptr, Def.Path))
+		{
+			WeaponEquipCues.Add(FName(Def.Family), Cue);
+		}
+	}
+}
+
+void UEclipseAudioSubsystem::OnWeaponSwapped(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Swap = Payload.GetPtr<FEclipseCombatEventPayload>();
+	if (Swap == nullptr || GetWorld() == nullptr)
+	{
+		return;
+	}
+	TObjectPtr<USoundBase>* Cue = WeaponEquipCues.Find(Swap->WeaponSoundFamily);
+	if (Cue == nullptr || *Cue == nullptr)
+	{
+		return;
+	}
+	++EquipSoundCount;
+	// Bij de schutter, niet 2D: ook een vijand die naar zijn pistool grijpt hoort
+	// hoorbaar te zijn — dat is dezelfde tell als het herladen.
+	if (AActor* Live = Swap->Shooter.Get())
+	{
+		UGameplayStatics::SpawnSoundAttached(*Cue, Live->GetRootComponent(), NAME_None,
+			FVector::ZeroVector, EAttachLocation::SnapToTarget, true, ReloadFoleyVolume);
+		return;
+	}
+	UGameplayStatics::PlaySoundAtLocation(this, *Cue, Swap->Origin, ReloadFoleyVolume);
+}
+
+int32 UEclipseAudioSubsystem::GetReloadFoleyStepCount(FName Family) const
+{
+	const TArray<FFoleyStep>* Steps = ReloadFoley.Find(Family);
+	return Steps != nullptr ? Steps->Num() : 0;
+}
+
+void UEclipseAudioSubsystem::OnReloadStarted(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Reload = Payload.GetPtr<FEclipseCombatEventPayload>();
+	UWorld* World = GetWorld();
+	if (Reload == nullptr || World == nullptr)
+	{
+		return;
+	}
+
+	const TArray<FFoleyStep>* Steps = ReloadFoley.Find(Reload->WeaponSoundFamily);
+	if (Steps == nullptr)
+	{
+		return;
+	}
+
+	// AAN DE ACTOR en niet aan een plek: een herlaadbeurt duurt seconden en de
+	// schutter loopt door. Foley die achterblijft waar hij begon klinkt als iemand
+	// anders die daar staat te rommelen. Dat geldt ook voor een VIJAND die
+	// herlaadt — dat is een tell die je hoort verplaatsen, en het is de reden dat
+	// dit voor iedereen speelt en niet alleen voor de speler.
+	AActor* Shooter = Reload->Shooter.Get();
+	const FVector Fallback = Reload->Origin;
+	const float Duration = FMath::Max(Reload->DurationSeconds, 0.05f);
+
+	for (const FFoleyStep& Step : *Steps)
+	{
+		USoundBase* Cue = Step.Cue;
+		if (Cue == nullptr)
+		{
+			continue;
+		}
+		++ReloadFoleyCount;
+
+		const float Delay = Step.Fraction * Duration;
+		TWeakObjectPtr<AActor> WeakShooter(Shooter);
+		FTimerHandle Handle;
+		World->GetTimerManager().SetTimer(Handle,
+			FTimerDelegate::CreateWeakLambda(this, [this, Cue, WeakShooter, Fallback]()
+			{
+				if (AActor* Live = WeakShooter.Get())
+				{
+					UGameplayStatics::SpawnSoundAttached(Cue, Live->GetRootComponent(), NAME_None,
+						FVector::ZeroVector, EAttachLocation::SnapToTarget, /*bStopWhenAttachedToDestroyed=*/true,
+						ReloadFoleyVolume);
+					return;
+				}
+				// Schutter weg tijdens het herladen (neergeschoten). Het geluid nog
+				// afmaken waar hij stond: dat is wat je zou horen.
+				UGameplayStatics::PlaySoundAtLocation(this, Cue, Fallback, ReloadFoleyVolume);
+			}),
+			FMath::Max(Delay, 0.001f), /*bLoop=*/false);
+	}
 }
 
 void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)

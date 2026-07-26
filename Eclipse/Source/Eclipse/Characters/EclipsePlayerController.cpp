@@ -539,6 +539,10 @@ void AEclipsePlayerController::SetupInputComponent()
 	MapKey(SelectPrevAction, EKeys::Gamepad_LeftTrigger); // pad prev (review minor; RT stays fire)
 	DirectPickAction = MakeAction(EInputActionValueType::Boolean);
 	MapKey(DirectPickAction, EKeys::E);
+	// R is herladen op elk toetsenbord sinds Half-Life. Op dezelfde actie als E/X,
+	// want het is dezelfde handeling — de betekenis hangt aan Command Mode, niet
+	// aan welke toets je indrukte.
+	MapKey(DirectPickAction, EKeys::R);
 	MapKey(DirectPickAction, EKeys::Gamepad_FaceButton_Left);
 	StanceToggleAction = MakeAction(EInputActionValueType::Boolean);
 	MapKey(StanceToggleAction, EKeys::Gamepad_FaceButton_Top);
@@ -655,6 +659,23 @@ void AEclipsePlayerController::SetupInputComponent()
 			CommandMode->CycleSoldierSelection(+1);
 			return;
 		}
+
+		// WAPENWISSEL (owner-opdracht 26-07 avond, punt 5: "inclusief wapenwissel
+		// op RB"). Het genre legt hem meestal op Y/Driehoek — Division, Call of
+		// Duty, Gears en Destiny doen dat allemaal — maar Y draagt hier de stance,
+		// en de owner heeft RB genoemd. Een bumper is bovendien beter dan een
+		// gezichtsknop voor iets wat je middenin een vuurgevecht doet: je duim
+		// blijft op de rechterstick, dus je blijft mikken terwijl je wisselt.
+		//
+		// Het camerastandpunt verliest hiermee zijn padknop en houdt C op het
+		// toetsenbord. Dat is een bewuste ruil en geen verwaarlozing: van wapen
+		// wisselen is een gevechtshandeling die je tientallen keren per missie
+		// doet, en 1e/3e persoon is een voorkeur die je één keer zet. De owner
+		// haalde R3 er eerder om precies die reden al af.
+		if (TrySwapWeapon())
+		{
+			return;
+		}
 		HandleToggleView();
 	});
 
@@ -687,6 +708,20 @@ void AEclipsePlayerController::SetupInputComponent()
 		if (bHeld)
 		{
 			CommandMode->PickSoldierUnderReticle();
+			return;
+		}
+
+		// HERLADEN (26-07 avond, punt 4). X/Vierkant is herladen in Call of Duty,
+		// Battlefield, Gears, The Division, Borderlands en Destiny — dat is zo'n
+		// sterke conventie als er in dit genre bestaat, en sterker dan de claim van
+		// de hergroepeer-order die ik er vanmorgen zelf op zette.
+		//
+		// Het conflict los ik op zoals LT vanmorgen: BINNEN Command Mode blijft het
+		// de order, erbuiten wordt het herladen. Zelfde knop, twee betekenissen die
+		// niet tegelijk kunnen gelden — en de speler houdt LB vast op het moment dat
+		// hij orders geeft, dus hij weet in welke van de twee hij zit.
+		if (TryReload())
+		{
 			return;
 		}
 		IssueSquadOrder(EEclipseSquadOrder::Regroup);
@@ -1038,11 +1073,19 @@ void AEclipsePlayerController::HandleLook(const FInputActionValue& Value)
 	// staat dan letterlijk over zijn schouder te kijken.
 	//
 	// 90 graden is waar de referentie het ook legt. Gears en The Division draaien
-	// het lichaam bij ongeveer een kwartslag na, met een draai-animatie erbij. Die
-	// animatie zit niet in de packs (nagekeken: geen enkele Turn_*-take), dus de
-	// voeten schuiven een fractie. Dat gebeurt alleen bij een kwartslag of meer,
-	// en nooit tijdens het kleine corrigeren waar dit model voor gemaakt is.
-	// De draai-animatie staat als owner-item; zodra hij er is kan de drempel omlaag.
+	// het lichaam bij ongeveer een kwartslag na, met een draai-animatie erbij.
+	//
+	// CORRECTIE 26-07 avond. Hier stond "die animatie zit niet in de packs
+	// (nagekeken: geen enkele Turn_*-take)". Dat was fout, en het is het soort fout
+	// dat zich vastzet: ik keek in SciFiCharacter, maar de SPELER is Belica, en
+	// ParagonLtBelica levert Idle_Turn_90_Left/Right, Idle_Turn_180_Left/Right en
+	// drie TurnInPlace-varianten. Een "bestaat niet" hoort te zeggen WAAR er
+	// gekeken is — anders leest een verkeerde bevinding als iets wat al onderzocht
+	// is, en blijft deze drempel op 90 staan om een reden die niet bestaat.
+	//
+	// Tot de takes zijn aangesloten schuiven de voeten een fractie bij een
+	// kwartslag of meer; nooit tijdens het kleine corrigeren waar dit model voor
+	// gemaakt is. Zodra ze erin zitten kan de drempel omlaag.
 	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
 	{
 		const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
@@ -1126,6 +1169,38 @@ bool AEclipsePlayerController::IsUsingGamepadLook() const
 			== EHardwareDevicePrimaryType::Gamepad;
 	}
 	return false; // no subsystem (commandlet) — treat as mouse, i.e. raw
+}
+
+bool AEclipsePlayerController::TrySwapWeapon()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	UEclipseHitscanWeaponComponent* Weapon = Body != nullptr
+		? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
+	if (Weapon == nullptr)
+	{
+		return false;
+	}
+	// FALSE als er maar één wapen is. Dan valt RB door naar het camerastandpunt,
+	// zodat de knop nooit niets doet — dezelfde regel als bij herladen op X.
+	return Weapon->SwapWeapon();
+}
+
+bool AEclipsePlayerController::TryReload()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	if (Body == nullptr)
+	{
+		return false;
+	}
+	UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (Weapon == nullptr)
+	{
+		return false;
+	}
+	// FALSE als er niets te herladen valt (vol magazijn, of al bezig). Dan valt de
+	// knop door naar de hergroepeer-order in plaats van niets te doen — geen dode
+	// knoppen, ook niet als de betekenis van de knop wisselt.
+	return Weapon->StartReload(TEXT("PlayerReload"));
 }
 
 void AEclipsePlayerController::HandleToggleView()

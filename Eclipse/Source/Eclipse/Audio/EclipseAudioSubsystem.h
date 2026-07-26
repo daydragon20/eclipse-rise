@@ -67,6 +67,11 @@ public:
 	void PlayFootstep(const FVector& Location, uint8 SurfaceType, float Volume);
 	int32 GetFootstepSoundCount() const { return FootstepSoundCount; }
 	int32 GetFootstepVariantCount(uint8 SurfaceType) const;
+
+	/** Foley-stappen die echt gepland zijn — het bewijs dat de keten loopt. */
+	int32 GetReloadFoleyCount() const { return ReloadFoleyCount; }
+	int32 GetReloadFoleyStepCount(FName Family) const;
+	int32 GetEquipSoundCount() const { return EquipSoundCount; }
 	int32 GetWeaponSoundFamilyCount() const { return WeaponSoundSets.Num(); }
 	int32 GetWeaponSoundVariantCount(FName Family) const;
 
@@ -93,6 +98,8 @@ private:
 	void OnOrderAnswered(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload);
+	void OnReloadStarted(FGameplayTag EventTag, const FInstancedStruct& Payload);
+	void OnWeaponSwapped(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Bus we subscribed on; weak so teardown order during shutdown cannot dangle. */
 	TWeakObjectPtr<UEclipseEventBusSubsystem> BoundBus;
@@ -101,6 +108,8 @@ private:
 	FEclipseEventSubscriptionHandle OrderRefusedHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
 	FEclipseEventSubscriptionHandle HitLandedHandle;
+	FEclipseEventSubscriptionHandle ReloadStartedHandle;
+	FEclipseEventSubscriptionHandle WeaponSwappedHandle;
 
 	/** Laatste bark per soldaat (wereldseconden) — de rem van BarkCooldownSeconds. */
 	TMap<FGuid, double> LastBarkSeconds;
@@ -154,6 +163,26 @@ private:
 	 * cues zouden per lichaam opnieuw geladen worden. Eén eigenaar, één keer laden.
 	 */
 	void LoadFootstepBanks();
+
+	/**
+	 * De herlaadketen per wapenfamilie: magazijn pakken, laten vallen, insteken,
+	 * grendel. Als LIJST met tijdstippen en niet als één geluid bij de start —
+	 * dat is precies wat de owner erover schreef, en het is ook waarom het pack
+	 * ze genummerd levert.
+	 */
+	void LoadReloadFoley();
+
+	struct FFoleyStep
+	{
+		float Fraction = 0.0f;
+		TObjectPtr<USoundBase> Cue;
+	};
+	TMap<FName, TArray<FFoleyStep>> ReloadFoley;
+	int32 ReloadFoleyCount = 0;
+
+	/** Het geluid van een wapen dat je optilt, per familie. */
+	TMap<FName, TObjectPtr<USoundBase>> WeaponEquipCues;
+	int32 EquipSoundCount = 0;
 
 	TMap<uint8, FWeaponSoundSet> FootstepBanks;
 	int32 FootstepSoundCount = 0;

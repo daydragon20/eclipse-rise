@@ -70,6 +70,12 @@ protected:
 
 
 private:
+	/** Herladen als er iets te herladen valt; false laat de knop doorvallen. */
+	bool TryReload();
+
+	/** Wisselen als er een tweede wapen is; false laat de knop doorvallen. */
+	bool TrySwapWeapon();
+
 	void HandleMove(const struct FInputActionValue& Value);
 	void HandleLook(const struct FInputActionValue& Value);
 	void HandleFire();

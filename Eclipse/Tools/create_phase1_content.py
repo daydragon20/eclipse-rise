@@ -172,13 +172,37 @@ setup.set_editor_property("roster_tuning", roster_tuning)
 # --- Preparation data (SPEC-P1-08): loadout options + tuning.
 loadouts = get_or_create("DT_LoadoutOptions", unreal.DataTable,
                          make_table_factory(unreal.EclipseLoadoutOptionRow.static_struct()))
+# ELKE LOADOUT GEEFT NU ECHT WAPENS (26-07 avond, punt 5). Tot vandaag droeg een
+# loadout alleen een tag en kreeg je altijd de eerste rij van DT_Weapons.
+#
+# Elke loadout houdt de sidearm, want dat doet het hele genre: Division, Ghost
+# Recon en Call of Duty geven je er altijd een. Hij is bovendien het enige
+# gedempte wapen, dus hij is niet je zwakke reserve maar je stille optie.
+#
+# DE BASIS-LOADOUT IS DE ALLROUNDER, en dat is geen smaakkwestie. Ik had hier
+# eerst de SMG staan omdat "Scavenged" klinkt als "wat je vond". De speelronde
+# viel daarop om: met 11 schade en een afval naar 35% voorbij 8 m ging er geen
+# enkele vijand meer neer op afstand, en de missie liep vast op zijn eigen
+# hoofddoel.
+#
+# Dat was geen testprobleem maar een ontwerpfout. Elke shooter geeft je als
+# STARTWAPEN de allrounder - Call of Duty, Borderlands en Destiny alle drie - en
+# maakt de gespecialiseerde wapens tot unlock. Een startwapen dat alleen dichtbij
+# werkt, straft je voor het spel dat je nog niet kent.
+#
+# Dus: Scavenged (geen unlock) is de AR. "Rifle platform" wordt de DMR, want een
+# DMR is een rifle platform en het is de unlock voor wie afstand wil. "Medium
+# armor" wordt de SMG: pantser is voor wie de afstand juist wil OVERBRUGGEN.
 loadouts_json = json.dumps([
     {"Name": "Loadout_Scavenged", "DisplayName": "Scavenged arms",
-     "LoadoutTag": {"TagName": "Loadout.Scavenged"}, "RequiredUnlockTag": {"TagName": "None"}},
+     "LoadoutTag": {"TagName": "Loadout.Scavenged"}, "RequiredUnlockTag": {"TagName": "None"},
+     "PrimaryWeapon": "AR_Foundry", "SidearmWeapon": "Sidearm_Scrap"},
     {"Name": "Loadout_Rifle", "DisplayName": "Rifle platform",
-     "LoadoutTag": {"TagName": "Loadout.Rifle"}, "RequiredUnlockTag": {"TagName": "Loadout.Rifle"}},
+     "LoadoutTag": {"TagName": "Loadout.Rifle"}, "RequiredUnlockTag": {"TagName": "Loadout.Rifle"},
+     "PrimaryWeapon": "DMR_Longsight", "SidearmWeapon": "Sidearm_Scrap"},
     {"Name": "Loadout_MediumArmor", "DisplayName": "Medium armor",
-     "LoadoutTag": {"TagName": "Loadout.MediumArmor"}, "RequiredUnlockTag": {"TagName": "Loadout.MediumArmor"}},
+     "LoadoutTag": {"TagName": "Loadout.MediumArmor"}, "RequiredUnlockTag": {"TagName": "Loadout.MediumArmor"},
+     "PrimaryWeapon": "SMG_Patch", "SidearmWeapon": "Sidearm_Scrap"},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(loadouts, loadouts_json):
     raise RuntimeError("DT_LoadoutOptions JSON fill failed")

@@ -587,6 +587,14 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	TSoftObjectPtr<UAnimSequence> HitReactAnim;
 
 	/**
+	 * Herladen (26-07 avond, punt 4). SciFiCharacter levert Reload_Rifle_Hip,
+	 * Reload_Rifle_Ironsights en Reload_Pistol; ze lagen er sinds de import en
+	 * werden door niets afgespeeld — er wás geen herladen.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
+	TSoftObjectPtr<UAnimSequence> ReloadAnim;
+
+	/**
 	 * Hurken en opstaan (locomotie-audit 26-07, punt 13). Zonder deze take
 	 * verspringt het lichaam tussen staand en gehurkt zonder tussenbeweging — de
 	 * capsule krimpt, de pose knipt. SciFiCharacter levert Crouch_to_Stand; die

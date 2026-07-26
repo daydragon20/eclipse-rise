@@ -39,6 +39,8 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderAcknowledged)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combat_ShotFired)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combat_HitLanded)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combat_ReloadStarted)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combat_WeaponSwapped)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderRefused)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierDowned)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierStabilized)

@@ -35,8 +35,10 @@ echo   MIKKEN ............... Rechtermuisknop      ^|  LT
 echo   SPRINGEN ............. Spatie               ^|  A
 echo   Sprint ............... Shift VASTHOUDEN     ^|  L3 = AAN/UIT (toggle)
 echo   Hurken ............... Ctrl (je zakt 52 cm) ^|  B
-echo   1e/3e persoon wisselen  C                   ^|  RB (buiten Command Mode)
-echo   Squad hergroeperen ... E                    ^|  X  (buiten Command Mode)
+echo   1e/3e persoon wisselen  C                   ^|  (geen - RB draagt nu de wissel)
+echo   WAPEN WISSELEN ....... (geen)               ^|  RB (buiten Command Mode)
+echo   HERLADEN ............. R                    ^|  X  (buiten Command Mode)
+echo   Squad hergroeperen ... E                    ^|  X  (als het magazijn vol is)
 echo.
 echo   Sprint verschilt per apparaat en dat is met opzet: op toetsenbord houd je
 echo   Shift vast, op de pad zet L3 hem AAN en blijft hij aan. Hij gaat vanzelf uit

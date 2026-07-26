@@ -171,6 +171,14 @@ struct FEclipseCombatEventPayload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	bool bSuppressed = false;
 
+	/**
+	 * ReloadStarted: hoe lang het herladen duurt. De foley-keten verdeelt zich
+	 * hierover — zonder dit getal zou de audiolaag de wapentabel moeten lezen om
+	 * te weten wanneer de grendel valt.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float DurationSeconds = 0.0f;
+
 	/** True als de schutter aan spelerskant staat. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	bool bPlayerSide = false;

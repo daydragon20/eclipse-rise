@@ -91,6 +91,10 @@ struct FEclipseLocomotionSet
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> HitReact = nullptr;
 
+	/** Herladen (26-07 avond). Lag in SciFiCharacter/Animations en werd nooit gespeeld. */
+	UPROPERTY()
+	TObjectPtr<UAnimSequence> Reload = nullptr;
+
 	/** Hurken/opstaan (26-07, audit punt 13). */
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> CrouchTransition = nullptr;

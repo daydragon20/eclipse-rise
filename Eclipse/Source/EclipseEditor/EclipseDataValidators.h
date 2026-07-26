@@ -34,4 +34,12 @@ namespace EclipseDataValidators
 	 * van, dus CI is de enige plek waar het kan opvallen.
 	 */
 	ECLIPSEEDITOR_API int32 ValidateWeaponTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
+
+	/**
+	 * Loadouts (26-07 avond, punt 5): elke loadout moet wapens noemen die BESTAAN,
+	 * en de twee moeten van elkaar verschillen. Een tikfout hier geeft je stilletjes
+	 * de terugval, en dan lijkt het alsof je keuze niets doet — precies de bug die
+	 * deze laag kwam repareren.
+	 */
+	ECLIPSEEDITOR_API int32 ValidateLoadoutTables(TArray<FString>& OutErrors, int32& OutAssetsChecked);
 }

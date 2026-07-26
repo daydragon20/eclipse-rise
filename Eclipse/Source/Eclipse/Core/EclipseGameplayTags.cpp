@@ -23,6 +23,8 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderIssued, "Event.Squad.OrderIssued", "Player issued a squad order (SPEC-P1-06).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderAcknowledged, "Event.Squad.OrderAcknowledged", "Squadmate accepted an order with a bark line; silence is forbidden (GDD 9.5).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_WeaponSwapped, "Event.Combat.WeaponSwapped", "Er is van wapen gewisseld: welke familie er nu in de handen ligt en hoe lang het optillen duurt (26-07 avond, punt 5).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_ReloadStarted, "Event.Combat.ReloadStarted", "Er wordt herladen: welke wapenfamilie en hoe lang het duurt. De foley-keten hangt aan de FASEN van dit feit, niet aan een enkel geluid bij de start (26-07 avond).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_HitLanded, "Event.Combat.HitLanded", "Een schot RAAKT iemand: plek, of het een kopschot was, en hoeveel schade. Het tegenovergestelde feit van ShotFired, dat ook bij een misser vuurt (26-07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_ShotFired, "Event.Combat.ShotFired", "Er is geschoten: oorsprong plus de geluidsradius van het wapen. Raak of mis maakt niet uit — de loop maakt het lawaai (26-07, punt 1).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderRefused, "Event.Squad.OrderRefused", "Squadmate refused an order with a reason; silent failure is a release blocker (GDD 8.4).")

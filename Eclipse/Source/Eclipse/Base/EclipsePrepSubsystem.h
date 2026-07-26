@@ -56,6 +56,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Prep")
 	int32 ResolveSquadmateCount() const;
 
+	/**
+	 * De tabel met kiesbare loadouts (26-07 avond, punt 5). Publiek omdat de game
+	 * mode moet weten WELKE wapens bij de gekozen loadout horen, en de prep-laag
+	 * daar eigenaar van is — de tuning zelf blijft privé, alleen dit ene antwoord
+	 * gaat naar buiten.
+	 */
+	const UDataTable* GetLoadoutTable() const;
+
 private:
 	const class UEclipsePrepTuningAsset* ResolveTuning() const;
 	TArray<EclipsePrepLogic::FEclipseLoadoutOption> ResolveLoadoutOptions() const;

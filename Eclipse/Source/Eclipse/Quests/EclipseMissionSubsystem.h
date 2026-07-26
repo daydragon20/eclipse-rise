@@ -29,6 +29,9 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
+	/** Welke loadout er gekozen is voor de lopende missie; leeg als er geen is. */
+	FGameplayTag GetActiveLoadoutTag() const { return ActiveLoadoutTag; }
+
 	EEclipseMissionPhase GetPhase() const { return Phase; }
 	const FEclipseMissionOutcome& GetLastOutcome() const { return LastOutcome; }
 
@@ -134,6 +137,9 @@ public:
 private:
 	void OnMissionSelected(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnLaunchRequested(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/** De loadout waarmee deze missie gelanceerd is (26-07 avond, punt 5). */
+	FGameplayTag ActiveLoadoutTag;
 	void BroadcastMissionEvent(const FGameplayTag& Tag, FName ObjectiveId, bool bSuccess);
 
 	/** Emit Event.Mission.PhaseChanged (SPEC-P2-04): outer phases false, named sub-phases (Alarm) true. */

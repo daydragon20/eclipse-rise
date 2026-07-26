@@ -1,6 +1,7 @@
 #include "UI/EclipseMissionHudWidget.h"
 
 #include "Components/CanvasPanel.h"
+#include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Core/EclipseEventPayloads.h"
@@ -94,12 +95,50 @@ namespace
 	}
 }
 
+void UEclipseMissionHudWidget::RefreshAmmoReadout()
+{
+	if (AmmoReadout == nullptr)
+	{
+		return;
+	}
+
+	const APawn* Body = GetOwningPlayerPawn();
+	const UEclipseHitscanWeaponComponent* Weapon = Body != nullptr
+		? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
+	if (Weapon == nullptr || Weapon->GetMagazineSize() <= 0)
+	{
+		// Geen wapen, of een wapen met een oneindig magazijn: dan is er niets te
+		// tellen en hoort er niets te staan. Een teller die "0 / 0" toont liegt.
+		AmmoReadout->SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	AmmoReadout->SetVisibility(ESlateVisibility::HitTestInvisible);
+	if (Weapon->IsReloading())
+	{
+		AmmoReadout->SetText(NSLOCTEXT("Eclipse", "Reloading", "HERLADEN"));
+		AmmoReadout->SetColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.65f, 0.15f)));
+		return;
+	}
+
+	const int32 Ammo = Weapon->GetAmmoInMagazine();
+	AmmoReadout->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), Ammo, Weapon->GetMagazineSize())));
+	// Onder een derde kleurt hij. Dat is het punt waarop je moet BESLUITEN of je
+	// herlaadt of doorschiet, en een getal alleen haal je in een vuurgevecht niet
+	// van het scherm — kleur wel.
+	const bool bLow = Ammo * 3 <= Weapon->GetMagazineSize();
+	AmmoReadout->SetColorAndOpacity(FSlateColor(bLow
+		? FLinearColor(1.0f, 0.35f, 0.2f) : FLinearColor(0.9f, 0.9f, 0.9f)));
+}
+
 void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
 {
 	Super::NativeTick(Geometry, DeltaSeconds);
 
 	// Alleen werk als er iets te doven valt. Deze widget tikt toch al voor Slate;
 	// een timer per treffer zou bij 6,67 schoten per seconde meer kosten dan dit.
+	RefreshAmmoReadout();
+
 	if (HitMarkerSecondsLeft > 0.0f)
 	{
 		HitMarkerSecondsLeft -= DeltaSeconds;
@@ -201,6 +240,21 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	MarkerFont.Size = 28;
 	HitMarker->SetFont(MarkerFont);
 	HitMarker->SetVisibility(ESlateVisibility::Hidden);
+
+	// De munitieteller. Rechtsonder verankerd, uitgelijnd op zijn eigen
+	// rechteronderhoek, zodat "30 / 30" en "7 / 30" op dezelfde plek eindigen —
+	// een teller die verspringt terwijl je hem afleest is erger dan geen teller.
+	AmmoReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("AmmoReadout"));
+	if (UCanvasPanelSlot* AmmoSlot = Canvas->AddChildToCanvas(AmmoReadout))
+	{
+		AmmoSlot->SetAutoSize(true);
+		AmmoSlot->SetAnchors(FAnchors(1.0f, 1.0f));
+		AmmoSlot->SetAlignment(FVector2D(1.0f, 1.0f));
+		AmmoSlot->SetPosition(FVector2D(-48.0f, -32.0f));
+	}
+	FSlateFontInfo AmmoFont = AmmoReadout->GetFont();
+	AmmoFont.Size = 22;
+	AmmoReadout->SetFont(AmmoFont);
 
 	// A mount is a fresh run: the widget is cached by the controller and
 	// re-constructed per mission, exactly like the two automatic tallies reset per

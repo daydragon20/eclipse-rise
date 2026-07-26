@@ -47,12 +47,12 @@ bool FEclipseAudioSubsystemBusContractTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Bound after BindToBus"), Audio->IsBoundToBus());
 	// Drie: de missie-sting plus de twee order-antwoorden (barks, 26-07).
 	// Vijf: sting, de twee order-antwoorden, het schot en de treffer (26-07).
-	TestEqual(TEXT("Vijf live subscriptions: sting + ack + refused + schot + treffer"), Bus->GetSubscriptionCount(), 5);
+	TestEqual(TEXT("Zeven live subscriptions: sting + ack + refused + schot + treffer + herladen + wapenwissel"), Bus->GetSubscriptionCount(), 7);
 
 	// Re-bind must swap, not stack — a leaked second subscription would double
 	// every sting.
 	Audio->BindToBus(*Bus);
-	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 5);
+	TestEqual(TEXT("Re-bind does not leak a subscription"), Bus->GetSubscriptionCount(), 7);
 
 	// Completed is consumed; the world-less context skips playback but still
 	// counts the request (the 14.3.5 degradation path this test rides on).

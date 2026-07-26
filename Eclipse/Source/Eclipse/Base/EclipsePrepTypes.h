@@ -28,6 +28,37 @@ struct FEclipseLoadoutOptionRow : public FTableRowBase
 	/** Empty = base option; otherwise requires this tag in CampaignState.UnlockedLoadoutTags (SPEC-P1-03 production gate). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Prep")
 	FGameplayTag RequiredUnlockTag;
+
+	/**
+	 * WELKE WAPENS deze loadout je geeft (owner-opdracht 26-07 avond, punt 5).
+	 *
+	 * Rijnamen in DT_Weapons. Tot vandaag droeg een loadout alleen een TAG: je
+	 * koos netjes, de keuze werd netjes onthouden, en het wapen in je handen was
+	 * altijd de eerste rij van de tabel. Drie van de vier wapens waren daardoor
+	 * voor niemand bereikbaar — en dat gat werd elke as die ik vandaag toevoegde
+	 * alleen maar groter.
+	 *
+	 * RESEARCH — hoe het genre een loadout aan wapens bindt:
+	 *   Destiny 2      drie vaste slots op munitiesoort; wisselen op één knop
+	 *   The Division   twee primaries plus een sidearm, wisselen op Y/Driehoek
+	 *   Ghost Recon    primair, secundair, sidearm
+	 *   Borderlands    vier slots die je gaandeweg vrijspeelt, cyclen op één knop
+	 *   Fortnite       vijf slots, cijfertoetsen of cyclen
+	 *
+	 * Wat ze ALLEMAAL doen: een klein VAST aantal slots, waarvan er één een
+	 * sidearm is, en wisselen op één knop met een opheftijd die per wapen
+	 * verschilt. Dat laatste is precies wat `ReadySeconds` in DT_Weapons al zegt
+	 * en wat nog nergens gelezen werd.
+	 *
+	 * Twee slots en niet vier: vier vraagt een inventaris die opgeraapte wapens
+	 * bijhoudt, en die bestaat hier niet. Twee is het minimum waarbij "wisselen"
+	 * iets betekent, en het is wat Division en Ghost Recon ook geven.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Prep")
+	FName PrimaryWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Prep")
+	FName SidearmWeapon;
 };
 
 UCLASS(BlueprintType)

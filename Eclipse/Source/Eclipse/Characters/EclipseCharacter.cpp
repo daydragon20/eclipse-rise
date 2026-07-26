@@ -225,6 +225,14 @@ void AEclipseCharacter::PlayShootPose()
 	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f);
 }
 
+void AEclipseCharacter::PlayReloadPose(float Seconds)
+{
+	// Half gewicht, net als de schietpose: herladen is een handeling van de armen
+	// en mag de looppose niet overrulen. Wie herlaadt terwijl hij rent, moet nog
+	// steeds rennen.
+	PlayOneShotPose(LocomotionSet.Reload, FMath::Max(Seconds, 0.1f), 0.85f);
+}
+
 void AEclipseCharacter::PlayHitReactPose()
 {
 	// 0,25 s en vol gewicht. De referentie (Gears, Division, Destiny) zit op
@@ -859,6 +867,7 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"));
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"));
+	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"));
 	LocomotionSet.CrouchTransition = ResolveClip(BodyDef.CrouchTransitionAnim, TEXT("crouch-transition"));
 
 	const EEclipseLocomotionTier Tier = LocomotionSet.GetTier();

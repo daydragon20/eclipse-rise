@@ -136,6 +136,17 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> HitMarker;
 
+	/**
+	 * MUNITIETELLER (26-07 avond). Een magazijn dat je niet ziet is geen mechaniek
+	 * maar een verrassing: je klikt, er gebeurt niets, en je weet niet of je leeg
+	 * bent of dat er iets stuk is. Rechtsonder, want daar staat hij in elke
+	 * shooter sinds Doom — dat is geen smaak maar waar het oog hem zoekt.
+	 */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> AmmoReadout;
+
+	void RefreshAmmoReadout();
+
 	/** Hoe lang de marker nog zichtbaar blijft (seconden). */
 	float HitMarkerSecondsLeft = 0.0f;
 

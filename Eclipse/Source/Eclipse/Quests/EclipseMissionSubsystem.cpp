@@ -92,6 +92,12 @@ void UEclipseMissionSubsystem::OnLaunchRequested(FGameplayTag EventTag, const FI
 		return;
 	}
 
+	// DE GEKOZEN LOADOUT ONTHOUDEN (26-07 avond, punt 5). Hij zat al in dit feit
+	// en werd door niemand gelezen: je koos netjes, de keuze werd netjes
+	// gevalideerd en verzonden, en het wapen in je handen was altijd de eerste rij
+	// van DT_Weapons. Dit is de ontbrekende schakel, niet een nieuw systeem.
+	ActiveLoadoutTag = Prep->LoadoutTag;
+
 	FString Error;
 	if (!StartMission(Prep->SquadSoldierIds, Error))
 	{

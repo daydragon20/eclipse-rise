@@ -1877,6 +1877,22 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 			// tweede schot geen kopschot meer: gemeten 55 + 22 = 77, oftewel een
 			// verhouding van 1,75 die niets zegt over de multiplier.
 			//
+			// VOL MAGAZIJN afdwingen. Sinds 26-07 avond raakt een magazijn leeg, en
+			// de secties hierboven (vuurtempo, bereik, afval) schieten er samen
+			// ruim doorheen. Een kopschot-meting die toevallig in een herlaadbeurt
+			// valt, meet nul schade en leest als "kopschoten doen niets" — precies
+			// de verkeerde conclusie uit een correct spel.
+			// OOK als hij al bezig is, en dat was de fout in de eerste versie: bij
+			// een leeg magazijn had het vuren hierboven de herlaadbeurt zelf al
+			// gestart, dus StartReload gaf false en er werd niet gewacht. Het
+			// meetschot viel dan middenin het herladen en gaf 0 schade — wat leest
+			// als "kopschoten doen niets".
+			if (Weapon->IsReloading() || Weapon->GetAmmoInMagazine() < 2)
+			{
+				Weapon->StartReload(TEXT("TestTopUp"));
+				Harness.Idle(Weapon->GetReloadSeconds() + 0.3f);
+			}
+
 			// De rust ervoor breekt de vuurreeks (drie vuurintervallen stilte), dus
 			// dit schot is gegarandeerd het EERSTE van zijn reeks en daarmee zuiver.
 			// Dat is precies waar first-shot accuracy voor gemaakt is.
@@ -3184,6 +3200,216 @@ bool FEclipseFootstepsKnowTheirSurface::RunTest(const FString& Parameters)
 	TestEqual(TEXT("voetstappen: op een dekkingsblok klinkt metaal"), static_cast<int32>(MetalSurface), 1);
 	TestTrue(TEXT("voetstappen: dat is een ANDER oppervlak dan de vloer"),
 		MetalSurface != Surface);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * MAGAZIJN EN HERLADEN (owner-opdracht 26-07 avond, punt 4).
+ *
+ * Herladen is wat een vuurtempo betekenis geeft. Zonder magazijn is een hoge
+ * cadans gratis en is "40 kogels tegen 10" een getal zonder gevolg — dan zegt de
+ * wapentabel iets wat het spel niet doet.
+ *
+ * Vier dingen die waar moeten zijn: het magazijn loopt leeg, een leeg magazijn
+ * herlaadt zichzelf in plaats van een dode trekker te geven, tijdens het
+ * herladen kun je niet vuren, en daarna zit je weer vol.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMagazineEmptiesAndReloads,
+	"Eclipse.Mission.Playthrough.MagazineEmptiesAndReloads",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseMagazineEmptiesAndReloads::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseAudioSubsystem* Audio = GameInstance->GetSubsystem<UEclipseAudioSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("magazijn: audio"), Audio) || !TestNotNull(TEXT("magazijn: strategie"), Strategy)
+		|| !TestNotNull(TEXT("magazijn: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("magazijn: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UEclipseHitscanWeaponComponent* Weapon = Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (!TestNotNull(TEXT("magazijn: de speler heeft een wapen"), Weapon))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const int32 Size = Weapon->GetMagazineSize();
+	Report(*this, TEXT("magazijngrootte uit de data"), static_cast<float>(Size), TEXT("kogels"));
+	Report(*this, TEXT("herlaadtijd uit de data"), Weapon->GetReloadSeconds(), TEXT("s"));
+	Report(*this, TEXT("foley-stappen voor deze familie"),
+		static_cast<float>(Audio->GetReloadFoleyStepCount(TEXT("AssaultRifle"))), TEXT(""),
+		TEXT("magazijn laten vallen, pakken, insteken, grendel"));
+
+	TestEqual(TEXT("magazijn: vol bij de start"), Weapon->GetAmmoInMagazine(), Size);
+	TestEqual(TEXT("magazijn: de foley-keten heeft vier fasen"),
+		Audio->GetReloadFoleyStepCount(TEXT("AssaultRifle")), 4);
+
+	// --- leegschieten -------------------------------------------------------
+	const int32 FoleyBefore = Audio->GetReloadFoleyCount();
+	const double Start = Harness.ElapsedSeconds;
+	while (Harness.ElapsedSeconds - Start < 8.0 && Weapon->GetReloadCount() == 0)
+	{
+		Harness.Inject(TEXT("Fire"), true);
+		Harness.Step();
+	}
+
+	Report(*this, TEXT("schoten tot het magazijn leeg was"),
+		static_cast<float>(Weapon->GetShotsFired()), TEXT(""));
+	Report(*this, TEXT("herlaadbeurten"), static_cast<float>(Weapon->GetReloadCount()), TEXT(""));
+	Report(*this, TEXT("foley-stappen ingepland"),
+		static_cast<float>(Audio->GetReloadFoleyCount() - FoleyBefore), TEXT(""));
+
+	TestTrue(TEXT("magazijn: een leeg magazijn herlaadt zichzelf"), Weapon->GetReloadCount() >= 1);
+	TestEqual(TEXT("magazijn: precies een magazijn lang geschoten"), Weapon->GetShotsFired(), Size);
+	TestEqual(TEXT("magazijn: de hele keten is ingepland"),
+		Audio->GetReloadFoleyCount() - FoleyBefore, 4);
+
+	// --- tijdens het herladen kun je niet vuren -----------------------------
+	TestTrue(TEXT("magazijn: hij is aan het herladen"), Weapon->IsReloading());
+	const int32 ShotsDuringReload = Weapon->GetShotsFired();
+	Harness.Idle(0.2f);
+	Harness.Inject(TEXT("Fire"), true);
+	Harness.Step();
+	TestEqual(TEXT("magazijn: vuren tijdens het herladen doet niets"),
+		Weapon->GetShotsFired(), ShotsDuringReload);
+
+	// --- en daarna zit je weer vol ------------------------------------------
+	Harness.Idle(Weapon->GetReloadSeconds() + 0.3f);
+	Harness.Inject(TEXT("Fire"), true);
+	Harness.Step();
+	Report(*this, TEXT("kogels na het herladen"),
+		static_cast<float>(Weapon->GetAmmoInMagazine()), TEXT(""), TEXT("een eraf: het schot dat de test net deed"));
+	TestTrue(TEXT("magazijn: na het herladen kun je weer schieten"),
+		Weapon->GetShotsFired() > ShotsDuringReload);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * LOADOUTS EN WAPENWISSEL (owner-opdracht 26-07 avond, punt 5).
+ *
+ * De gevechts-audit kwam er twee rondes achter elkaar op uit: er zijn vier
+ * wapens die sinds vandaag echt van elkaar verschillen, en drie ervan kon
+ * niemand vasthouden. De loadout-keuze bestond, werd gevalideerd en verzonden —
+ * en bereikte het wapen nooit.
+ *
+ * Vier dingen die nu waar moeten zijn: je krijgt het wapen dat je koos, je hebt
+ * er een tweede bij, wisselen werkt, en elk wapen houdt zijn eigen magazijn.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLoadoutReachesTheWeapon,
+	"Eclipse.Mission.Playthrough.LoadoutReachesTheWeapon",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseLoadoutReachesTheWeapon::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("loadout: strategie"), Strategy) || !TestNotNull(TEXT("loadout: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("loadout: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UEclipseHitscanWeaponComponent* Weapon = Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (!TestNotNull(TEXT("loadout: de speler heeft een wapen"), Weapon))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	Report(*this, TEXT("wapenslots"), static_cast<float>(Weapon->GetSlotCount()), TEXT(""),
+		TEXT("primair plus sidearm"));
+	TestEqual(TEXT("loadout: twee slots, niet één"), Weapon->GetSlotCount(), 2);
+
+	// --- het primaire wapen is dat van de gekozen loadout -------------------
+	const float PrimaryDamage = Weapon->GetDamage();
+	const int32 PrimaryMagazine = Weapon->GetMagazineSize();
+	Report(*this, TEXT("schade primair"), PrimaryDamage, TEXT("hp"));
+	Report(*this, TEXT("magazijn primair"), static_cast<float>(PrimaryMagazine), TEXT(""));
+
+	// --- een paar kogels eruit, dan wisselen -------------------------------
+	const double Start = Harness.ElapsedSeconds;
+	while (Harness.ElapsedSeconds - Start < 0.5)
+	{
+		Harness.Inject(TEXT("Fire"), true);
+		Harness.Step();
+	}
+	const int32 AmmoLeftInPrimary = Weapon->GetAmmoInMagazine();
+	Report(*this, TEXT("kogels over in het primaire"), static_cast<float>(AmmoLeftInPrimary), TEXT(""));
+	TestTrue(TEXT("loadout: er is uit het primaire geschoten"), AmmoLeftInPrimary < PrimaryMagazine);
+
+	Harness.Idle(0.3f);
+	TestTrue(TEXT("loadout: wisselen lukt"), Weapon->SwapWeapon());
+
+	const float SidearmDamage = Weapon->GetDamage();
+	Report(*this, TEXT("schade sidearm"), SidearmDamage, TEXT("hp"));
+	Report(*this, TEXT("magazijn sidearm"), static_cast<float>(Weapon->GetMagazineSize()), TEXT(""));
+	Report(*this, TEXT("actief slot na wisselen"), static_cast<float>(Weapon->GetActiveSlot()), TEXT(""));
+
+	// DIT is de meting die telt: als beide slots hetzelfde wapen dragen, reageert
+	// de knop wel en verandert er niets — precies de klasse die deze laag kwam
+	// repareren, alleen een niveau dieper.
+	TestEqual(TEXT("loadout: het tweede slot is actief"), Weapon->GetActiveSlot(), 1);
+	TestTrue(TEXT("loadout: de sidearm is een ANDER wapen dan het primaire"),
+		!FMath::IsNearlyEqual(SidearmDamage, PrimaryDamage) || Weapon->GetMagazineSize() != PrimaryMagazine);
+
+	// --- handling: vlak na de wissel kun je nog niet vuren ------------------
+	TestFalse(TEXT("loadout: het opgetilde wapen is nog niet klaar"), Weapon->IsReady());
+	Harness.Idle(1.0f);
+	TestTrue(TEXT("loadout: na de opheftijd wel"), Weapon->IsReady());
+
+	// --- terugwisselen: het primaire komt halfleeg terug --------------------
+	TestTrue(TEXT("loadout: terugwisselen lukt"), Weapon->SwapWeapon());
+	Report(*this, TEXT("kogels in het primaire na terugwisselen"),
+		static_cast<float>(Weapon->GetAmmoInMagazine()), TEXT(""),
+		TEXT("moet gelijk zijn aan wat er over was"));
+	TestEqual(TEXT("loadout: elk wapen houdt zijn eigen magazijn"),
+		Weapon->GetAmmoInMagazine(), AmmoLeftInPrimary);
 
 	Harness.Shutdown();
 	return true;

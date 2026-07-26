@@ -177,18 +177,24 @@ namespace EclipseGauntletOverlay
 			{ TEXT("Hurken"),       TEXT("Ctrl"),              TEXT("B") },
 			{ TEXT("Springen"),     TEXT("Spatie"),            TEXT("A") },
 			{ TEXT("Mikken"),       TEXT("RMB"),               TEXT("LT (altijd)") },
-			{ TEXT("1e/3e persoon"),TEXT("C"),                 TEXT("geen (R3 ging per ongeluk af)") },
+			{ TEXT("1e/3e persoon"),TEXT("C"),                 TEXT("geen — RB draagt sinds 26-07 de wapenwissel") },
 			{ TEXT("Command Mode"), TEXT("Q vasthouden"),      TEXT("LB vasthouden") },
-			{ TEXT("Volgende"),     TEXT("Tab / scroll op (tijdens Command Mode)"), TEXT("RB (in CM; erbuiten: 1e/3e persoon)") },
+			{ TEXT("Volgende"),     TEXT("Tab / scroll op (tijdens Command Mode)"), TEXT("RB (in CM; erbuiten: WAPENWISSEL)") },
 			{ TEXT("Vorige"),       TEXT("scroll neer (tijdens Command Mode)"),     TEXT("geen — RB wrapt rond") },
-			{ TEXT("Onder kruis"),  TEXT("E (tijdens Command Mode)"),               TEXT("X (in CM; erbuiten: hergroepeer)") },
+			{ TEXT("Onder kruis"),  TEXT("E in CM; R/E erbuiten: HERLADEN"),        TEXT("X (in CM; erbuiten: HERLADEN)") },
 			{ TEXT("Orders"),       TEXT("1 2 3 4"),           TEXT("D-pad") },
 			// Elke rij noemt zijn CONTEXT, en die contexten zijn 26-07 veranderd.
 			//
 			// Tot vannacht deden vier controls buiten Command Mode stil niets. Drie
 			// daarvan hebben er nu echt werk gekregen, en de tabel zegt wat: RB
-			// wisselt buiten de modus het camerastandpunt, X geeft een snelle
-			// hergroepeer-order, en LT is geen moduskeuze meer — die is altijd
+			// wisselt buiten de modus van WAPEN (26-07 avond, punt 5: de owner vroeg
+			// hem op RB; het genre legt hem meestal op Y/Driehoek, maar Y draagt
+			// hier de stance — en een bumper is beter voor iets wat je middenin een
+			// vuurgevecht doet, want je duim blijft op de rechterstick), X HERLAADT (26-07 avond:
+			// X/Vierkant is herladen in Call of Duty, Battlefield, Gears, Division,
+			// Borderlands en Destiny — een sterkere claim dan de hergroepeer-order
+			// die ik er 's ochtends zelf op zette; die valt terug op X zodra er
+			// niets te herladen valt), en LT is geen moduskeuze meer — die is altijd
 			// mikken, want een moduskeuze op een analoge trigger druk je half per
 			// ongeluk (Division en Gears houden de triggers daarom heilig).
 			// "Vorige" heeft daardoor geen padknop meer: RB wrapt rond, en bij vier

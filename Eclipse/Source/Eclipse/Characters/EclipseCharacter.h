@@ -114,6 +114,14 @@ public:
 	/** Speel de klap (26-07, punt 2) — aangeroepen bij het oplopen van schade. */
 	void PlayHitReactPose();
 
+	/**
+	 * Speel de herlaadpose (26-07 avond). De DUUR komt van het wapen: een
+	 * herlaadbeurt van 1,4 s (sidearm) en een van 2,8 s (DMR) horen niet dezelfde
+	 * beweging even lang te tonen, en het is dezelfde klok die de foley-keten
+	 * verdeelt — anders valt de grendel op een ander moment dan je hem hoort.
+	 */
+	void PlayReloadPose(float Seconds);
+
 	/** De hoofd-hitbox, of null als dit lichaam geen hoofd-socket heeft. */
 	const USphereComponent* GetHeadHitbox() const { return HeadHitbox; }
 

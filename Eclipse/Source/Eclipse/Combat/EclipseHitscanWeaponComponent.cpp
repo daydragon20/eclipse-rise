@@ -21,6 +21,135 @@ UEclipseHitscanWeaponComponent::UEclipseHitscanWeaponComponent()
 void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row)
 {
 	Weapon = Row;
+	// Vol beginnen. Een wapen dat je halfleeg krijgt zou een verhaal vertellen dat
+	// niemand geschreven heeft.
+	AmmoInMagazine = Weapon.MagazineSize;
+	bReloading = false;
+	ReloadEndSeconds = -1.0;
+
+	// Eén slot. Vijanden en squadmates krijgen hun wapen via dit pad en hebben
+	// geen wissel — die is van de speler, want alleen hij kiest een loadout.
+	SlotRows = { Row };
+	SlotAmmo = { AmmoInMagazine };
+	ActiveSlot = 0;
+	ReadyAtSeconds = -1.0;
+}
+
+void UEclipseHitscanWeaponComponent::ApplyLoadout(const FEclipseWeaponRow& Primary, const FEclipseWeaponRow& Sidearm)
+{
+	ApplyWeaponRow(Primary);
+	SlotRows.Add(Sidearm);
+	SlotAmmo.Add(Sidearm.MagazineSize);
+}
+
+bool UEclipseHitscanWeaponComponent::IsReady() const
+{
+	const UWorld* World = GetWorld();
+	return World == nullptr || ReadyAtSeconds < 0.0 || World->GetTimeSeconds() >= ReadyAtSeconds;
+}
+
+bool UEclipseHitscanWeaponComponent::SwapWeapon()
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr || SlotRows.Num() < 2)
+	{
+		return false;
+	}
+	if (!IsReady())
+	{
+		return false; // je bent het vorige nog aan het optillen
+	}
+
+	// Het huidige magazijn bewaren. Dit is wat wisselen tactisch maakt in plaats
+	// van cosmetisch: een halfleeg wapen komt halfleeg terug.
+	SlotAmmo[ActiveSlot] = AmmoInMagazine;
+
+	ActiveSlot = (ActiveSlot + 1) % SlotRows.Num();
+	Weapon = SlotRows[ActiveSlot];
+	AmmoInMagazine = SlotAmmo[ActiveSlot];
+
+	// Een herlaadbeurt overleeft de wissel NIET. Dat is ook de klassieke truc uit
+	// het genre: wisselen is sneller dan herladen, dus een tweede wapen is een
+	// antwoord op een leeg magazijn. Zonder dit zou je kunnen wisselen en het
+	// wapen alsnog vol terugkrijgen.
+	bReloading = false;
+	ReloadEndSeconds = -1.0;
+
+	// Handling: ReadySeconds stond sinds vanmiddag in de data en werd door niets
+	// gelezen. Dit is waar het getal betekenis krijgt — de sidearm is er in 0,25 s,
+	// de DMR pas na 0,8 s, en dat is het verschil tussen een noodwapen en een keuze.
+	ReadyAtSeconds = World->GetTimeSeconds() + Weapon.ReadySeconds;
+	ConsecutiveShots = 0; // vers wapen, verse reeks: het eerste schot is weer zuiver
+
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
+		{
+			FEclipseCombatEventPayload Swap;
+			Swap.Shooter = GetOwner();
+			Swap.Origin = GetOwner() != nullptr ? GetOwner()->GetActorLocation() : FVector::ZeroVector;
+			Swap.WeaponSoundFamily = Weapon.SoundFamily;
+			Swap.DurationSeconds = Weapon.ReadySeconds;
+			const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner());
+			Swap.bPlayerSide = Body != nullptr && Body->IsPlayerSide();
+			Bus->Broadcast(EclipseTags::Event_Combat_WeaponSwapped, FInstancedStruct::Make(Swap));
+		}
+	}
+	return true;
+}
+
+bool UEclipseHitscanWeaponComponent::StartReload(FName Cause)
+{
+	// Cause is diagnostiek: "PlayerReload" of "MagazineEmpty". Het zegt WAAROM er
+	// herladen wordt, en dat is het verschil tussen een speler die vooruitdenkt en
+	// een die droogloopt — precies wat je wilt zien in een log van een speelronde.
+	UWorld* World = GetWorld();
+	if (World == nullptr || bReloading || Weapon.MagazineSize <= 0)
+	{
+		return false;
+	}
+	if (AmmoInMagazine >= Weapon.MagazineSize)
+	{
+		return false; // vol is vol; herladen om niets is een animatie zonder reden
+	}
+
+	bReloading = true;
+	++ReloadCount;
+	ReloadEndSeconds = World->GetTimeSeconds() + Weapon.ReloadSeconds;
+
+	// HET FEIT, met zijn duur erbij. De foley-keten hangt aan de FASEN hiervan en
+	// niet aan één geluid bij de start: het pack levert vier takes (magazijn
+	// pakken, laten vallen, insteken, grendel) en die horen over de herlaadbeurt
+	// verdeeld te worden. Zonder de duur in het feit zou de audiolaag de
+	// wapentabel moeten lezen om te weten wanneer de grendel valt.
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
+		{
+			FEclipseCombatEventPayload Reload;
+			Reload.Shooter = GetOwner();
+			Reload.Origin = GetOwner() != nullptr ? GetOwner()->GetActorLocation() : FVector::ZeroVector;
+			Reload.WeaponSoundFamily = Weapon.SoundFamily;
+			Reload.bSuppressed = Weapon.bSuppressed;
+			Reload.DurationSeconds = Weapon.ReloadSeconds;
+			const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner());
+			Reload.bPlayerSide = Body != nullptr && Body->IsPlayerSide();
+			Bus->Broadcast(EclipseTags::Event_Combat_ReloadStarted, FInstancedStruct::Make(Reload));
+		}
+	}
+
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner()))
+	{
+		Body->PlayReloadPose(Weapon.ReloadSeconds);
+	}
+	return true;
+}
+
+void UEclipseHitscanWeaponComponent::FinishReload()
+{
+	bReloading = false;
+	ReloadEndSeconds = -1.0;
+	AmmoInMagazine = Weapon.MagazineSize;
 }
 
 bool UEclipseHitscanWeaponComponent::ShooterBodyIsAiming() const
@@ -38,8 +167,36 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	}
 
 	const double Now = World->GetTimeSeconds();
+
+	// Herladen loopt af op de klok en niet op een timer: een timer die tijdens een
+	// missiewissel blijft staan zou een wapen voorgoed blokkeren, en dit component
+	// tikt niet uit zichzelf.
+	if (bReloading)
+	{
+		if (Now < ReloadEndSeconds)
+		{
+			return false; // je handen zitten aan het magazijn
+		}
+		FinishReload();
+	}
+
+	if (!IsReady())
+	{
+		return false; // het wapen is nog omhoog aan het komen (handling)
+	}
+
 	if (LastFireTimeSeconds >= 0.0 && Now - LastFireTimeSeconds < Weapon.FireInterval)
 	{
+		return false;
+	}
+
+	// LEEG: automatisch herladen in plaats van een dode trekker. Call of Duty,
+	// Borderlands en Destiny doen het alle drie zo, en om dezelfde reden — een
+	// trekker die niets doet leest als een defect, ook als je zelf vergat te
+	// herladen.
+	if (Weapon.MagazineSize > 0 && AmmoInMagazine <= 0)
+	{
+		StartReload(TEXT("MagazineEmpty"));
 		return false;
 	}
 
@@ -53,6 +210,10 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	}
 	LastFireTimeSeconds = Now;
 	++ShotsFired;
+	if (Weapon.MagazineSize > 0)
+	{
+		--AmmoInMagazine;
+	}
 
 	// HET SCHOT VERRAADT JE (owner-opdracht 26-07, punt 1).
 	//

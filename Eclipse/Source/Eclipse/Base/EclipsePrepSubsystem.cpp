@@ -173,6 +173,12 @@ bool UEclipsePrepSubsystem::SpendIntelForReveal(FString& OutError)
 	return true;
 }
 
+const UDataTable* UEclipsePrepSubsystem::GetLoadoutTable() const
+{
+	const UEclipsePrepTuningAsset* Tuning = ResolveTuning();
+	return Tuning != nullptr ? Tuning->LoadoutOptions.LoadSynchronous() : nullptr;
+}
+
 bool UEclipsePrepSubsystem::LaunchMission(const TArray<FGuid>& SquadSoldierIds, FGameplayTag LoadoutTag, FName InsertionId, FString& OutError)
 {
 	if (SelectedRegionId.IsNone())
