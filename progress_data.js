@@ -3,7 +3,7 @@
 // en worden door Tools/update_progress.ps1 gegenereerd — daar blijf je vanaf.
 // Regels: percentages zijn eerlijk (liever te laag dan gejokt); geen HTML hier, alleen data.
 window.PROGRESS_DATA = {
-  bijgewerkt: "2026-07-26 07:00",
+  bijgewerkt: "2026-07-26 10:40",
   hero: { label: "Hele game", pct: 8 },
   playtestChip: "ACTIVE_MILESTONE: Phase 2 (owner-instructie 23-07) · 13.2-playtest Phase 1: OPEN (standing owner-actie)",
 
@@ -45,6 +45,22 @@ window.PROGRESS_DATA = {
 
   // Wat de owner concreet moet doen — apart paneel bovenaan. Dev-sessie houdt kort + actueel; leeg [] = niks te doen.
   ownerActies: [
+    { titel: "Speel het gevechtsblok en oordeel — meten kan ik het niet", prio: "nu", waarom: "Drie dingen die vandaag geland zijn veranderen hoe een gevecht speelt, en geen van drieën is met een getal te beoordelen. (1) Kopschoten werken echt: 44 hp romp tegen 110 hp hoofd, dus je time-to-kill halveert van 4 kogels naar 2. Dat was de bedoeling, maar jij moet voelen of het klopt. (2) Je eerste schot verraadt je: vijanden binnen 5000 cm lopen naar de plek waar geschoten werd, ook bij een misser. Sluipen blijft mogelijk, precies één schot lang. (3) De vijandopstelling is anders van vorm — groepen op het site dat de missie noemt in plaats van vier op een hoop bij het hoofddoel. Het aantal schuift nauwelijks: Assault +2, Rescue +1, Sabotage +0.", stappen: [
+      "Speel M1.1 en daarna Assault of Sabotage — die laatste twee zijn het meest veranderd",
+      "Let op de time-to-kill: voelt 2 kogels op het hoofd goed of goedkoop?",
+      "Let op het schot-alarm: kun je nog iets stiekem doen, of is één schot meteen alles?",
+      "LET OP: het alarm zelf kost je vandaag NIETS. Nagemeten uit de assets: er is geen enkele optional die stilte eist. Speel er dus niet omheen alsof er straf op staat"
+    ] },
+    { titel: "Kost mikken snelheid? Vandaag niet — mijn advies is 0,6x", prio: "nu", waarom: "Uit de locomotie-audit (punt 14). Je sprint vandaag even hard met je vizier op als zonder. In dit genre is een snelheidsstraf tijdens mikken vrijwel universeel — Division zit rond 0,6x, Gears vertraagt je automatisch. Zonder straf is er geen enkele reden om ooit NIET te mikken, en dan is mikken geen keuze meer maar een gratis verbetering.", stappen: [
+      "Mijn advies: doen, 0,6x",
+      "Maar het raakt hoe elk gevecht speelt, dus het is jouw beslissing en geen tuningdetail",
+      "Zeg 'mikken kost snelheid' en ik bouw het met een meting erbij"
+    ] },
+    { titel: "Assetwerk: geen draai-animatie, en vijf lichamen zonder zijcycli", prio: "later", waarom: "Twee dingen waar aansluitwerk ophoudt, en ik heb ze allebei nagemeten in plaats van aangenomen. GEEN ENKELE pack heeft een Turn_*-take, dus turn-in-place (punt 7) blijft half: het lichaam draait mee boven 90 graden zoals Gears en Division, maar de voeten schuiven. Zoals je zei stop ik daar. En de vier richtingscycli zitten in EEN pack terwijl je lichamen uit vijf packs komen: Rebel_A, Veil en RadiantGuard krijgen 6/6, de speler 3/6, en vijf lichamen 0/6. Voor die vijf is er niets om op terug te vallen — die moonwalken bij achteruit en strafen.", stappen: [
+      "Dit is inkoop of authoring, geen tuning",
+      "De kruislingse terugval die ik inbouwde (mist de loop zijn zijcyclus, pak die van de ren) helpt de speler van 3 naar 6, maar niet de vijf kale lichamen",
+      "Zeg het als je wilt dat ik zoek wat er in de Fab-bibliotheek staat"
+    ] },
     { titel: "Je vuurt en het lichaam beweegt niet — er is nooit een schietanimatie", prio: "later", waarom: "Elk lichaam heeft een ShootAnim geauthord (setup_character_data.py vult hem), maar er wordt nergens een schietanimatie afgespeeld: de lichamen draaien idle of een gangbeweging, en vuren verandert de pose niet. Van de drie dingen die vechten leeg maakten is dit de enige die nog open staat — kopschoten en het alarm zijn 26-07 afgehandeld.", stappen: [
       "Dit is de goedkoopste van de reeks: de take staat er al, hij wordt alleen niet gespeeld",
       "Ik heb hem niet aangesloten omdat je moet KIJKEN of de animatie klopt op deze lichamen — de gangbewegingen komen uit gemengde packs en dat gaat vaker mis. Meten kan ik het niet",

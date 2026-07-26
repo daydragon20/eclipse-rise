@@ -1,5 +1,48 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-25 (nachtsessie: testharnas + feel-audit).*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-26 (dagopdracht: gevecht, oriëntatie, locomotie-audit).*
+
+---
+
+# DAGRAPPORT — 26 juli 2026, 10:40
+
+**Bar: build ✓ (-NoUba) · 134/134 tests · validatie 4 validators / 0 fouten · catalog 30/30.**
+
+## Wat werkt er nu dat gisteren niet werkte
+
+| | Gemeten |
+|---|---|
+| **Achteruit lopen draait je niet meer om.** Het personage blijft naar de camera kijken en loopt achteruit — de third-person-shooter-conventie (Gears, Division, Borderlands) in plaats van het adventure-model. | Draaiing bij puur achteruit duwen: **180° → 0,0°**. Looprichting t.o.v. kijkrichting: **+1,00 → −1,00** |
+| **Kopschoten doen echt meer.** Er zit een hitbox op de hoofd-socket, met terugval bovenin de capsule voor lichamen zonder mesh. | Romp **44 hp**, hoofd **110 hp** → verhouding **2,50×**, exact wat DT_Weapons zegt. Was 22 tegen 22 |
+| **Je eerste schot verraadt je.** Vijanden binnen gehoorsafstand lopen naar de plek waar geschoten werd — niet naar waar je nú bent. Ook een gemist schot. | Vanaf **4200 cm** (buiten élk waarnemingsbereik): alle vier komen in beweging, samen **10.871 cm** dichterbij. Radius per wapen: **5000 cm** |
+| **Vuren en geraakt worden veranderen de pose.** Schietanimatie en hit-reactie, allebei op één overlay-slot. | Klap heeft op 0,1 s gewicht **0,995** en dooft uit; schietpose past binnen het vuurinterval |
+| **Landen heeft gewicht.** Camera-dip geschaald met de valsnelheid. | **4,3 cm** bij een normale sprong, komt exact terug op 65 |
+| **Hurken heeft een overgang.** De take zat al in de pack en werd nooit gespeeld. | 0,3 s op half gewicht; hoofd-hitbox zakt mee |
+| **Missies plaatsen hun eigen vijanden.** De vaste lus van vier is weg. | Assault **6**, Rescue **5**, Sabotage **4** (was overal 4). Sjabloon vraagt 5 → er staan er 5. M1.1 houdt zijn 4 |
+| **Je squad praat.** Acht order-antwoorden met een rem van 2 s per soldaat. | **8 van de 8** aangesloten zinnen hebben een clip; een gevallen soldaat zegt nu *"I'm hit - can't move."* in plaats van *"No route, boss."* |
+| **De +20 voor een ronde zonder gewonden betaalt uit.** | **20 materiaal** gemeten; was 0 |
+| **Geen dode knoppen meer op RB en X.** RB wisselt buiten Command Mode het camerastandpunt (de pad kón dat helemaal niet meer), X geeft een snelle hergroepeer-order. LT is weer alleen mikken. | — |
+| **Het alarm gaat af bij de eerste waarneming.** | Zie waarschuwing hieronder |
+
+## Wat wacht er op jou
+
+**Spelen en oordelen — dat kan ik niet meten:**
+1. **De nieuwe vijandopstelling.** Niet meer vier op een hoop bij het hoofddoel, maar groepen op het site dat de missie noemt. Het aantal schuift nauwelijks (+2, +1, +0); de **vorm** verandert wel.
+2. **Kopschoten halveren je time-to-kill** van 4 kogels naar 2. Dat was de bedoeling, maar je moet het voelen.
+3. **Het schot-alarm.** Sluipen blijft mogelijk, precies één schot lang.
+
+**Beslissingen:**
+
+| Vraag | Mijn aanbeveling |
+|---|---|
+| **Kost mikken snelheid?** Vandaag niet — je sprint even hard met je vizier op. In dit genre is 0,6× standaard. | **Doen.** Zonder straf is er geen reden om ooit níét te mikken. Maar het raakt elk gevecht, dus jouw call. |
+| **Y (stance) blijft dood.** Stance wisselt alleen de HUD-regel; er is geen gedrag om buiten Command Mode aan te hangen. | **Laten tot de klasse-verbs.** Er iets anders op zetten verbergt dat stance zelf nog niet af is. |
+| **Het alarm kost je vandaag niets.** Nagemeten uit de assets: **0** optionals eisen stilte, 1 eist nul gewonden. | Speel er niet omheen alsof het al straf oplevert. Het staat klaar voor je eerste stealth-optional. |
+
+**Assetwerk — hier houdt aansluitwerk op:**
+- **Geen enkele pack heeft een draai-animatie.** Punt 7 is daarom half: het lichaam draait mee boven 90° (zoals Gears en Division), maar de voeten schuiven. Zoals afgesproken stop ik daar — dit is assetwerk.
+- **Vijf van je negen lichamen hebben geen zijcycli.** De vier richtingen zitten in één pack; je lichamen komen uit vijf. De speler krijgt er 3 van de 6. Er is een kruislingse terugval, maar voor die vijf is er niets om op terug te vallen: die moonwalken bij achteruit en strafen.
+
+**De volledige locomotie-audit staat in [phase0/LOCOMOTIE_AUDIT.md](phase0/LOCOMOTIE_AUDIT.md)** — vijftien onderdelen, elk getal gemeten, met per punt of het een keuze of een omissie is. Die ronde hoort aan het eind van elke dag opnieuw te draaien.
 
 ---
 
