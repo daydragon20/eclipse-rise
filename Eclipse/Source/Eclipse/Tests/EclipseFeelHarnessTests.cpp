@@ -453,6 +453,36 @@ bool FEclipseFeelLayer2LookTest::RunTest(const FString& Parameters)
 			MeasuredYawRate, Harness.Tuning->StickYawSpeed),
 		FMath::Abs(MeasuredYawRate - Harness.Tuning->StickYawSpeed) <= Harness.Tuning->StickYawSpeed * 0.10);
 
+	// --- 5b. hetzelfde, maar met de trekker half in -------------------------
+	// AdsLookMultiplier staat als open vraag op de owner-lijst (0,35 nu, of 0,60?)
+	// en die vraag was tot nu toe alleen in factoren te bespreken. Hier wordt hij
+	// een tijd, want dat is wat je voelt: hoe lang duurt een volle draai terwijl
+	// je mikt. Vasthouden, want ADS is een hold.
+	{
+		double AdsYawSwept = 0.0;
+		double LastYaw = Harness.Controller->GetControlRotation().Yaw;
+		const double Start = Harness.ElapsedSeconds;
+		const int32 MaxSteps = FMath::RoundToInt(20.0f / FixedStepSeconds);
+		for (int32 I = 0; I < MaxSteps && AdsYawSwept < 360.0; ++I)
+		{
+			Harness.Inject(TEXT("Aim"), true);
+			Harness.Inject(TEXT("Look"), FVector2D(1.0f, 0.0f));
+			Harness.Step();
+			const double Yaw = Harness.Controller->GetControlRotation().Yaw;
+			AdsYawSwept += FMath::Abs(FMath::FindDeltaAngleDegrees(LastYaw, Yaw));
+			LastYaw = Yaw;
+		}
+		const double AdsTurnSeconds = Harness.ElapsedSeconds - Start;
+		Report(*this, TEXT("seconden per 360 TIJDENS mikken"), AdsTurnSeconds, TEXT("s"),
+			*FString::Printf(TEXT("AdsLookMultiplier = %.2f — owner-vraag: 0,35 of 0,60?"),
+				Harness.Tuning->AdsLookMultiplier));
+		Report(*this, TEXT("verhouding mikken/heup"), TurnSeconds > 0.0 ? AdsTurnSeconds / TurnSeconds : 0.0,
+			TEXT("x"), TEXT("de omgekeerde van de multiplier"));
+		TestTrue(FString::Printf(TEXT("laag 2: mikken vertraagt het kijken écht (%.2f s tegen %.2f s)"),
+				AdsTurnSeconds, TurnSeconds),
+			AdsYawSwept >= 359.0 && AdsTurnSeconds > TurnSeconds * 1.2);
+	}
+
 	// --- 5b. pitch: snelheid EN teken --------------------------------------
 	// Het teken is hier geen detail. De legacy-pitchschaal van de engine was
 	// NEGATIEF (-2.5), dus de handler compenseerde een verborgen omkering; sinds
