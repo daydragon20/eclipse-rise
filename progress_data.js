@@ -56,7 +56,8 @@ window.PROGRESS_DATA = {
       "1. DE SCHAAL-BUG (F9). Blijf rennen en kijk of er iets meeschaalt met je snelheid. Dit is de enige vraag die ik principieel niet kan beantwoorden — ik heb de camera-lag geklemd en meet 0,00% verschil tussen rennen en sprinten, maar of JIJ het nog ziet weet alleen jij",
       "2. HET GEVECHT (nieuw sinds 26-07). Kopschoten doen 2,5x, dus je time-to-kill halveert van 4 kogels naar 2 — voelt dat goed of goedkoop? Je eerste schot verraadt je: vijanden binnen 50 m lopen naar de plek waar je schoot, ook bij een misser. En je hoort het nu: schot, inslag (harder bij een kopschot) en voetstappen",
       "3. DE BEWEGING (nieuw sinds 26-07). Duw achteruit: hij hoort naar de camera te blijven kijken en achteruit te lopen, niet om te draaien. Kijk stilstaand ver rond: boven een kwartslag draait hij mee, en dan schuiven de voeten — dat is de ontbrekende draai-animatie",
-      "4. DE MISSIE. Speel Assault of Sabotage, niet alleen M1.1: die twee hebben nu hun eigen vijandopstelling (6 en 4 in plaats van vier op een hoop bij het hoofddoel)",
+      "4. DE MISSIE. Speel ook de RESCUE, niet alleen M1.1: die heeft als enige bereikbare missie een eigen vijandopstelling (5 vijanden uit 2 batches, op hun eigen sites). Nagemeten in een echte run: 0 fouten, 0 waarschuwingen. Start hem met -EclipseStartMission=WorkerHousing in plaats van TransitCheckpoint",
+      "   LET OP: Assault en Sabotage kun je op dag 1 NIET starten — geen aangrenzende eigen regio (GDD 3.1 regel 1). De snelstart meldt dat netjes en zet je in de hub. Wil je die twee zien, dan moet je eerst een dag verder of een regio innemen",
       "5. R3-VERDICT + 13.2. De gids vraagt ze aan het eind zelf. Voelt Command Mode als sneller denken of als een menu openen, en wil je vrijwillig een tweede ronde?",
       "Zeg daarna gewoon wat je zag. Losse zinnen zijn genoeg — ik haal de rest uit de logs"
     ] },
