@@ -5,6 +5,8 @@
 #include "Characters/EclipseCharacter.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "EngineUtils.h"
+#include "Engine/GameInstance.h"
+#include "Quests/EclipseMissionSubsystem.h"
 #include "TimerManager.h"
 
 void AEclipseEnemyController::OnPossess(APawn* InPawn)
@@ -96,6 +98,26 @@ void AEclipseEnemyController::SenseAndAct()
 		UE_LOG(LogEclipse, Display, TEXT("Vijand %s: eerste contact op %.0f cm (waarnemingsbereik %.0f, engage-bereik %.0f)."),
 			*GetNameSafe(GetPawn()), GetPawn() != nullptr ? FVector::Dist(GetPawn()->GetActorLocation(), Target->GetActorLocation()) : -1.0f,
 			Archetype.PerceptionRadius, Archetype.EngageRange);
+
+		// Het alarm gaat af bij de EERSTE waarneming (owner-beslissing 26-07).
+		// Tot vandaag was NotifyAlarmRaised alleen via een console-commando te
+		// bereiken: vier vijanden konden je zien en neerschieten terwijl de latch
+		// uit bleef, en spook-optionals bleven dus altijd haalbaar.
+		//
+		// Deze regel en niet "bij het eerste schot": zien is de gebeurtenis die de
+		// speler kan vermijden, en dat is wat een spook-optional beloont. De
+		// aanroep is idempotent en negeert zichzelf buiten een lopende missie, dus
+		// een vijand die je in de vrije wereld ziet zet niets aan.
+		if (const UWorld* World = GetWorld())
+		{
+			if (UGameInstance* GameInstance = World->GetGameInstance())
+			{
+				if (UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>())
+				{
+					Mission->NotifyAlarmRaised();
+				}
+			}
+		}
 	}
 
 	// EEN KEER per vijand, op Display. Verbose leek netter maar vraagt een extra

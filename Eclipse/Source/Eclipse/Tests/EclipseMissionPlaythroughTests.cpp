@@ -1109,14 +1109,19 @@ bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
 	Report(*this, TEXT("verste dat een vijand van zijn spawn kwam"), FurthestHostileMove, TEXT("cm"));
 	Report(*this, TEXT("missie gefaald op"), MissionFailedAt, TEXT("s"), TEXT("-1 = niet gefaald"));
 
-	// Het alarm: gaat er iets escaleren als vier vijanden je zien en neerschieten?
-	// De missie houdt een alarm-latch bij, de debrief rekent er anders door af en
-	// de HUD toont een eigen sub-fase — maar het ENIGE wat NotifyAlarmRaised()
-	// aanroept is een console-commando. Deze ronde is het bewijs: als vier
-	// schutters je van vol naar neer brengen en het alarm blijft uit, dan bestaat
-	// er geen enkele speelbare weg naartoe.
+	// Het alarm. Tot 26-07 was dit een rapportageregel met een pijnlijke uitkomst:
+	// vier schutters brachten je van vol naar neer en de latch bleef uit, want het
+	// ENIGE wat NotifyAlarmRaised() aanriep was een console-commando.
+	//
+	// Op owner-beslissing zit hij nu op de eerste waarneming van een vijand. Dat
+	// maakt dit een echte assert: loop je hun bereik in en word je gezien, dan
+	// hóórt het alarm te staan. Gaat deze regel rood, dan is de koppeling stuk of
+	// heeft niemand je gezien — en dat tweede zou de rest van deze test ook al
+	// rood hebben gemaakt.
 	Report(*this, TEXT("alarm geslagen"), MissionSub->IsAlarmRaised() ? 1.0f : 0.0f, TEXT(""),
-		TEXT("0 terwijl je gezien én neergeschoten bent = geen enkel spelpad zet het alarm aan"));
+		TEXT("1 = de eerste waarneming heeft het alarm aangezet"));
+	TestTrue(TEXT("alarm: gezien worden zet het alarm aan (owner-beslissing 26-07: eerste waarneming)"),
+		MissionSub->IsAlarmRaised());
 	if (FirstDamageAt >= 0.0f && DownedAt >= 0.0f)
 	{
 		// Time-to-death vanaf de eerste treffer: dit is het getal dat zegt hoeveel

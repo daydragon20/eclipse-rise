@@ -192,6 +192,26 @@ void UEclipseEventBusSubsystem::DeliverToTag(FGameplayTag MatchTag, FGameplayTag
 
 void UEclipseEventBusSubsystem::RecordEvent(FGameplayTag EventTag, const FInstancedStruct& Payload)
 {
+	// Eén regel per event, de EERSTE keer dat hij in dit proces vuurt.
+	//
+	// Waarom: de catalogus zegt welke 29 events er zijn en de catalogustest bewijst
+	// dat ze alle 29 geïmplementeerd zijn — maar "er staat een Broadcast in de code"
+	// is niet hetzelfde als "hij gaat ooit af". Dat verschil was vannacht de duurste
+	// klasse fouten (de camera zette keurig zijn doel en bewoog nooit). Tot nu toe
+	// stond er in de speelronde "11 van de 29 gevuurd, de rest vuurt buiten een
+	// missie of nergens" — en dat "of nergens" was een aanname.
+	//
+	// Statisch en niet per-subsystem, want de vraag gaat over het proces: over alle
+	// werelden en alle tests heen, wélke events zijn ooit afgegaan. Kosten: één
+	// set-lookup per broadcast, en events zijn gameplay-beats, geen per-frame werk.
+	static TSet<FGameplayTag> SeenThisProcess;
+	bool bAlreadySeen = false;
+	SeenThisProcess.Add(EventTag, &bAlreadySeen);
+	if (!bAlreadySeen)
+	{
+		UE_LOG(LogEclipse, Verbose, TEXT("EventFirstFire: %s"), *EventTag.ToString());
+	}
+
 	const int32 HistorySize = FMath::Max(1, CVarEclipseEventsHistorySize.GetValueOnGameThread());
 	if (RecentEvents.Num() != HistorySize)
 	{
