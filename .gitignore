@@ -32,6 +32,16 @@ Eclipse/Content/SciFi*/
 Eclipse/Content/Paragon*/
 Eclipse/Content/Fab/
 
+# Sci-Fi Light Pack: machine-local, zelfde regel als de andere Fab-packs (64 MB;
+# per machine opnieuw via 'Add to Project'). De graybox verwijst ernaar en
+# degradeert luid als hij ontbreekt — dan blijven de armaturen ongeplaatst en zegt
+# de log dat per stuk, in plaats van stil niets te doen.
+#
+# De AUDIO-packs staan er met opzet WEL in (FreeWeaponSounds 4,5 MB, Footsteps 6
+# MB): klein genoeg om te dragen, en een district dat op een verse machine stil is
+# leest als een defect. Bij 64 MB aan armaturen weegt die afweging andersom.
+Eclipse/Content/Sci_Fi_Light/
+
 # MetaHuman/Fab character content: machine-local (908 MB+; re-download per machine via Window->Fab)
 Eclipse/Content/CharacterAssemblies/
 Eclipse/Content/MetaHumans/

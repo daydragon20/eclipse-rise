@@ -710,6 +710,25 @@ The clean mechanism is **git**. The bible + code are already **one repo** (§2),
 **From then on — keep it synced (this is the auto-push command):**
 - Double-click **`push-all.bat`** (or run `push-all.ps1`). It commits all current work and `git push`es. Use it before switching machines or whenever Claude nears a session limit.
 
+**Op een verse machine: drie stappen die NIET in git zitten** (26-07 avond). De
+Fab-packs zijn machine-lokaal (zie `.gitignore`), en twee daarvan hebben een
+naverwerking nodig die alleen in de editor kan:
+
+```
+# 1. de packs erbij halen via Fab -> Add to Project (character-packs, Sci-Fi Light)
+# 2. de skeletten aan elkaar knopen, anders lopen vijf lichamen zijwaarts met een
+#    vooruit-pas onder hun voeten:
+UnrealEditor-Cmd.exe Eclipse.uproject -run=pythonscript ^
+    -script="Eclipse\Tools\link_compatible_skeletons.py" -unattended -nullrhi
+# 3. het materiaal voor de armaturen (anders staan de lampen uit):
+UnrealEditor-Cmd.exe Eclipse.uproject -run=pythonscript ^
+    -script="Eclipse\Tools\create_fixture_material.py" -unattended -nullrhi
+```
+
+Alle drie degraderen luid als je ze overslaat: de graybox meldt per armatuur dat
+hij ontbreekt, en de validator zet elk lichaam zonder zijcyclus rood. Je merkt het
+dus, in plaats van dat het district er stilletjes anders uitziet.
+
 **On the strong PC:** install the toolchain (`SETUP.md`), `git clone https://github.com/<owner>/eclipse-rise.git C:\Dev\ECLIPSE_GDD`, build (§6), read this file + `ACTIVE_MILESTONE`, continue at §5. **Full day-one migration guide — with UML/BPMN diagrams, the Max/Fable login, the secrets vault, and a paste-ready Fable prompt — is in [`MIGRATION_TO_STRONG_PC.md`](MIGRATION_TO_STRONG_PC.md).**
 
 **Alternatives if you don't want GitHub yet:** `git bundle create eclipse.bundle --all` (one file, full history) transferred by USB/drive/server; or push to the existing Rocadelo server the project already came from.
