@@ -47,11 +47,26 @@
   .wake b{color:var(--rood)}
 
   /* Cockpit tiles */
-  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-top:14px}
   .tile{background:var(--card);border:1px solid var(--lijn);border-radius:var(--radius);padding:16px;text-align:center}
   .tile .big{font-size:34px;font-weight:800;line-height:1}
   .tile .lab{color:var(--grijs);font-size:13px;margin-top:6px;letter-spacing:.5px}
   .tile small{display:block;color:var(--grijs);font-size:12px;margin-top:4px}
+  /* Herkomst: onderscheid tussen een GETELD feit en een SCHATTING. Zonder dit
+     leest een verouderde schatting als een meting, en dat is precies hoe een
+     dashboard stil kan liegen. */
+  .tile .herk{font-size:11px;letter-spacing:.3px;opacity:.85}
+  .tile .herk.g::before{content:"● ";color:var(--groen)}
+  .tile .herk.s::before{content:"◐ ";color:var(--amber2)}
+  .vers{background:var(--card2,var(--card));border:1px solid var(--lijn);border-radius:var(--radius);
+        padding:10px 14px;margin-top:14px;display:grid;gap:6px}
+  .versrij{display:flex;align-items:center;gap:9px;font-size:13px;flex-wrap:wrap}
+  .versdot{width:9px;height:9px;border-radius:50%;flex:none}
+  .versrij b{font-size:13px}
+  .versw{color:var(--grijs)}
+  .verst{font-weight:700;margin-left:auto}
+  .versb{color:var(--grijs);font-size:12px;opacity:.75;flex-basis:100%;padding-left:18px}
+  @media(min-width:620px){.versb{flex-basis:auto;padding-left:0}}
 
   /* Progress bars */
   .bar{height:12px;border-radius:999px;background:var(--card2);overflow:hidden;border:1px solid var(--lijn)}
@@ -144,11 +159,12 @@
 <div class="wrap" id="app">laden…</div>
 <div class="lightbox" id="lb" onclick="this.style.display='none'"><img src="" alt=""></div>
 
-<script src="progress_auto.js"></script>
-<script src="progress_data.js"></script>
+<!-- Bewust NIET hier ingeladen: bij een file://-pagina cachet de browser deze
+     bestanden, waardoor een herlaad dezelfde oude cijfers teruggeeft. Ze worden
+     onderaan dynamisch geladen met een cache-buster. -->
 <script>
-const D = window.PROGRESS_DATA || {};
-const A = window.PROGRESS_AUTO || {};
+let D = {};
+let A = {};
 const esc = (s)=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const trim = (s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n-1).trim()+'…':s;};
 const slug = (s)=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -231,11 +247,49 @@ function render(){
   let activeIdx=-1; fases.forEach((f,i)=>{if((f.pct||0)>0&&(f.pct||0)<100)activeIdx=i;});
   const fase=fases[activeIdx];
   const testTx=A.tests?`${A.tests.ok}/${A.tests.total}`:'—';
-  H+=`<div class="tiles">
-    <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div><small>groeit traag — normaal</small></div>
-    <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div><div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div><small>hier gebeurt het nu</small></div>
-    <div class="tile"><div class="big" style="color:var(--groen)">${testTx}</div><div class="lab">TESTS GESLAAGD</div><small>alles wat werkt, blijft werken</small></div>
+  const W=A.werk||{};
+
+  // Leeftijd van de twee bronnen apart. Ze verouderen los van elkaar:
+  // progress_auto.js komt van de watcher (elke 15 min), progress_data.js
+  // wordt door de dev-sessie geschreven. Eén cijfer voor beide zou liegen.
+  const ouderdom=s=>{
+    if(!s) return null;
+    const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    if(!m) return null;
+    return Math.round((Date.now()-new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime())/60000);
+  };
+  const zegAge=min=>min===null?'onbekend':min<1?'zojuist':min<60?`${min} min geleden`:min<1440?`${Math.floor(min/60)} uur geleden`:`${Math.floor(min/1440)} dagen geleden`;
+  const kleurAge=(min,grens)=>min===null?'var(--grijs)':min<=grens?'var(--groen)':min<=grens*8?'var(--amber2)':'var(--rood)';
+
+  const autoMin=ouderdom(A.generatedAt), dataMin=ouderdom(W.dataStamp);
+  const versheid=[
+    {lab:'Meetcijfers', wat:'tests, commits, tellingen', min:autoMin, grens:20, bron:'watcher, elke 15 min'},
+    {lab:'Schattingen', wat:'de percentages hieronder', min:dataMin, grens:1440, bron:'door de dev-sessie gezet'}
+  ];
+
+  H+=`<div class="vers">
+    ${versheid.map(v=>`<div class="versrij">
+      <span class="versdot" style="background:${kleurAge(v.min,v.grens)}"></span>
+      <b>${v.lab}</b> <span class="versw">${esc(v.wat)}</span>
+      <span class="verst" style="color:${kleurAge(v.min,v.grens)}">${zegAge(v.min)}</span>
+      <span class="versb">${esc(v.bron)}</span>
+    </div>`).join('')}
   </div>`;
+
+  H+=`<div class="tiles">
+    <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div><small class="herk s">schatting · ${zegAge(dataMin)}</small></div>
+    <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div><div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div><small class="herk s">schatting · ${zegAge(dataMin)}</small></div>
+    <div class="tile"><div class="big" style="color:var(--groen)">${testTx}</div><div class="lab">TESTS GESLAAGD</div><small class="herk g">geteld · ${zegAge(autoMin)}</small></div>
+    <div class="tile"><div class="big" style="color:var(--groen)">${W.klaar!=null?`${W.klaar}/${W.taken}`:'—'}</div><div class="lab">TAKEN AF</div><small class="herk g">geteld · ${W.bezig!=null?`${W.bezig} bezig, ${W.open} open`:'—'}</small></div>
+    <div class="tile"><div class="big" style="color:${(A.tempo&&A.tempo.vandaag)?'var(--groen)':'var(--grijs)'}">${A.tempo?A.tempo.vandaag:'—'}</div><div class="lab">COMMITS VANDAAG</div><small class="herk g">geteld · laatste ${A.tempo&&A.tempo.laatsteAge?esc(A.tempo.laatsteAge):'—'}</small></div>
+  </div>`;
+
+  if(autoMin!==null&&autoMin>60){
+    H+=`<div class="card" style="border-color:var(--rood);background:rgba(220,60,60,.08)">
+      <b style="color:var(--rood)">De meetcijfers zijn ${zegAge(autoMin)} bijgewerkt.</b>
+      <p class="sub" style="margin:6px 0 0">De watcher hoort elke 15 minuten te draaien. Draait hij niet, dan zijn tests, commits en tellingen hierboven verouderd — ze zien er alleen niet zo uit.
+      Herstellen: dubbelklik <b>start_progress_watcher.bat</b>, of laat de taak "ECLIPSE Dashboard" in Taakplanner opnieuw starten.</p></div>`;
+  }
 
   // WAT MOET JIJ DOEN — met aanvink-knoppen
   const done=getDone();
@@ -349,7 +403,8 @@ function render(){
 
   // FOOTER
   H+=`<div class="footer">
-    Laatst bijgewerkt: <b>${esc(D.bijgewerkt||'?')}</b> · deze pagina vernieuwt zichzelf elke 30 sec.<br>
+    Meetcijfers <b>${zegAge(autoMin)}</b> ververst · schattingen <b>${zegAge(dataMin)}</b> gezet · pagina leest elke 30 sec opnieuw.<br>
+    <span style="opacity:.7">● geteld = hard feit uit de repo · ◐ schatting = door de dev-sessie ingevuld</span><br>
     Alle technische details? → <a href="PROGRESS.html">PROGRESS.html</a> (voor de nerds 🤓)
   </div>`;
 
@@ -385,11 +440,32 @@ document.getElementById('app').addEventListener('click',e=>{
   }
 });
 
-render();
+/* Data laden met cache-buster. Zonder de ?t= geeft de browser bij een
+   file://-pagina het gecachte bestand terug, en dan blijven de cijfers staan
+   terwijl de watcher wél verse data heeft weggeschreven. */
+function laadData(klaar){
+  document.querySelectorAll('script[data-databron]').forEach(s=>s.remove());
+  let open=2;
+  const af=()=>{ if(--open===0){ D=window.PROGRESS_DATA||{}; A=window.PROGRESS_AUTO||{}; klaar(); } };
+  ['progress_auto.js','progress_data.js'].forEach(f=>{
+    const s=document.createElement('script');
+    s.src=f+'?t='+Date.now();
+    s.setAttribute('data-databron','');
+    s.onload=af; s.onerror=af;
+    document.head.appendChild(s);
+  });
+}
 
-/* scroll bewaren + elke 30s verversen (leest verse data) */
-window.scrollTo(0, parseInt(sessionStorage.getItem('eclipseScroll')||'0'));
-setInterval(()=>{sessionStorage.setItem('eclipseScroll',window.scrollY);location.reload();},30000);
+/* Verversen zonder de pagina te herladen: geen flits, scrollpositie blijft
+   staan, en je verliest geen open lightbox. */
+function ververs(){ laadData(render); }
+
+laadData(()=>{
+  render();
+  window.scrollTo(0, parseInt(sessionStorage.getItem('eclipseScroll')||'0'));
+});
+setInterval(ververs, 30000);
+window.addEventListener('beforeunload',()=>sessionStorage.setItem('eclipseScroll',window.scrollY));
 </script>
 </body>
 </html>

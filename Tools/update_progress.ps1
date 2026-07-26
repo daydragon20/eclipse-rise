@@ -91,8 +91,64 @@ function Update-Once([string]$Root) {
         }
     } catch {}
 
+    # --- werkvoortgang: GETELD uit progress_data.js, niet geschat ---
+    # De percentages in het dashboard zijn handmatige scope-inschattingen. Die kunnen
+    # verouderen zonder dat iemand het ziet. Deze telling is een hard feit uit dezelfde
+    # bron, zodat het dashboard kan tonen of de schatting nog met het werk meebeweegt.
+    try {
+        $dataFile = Join-Path $Root "progress_data.js"
+        if (Test-Path $dataFile) {
+            $raw = Get-Content $dataFile -Raw
+
+            $taken = [regex]::Matches($raw, 'taak:\s*"(?:[^"\\]|\\.)*",\s*status:\s*"(\w+)",\s*pct:\s*(\d+)')
+            $status = @{ klaar = 0; bezig = 0; gepland = 0; wachten = 0 }
+            $som = 0
+            foreach ($m in $taken) {
+                $s = $m.Groups[1].Value
+                if ($status.ContainsKey($s)) { $status[$s]++ }
+                $som += [int]$m.Groups[2].Value
+            }
+            $aantal = @($taken).Count
+
+            $fases = @()
+            # Escape-tolerant: fase-namen bevatten aanhalingstekens (Prototype \"The Loop\"),
+            # en een naief [^"]* kapt die eruit — precies de twee actieve fases.
+            foreach ($m in [regex]::Matches($raw, 'naam:\s*"(Fase\s*\d+(?:[^"\\]|\\.)*)",\s*pct:\s*(\d+)')) {
+                $fases += [ordered]@{ naam = ($m.Groups[1].Value -replace '\\"', '"'); pct = [int]$m.Groups[2].Value }
+            }
+
+            $heel = [regex]::Match($raw, 'hero:\s*\{[^}]*pct:\s*(\d+)')
+
+            $auto.werk = [ordered]@{
+                taken       = $aantal
+                klaar       = $status.klaar
+                bezig       = $status.bezig
+                open        = $status.gepland + $status.wachten
+                gemiddeld   = if ($aantal -gt 0) { [math]::Round($som / $aantal) } else { 0 }
+                fases       = $fases
+                heleGamePct = if ($heel.Success) { [int]$heel.Groups[1].Value } else { $null }
+                dataAge     = Get-RelativeAge (Get-Item $dataFile).LastWriteTime
+                dataStamp   = (Get-Item $dataFile).LastWriteTime.ToString("yyyy-MM-dd HH:mm")
+            }
+        }
+    } catch {}
+
+    # --- tempo: commits per dag, zodat stilstand zichtbaar wordt ---
+    try {
+        $vandaag = @(git -C $Root log --since="midnight" --oneline 2>$null).Count
+        $week    = @(git -C $Root log --since="7 days ago" --oneline 2>$null).Count
+        # git gebruikt strftime, geen .NET-formaten — %Y niet yyyy.
+        $laatste = git -C $Root log -1 --pretty=format:"%ad" --date=format:"%Y-%m-%d %H:%M" 2>$null
+        $auto.tempo = [ordered]@{
+            vandaag = $vandaag
+            week    = $week
+            laatsteCommit = "$laatste"
+        }
+        if ($laatste) { $auto.tempo.laatsteAge = Get-RelativeAge ([datetime]::ParseExact($laatste, "yyyy-MM-dd HH:mm", $null)) }
+    } catch {}
+
     # --- wegschrijven als JS (ConvertTo-Json levert geldige JS-objectliteral) ---
-    $json = ($auto | ConvertTo-Json -Depth 5)
+    $json = ($auto | ConvertTo-Json -Depth 6)
     $body = "// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.`r`nwindow.PROGRESS_AUTO = $json;`r`n"
     $body | Out-File -FilePath (Join-Path $Root "progress_auto.js") -Encoding utf8
     Write-Host "[update_progress] $($auto.generatedAt) - $(@($auto.commits).Count) commits, tests: $(if ($auto.tests) { "$($auto.tests.ok)/$($auto.tests.total)" } else { 'geen rapport' }), $(@($auto.screenshots).Count) shots"
