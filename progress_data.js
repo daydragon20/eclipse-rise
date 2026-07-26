@@ -127,6 +127,12 @@ window.PROGRESS_DATA = {
       "Mijn aanbeveling: pas na de feedback-laag, net als de stance-splitsing. Een klasse die anders vecht is alleen te beoordelen als je ziet en hoort dat er gevochten wordt",
       "Ik heb ze niet gebouwd: dat is specwerk met eigen ontwerpkeuzes, geen tuningronde"
     ] },
+    { titel: "Je squad heeft acht ingesproken zinnen die nooit worden afgespeeld", prio: "gauw", waarom: "Gevonden door te vragen wie het stemsysteem eigenlijk aanroept. Antwoord: niemand. De enige verwijzingen buiten de tests komen van de GENERATOR die de bestanden maakt — er is geen enkele regel die ze tijdens het spelen afspeelt. Er staan acht kant-en-klare opnames in Content/Audio/Generated: Bark_Ack_Move_A en _B, Ack_Hold_A, Ack_Regroup_B, Down_B, en drie weigeringen (NoRoute, NoShot, Pinned). Je squad antwoordt dus in TEKST terwijl de stem er letterlijk al is. Dat raakt precies waar GDD 8.4 om draait: een order krijgt antwoord, en gehoord antwoord is sterker dan gelezen antwoord.", stappen: [
+      "Het is klein werk: de audio-subsystem is al een pure bus-consument (zo speelt de missie-sting al af), dus dit is er een consument bij op Event.Squad.OrderAcknowledged en OrderRefused",
+      "Wat WEL een keuze is en daarom bij jou ligt: hoe vaak mag hij praten? Vier orders achter elkaar geven zonder rem levert vier stemmen over elkaar",
+      "Mijn aanbeveling: doen, en met een simpele rem van een seconde of twee per soldaat. Dit is de goedkoopste stap richting 'het gevecht voelt ergens naar' die er ligt",
+      "Ik heb het niet gebouwd omdat de rem een ontwerpkeuze is en het een nieuwe feature is, geen reparatie"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",
