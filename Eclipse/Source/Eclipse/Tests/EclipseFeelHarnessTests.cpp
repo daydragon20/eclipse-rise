@@ -957,9 +957,21 @@ bool FEclipseGuideNumbersMatchTuningTest::RunTest(const FString& Parameters)
 		return Step != nullptr ? Step->Expectation : FString();
 	};
 
+	// LET OP de decimalen, en de KOMMA. Deze helper formatteerde met %.0f, en dat
+	// maakte elke assert op een waarde onder 1 een tautologie: 0,11 werd "0", en
+	// "0" staat in vrijwel elke zin. Zo stonden er even twee bewakers die niet rood
+	// kónden worden — precies wat ze horen te voorkomen.
+	//
+	// Nu: waarden onder 10 met twee decimalen, en de gidsteksten schrijven Nederlands
+	// (0,11 met een komma), dus beide schrijfwijzen tellen.
 	auto MentionsNumber = [](const FString& Text, float Value)
 	{
-		return Text.Contains(FString::Printf(TEXT("%.0f"), Value));
+		const FString Dotted = Value < 10.0f
+			? FString::Printf(TEXT("%.2f"), Value)
+			: FString::Printf(TEXT("%.0f"), Value);
+		FString Comma = Dotted;
+		Comma.ReplaceInline(TEXT("."), TEXT(","));
+		return Text.Contains(Dotted) || Text.Contains(Comma);
 	};
 
 	const FString SprintText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Sprint);
@@ -978,6 +990,24 @@ bool FEclipseGuideNumbersMatchTuningTest::RunTest(const FString& Parameters)
 	// bewaker bestaat. Verandert CrouchedHalfHeightCm, dan moet de tekst mee.
 	TestTrue(*FString::Printf(TEXT("gids: de hurk-stap noemt de getunede hurkhoogte (%.0f cm)"), T.CrouchedHalfHeightCm * 2.0f),
 		MentionsNumber(CrouchText, T.CrouchedHalfHeightCm * 2.0f));
+
+	// De sprong-stap noemt sinds 26-07 de twee vergevingsvensters. Die zijn de enige
+	// feel-toevoeging die je NIET opmerkt tenzij iemand het zegt — ze bestaan om
+	// onzichtbaar te zijn — dus juist daar mag de tekst niet stil van de tuning
+	// afdrijven.
+	const FString JumpText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Jump);
+	TestTrue(TEXT("gids: er is een sprong-stap"), !JumpText.IsEmpty());
+	TestTrue(*FString::Printf(TEXT("gids: de sprong-stap noemt het getunede coyote-venster (%.2f s)"), T.CoyoteTimeSeconds),
+		MentionsNumber(JumpText, T.CoyoteTimeSeconds));
+	TestTrue(*FString::Printf(TEXT("gids: de sprong-stap noemt het getunede inputbuffer-venster (%.2f s)"), T.JumpInputBufferSeconds),
+		MentionsNumber(JumpText, T.JumpInputBufferSeconds));
+
+	// En de kijk-stap noemt de getunede stick-snelheid, want die zin claimt sinds
+	// vannacht expliciet dat het graden per SECONDE zijn.
+	const FString LookText = ExpectationFor(EclipseTestGuide::EEclipseGuideSignal::Look);
+	TestTrue(TEXT("gids: er is een kijk-stap"), !LookText.IsEmpty());
+	TestTrue(*FString::Printf(TEXT("gids: de kijk-stap noemt de getunede kijksnelheid (%.0f gr/s)"), T.StickYawSpeed),
+		MentionsNumber(LookText, T.StickYawSpeed));
 
 	// En de kop van de gids toont de kijkwaarden; die regel wordt uit dezelfde
 	// members gebouwd die de handler gebruikt, dus hij kan niet verouderen — maar
