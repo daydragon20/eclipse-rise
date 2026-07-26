@@ -104,8 +104,9 @@ schot valt, maar er is geen model in de handen.
 2. **Drie zinnen laten inspreken** (squad-barks bij autonoom handelen) — kost een
    betaalde generatie, dus jouw keuze. Staat in het kliklijstje.
 3. **Vaste-camera ronde** voor de 13 armaturen voordat er meer bij komen.
-4. **Welk lichaam is de speler?** Belica heeft draaitakes maar geen wandel- of
-   herlaadcyclus; de SciFi-packs andersom.
+4. **Welk lichaam is de speler?** Minder dringend geworden: Belica's ontbrekende
+   herlaad- en hurktake zijn geleend uit SciFiCharacter en ze spelen schadeloos af
+   (nagekeken op een beeld). De vraag is nu vooral een stijlvraag.
 
 ---
 
@@ -116,8 +117,8 @@ schot valt, maar er is geen model in de handen.
 Draaien met **één commando**, dat ook bouwt en de suite draait:
 
 ```
-powershell -File Eclipse\Toolserify.ps1
-powershell -File Eclipse\Toolserify.ps1 -SkipShots     # alleen bouwen + suite
+powershell -File Eclipse\Tools\verify.ps1
+powershell -File Eclipse\Tools\verify.ps1 -SkipShots     # alleen bouwen + suite
 ```
 
 Gebruik dit bij elke landing. Het was vier losse stappen die ik met de hand aan
@@ -148,11 +149,11 @@ Gemeten en op beeld. Wat er nog ligt: de drempel van 60 graden is bij deze
 bemonstering niet zichtbaar (het lichaam is bij elke opname al bijgedraaid). Als
 je die grens wilt beoordelen, moet de ronde dichter bemonsteren dan elke 2 s.
 
-### 3. HET KNOPPENSCHEMA PER MODUS (punt 7)
+### 3. ~~HET KNOPPENSCHEMA PER MODUS~~ — STAAT
 
-Nooit gedaan, en LT doet nog twee dingen. Als DATA met een validator, en het wordt
-de bron van `BESTURING.md`, de F3-gids en `SPEEL_ECLIPSE.bat`. Nu staan die vier
-uit elkaar te lopen — dat kostte vandaag vier keer dezelfde correctie.
+De modus is een veld in plaats van proza in een cel, en alle vier de bronnen
+worden ertegen gehouden. De vondst was dat LT nog steeds twee dingen deed terwijl
+drie beschrijvingen al zeiden van niet; zie het morgenrapport.
 
 ### 4. HET LICHTPLAN, ronde 2
 
@@ -168,7 +169,13 @@ Zie `phase0/LOCOMOTIE_AUDIT.md`. Wat er uit die ronde nog open ligt:
   is de omgekeerde richting van de leenoperatie die vannacht wél is gedaan.
 - **De draai-animatie draagt geen eigen rotatie** en dat is inherent aan dit
   materiaal, niet met tuning te verhelpen.
-- **Punt 15 blijft half:** nog steeds geen start-, stop- of landtake.
+- **Punt 15 is GEEN assetwerk** — dat is 26-07 laat weerlegd. Belica levert
+  `Jog_{Fwd,Bwd,Left,Right}_{Start,Stop}` en `Jump_PreLand`; ze zijn alleen nooit
+  aangesloten. Derde keer dat "assetwerk" aansluitwerk bleek. **Bouw dit niet aan
+  de one-shot-laag:** die speelt een volledige pose op 0,85 en schaalt de rest met
+  `1 - gewicht`, en precies dat drukte de loopcyclus naar 15% bij de draaitake.
+  Een start-take moet de cyclus INLEIDEN, niet vervangen — dus een eigen gewicht
+  dat eroverheen mengt.
 
 ### 6. HET KNOPPENSCHEMA, FASE 2
 
