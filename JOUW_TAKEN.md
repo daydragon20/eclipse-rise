@@ -259,3 +259,23 @@ zag zijn geen bug maar een keuze, en die is van jou:
   *De HUD ontbrak niet: die mount netjes en de teller hoort zichtbaar te zijn. Dat
   hij niet op mijn beelden staat, komt doordat screenshots de UMG-laag niet
   meenemen — mijn meetmethode, geen bug. Idem "nul schoten": verkeerd zoekwoord.*
+
+## Werkt de View-knop nu wel? (26-07 laat)
+
+Je meldde op 25-07 dat twaalf gameplay-acties de gamepad bereikten, maar dat de
+testgids op de **View-knop** niet in het log verscheen. In de code stond het
+vermoeden al: "View/Menu zijn precies de knoppen die een UI-laag pleegt op te
+eten."
+
+De oorzaak lag in je opstartlog, als ERROR, bij elke start:
+
+> *Using CommonUI without a CommonGameViewportClient derived game viewport client.
+> **CommonUI Input routing will not function correctly.***
+
+CommonUI komt binnen als plugin-afhankelijkheid, en het project draaide in een
+configuratie die de plugin zelf ongeldig noemt. Dat is nu gezet.
+
+**Wil je bij je volgende sessie even proberen of de View-knop de gids opent?** Ik
+kan een gamepad niet headless indrukken, dus dit is het enige stuk dat ik niet zelf
+kan afvinken. Werkt het nog steeds niet, dan weten we dat het hier níét aan lag —
+ook dat is winst.

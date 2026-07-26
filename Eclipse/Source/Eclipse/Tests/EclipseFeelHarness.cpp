@@ -58,14 +58,22 @@ namespace EclipseFeelHarness
 	bool FHarness::Start(FAutomationTestBase& Test, const FOptions& Options)
 	{
 		StepSeconds = Options.StepSeconds;
-		// CommonUI klaagt luid (op Error-niveau) zodra er een lokale speler bijkomt
-		// zonder CommonGameViewportClient. Dat is hier correct gedrag — er IS geen
-		// viewport, dat is het punt van headless — maar een Error laat de test
-		// vallen. Verwacht hem expliciet in plaats van hem te dempen, zodat een
-		// ANDERE UI-fout nog steeds gewoon rood wordt.
+		// Hier stond een AddExpectedError voor "Using CommonUI without a
+		// CommonGameViewportClient". Die verwachting is 26-07 laat weggehaald,
+		// omdat de OORZAAK is weggenomen: DefaultEngine.ini wijst nu
+		// CommonGameViewportClient aan, zoals de plugin zelf eist.
+		//
+		// De oude opmerking hier zei dat de error "correct gedrag" was omdat er
+		// headless geen viewport is. Dat klopte niet: de engine meldde dat
+		// INVOERROUTERING niet goed werkt, en dat gold ook in het echte spel —
+		// waar de owner precies dat symptoom zag (de View-knop kwam niet aan).
+		// Een verwachte fout is een geaccepteerde fout, en die had hier niet
+		// geaccepteerd mogen worden.
+		//
+		// 47 tests werden rood toen de error verdween. Dat is de bedoeling van
+		// AddExpectedError en het bewijst dat de verwachting echt hing aan wat
+		// hij beweerde.
 		OwningTest = &Test;
-		Test.AddExpectedError(TEXT("Using CommonUI without a CommonGameViewportClient"),
-			EAutomationExpectedErrorFlags::Contains, /*Occurrences*/ 0);
 
 		GameInstance = NewObject<UGameInstance>(GEngine);
 		GameInstance->InitializeStandalone();
