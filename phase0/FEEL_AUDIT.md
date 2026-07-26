@@ -9,6 +9,30 @@ project) · **N.V.T.** (bewust anders, met reden).
 
 Alles hieronder is uit de code gelezen of gemeten, niet uit het geheugen.
 
+## EINDSTAND per gebied (nacht 25→26 juli 2026)
+
+Wie hier morgen begint, hoeft alleen deze tabel te lezen. Elk gebied is óf gemeten
+en geland, óf gemeten en bewust doorgeschoven, óf niet gebouwd — en de laatste
+kolom zegt waar het bewijs staat.
+
+| Gebied | Stand | Bewijs |
+|---|---|---|
+| Locomotie (snelheid, aanloop, remmen, richting) | **gemeten en geland** | `Eclipse.Feel.Layer2.InjectedLocomotion*` — aanloop 0,300 s · stoppen 0,150 s / 26,6 cm · achteruit 0,85× |
+| Sprint in/uit | **gemeten, asymmetrie is owner-keuze** | 0,150 s erin, 0,042 s eruit — `SprintRampsInsteadOfSnapping` |
+| Hurken | **gemeten en geland** | 150 cm/s en 124 cm hoog (was de engine-default 80) — `CrouchCostsSpeedAndBuysHeight` |
+| Sprong (hoogte, airtime, vergevingsvensters) | **gemeten en geland** | 127,5 cm · 1,008 s · coyote 0,110 s · buffer 0,150 s |
+| Luchtsturing | **gemeten, hoeveelheid is owner-keuze** | 213 cm met aanloop (287 vanuit stilstand — daar verdubbelt UE hem) |
+| Traversal (stap, perch) | **gemeten en geland** | stoeprand 19,98 cm · kniehoogte 0,00 cm |
+| Kijken (snelheid, deadzone, demping) | **gemeten en geland** | 1,500 s per 360° · stick 0,05 geeft niets · demping 180 → 52,8 gr/s |
+| Kijken tijdens mikken | **gemeten, factor is owner-keuze** | 4,29 s per 360° = 2,86× trager |
+| Camera-afstand bij snelheid (S1) | **gemeten en geland** | 8,4% → 0,00% tussen rennen en sprinten |
+| Camera-overgangen (1e persoon, ADS, Command Mode) | **was DOOD, nu geland** | de blend draaide nooit; nu 300→0, 300→165, 300→520 |
+| Pitch-limieten | **gemeten — de audit had het mis** | omlaag gebeurt niets; omhoog 300 → 84 cm vanaf ~+25° |
+| Rotatie lichaam | **gemeten en geland** | 500 gr/s, 180° in 0,400 s |
+| Turn-in-place | **niet gebouwd** | vraagt een draai-animatie (owner, §4 punt 7) |
+| Wapen (tempo, bereik, kopschot) | **gemeten; twee getallen kloppen niet** | 14 schoten/2 s ✓ · bereik 4700 i.p.v. 5000 · kopschot doet niets |
+| §8 FEEDBACK (shake, recoil, hitmarkers) | **bestaat niet** | grootste openstaande post (owner, §4 punt 8) |
+
 ## De vondst die het meeste verklaart
 
 Van het `CharacterMovementComponent` werden **vier** dingen gezet: `MaxWalkSpeed`,
