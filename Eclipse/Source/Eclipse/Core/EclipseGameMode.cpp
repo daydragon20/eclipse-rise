@@ -410,7 +410,9 @@ void AEclipseGameMode::AdvancePlayShotRound()
 	{
 		return;
 	}
-	if (PlayShotStep >= 1 && PlayShotStep <= 9)
+	// Tot 8: stap 9 valt op een eigen timer midden in de herlaadbeurt en meet
+	// daar zelf, anders staat elke regel er twee keer.
+	if (PlayShotStep >= 1 && PlayShotStep <= 8)
 	{
 		MeasurePlayShot(PlayShotStep);
 		MeasureDressingFigures(PlayShotStep);
