@@ -496,17 +496,6 @@ void UEclipseAnimInstance::UpdateFootsteps(float SpeedOnGround)
 	DistanceSinceFootstep = 0.0f;
 	++FootstepCount;
 
-	if (!bTriedLoadFootstep)
-	{
-		bTriedLoadFootstep = true;
-		FootstepCue = LoadObject<USoundBase>(nullptr,
-			TEXT("/Game/Audio/SFX/Cue_SFX_Foot_Asphalt_01.Cue_SFX_Foot_Asphalt_01"));
-		if (FootstepCue == nullptr)
-		{
-			UE_LOG(LogEclipse, Warning, TEXT("Audio: voetstapcue ontbreekt — lopen blijft stil (14.3.5)."));
-		}
-	}
-
 	// Alleen asfalt. Cue_SFX_Foot_Metal_01 ligt er ook, maar kiezen tussen de twee
 	// vraagt physical materials op de vloeren en die zijn er niet — dat is
 	// assetwerk en staat als bevinding in de gevechts-audit.
@@ -525,6 +514,21 @@ void UEclipseAnimInstance::SetLocomotionSet(const FEclipseLocomotionSet& InSet)
 void UEclipseAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
+
+	// De voetstapcue NU laden, niet bij de eerste stap. LoadObject is synchroon, en
+	// de eerste stap valt per definitie op het moment dat de speler begint te
+	// bewegen — precies wanneer een hitch opvalt. Hier valt hij weg in het
+	// spawnen van het lichaam, waar er toch al een zit.
+	if (!bTriedLoadFootstep)
+	{
+		bTriedLoadFootstep = true;
+		FootstepCue = LoadObject<USoundBase>(nullptr,
+			TEXT("/Game/Audio/SFX/Cue_SFX_Foot_Asphalt_01.Cue_SFX_Foot_Asphalt_01"));
+		if (FootstepCue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Audio: voetstapcue ontbreekt — lopen blijft stil (14.3.5)."));
+		}
+	}
 
 	OwningBody = Cast<AEclipseCharacter>(TryGetPawnOwner());
 	if (OwningBody != nullptr)

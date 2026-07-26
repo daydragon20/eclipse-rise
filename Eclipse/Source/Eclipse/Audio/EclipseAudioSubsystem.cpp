@@ -96,6 +96,36 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnOrderAnswered),
 		FEclipseSquadEventPayload::StaticStruct());
 
+	// De twee gevechtscues NU laden en niet bij het eerste schot (26-07).
+	//
+	// LoadObject is synchroon. Met het lazy patroon viel die laadtijd precies op de
+	// eerste kogel van je eerste vuurgevecht — het slechtste moment dat er is. Het
+	// harnas mat de slechtste tick op 14,5 ms tegen een budget van 16,7 (12.4), en
+	// dat is te weinig marge om er drie synchrone laadacties in te laten vallen.
+	//
+	// Hier kost het niets zichtbaars: binden gebeurt bij het opstarten van het
+	// subsysteem, waar een hitch niemand opvalt. De sting hieronder houdt zijn
+	// lazy pad — die klinkt bij de DEBRIEF, en daar valt een hitch weg tussen het
+	// afronden en het laden van het hub-scherm.
+	if (!bTriedLoadWeaponShot)
+	{
+		bTriedLoadWeaponShot = true;
+		WeaponShotCue = LoadObject<USoundBase>(nullptr, WeaponShotCuePath);
+		if (WeaponShotCue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Audio: wapencue %s ontbreekt — schieten blijft stil (14.3.5)."), WeaponShotCuePath);
+		}
+	}
+	if (!bTriedLoadImpact)
+	{
+		bTriedLoadImpact = true;
+		ImpactCue = LoadObject<USoundBase>(nullptr, ImpactCuePath);
+		if (ImpactCue == nullptr)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Audio: inslagcue %s ontbreekt — treffers blijven stil (14.3.5)."), ImpactCuePath);
+		}
+	}
+
 	// Wapengeluid (gevechts-audit punt 12). Het schot-event bestaat sinds vanochtend
 	// en vuurt bij elk schot dat de cadans passeert, raak of mis — precies het feit
 	// waar een schotgeluid aan hoort te hangen.
@@ -138,17 +168,6 @@ void UEclipseAudioSubsystem::OnShotFired(FGameplayTag EventTag, const FInstanced
 
 	++ShotSoundCount;
 
-	if (!bTriedLoadWeaponShot)
-	{
-		bTriedLoadWeaponShot = true;
-		WeaponShotCue = LoadObject<USoundBase>(nullptr, WeaponShotCuePath);
-		if (WeaponShotCue == nullptr)
-		{
-			UE_LOG(LogEclipse, Warning,
-				TEXT("Audio: wapencue %s ontbreekt — schieten blijft stil (14.3.5)."), WeaponShotCuePath);
-		}
-	}
-
 	// Op de PLEK van het schot en niet 2D: je moet kunnen horen dat er naast je
 	// geschoten wordt, en straks waar vandaan. Het feit draagt zijn oorsprong al,
 	// precies waarvoor die in het event zit.
@@ -167,17 +186,6 @@ void UEclipseAudioSubsystem::OnHitLanded(FGameplayTag EventTag, const FInstanced
 	}
 
 	++HitSoundCount;
-
-	if (!bTriedLoadImpact)
-	{
-		bTriedLoadImpact = true;
-		ImpactCue = LoadObject<USoundBase>(nullptr, ImpactCuePath);
-		if (ImpactCue == nullptr)
-		{
-			UE_LOG(LogEclipse, Warning,
-				TEXT("Audio: inslagcue %s ontbreekt — treffers blijven stil (14.3.5)."), ImpactCuePath);
-		}
-	}
 
 	// Een kopschot klinkt harder. Dat is de goedkoopste manier om punt 5 uit de
 	// audit half op te lossen: je hóórt het verschil, ook zonder hitmarker. Een
