@@ -35,6 +35,14 @@ gecontroleerd; twee klopten niet en zijn gecorrigeerd (R3 en deze).*
 | Springen | Spatie | A | ja — `HandleJump` |
 | 1e/3e persoon | C | **geen** — R3 is er bewust af | ja — `HandleToggleView` (alleen op C) |
 
+> **Wandelen bestaat alleen op de controller** (gemeten 26-07). `WalkSpeed` (180 cm/s)
+> wordt alleen door de ANIMATIE gelezen — als ankerpunt voor de loop/ren-blend — en
+> het bewegingscomponent mikt altijd op `RunSpeed`. Met een stick haal je elke
+> tussensnelheid (de respons is lineair: 40% uitslag = 40% snelheid, dus 180 zit op
+> ~43%), maar WASD zijn digitale toetsen en geven altijd 1,0. **Op toetsenbord loop
+> je dus altijd 420.** Geen defect, wel een apparaatverschil; een wandeltoets zou
+> een bindingskeuze zijn en Alt is bezet door stance.
+
 ## Command Mode (wereld naar 30%)
 
 | Actie | Muis/toetsenbord | Controller | Handler |
