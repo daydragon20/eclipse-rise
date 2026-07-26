@@ -54,6 +54,7 @@
 #include "Squad/EclipseSquadTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
+#include "Quests/EclipseStoryTypes.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseStrategySubsystem.h"
 #include "Tests/EclipseFeelHarness.h"
@@ -2077,6 +2078,35 @@ bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
 	{
 		TestTrue(FString::Printf(TEXT("bereik: '%s' is ooit te bereiken"), *Region.RegionId.ToString()),
 			Reached.Contains(Region.RegionId));
+	}
+
+	// --- en de verhaallijn: wijst elke beat naar een regio die bestaat? -------
+	// Een story-missie die aan een regio hangt die niet in de graaf staat, wordt
+	// nooit aangeboden — dezelfde dode content als hierboven, maar dan in de laag
+	// die de campagne zijn verhaal geeft. Geen van de vier bestaande validators
+	// kijkt hiernaar.
+	if (const UDataTable* Story = Setup->StoryMissions.LoadSynchronous())
+	{
+		TSet<FName> RegionIds;
+		for (const FEclipseRegionDefinition& Region : Regions)
+		{
+			RegionIds.Add(Region.RegionId);
+		}
+		int32 StoryRows = 0;
+		Story->ForeachRow<FEclipseStoryMissionRow>(TEXT("VerhaalControle"),
+			[&StoryRows, &RegionIds, this](const FName&, const FEclipseStoryMissionRow& Row)
+			{
+				++StoryRows;
+				if (Row.PinnedRegionId.IsNone())
+				{
+					return; // niet vastgepind = overal aan te bieden, dus niets te controleren
+				}
+				TestTrue(FString::Printf(TEXT("verhaal: '%s' is vastgepind op regio '%s' en die bestaat"),
+						*Row.MissionId.ToString(), *Row.PinnedRegionId.ToString()),
+					RegionIds.Contains(Row.PinnedRegionId));
+			});
+		Report(*this, TEXT("story-missies gecontroleerd"), StoryRows, TEXT(""),
+			TEXT("elk vastgepind op een regio die in de graaf staat"));
 	}
 
 	GameInstance->Shutdown();
