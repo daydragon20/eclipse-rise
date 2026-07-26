@@ -183,6 +183,19 @@ DEATH_KEYWORDS = ("death", "die", "dead")
 # onder een slank lichaam valt op. Zie Tools/link_compatible_skeletons.py — zonder
 # die koppeling weigert de engine de take.
 DONOR_PACKS = {
+    # DE SPELER LEENT OOK (26-07 laat). Belica haalde 3/5 poses: geen herlaad- en
+    # geen hurktake. Nagemeten over alle 143 takes in ParagonLtBelica met vier
+    # respectievelijk drie trefwoorden: die bestaan daar niet.
+    #
+    # SciFiCharacter heeft er 7 en 14. Dat lenen kan is GEMETEN en niet aangenomen:
+    # Belica_Skeleton heeft 158 botten, het mannequin-donorskelet 68, en alle 68
+    # namen komen in Belica voor — het Paragon-rig is een superset. Zonder die
+    # meting zou "kandidaat gevonden" lezen als "op te lossen", terwijl een take
+    # alleen speelt op een skelet met dezelfde botnamen.
+    #
+    # Herladen is het scherpste gat van de tien in het project: 2,2 s met vier
+    # foley-fasen eronder, dus je hoort een handeling die je niet ziet.
+    "ParagonLtBelica": "SciFiCharacter",
     "SciFiGirl": "SciFiCharacter",
     "SciFiCharacterPack/SciFiGirl": "SciFiCharacterPack/SciFiSoldier",
     "SciFiSoldier02": "SciFiCharacter",

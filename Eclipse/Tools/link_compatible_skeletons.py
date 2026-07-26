@@ -34,8 +34,23 @@ eal = unreal.EditorAssetLibrary
 
 SKELETON = "Meshes/UE4_Mannequin_Skeleton"
 
+# Skeletten die NIET op /Game/<pack>/Meshes/UE4_Mannequin_Skeleton liggen.
+# Belica komt uit Paragon en draagt een eigen rig op een eigen pad; de generieke
+# padopbouw hieronder vindt hem niet.
+SPECIAL_SKELETONS = {
+    "ParagonLtBelica": "/Game/ParagonLtBelica/Characters/Heroes/Belica/Meshes/Belica_Skeleton",
+}
+
 # doelpack -> donorpack (het pack waarvan het de takes mag afspelen)
 DONORS = {
+    # DE SPELER. Gemeten: Belica_Skeleton heeft 158 botten, het donorskelet 68, en
+    # alle 68 namen komen in Belica voor (100%) — het Paragon-rig is een superset
+    # van de mannequin. Daarmee is dit dezelfde truc als bij de zijwaartse cycli
+    # en geen gok.
+    #
+    # Waarvoor: Belica heeft geen herlaad- en geen hurktake, nagemeten over al
+    # zijn 143 takes. SciFiCharacter heeft er 7 en 14.
+    "ParagonLtBelica": "SciFiCharacter",
     "SciFiGirl": "SciFiCharacter",
     "SciFiCharacterPack/SciFiGirl": "SciFiCharacterPack/SciFiSoldier",
     "SciFiSoldier02": "SciFiCharacter",
@@ -45,8 +60,8 @@ DONORS = {
 
 linked = 0
 for target_pack, donor_pack in DONORS.items():
-    target_path = f"/Game/{target_pack}/{SKELETON}"
-    donor_path = f"/Game/{donor_pack}/{SKELETON}"
+    target_path = SPECIAL_SKELETONS.get(target_pack, f"/Game/{target_pack}/{SKELETON}")
+    donor_path = SPECIAL_SKELETONS.get(donor_pack, f"/Game/{donor_pack}/{SKELETON}")
 
     target = eal.load_asset(target_path)
     donor = eal.load_asset(donor_path)

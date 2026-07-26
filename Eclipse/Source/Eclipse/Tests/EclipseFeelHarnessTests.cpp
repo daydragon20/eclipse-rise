@@ -2671,4 +2671,180 @@ bool FEclipseWhereIsTheTurnInTheTakeTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// Wat zit er in het spelerspack voor de poses die de speler mist?
+// ---------------------------------------------------------------------------
+//
+// De speler haalt 3/5 poses: herladen en hurken ontbreken. Herladen is de
+// scherpste van de tien ontbrekende poses in het project — het duurt 2,2 s met
+// vier foley-fasen eronder, dus je HOORT een handeling die je niet ziet.
+//
+// "De speler heeft geen herlaadtake" is pas bruikbaar als erbij staat WAAR er
+// gekeken is. Diezelfde vorm ging vandaag al twee keer mis: eerst met de
+// draaitakes ("geen enkele pack heeft er een" — Belica leverde ze wel), en toen
+// met de rotatie in die takes (alleen de heup gemeten). Deze veegt het hele
+// pack en zet de kandidaten in de uitvoer, zodat de volgende ronde kan kiezen
+// in plaats van opnieuw te zoeken.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseWhichTakesCouldFillTheGapsTest,
+	"Eclipse.Feel.Input.WhichTakesCouldFillTheGaps",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseWhichTakesCouldFillTheGapsTest::RunTest(const FString& Parameters)
+{
+	const UDataTable* BodiesTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_BodyDefs.DT_BodyDefs"));
+	const FEclipseBodyDefRow* PlayerRow = BodiesTable != nullptr
+		? BodiesTable->FindRow<FEclipseBodyDefRow>(TEXT("Player"), TEXT("GapSweep")) : nullptr;
+
+	IAssetRegistry& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+	TArray<FAssetData> Assets;
+	Registry.GetAssetsByPath(TEXT("/Game/ParagonLtBelica"), Assets, /*bRecursive*/ true);
+
+	struct FGap { const TCHAR* Pose; TArray<const TCHAR*> Keywords; };
+	const FGap Gaps[] = {
+		{ TEXT("herladen"), { TEXT("reload"), TEXT("herlaad"), TEXT("ammo"), TEXT("magazine") } },
+		// "cover" stond hier ook, en dat leverde meteen twee valse treffers op:
+		// Jump_Recovery bevat "cover". Een te ruime match maakt een gat kleiner
+		// dan het is, en dat is erger dan geen zoekopdracht — je denkt dat er een
+		// kandidaat ligt en kijkt niet verder.
+		{ TEXT("hurken"),   { TEXT("crouch"), TEXT("kneel"), TEXT("duck") } },
+	};
+
+	// Waar de packs ELKAAR kunnen aanvullen. De skeletten zijn sinds 26-07
+	// compatibel gemaakt, dus een take uit een ander pack is leenbaar — precies
+	// zoals de zijwaartse loopcycli zijn opgelost. Zonder deze kolom eindigt een
+	// ontbrekende pose in "kan niet", terwijl het antwoord "van wie" is.
+	const TCHAR* Packs[] = {
+		TEXT("/Game/ParagonLtBelica"), TEXT("/Game/SciFiCharacter"),
+		TEXT("/Game/SciFiCharacterPack"), TEXT("/Game/SciFiGirl"),
+		TEXT("/Game/SciFiSoldier"), TEXT("/Game/SciFiSoldier02"),
+		TEXT("/Game/SciFiSoldier03"), TEXT("/Game/SciFiWarrior02"),
+	};
+
+	int32 Sequences = 0;
+	for (const FAssetData& Asset : Assets)
+	{
+		if (Asset.AssetClassPath == UAnimSequence::StaticClass()->GetClassPathName())
+		{
+			++Sequences;
+		}
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  ParagonLtBelica bevat %d animatietakes"), Sequences));
+
+	// Zonder dit is een lege kandidatenlijst dubbelzinnig: geen kandidaat, of
+	// gewoon niets doorzocht? Dezelfde valkuil als bij elke nulmeting.
+	if (!TestTrue(TEXT("gaten: het spelerspack levert takes om te doorzoeken"), Sequences > 0))
+	{
+		return false;
+	}
+
+	for (const FGap& Gap : Gaps)
+	{
+		TArray<FString> Found;
+		for (const FAssetData& Asset : Assets)
+		{
+			if (Asset.AssetClassPath != UAnimSequence::StaticClass()->GetClassPathName())
+			{
+				continue;
+			}
+			const FString Name = Asset.AssetName.ToString();
+			for (const TCHAR* Keyword : Gap.Keywords)
+			{
+				if (Name.Contains(Keyword))
+				{
+					Found.AddUnique(Name);
+					break;
+				}
+			}
+		}
+
+		if (Found.Num() == 0)
+		{
+			AddInfo(FString::Printf(
+				TEXT("GEMETEN  %s: GEEN kandidaat in ParagonLtBelica (gezocht op %d trefwoorden over %d takes)"),
+				Gap.Pose, Gap.Keywords.Num(), Sequences));
+			continue;
+		}
+		Found.Sort();
+		for (const FString& Name : Found)
+		{
+			AddInfo(FString::Printf(TEXT("GEMETEN  %s: kandidaat %s"), Gap.Pose, *Name));
+		}
+	}
+
+	// En dezelfde vraag aan alle andere packs: wie heeft er wel een?
+	for (const FGap& Gap : Gaps)
+	{
+		for (const TCHAR* Pack : Packs)
+		{
+			TArray<FAssetData> PackAssets;
+			Registry.GetAssetsByPath(Pack, PackAssets, /*bRecursive*/ true);
+			int32 Hits = 0;
+			FString FirstHit;
+			for (const FAssetData& Asset : PackAssets)
+			{
+				if (Asset.AssetClassPath != UAnimSequence::StaticClass()->GetClassPathName())
+				{
+					continue;
+				}
+				const FString Name = Asset.AssetName.ToString();
+				for (const TCHAR* Keyword : Gap.Keywords)
+				{
+					if (Name.Contains(Keyword))
+					{
+						++Hits;
+						if (FirstHit.IsEmpty()) { FirstHit = Name; }
+						break;
+					}
+				}
+			}
+			if (Hits > 0)
+			{
+				AddInfo(FString::Printf(TEXT("GEMETEN  KANDIDAAT %s uit %s (%d takes, bv. %s)"),
+					Gap.Pose, Pack, Hits, *FirstHit));
+			}
+		}
+	}
+
+	// EN OF LENEN HIER UBERHAUPT KAN. De zijwaartse loopcycli konden geleend
+	// worden omdat alle SciFi-packs een KOPIE van hetzelfde UE4_Mannequin_Skeleton
+	// dragen: andere assets, dezelfde botten. Belica komt uit Paragon en draagt
+	// een eigen rig.
+	//
+	// Zonder deze meting zou "kandidaat gevonden in SciFiCharacter" lezen als
+	// "op te lossen", terwijl een take alleen afspeelbaar is op een skelet met
+	// dezelfde botnamen. Een kandidaat noemen die niet past is erger dan geen
+	// kandidaat noemen — dan gaat de volgende ronde bouwen aan iets dat niet kan.
+	const USkeletalMesh* PlayerMesh = PlayerRow != nullptr ? PlayerRow->Mesh.LoadSynchronous() : nullptr;
+	const USkeleton* PlayerSkeleton = PlayerMesh != nullptr ? PlayerMesh->GetSkeleton() : nullptr;
+	const USkeleton* DonorSkeleton = LoadObject<USkeleton>(nullptr,
+		TEXT("/Game/SciFiCharacter/Meshes/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton"));
+	if (PlayerSkeleton != nullptr && DonorSkeleton != nullptr)
+	{
+		const FReferenceSkeleton& Mine = PlayerSkeleton->GetReferenceSkeleton();
+		const FReferenceSkeleton& Theirs = DonorSkeleton->GetReferenceSkeleton();
+		int32 Shared = 0;
+		for (int32 Index = 0; Index < Theirs.GetNum(); ++Index)
+		{
+			if (Mine.FindBoneIndex(Theirs.GetBoneName(Index)) != INDEX_NONE)
+			{
+				++Shared;
+			}
+		}
+		AddInfo(FString::Printf(
+			TEXT("GEMETEN  skeletten: speler %s heeft %d botten, donor %d — %d namen gedeeld (%.0f%%)"),
+			*PlayerSkeleton->GetName(), Mine.GetNum(), Theirs.GetNum(), Shared,
+			Theirs.GetNum() > 0 ? 100.0f * Shared / Theirs.GetNum() : 0.0f));
+		AddInfo(Shared * 2 >= Theirs.GetNum()
+			? TEXT("GEMETEN  -> lenen is kansrijk: de botnamen overlappen grotendeels")
+			: TEXT("GEMETEN  -> LENEN KAN NIET: te weinig gedeelde botnamen, de take zou op de verkeerde botten landen"));
+	}
+	else
+	{
+		AddInfo(TEXT("GEMETEN  skeletten: niet te vergelijken (speler- of donorskelet niet geladen)"));
+	}
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

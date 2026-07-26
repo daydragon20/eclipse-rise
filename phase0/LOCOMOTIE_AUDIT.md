@@ -269,3 +269,33 @@ document anders zou suggereren dat dit ook rond is.
 duurt 2,2 s met vier foley-fasen eronder, dus je hóórt een handeling die je niet
 ziet.
 
+### Ronde 3, aanvulling: de speler heeft nu alle vijf de poses
+
+De tabel hierboven zet de speler op 3/5 — geen herlaad- en geen hurktake. Dat is
+diezelfde avond opgelost, en de weg ernaartoe is dezelfde als bij de zijwaartse
+cycli: **lenen van een donorpack.**
+
+Wat er gemeten is, in deze volgorde, want elke stap kon de volgende ongeldig maken:
+
+1. **Heeft Belica ze zelf?** Nee. Doorzocht: alle **143 takes** in
+   `ParagonLtBelica`, op vier trefwoorden voor herladen en drie voor hurken. Nul
+   kandidaten. (De scope staat er expliciet bij — een "bestaat niet" zonder
+   zoekgebied heeft vandaag al twee keer een taak ten onrechte doodverklaard.)
+2. **Heeft een ander pack ze?** Ja: `SciFiCharacter` heeft **7** herlaadtakes en
+   **14** hurktakes.
+3. **Kán Belica ze afspelen?** Dit was de stap die de conclusie kon breken. De
+   SciFi-packs delen een kopie van `UE4_Mannequin_Skeleton`; Belica komt uit
+   Paragon en draagt een eigen rig. Gemeten: **Belica_Skeleton heeft 158 botten,
+   het donorskelet 68, en alle 68 namen komen in Belica voor (100%)** — het
+   Paragon-rig is een superset van de mannequin. Pas daarmee is "kandidaat
+   gevonden" ook "op te lossen".
+
+Eén eigen fout onderweg, die het script zelf ving: ik gaf het verkeerde pad naar
+`Belica_Skeleton` mee. Het script meldde "skelet ontbreekt (doel MISSING)" in
+plaats van stil nul koppelingen te maken — precies waarvoor die controle er sinds
+vanochtend in zit.
+
+**Resultaat, nagemeten:** speler **5/5 poses (compleet)**, ontbrekende poses in het
+project **10 → 8**, degradaties 0. Wat rest is de draaitake bij de acht
+niet-speler-lichamen.
+
