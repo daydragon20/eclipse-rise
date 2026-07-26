@@ -20,6 +20,10 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
+#include "Engine/ExponentialHeightFog.h"
+#include "Components/SkyAtmosphereComponent.h"
+#include "Engine/SkyLight.h"
+#include "Engine/DirectionalLight.h"
 #include "Engine/TargetPoint.h"
 #include "EngineUtils.h"
 #include "Misc/CommandLine.h"
@@ -686,6 +690,57 @@ void AEclipseGameMode::SetupShotRig()
 	// alternates teleport and capture so every shot gets a stabilized frame.
 	GetWorldTimerManager().SetTimer(ShotRigTimer, this, &AEclipseGameMode::AdvanceShotRig, 2.0f, /*bLoop*/ true, /*FirstDelay*/ 8.0f);
 	UE_LOG(LogEclipse, Display, TEXT("ShotRig: armed (Part 15.9 fixed review cameras)."));
+
+	// ALLEEN DE ARMATUREN (-EclipseShotFixtures, 26-07 laat).
+	//
+	// De lichtreview liep vast op een vraag die geen ontwerpvraag is: WELKE van de
+	// twintig ambervlakken op het plein zijn de dertien armaturen? Zolang dat niet
+	// vaststaat, kan een oordeel als "ze zijn te fel" over de verkeerde objecten
+	// gaan — dezelfde valkuil als het meetvak dat voor 95% een ander oppervlak
+	// bleek.
+	//
+	// Dezelfde truc als de isolatie-opname in de speelronde: overhouden in plaats
+	// van weglaten. Wat hier in beeld staat, ZIJN de armaturen; er valt niets meer
+	// te interpreteren. Dit plaatst er geen enkele bij, dus het respecteert de
+	// pauze die de owner zelf heeft gevraagd.
+	if (FParse::Param(FCommandLine::Get(), TEXT("EclipseShotFixtures")))
+	{
+		int32 Hidden = 0;
+		int32 Kept = 0;
+		for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+			if (Actor == nullptr || Actor->ActorHasTag(TEXT("EclipseFixture")))
+			{
+				Kept += Actor != nullptr ? 1 : 0;
+				continue;
+			}
+			// De hemel en de mist blijven: zonder die twee beoordeel je een
+			// armatuur tegen zwart, en dat is een andere vraag dan of hij het in
+			// dit district doet.
+			if (Actor->IsA<AExponentialHeightFog>() || Actor->IsA<ASkyAtmosphere>() || Actor->IsA<ADirectionalLight>())
+			{
+				continue;
+			}
+			if (Actor->GetRootComponent() != nullptr && !Actor->IsHidden())
+			{
+				Actor->SetActorHiddenInGame(true);
+				++Hidden;
+			}
+		}
+		// Het AANTAL is hier het bewijs, niet het beeld. Toen deze regel 226
+		// armaturen meldde tegen 13 geplaatste, bleek de gedeelde tag in de
+		// verkeerde spawner te staan — terwijl het frame er plausibel uitzag.
+		UE_LOG(LogEclipse, Display,
+			TEXT("ShotRig: ALLEEN ARMATUREN — %d armaturen zichtbaar, %d andere actoren verborgen."),
+			Kept, Hidden);
+		if (Kept != 13)
+		{
+			UE_LOG(LogEclipse, Error,
+				TEXT("ShotRig: %d armaturen gevonden, maar de graybox plaatst er 13 — de tag zit op de verkeerde actoren."),
+				Kept);
+		}
+	}
 
 	// Body showcase (step-2 character pipeline QC): one body per DT_BodyDefs row
 	// lined up in review-camera 1's view, dressed through the REAL ApplyBodyDef

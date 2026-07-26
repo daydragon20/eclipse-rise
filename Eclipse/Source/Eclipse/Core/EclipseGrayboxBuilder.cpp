@@ -1156,6 +1156,17 @@ void BuildDistrict(UWorld& World)
 			Actor->SetMobility(EComponentMobility::Movable);
 			Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
 			Actor->Tags.Add(Label);
+			// EEN GEDEELDE TAG NAAST HET LABEL. Het label zegt WELKE armatuur dit
+			// is; deze zegt DAT het er een is, en dat is wat een isolatie-opname
+			// nodig heeft — zonder gemeenschappelijke tag kun je ze niet als groep
+			// overhouden.
+			//
+			// Deze regel stond eerst in SpawnBlock, de generieke blokkenspawner:
+			// 226 districtblokken kregen daardoor het label "armatuur" en de
+			// isolatie-opname liet het halve district staan. Gevonden doordat het
+			// GETAL niet klopte (226 tegen 13 geplaatste armaturen) en niet doordat
+			// het beeld er raar uitzag — dat zag er namelijk plausibel uit.
+			Actor->Tags.Add(TEXT("EclipseFixture"));
 
 			if (FixtureMaster != nullptr)
 			{
@@ -1178,6 +1189,23 @@ void BuildDistrict(UWorld& World)
 					Mid->SetTextureParameterValue(TEXT("EmissiveMaskTex"), Emissive);
 				}
 				Mid->SetScalarParameterValue(TEXT("GlowGain"), GlowGain);
+
+				// WELKE INGANG KREEG DEZE ARMATUUR ECHT. Op de isolatie-opname van
+				// 26-07 stonden alle dertien als DONKERE dozen in beeld, terwijl
+				// een emissive met gain 6-16 juist had moeten uitslaan. "Ze
+				// gloeien niet" is dan nog geen bevinding: het kan de textuur
+				// zijn, de gain, of de materiaalgraaf, en die drie vragen om
+				// verschillende reparaties.
+				//
+				// Zelfde vorm als de proplogregel ernaast (slots/tex/mid): zeg per
+				// object welke ingang aankwam, zodat een ontbrekende niet als
+				// "ziet er donker uit" hoeft te worden geraden.
+				UE_LOG(LogEclipse, Display,
+					TEXT("Graybox: armatuur %s  mesh=ok  basis=%s  emissive=%s  gain=%.1f"),
+					Label,
+					LoadObject<UTexture>(nullptr, BasePath) != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"),
+					LoadObject<UTexture>(nullptr, EmissivePath) != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"),
+					GlowGain);
 				for (int32 Slot = 0; Slot < Actor->GetStaticMeshComponent()->GetNumMaterials(); ++Slot)
 				{
 					Actor->GetStaticMeshComponent()->SetMaterial(Slot, Mid);

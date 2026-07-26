@@ -293,6 +293,16 @@ daardoor leest de helderheid-hiërarchie (extractie 16 / sites 10 / routes 6) op
 commando-afstand niet: alle ambervlakken lijken even helder. Wat wél opvalt is de
 gele schijf bij extractie, en die is met VORM gemaakt, niet met helderheid.
 
+**CORRECTIE een uur later:** die ambervlakken waren de armaturen niet. Met een
+isolatieronde (alleen de dertien armaturen zichtbaar, 423 andere actoren verborgen)
+blijken ze kleine donkere dozen **zonder enige gloed** — terwijl alle dertien hun
+mesh, basistextuur, emissive-masker en gain wél krijgen (16 / 10 / 6, precies de
+bedoelde hiërarchie). Er is dus niets ontbrekend en niets verkeerd ingesteld; het
+zit in de materiaalgraaf of het masker.
+
+Daardoor zijn de twee vragen hieronder **niet urgent**: over de helderheid van iets
+dat helemaal niet oplicht, valt nog niets te beslissen. Eerst dat uitzoeken.
+
 Twee vragen voor jou, allebei ontwerpkeuzes en geen bugs:
 - Mag een armatuur licht **werpen** (een plas op de grond) in plaats van alleen te
   gloeien?
