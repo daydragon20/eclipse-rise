@@ -133,6 +133,12 @@ window.PROGRESS_DATA = {
       "Mijn aanbeveling: doen, en met een simpele rem van een seconde of twee per soldaat. Dit is de goedkoopste stap richting 'het gevecht voelt ergens naar' die er ligt",
       "Ik heb het niet gebouwd omdat de rem een ontwerpkeuze is en het een nieuwe feature is, geen reparatie"
     ] },
+    { titel: "Op toetsenbord kun je niet wandelen — op de controller wel", prio: "later", waarom: "Gevonden door te controleren welke tuningvelden nergens worden toegepast. WalkSpeed (180 cm/s) blijkt alleen door de ANIMATIE gelezen te worden, als ankerpunt voor de loop/ren-blend; het bewegingscomponent mikt altijd op RunSpeed. Daarmee is wandelen alleen bereikbaar met een deels uitgeslagen stick — en WASD zijn digitale toetsen, dus op toetsenbord loop je altijd 420. Gemeten is de stickrespons trouwens kaarsrecht lineair (20 procent uitslag geeft 20 procent snelheid), dus 180 zit netjes op ongeveer 43 procent.", stappen: [
+      "Op de controller werkt het dus al: rustig duwen is wandelen, en de animatie blendt mee",
+      "Op toetsenbord zou het een aparte toets vragen. Alt is bezet door stance, dus dat wordt een keuze",
+      "Mijn aanbeveling: laten tot je zelf met beide apparaten gespeeld hebt. Het valt pas op als je op toetsenbord door een ruimte wilt sluipen en merkt dat je altijd rent",
+      "Niet gewijzigd: een toets toevoegen is een bindingskeuze en die zijn van jou"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",
