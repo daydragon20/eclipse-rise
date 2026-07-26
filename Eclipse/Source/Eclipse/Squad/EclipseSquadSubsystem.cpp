@@ -340,6 +340,16 @@ bool UEclipseSquadSubsystem::IssueOrder(const FGuid& SoldierId, EEclipseSquadOrd
 	{
 		const FString Bark = EclipseSquadOrderLogic::PickBarkLine(
 			Row != nullptr ? Row->RefusalLines : TArray<FString>(), SoldierId, static_cast<uint32>(Order) + 100u);
+
+		// A refusal is an answer (GDD 8.4), and it is the answer most worth
+		// reading back: acknowledgements are the expected case, refusals are the
+		// ones that explain why an order did nothing. Only the refusal branch
+		// logs — logging every ack would bury it.
+		UE_LOG(LogEclipse, Display, TEXT("Squad: %s REFUSED order %s (reason: %s) — \"%s\""),
+			*SoldierId.ToString(EGuidFormats::DigitsWithHyphensLower).Left(8), *OrderRowName.ToString(),
+			*UEnum::GetValueAsString(Decision.Reason).RightChop(FString(TEXT("EEclipseOrderRefusalReason::")).Len()),
+			*Bark);
+
 		BroadcastOrderEvent(EclipseTags::Event_Squad_OrderRefused, SoldierId, Order, Bark, Decision.Reason);
 	}
 

@@ -1065,4 +1065,126 @@ bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Een weigering is een antwoord (GDD 8.4) — maar niemand had er ooit een gezien.
+//
+// De weigerregels zelf zijn goed getest, alleen als PURE functie
+// (EclipseSquadTests: NoRoute, InvalidTarget, NoLineOfSight, Downed). De weg
+// erboven — IssueOrder -> DecideOrder -> bark kiezen -> Event.Squad.OrderRefused
+// — draaide nog nooit: een volledige M1.1 levert nul weigeringen op, want de
+// squad kan alles wat er gevraagd wordt. Alles wat aan een weigering vastzit
+// (de bark, de reden in de payload, de logregel) was dus onbewezen.
+//
+// Deze test dwingt er een af langs het goedkoopste pad dat de regels toestaan:
+// FocusTarget zonder doelwit -> bTargetValid is onwaar -> InvalidTarget.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadRefusalIsAnAnswerTest,
+	"Eclipse.Playthrough.ARefusalReachesThePlayerWithAReason",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseSquadRefusalIsAnAnswerTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (!TestNotNull(TEXT("weigering: strategie"), Strategy) || !TestNotNull(TEXT("weigering: prep"), Prep)
+		|| !TestNotNull(TEXT("weigering: missie"), Mission) || !TestNotNull(TEXT("weigering: eventbus"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("weigering: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	int32 Refusals = 0;
+	int32 Acknowledgements = 0;
+	FName ReceivedReason = NAME_None;
+	FString ReceivedBark;
+	FEclipseEventSubscriptionHandle Handle = Bus->Subscribe(
+		FGameplayTag::RequestGameplayTag(TEXT("Event.Squad")),
+		FEclipseEventNativeDelegate::CreateLambda(
+			[&Refusals, &Acknowledgements, &ReceivedReason, &ReceivedBark](FGameplayTag Tag, const FInstancedStruct& Payload)
+		{
+			const FString Name = Tag.ToString();
+			if (Name.Contains(TEXT("Refused")))
+			{
+				++Refusals;
+				if (const FEclipseSquadEventPayload* Squad = Payload.GetPtr<FEclipseSquadEventPayload>())
+				{
+					ReceivedReason = Squad->Reason;
+					ReceivedBark = Squad->BarkLine;
+				}
+			}
+			else if (Name.Contains(TEXT("Acknowledged")))
+			{
+				++Acknowledgements;
+			}
+		}));
+
+	UEclipseSquadSubsystem* Squad = Harness.World->GetSubsystem<UEclipseSquadSubsystem>();
+	const TArray<FGuid> Deployed = Mission->GetDeployedSoldierIds();
+	if (!TestNotNull(TEXT("weigering: squad-subsysteem"), Squad)
+		|| !TestTrue(TEXT("weigering: er is een soldaat om iets aan te vragen"), Deployed.Num() > 0))
+	{
+		Bus->Unsubscribe(Handle);
+		Harness.Shutdown();
+		return false;
+	}
+
+	// FocusTarget zonder doelwit. Niet omdat een speler dat doet, maar omdat het
+	// de enige weigergrond is die zonder wereldopstelling af te dwingen is —
+	// NoRoute vraagt een onbereikbaar punt, Downed vraagt een gevallen soldaat.
+	const bool bProcessed = Squad->IssueOrder(Deployed[0], EEclipseSquadOrder::FocusTarget,
+		FVector::ZeroVector, /*TargetActor*/ nullptr);
+	Harness.Idle(0.2f);
+	Bus->Unsubscribe(Handle);
+
+	// De order is VERWERKT (hij is aangekomen en beoordeeld); dat is iets anders
+	// dan geaccepteerd. Zou dit onwaar zijn, dan viel de order al eerder stil en
+	// zegt de rest van deze test niets.
+	TestTrue(TEXT("weigering: de order is beoordeeld, niet stil weggevallen"), bProcessed);
+
+	Report(*this, TEXT("weigeringen ontvangen"), Refusals, TEXT(""), TEXT("precies 1 — een order krijgt één antwoord"));
+	Report(*this, TEXT("bevestigingen ontvangen"), Acknowledgements, TEXT(""), TEXT("0 — dit kon niet uitgevoerd worden"));
+
+	TestEqual(TEXT("weigering: er komt precies één antwoord terug, en het is een weigering"), Refusals, 1);
+	TestEqual(TEXT("weigering: geen bevestiging voor een order die niet kan"), Acknowledgements, 0);
+	// De reden reist als FName over de bus en draagt de VOLLEDIGE enum-naam
+	// ("EEclipseOrderRefusalReason::InvalidTarget"), niet de korte vorm — dat is
+	// hier gemeten, niet aangenomen; de eerste versie van deze test verwachtte de
+	// korte vorm en ging daarop rood. De payload zegt zelf dat dit veld op
+	// OrderRefused nooit leeg mag zijn, dus vergelijken op de hele naam.
+	TestEqual(TEXT("weigering: de reden is InvalidTarget en niet leeg"),
+		ReceivedReason, FName(TEXT("EEclipseOrderRefusalReason::InvalidTarget")));
+	// Een weigering zonder tekst is nog steeds stilte voor de speler: hij hoort
+	// niets en ziet alleen dat er niets gebeurt. De regel valt terug op een
+	// generieke zin als de barkpool leeg is, dus leeg is hier een echte fout.
+	TestTrue(FString::Printf(TEXT("weigering: er komt een hoorbare zin mee ('%s')"), *ReceivedBark),
+		!ReceivedBark.IsEmpty());
+	AddInfo(FString::Printf(TEXT("weigering: de squad zegt \"%s\""), *ReceivedBark));
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

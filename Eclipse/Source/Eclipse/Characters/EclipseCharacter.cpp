@@ -734,6 +734,17 @@ void AEclipseCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
 	bDowned = true;
 	GetCharacterMovement()->DisableMovement();
 
+	// Going down was entirely silent — including for the PLAYER. A self-playing
+	// round walked into the checkpoint, lost 100 hp in 2.5 s and went down, and
+	// the only trace in the log was the mission failing 0.5 s later. Anyone
+	// reading Saved/Logs after a session had no way to see they died, let alone
+	// to what. One line per body, once (bDowned latches above), so it stays a
+	// fact and not a stream (GDD 14.3.5).
+	UE_LOG(LogEclipse, Display, TEXT("%s DOWN: %s at %s (cause: %s)"),
+		IsPlayerSide() ? TEXT("Player-side") : TEXT("Hostile"), *GetName(),
+		*GetActorLocation().ToCompactString(),
+		LastDamageCause.IsNone() ? TEXT("Unknown") : *LastDamageCause.ToString());
+
 	// One fact, broadcast once: squad/mission listeners resolve dead-vs-wounded
 	// at debrief (SPEC-P1-07); the body itself only reports.
 	OnDowned.Broadcast(this, LastDamageCause.IsNone() ? FName(TEXT("Unknown")) : LastDamageCause);
