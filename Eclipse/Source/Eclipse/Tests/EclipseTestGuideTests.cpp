@@ -36,9 +36,13 @@ bool FEclipseGuideStepListTest::RunTest(const FString& Parameters)
 	using namespace EclipseTestGuide;
 
 	const TArray<FEclipseGuideStep> Steps = GetGuideSteps();
-	TestEqual(TEXT("Eleven controls, four systems and five questions"), Steps.Num(), GuideStepCount);
-	// 12 controls since the camera landed (the first/third-person toggle is a
-	// control the guide has to teach like any other), 4 systems, 5 questions.
+	// Geen aantallen in de tekst van deze assert: de lijst groeide vannacht van elf
+	// naar veertien controls en de omschrijving liep er twee keer op achter — ook
+	// in het kliklijstje van de owner, dat "20 stappen" beloofde terwijl het er 23
+	// waren. De constanten zijn de bron; de assert eronder pint het totaal.
+	TestEqual(TEXT("Every step in the list is accounted for"), Steps.Num(), GuideStepCount);
+	// Het totaal is de som van de drie deel-constanten; verandert er een, dan hoort
+	// dit getal mee te veranderen en niet stilletjes te blijven staan.
 	TestEqual(TEXT("The list is twenty-three steps long"), GuideStepCount, 23);
 
 	// The guide's promise is not "press this key" but "press this key AND here is
