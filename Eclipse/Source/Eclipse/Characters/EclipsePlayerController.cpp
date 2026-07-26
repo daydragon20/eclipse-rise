@@ -179,6 +179,42 @@ void AEclipsePlayerController::DumpFeelState() const
 	if (GEngine != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(/*Key*/ 90901, /*Time*/ 8.0f, FColor::Yellow, FString::Printf(TEXT("FEEL: %s"), *Line));
+
+		// En het VERSCHIL met de vorige druk, want dat is de eigenlijke vraag.
+		// De owner moet weten of zijn personage met de snelheid meeschaalt, en
+		// daarvoor drukt hij één keer stappend en één keer sprintend. Twee losse
+		// regels dwingen hem getallen te onthouden terwijl hij speelt — en de
+		// tweede overschreef de eerste ook nog, want het is dezelfde sleutel.
+		// Nu rekent de dump het zelf uit.
+		const FEclipseFeelSample Now = Body->SampleFeelState();
+		if (bHasPreviousFeelSample)
+		{
+			const float SizeDeltaPct = PreviousFeelSample.ApparentHeightDegrees > KINDA_SMALL_NUMBER
+				? (Now.ApparentHeightDegrees - PreviousFeelSample.ApparentHeightDegrees)
+					/ PreviousFeelSample.ApparentHeightDegrees * 100.0f
+				: 0.0f;
+			// Meer dan 2% verschil in schijnbare grootte is wat je als "hij schaalt"
+			// zou zien; daaronder is het meetruis van de camera-lag.
+			const bool bSuspicious = FMath::Abs(SizeDeltaPct) > 2.0f;
+			GEngine->AddOnScreenDebugMessage(/*Key*/ 90902, /*Time*/ 8.0f,
+				bSuspicious ? FColor::Red : FColor::Green,
+				FString::Printf(TEXT("FEEL Δ sinds vorige druk: snelheid %+.0f cm/s · schijnbare grootte %+.2f%% · camera-afstand %+.1f cm  %s"),
+					Now.SpeedCm - PreviousFeelSample.SpeedCm,
+					SizeDeltaPct,
+					Now.CameraToPawnCm - PreviousFeelSample.CameraToPawnCm,
+					bSuspicious ? TEXT("<< SCHAALT MEE — dit is S1") : TEXT("(binnen ruis)")));
+			UE_LOG(LogEclipse, Display,
+				TEXT("Feel: Δ sinds vorige druk — snelheid %+.0f cm/s, schijnbare grootte %+.2f%%, camera-afstand %+.1f cm."),
+				Now.SpeedCm - PreviousFeelSample.SpeedCm, SizeDeltaPct,
+				Now.CameraToPawnCm - PreviousFeelSample.CameraToPawnCm);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(/*Key*/ 90902, /*Time*/ 8.0f, FColor::White,
+				TEXT("FEEL: druk nu nogmaals F9 op een ANDERE snelheid — dan verschijnt hier het verschil"));
+		}
+		PreviousFeelSample = Now;
+		bHasPreviousFeelSample = true;
 	}
 }
 

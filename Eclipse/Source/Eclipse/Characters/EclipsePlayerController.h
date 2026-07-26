@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "GameFramework/PlayerController.h"
+#include "Characters/EclipseCharacter.h" // FEclipseFeelSample voor de F9-delta
 #include "Squad/EclipseSquadTypes.h"
 #include "EclipsePlayerController.generated.h"
 
@@ -87,6 +88,10 @@ private:
 	/** De feel-meting naar log én scherm. Eén implementatie voor F9, voor
 	 *  Eclipse.Feel.Dump en voor het harnas (S3). */
 	void DumpFeelState() const;
+	/** Vorige F9-meting, zodat de dump het VERSCHIL kan tonen (S1 is een verschil,
+	 *  geen absoluut getal — zie DumpFeelState). Mutable: de dump is const. */
+	mutable FEclipseFeelSample PreviousFeelSample;
+	mutable bool bHasPreviousFeelSample = false;
 
 	/** Navmesh-stand naar het log. Wordt TWEE keer aangeroepen — bij missiestart
 	 *  en vijf seconden later — omdat Recast asynchroon bouwt en een meting op
