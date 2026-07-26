@@ -873,4 +873,196 @@ bool FEclipsePresenceDoesNotDestroyTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// De andere helft van het gevecht.
+//
+// De grote speelronde wint door van 42 meter af te schieten. Dat is legitiem
+// spelersgedrag, maar het betekent dat de vijand daar NOOIT iets doet: geen
+// naderen, geen terugvuren. Die ronde meet zijn dichtste nadering (~4170 cm)
+// juist om dat gat zichtbaar te houden; deze test dekt het af. Hij speelt niet
+// om te winnen — hij loopt bewust hun bereik in en kijkt wat er dan gebeurt.
+//
+// Wat de eerste rondes leerden, en waarom hier per stap gemeten wordt: bij
+// aankomst waren er nul vijanden en nul schade, en dat las als "er gebeurt
+// niets". Het tegendeel was waar. De speler ging NEER op 31,5 s, de missie
+// faalde, en het opruimen despawnde alle vier de vijanden. Alles wat daarna
+// gemeten werd, mat een opgeruimde wereld. Meten na de gebeurtenis meet de
+// gebeurtenis niet.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEnemiesEngageTest,
+	"Eclipse.Playthrough.EnemiesEngageWhenYouWalkIntoTheirRange",
+	EclipsePlaythrough::TestFlags)
+
+bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	IConsoleVariable* ForceGamepad = IConsoleManager::Get().FindConsoleVariable(TEXT("Eclipse.Input.ForceGamepad"));
+	const int32 PreviousForce = ForceGamepad != nullptr ? ForceGamepad->GetInt() : -1;
+	if (ForceGamepad != nullptr)
+	{
+		ForceGamepad->Set(0, ECVF_SetByCode);
+	}
+	ON_SCOPE_EXIT
+	{
+		if (ForceGamepad != nullptr)
+		{
+			ForceGamepad->Set(PreviousForce, ECVF_SetByCode);
+		}
+	};
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+	Options.StepSeconds = 1.0f / 60.0f;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* MissionSub = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (!TestNotNull(TEXT("contact: strategie"), Strategy) || !TestNotNull(TEXT("contact: prep"), Prep)
+		|| !TestNotNull(TEXT("contact: missie"), MissionSub) || !TestNotNull(TEXT("contact: eventbus"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Hetzelfde ECHTE laadpad als de grote ronde: een contacttest op een eigen
+	// opstelling bewijst iets over die opstelling, niet over M1.1.
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("contact: missie geselecteerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error))
+		|| !TestTrue(FString::Printf(TEXT("contact: gelanceerd (%s)"), *Error), Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	double MissionFailedAt = -1.0;
+	FEclipseEventSubscriptionHandle MissionHandle = Bus->Subscribe(
+		FGameplayTag::RequestGameplayTag(TEXT("Event.Mission")),
+		FEclipseEventNativeDelegate::CreateLambda([&MissionFailedAt, &Harness](FGameplayTag Tag, const FInstancedStruct&)
+		{
+			if (MissionFailedAt < 0.0 && Tag.ToString().Contains(TEXT("Failed")))
+			{
+				MissionFailedAt = Harness.ElapsedSeconds;
+			}
+		}));
+
+	auto ForEachHostile = [&Harness](TFunctionRef<void(AEclipseCharacter&)> Fn)
+	{
+		for (TActorIterator<AEclipseCharacter> It(Harness.World); It; ++It)
+		{
+			AEclipseCharacter* Character = *It;
+			if (Character != nullptr && Character != Harness.Body && !Character->IsPlayerSide())
+			{
+				Fn(*Character);
+			}
+		}
+	};
+
+	TMap<TWeakObjectPtr<AEclipseCharacter>, FVector> SpawnPositions;
+	ForEachHostile([&SpawnPositions](AEclipseCharacter& Hostile)
+	{
+		SpawnPositions.Add(&Hostile, Hostile.GetActorLocation());
+	});
+	Report(*this, TEXT("vijanden bij vertrek"), SpawnPositions.Num(), TEXT(""), TEXT("> 0 — anders is er niets om tegenaan te lopen"));
+	if (SpawnPositions.Num() == 0)
+	{
+		Bus->Unsubscribe(MissionHandle);
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Naar het controlepost lopen en NIET stoppen op vuurafstand. Geen sprint:
+	// dit gaat over binnenkomen, niet over snel zijn.
+	//
+	// In korte etappes, met een meting NA ELKE etappe. Alles wat telt gebeurt in
+	// de zes seconden tussen "binnen bereik" en "neer", en een meting achteraf
+	// mist dat volledig.
+	const float HealthAtStart = Harness.Body->GetHealth();
+	float FirstDamageAt = -1.0f;
+	float DistanceAtFirstDamage = -1.0f;
+	float ClosestApproach = TNumericLimits<float>::Max();
+	float FurthestHostileMove = 0.0f;
+	float DownedAt = -1.0f;
+	float LowestHealth = HealthAtStart;
+
+	constexpr double LegSeconds = 0.5;
+	constexpr double ApproachBudget = 90.0;
+	const double ApproachStart = Harness.ElapsedSeconds;
+	bool bArrived = false;
+	while (!bArrived && Harness.ElapsedSeconds - ApproachStart < ApproachBudget && DownedAt < 0.0f)
+	{
+		bArrived = Harness.DriveTo(SiteControlPost, LegSeconds, /*ArriveRadius*/ 800.0f, /*bSprint*/ false);
+
+		const float Health = Harness.Body->GetHealth();
+		LowestHealth = FMath::Min(LowestHealth, Health);
+		if (FirstDamageAt < 0.0f && Health < HealthAtStart - KINDA_SMALL_NUMBER)
+		{
+			FirstDamageAt = static_cast<float>(Harness.ElapsedSeconds - ApproachStart);
+			DistanceAtFirstDamage = ClosestApproach;
+		}
+		if (DownedAt < 0.0f && Harness.Body->IsDowned())
+		{
+			DownedAt = static_cast<float>(Harness.ElapsedSeconds - ApproachStart);
+		}
+
+		ForEachHostile([&](AEclipseCharacter& Hostile)
+		{
+			if (!Hostile.IsDowned())
+			{
+				ClosestApproach = FMath::Min(ClosestApproach,
+					static_cast<float>(FVector::Dist(Hostile.GetActorLocation(), Harness.Location())));
+			}
+			if (const FVector* Spawn = SpawnPositions.Find(&Hostile))
+			{
+				FurthestHostileMove = FMath::Max(FurthestHostileMove,
+					static_cast<float>(FVector::Dist2D(Hostile.GetActorLocation(), *Spawn)));
+			}
+		});
+	}
+
+	Bus->Unsubscribe(MissionHandle);
+
+	const float DamageTaken = HealthAtStart - LowestHealth;
+	Report(*this, TEXT("dichtste nadering tot een vijand"),
+		ClosestApproach == TNumericLimits<float>::Max() ? -1.0f : ClosestApproach, TEXT("cm"),
+		TEXT("< 3000 = binnen hun waarneming, anders zegt deze test niets"));
+	Report(*this, TEXT("eerste schade na"), FirstDamageAt, TEXT("s"), TEXT("-1 = nooit geraakt"));
+	Report(*this, TEXT("afstand bij de eerste treffer"), DistanceAtFirstDamage, TEXT("cm"));
+	Report(*this, TEXT("schade die de speler opliep"), DamageTaken, TEXT("hp"), TEXT("van 100"));
+	Report(*this, TEXT("speler neer na"), DownedAt, TEXT("s"), TEXT("-1 = bleef staan"));
+	Report(*this, TEXT("verste dat een vijand van zijn spawn kwam"), FurthestHostileMove, TEXT("cm"));
+	Report(*this, TEXT("missie gefaald op"), MissionFailedAt, TEXT("s"), TEXT("-1 = niet gefaald"));
+	if (FirstDamageAt >= 0.0f && DownedAt >= 0.0f)
+	{
+		// Time-to-death vanaf de eerste treffer: dit is het getal dat zegt hoeveel
+		// speelruimte je hebt als je hun bereik in loopt. Geen assert — hoe hard
+		// dat mag zijn is balans en dus een owner-keuze, net als de bereik-
+		// asymmetrie waar het de keerzijde van is.
+		Report(*this, TEXT("van eerste treffer tot neer"), DownedAt - FirstDamageAt, TEXT("s"));
+	}
+
+	// De assert is bewust ruim: geraakt worden OF zien naderen telt allebei als
+	// "hij doet iets". Welke van de twee het wordt hangt af van dekking en van
+	// waar de squad staat; dat vastpinnen levert een test op die op toeval rood
+	// gaat. Wat NIET mag is dat er niets gebeurt terwijl je binnen hun bereik
+	// staat — dat is precies het gat dat de grote ronde openlaat.
+	const bool bEngaged = DamageTaken > 0.0f || FurthestHostileMove > 200.0f;
+	TestTrue(TEXT("contact: de vijand doet iets als je zijn bereik in loopt (nadert of vuurt terug)"), bEngaged);
+	TestTrue(TEXT("contact: de speler is daadwerkelijk binnen hun waarnemingsbereik gekomen"),
+		ClosestApproach < 3000.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

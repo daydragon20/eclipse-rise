@@ -421,6 +421,17 @@ bool UEclipseMissionSubsystem::ResolveDebrief(bool bSuccess, FString& OutError)
 	}
 
 	BroadcastMissionEvent(bSuccess ? EclipseTags::Event_Mission_Completed : EclipseTags::Event_Mission_Failed, NAME_None, bSuccess);
+
+	// The start of a mission is logged; the end was not, and that asymmetry hides
+	// the half that matters most. A self-playing round found it the hard way: the
+	// player walked into the checkpoint, went down, and the mission failed at
+	// 31.5 s with the event bus as the only witness — no log line, no reason. A
+	// run that ends says why it ended (GDD 14.3.5: degrade loudly).
+	UE_LOG(LogEclipse, Display, TEXT("Mission '%s' %s at region '%s' (%d/%d objectives, %d/%d squad down%s)."),
+		*PendingTemplateId.ToString(), bSuccess ? TEXT("SUCCEEDED") : TEXT("FAILED"), *PendingRegionId.ToString(),
+		CompletedObjectiveIds.Num(), ActiveObjectives.Num(), DownedSoldiers.Num(), DeployedSoldierIds.Num(),
+		bAlarmRaised ? TEXT(", alarm raised") : TEXT(""));
+
 	Phase = EEclipseMissionPhase::Finished;
 	bHasPendingOffer = false;
 	return true;
