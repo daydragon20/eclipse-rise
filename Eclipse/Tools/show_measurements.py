@@ -2,9 +2,10 @@
 
 Waarom dit bestaat: de harnas-tests rapporteren hun metingen met Report(), en die
 komen als "GEMETEN <label> <waarde> <eenheid> (verwacht: ...)" in Saved/Logs
-terecht. Dat zijn er inmiddels tegen de zestig, verspreid over vijfentwintig
-tests, en wie een getal wil opzoeken ("hoe hoog springt hij ook alweer?") moet nu
-door een logbestand van duizenden regels scrollen.
+terecht. Het zijn er veel — wie een getal wil opzoeken ("hoe hoog springt hij ook
+alweer?") moet anders door een logbestand van duizenden regels scrollen. Hoeveel
+het er precies zijn telt dit script zelf; hier een getal neerzetten zou binnen een
+dag verlopen.
 
 Dit script LEEST alleen; het draait niets en verandert niets. Draai de suite eerst
 als je verse cijfers wilt:
@@ -26,16 +27,33 @@ import re
 import sys
 from pathlib import Path
 
-LOG = Path(__file__).resolve().parents[1] / "Saved" / "Logs" / "Eclipse.log"
+LOGDIR = Path(__file__).resolve().parents[1] / "Saved" / "Logs"
 
 # "LogAutomationController: GEMETEN  <label>  <waarde> <eenheid>   (verwacht: ...)"
 MEASURE = re.compile(r"GEMETEN\s{2}(.+?)\s{2,}(-?[\d.]+)\s*(\S*)\s*(\(verwacht:.*)?$")
 TEST_DONE = re.compile(r"Test Completed\. Result=\{(\w+)\} Name=\{([^}]+)\}")
 
 
+def find_log() -> "Path | None":
+    """Het nieuwste log dat echt metingen bevat — niet per se Eclipse.log.
+
+    Waarom niet gewoon Eclipse.log: elke engine-start hernoemt het vorige log naar
+    Eclipse-backup-<tijd>.log. Draai je de groene bar, dan komt de validatie- of
+    catalogusronde ná de tests, en die overschrijft Eclipse.log met een run die
+    nul metingen bevat. Precies wie het netjes doet — eerst alles groen, dan de
+    cijfers opvragen — kreeg zo "geen metingen gevonden" te zien.
+    """
+    logs = sorted(LOGDIR.glob("Eclipse*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+    for path in logs:
+        if "GEMETEN" in path.read_text(encoding="utf-8", errors="replace"):
+            return path
+    return None
+
+
 def main() -> int:
-    if not LOG.exists():
-        print(f"Geen logbestand op {LOG} — draai eerst de suite.")
+    log = find_log()
+    if log is None:
+        print(f"Geen meting gevonden in {LOGDIR} — draai eerst de suite met -log.")
         return 1
 
     needle = sys.argv[1].lower() if len(sys.argv) > 1 else None
@@ -46,7 +64,7 @@ def main() -> int:
     # versie van dit script ging van de omgekeerde volgorde uit en hing elke
     # meting aan de VOLGENDE test.
     current, groups, order = None, {}, []
-    for raw in LOG.read_text(encoding="utf-8", errors="replace").splitlines():
+    for raw in log.read_text(encoding="utf-8", errors="replace").splitlines():
         done = TEST_DONE.search(raw)
         if done:
             current = done.group(2)
@@ -59,10 +77,7 @@ def main() -> int:
             label, value, unit, expect = m.groups()
             groups[current].append((label.strip(), value, unit or "", (expect or "").strip()))
 
-    if not groups:
-        print("Geen GEMETEN-regels gevonden — draai de suite met -log.")
-        return 1
-
+    print(f"Bron: {log.name}")
     shown = 0
     for name in order:
         rows = groups[name]
