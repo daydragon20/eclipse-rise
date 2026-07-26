@@ -30,6 +30,8 @@ public:
 	bool Fire(const FVector& ViewLocation, const FVector& ViewDirection, FName Cause);
 
 	float GetDamage() const { return Weapon.Damage; }
+	/** Vermenigvuldiger op een treffer in de bone "head". */
+	float GetHeadshotMultiplier() const { return Weapon.HeadshotMultiplier; }
 	/** Maximale hitscan-afstand in cm. */
 	float GetRangeCm() const { return Weapon.RangeCm; }
 	/** Seconden tussen twee schoten — de poort die het vuurtempo bepaalt. */

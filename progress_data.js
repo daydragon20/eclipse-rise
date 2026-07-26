@@ -108,6 +108,13 @@ window.PROGRESS_DATA = {
       "Mijn aanbeveling: pas na de feedback-laag (item 8). Een squad die anders vecht is alleen te beoordelen als je ziet en hoort dat er gevochten wordt",
       "Zolang het zo is, is de eerlijke tekst de fix - niet het gedrag stilletjes verzinnen"
     ] },
+    { titel: "Kopschoten doen niets extra — de x2,5 in de data is onbereikbaar", prio: "gauw", waarom: "Gemeten door op borsthoogte en op hoofdhoogte te vuren: allebei 22 hp. De code vermenigvuldigt netjes met 2,5 als de geraakte bone 'head' heet, maar de kogel raakt de CAPSULE en die heeft geen bones. Dat blijft zo, ook als er straks echte skeletten in staan, want het trace-kanaal is ECC_Pawn en de capsule blokkeert altijd eerst. Het is dus geen graybox-beperking maar een structurele: de waarde staat in DT_Weapons, komt door de validatie, en leest als een werkende feature terwijl hij nooit kan afgaan.", stappen: [
+      "Dit raakt je time-to-kill: met kopschoten ga je van vier kogels naar twee per vijand",
+      "Optie 1: apart botsingsvolume op het hoofd (de gebruikelijke oplossing, kost wat opzet per personage)",
+      "Optie 2: op de mesh tracen in plaats van op de capsule - preciezer maar duurder per schot",
+      "Optie 3: de vermenigvuldiger uit de data halen zolang hij niet werkt, zodat niemand erop rekent",
+      "Mijn aanbeveling: optie 3 nu (eerlijk houden), optie 1 wanneer het gevecht aan de beurt is - niet eerder, want het is pas te beoordelen als je ziet en hoort dat je raak schiet"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",

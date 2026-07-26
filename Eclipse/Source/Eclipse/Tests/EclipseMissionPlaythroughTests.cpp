@@ -33,6 +33,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
@@ -1733,6 +1734,42 @@ bool FEclipseFireRateTest::RunTest(const FString& Parameters)
 		Report(*this, TEXT("verste afstand waarop je nog raakt"), LastHitDistance, TEXT("cm"));
 		Report(*this, TEXT("eerste afstand waarop je mist"), FirstMissDistance, TEXT("cm"));
 		TestTrue(TEXT("bereik: het wapen raakt überhaupt iets binnen zijn bereik"), LastHitDistance > 0.0f);
+
+		// --- kopschot: bestaat die vermenigvuldiging in de praktijk? ---------
+		// De code vermenigvuldigt met HeadshotMultiplier als de geraakte bone
+		// "head" heet. Het commentaar erbij zegt zelf dat graybox-capsules gewoon
+		// basisschade krijgen — dus de vraag is niet of de REGEL klopt maar of hij
+		// ooit uitgevoerd wordt. Zelfde vraag als bij de dode camera-blend: een
+		// correcte regel die nooit draait, is geen feature.
+		Target->SetActorLocation(Harness.Location() + Harness.Body->GetActorForwardVector() * 600.0f);
+		Harness.Idle(0.2f);
+		const float TargetHalfHeight = Target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+		auto DamageAiming = [&](float ZOffset) -> float
+		{
+			Harness.AimAt(Target->GetActorLocation() + FVector(0.0f, 0.0f, ZOffset));
+			const float Before = Target->GetHealth();
+			const double Start3 = Harness.ElapsedSeconds;
+			while (Harness.ElapsedSeconds - Start3 < FireInterval * 1.5)
+			{
+				Harness.Inject(TEXT("Fire"), true);
+				Harness.Step();
+			}
+			return Before - Target->GetHealth();
+		};
+
+		const float ChestDamage = DamageAiming(0.0f);
+		const float HeadDamage = DamageAiming(TargetHalfHeight * 0.85f);
+		Report(*this, TEXT("schade op borsthoogte"), ChestDamage, TEXT("hp"));
+		Report(*this, TEXT("schade op hoofdhoogte"), HeadDamage, TEXT("hp"),
+			*FString::Printf(TEXT("×%.1f zou %.0f hp zijn"), Weapon->GetHeadshotMultiplier(),
+				ChestDamage * Weapon->GetHeadshotMultiplier()));
+		// GEEN assert dat kopschoten meer doen: als dat vandaag niet zo is, is dat
+		// een BEVINDING en geen reden om rood te landen. Het getal spreekt.
+		AddInfo(HeadDamage > ChestDamage * 1.5f
+			? TEXT("kopschot: de vermenigvuldiging wordt in de praktijk toegepast")
+			: TEXT("kopschot: hoofd en romp doen EVENVEEL — de vermenigvuldiging wordt hier niet bereikt (graybox-capsule zonder bone 'head')"));
+		TestTrue(TEXT("kopschot: er is überhaupt schade om te vergelijken"), ChestDamage > 0.0f);
 	}
 	// 10% marge: de laatste schot-poort valt zelden precies op het einde van het
 	// venster, en de stapgrootte kwantiseert.
