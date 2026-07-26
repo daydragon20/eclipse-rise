@@ -66,6 +66,18 @@ raken. Geen ontwerpkeuzes — feiten die je liever vooraf kent dan halverwege.
    hitmarker vraagt dus eerst een feit op de bus, en dat is meteen het haakje voor
    geluid en haptiek (de audio-subsystem is al een pure bus-consument).
 
+## Hoe je de rest van dit document leest
+
+De tabellen hieronder (LOCOMOTIE, ROTATIE, CAMERA, SPRONG) zijn de **oorspronkelijke
+diagnose** van 25 juli, met kolommen *Was* en *Wordt*. Ze zijn bewust blijven staan
+zoals ze geschreven zijn: ze laten zien wát er gevonden werd en waaróm er iets
+moest veranderen, en een paar ervan bleken bij het nameten zélf fout (zie de
+CAM-05-rij en het blok over de pitch-limieten).
+
+**Wat er nú staat, staat in de eindstand-tabel hierboven.** Lees een "Wordt" in de
+tabellen hieronder dus niet als openstaand werk — op één na zijn ze allemaal
+geland en gemeten, en de eindstand zegt per gebied welke.
+
 ## De vondst die het meeste verklaart
 
 Van het `CharacterMovementComponent` werden **vier** dingen gezet: `MaxWalkSpeed`,
