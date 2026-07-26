@@ -601,6 +601,8 @@ void AEclipseGameMode::SpawnMissionActors()
 		const FEclipseEnemyArchetypeRow* Row = nullptr;
 		FName RowName;
 		FVector Location = FVector::ZeroVector;
+		/** Het site waar deze batch om vroeg; None = de graybox-terugval. */
+		FName SiteId;
 	};
 	TArray<FPlacement> Placements;
 
@@ -648,7 +650,7 @@ void AEclipseGameMode::SpawnMissionActors()
 		for (int32 InSet = 0; InSet < Set.Count; ++InSet)
 		{
 			Placements.Add({ Row, Set.ArchetypeId,
-				Anchor + FVector(300.0f * InSet, 200.0f * (InSet % 2), 0.0f) });
+				Anchor + FVector(300.0f * InSet, 200.0f * (InSet % 2), 0.0f), Set.SpawnSiteId });
 		}
 	}
 
@@ -671,13 +673,36 @@ void AEclipseGameMode::SpawnMissionActors()
 			const FName RowName = !ArchetypeRows.IsEmpty()
 				? ArchetypeRows[Index % ArchetypeRows.Num()].Key : FName(TEXT("Enforcer"));
 			Placements.Add({ RowForEnemy, RowName,
-				PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f) });
+				PrimarySite + FVector(300.0f * Index, 200.0f * (Index % 2), 0.0f), NAME_None });
 		}
 	}
 	else
 	{
 		UE_LOG(LogEclipse, Display, TEXT("EnemySpawns: %d vijanden uit %d geauthorde batch(es)."),
 			Placements.Num(), AuthoredSpawns.Num());
+	}
+
+	// Welke plaatsing wordt het DestroyTarget-doelwit? De dichtstbijzijnde bij het
+	// site dat het objective noemt. Vooraf bepaald zodat de spawnlus hieronder
+	// alleen nog hoeft te vergelijken, en zodat "geen enkele vijand" zichtbaar is
+	// vóór er iets gespawnd is.
+	int32 ObjectiveHostileIndex = INDEX_NONE;
+	if (!ObjectiveHostileSiteId.IsNone() && !Placements.IsEmpty())
+	{
+		const FVector ObjectiveLocation = FindSiteLocation(ObjectiveHostileSiteId, PrimarySite);
+		double Best = TNumericLimits<double>::Max();
+		for (int32 Index = 0; Index < Placements.Num(); ++Index)
+		{
+			const double Distance = FVector::Dist(Placements[Index].Location, ObjectiveLocation);
+			if (Distance < Best)
+			{
+				Best = Distance;
+				ObjectiveHostileIndex = Index;
+			}
+		}
+		UE_LOG(LogEclipse, Display,
+			TEXT("GameMode: doelwit van '%s' wordt de vijand op %.0f cm van dat site (van %d geplaatst)."),
+			*ObjectiveHostileSiteId.ToString(), Best, Placements.Num());
 	}
 
 	for (int32 Index = 0; Index < Placements.Num(); ++Index)
@@ -719,7 +744,23 @@ void AEclipseGameMode::SpawnMissionActors()
 			SpawnedMissionActors.Add(Controller);
 			++EnemyIndex;
 		}
-		if (!ObjectiveHostileSiteId.IsNone() && ObjectiveHostiles.IsEmpty())
+		// Het doelwit is de vijand die het DICHTST bij het objective-site staat.
+		//
+		// Regressie die ik vanochtend zelf introduceerde en binnen het uur vond.
+		// Tot de spawn-koppeling landde stonden alle vier de vijanden bij het
+		// primaire doel, dus "de eerste" was per definitie ook "de juiste". Met
+		// geauthorde batches klopt dat niet meer: de eerste plaatsing komt uit de
+		// eerste batch, en die kan aan de andere kant van het district staan. Dat
+		// raakt Assault (DestroyTarget op Site_ControlPost) en Sabotage (Site_Crane),
+		// en het zou stil misgaan — een doelwit dat leeft, alleen niet waar de
+		// marker staat.
+		//
+		// Op AFSTAND en niet op sitenaam. De eerste versie van deze reparatie eiste
+		// een batch mét dezelfde sitenaam, en die aanname was fout: spawnpunten
+		// heten Spawn_* en objectives Site_*, met opzet — de vijanden bewaken het
+		// doel, ze staan er niet bovenop. Afstand is de vraag die er echt toe doet
+		// en die overleeft elke hernoeming.
+		if (!ObjectiveHostileSiteId.IsNone() && Index == ObjectiveHostileIndex)
 		{
 			// De EERSTE vijand van de set is het doelwit. M1.1 zegt "take out the
 			// patrol leader", enkelvoud: de andere drie zijn de patrouille, en die
