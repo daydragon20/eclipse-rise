@@ -44,6 +44,12 @@ public:
 	/** Diagnostiek: hoeveel schoten deze soldaat op zijn FocusTarget-order heeft gelost. */
 	int32 GetFocusFireShots() const { return FocusFireShots; }
 
+	/** Diagnostiek: verplaatsingen die uit MEELOPEN kwamen, niet uit een order. */
+	int32 GetFollowMoves() const { return FollowMoves; }
+
+	/** Start de basislaag: meelopen. Aangeroepen zodra de soldaat een lichaam heeft. */
+	void BeginFollowing(float FollowDistanceCm);
+
 	/**
 	 * Apply this soldier's resolved class kit (SPEC-P2-01). Pure data over the
 	 * shared body (GDD 12.3): modulates order execution (push distance, cover
@@ -83,6 +89,17 @@ private:
 	EEclipseSquadOrder CurrentOrder = EEclipseSquadOrder::Hold;
 
 	/**
+	 * Heeft deze soldaat OOIT een order gekregen? (26-07 avond, laag 1.)
+	 *
+	 * Nodig omdat `CurrentOrder` standaard op Hold staat — de beginstand uit het
+	 * model van vóór vanavond, waarin de squad alleen op een order bewoog. Zonder
+	 * dit onderscheid leest "niemand heeft me iets gezegd" als "ik ben op mijn
+	 * post gezet", en dan loopt niemand ooit mee. Precies dat mat de eerste ronde:
+	 * nul verplaatsingen, terwijl de code klopte.
+	 */
+	bool bHasStandingOrder = false;
+
+	/**
 	 * Het doelwit van een lopende FocusTarget-order, plus de klok die hem
 	 * uitvoert (26-07). Zie ContinueFocusFire voor waarom dit er is.
 	 */
@@ -91,6 +108,35 @@ private:
 	int32 FocusFireShots = 0;
 
 	void ContinueFocusFire();
+
+	/**
+	 * MEELOPEN (owner-opdracht 26-07 avond, punt 1 — laag 1 van zes).
+	 *
+	 * De owner: "ze lopen mee ... Dat is geen feature die je aanzet, dat is de
+	 * basis." Tot vandaag bewoog de squad alleen op een order, en stond
+	 * `FollowDistance` in de data met een comment die zei dat hij niet gelezen
+	 * werd.
+	 *
+	 * Op een timer en niet op een tick, precies zoals ContinueFocusFire: dit
+	 * controleert een AFSTAND, en dat hoeft geen zestig keer per seconde.
+	 *
+	 * ORDERS BLIJVEN BELOFTES (8.4). Meelopen geldt alleen als er geen order
+	 * staat die hem ergens houdt — een soldaat die je op een positie zette, hoort
+	 * daar te blijven staan ook als jij wegloopt. Dat is het hele verschil tussen
+	 * "de squad handelt zelf" en "de squad negeert je".
+	 */
+	void UpdateFollow();
+
+	FTimerHandle FollowTimer;
+
+	/** Volgafstand uit DA_SquadTuning; 0 tot BeginFollowing hem zet. */
+	float FollowDistance = 0.0f;
+
+	/** Diagnostiek: hoe vaak meelopen een verplaatsing startte. */
+	int32 FollowMoves = 0;
+
+	/** De speler, of null. Meelopen heeft een leider nodig om achter te lopen. */
+	APawn* GetLeaderPawn() const;
 
 	/** Last move stance (SPEC-P1-06 stub; no behavior split yet — PLACEHOLDER in the enum). */
 	EEclipseSquadStance CurrentStance = EEclipseSquadStance::Ready;

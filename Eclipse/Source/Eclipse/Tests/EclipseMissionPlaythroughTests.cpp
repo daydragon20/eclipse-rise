@@ -42,6 +42,7 @@
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseEventPayloads.h"
 #include "Audio/EclipseAudioSubsystem.h"
+#include "Squad/EclipseSquadSubsystem.h"
 #include "Characters/EclipseAnimInstance.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/Engine.h"
@@ -57,7 +58,6 @@
 #include "NavigationSystem.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Quests/EclipseMissionTypes.h"
-#include "Squad/EclipseSquadSubsystem.h"
 #include "Squad/EclipseSquadTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
@@ -3410,6 +3410,123 @@ bool FEclipseLoadoutReachesTheWeapon::RunTest(const FString& Parameters)
 		TEXT("moet gelijk zijn aan wat er over was"));
 	TestEqual(TEXT("loadout: elk wapen houdt zijn eigen magazijn"),
 		Weapon->GetAmmoInMagazine(), AmmoLeftInPrimary);
+
+	Harness.Shutdown();
+	return true;
+}
+
+
+/**
+ * MEELOPEN (owner-opdracht 26-07 avond, punt 1 — laag 1 van zes).
+ *
+ * "ze lopen mee ... Dat is geen feature die je aanzet, dat is de basis."
+ *
+ * Twee dingen moeten waar zijn en ze staan op gespannen voet: de squad moet uit
+ * zichzelf bijlopen, en een staande order moet dat nog steeds winnen. Zonder het
+ * eerste is je squad een rij standbeelden; zonder het tweede is een order geen
+ * belofte meer (8.4) en kun je niemand meer ergens neerzetten.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSquadFollowsWithoutBeingTold,
+	"Eclipse.Mission.Playthrough.SquadFollowsWithoutBeingTold",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseSquadFollowsWithoutBeingTold::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+	using namespace EclipsePlaythrough;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString Error;
+	if (!TestNotNull(TEXT("meelopen: strategie"), Strategy) || !TestNotNull(TEXT("meelopen: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("meelopen: missie gelanceerd (%s)"), *Error),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(1.0f);
+
+	// Alle squadmates verzamelen.
+	TArray<AEclipseSquadmateController*> Mates;
+	for (TActorIterator<AEclipseSquadmateController> It(Harness.World); It; ++It)
+	{
+		Mates.Add(*It);
+	}
+	Report(*this, TEXT("squadleden in het veld"), static_cast<float>(Mates.Num()), TEXT(""));
+	if (!TestTrue(TEXT("meelopen: er is een squad"), Mates.Num() > 0))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	auto FarthestFromPlayer = [&Harness, &Mates]() -> float
+	{
+		float Worst = 0.0f;
+		for (const AEclipseSquadmateController* Mate : Mates)
+		{
+			if (const APawn* Body = Mate != nullptr ? Mate->GetPawn() : nullptr)
+			{
+				Worst = FMath::Max(Worst, static_cast<float>(FVector::Dist2D(Body->GetActorLocation(), Harness.Location())));
+			}
+		}
+		return Worst;
+	};
+
+	// --- de speler loopt weg -----------------------------------------------
+	const float Before = FarthestFromPlayer();
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 6.0, []() { return false; });
+	const float WhileWalking = FarthestFromPlayer();
+
+	int32 Moves = 0;
+	for (const AEclipseSquadmateController* Mate : Mates)
+	{
+		Moves += Mate != nullptr ? Mate->GetFollowMoves() : 0;
+	}
+
+	Report(*this, TEXT("verste soldaat bij de start"), Before, TEXT("cm"));
+	Report(*this, TEXT("verste soldaat na 6 s weglopen"), WhileWalking, TEXT("cm"),
+		TEXT("zonder meelopen groeit dit tot de hele loopafstand"));
+	Report(*this, TEXT("verplaatsingen uit MEELOPEN"), static_cast<float>(Moves), TEXT(""),
+		TEXT("niet uit een order"));
+
+	TestTrue(TEXT("meelopen: er is uit zichzelf bijgelopen"), Moves > 0);
+	// Zes seconden op 420 cm/s is ~2500 cm. Blijft de squad binnen het dubbele van
+	// de volgafstand, dan lopen ze echt mee in plaats van achter te blijven.
+	TestTrue(FString::Printf(TEXT("meelopen: de squad blijft in de buurt (%.0f cm)"), WhileWalking),
+		WhileWalking < 1200.0f);
+
+	// --- maar een order wint ------------------------------------------------
+	// Iemand op Hold zetten en dan weglopen: hij hoort te BLIJVEN.
+	AEclipseSquadmateController* Held = Mates[0];
+	const FVector HeldStart = Held->GetPawn() != nullptr ? Held->GetPawn()->GetActorLocation() : FVector::ZeroVector;
+	Held->ExecuteOrder(EEclipseSquadOrder::Hold, HeldStart, nullptr);
+	const int32 MovesBeforeHold = Held->GetFollowMoves();
+
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 6.0, []() { return false; });
+
+	const float HeldDrift = Held->GetPawn() != nullptr
+		? static_cast<float>(FVector::Dist2D(Held->GetPawn()->GetActorLocation(), HeldStart)) : -1.0f;
+	Report(*this, TEXT("afdrijving van de vastgezette soldaat"), HeldDrift, TEXT("cm"),
+		TEXT("een order is een belofte (8.4)"));
+	Report(*this, TEXT("meelopen-verplaatsingen tijdens Hold"),
+		static_cast<float>(Held->GetFollowMoves() - MovesBeforeHold), TEXT(""));
+
+	TestEqual(TEXT("meelopen: een Hold-order zet meelopen stil"),
+		Held->GetFollowMoves() - MovesBeforeHold, 0);
+	TestTrue(FString::Printf(TEXT("meelopen: de vastgezette soldaat blijft staan (%.0f cm)"), HeldDrift),
+		HeldDrift >= 0.0f && HeldDrift < 300.0f);
 
 	Harness.Shutdown();
 	return true;

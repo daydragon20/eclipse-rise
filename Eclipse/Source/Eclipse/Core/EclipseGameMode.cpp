@@ -692,6 +692,12 @@ void AEclipseGameMode::SpawnMissionActors()
 			Controller->ApplyClassKit(Kit); // before registration: the downed wiring reads the kit
 			Controller->Possess(Body);
 			Squad->RegisterSquadmate(Controller, SoldierId);
+
+			// MEELOPEN AANZETTEN (26-07 avond, punt 1 — laag 1). FollowDistance
+			// stond in DA_SquadTuning met een comment die zei dat hij niet gelezen
+			// werd; dit is de regel die dat waar maakt. Niet als optie: de owner
+			// noemde meelopen expliciet basisgedrag, geen feature.
+			Controller->BeginFollowing(SquadTuning != nullptr ? SquadTuning->FollowDistance : 400.0f);
 			SpawnedMissionActors.Add(Controller);
 		}
 		SpawnedMissionActors.Add(Body);

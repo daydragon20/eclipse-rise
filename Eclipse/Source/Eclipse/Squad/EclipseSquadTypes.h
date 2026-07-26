@@ -73,14 +73,23 @@ public:
 	int32 MaxDeployed = 4;
 
 	/**
-	 * NIET GELEZEN. Passief meelopen bestaat niet: de squad beweegt alleen op een
-	 * order (8.4 — orders zijn beloftes). Verzamelen gaat via Regroup, en díé
-	 * radius (RegroupAcceptanceRadius hieronder) wordt wel gebruikt.
+	 * Hoe ver een soldaat van je weg mag raken voor hij uit zichzelf bijloopt
+	 * (26-07 avond, punt 1 — laag 1 van de doctrine).
+	 *
+	 * Hier stond tot vandaag "NIET GELEZEN: passief meelopen bestaat niet, de
+	 * squad beweegt alleen op een order". Dat was waar en het was fout: de owner
+	 * noemde meelopen basisgedrag, geen feature. Orders blijven beloftes — een
+	 * staande Hold, MoveTo of FocusTarget wint van meelopen, dus een soldaat die
+	 * je ergens neerzette blijft daar staan.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
 	float FollowDistance = 400.0f;
 
-	/** NIET GELEZEN — er is geen dekkingzoekgedrag; het district bouwt wel dekking. */
+	/**
+	 * Zoekstraal voor dekking als er op je geschoten wordt. NOG NIET GELEZEN —
+	 * dat is laag 3 van de doctrine (zie phase0/SQUAD_DOCTRINE.md); laag 1
+	 * (meelopen) en laag 2 (autonoom vuren) gaan eraan vooraf.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Squad", meta = (ClampMin = 0))
 	float CoverSearchRadius = 800.0f;
 

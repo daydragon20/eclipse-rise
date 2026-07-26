@@ -57,6 +57,8 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 	}
 
 	CurrentOrder = Order;
+	// Vanaf hier is er ECHT iets gezegd; meelopen wijkt daarvoor (zie UpdateFollow).
+	bHasStandingOrder = true;
 	CurrentStance = Stance; // stored for the feel pass; no behavior split in Phase 1
 	switch (Order)
 	{
@@ -167,6 +169,71 @@ void AEclipseSquadmateController::ContinueFocusFire()
 	const float Interval = Weapon != nullptr ? FMath::Max(Weapon->GetFireInterval(), 0.05f) : 0.15f;
 	GetWorldTimerManager().SetTimer(FocusFireTimer, this,
 		&AEclipseSquadmateController::ContinueFocusFire, Interval, /*bLoop*/ false);
+}
+
+APawn* AEclipseSquadmateController::GetLeaderPawn() const
+{
+	const UWorld* World = GetWorld();
+	const APlayerController* Player = World != nullptr ? World->GetFirstPlayerController() : nullptr;
+	return Player != nullptr ? Player->GetPawn() : nullptr;
+}
+
+void AEclipseSquadmateController::BeginFollowing(float FollowDistanceCm)
+{
+	FollowDistance = FMath::Max(FollowDistanceCm, 100.0f);
+	// Elke halve seconde. Een soldaat die op 420 cm/s loopt legt daarin 210 cm af,
+	// ruim binnen de speling van een volgafstand van 400 — vaker kijken zou alleen
+	// meer padberekeningen kosten en niets veranderen aan wat je ziet.
+	GetWorldTimerManager().SetTimer(FollowTimer, this,
+		&AEclipseSquadmateController::UpdateFollow, 0.5f, /*bLoop*/ true);
+}
+
+void AEclipseSquadmateController::UpdateFollow()
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	if (Body == nullptr || Body->IsDowned())
+	{
+		return;
+	}
+
+	// EEN STAANDE ORDER WINT. Hold en MoveTo zetten deze soldaat ergens neer; die
+	// belofte breken omdat de speler wegloopt zou orders waardeloos maken (8.4).
+	// FocusTarget houdt hem ook: hij staat te vuren op wat je aanwees.
+	if (bHasStandingOrder
+		&& (CurrentOrder == EEclipseSquadOrder::Hold || CurrentOrder == EEclipseSquadOrder::MoveTo
+			|| CurrentOrder == EEclipseSquadOrder::FocusTarget))
+	{
+		return;
+	}
+
+	// Triage wint ook: iemand overeind helpen is belangrijker dan bij de speler
+	// blijven, en het loopt al op zijn eigen beweging.
+	if (TriageTarget.IsValid())
+	{
+		return;
+	}
+
+	const APawn* Leader = GetLeaderPawn();
+	if (Leader == nullptr)
+	{
+		return;
+	}
+
+	const float Apart = FVector::Dist2D(Body->GetActorLocation(), Leader->GetActorLocation());
+	if (Apart <= FollowDistance)
+	{
+		return;
+	}
+
+	// Naar een punt VÓÓR de speler uit, niet naar zijn voeten: vier soldaten die
+	// allemaal exact op de speler af lopen duwen elkaar weg en blijven om hem heen
+	// draaien. Op volgafstand achter hem is waar een squad in Ghost Recon en
+	// Division ook loopt.
+	const FVector Behind = Leader->GetActorLocation() - Leader->GetActorForwardVector() * (FollowDistance * 0.5f);
+	if (MoveToLocation(Behind, /*AcceptanceRadius*/ FollowDistance * 0.5f) == EPathFollowingRequestResult::RequestSuccessful)
+	{
+		++FollowMoves;
+	}
 }
 
 void AEclipseSquadmateController::HandlePawnDowned()
