@@ -48,6 +48,14 @@
 2. **"Take out the patrol leader" was af door erlangs te lopen.** De overlap-trigger voltooide objectives zonder naar het type te kijken, en `DestroyTarget` had zelf géén voltooiingspad. De missie eindigde in een keurige geslaagde debrief zonder dat er iets gebeurd was, en de hele suite stond groen.
 3. **Achteruitlopen was even snel als vooruit rennen.** UE kent geen richtingsstraf; `GetMaxSpeed()` is de enige plek waar dat kan.
 
+**Drie stiltes, en de sweep die erop volgde.** Je opdracht vroeg te noteren of er iets stils gebeurt dat luid had moeten zijn. Dat bleek geen bijvangst maar een categorie:
+
+1. **Een missie logde haar start wel en haar einde niet.** Zie hieronder — dit vond de speelronde.
+2. **Neergaan was volledig stil, ook voor jou.** Wie na een sessie `Saved/Logs` opende, kon nergens zien dát hij was doodgegaan, laat staan waaraan. Nu één regel per lichaam, eenmalig: `Player-side DOWN: … (cause: EnemyFire)`.
+3. **Een geweigerde order zei niets** — terwijl dat juist de tak is die verklaart waarom een order niets deed. Alleen weigeringen loggen; elke bevestiging loggen zou ze bedelven.
+
+Bij het controleren van punt 3 kwam er iets groters uit dan de logregel: **de weigerregels zijn goed getest, maar alleen als losse functie.** De weg erboven — order geven → beoordelen → bark kiezen → event versturen — had **nog nooit gedraaid**, want een volledige M1.1 levert nul weigeringen op; je squad kan alles wat je vraagt. De bark, de reden en de nieuwe logregel waren dus onbewezen. Dat is nu een test die er één afdwingt en controleert wat jíj merkt: precies één antwoord, geen bevestiging, een reden die niet leeg is, en een hoorbare zin (*"Can't see the target."*).
+
 **Vierde defect, gevonden nadat de rest al groen stond: een missie die eindigde zei niet dát ze eindigde.** Het *starten* werd gelogd (`Mission 'MT_M11' started …`), het *eindigen* niet. Toen mijn speelronde het checkpoint in liep, neerging en de missie faalde op **31,48 s**, was de eventbus de enige getuige — geen logregel, geen reden, en de vier vijanden verdwenen door het opruimen. `ResolveDebrief` logt nu uitkomst, objectives, gevallen squad en alarm (GDD 14.3.5, luid degraderen). Dit is precies het "iets stils dat luid had moeten zijn" uit je opdracht, en het was alleen te vinden door de missie echt te spélen.
 
 **De beschrijvingen hebben nu hun eigen bewakers.** Zes keer vannacht klopte een *beschrijving* niet met de code, en elke keer was het de beschrijving die de volgende ronde de verkeerde kant op stuurde — de 107 gedragstests zagen er geen één. Twee nieuwe tests sluiten dat gat voor de twee plekken die jij tijdens het spelen leest: de F2-controletabel mag geen binding claimen die niet bestaat, en de getallen in de testgids moeten die van `DA_CharacterTuning` zijn. **Allebei gefalsifieerd** — ik heb de historische fout teruggezet en gecontroleerd dat ze rood gaan, want een assert die niet rood kan worden geeft dekking die er niet is.
