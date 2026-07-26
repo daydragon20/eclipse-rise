@@ -55,12 +55,15 @@ echo.
 echo   ---------------------------------------------------------------------------
 echo   IN-GAME TESTGIDS - laat de game je alles leren
 echo   ---------------------------------------------------------------------------
-echo   F3 ....... testgids openen/sluiten (20 stappen, hij leidt je erdoorheen)
-echo   J ........ gehaald / goed / ja
+echo   F3 ....... testgids openen/sluiten
+echo   J ........ gelezen / goed / ja
 echo   N ........ sla over / niet goed / nee
 echo.
-echo   De gids MERKT ZELF dat je iets deed: loop je, dan vinkt hij "lopen" af.
-echo   Alleen stance (Alt) moet je met J bevestigen - dat is niet detecteerbaar.
+echo   DE GIDS IS SINDS 26-07 KORT. Hij bevat nog maar wat IK NIET KAN METEN:
+echo   wat er veranderd is sinds je vorige sessie, twee oordelen, en de vijf
+echo   13.2-vragen. Van de 23 stappen waren er 17 dingen die de dev zelf had
+echo   moeten vaststellen - die zijn eruit, en de suite bewaakt ze nu.
+echo   Niets vinkt zichzelf meer af: elke stap is een oordeel van jou.
 echo   Aan het eind schrijft hij je verdict naar Saved/Logs.
 echo.
 echo   COMMAND MODE (wereld naar 30%%):
@@ -69,11 +72,17 @@ echo   Volgende soldaat ..... Tab / scroll omhoog  ^|  RB
 echo   Vorige soldaat ....... scroll omlaag        ^|  (pad: RB wrapt rond)
 echo   Soldaat onder kruis .. E                    ^|  X
 echo   Orders geven ......... 1 2 3 4              ^|  D-pad
-echo   Stance ............... Alt vasthouden       ^|  Y (togglen)
+echo   DOCTRINE ............. Alt vasthouden       ^|  Y (cyclen)
 echo.
 echo   Die regels hierboven gelden TERWIJL je Q/LB vasthoudt. Buiten Command Mode
 echo   doen RB en X iets anders (zie boven); LT is buiten en binnen gewoon MIKKEN.
-echo   Stance wisselt vandaag alleen de HUD-regel; het gedrag verandert nog niet.
+echo   DOCTRINE VERANDERT SINDS 26-07 ECHT GEDRAG, en geldt meteen voor de hele
+echo   squad - hij reist niet meer mee met een order. Y cycelt door vier kaders:
+echo     recon ...... vuurt NIET tot er op hem geschoten wordt
+echo     ready ...... de volle basis: vuurt, zoekt dekking, loopt mee
+echo     overwatch .. blijft staan waar hij staat, vuurt vrij
+echo     aggressive . zoekt GEEN dekking, sluit af op wie er schoot
+echo   Welke actief is staat op de HUD, ook buiten Command Mode.
 echo.
 echo   Muis vrijgeven ....... Shift+F1
 echo   Afsluiten ............ Esc
