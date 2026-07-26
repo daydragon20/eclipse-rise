@@ -1114,4 +1114,113 @@ bool FEclipseCameraPitchCollapseTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Hoe hard schakelt sprint? (LOC-04, de laatste locomotie-rij die nog "AFWIJKEND
+// — harde omschakeling van MaxWalkSpeed, geen overgang" heet.)
+//
+// Die rij is geschreven toen MaxAcceleration nog op de engine-default 2048 stond
+// en er dus inderdaad niets tussen zat. Sindsdien staat acceleratie op 1400 en
+// remmen op 2000, en dat verandert het antwoord: MaxWalkSpeed springt wel, maar
+// de SNELHEID volgt via de acceleratie. Rekenen zou 230 / 1400 = 0,164 s zeggen —
+// alleen is remmen een ander mechanisme dan versnellen, dus de terugweg valt daar
+// niet uit af te leiden.
+//
+// Dus meten, beide kanten, en de vorm van de curve rapporteren in plaats van
+// alleen de duur: een overgang die in twee ticks klaar is voelt als een schakelaar,
+// ook als "0,16 s" op papier soepel lijkt.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSprintRampTest,
+	"Eclipse.Feel.Layer2.SprintRampsInsteadOfSnapping",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseSprintRampTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	const float RunSpeed = Harness.Tuning->RunSpeed;
+	const float SprintSpeed = Harness.Tuning->SprintSpeed;
+
+	// Eerst op stabiele rensnelheid komen; anders meet de sprint-overgang nog de
+	// staart van de aanloop mee.
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 3.0, [&Harness, RunSpeed]()
+	{
+		return Harness.SpeedCm() >= RunSpeed - 2.0f;
+	});
+	const float BeforeSprint = Harness.SpeedCm();
+	Report(*this, TEXT("snelheid vlak voor sprint"), BeforeSprint, TEXT("cm/s"),
+		*FString::Printf(TEXT("~%.0f = rensnelheid"), RunSpeed));
+
+	// OMHOOG: sprint erbij, vooruit blijven duwen (loslaten annuleert de latch).
+	Harness.PressWhileMovingForward(TEXT("SprintToggle"));
+	double UpStart = Harness.ElapsedSeconds;
+	double UpReached = -1.0;
+	int32 UpTicks = 0;
+	TArray<FString> UpCurve;
+	while (Harness.ElapsedSeconds - UpStart < 2.0)
+	{
+		Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), Harness.StepSeconds);
+		++UpTicks;
+		const float Speed = Harness.SpeedCm();
+		if (UpTicks <= 12 || UpTicks % 6 == 0)
+		{
+			UpCurve.Add(FString::Printf(TEXT("%5.3f s -> %6.1f cm/s"), Harness.ElapsedSeconds - UpStart, Speed));
+		}
+		if (UpReached < 0.0 && Speed >= SprintSpeed - 2.0f)
+		{
+			UpReached = Harness.ElapsedSeconds - UpStart;
+			break;
+		}
+	}
+	for (const FString& Line : UpCurve)
+	{
+		AddInfo(FString::Printf(TEXT("sprint-in: %s"), *Line));
+	}
+	Report(*this, TEXT("van rennen naar sprint"), UpReached, TEXT("s"), TEXT("-1 = sprintsnelheid niet gehaald"));
+
+	// OMLAAG: sprint eraf, vooruit blijven duwen. Dit is de kant die niet uit de
+	// acceleratie volgt — afremmen naar een LAGERE maximumsnelheid loopt via
+	// wrijving, niet via BrakingDecelerationWalking (dat geldt bij loslaten).
+	Harness.PressWhileMovingForward(TEXT("SprintToggle"));
+	double DownStart = Harness.ElapsedSeconds;
+	double DownReached = -1.0;
+	int32 DownTicks = 0;
+	TArray<FString> DownCurve;
+	while (Harness.ElapsedSeconds - DownStart < 2.0)
+	{
+		Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), Harness.StepSeconds);
+		++DownTicks;
+		const float Speed = Harness.SpeedCm();
+		if (DownTicks <= 12 || DownTicks % 6 == 0)
+		{
+			DownCurve.Add(FString::Printf(TEXT("%5.3f s -> %6.1f cm/s"), Harness.ElapsedSeconds - DownStart, Speed));
+		}
+		if (DownReached < 0.0 && Speed <= RunSpeed + 2.0f)
+		{
+			DownReached = Harness.ElapsedSeconds - DownStart;
+			break;
+		}
+	}
+	for (const FString& Line : DownCurve)
+	{
+		AddInfo(FString::Printf(TEXT("sprint-uit: %s"), *Line));
+	}
+	Report(*this, TEXT("van sprint terug naar rennen"), DownReached, TEXT("s"), TEXT("-1 = niet teruggezakt"));
+
+	// De ondergrens is wat "geen overgang" betekent: één of twee ticks. Alles
+	// daarboven is een echte overgang, ook al is hij kort. Geen bovengrens —
+	// hoe soepel het MOET voelen is smaak, en daar hoort geen assert op.
+	TestTrue(TEXT("sprint: omhoog is een overgang en geen schakelaar (> 2 ticks)"),
+		UpReached > Harness.StepSeconds * 2.0);
+	TestTrue(TEXT("sprint: omlaag is een overgang en geen schakelaar (> 2 ticks)"),
+		DownReached > Harness.StepSeconds * 2.0);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

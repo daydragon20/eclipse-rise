@@ -79,6 +79,10 @@ namespace EclipseFeelHarness
 
 		bool IsValid() const { return World != nullptr && Controller != nullptr && Body != nullptr && Input != nullptr; }
 
+		/** De test die dit harnas draait — nodig om injectiefouten LUID te melden
+		 *  in plaats van ze stil te laten verdampen. */
+		FAutomationTestBase* OwningTest = nullptr;
+
 		struct FOptions
 		{
 			/**
@@ -110,6 +114,13 @@ namespace EclipseFeelHarness
 		/** Injecteer één tick lang een waarde op een actie (naam per FindInputAction). */
 		void Inject(FName ActionName, const FVector2D& Value);
 		void Inject(FName ActionName, bool bPressed);
+
+	private:
+		/** Meldt één keer per naam dat een injectie op een onbestaande actie ging. */
+		void ReportUnknownAction(FName ActionName);
+		TSet<FName> UnknownActionsReported;
+
+	public:
 
 		/**
 		 * Houd een actie Seconds lang vast, en tick mee. Predicate mag de lus

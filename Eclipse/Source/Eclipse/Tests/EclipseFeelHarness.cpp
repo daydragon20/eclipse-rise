@@ -63,6 +63,7 @@ namespace EclipseFeelHarness
 		// viewport, dat is het punt van headless — maar een Error laat de test
 		// vallen. Verwacht hem expliciet in plaats van hem te dempen, zodat een
 		// ANDERE UI-fout nog steeds gewoon rood wordt.
+		OwningTest = &Test;
 		Test.AddExpectedError(TEXT("Using CommonUI without a CommonGameViewportClient"),
 			EAutomationExpectedErrorFlags::Contains, /*Occurrences*/ 0);
 
@@ -248,6 +249,26 @@ namespace EclipseFeelHarness
 		}
 	}
 
+	void FHarness::ReportUnknownAction(FName ActionName)
+	{
+		// Een onbekende actienaam injecteerde NIETS en zei er niets over, dus de
+		// test tikte netjes door met een speler die geen knop indrukte. Zo kostte
+		// een sprint-meting een hele ronde: de acties heten SprintHold en
+		// SprintToggle, "Sprint" bestaat niet, en het resultaat las als "sprint
+		// werkt niet" in plaats van "die knop bestaat niet".
+		//
+		// Eén keer per naam: een tikfout in een lus van 120 ticks moet geen 120
+		// regels opleveren.
+		if (OwningTest != nullptr && !UnknownActionsReported.Contains(ActionName))
+		{
+			UnknownActionsReported.Add(ActionName);
+			OwningTest->AddError(FString::Printf(
+				TEXT("harnas: actie '%s' bestaat niet — die injectie deed NIETS. ")
+				TEXT("Controleer de naam tegen AEclipsePlayerController::FindInputAction."),
+				*ActionName.ToString()));
+		}
+	}
+
 	void FHarness::Inject(FName ActionName, const FVector2D& Value)
 	{
 		if (Input == nullptr || Controller == nullptr)
@@ -257,6 +278,10 @@ namespace EclipseFeelHarness
 		if (const UInputAction* Action = Controller->FindInputAction(ActionName))
 		{
 			Input->InjectInputForAction(Action, FInputActionValue(Value), {}, {});
+		}
+		else
+		{
+			ReportUnknownAction(ActionName);
 		}
 	}
 
@@ -269,6 +294,10 @@ namespace EclipseFeelHarness
 		if (const UInputAction* Action = Controller->FindInputAction(ActionName))
 		{
 			Input->InjectInputForAction(Action, FInputActionValue(true), {}, {});
+		}
+		else
+		{
+			ReportUnknownAction(ActionName);
 		}
 	}
 

@@ -74,6 +74,12 @@ window.PROGRESS_DATA = {
       "Optie 3: laten staan - elke derde-persoons-game met een boom van 3 meter heeft dit in enige mate",
       "Mijn voorkeur: eerst zelf omhoog kijken in de build en zeggen of het je opvalt. Het getal is groot, maar of het STOORT hangt af van hoe vaak je omhoog kijkt - en dat weet jij"
     ] },
+    { titel: "Je valt 3,5x sneller UIT de sprint dan je erin komt — bedoeld of niet?", prio: "later", waarom: "Gemeten met vooruit blijven duwen in beide richtingen: rennen naar sprint duurt 0,150 s en loopt gelijkmatig op (420-455-490-525-560-583-650), maar sprint terug naar rennen is in 0,042 s klaar. Dat verschil heeft niemand gekozen: versnellen loopt via de acceleratie, terugzakken via de grondwrijving, en die twee zijn nooit op elkaar afgestemd. De audit noemde dit ooit een harde omschakeling zonder overgang - dat klopte toen, maar de acceleratiefix van dezelfde nacht heeft de INSTAP onderweg al opgelost. Alleen de uitstap staat nog los.", stappen: [
+      "Snel uit de sprint vallen is verdedigbaar: je wilt je controle terug zodra je loslaat",
+      "Maar 3,5 keer is een gevolg van twee losse mechanismen, geen ontwerp",
+      "Mijn aanbeveling: laten staan tot je het zelf gespeeld hebt. Als het abrupt voelt bij het uitkomen van een sprint, zeg het en ik trek de uitstap naar ongeveer 0,10 s",
+      "Ik heb niets gewijzigd - dit is smaak"
+    ] },
     { titel: "Vier ja/nee-vragen — mijn aanbeveling staat er telkens bij", prio: "gauw", waarom: "Vannacht liep ik op vier dingen die jouw oordeel vragen (smaak of scope), niet mijn meting. Ze staan volledig uitgewerkt bovenaan HANDOFF.md; hier de korte versie zodat ja of nee volstaat.", stappen: [
       "Command Mode trekt de camera 73% terug, maar de spec én de GDD zeggen 15%. AANBEVELING: houd de 73% en corrigeer de GDD-regel — 520 is bewust geauthord, 15% is nooit gespeeld",
       "De squad weigert bij insertie ELKE order met 'no route' (mét bark — het is netjes luid, maar het leest als een dode squad). AANBEVELING: ja, laat mij de navmesh-generatie uitzoeken",

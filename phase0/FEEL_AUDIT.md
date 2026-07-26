@@ -25,7 +25,7 @@ ze allemaal overschrijft. Samen zijn ze de reden dat lopen als schaatsen leest.
 | Afremmen (lopen) | AFWIJKEND | 2048 (default) | 2000 | [ENGINE] template |
 | Min. analoge loopsnelheid | AFWIJKEND | 0 (default) — lichte stickuitslag glijdt vooruit in idle-pose | 20 | [ENGINE] template |
 | Snelheidstrappen | OK | walk 180 / run 420 / sprint 650 / crouch 150, uit data | — | project-eigen feel targets |
-| Sprint in/uitstap | AFWIJKEND | harde omschakeling van MaxWalkSpeed, geen overgang | eigen stap, zie openstaand | — |
+| Sprint in/uitstap | **GEMETEN — half gefixt** | in: 0,150 s vloeiende oploop (was inderdaad hard toen acceleratie nog 2048 was). uit: 0,042 s, dus 3,5x sneller terug dan erin | asymmetrie is een owner-keuze | meting |
 | Strafen / achteruit | ONTBREEKT | geen aparte snelheden; achteruit is even snel als vooruit | eigen stap | conventie: 60-80% |
 
 ## ROTATIE
@@ -100,6 +100,30 @@ duidelijk beter zonder zijn oordeel: `ViewPitchMax` omlaag naar ~+45 (behoudt he
 kader, kost je omhoog richten), de socket hoger of de boom korter bij positieve
 pitch (behoudt beide, vraagt bouwwerk), of laten staan (elke derde-persoons-game
 met een boom van 3 m heeft dit in enige mate).
+
+
+### LOC-04 sprint in/uitstap: erin is gerepareerd, eruit is 3,5x sneller
+
+Deze rij zei "harde omschakeling van MaxWalkSpeed, geen overgang". Dat klopte
+toen hij geschreven werd — met `MaxAcceleration` op de engine-default 2048 zat er
+niets tussen. De acceleratiefix van dezelfde nacht heeft de instap onderweg
+opgelost, en dat was tot nu toe nergens nagemeten.
+
+Gemeten (`Eclipse.Feel.Layer2.SprintRampsInsteadOfSnapping`), vooruit blijven
+duwen in beide richtingen:
+
+| richting | duur | verloop |
+|---|---|---|
+| rennen → sprint | **0,150 s** | 420 → 455 → 490 → 525 → 560 → 583 → 650, gelijkmatig over 18 ticks |
+| sprint → rennen | **0,042 s** | 650 → 539 → 504 → 471 → 438 → 420, in 5 ticks |
+
+**Erin is een echte oploop. Eruit is 3,5x sneller** — en dat verschil is geen
+instelling die iemand gekozen heeft: versnellen loopt via `MaxAcceleration`,
+terugzakken via de grondwrijving, en die twee zijn nooit op elkaar afgestemd.
+
+Niets aan gewijzigd. Snel uit de sprint vallen is verdedigbaar (je wilt je
+controle terug), maar 3,5x is een gevolg van twee losse mechanismen en geen
+keuze, dus het hoort langs de owner. Staat in zijn lijstje.
 
 
 ## WAPEN, FEEDBACK, ANIMATIE, TRAVERSAL — de ONTBREEKT-lijst
