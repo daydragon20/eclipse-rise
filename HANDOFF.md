@@ -424,57 +424,38 @@ The full loop is **proven headless** (test `Eclipse.Base.Prep.FullCircleSmoke`: 
 
 ## 5. What's next
 
-**Waar het nu op wacht (2026-07-25):** één speelsessie van de owner. Die levert in één
-keer twee dingen die geen enkele geautomatiseerde check kan geven: het **R3-verdict**
-over de feel van Command Mode, en het **13.2-antwoord** ("spelen testers vrijwillig een
-tweede ronde?"). De game begeleidt die sessie nu zelf via F3, dus er hoeft geen document
-naast het scherm.
+**Voor de owner: één speelsessie.** Die levert in één keer wat geen enkele
+geautomatiseerde check kan geven — het **R3-verdict** over Command Mode en het
+**13.2-antwoord** ("speel je vrijwillig een tweede ronde?"). De game begeleidt die
+sessie zelf via F3. Het kliklijstje op het dashboard zegt in vijf stappen wat er
+sinds gisteren veranderd is en waar je op moet letten.
 
-**Wat de nacht van 25→26 juli aan de wachtrij heeft toegevoegd** (uitgewerkt in §1 en §4 hierboven — hier alleen de kop, zodat deze lijst niet zijn eigen tweede versie wordt):
+**Voor de volgende sessie: de drie audits zijn de wachtrij.** Ze staan in
+`phase0/` en vervangen de losse lijst die hier stond, want die dupliceerde §1 en
+§4 en liep daardoor achter:
 
-- **Zeven mechanismen die bestaan maar tijdens spelen niet bereikbaar zijn:** de camera-blend (gerepareerd), kopschoten, het alarm, twee klasse-verbs, acht ingesproken squad-zinnen, de +20-stretchbonus, en `DT_NamedCharacters` (het asset bestaat, het veld staat op de campagne-setup, maar geen enkele regel C++ laadt de tabel — wie daar een naam invult ziet niets). Alleen de eerste is gefixt; de rest vraagt een ontwerpbeslissing en staat in §4. De zevende vond ik door de omgekeerde vraag te stellen: niet "welke code mist een aanroep" maar **"welk tuningveld kan de owner verdraaien zonder dat iets het leest"** — dat leverde precies twee dode velden op, allebei in die tabel.
-- **Diezelfde vraag op alle twaalf typebestanden losgelaten gaf er nog tien**, en één daarvan raakt je direct bij het maken van missies: **`EnemySpawns` op het missiesjabloon wordt genegeerd.** Vul je "6 Enforcers op SiteB" in, dan krijg je vier gemengde vijanden naast het hoofddoel — dat is een vaste lus van vier in `AEclipseGameMode`, die de rijen van `DT_EnemyArchetypes` afwisselt. De struct-comment zei "consumed by the graybox level wiring". **En dit is geen toekomstig risico: drie van je vier missies vullen het veld al in** — Assault 2 batches, Rescue 2, Sabotage 1, M1.1 geen. Die missies beschrijven dus een vijandopstelling die nooit gebeurt. Ik dacht eerst dat er nul ingevuld waren (de setup-scripts authoren ze niet); de test die ik erbij bouwde bewees het tegendeel — de assets zijn in de editor gevuld. `Eclipse.Playthrough.AuthoredEnemySpawnsWouldActuallySpawn` noemt ze nu bij naam in het log en klemt het getal op 5, dus er kan niets stil bij komen. Verder: `CameraPullbackPercent` (zie §4 punt 3 — de levende knop zit ergens anders), `FollowDistance` en `CoverSearchRadius` (passief meelopen en dekking zoeken bestaan niet als gedrag), `BriefingSpeaker` (de briefingtekst verschijnt wél, zonder naam ervoor), en vier Stage-B-velden die al eerlijk gelabeld waren. **Alle tien staan nu met een `NIET GELEZEN`-regel in de header** — niets aangesloten, want dat is telkens een ontwerpbeslissing, maar niets liegt meer.
-- **Diezelfde sweep had zelf een blinde vlek**, en dat is de moeite van het vermelden waard: hij keek alleen naar getallen en namen, niet naar lijsten en verwijzingen. `EnemySpawns` is een `TArray` en vond ik met de hand. Uitgebreid naar containers en pointers kwamen er **negen** bij, waarvan drie die je merkt: **`ShootAnim`** (elk lichaam heeft een schiettake geauthord, er wordt nooit een schietanimatie afgespeeld — je vuurt en de pose verandert niet), **`InsertionPointIds`** (welke van de drie ingangen een missie aanbiedt doet niets; je start altijd bij Entry_Main) en **`UnlockTag`** (een draaiende faciliteit ontsluit vandaag geen enkele capability). Verder `MissionAsset` op de story-rij (de koppeling loopt via `MissionId`; deze pointer is de stille tweede), en de twee stemvelden. **Drieëntwintig dode velden in totaal**, allemaal gelabeld. Ik schreef eerst "negentien" — een met de hand opgetelde telling, exact de fout die ik vannacht vijf keer had gerepareerd, en toen zelf maakte. Daarom is de sweep nu gereedschap in plaats van een getal: `python Eclipse/Tools/find_dead_fields.py` telt ze zelf, en dát is de bron. Zet het getal niet over in een document.
-- **Het goedkoopste werk dat er ligt** is de barks aansluiten: opnames én stemsysteem bestaan al, het is één consument op de eventbus. Let op de mismatch in de woordenlijst (§4 punt 19).
-- **De grootste post blijft §8 FEEDBACK**, en er ligt nu een blok *"wat §8 moet weten voordat het gebouwd wordt"* in `phase0/FEEL_AUDIT.md` met vier gemeten valkuilen.
-- **De feel-audit is van beredeneerd naar gemeten gegaan.** De eindstand-tabel bovenaan dat document zegt per gebied wat er staat en waar het bewijs zit; twee rijen bleken bij het nameten zélf fout.
+| document | wat er nog open staat |
+|---|---|
+| [LOCOMOTIE_AUDIT.md](phase0/LOCOMOTIE_AUDIT.md) | één omissie (mikken kost geen snelheid) en assetwerk: geen `Turn_*`-take in welke pack dan ook, en vijf van de negen lichamen zonder zijcycli |
+| [GEVECHT_AUDIT.md](phase0/GEVECHT_AUDIT.md) | de hitmarker (de rest van de feedbacklaag is 26-07 gedaan), spreiding en terugslag, en de loadout die het wapen niet bereikt |
+| [SQUAD_AUDIT.md](phase0/SQUAD_AUDIT.md) | één vraag in drie vormen: mag de squad iets doen zonder order? Dat is de grootste beslissing die er ligt |
 
-**Openstaand ná die sessie, in volgorde:**
-1. Dressing-iteratie 3 afmaken — pool-compositing (multiply in plaats van over),
-   bloom/halo, en de contactschaduw-rok afleiden van de HOOGTE in plaats van de
-   footprint (`phase0/DRESSING_ITERATIE_3.md` §5).
-2. Kit-pass P2-08 plaatsing — de 12 Factory-Pack-kandidaten zijn gemeten en groen
-   (`phase0/KITPASS_P2-08.md` §2a); wat nog een beslissing vraagt is of de accepts naar
-   repo-tracked `/Game/Art/Imported` migreren, want deze meshes dragen 4K-textures en
-   dat kost repo-omvang.
-3. MetaHuman gezichts-tier B implementeren (`phase0/MH_FACE_TIER_B.md`), met de
-   15.8-shotronde op de naad huid↔oog als harde poort.
+**Herhaal die audits aan het eind van elke werkdag.** Dat is niet ceremonieel: op
+26-07 waren twee van de vier locomotie-omissies pas zichtbaar dóór een fix van
+diezelfde ochtend. Elke reparatie verandert wat de volgende ronde vindt.
 
-The **live playable loop is done** (commit `[Loop] Wire the live playable loop`): boot → menu base → launch → graybox mission with squad orders → extraction/lose → debrief → base, no console commands. The remaining Phase-1 step is the **gate question** — a human plays it and answers *"do testers voluntarily play a second loop?"* (13.2). That's the owner's call, not an automated check.
+**Twee gereedschappen die de vorige sessies hebben opgeleverd**, en die de vraag
+"wat ligt hier dood?" beantwoorden zonder erover te struikelen:
 
-**Done since 2026-07-21 (Fable 5 independent re-review, all green + pushed):**
-- Stance stub + `DA_SquadTuning` wiring landed (previous session's last commit).
-- Re-review fixes: `MarkMissionServed` mutation (roster service count was never incremented); squad cover scorer treated the id-less player as a threat + downed-callback lifetime hardened; ground-data wiring (DA_CharacterTuning/DT_Weapons/DT_EnemyArchetypes were dead data, the player pawn had **no weapon** and stayed **downed after a lost run** — all fixed, player revives per launch); prep/launch rejections now visible in the hub.
-- First stylized dressing pass on the code-built district (owner-authorized ahead of Phase 2): palette MIDs, SkyAtmosphere, haze, punch grading, authored ink-outline post material (`/Game/Art/PP_EclipseOutline`), and a `-EclipseShot` screenshot review rig (15.9). Dev-box (SM5) lighting calibration in progress — see PROGRESS.html for honest status; the full stack (Lumen/Nanite/VSM) remains RTX-PC work.
+- `python Eclipse/Tools/find_dead_fields.py` — tuningvelden die niets leest
+- `python Eclipse/Tools/find_dead_assets.py` — audiocues die niemand afspeelt
 
-**Done later on 2026-07-22 (owner-mandate session, all green + pushed):**
-- **Audio pipeline per OWNER_MANDATE** (16.12): TTS now requests raw PCM and stores **WAV** in `Content/Audio/Generated/` (cache travels with the repo); runtime `PlayLine` (asset → cached wav → generate); `FEclipseDialogueLine.GeneratedAudio` + per-character `Lines`; bulk commandlet `-run=EclipseGenerateVoices` (AssetRegistry scan → generate → import USoundWave → auto-assign + save); 2 new headless tests. First live-API run still pending (no key on this box).
-- **Live progress dashboard** `PROGRESS.html` + `progress_media/` (per-subtask %, screenshots) — update it every session.
-
-**Done still later on 2026-07-22 (green-bar re-verify + first live voice run, all pushed):**
-- Green bar independently re-verified (build ✓, tests ✓, validation ✓, catalog ✓).
-- **Dialogue-database seed** (16.12): `Content/Audio/DialogueSeed.json` → the commandlet materialises `UEclipseCharacterVoiceData` assets under `/Game/Audio` (create-only, never overwrites); pure parser `EclipseDialogueSeed` + headless rules test (test #31).
-- **First live ElevenLabs run succeeded** using the vault key (`ECLIPSE_SECRETS\UserSecrets.ini`, copied to `Eclipse/Config/` — gitignored): 8/8 squad barks generated (PCM→WAV), imported as `USoundWave`, auto-assigned, saved; the re-run proved 8 cached / 0 generated. Cache + assets committed.
-- **Key scope note:** the vault key works for TTS but `/v1/voices` returns **401** — it appears scope-restricted to text-to-speech. Whether this is the already-rotated key is for the owner to confirm; if the plaintext-shared key is still active, rotate it in the ElevenLabs dashboard and update the vault + `Eclipse/Config/UserSecrets.ini`.
-
-**Open (small, non-blocking) polish:**
-- First audible PIE check of `PlayLine` (assets exist; nobody has *heard* them in-game yet).
-- Music/SFX endpoints + adaptive always-on music (16.7) — Phase 2 forward infra.
-- Graphics: the SM5 dev-box milestone is banked (dusk two-tone + ink outlines); the real fidelity pass (Lumen/Nanite/VSM, Part 15 full stack) runs on the RTX PC.
-
-**Non-blocking carryover** (roadmap-allowed to lag): CI self-hosted runner, 10 concept-art pieces, 5 feel-reference clips. **Fidelity/art starts at Phase 2** (graybox rule); Parts 15–17 are the target for that.
-
----
+**Bekende dekkingsgat, technisch:** de basis-hub-widget heeft geen enkele test,
+terwijl dat de laag is waar elke missie start en elke aankoop gebeurt. De logica
+eronder is wél gedekt (`EclipseBaseTests`, `EclipsePrepTests`,
+`EclipseEconomyTests`); het is de bedrading die blind is. Op 26-07 zijn daar twee
+bugs gevonden door te lezen — een genegeerde uitkomst en een ontbrekende refresh —
+en structureel dichtgezet met één gedeelde afhandeling, maar een test is er niet.
 
 ## 6. How to build, test, and run (any Windows machine with the toolchain)
 
