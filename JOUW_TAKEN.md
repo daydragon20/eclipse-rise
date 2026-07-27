@@ -40,6 +40,29 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
 | **5** wapenwissel | **HET WAPEN IS EEN APART MATERIAALSLOT** (`M_Belica_Guns`, slot 4 van 12). Zichtbaar máken vraagt dus geen mesh-operatie, alleen een eigen tint. Wisselbaar maken vraagt het nog steeds wel |
 | **6** de gids | **DE KETEN WERKT — end-to-end gemeten.** Toets → actie → handler → paneel open met 13 regels. G kon je niet hebben (toegevoegd ná je sessie); F3 is door de engine geclaimd als `viewmode lit` |
 
+### ⚠️ LET OP: de in-game gids zal zeggen dat er NIETS veranderd is
+
+Deel 1 van de gids toont "wat er veranderd is sinds je vorige sessie", en die
+datum komt uit het nieuwste eindrapport in `Saved/Logs`. Dat rapport is vandaag
+**door mijn eigen suite geschreven** (10:14), dus de gids filtert op 2026-07-27 en
+laat alles van die dag weg — inclusief alle vijf de dingen die ik vandaag voor je
+heb gebouwd.
+
+**Je krijgt dus "niets sinds je vorige sessie" te zien terwijl er vijf dingen
+veranderd zijn.** Dat is geen bug in wat ik bouwde maar in de filter, en de
+oorzaak is gemeten en vastgelegd (de filter leest een map waar de draai zelf in
+schrijft).
+
+**Wat er wél veranderd is, hier dus met de hand:**
+
+| | |
+|---|---|
+| **G** opent de testgids | F3 is door de engine geclaimd als viewmode |
+| Er staat een **richtkruis** (`+`) in het midden | bestond nooit eerder |
+| Je personage **draait niet meer mee** bij stilstand | mikken laat hem wél aansluiten |
+| Het **wapen** is gunmetal en steekt af | het hing er al, maar in je eigen lichaamskleur |
+| Een **misser is hoorbaar** | een schot in een muur liet eerst geen enkel spoor na |
+
 ### ⛔ GEPARKEERD MET OPZET: de squad-barks (jouw JA staat nog open)
 
 Je gaf eerder **"JA"** op drie zinnen per stem, zes in totaal — **één betaalde
