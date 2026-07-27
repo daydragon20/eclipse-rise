@@ -316,6 +316,13 @@ void AEclipseGameMode::DrivePlayShotInput()
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
 		const FRotator YawOnly(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
 		Body->AddMovementInput(FRotationMatrix(YawOnly).GetUnitAxis(EAxis::X), 1.0f);
+		// TELLEN DAT HIJ ECHT GEDUWD IS. Het hele 3-cm-dossier staat op de aanname
+		// dat de invoer in dat dode interval wordt aangeboden, en die leidde ik af
+		// uit 'duw 1.00' op het OPNAMEMOMENT - een andere timer, dus die waarde kan
+		// net zo goed van een latere tick komen. Vier keer vandaag bleek een aanname
+		// die ik nergens tegenaan hield onjuist; dit is de laatste die er nog onder
+		// zit.
+		++PlayShotIntervalPushes;
 	}
 	if (bPlayShotTurning)
 	{
@@ -445,8 +452,9 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen, AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
+				PlayShotIntervalPushes,
 				PlayShotIntervalPathLength,
 				PlayShotIntervalTopSpeed,
 				PlayShotIntervalMinMaxSpeed,
@@ -459,6 +467,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
 		PlayShotIntervalTopSpeed = 0.0f;
 		PlayShotIntervalPathLength = 0.0f;
+		PlayShotIntervalPushes = 0;
 		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{

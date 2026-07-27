@@ -109,6 +109,9 @@ private:
 	 */
 	float PlayShotIntervalPathLength = 0.0f;
 
+	/** Hoe vaak AddMovementInput echt is aangeroepen sinds het vorige moment. */
+	int32 PlayShotIntervalPushes = 0;
+
 	/** Laagste GetMaxSpeed() van het interval; nul verklaart een pawn die niet loopt. */
 	float PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 
