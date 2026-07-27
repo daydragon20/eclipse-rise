@@ -483,6 +483,7 @@ void AEclipseCharacter::ApplyTuning(const UEclipseCharacterTuningAsset* Tuning)
 	CommandModeArmLength = Tuning->CommandModeArmLength;
 	CommandModeCameraRise = Tuning->CommandModeCameraRise;
 	BaseSocketOffsetZ = Tuning->CameraSocketOffset.Z;
+	BaseSocketOffsetY = Tuning->CameraSocketOffset.Y;
 	FirstPersonFOV = Tuning->CameraFOV;
 	ThirdPersonFOV = Tuning->ThirdPersonFOV;
 	ViewToggleBlendTime = Tuning->ViewToggleBlendTime;
@@ -673,6 +674,42 @@ void AEclipseCharacter::RefreshCameraTargets()
 			TargetArmLength *= 0.55f;
 			TargetFOV *= 0.80f;
 		}
+	}
+
+	// HET VIZIER MOET STILSTAAN — owner-punt 1, 27-07: "nu beweegt alles als ik
+	// mik en kan ik niet eens deftig kijken." Twee dingen, allebei uit
+	// phase0/REFERENTIE_TPS.md en allebei aanwijsbaar in de code hierboven.
+	//
+	// 1. DE CAMERA-LAG GING NOOIT UIT TIJDENS HET MIKKEN. Deze functie raakte hem
+	//    niet aan, en de enige plek die bEnableCameraLag zet kijkt alleen naar
+	//    bCameraLagSuspended en de tuningsnelheid. Het richtkruis staat SCHERMVAST
+	//    in het midden terwijl de camera achterloopt op de pawn — dus de WERELD
+	//    schuift onder je kruis door zolang je beweegt. Bij het lopen is dat
+	//    gewicht en dus gewenst; bij het richten is het precies het mechanisme dat
+	//    een vizier laat zwemmen. Elke referentie zet de lag bij ADS op nul, en
+	//    dat is de reden dat mikken daar vastklikt.
+	//
+	// 2. DE ZIJWAARTSE OFFSET KROMP NIET MEE. De arm gaat van 300 naar 165 cm en
+	//    de offset bleef 55 cm. Die 55 cm is niet in centimeters relevant maar in
+	//    GRADEN, en dezelfde 55 cm weegt op een arm van 165 bijna twee keer zo
+	//    zwaar. Het personage kroop bij het mikken dus JUIST je vizierlijn in,
+	//    terwijl de offset er nu net is om die lijn vrij te maken. Meeschalen met
+	//    de armverhouding houdt de hoek constant: hetzelfde beeld, dichterbij.
+	if (CameraBoom != nullptr && !bFirstPerson)
+	{
+		const float ArmRatio = ThirdPersonArmLength > KINDA_SMALL_NUMBER
+			? TargetArmLength / ThirdPersonArmLength : 1.0f;
+		// ALLEEN DE Y. De Z van deze offset wordt elders al bestuurd (de landingsdip
+		// zakt hem), en die overschrijven zou een tweede eigenaar van hetzelfde veld
+		// maken — precies de vorm waar dit project vandaag drie keer op viel.
+		FVector Offset = CameraBoom->SocketOffset;
+		Offset.Y = BaseSocketOffsetY * ArmRatio;
+		CameraBoom->SocketOffset = Offset;
+
+		// De lag uit bij het mikken. bCameraLagSuspended blijft leidend: dat is de
+		// bestaande onderdrukking en die mag deze niet overrulen.
+		CameraBoom->bEnableCameraLag =
+			!bCameraLagSuspended && !bAiming && TunedCameraLagSpeed > 0.0f;
 	}
 
 	const bool bNeedsBlend =

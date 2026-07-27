@@ -362,6 +362,14 @@ private:
 	/** Socket offset Z as authored, so the Command Mode rise has a zero to
 	 *  return to instead of accumulating every time the hold ends. */
 	float BaseSocketOffsetZ = 65.0f;
+
+	/**
+	 * De ZIJWAARTSE offset zoals de tuning hem levert, vóór het meeschalen met de
+	 * armlengte. Nodig omdat RefreshCameraTargets de Y elke keer opnieuw berekent:
+	 * zonder een onaangetast origineel zou hij zichzelf bij elke mikbeurt verder
+	 * inkrimpen. Zie REFERENTIE_TPS.md hoofdstuk 2.
+	 */
+	float BaseSocketOffsetY = 55.0f;
 	float FirstPersonFOV = 90.0f;
 	float ThirdPersonFOV = 80.0f;
 	float ViewToggleBlendTime = 0.2f;
