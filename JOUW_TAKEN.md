@@ -73,6 +73,25 @@ schrijft).
 | Het **wapen** is gunmetal en steekt af | het hing er al, maar in je eigen lichaamskleur |
 | Een **misser is hoorbaar** | een schot in een muur liet eerst geen enkel spoor na |
 
+### ❓ VRAAG AAN JOU: hoe groot mag je personage in beeld staan?
+
+Dit is de enige knop die ik nu niet zelf kan draaien, en punt 1 hangt erop.
+
+**Gemeten:** je personage vult **59–61%** van de beeldhoogte op heuphoogte en
+**97%** tijdens het mikken (×5 in oppervlak). Zijn **voeten staan nooit in beeld** —
+in 11 van de 15 opnames loopt zijn silhouet de onderrand uit, ook zonder mikken.
+Je richtkruis wordt overigens nooit bedekt; dat had ik verkeerd verwacht en heb ik
+gemeten.
+
+**Wat ik van jou nodig heb, één zin:** hoeveel van het beeld mag hij vullen, en
+horen zijn voeten erin? De referentie legt vast dat hij naast je vizierlijn staat,
+maar noemt geen beeldvullingsgetal — en zonder norm wordt de keuze tussen
+boomlengte, FOV, pitch en sockethoogte weer een invulling van mij. Daar ben ik
+vandaag drie keer op teruggekomen, dus ik vul hem niet in.
+
+*(Wil je het liever zien dan uitrekenen: `HighresScreenshot01036` is de mikstand,
+`01038` de heupstand.)*
+
 ### ⛔ GEPARKEERD MET OPZET: de squad-barks (jouw JA staat nog open)
 
 Je gaf eerder **"JA"** op drie zinnen per stem, zes in totaal — **één betaalde

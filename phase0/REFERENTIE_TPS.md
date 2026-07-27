@@ -68,11 +68,24 @@ zit verder weg, Borderlands zit dichter op het personage met een bredere FOV.
 - **De klem werkt en is een KEUZE.** 5,8 cm achterstand op volle snelheid, tegen
   een klem van 6. Zonder die klem zou de achterstand `snelheid / 12` zijn — 35 cm
   bij rennen. Dat is eerder gerepareerd en het houdt.
-- **De laterale offset van 55 cm is een GAT in zijn onderbouwing.** Hij staat als
-  vast getal naast een armlengte van 300. Wat de referentie doet is de offset
-  koppelen aan de armlengte, want de offset bepaalt hoeveel graden het personage
-  uit het midden staat — en dat verandert zodra de arm korter wordt. Zie hoofdstuk
-  2: bij het mikken krimpt onze arm wél en blijft de offset staan.
+- **De laterale offset van 55 cm is een GAT in zijn ONDERBOUWING — maar niet in
+  zijn uitwerking.** Hij staat als vast getal naast een armlengte van 300, en de
+  redenering was: koppel hem aan de arm, want hij bepaalt hoeveel graden het
+  personage uit het midden staat.
+  > **GETOETST 27-07, EN DE UITWERKING KLOPT.** Op de opnames is het kruis in geen
+  > enkele stand bedekt, en bij het mikken staat hij er zelfs verder vanaf (124 px
+  > lucht tegen 40 op heuphoogte). De vaste offset is dus slecht onderbouwd en
+  > tegelijk in de praktijk voldoende. Ik heb er twee keer aan gezeten op grond van
+  > redenering — één keer krimpend, één keer groeiend — en beide keren wees de
+  > meting het af. Zie hoofdstuk 2.
+
+- **DE TWEE MEETMETHODEN ZIJN HET EENS, en dat is de eerste keer vandaag.** De
+  hoekmeting hierboven zegt 31,52° schijnbare hoogte; bij een horizontale FOV van
+  80° op 16:9 is het beeld 50,5° hoog, dus dat is **62,4%** van de beeldhoogte. De
+  pixelmeting op de opnames komt onafhankelijk op **59–61%** (en geclipt, dus een
+  ondergrens). Twee wegen, dezelfde uitkomst — daarmee is de pixelmeting
+  betrouwbaar genoeg om er verder op te bouwen, en dat mocht ik van geen van beide
+  alleen aannemen.
 - **"Schuift mijn personage naar de zijkant als ik ren" is nog NIET gemeten — en
   de meting die ernaar lijkt te kijken KAN het niet vinden.** De opnameronde drukt
   per moment `scherm=(x,y)` af, en dat leek de meetopdracht al te dekken. Nagemeten
