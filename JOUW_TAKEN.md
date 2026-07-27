@@ -259,11 +259,24 @@ zag zijn geen bug maar een keuze, en die is van jou:
   hetzelfde frame vloeken die twee. Hun maat heb ik wel gerepareerd — ze stonden
   op 328 cm naast jouw 190 cm. Wat wil je: de figuren vervangen, jouw personage
   stileren, of laten staan tot de art-pass?
+
+  **Op 27-07 opnieuw bekeken, dichterbij:** de botsing zit niet in de maat maar
+  in de VERHOUDING. Zo'n figuur heeft een kop die ongeveer even breed is als zijn
+  romp; die van jou is normaal geproportioneerd. Ze staan nu vaak binnen twee
+  meter van elkaar in beeld, en dan is het geen stijl meer maar een fout die je
+  ziet. De maat kloppend maken heeft dat niet opgelost en gaat dat ook niet doen.
 - **Geen wapen in de handen.** Dit is het enige echte van de drie dingen die ik
   eerst meldde. Het schot valt en de munitie loopt (30 → 19, elf schoten gemeten),
   maar er hangt nergens een wapenmesh aan een bot — in de hele module hangt maar
   één ding aan het skelet, en dat is de hoofd-hitbox. Wil je dat ik daar een model
   aan koppel, of wacht dat op de art-pass?
+
+  **Nagekeken op 27-07, en het is concreter dan ik het eerst bracht.** Op het
+  schietmoment is te zien dat het schot ALLEEN door de hulzen leest: er komt geen
+  mondingsvuur, want er is geen loop om het aan te hangen. De vraag "schiet ik nu
+  eigenlijk?" wordt dus beantwoord door drie wegvliegende hulzen en verder niets.
+  Een wapenmesh lost daarmee twee dingen tegelijk op — je ziet wát je vasthoudt,
+  én je ziet dát je vuurt. Zonder mesh heeft mondingsvuur toevoegen geen zin.
 
   *De HUD ontbrak niet: die mount netjes en de teller hoort zichtbaar te zijn. Dat
   hij niet op mijn beelden staat, komt doordat screenshots de UMG-laag niet
