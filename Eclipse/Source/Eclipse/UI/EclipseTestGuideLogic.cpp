@@ -197,6 +197,14 @@ namespace EclipseTestGuide
 				++Count;
 			}
 		}
+		// ZEG WELKE DATUM HIJ GEBRUIKTE. De teller en GetGuideSteps hieronder
+		// filteren op dezelfde manier op dezelfde tabel, en toch liepen ze op
+		// 27-07 twee stappen uiteen (teller 1, lus 3). Dat kan alleen als hun
+		// Since verschilt — en die komt van de schijf, dus hij kan tussen twee
+		// aanroepen verschuiven. Niet meer redeneren: allebei drukken nu af
+		// waarop ze filterden.
+		UE_LOG(LogEclipse, Display, TEXT("Gids: TELLER filtert op '%s' en komt op %d van %d wijzigingen."),
+			*Since, Count, static_cast<int32>(UE_ARRAY_COUNT(GuideChanges)));
 		return Count;
 	}
 
@@ -260,6 +268,13 @@ namespace EclipseTestGuide
 			Step.Expectation = GuideQuestionExpectations[Index];
 		}
 
+		// En de andere kant van dezelfde vraag: waarop filterde de LUS, en hoeveel
+		// stappen leverde dat op. Staan deze twee regels straks met een
+		// verschillende datum in het log, dan is de race bewezen; staan ze met
+		// dezelfde datum en toch verschillende aantallen, dan ligt het aan de
+		// filtering en niet aan de timing. Eén draai beslist het.
+		UE_LOG(LogEclipse, Display, TEXT("Gids: LUS filtert op '%s' en bouwde %d stappen; teller zegt %d."),
+			*Since, Steps.Num(), GetGuideStepCount());
 		return Steps;
 	}
 
