@@ -178,6 +178,22 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	//                                  OpacityScale, exact het recept van de
 	//                                  grondvlakken van de grayboxbouwer
 	//
+	// EN TOEN DE CONTROLEPROEF DIE ALLES OMDRAAIDE. Een magenta blok van 50 cm,
+	// VASTGEMAAKT AAN HET PERSONAGE en neergezet bij BeginPlay, staat groot en
+	// helder in elk frame. Spawnen, materiaal, toon-master en renderen werken dus
+	// gewoon — en dat had ik na twaalf uitsluitingen nog niet vastgesteld.
+	//
+	// Daarna hetzelfde blok als INSLAGSPOOR: zelfde mesh, zelfde materiaal, zelfde
+	// maat, geen levensduur, geen RF_Transient. Onzichtbaar. Ook zonder RF_Transient.
+	// De sporen staan aantoonbaar VOOR de camera (dot-product) op 8,5 m, met
+	// straal 63,7, geregistreerd en zichtbaar.
+	//
+	// HET ENIGE VERSCHIL DAT OVERBLIJFT IS WIE ZE NEERZET: dit component tijdens
+	// het vuren, tegen de game mode bij het starten. Dat is waar de volgende sessie
+	// hoort te beginnen — bijvoorbeeld door hetzelfde spoor vanuit de game mode op
+	// een timer neer te zetten. Niet meer gokken aan materiaal, maat of vorm: die
+	// zijn alle drie uitgesloten door een blok dat WEL verschijnt.
+	//
 	// TWEE VAN DIE UITSLUITINGEN ZIJN ZWAKKER DAN ZE LIJKEN, en dat hoort erbij:
 	// de kanarie-proeven leunden op "inbeeld=1", en dat zegt NIETS over wat er voor
 	// het vlak staat. De eerste kanarie bleek achter een pilaar te vallen; een

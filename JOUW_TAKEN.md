@@ -192,6 +192,28 @@ mogelijkheden:
    hele middag naar de verkeerde pixels gekeken en is elke "hij staat in het kader"
    waardeloos, inclusief de elf uitsluitingen hierboven.
 
+**EN TOEN HEB IK HET UITGEZOCHT — het is nummer 1 niet, en nummer 2 ook niet.**
+
+Ik heb hetzelfde magenta blok **aan je personage vastgemaakt** en bij het starten
+neergezet. Dat staat groot en helder in elk frame. Spawnen, materiaal, toon-master
+en renderen werken dus gewoon, en mijn projectie klopt ook: de sporen melden zich
+netjes als *vóór* de camera op 8,5 m.
+
+Daarna heb ik het inslagspoor **identiek gemaakt aan dat werkende blok** — zelfde
+mesh, zelfde materiaal, zelfde maat, geen levensduur, geen transient-vlag.
+**Onzichtbaar.** Op 90 cm ook. Zonder de transient-vlag ook.
+
+**Er blijft precies één verschil over: wie het neerzet.** De blokken die verschijnen
+worden door de game mode bij het starten neergezet; de sporen door het wapencomponent
+tijdens het vuren. Alles daarbuiten — maat, vorm, materiaal, masker, plaats,
+levensduur, dikte, kleur, oriëntatie — is uitgesloten door een blok dat wél verschijnt.
+
+**Dat is een scherpe vraag in plaats van een mysterie**, en de volgende stap is één
+proef: hetzelfde spoor vanuit de game mode op een timer neerzetten. Verschijnt hij
+dan, dan ligt het aan de spawncontext van het component en niet aan het spoor.
+
+*(hieronder stond mijn eerdere, nog onopgeloste versie)*
+
 **Ik weet niet welke van de twee het is, en dat is precies waarom dit hier staat.**
 Wat ik wel weet: één van mijn twee meetgereedschappen deugt niet, en alles wat ik
 vandaag over dit onderwerp heb opgeschreven staat op één van die twee. De editor

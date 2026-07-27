@@ -903,9 +903,19 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 					}
 					FVector2D Scherm;
 					const bool bInBeeld = Controller->ProjectWorldLocationToScreen(SpoorIt->GetActorLocation(), Scherm);
-					Waar += FString::Printf(TEXT(" [scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f]"),
-						Scherm.X, Scherm.Y, bInBeeld ? 1 : 0,
-						FVector::Dist(SpoorIt->GetActorLocation(), CameraLocation));
+					// VOOR OF ACHTER DE CAMERA — de vraag die ik nooit heb gesteld, en
+					// die alles kan verklaren. ProjectWorldLocationToScreen geeft ook
+					// coordinaten voor dingen ACHTER je; "inbeeld=1" is daar
+					// betekenisloos. Een blok boven het personage bewees vandaag dat
+					// spawnen en renderen prima werken, dus de sporen BESTAAN — de
+					// vraag is of de camera er op het opnamemoment nog naar kijkt. Het
+					// personage loopt in dat interval ruim twee meter door en de
+					// inslagen blijven liggen waar hij schoot.
+					const FVector NaarSpoor = SpoorIt->GetActorLocation() - CameraLocation;
+					const float Voor = FVector::DotProduct(NaarSpoor.GetSafeNormal(), CameraRotation.Vector());
+					Waar += FString::Printf(TEXT(" [scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f %s]"),
+						Scherm.X, Scherm.Y, bInBeeld ? 1 : 0, NaarSpoor.Size(),
+						Voor > 0.0f ? TEXT("VOOR") : TEXT("ACHTER"));
 				}
 				UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SPOREN] %d levend%s"),
 					ShotIndex, Levend, *Waar);
