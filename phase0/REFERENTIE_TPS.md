@@ -487,8 +487,20 @@ afwezigheid als bewijs wordt gebruikt.
 - Geen enkel getal uit Borderlands, Gears, The Division of Destiny. De mechanismen
   zijn beschreven, de getallen niet — die zijn niet gepubliceerd en ik verzin ze
   niet.
-- De verdenking dat de HUD-widget niet gemonteerd is, is een HYPOTHESE uit
-  codelezing. Niet gemeten.
-- Dat de camera-lag de oorzaak is van "alles beweegt als ik mik" is een redenering
-  uit de code (lag staat aan, kruis staat schermvast), niet uit een meting op een
-  frame. Het is de eerste hypothese, niet de conclusie.
+- ~~De verdenking dat de HUD-widget niet gemonteerd is~~ — **WEERLEGD (27-07).**
+  In het log van de owner-sessie staat `Mission mode: debug HUD mounted`, en de
+  ronde duwt inmiddels een echte toetsaanslag door de invoerketen: `toets 'G' kwam
+  aan (HUD staat, actie uitgevoerd)` gevolgd door `F3 testgids open=1 regels=13`.
+  De widget is er en de keten werkt. Dit hoort niet meer als open verdenking te
+  staan.
+- Dat de camera-lag de oorzaak is van "alles beweegt als ik mik" blijft een
+  **redenering uit de code**, niet een meting op een frame. De lag gaat nu uit bij
+  ADS (`d0aaf04`), maar of dat het gevoel oplost is `[uit code, niet visueel
+  bevestigd]` tot de owner het speelt. Wat er wél op een frame is vastgesteld, is
+  een ANDER mik-probleem dat hierbij aan het licht kwam: het personage viel onder
+  de onderrand (y=763 op 720), en dat is gerepareerd en gemeten.
+- **Het richtkruis** bestaat en wordt getekend volgens het zelfrapport
+  (`zichtbaarheid=3 tekst='+'`), maar staat op **geen enkele opname** — vier
+  opnamemethodes vangen de UMG-laag niet. Dat is een gat in de verificatielaag en
+  niet in het kruis, en het blijft `[uit code, niet visueel bevestigd]` tot de
+  owner-schermopname het bevestigt.
