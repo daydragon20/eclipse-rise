@@ -29,6 +29,14 @@ en nul echte waarschuwingen**. Gisteren stonden daar een CommonUI-error over
 invoerroutering en twee geluiden die niet bestaan. Dat pad had ik nooit eerder
 gedraaid, en het leverde twee van de vijf bugs van vannacht op.
 
+**Opnieuw gedraaid op `161cb92`,** want ik heb daarna nog aan de player-controller
+en de strategielaag gezeten en dat draait allebei in jouw pad. Nul Eclipse-errors,
+nul waarschuwingen, nul degradaties — en het bewijs dat hij echt starttte in
+plaats van stilletjes af te breken: missie `MT_M11` begonnen op TransitCheckpoint
+met 3 squadleden en 4 vijanden, gids open met 13 stappen, munitieteller zichtbaar
+op `AR_Foundry 30 / 30`, navmesh onder de speler JA. Zes geluidsbanken geladen
+(7 · 9 · 7 · 7 · 8 · 5 varianten).
+
 ---
 
 ## MORGENRAPPORT
