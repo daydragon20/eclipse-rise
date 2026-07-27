@@ -377,6 +377,37 @@ void UEclipseMissionHudWidget::NativeConstruct()
 				UE_LOG(LogEclipse, Display, TEXT("UI:   H playtest    open=%d  regels=%d"),
 					bPlaytestVisible ? 1 : 0, PlaytestRows.Num());
 				UE_LOG(LogEclipse, Display, TEXT("UI:   R3-verdict    regels=%d"), GauntletRows.Num());
+
+				// EN OORDELEN WAAR HET KAN. Een dump die je moet lezen is beter dan
+				// niets, maar hij vangt alleen wat iemand toevallig naleest. Deze
+				// drie gevallen zijn voor de speler kapot en horen dus op te vallen
+				// zonder dat er iemand kijkt.
+				const APawn* ReportBody = GetOwningPlayerPawn();
+				const UEclipseHitscanWeaponComponent* ReportWeapon = ReportBody != nullptr
+					? ReportBody->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
+
+				if (!IsInViewport())
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — de missie-HUD hangt niet in de viewport; de speler ziet niets van dit alles."));
+				}
+				// Een wapen met een magazijn en een onzichtbare teller: dan schiet
+				// je zonder te weten hoeveel je nog hebt.
+				if (ReportWeapon != nullptr && ReportWeapon->GetMagazineSize() > 0
+					&& AmmoReadout != nullptr && AmmoReadout->GetVisibility() == ESlateVisibility::Hidden)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — er is een wapen met een magazijn van %d, maar de munitieteller staat verborgen."),
+						ReportWeapon->GetMagazineSize());
+				}
+				// Open zonder regels is voor de speler niet te onderscheiden van
+				// dicht — en dat is precies waarom het apart gemeld hoort te worden.
+				if (bGuideVisible && GuideRows.Num() == 0)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — de testgids staat open maar heeft nul regels; dat ziet er leeg uit terwijl hij aan staat."));
+				}
+				if (bPlaytestVisible && PlaytestRows.Num() == 0)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — het playtest-paneel staat open maar heeft nul regels."));
+				}
 			}),
 			ECVF_Default);
 	}

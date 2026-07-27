@@ -113,7 +113,10 @@ if (-not $SkipShots) {
     # De ronde oordeelt nu ook zelf waar dat kan: wordt de speler getekend, vult
     # hij een echt stuk beeld, staat hij in het frame. Die controles meten in
     # SCHERMruimte, en dat is precies het verschil dat de suite niet kan zien.
-    $Wrong = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "PLAYSHOT \d+ FOUT\]"
+    # Ook de UI-dump kan fouten melden. Die staan niet in het PLAYSHOT-formaat
+    # omdat ze uit de HUD zelf komen, en een scan die alleen het ene patroon kent
+    # zou ze stil laten passeren.
+    $Wrong = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "PLAYSHOT \d+ FOUT\]|UI: FOUT"
     if ($Wrong) {
         Write-Host ""
         Write-Host "DE OPNAMERONDE VOND FOUTEN:"
