@@ -37,6 +37,7 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierDowned, "Event.Squad.SoldierDowned", "A squadmate went down in mission; resolution to dead/wounded happens at debrief (SPEC-P1-06/07).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierStabilized, "Event.Squad.SoldierStabilized", "A downed squadmate was stabilized inside the data-driven window - the Medic save that turns permadeath into a wound (SPEC-P2-01, GDD 4.2.5).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_ClassAbilityUsed, "Event.Squad.ClassAbilityUsed", "A class signature verb fired (Stabilize/Momentum/Killzone); payload names the verb tag (SPEC-P2-01, GDD 4.2.3).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SelfAction, "Event.Squad.SelfAction", "Een soldaat doet uit zichzelf iets dat de speler raakt: vuur openen, dekking zoeken, herladen. Reason zegt welk van de drie (GDD 9.5 verbale transparantie).")
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeEntered, "Event.Command.ModeEntered", "Command Mode hold began; payload carries the applied dilation (SPEC-P2-02). Audio ducks/filters on this (SPEC-P2-09); UI is a consumer, never the emitter.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeExited, "Event.Command.ModeExited", "Command Mode ended (release or fail-safe); payload carries HeldSeconds + OrdersIssuedWhileHeld — the R3 feel-gauntlet telemetry (SPEC-P2-02).")

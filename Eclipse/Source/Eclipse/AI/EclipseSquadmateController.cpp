@@ -406,6 +406,7 @@ void AEclipseSquadmateController::UpdateEngagement()
 		UE_LOG(LogEclipse, Display,
 			TEXT("[SQUAD Contact] %s opent op eigen initiatief het vuur (%s) — dat verraadt de groep."),
 			*GetName(), *Target->GetName());
+		NoteSelfAction(TEXT("Contact"));
 	}
 	AutoTarget = Target;
 	if (bKillzoneEngaged)
@@ -519,6 +520,7 @@ void AEclipseSquadmateController::HandleHitTaken(AEclipseCharacter* Shooter, flo
 	if (MoveToLocation(CoverPoint, /*AcceptanceRadius*/ 80.0f) == EPathFollowingRequestResult::RequestSuccessful)
 	{
 		++CoverRuns;
+		NoteSelfAction(TEXT("TakingFire"));
 	}
 }
 
@@ -539,6 +541,33 @@ void AEclipseSquadmateController::NoteVerbUsed()
 	FEclipseSquadEventPayload Ability;
 	Ability.AbilityVerb = ClassKit.SignatureVerb;
 	Bus->Broadcast(EclipseTags::Event_Squad_ClassAbilityUsed, FInstancedStruct::Make(Ability));
+}
+
+void AEclipseSquadmateController::NoteSelfAction(FName Reason)
+{
+	// HIJ DEED HET ZONDER DAT JE HET VROEG, en dan hoort hij het te zeggen.
+	//
+	// Owner 27-07: "je squad handelt sinds gisteravond zelfstandig en zegt er niets
+	// bij." Dit is de bron van die stem: één feit met de reden erin, en de audiolaag
+	// beslist wat er klinkt. Zo hoeft deze controller niets van stemmen te weten en
+	// staat de rem (2 s per soldaat) op één plek, samen met die van de
+	// order-antwoorden — anders praten vier man door elkaar zodra het losbarst.
+	UGameInstance* GameInstance = GetWorld() != nullptr ? GetWorld()->GetGameInstance() : nullptr;
+	UEclipseEventBusSubsystem* Bus = GameInstance != nullptr
+		? GameInstance->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr;
+	if (Bus == nullptr)
+	{
+		return;
+	}
+	FEclipseSquadEventPayload Self;
+	// De identiteit hangt aan het LICHAAM en niet aan deze controller — dezelfde
+	// bron die de audiolaag gebruikt om de rem per soldaat bij te houden.
+	if (const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
+	{
+		Self.SoldierId = Body->GetSoldierId();
+	}
+	Self.Reason = Reason;
+	Bus->Broadcast(EclipseTags::Event_Squad_SelfAction, FInstancedStruct::Make(Self));
 }
 
 void AEclipseSquadmateController::HandlePawnDowned()

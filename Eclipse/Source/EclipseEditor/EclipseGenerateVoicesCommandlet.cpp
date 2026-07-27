@@ -128,8 +128,47 @@ namespace
 	 * GeneratedAudio assignments and tuned settings), so the seed never touches it —
 	 * re-running the commandlet is always safe.
 	 */
+	/**
+	 * Vult een bestaand stemasset aan met seed-regels die het nog niet heeft.
+	 * Nooit overschrijven, nooit verwijderen — zie de aanroep hierboven.
+	 */
+	void AppendMissingLines(const FString& PackageName, const FEclipseVoiceSeedEntry& Entry, int32& NumAppended)
+	{
+		UEclipseCharacterVoiceData* Voice = LoadObject<UEclipseCharacterVoiceData>(
+			nullptr, *FString::Printf(TEXT("%s.%s"), *PackageName, *FPackageName::GetShortName(PackageName)));
+		if (Voice == nullptr)
+		{
+			return;
+		}
+		int32 Added = 0;
+		for (const FEclipseVoiceSeedLine& SeedLine : Entry.Lines)
+		{
+			const bool bHas = Voice->Lines.ContainsByPredicate(
+				[&SeedLine](const FEclipseDialogueLine& L) { return L.LineId == SeedLine.LineId; });
+			if (bHas)
+			{
+				continue;
+			}
+			FEclipseDialogueLine Line;
+			Line.LineId = SeedLine.LineId;
+			Line.CharacterId = Entry.CharacterId;
+			Line.Text = SeedLine.Text;
+			Line.Emotion = SeedLine.Emotion;
+			Voice->Lines.Add(MoveTemp(Line));
+			++Added;
+		}
+		if (Added > 0 && SaveVoiceAsset(*Voice))
+		{
+			NumAppended += Added;
+			UE_LOG(LogEclipseEditor, Display,
+				TEXT("GenerateVoices: %s kreeg %d nieuwe regel(s) uit de seed; bestaande regels ongemoeid."),
+				*PackageName, Added);
+		}
+	}
+
 	int32 SeedVoiceAssets(const FString& SeedFilePath)
 	{
+		int32 NumAppended = 0;
 		FString JsonText;
 		if (!FFileHelper::LoadFileToString(JsonText, *SeedFilePath))
 		{
@@ -155,7 +194,23 @@ namespace
 			const FString PackageName = FString::Printf(TEXT("%s/%s"), GVoiceIdentityAssetPath, *ObjectTools::SanitizeObjectName(Entry.AssetName));
 			if (FPackageName::DoesPackageExist(PackageName))
 			{
-				continue; // live asset wins — the seed only bootstraps
+				// LEVEND ASSET WINT NOG STEEDS, MAAR ONTBREKENDE REGELS WORDEN
+				// AANGEVULD — en dat gat kostte de owner vandaag bijna zijn feature.
+				//
+				// Create-only betekende dat nieuwe zinnen in de seed NOOIT bij een
+				// bestaand stemasset aankwamen. De owner keurde drie zinnen per stem
+				// goed ("Contact." / "Taking fire!" / "Reloading!") en die hadden
+				// zonder dit nergens kunnen landen: het asset bestaat al sinds de
+				// eerste generatie.
+				//
+				// AANVULLEN IS NIET OVERSCHRIJVEN, en dat verschil is het hele punt:
+				// bestaande regels blijven ongemoeid, inclusief hun getunede settings
+				// en hun toegewezen GeneratedAudio. Alleen een lineId die er nog niet
+				// is, komt erbij. Verwijderen doet de seed nooit — een regel die uit
+				// de seed verdwijnt kan al ingesproken zijn, en betaalde audio gooi je
+				// niet weg omdat een JSON-bestand veranderde.
+				AppendMissingLines(PackageName, Entry, NumAppended);
+				continue;
 			}
 
 			UPackage* Package = CreatePackage(*PackageName);

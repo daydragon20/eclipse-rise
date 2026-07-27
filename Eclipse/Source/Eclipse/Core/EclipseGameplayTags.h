@@ -48,6 +48,18 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SoldierStabilized)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_ClassAbilityUsed)
 
+	/**
+	 * Een soldaat doet uit zichzelf iets dat de speler RAAKT: vuur openen, dekking
+	 * zoeken onder vuur, herladen. Reason draagt welk van de drie ("Contact",
+	 * "TakingFire", "Reloading").
+	 *
+	 * Waarom een EIGEN tag en niet OrderAcknowledged: die betekent "ik heb jouw
+	 * order gehoord", en dit is het tegenovergestelde — hij deed het zonder dat je
+	 * het vroeg. De owner vroeg er stemmen bij omdat zijn squad sinds de
+	 * autonomie-laag zelfstandig handelt en er niets bij zegt.
+	 */
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SelfAction)
+
 	// Command Mode lifecycle (SPEC-P2-02)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeEntered)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeExited)

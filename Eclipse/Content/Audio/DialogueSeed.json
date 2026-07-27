@@ -1,76 +1,106 @@
 {
-  "_readme": [
-    "ECLIPSE dialogue-database seed (GDD 16.12). -run=EclipseGenerateVoices materialises",
-    "each entry below into a UEclipseCharacterVoiceData asset under /Game/Audio the first",
-    "time it runs; existing assets are NEVER overwritten (the asset is the live copy,",
-    "this file only bootstraps). Voice ids are ElevenLabs premade voices — swap them in",
-    "data whenever the account's voice library settles (16.15 rule 4 applies from then).",
-    "Phase 1 scope: generic squad bark voices only (SPEC-P1-06 debug barks made audible);",
-    "canon companions (Mara, Dex, ...) get their own entries in Phase 2."
-  ],
-  "voices": [
+ "_readme": [
+  "ECLIPSE dialogue-database seed (GDD 16.12). -run=EclipseGenerateVoices materialises",
+  "each entry below into a UEclipseCharacterVoiceData asset under /Game/Audio the first",
+  "time it runs; existing assets are NEVER overwritten (the asset is the live copy,",
+  "this file only bootstraps). Voice ids are ElevenLabs premade voices — swap them in",
+  "data whenever the account's voice library settles (16.15 rule 4 applies from then).",
+  "Phase 1 scope: generic squad bark voices only (SPEC-P1-06 debug barks made audible);",
+  "canon companions (Mara, Dex, ...) get their own entries in Phase 2."
+ ],
+ "voices": [
+  {
+   "assetName": "DA_Voice_SquadA",
+   "characterId": "Squad.VoiceA",
+   "displayName": "Squad Voice A",
+   "elevenLabsVoiceId": "TxGEqnHWrfWFTfGW9XjX",
+   "modelId": "eleven_multilingual_v2",
+   "lines": [
     {
-      "assetName": "DA_Voice_SquadA",
-      "characterId": "Squad.VoiceA",
-      "displayName": "Squad Voice A",
-      "elevenLabsVoiceId": "TxGEqnHWrfWFTfGW9XjX",
-      "modelId": "eleven_multilingual_v2",
-      "lines": [
-        {
-          "lineId": "Bark_Ack_Move_A",
-          "emotion": "Confident",
-          "text": "Copy. Moving up."
-        },
-        {
-          "lineId": "Bark_Ack_Hold_A",
-          "emotion": "Calm",
-          "text": "Holding position."
-        },
-        {
-          "lineId": "Bark_Refuse_NoRoute_A",
-          "emotion": "Urgent",
-          "text": "Negative, I can't find a route."
-        },
-        {
-          "lineId": "Bark_Ack_Focus_A",
-          "emotion": "Confident",
-          "text": "Eyes on. Engaging."
-        }
-      ]
+     "lineId": "Bark_Ack_Move_A",
+     "emotion": "Confident",
+     "text": "Copy. Moving up."
     },
     {
-      "assetName": "DA_Voice_SquadB",
-      "characterId": "Squad.VoiceB",
-      "displayName": "Squad Voice B",
-      "elevenLabsVoiceId": "21m00Tcm4TlvDq8ikWAM",
-      "modelId": "eleven_multilingual_v2",
-      "lines": [
-        {
-          "lineId": "Bark_Ack_Move_B",
-          "emotion": "Confident",
-          "text": "On my way."
-        },
-        {
-          "lineId": "Bark_Ack_Regroup_B",
-          "emotion": "Calm",
-          "text": "Falling back to you."
-        },
-        {
-          "lineId": "Bark_Refuse_NoShot_B",
-          "emotion": "Urgent",
-          "text": "No shot from here."
-        },
-        {
-          "lineId": "Bark_Down_B",
-          "emotion": "Sad",
-          "text": "I'm hit. Someone patch me up."
-        },
-        {
-          "lineId": "Bark_Refuse_InvalidTarget_B",
-          "emotion": "Urgent",
-          "text": "That's not a target."
-        }
-      ]
+     "lineId": "Bark_Ack_Hold_A",
+     "emotion": "Calm",
+     "text": "Holding position."
+    },
+    {
+     "lineId": "Bark_Refuse_NoRoute_A",
+     "emotion": "Urgent",
+     "text": "Negative, I can't find a route."
+    },
+    {
+     "lineId": "Bark_Ack_Focus_A",
+     "emotion": "Confident",
+     "text": "Eyes on. Engaging."
+    },
+    {
+     "lineId": "Bark_Contact_A",
+     "emotion": "Confident",
+     "text": "Contact."
+    },
+    {
+     "lineId": "Bark_TakingFire_A",
+     "emotion": "Urgent",
+     "text": "Taking fire!"
+    },
+    {
+     "lineId": "Bark_Reloading_A",
+     "emotion": "Calm",
+     "text": "Reloading!"
     }
-  ]
+   ]
+  },
+  {
+   "assetName": "DA_Voice_SquadB",
+   "characterId": "Squad.VoiceB",
+   "displayName": "Squad Voice B",
+   "elevenLabsVoiceId": "21m00Tcm4TlvDq8ikWAM",
+   "modelId": "eleven_multilingual_v2",
+   "lines": [
+    {
+     "lineId": "Bark_Ack_Move_B",
+     "emotion": "Confident",
+     "text": "On my way."
+    },
+    {
+     "lineId": "Bark_Ack_Regroup_B",
+     "emotion": "Calm",
+     "text": "Falling back to you."
+    },
+    {
+     "lineId": "Bark_Refuse_NoShot_B",
+     "emotion": "Urgent",
+     "text": "No shot from here."
+    },
+    {
+     "lineId": "Bark_Down_B",
+     "emotion": "Sad",
+     "text": "I'm hit. Someone patch me up."
+    },
+    {
+     "lineId": "Bark_Refuse_InvalidTarget_B",
+     "emotion": "Urgent",
+     "text": "That's not a target."
+    },
+    {
+     "lineId": "Bark_Contact_B",
+     "emotion": "Confident",
+     "text": "Contact."
+    },
+    {
+     "lineId": "Bark_TakingFire_B",
+     "emotion": "Urgent",
+     "text": "Taking fire!"
+    },
+    {
+     "lineId": "Bark_Reloading_B",
+     "emotion": "Calm",
+     "text": "Reloading!"
+    }
+   ]
+  }
+ ]
 }

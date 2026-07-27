@@ -171,6 +171,7 @@ private:
 	FEclipseEventSubscriptionHandle MissionCompletedHandle;
 	FEclipseEventSubscriptionHandle OrderAckHandle;
 	FEclipseEventSubscriptionHandle OrderRefusedHandle;
+	FEclipseEventSubscriptionHandle SelfActionHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
 	FEclipseEventSubscriptionHandle HitLandedHandle;
 

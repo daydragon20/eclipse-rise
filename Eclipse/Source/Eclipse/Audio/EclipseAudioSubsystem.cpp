@@ -232,6 +232,13 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		EclipseTags::Event_Squad_OrderRefused,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnOrderAnswered),
 		FEclipseSquadEventPayload::StaticStruct());
+	// En wat hij UIT ZICHZELF doet — dezelfde handler, dus automatisch dezelfde rem
+	// per soldaat. Owner 27-07: zijn squad handelt sinds de autonomie-laag
+	// zelfstandig en zei er niets bij.
+	SelfActionHandle = Bus.Subscribe(
+		EclipseTags::Event_Squad_SelfAction,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnOrderAnswered),
+		FEclipseSquadEventPayload::StaticStruct());
 
 	// De twee gevechtscues NU laden en niet bij het eerste schot (26-07).
 	//
@@ -305,6 +312,7 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 		Bus->Unsubscribe(MissionCompletedHandle);
 		Bus->Unsubscribe(OrderAckHandle);
 		Bus->Unsubscribe(OrderRefusedHandle);
+		Bus->Unsubscribe(SelfActionHandle);
 		Bus->Unsubscribe(ShotFiredHandle);
 		Bus->Unsubscribe(HitLandedHandle);
 		Bus->Unsubscribe(WorldImpactHandle);
@@ -769,9 +777,36 @@ void UEclipseAudioSubsystem::OnOrderAnswered(FGameplayTag EventTag, const FInsta
 	};
 
 	const bool bRefused = EventTag == EclipseTags::Event_Squad_OrderRefused;
+	const bool bSelfAction = EventTag == EclipseTags::Event_Squad_SelfAction;
 	FString LineText;
 	EEclipseVoiceEmotion Emotion = EEclipseVoiceEmotion::Calm;
-	if (bRefused)
+	if (bSelfAction)
+	{
+		// WAT HIJ UIT ZICHZELF DOET — owner 27-07, en de reden dat deze drie zinnen
+		// bestaan: "ze handelen sinds gisteravond zelfstandig en zeggen er niets bij."
+		//
+		// Dezelfde weg als de order-antwoorden, dus ook dezelfde rem van 2 s per
+		// soldaat. Dat is geen detail: bij een vuurgevecht vallen deze drie momenten
+		// vaak tegelijk (hij ziet contact, hij krijgt vuur, hij herlaadt), en zonder
+		// rem antwoorden vier man door elkaar.
+		const FString Wat = ShortName(Squad->Reason);
+		if (Wat == TEXT("Contact"))
+		{
+			LineText = TEXT("Contact.");
+			Emotion = EEclipseVoiceEmotion::Confident;
+		}
+		else if (Wat == TEXT("TakingFire"))
+		{
+			LineText = TEXT("Taking fire!");
+			Emotion = EEclipseVoiceEmotion::Urgent;
+		}
+		else if (Wat == TEXT("Reloading"))
+		{
+			LineText = TEXT("Reloading!");
+			Emotion = EEclipseVoiceEmotion::Calm;
+		}
+	}
+	else if (bRefused)
 	{
 		const FString Reason = ShortName(Squad->Reason);
 		if (Reason == TEXT("NoRoute"))

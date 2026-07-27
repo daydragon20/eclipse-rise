@@ -194,6 +194,9 @@ private:
 	int32 VerbUses = 0;
 	void NoteVerbUsed();
 
+	/** Een zelfstandige handeling die de speler raakt: "Contact", "TakingFire", "Reloading". */
+	void NoteSelfAction(FName Reason);
+
 	/** Killzone raakte dit doelwit alleen dankzij zijn laanbereik (mutable: gezet in een const zoeker). */
 	mutable bool bKillzoneEngaged = false;
 	void ContinueAutoFire();
