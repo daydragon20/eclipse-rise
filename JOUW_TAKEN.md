@@ -44,7 +44,25 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
 1. **Speel na een verse build en druk G.** Dat sluit punt 6 én bevestigt of je het
    richtkruis ziet. Werkt G niet, dan ligt het aan je toetsenbord — en dat weten we
    dan ook, want de keten is gemeten.
-2. **Punt 5: welke kleur krijgt het wapen?** Een eigen tint op slot 4 maakt het
+2. **Punt 5 — GUNMETAL KAN, hier is de meting die je voorwaardelijk vroeg.**
+   Gemeten op de mik-opname (`HighresScreenshot00980`), helderheid op 0–255:
+
+   | | |
+   |---|---|
+   | lichaam, mediaan | **50,9** (10% op 43,3 · 90% op 57,6) |
+   | asfalt eronder | 58,0 |
+   | donkerste 5% van het frame | onder **11,1** |
+
+   Het lichaam is donker (20% van wit) maar er zit ruim marge onder. Twee gebankte
+   waardestappen van het district (×0,72) brengen 51 naar **≈26** — duidelijk
+   onder het lichaam, en nog steeds ruim boven de donkerste 5% waar het in de
+   schaduw zou verdwijnen. Jouw instructie is dus uitvoerbaar zonder
+   kleuruitzondering; ik kom niet terug met een verzoek maar met een frame.
+
+   *Kanttekening: dit is één frame van een schemerdistrict. Op een lichtere scène
+   ligt het lichaam hoger en wordt de marge alleen maar groter, niet kleiner.*
+
+3. **~~Punt 5: welke kleur krijgt het wapen?~~ (beantwoord — zie hierboven)** Een eigen tint op slot 4 maakt het
    meteen leesbaar in silhouet. Maar wélke kleur raakt de ÉÉN-STIJL-WET en de
    waardehiërarchie die in het district al vastligt (Cover > CoverB > DecoLine).
    Dat is art-directie en dus jouw oordeel, niet iets wat ik 's nachts invul.
