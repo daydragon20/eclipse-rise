@@ -62,6 +62,23 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
    *Kanttekening: dit is één frame van een schemerdistrict. Op een lichtere scène
    ligt het lichaam hoger en wordt de marge alleen maar groter, niet kleiner.*
 
+   **GELAND (`776ffa9`) — het frame is `HighresScreenshot00988`, en het oordeel is
+   aan jou.** Slot herkend op naam (`M_Belica_Guns`), twee gebankte waardestappen,
+   85% ontzadigd richting de eigen luminantie zodat er geen nieuwe hue bijkomt.
+
+   **Maar ik heb GEEN betrouwbaar getal bij dat frame, en dat zeg ik erbij.** Twee
+   pogingen om het wapen te meten zijn allebei mislukt:
+   - een handmatig meetvenster pakte de betonnen pilaar mee (gaf 54,1 tegen 44,4 —
+     *lichter*, wat het op het frame duidelijk niet is);
+   - het verschil tussen het vorige en het nieuwe frame nemen pakte 5,59% van het
+     hele beeld (`x 0..1278, y 0..719`), want de ronde is vanaf stap 3 niet
+     bit-reproduceerbaar en ik meet dan scèneruis mee.
+
+   Dat er 0,69 uit die tweede rolt — dicht bij de beoogde 0,52 — is dus **geen
+   bevestiging**. Het staat hier zodat niemand het later als bewijs oppakt.
+   Wil je een hard getal naast je oordeel, dan is de weg een isolatie-opname zoals
+   opname 5 (alleen het wapenslot zichtbaar); dat is een build en die staat klaar.
+
 3. **~~Punt 5: welke kleur krijgt het wapen?~~ (beantwoord — zie hierboven)** Een eigen tint op slot 4 maakt het
    meteen leesbaar in silhouet. Maar wélke kleur raakt de ÉÉN-STIJL-WET en de
    waardehiërarchie die in het district al vastligt (Cover > CoverB > DecoLine).
