@@ -553,6 +553,67 @@ speelde hij oude code en kán het kruis er niet zijn.
 
 ---
 
+## 6. SCHIETEN EN BEWEGEN — Fortnite/Borderlands als maatstaf (owner, 27-07)
+
+*Owner-opdracht: "bouw alle schietanimaties en movements en alles van fortnite,
+baseer je daarop of borderlands, en ga daar niet vanaf totdat het klaar is."*
+
+### REFERENTIE
+
+Het mechanisme dat beide spellen delen, en dat is waarneembaar zonder één getal uit
+die spellen over te nemen:
+
+1. **Schieten en herladen zijn een BOVENLICHAAMSLAAG.** Je benen lopen door terwijl
+   je armen vuren of herladen. In Fortnite ren je met een geheven wapen; in
+   Borderlands blijf je op volle snelheid schieten. De vuurbeweging vervangt je
+   gangpose nooit.
+2. **Terugslag is ADDITIEF en klein.** Het is een schokje bovenop de houding, geen
+   eigen pose. Daarom stapelt automatisch vuur tot een trilling van het wapen en
+   niet van het lichaam.
+3. **Het onderlichaam kent één blend-ruimte** (stilstand → wandelen → rennen ×
+   acht richtingen) en die wordt door niets anders overschreven.
+4. **De bovenkant volgt je vizier via een aim-offset**, niet door het hele lichaam
+   te draaien.
+
+### WIJ NU — GEMETEN 27-07, dit zijn de takes die echt draaien
+
+| pose | take | lengte | aard |
+|---|---|---|---|
+| schieten | `Primary_Fire_Med` | 1,00 s | **VOLLEDIGE POSE** |
+| herladen | `Reload_Rifle_Hip` | 2,17 s | **VOLLEDIGE POSE** |
+| draaien | `Idle_Turn_90_Left` | 3,00 s | **VOLLEDIGE POSE** |
+
+De blender behandelt de twee soorten tegengesteld, en dat staat in
+`EclipseAnimInstance.cpp`: een additieve take komt als laag bovenop de gangpose
+(regel 478), een volledige take VERVANGT hem naar rato van zijn gewicht
+(`Sample.Weight *= 1.0f - OneShotWeight`, regel 436).
+
+**Alle drie onze eenmalige poses zijn volledig.** Bij 6,7 schoten per seconde
+springt het hele lichaam dus 6,7 keer per seconde tussen looppose en schietpose.
+Dat is gemeten: 27 richtingsomkeringen van de rechterhand in een vuurinterval,
+tegen hoogstens 2 in elk ander interval.
+
+### KEUZE OF GAT
+
+- **Punt 1 is het GAT en het is code, geen content.** De takes hoeven niet
+  vervangen te worden: ze moeten op het BOVENLICHAAM gelegd worden in plaats van
+  op het hele lijf. Dat is een per-bot-blend in de bestaande blender, geen nieuw
+  systeem en geen nieuwe asset.
+- **Punt 2 vraagt wél content:** een additieve terugslagtake bestaat niet in dit
+  project. Zolang die er niet is, is een korte bovenlichaamspose de beste
+  benadering.
+- **Punt 3 is er al** — de acht richtingen bestaan als slots; vijf lichamen missen
+  hun zijcycli, en dat staat al als assetwerk op de owner-lijst.
+- **Punt 4 ontbreekt volledig.** Wij draaien het HELE lichaam naar de camera bij
+  het mikken; een aim-offset bestaat niet. Dat vraagt een aim-offset-asset per
+  lichaam en is dus content.
+
+**Bouwvolgorde die hieruit volgt:** eerst 1 (code, raakt schieten én herladen én
+het trillen in één keer), dan 3 (assets die al op de lijst staan), dan 2 en 4
+(content).
+
+---
+
 ## Wat dit document voor de bouwvolgorde betekent
 
 De owner-volgorde blijft leidend. Wat de referentie eraan toevoegt:

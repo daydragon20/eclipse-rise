@@ -273,6 +273,9 @@ private:
 	 */
 	TSet<FString> WarnedMissingPoses;
 
+	/** Welke posesoorten hun aard al gemeld hebben (additief of volledig). */
+	TSet<FString> LoggedPoseKinds;
+
 	/** Is dit lichaam ooit aangekleed? Een kale capsule mist zijn poses met reden. */
 	bool bBodyDefApplied = false;
 

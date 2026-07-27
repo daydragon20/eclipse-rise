@@ -239,6 +239,27 @@ void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, flo
 		}
 		return;
 	}
+	// ADDITIEF OF NIET — dit is het verschil tussen de Fortnite/Borderlands-manier en
+	// wat wij doen, en het staat nergens hardop.
+	//
+	// De blender hieronder behandelt de twee tegengesteld: een ADDITIEVE take komt
+	// als laag BOVENOP de gangpose (je blijft lopen terwijl je schiet), een
+	// volledige take VERVANGT de gangpose naar rato van zijn gewicht. Bij 6,7
+	// schoten per seconde betekent dat laatste dat je hele lichaam 6,7 keer per
+	// seconde tussen looppose en schietpose heen en weer springt - en dat is precies
+	// de "trilling" die de owner meldt.
+	//
+	// Eén regel per lichaam en per pose, niet per aanroep: dit is een eigenschap van
+	// de take, geen gebeurtenis.
+	if (Clip != nullptr && !LoggedPoseKinds.Contains(PoseName))
+	{
+		LoggedPoseKinds.Add(PoseName);
+		UE_LOG(LogEclipse, Display, TEXT("Pose '%s' van %s: %s (%s, %.2f s)"),
+			PoseName, *GetName(), *Clip->GetName(),
+			Clip->IsValidAdditive() ? TEXT("ADDITIEF — laag bovenop het lopen")
+									: TEXT("VOLLEDIGE POSE — vervangt het lopen"),
+			Clip->GetPlayLength());
+	}
 	if (UEclipseAnimInstance* Anim = Cast<UEclipseAnimInstance>(GetMesh() != nullptr ? GetMesh()->GetAnimInstance() : nullptr))
 	{
 		Anim->PlayOneShotPose(Clip, Duration, PeakWeight);
