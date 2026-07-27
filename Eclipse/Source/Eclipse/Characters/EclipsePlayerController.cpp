@@ -4,6 +4,8 @@
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Characters/EclipseCommandModeComponent.h"
+#include "CommonInputSubsystem.h"
+#include "CommonInputTypeEnum.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
@@ -360,6 +362,42 @@ void AEclipsePlayerController::EnterBaseMode()
 	FInputModeUIOnly Mode;
 	Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(Mode);
+
+	// bShowMouseCursor IS NIET GENOEG ALS JE MET EEN CONTROLLER SPEELT.
+	//
+	// Owner-blokkade 27-07: "ik ga dood, de hub verschijnt, en er is geen muis."
+	// De aanname was dat deze overgang bij een dood niet werd gemaakt. Dat klopt
+	// niet — het log van die sessie laat hem gewoon draaien. Wat er wel gebeurt,
+	// staat er in twee paren die één op één op elkaar aansluiten:
+	//
+	//   07.28.37  Using Gamepad -> UsePlatformCursorForCursorUser(FALSE)
+	//   07.29.25  dood; EnterBaseMode draait, bShowMouseCursor = true
+	//   07.29.31  Using Mouse   -> UsePlatformCursorForCursorUser(TRUE)
+	//   07.29.44  klik komt aan: "BaseHub: intel inzetten afgewezen"
+	//
+	// CommonUI zet de PLATFORMCURSOR uit zodra het invoertype gamepad is, en
+	// bShowMouseCursor overrulet dat niet. Wie met een controller speelt en
+	// sneuvelt, landt dus in een UI-only hub zonder zichtbare cursor — en de hub
+	// heeft geen gamepad-navigatie, dus er is niets over om mee te bedienen. Hij
+	// ging bij de owner alleen open doordat hij toevallig de muis aanraakte.
+	//
+	// Een LOCK en niet SetCurrentInputType: dat laatste wordt bij de eerstvolgende
+	// druk op de stick meteen teruggedraaid door RecalculateCurrentInputType, en
+	// dan is de cursor weer weg zonder dat iemand iets deed. De lock houdt stand
+	// zolang de hub op het scherm staat en wordt in EnterMissionMode weer
+	// opgeheven, zodat het veld gewoon het echte apparaat volgt.
+	//
+	// DIT IS FASE 1 EN LOST DE HALVE BLOKKADE OP: je ziet weer waar je klikt.
+	// Wat er niet mee is opgelost, is de hub met de CONTROLLER kunnen bedienen —
+	// dat is focusnavigatie en een eigen stap, en die staat in het kliklijstje.
+	if (UCommonInputSubsystem* CommonInput = UCommonInputSubsystem::Get(GetLocalPlayer()))
+	{
+		CommonInput->AddOrRemoveInputTypeLock(
+			TEXT("EclipseBaseHub"), ECommonInputType::MouseAndKeyboard, /*bAddLock*/ true);
+		UE_LOG(LogEclipse, Display,
+			TEXT("Hub: cursor vastgezet op muis/toetsenbord (was '%s') — anders blijft hij onzichtbaar voor wie met een controller speelt."),
+			*UEnum::GetValueAsString(CommonInput->GetCurrentInputType()));
+	}
 	if (APawn* ControlledPawn = GetPawn())
 	{
 		ControlledPawn->DisableInput(this); // parked while the tester plans at the base
@@ -371,6 +409,14 @@ void AEclipsePlayerController::EnterMissionMode()
 	if (BaseHub != nullptr)
 	{
 		BaseHub->RemoveFromParent();
+	}
+	// De cursorlock hoort bij de hub en niet bij het veld: hier volgt het
+	// invoertype weer gewoon het apparaat in je handen. Zie EnterBaseMode voor
+	// waarom die lock bestaat.
+	if (UCommonInputSubsystem* CommonInput = UCommonInputSubsystem::Get(GetLocalPlayer()))
+	{
+		CommonInput->AddOrRemoveInputTypeLock(
+			TEXT("EclipseBaseHub"), ECommonInputType::MouseAndKeyboard, /*bAddLock*/ false);
 	}
 	// A -EclipseShot review round gets NO debug HUD at all (15.8/15.9): the whole
 	// widget is skipped here, not just hidden, so no fact can put text in a still.
@@ -406,7 +452,7 @@ void AEclipsePlayerController::EnterMissionMode()
 		UE_LOG(LogEclipse, Warning, TEXT("Input: geen UInputDeviceSubsystem — apparaatdetectie onbeschikbaar."));
 	}
 
-	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 test guide, F9 feel-dump, H playtest)."),
+	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 OF G test guide, F9 feel-dump, H playtest)."),
 		MissionHud == nullptr
 			? (!UEclipseMissionHudWidget::IsDebugHudAllowed()
 				? TEXT("suppressed by -EclipseShot, as designed")
@@ -849,6 +895,25 @@ void AEclipsePlayerController::SetupInputComponent()
 		{ EKeys::F2, EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.ToggleControlsPanel(); } },
 		{ EKeys::H,  EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.TogglePlaytestPanel(); } },
 		{ EKeys::F3, EKeys::Gamepad_Special_Left,    [](UEclipseMissionHudWidget& Hud) { Hud.ToggleGuidePanel(); } },
+		// G IS DE TWEEDE TOETS VOOR DE GIDS, en niet uit voorzichtigheid.
+		//
+		// Owner-blokkade 27-07: "ik druk F3 en er gebeurt niets in het spel —
+		// alleen mijn systeemgeluid verandert." Twee dingen kunnen F3 wegnemen
+		// voordat Enhanced Input hem ziet, en ik kan van buitenaf niet zien welke
+		// van de twee het was:
+		//   1. De ENGINE claimt hem. Uit het log van diezelfde sessie:
+		//      "DebugExecBindings geladen: 19 [... F3=viewmode lit ...]" — F1 t/m
+		//      F5 zijn engine-viewmodes, en in een unlit district verandert
+		//      'viewmode lit' niets zichtbaars, dus dat gebeurt stil.
+		//   2. Het TOETSENBORD claimt hem. Systeemgeluid dat verspringt is een
+		//      mediatoets die de OS-laag afvangt; dan komt er niets in het proces.
+		//
+		// Uitzoeken WELKE van de twee is hier verspilde moeite: allebei liggen ze
+		// buiten dit project en allebei worden ze door dezelfde maatregel opgelost.
+		// G is vrij in de hele module (gecontroleerd tegen elke EKeys-referentie),
+		// staat niet in de DebugExecBindings van de engine, en is geen mediatoets.
+		// F3 blijft staan voor wie hem wél heeft.
+		{ EKeys::G,  EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.ToggleGuidePanel(); } },
 		{ EKeys::J,  EKeys::Gamepad_Special_Right,   [](UEclipseMissionHudWidget& Hud) { Hud.ConfirmGuideStep(); } },
 		{ EKeys::N,  EKeys::Invalid,                 [](UEclipseMissionHudWidget& Hud) { Hud.SkipGuideStep(); } },
 		{ EKeys::F4, EKeys::Invalid, [](UEclipseMissionHudWidget& Hud) { Hud.NoteTargetingPick(/*bCleanPick*/ true); } },
@@ -893,11 +958,21 @@ void AEclipsePlayerController::SetupInputComponent()
 		}
 
 		void (*Invoke)(UEclipseMissionHudWidget&) = DebugBindings[Index].Invoke;
-		Input->BindActionValueLambda(DebugOverlayActions[Index], ETriggerEvent::Started, [this, Invoke](const FInputActionValue&)
+		const FString KeyName = DebugBindings[Index].Key.ToString();
+		Input->BindActionValueLambda(DebugOverlayActions[Index], ETriggerEvent::Started, [this, Invoke, KeyName](const FInputActionValue&)
 		{
 			// Mounted HUD only: at the base the widget is torn down, and pressing a
 			// gauntlet key there must not quietly edit the next run's numbers.
-			if (MissionHud != nullptr && MissionHud->IsInViewport())
+			const bool bMounted = MissionHud != nullptr && MissionHud->IsInViewport();
+			// ZEGGEN DAT DE TOETS AANKWAM. Zonder deze regel zien "de toets bereikt
+			// het spel niet" en "de toets komt aan maar er is geen HUD om te
+			// bedienen" er van buitenaf identiek uit — precies de vraag die de
+			// owner-melding over F3 onbeantwoordbaar maakte. Elke druk logt: deze
+			// toetsen zijn zeldzaam, dus dit is geen ruis.
+			UE_LOG(LogEclipse, Display, TEXT("Debug: toets '%s' kwam aan (%s)."),
+				*KeyName,
+				bMounted ? TEXT("HUD staat, actie uitgevoerd") : TEXT("GEEN HUD gemonteerd — er gebeurt niets"));
+			if (bMounted)
 			{
 				Invoke(*MissionHud);
 			}
@@ -974,12 +1049,42 @@ void AEclipsePlayerController::UpdateBodyTurn()
 	// Tot de takes zijn aangesloten schuiven de voeten een fractie bij een
 	// kwartslag of meer; nooit tijdens het kleine corrigeren waar dit model voor
 	// gemaakt is. Zodra ze erin zitten kan de drempel omlaag.
+	// HERZIENING 27-07 — OWNER: "als ik stilsta en rondkijk wil ik mijn personage
+	// van VOREN kunnen zien." Op 60 graden draaide hij al mee, dus je zag altijd
+	// alleen zijn rug. De spanning die de owner er zelf bij noemde is echt: als
+	// hij NOOIT meedraait, sta je bij het mikken opzij te schieten.
+	//
+	// WAT IK OVERNEEM UIT HET GENRE, en waarom. De verdeling die de owner
+	// beschrijft is de standaard driedeling van de third-person shooter, en die
+	// neem ik in zijn geheel over:
+	//   - stilstaand en niet mikken -> camera draait vrij, lichaam blijft staan
+	//   - mikken                    -> lichaam draait METEEN naar de camera
+	//   - bewegen                   -> lichaam draait naar de looprichting
+	// The Division en GTA doen precies deze splitsing; Borderlands is eerste
+	// persoon en zegt over het lichaam dus niets.
+	//
+	// WAT IK NIET OVERNEEM: een exacte gradenwaarde uit die spellen. Die is
+	// nergens gepubliceerd, en een getal verzinnen en er een spelnaam bij zetten
+	// is precies wat "research" hier niet mag betekenen. De correctheid zit in de
+	// MIK-UITZONDERING, niet in een drempel — zodra je mikt staat het lichaam goed,
+	// en dat is het enige moment waarop het richting moet dragen.
+	//
+	// Daarom draait het lichaam bij stilstand-zonder-mikken NIET meer mee, hoe ver
+	// je ook rondkijkt. De draaidrempel is daarmee geen kijkhoek meer maar een
+	// toestand.
+	//
+	// TURN-IN-PLACE BLIJFT: die animatie speelt nu op het moment dat hij ECHT
+	// draait — bij het aanzetten van het mikken. Dat is waar hij voor bedoeld was;
+	// hij hoorde alleen nooit jouw zicht op zijn voorkant weg te nemen.
 	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn()))
 	{
 		const float BodyYaw = static_cast<float>(Body->GetActorRotation().Yaw);
 		const float ViewYaw = static_cast<float>(GetControlRotation().Yaw);
 		const float Apart = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYaw, ViewYaw));
-		if (Apart > IdleTurnThresholdDegrees)
+		// De drempel geldt alleen nog TIJDENS HET MIKKEN. IdleTurnThresholdDegrees
+		// staat daarom op 0: mik je, dan sluit het lichaam meteen aan; mik je niet,
+		// dan blijft hij staan waar hij staat.
+		if (Body->IsAiming() && Apart > IdleTurnThresholdDegrees)
 		{
 			// DE DRAAIPOSE ERBIJ (26-07 avond, punt 7). Alleen op het moment dat de
 			// drempel gepasseerd wordt, niet elk frame daarna: anders herstart de
@@ -992,11 +1097,11 @@ void AEclipsePlayerController::UpdateBodyTurn()
 			}
 			Body->SetOrientationFollowsCameraNow(true);
 		}
-		else if (Apart < IdleTurnThresholdDegrees * 0.5f)
+		else if (!Body->IsAiming() || Apart < 5.0f)
 		{
-			// Ruim onder de drempel: de draai is af en een volgende mag weer.
-			// Hysterese, want precies op de drempel zou hij bij elke trilling
-			// opnieuw willen starten.
+			// Klaar met draaien: of je mikt niet meer, of het lichaam staat er
+			// bovenop. De 5 graden zijn hysterese — precies op nul zou de take bij
+			// elke stickrilling opnieuw willen starten.
 			bBodyTurning = false;
 		}
 	}

@@ -38,6 +38,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/EclipsePlayerController.h"
+#include "CommonInputSubsystem.h"
+#include "CommonInputTypeEnum.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
@@ -4836,6 +4838,94 @@ bool FEclipseNobodyIsAGiant::RunTest(const FString& Parameters)
 	TestTrue(FString::Printf(TEXT("reus: de langste van %d figuren is %s op %.1f cm, speler %.1f cm (grens %.1f cm)"),
 			Checked, *TallestName, Tallest, PlayerHeight, Limit),
 		Tallest <= Limit);
+
+	Harness.Shutdown();
+	return true;
+}
+
+/**
+ * NA JE DOOD KUN JE NOG KLIKKEN — OOK ALS JE MET EEN CONTROLLER SPEELDE.
+ *
+ * Owner-blokkade 27-07: "ik ga dood, de hub verschijnt met de missielijst, en er
+ * is geen muis. Ik kan de missie niet afsluiten, niet opnieuw beginnen en niet
+ * naar de debrief." Een doodlopende weg, en dus de enige echte blokkade uit die
+ * speelsessie.
+ *
+ * De aanname erbij was dat de overgang naar de hub bij een dood niet gemaakt
+ * wordt. Dat bleek niet zo: het log van die sessie laat EnterBaseMode gewoon
+ * draaien, de viewport laat de muis los op de milliseconde van de dood, en
+ * negentien seconden later komt er zelfs een klik aan ("BaseHub: intel inzetten
+ * afgewezen"). De echte oorzaak staat in twee paren die één op één sluiten:
+ * CommonUI zet de platformcursor UIT zodra het invoertype gamepad is, en
+ * bShowMouseCursor overrulet dat niet.
+ *
+ * Deze test zet dat vast op de manier waarop het misging: eerst het invoertype
+ * op gamepad, dan de missie laten falen, en dan pas kijken. Zonder die eerste
+ * stap toetst hij niets — een sessie met een muis in de hand had het defect ook
+ * nooit laten zien.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseHubStaysClickableAfterDeath,
+	"Eclipse.Mission.Playthrough.HubStaysClickableAfterDeath",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseHubStaysClickableAfterDeath::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UGameInstance* GameInstance = Harness.GameInstance;
+	UEclipseStrategySubsystem* Strategy = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipseStrategySubsystem>() : nullptr;
+	UEclipsePrepSubsystem* Prep = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipsePrepSubsystem>() : nullptr;
+	FString Error;
+	if (!TestTrue(FString::Printf(TEXT("hub: missie gelanceerd (%s)"), *Error),
+			Strategy != nullptr && Prep != nullptr
+			&& Strategy->SelectMission(TEXT("TransitCheckpoint"), Error) && Prep->AutoLaunch(Error)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UCommonInputSubsystem* CommonInput = Harness.Controller != nullptr
+		? UCommonInputSubsystem::Get(Harness.Controller->GetLocalPlayer()) : nullptr;
+	if (!TestNotNull(TEXT("hub: er is een CommonInput-subsysteem om tegen te meten"), CommonInput))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// ZOALS DE OWNER SPEELDE: met een controller in zijn handen. Dit is de stap
+	// die het defect zichtbaar maakt.
+	CommonInput->SetCurrentInputType(ECommonInputType::Gamepad);
+	Report(*this, TEXT("invoertype vlak voor de dood"),
+		static_cast<float>(CommonInput->GetCurrentInputType()), TEXT(""),
+		TEXT("1 = gamepad; hiermee zet CommonUI de platformcursor uit"));
+
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+	if (!TestNotNull(TEXT("hub: de bus bestaat"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Bus->Broadcast(EclipseTags::Event_Mission_Failed, FInstancedStruct());
+	Harness.Idle(0.2f);
+
+	const ECommonInputType After = CommonInput->GetCurrentInputType();
+	Report(*this, TEXT("invoertype in de hub"), static_cast<float>(After), TEXT(""),
+		TEXT("0 = muis/toetsenbord: de cursor is zichtbaar en je kunt klikken"));
+	TestTrue(
+		FString::Printf(TEXT("hub: na de dood is er een cursor om mee te klikken (invoertype %s)"),
+			*UEnum::GetValueAsString(After)),
+		After == ECommonInputType::MouseAndKeyboard);
 
 	Harness.Shutdown();
 	return true;

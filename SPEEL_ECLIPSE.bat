@@ -19,11 +19,15 @@ echo     -EclipseStartMission=TransitCheckpoint   ^<- direct de missie in
 echo     Eclipse.Guide.Overlay 1                  ^<- testgids staat al open
 echo.
 echo   Je muis verdwijnt meteen en je personage werkt vanaf de eerste seconde.
-echo   Zie je een CROSSHAIR? Goed - je zit in het veld.
+echo   Verdwijnt je muisaanwijzer? Goed - je zit in het veld.
 echo   Zie je een HANDJE? Dan is de snelstart niet gelukt en zit je in de basis:
 echo     COMMAND-tab -^> ADVANCE DAY -^> klik een MISSIE-OFFER aan.
 echo.
-echo   Testgids niet zichtbaar? Druk F3.
+echo   HIER STOND "zie je een CROSSHAIR". Dat was nooit waar: het enige woord
+echo   crosshair in het project is de VORM van de muisaanwijzer, en die staat in
+echo   het veld juist uit. Aangewezen door de owner op 27-07.
+echo.
+echo   Testgids niet zichtbaar? Druk F3 - of G als F3 niets doet.
 echo.
 echo ===============================================================================
 echo   BESTURING - MUIS + TOETSENBORD              ^|  CONTROLLER (Xbox)
@@ -47,20 +51,23 @@ echo.
 echo   F9 ....... toont de bewegingswaarden op het scherm (en wat er sinds de
 echo              vorige druk veranderd is).
 echo.
-echo   DE SCHAAL-BUG IS WEG - hier stond dat je hem met F9 moest opsporen.
-echo   Oorzaak was de camera die evenredig met je snelheid achterliep; nu geklemd
-echo   op 0,00%% verschil tussen rennen en sprinten. Het VERDWIJNENDE personage
-echo   had een andere oorzaak: de idle-take van Belica is additief en klapte alle
-echo   botten in. Omvang stilstaand ging van 1,0 naar 189,9 cm.
+echo   DE SCHAAL-BUG IS NIET WEG - hier stond dat hij dat wel was, en dat klopt
+echo   niet. De MESH schaalt niet mee (SetRelativeScale3D draait eenmalig, niet
+echo   per frame), dus die metingen waren juist maar maten het verkeerde ding.
+echo   Wat overblijft is de CAMERA: boomlengte, FOV, lag of socket-offset.
+echo   Aangewezen door de owner op 27-07; wordt op SCHIJNBARE grootte gemeten.
+echo   Het VERDWIJNENDE personage was wel een echte, andere oorzaak: de idle-take
+echo   van Belica is additief en klapte alle botten in (1,0 -^> 189,9 cm).
 echo.
-echo   TESTGIDS:  F3 openen  ^|  J = gehaald/ja  ^|  N = overslaan/nee
+echo   TESTGIDS:  F3 of G openen  ^|  J = gehaald/ja  ^|  N = overslaan/nee
 echo   Op de pad: View-knop (links van Xbox-logo) opent de gids,
 echo              Menu-knop (rechts ervan) = gehaald/ja
 echo.
 echo   ---------------------------------------------------------------------------
 echo   IN-GAME TESTGIDS - laat de game je alles leren
 echo   ---------------------------------------------------------------------------
-echo   F3 ....... testgids openen/sluiten
+echo   F3 of G .. testgids openen/sluiten  (G omdat de engine F1-F5 zelf claimt
+echo              voor viewmodes, en sommige toetsenborden F3 als mediatoets pakken)
 echo   J ........ gelezen / goed / ja
 echo   N ........ sla over / niet goed / nee
 echo.

@@ -168,14 +168,20 @@ private:
 	 * draai-animatie bestond; die is er wel (ParagonLtBelica levert
 	 * Idle_Turn_90_Left/Right), dus de reden voor de hoge drempel is weg.
 	 *
-	 * 60 en niet lager: de take is een kwartslag, en het lichaam draait hier een
-	 * variabel aantal graden. Hoe dichter de gedraaide hoek bij de 90 van de take
-	 * ligt, hoe minder je het verschil ziet — maar wachten tot 90 betekent dat je
-	 * eerst een halve slag over je schouder staat te kijken. 60 is waar die twee
-	 * elkaar raken, en het ligt in de band waar Gears en The Division het ook
-	 * leggen (45-90).
+	 * NUL SINDS 27-07, en dat is geen uitgeschakelde drempel maar een verplaatste.
+	 *
+	 * Hier stond 60, met de redenering dat je anders "over je schouder staat te
+	 * kijken". De owner speelde het en trok precies de omgekeerde conclusie: op 60
+	 * graden draait hij al mee, dus je krijgt je personage NOOIT van voren te zien.
+	 * Vrij om je eigen personage heen kunnen kijken is de wens; meedraaien was de
+	 * ongevraagde bijwerking.
+	 *
+	 * De drempel geldt daarom niet meer op de KIJKHOEK maar op de TOESTAND: hij
+	 * wordt alleen nog toegepast terwijl je mikt (zie UpdateBodyTurn), en dan hoort
+	 * het lichaam meteen aan te sluiten — vandaar 0. Mik je niet, dan blijft hij
+	 * staan hoe ver je ook rondkijkt.
 	 */
-	static constexpr float IdleTurnThresholdDegrees = 60.0f;
+	static constexpr float IdleTurnThresholdDegrees = 0.0f;
 
 	/** Loopt er een draai? Voorkomt dat de take zichzelf elk frame herstart. */
 	bool bBodyTurning = false;

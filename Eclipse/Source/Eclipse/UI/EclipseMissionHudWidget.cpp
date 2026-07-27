@@ -104,6 +104,9 @@ void UEclipseMissionHudWidget::LogUiReport() const
 		AmmoReadout != nullptr ? *AmmoReadout->GetText().ToString() : TEXT("(bestaat niet)"));
 	UE_LOG(LogEclipse, Display, TEXT("UI:   trefteken zichtbaarheid=%d"),
 		HitMarker != nullptr ? static_cast<int32>(HitMarker->GetVisibility()) : -1);
+	UE_LOG(LogEclipse, Display, TEXT("UI:   richtkruis  zichtbaarheid=%d tekst='%s'"),
+		Crosshair != nullptr ? static_cast<int32>(Crosshair->GetVisibility()) : -1,
+		Crosshair != nullptr ? *Crosshair->GetText().ToString() : TEXT("(bestaat niet)"));
 	// Per paneel: staat de vlag aan EN hoeveel regels hangen eronder.
 	// Een open paneel zonder regels ziet er voor de speler net zo leeg
 	// uit als een dicht paneel, en dat zijn twee verschillende bugs.
@@ -133,6 +136,14 @@ void UEclipseMissionHudWidget::LogUiReport() const
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — er is een wapen met een magazijn van %d, maar de munitieteller staat verborgen."),
 			ReportWeapon->GetMagazineSize());
+	}
+	// Een wapen zonder richtkruis: dan schiet je zonder te weten WAAR je
+	// richt. Dit is de owner-melding van 27-07 als vaste controle, zodat
+	// hij niet nog eens twee dagen stil kan wegvallen.
+	if (ReportWeapon != nullptr
+		&& (Crosshair == nullptr || Crosshair->GetVisibility() == ESlateVisibility::Hidden))
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — er is een wapen, maar er staat geen richtkruis; de speler kan niet zien waar hij richt."));
 	}
 	// Open zonder regels is voor de speler niet te onderscheiden van
 	// dicht — en dat is precies waarom het apart gemeld hoort te worden.
@@ -300,6 +311,44 @@ void UEclipseMissionHudWidget::NativeConstruct()
 
 	LiveBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	Root->AddChildToVerticalBox(LiveBox);
+
+	// HET RICHTKRUIS. Owner-melding 27-07: "ik kan niet zien waar ik richt."
+	// Nagekeken en de melding klopt volledig — de enige treffer op 'Crosshair' in
+	// het hele project was EMouseCursor::Crosshairs, de VORM van de
+	// muisaanwijzer, en die staat in het veld juist uit. Er is dus nooit een
+	// richtkruis geweest, terwijl de startbat er al die tijd naar vroeg.
+	//
+	// Dit maakt ook de hitmarker pas af: die zat op een kruis dat niet bestond,
+	// dus een treffer verscheen op een plek die je verder nergens aan kon
+	// herkennen. Zelfde constructie als de hitmarker en om dezelfde reden tekst:
+	// er ligt geen richtkruis-textuur in het project en er een verzinnen zou
+	// betekenen dat ik ga tekenen.
+	//
+	// EERST HET KRUIS, DAN DE HITMARKER: de canvas tekent in volgorde van
+	// toevoegen, dus de hitmarker hoort erná zodat een treffer OVER het kruis
+	// oplicht in plaats van eronder te verdwijnen.
+	Crosshair = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Crosshair"));
+	if (UCanvasPanelSlot* CrosshairSlot = Canvas->AddChildToCanvas(Crosshair))
+	{
+		CrosshairSlot->SetAutoSize(true);
+		CrosshairSlot->SetAnchors(FAnchors(0.5f, 0.5f));
+		CrosshairSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+		CrosshairSlot->SetPosition(FVector2D::ZeroVector);
+	}
+	FSlateFontInfo CrosshairFont = Crosshair->GetFont();
+	// KLEINER DAN DE HITMARKER (28), en met opzet. Het kruis staat er altijd, dus
+	// het moet het beeld dragen zonder het te vullen; de hitmarker moet er juist
+	// bovenuit springen op het moment dat hij komt.
+	CrosshairFont.Size = 18;
+	Crosshair->SetFont(CrosshairFont);
+	Crosshair->SetText(FText::FromString(TEXT("+")));
+	// Niet wit: tegen de oranje horizon en het lichte asfalt van het district
+	// verdwijnt zuiver wit. Een lichte koele tint met volle dekking blijft op
+	// beide leesbaar, en de zwarte contourlijnen van de toon-stijl geven hem
+	// vanzelf rand.
+	Crosshair->SetColorAndOpacity(FSlateColor(FLinearColor(0.85f, 0.92f, 1.0f, 1.0f)));
+	// HitTestInvisible en niet Visible: het kruis mag nooit een klik opvangen.
+	Crosshair->SetVisibility(ESlateVisibility::HitTestInvisible);
 
 	// De hitmarker: één tekstblok in het midden, onzichtbaar tot er iets geraakt
 	// wordt. Tekst en geen afbeelding, en dat is een bewuste beperking — er ligt

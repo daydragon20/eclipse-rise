@@ -2368,25 +2368,57 @@ bool FEclipseTurnInPlaceFollowsTheCamera::RunTest(const FString& Parameters)
 		return FMath::Abs(FMath::FindDeltaAngleDegrees(Before, static_cast<float>(Harness.Body->GetActorRotation().Yaw)));
 	};
 
-	// --- onder de drempel: het lichaam blijft staan -------------------------
+	// --- NIET MIKKEN: het lichaam blijft staan, hoe ver je ook kijkt ---------
+	//
+	// HERSCHREVEN 27-07 NA EEN SPEELSESSIE. Hier stond "onder de drempel blijft
+	// hij staan, boven de drempel draait hij mee", met de drempel op 60 graden.
+	// Dat legde het oude gedrag vast en het oude gedrag was fout: de owner speelde
+	// het en kreeg zijn personage nooit van voren te zien. Vrij om je eigen
+	// personage heen kunnen kijken is de wens; meedraaien was de bijwerking.
+	//
+	// De 40 graden blijven staan als ondergrens-geval, maar de 75 is nu het geval
+	// dat het VERSCHIL maakt: die draaide vroeger mee en hoort nu te blijven staan.
 	const float SmallSweep = BodySweepAfterFlick(40.0f);
-	Report(*this, TEXT("lichaam gedraaid na een flick van 40 gr"), SmallSweep, TEXT("gr"),
-		TEXT("hoort ~0 te zijn: onder de drempel kijk je met je hoofd"));
+	Report(*this, TEXT("lichaam gedraaid na een flick van 40 gr, niet mikkend"), SmallSweep, TEXT("gr"),
+		TEXT("hoort ~0 te zijn"));
 
-	// --- boven de drempel: het lichaam volgt --------------------------------
-	// Terug naar recht vooruit, dan een flick die de drempel wél haalt.
 	Harness.Inject(TEXT("Look"), FVector2D(-40.0f / Harness.Tuning->MouseLookScale, 0.0f));
 	Harness.Step();
 	Harness.Idle(1.2f);
 
-	const float BigSweep = BodySweepAfterFlick(75.0f);
-	Report(*this, TEXT("lichaam gedraaid na een flick van 75 gr"), BigSweep, TEXT("gr"),
-		TEXT("drempel staat op 60"));
+	const float WideSweep = BodySweepAfterFlick(75.0f);
+	Report(*this, TEXT("lichaam gedraaid na een flick van 75 gr, niet mikkend"), WideSweep, TEXT("gr"),
+		TEXT("hoorde vroeger MEE te draaien (drempel 60); hoort nu te blijven staan"));
 
-	TestTrue(FString::Printf(TEXT("turn-in-place: onder de drempel blijft het lichaam staan (%.0f gr)"), SmallSweep),
+	TestTrue(FString::Printf(TEXT("turn-in-place: rondkijken laat het lichaam staan bij 40 gr (%.0f gr)"), SmallSweep),
 		SmallSweep < 15.0f);
-	TestTrue(FString::Printf(TEXT("turn-in-place: boven de drempel draait het lichaam mee (%.0f gr)"), BigSweep),
-		BigSweep > 40.0f);
+	TestTrue(FString::Printf(TEXT("turn-in-place: rondkijken laat het lichaam OOK staan bij 75 gr — je ziet je personage van voren (%.0f gr)"), WideSweep),
+		WideSweep < 15.0f);
+
+	// --- MIKKEN: het lichaam sluit meteen aan ------------------------------
+	//
+	// Dit is de andere helft van de owner-opdracht, en zonder deze helft zou de
+	// bovenstaande versoepeling een echt defect zijn: dan sta je bij het mikken
+	// opzij te schieten. De draaitake hoort hier te spelen — dit is het moment
+	// waarop hij écht draait.
+	const float BeforeAim = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+	const float ViewBeforeAim = static_cast<float>(Harness.Controller->GetControlRotation().Yaw);
+	const float ApartBeforeAim = FMath::Abs(FMath::FindDeltaAngleDegrees(BeforeAim, ViewBeforeAim));
+	Harness.Inject(TEXT("Aim"), true);
+	Harness.Step();
+	Harness.Idle(1.2f);
+	const float ApartWhileAiming = FMath::Abs(FMath::FindDeltaAngleDegrees(
+		static_cast<float>(Harness.Body->GetActorRotation().Yaw),
+		static_cast<float>(Harness.Controller->GetControlRotation().Yaw)));
+
+	Report(*this, TEXT("hoek lichaam-camera vlak voor het mikken"), ApartBeforeAim, TEXT("gr"),
+		TEXT("hier staat hij opzij; dat mag zolang je niet mikt"));
+	Report(*this, TEXT("hoek lichaam-camera tijdens het mikken"), ApartWhileAiming, TEXT("gr"),
+		TEXT("hoort klein te zijn: je schiet waar je kijkt"));
+	TestTrue(FString::Printf(TEXT("turn-in-place: er stond echt een hoek om weg te draaien (%.0f gr)"), ApartBeforeAim),
+		ApartBeforeAim > 30.0f);
+	TestTrue(FString::Printf(TEXT("turn-in-place: mikken zet het lichaam naar de camera (%.0f gr over)"), ApartWhileAiming),
+		ApartWhileAiming < 15.0f);
 
 	Harness.Shutdown();
 	return true;

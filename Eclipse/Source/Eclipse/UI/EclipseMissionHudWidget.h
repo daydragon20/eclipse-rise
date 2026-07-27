@@ -144,6 +144,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> HitMarker;
 
+	/** Het richtkruis: staat altijd, midden in beeld. Zie BuildStaticPanels. */
+	UPROPERTY()
+	TObjectPtr<class UTextBlock> Crosshair;
+
 	/**
 	 * MUNITIETELLER (26-07 avond). Een magazijn dat je niet ziet is geen mechaniek
 	 * maar een verrassing: je klikt, er gebeurt niets, en je weet niet of je leeg
