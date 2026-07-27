@@ -103,10 +103,18 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
     wordt wel degelijk aangeboden.
   - `duw 1.00` op het meetmoment betekent dat de pending input NIET geconsumeerd
     is. Het probleem zit dus tussen `AddMovementInput` en de movement-tick.
-  - **Uitgesloten kandidaat, niet opnieuw onderzoeken:** de actor-tick van
-    `AEclipseCharacter` staat bewust uit (`bStartWithTickEnabled = false`, alleen
-    aan tijdens een camerablend), maar de CharacterMovementComponent tickt
-    zelfstandig — dat verklaart dit dus niet.
+  - **DEZE UITSLUITING IS TERUGGEDRAAID (27-07 laat) — WEER OPEN.** Hier stond:
+    "de actor-tick staat bewust uit, maar de CharacterMovementComponent tickt
+    zelfstandig, dus dat verklaart dit niet." Dat was een AANNAME over
+    engine-gedrag en geen meting, en hij is later op de dag weerlegd: de pending
+    input-vector stapelt op tot **19** vóór een duw, dus er zijn stretches van
+    ~0,4 s waarin niemand hem consumeert — de movement-tick draait daar niet.
+    Een uitsluiting die niet gemeten is, houdt de volgende lezer wég bij de
+    oorzaak; dat is de duurste fout van deze dag geweest.
+  - **Wat wél is nagekeken en het NIET verklaart:** `DisableMovement()` hangt
+    alleen aan neergaan (de speler leeft in dat interval), en de tickopzet van het
+    bewegingscomponent is standaard. De projectcode is daarmee uitgeput; de rest
+    vraagt de engine-kant volgen.
   - **Tweede uitgesloten kandidaat:** de pawn is NIET input-disabled gebleven.
     `EnterMissionMode` roept `ControlledPawn->EnableInput(this)` aan
     (`EclipsePlayerController.cpp:507`), direct tegenover de `DisableInput` van
