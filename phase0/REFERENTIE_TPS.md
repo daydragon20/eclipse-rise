@@ -214,19 +214,48 @@ speelde hij oude code en kán het kruis er niet zijn.
 
 ### WIJ NU
 
-- **Er hangt geen wapenmesh.** Nagekeken: de enige `AttachToComponent` in de hele
-  karakterlaag is de kop-hitbox. Het schot valt, de hulzen ejecteren, het geluid
-  klinkt — er is alleen niets in de handen.
-- De wapenlaag zelf is compleet als DATA: `component=1 magazijn=30 munitie=30`,
-  twee slots, RB wisselt, elk slot houdt zijn eigen magazijn.
+> **HERSCHREVEN 27-07 NA EEN CORRECTIE VAN DE OWNER.** Hier stond "er hangt geen
+> wapenmesh — er is alleen niets in de handen". **Dat was onjuist.** Ik had het
+> afgeleid uit codelezing (geen `AttachToComponent` in de karakterlaag behalve de
+> kop-hitbox) zonder naar een frame te kijken. Dat is exact de vorm die ik vandaag
+> vier keer bij mezelf en bij anderen heb aangewezen: de conclusie klopte met de
+> code en niet met de werkelijkheid. In een document dat de MAATSTAF is weegt die
+> fout zwaarder dan in een losse commit, want elke volgende keuze gaat erop staan.
+
+- **ER HANGT WÉL EEN WAPEN.** [GEZIEN — `HighresScreenshot00915`, en bevestigd op
+  00909, 00910, 00914 en `ScreenShot00000`.] Een geweer, horizontaal voor de borst,
+  in beide handen, met loop en greep herkenbaar.
+- **Waarom de codezoektocht hem niet vond**: er is geen attachment omdat het wapen
+  deel is van de karaktermesh of van de pose. Zoeken op `AttachToComponent` kón hem
+  dus per definitie niet vinden.
+- **Waarom hij op eerdere beelden niet opviel**: de toon-restyle geeft ELK
+  materiaalslot dezelfde factietint (`TintLit`/`TintShade` per lichaam), dus het
+  wapen heeft exact de kleur van het lichaam waar het tegenaan ligt. Het verdwijnt
+  in het silhouet.
+- **Bij stilstand ligt het wapen netjes tegen het lichaam** [GEZIEN — 00915]. Dat
+  is de pose, en die is dus goed.
+- De wapenlaag is compleet als DATA: `component=1 magazijn=30 munitie=30`, twee
+  slots, RB wisselt, elk slot houdt zijn eigen magazijn. [uit code en log; de
+  wissel is NIET visueel bevestigd.]
 
 ### KEUZE OF GAT
 
-- **Een GAT, en het grootste zichtbare van deze lijst.** Alles eromheen bestaat —
-  loadout, magazijnen, wissel, terugslag, geluid — en de speler ziet er niets van.
-- **Dat de wapenwissel "visueel niets doet" is hetzelfde gat, niet een tweede.**
-  Zonder mesh is er niets om te wisselen. Owner-punt 5 lost op zodra punt "wapen in
-  beeld" opgelost is; het is geen aparte post.
+- **Het gat is niet "er is geen wapen" maar "het wapen is geen los object".**
+  Dat verklaart drie waarnemingen met één oorzaak: er is geen attachment (klopt),
+  er hángt een wapen (klopt ook), en de wapenwissel doet visueel niets — want er is
+  niets om te wisselen zolang het wapen deel van het lichaam is.
+- **Owner-punt 5 verandert daarmee van "bouw een wapenmesh" naar "haal het wapen
+  UIT de mesh".** Dat is een andere en grotere klus. **Wat het kost, vóór er iets
+  begint:** de wapensectie uit de skeletal mesh isoleren of verbergen (per
+  materiaalslot of per botsectie), een los mesh-asset per wapenfamilie krijgen,
+  een socket op `hand_r` maken die op dit Paragon-rig bestaat, en de bestaande
+  wisselogica daaraan hangen. Elk van die vier is een eigen falsificeerbare stap.
+  **Dit hoort opnieuw gewogen te worden tegen de rest van de volgorde en dat is een
+  owner-keuze, geen mijne.**
+- **Een goedkopere tussenstap die het meeste oplost**: het wapen een EIGEN tint
+  geven in plaats van de factietint van het lichaam. Dan is het leesbaar in
+  silhouet zonder dat er iets uit de mesh hoeft. Dat lost "ik zie mijn wapen niet"
+  op, maar niet "de wissel doet niets".
 
 ---
 
@@ -247,12 +276,26 @@ speelde hij oude code en kán het kruis er niet zijn.
 
 ### WIJ NU
 
+> **OOK HERZIEN NA DE OWNER-CORRECTIE**, met de frames ernaast in plaats van
+> alleen de code. Eén uitspraak hier was te absoluut.
+
 - **Geluid bestaat**: `Cue_SFX_Impact_BulletMetal_01`, met oppervlaktetypes onder
   de voeten al geïmplementeerd (beton/metaal via physical materials en een trace).
-- **Visueel bestaat er niets**: geen tracer, geen inslag-VFX, geen decal, geen
-  flinch.
-- De hitmarker is de enige visuele terugkoppeling, en die zat tot vandaag op een
-  kruis dat niet bestond.
+  [uit code — NIET hoorbaar te verifiëren in een opnameronde.]
+- **ER IS WÉL IETS ZICHTBAARS BIJ HET VUREN: hulzen.** [GEZIEN —
+  `HighresScreenshot00911`, de opname "lopend en vurend": kleine gele objecten die
+  uit het wapen wegvliegen.] Hier stond "visueel bestaat er niets", en dat klopte
+  niet. Het is bovendien de enige reden dat ik op dat frame kon vaststellen DAT er
+  geschoten werd.
+- **Geen tracer zichtbaar** [GEZIEN op 00911 — geen baan tussen wapen en doel].
+- **Geen inslag zichtbaar** — maar dit is **NIET geverifieerd**: op geen enkele
+  opname staat een doel dat op dat moment geraakt wordt, dus het frame kan het
+  verschil tussen "geen inslag-VFX" en "geen inslag in beeld" niet maken. Dit
+  blijft dus een uitspraak uit codelezing, en zo staat hij hier.
+- **Geen flinch en geen schadegetal** — eveneens uit code, niet visueel bevestigd
+  om dezelfde reden.
+- De hitmarker is de enige andere visuele terugkoppeling, en die zat tot vandaag op
+  een kruis dat niet bestond.
 
 ### KEUZE OF GAT
 
@@ -281,6 +324,26 @@ De owner-volgorde blijft leidend. Wat de referentie eraan toevoegt:
 5. **Wapenwissel** — geen aparte post: dit is "wapen in beeld".
 6. **De gids** — niet nóg een toets. Uitzoeken waaróm er niets aankomt; zie de
    HUD-verdenking bij punt 2.
+
+## De regel die dit document zichzelf oplegt (owner, 27-07)
+
+**Kijk naar het beeld VOORDAT je een hoofdstuk over zichtbaarheid schrijft.**
+
+De eerste versie van hoofdstuk 4 beweerde dat er geen wapen in beeld hing. Dat was
+uit codelezing afgeleid en het was onjuist — de owner wees het aan op vier van mijn
+eigen opnames. In een los commentaar is dat een fout; in de maatstaf stuurt het
+elke volgende keuze de verkeerde kant op, want punt 5 verandert erdoor van "bouw
+een wapenmesh" naar "haal het wapen uit de mesh".
+
+Daarom draagt elke uitspraak over zichtbaarheid vanaf nu een merkteken:
+
+- **[GEZIEN — bestandsnaam]** — met eigen ogen op dat frame vastgesteld.
+- **[uit code, niet visueel bevestigd]** — gelezen, niet gezien. Mag nooit als
+  grond dienen voor een bouwbeslissing zonder eerst een frame.
+
+En waar een frame het verschil NIET kan maken (bijvoorbeeld: geen inslag-VFX
+versus geen doel in beeld), staat dat er expliciet bij in plaats van dat de
+afwezigheid als bewijs wordt gebruikt.
 
 ## Wat ik in dit document NIET heb geverifieerd
 
