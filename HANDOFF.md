@@ -309,8 +309,13 @@ de drie regio's die je bevrijdt.
 **Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
 laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
 elkaar botsen die twee stijlen. Dat is een art-directie keuze (ÉÉN-STIJL-WET) en
-geen bug, dus die laat ik aan jou. En er hangt **nergens een wapenmesh** — het
-schot valt, maar er is geen model in de handen.
+geen bug, dus die laat ik aan jou. ~~En er hangt nergens een wapenmesh — het
+schot valt, maar er is geen model in de handen.~~
+> **DIE LAATSTE ZIN IS ONJUIST (gecorrigeerd 27-07).** Er hángt een geweer; de
+> owner wees het aan op vier opnames. Ik had het afgeleid uit codelezing (geen
+> `AttachToComponent`) — maar het wapen zit IN de karaktermesh, als eigen
+> materiaalslot `M_Belica_Guns`, en de toon-restyle gaf het exact de kleur van het
+> lichaam. Sinds `776ffa9` is dat gunmetal en steekt het af.
 
 ### Wat wacht er op jou
 

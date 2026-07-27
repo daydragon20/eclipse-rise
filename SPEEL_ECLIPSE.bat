@@ -103,7 +103,9 @@ echo   NIEUW SINDS JE VORIGE SESSIE - waar je op kunt letten:
 echo     - je personage staat stil weer in beeld (was helemaal weg)
 echo     - hij DRAAIT mee als je ver wegkijkt, met een draai-animatie
 echo     - HERLADEN heeft nu een houding; die is geleend uit een ander pack
-echo     - er hangt nog GEEN wapen in je handen - dat is bekend, geen bug
+echo     - er HANGT een wapen in je handen; hier stond het tegenovergestelde en
+echo       dat was onjuist. Het zat verstopt doordat het dezelfde kleur had als je
+echo       lichaam; sinds vandaag is het gunmetal en steekt het af.
 echo     - haal je de FOOTHOLD (na Signal Fire), dan staat er in het debrief
 echo       nu een ZIN die uitlegt waarom de wijk kantelde - niet alleen welke
 echo       vakken omdraaiden. Zeg het als die zin niet aankomt of te vroeg komt.

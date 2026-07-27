@@ -451,11 +451,13 @@ zag zijn geen bug maar een keuze, en die is van jou:
   romp; die van jou is normaal geproportioneerd. Ze staan nu vaak binnen twee
   meter van elkaar in beeld, en dan is het geen stijl meer maar een fout die je
   ziet. De maat kloppend maken heeft dat niet opgelost en gaat dat ook niet doen.
-- **Geen wapen in de handen.** Dit is het enige echte van de drie dingen die ik
-  eerst meldde. Het schot valt en de munitie loopt (30 → 19, elf schoten gemeten),
-  maar er hangt nergens een wapenmesh aan een bot — in de hele module hangt maar
-  één ding aan het skelet, en dat is de hoofd-hitbox. Wil je dat ik daar een model
-  aan koppel, of wacht dat op de art-pass?
+- ~~**Geen wapen in de handen.**~~ **DIT KLOPTE NIET — jij hebt het weerlegd
+  (27-07).** Er hángt een geweer, zichtbaar op vier opnames. Mijn zoekopdracht
+  (geen `AttachToComponent`) kon hem niet vinden omdat het wapen IN de mesh zit,
+  als eigen materiaalslot `M_Belica_Guns` — en de toon-restyle gaf dat slot exact
+  de factietint van het lichaam, dus het verdween in het silhouet. Sinds
+  `776ffa9` is het gunmetal. Wat WEL open blijft is de **wisselbaarheid**: zolang
+  het wapen deel van het lichaam is, valt er niets te wisselen.
 
   **Nagekeken op 27-07, en het is concreter dan ik het eerst bracht.** Op het
   schietmoment is te zien dat het schot ALLEEN door de hulzen leest: er komt geen
