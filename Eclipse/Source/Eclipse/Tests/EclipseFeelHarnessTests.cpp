@@ -1039,6 +1039,50 @@ bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Paramete
 			IConsoleManager::Get().FindConsoleObject(Name));
 	}
 
+	// EN DE STARTVLAGGEN. Dezelfde regel als voor de commando's hierboven: een
+	// vlag die BESTURING.md adverteert en die niemand leest, kost dezelfde avond
+	// als een binding die niet aankomt. Deze controle gaat de ANDERE kant op —
+	// elke vlag die de CODE kent moet in het document staan — want dat is de
+	// richting die 27-07 twee ongedocumenteerde vlaggen aan het licht bracht
+	// (-EclipseShotPlay en -EclipseShotFixtures, allebei dagelijks gebruikt).
+	{
+		const FString DocPath = FPaths::ConvertRelativePathToFull(
+			FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), TEXT("BESTURING.md")));
+		FString Doc;
+		if (TestTrue(TEXT("startvlaggen: BESTURING.md is leesbaar"), FFileHelper::LoadFileToString(Doc, *DocPath)))
+		{
+			// EclipseLitToon staat er bewust niet bij: dat is een render-schakelaar
+			// voor de art-pass, geen startoptie die de owner ooit typt.
+			for (const TCHAR* Flag : { TEXT("EclipseShot"), TEXT("EclipseShotPlay"), TEXT("EclipseShotFixtures") })
+			{
+				TestTrue(*FString::Printf(TEXT("startvlaggen: -%s staat in BESTURING.md"), Flag),
+					Doc.Contains(Flag));
+			}
+
+			// GEEN STUURTEKENS IN HET DOCUMENT. Dit lijkt pietluttig en is het
+			// niet: twee keer op een nacht veranderde een Windows-pad in de
+			// documentatie in onzin doordat de backslash-v van "erify.ps1" als
+			// een verticale tab werd geschreven. Het resultaat leest in een editor
+			// als "Toolserify.ps1" — een commando dat de owner niet kan uitvoeren,
+			// en dat je in een diff nauwelijks ziet.
+			//
+			// Tabs en regeleindes horen er wel te zijn; alles daaronder niet.
+			int32 ControlChars = 0;
+			TCHAR FirstBad = 0;
+			for (const TCHAR Char : Doc)
+			{
+				if (Char < 32 && Char != 10 && Char != 13 && Char != 9)
+				{
+					++ControlChars;
+					if (FirstBad == 0) { FirstBad = Char; }
+				}
+			}
+			TestEqual(*FString::Printf(TEXT("startvlaggen: BESTURING.md bevat geen stuurtekens (eerste: 0x%02X)"),
+					static_cast<int32>(FirstBad)),
+				ControlChars, 0);
+		}
+	}
+
 	// Inline falsificatie: als de opzoeking alles zou vinden, bewees hij niets.
 	// Een naam die gegarandeerd niet bestaat MOET null geven.
 	TestNull(TEXT("de opzoeking discrimineert (een verzonnen commando bestaat niet)"),
