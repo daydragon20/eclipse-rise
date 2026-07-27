@@ -24,6 +24,46 @@ gekozen dat de downloads op de achtergrond binnenlopen terwijl jij speelt.
 
 ---
 
+## 🔴 NA DE REFERENTIE-OPDRACHT — STAND EN ÉÉN KLIK
+
+**De maatstaf staat: [phase0/REFERENTIE_TPS.md](phase0/REFERENTIE_TPS.md).**
+Vijf onderdelen, elk met wat de referentie doet, wat wij nu doen, en of dat een
+keuze is of een gat. Hoofdstuk 4 en 5 zijn herzien nadat jij het wapen op mijn
+eigen opnames aanwees — die stonden fout omdat ik ze uit codelezing had afgeleid.
+
+### ✅ EEN KLIK VAN JOU, en die beslist een open vraag
+
+**Start het spel pas nadat ik "build klaar" meld.** `SPEEL_ECLIPSE.bat` gebruikt de
+bestaande binaries; startte je vorige keer vóór mijn build af was, dan speelde je
+oude code en kón het richtkruis er niet zijn.
+
+Waarom dit de vraag beslist: in een draaiende missie meldt het spel zelf
+`UI: richtkruis zichtbaarheid=3 tekst='+'` — het kruis bestaat en wordt getekend.
+Ik kan het alleen niet fotograferen (zie hieronder). Zie jij het na een verse build
+nog steeds niet, dan zit het probleem ergens anders en weten we dat meteen.
+
+### De echte blokkade: ik kan geen UI fotograferen
+
+Vier methodes geprobeerd, alle vier hetzelfde 3D-beeld zonder widgets:
+HighResShot, FScreenshotRequest met bShowUI, een Slate-vensteropname, en het
+engine-commando `Shot showui`. Daarmee is jouw eis "controleer het op een
+screenshot voordat je het af noemt" voor **geen enkel UI-element** te vervullen.
+Dat is een gat in mijn verificatielaag, niet in het richtkruis — en het is de
+reden dat punt 2 nog niet af mag heten.
+
+### Stand van jouw zes punten
+
+| # | Punt | Stand |
+|---|---|---|
+| 1 | Mikken moet een stilstaand vizier geven | **GEBOUWD, NIET VISUEEL BEVESTIGD.** De camera-lag ging nooit uit tijdens het mikken — het kruis staat schermvast terwijl de camera achterloopt, dus de wéreld schuift eronder door. Nu uit bij ADS. En de zijoffset (55 cm) kromp niet mee met de arm (300→165), waardoor je personage juist je vizierlijn in kroop; die schaalt nu mee |
+| 2 | Richtkruis dat er is en klopt | **BESTAAT EN WORDT GETEKEND** volgens het zelfrapport. **Niet op een frame aan te wijzen** zolang de opnamelaag geen UI vangt |
+| 3 | De camera | Meetopdracht staat in de referentie: **schermpositie** meten bij 0/180/420/650 cm/s. Alle bestaande metingen gaan over grootte en afstand, niet over positie — en jouw klacht gaat over positie |
+| 4 | Kogels zichtbaar | **Hulzen zijn er wel** (gezien op 00911). Geen tracer. "Geen inslag" is uitdrukkelijk **niet** geverifieerd: op geen opname wordt op dat moment iets geraakt |
+| 5 | Wapenwissel zichtbaar | **VAN OPDRACHT VERANDERD** door jouw correctie: niet "bouw een wapenmesh" maar "haal het wapen uit de mesh". Kosten staan in de referentie. **Herweging is jouw keuze.** Goedkope tussenstap genoteerd: het wapen een eigen tint geven zodat het leesbaar wordt in silhouet |
+| 6 | De gids opent niet | Nog niet uitgezocht **waarom** — en dat is wat je vroeg, niet nog een toets |
+
+---
+
 ## 🟢 SPEELSESSIE 27-07 — STAND VAN JOUW ACHT PUNTEN
 
 Veilig te spelen: **commit `6933fa7`**. Suite 182 groen, ValidateData 0 fouten.
