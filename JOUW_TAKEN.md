@@ -40,7 +40,17 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
 | **5** wapenwissel | **HET WAPEN IS EEN APART MATERIAALSLOT** (`M_Belica_Guns`, slot 4 van 12). Zichtbaar máken vraagt dus geen mesh-operatie, alleen een eigen tint. Wisselbaar maken vraagt het nog steeds wel |
 | **6** de gids | **DE KETEN WERKT — end-to-end gemeten.** Toets → actie → handler → paneel open met 13 regels. G kon je niet hebben (toegevoegd ná je sessie); F3 is door de engine geclaimd als `viewmode lit` |
 
-### ⚠️ LET OP: de in-game gids zal zeggen dat er NIETS veranderd is
+### ✅ OPGELOST: de gids toont je vandaag WEL wat er veranderd is
+
+*(hieronder stond de waarschuwing; die is gerepareerd, maar ik laat hem staan
+zodat je ziet wat er speelde)*
+
+De gids opent nu met de drie die **alleen jij** kunt beoordelen: **G**, het
+**richtkruis** en het **gunmetal wapen**. De andere twee — het niet-meedraaien en
+de hoorbare misser — vielen af omdat je gids maximaal tien stappen mag hebben, en
+die staan hieronder in de tabel.
+
+### ⚠️ (was) de in-game gids zou zeggen dat er NIETS veranderd is
 
 Deel 1 van de gids toont "wat er veranderd is sinds je vorige sessie", en die
 datum komt uit het nieuwste eindrapport in `Saved/Logs`. Dat rapport is vandaag
