@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `437799c`
+## VEILIG TE SPELEN: JA, commit `ce89b9c`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -48,6 +48,7 @@ gedraaid, en het leverde twee van de vijf bugs van vannacht op.
 | **LT deed nog steeds twee dingen.** De afschaffing van vanochtend was alleen in het commentaar, de tabel en BESTURING.md geland — de `MapKey` stond er nog. | LT draagt nu 1 actie in plaats van 2 |
 | **Een gele engine-waarschuwing liep over je scherm.** Twee directionele lampen streden om "de" zon. | 0 waarschuwingen in het log en weg van het beeld |
 | **Twee voetstapgeluiden bestonden niet.** De code vroeg zeven houtvarianten, het pack levert er vijf — en niets telde die mislukte laadpogingen, want de teller sloeg alleen aan bij een compleet lege bank. De aantallen stonden met de hand in de code; de lader telt nu zelf. | 2 mislukte laadpogingen per start → **0**; en vier van de zes oppervlakken hebben nu méér varianten |
+| **"Waarom is mijn kaart leeg?" heeft nu een antwoord van één regel.** `Eclipse.Save.Report` zegt eerst of de campagne zijn setup-asset kent — zonder dat is er wél een campagne maar géén regiograaf, en biedt geen enkel vak een missie aan — en pas daarna wat er in de slots zit. Dat is precies de storing die vandaag drie metingen kostte: de save kwam bit-voor-bit terug en het bord bleef leeg. | Op een gezonde start: `setup DA_CampaignSetup`, `dag=1 regio's=6`, `geen slots`. De tak die een gezonde run nooit haalt ("setup ONTBREEKT") is een pure functie met een eigen test, en die test is gefalsifieerd: tekst weggehaald → rood, tekst terug → groen |
 | **CommonUI draaide in een configuratie die de plugin zelf ongeldig noemt** — "Input routing will not function correctly", als ERROR, bij elke start. Mogelijk de oorzaak van jouw View-knop die niet aankwam. | 0 CommonUI-errors; **jij moet de View-knop nog testen** |
 
 ### Wat ik heb GEZIEN op screenshots
