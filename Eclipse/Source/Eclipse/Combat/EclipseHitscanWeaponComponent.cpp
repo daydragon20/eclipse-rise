@@ -127,13 +127,41 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	// is 0,8 s twee frames. En los daarvan: een kogelspoor dat binnen een seconde
 	// weg is, is precies de klacht die dit moet oplossen — je kijkt na een salvo naar
 	// de muur om te zien waar je zat.
+	// ==================================================================
+	// STAND 27-07: DIT SPOOR IS ONZICHTBAAR EN IK WEET NIET WAAROM.
+	//
+	// Alles hieronder is GEMETEN, niet beredeneerd, en sluit telkens een oorzaak
+	// uit. De regel [PLAYSHOT n SPOREN] in de opnameronde projecteert de levende
+	// sporen naar schermcoordinaten; die maakt van "ik zie het niet" een getal.
+	//
+	//   ontstaat de actor        JA  - 11 stuks, zichtbaar=1, niet verborgen
+	//   heeft hij een mesh       JA  - MESH Cube, bolstraal 6,4, geregistreerd=1
+	//   staat hij in het kader   JA  - scherm (589,502), inbeeld=1, op 8,4 m
+	//   ligt het aan de maat     NEE - 90 cm (~100 px breed) is even onzichtbaar
+	//   aan de levensduur        NEE - 2,5 s, en er leven er 11 op het opnamemoment
+	//   aan de kleur             NEE - knalwit met honderdvoudige emissie: niets
+	//   aan MIJN materiaal       NEE - ook met de engine-standaard: niets
+	//   aan de spawnwijze        NEE - identiek aan de districtblokken die WEL renderen
+	//
+	// Wat dus overblijft ligt buiten wat dit harnas kan zien. Volgende stap is een
+	// ander gereedschap dan de opnameronde: in de editor kijken, of de renderlagen
+	// uitzetten tot hij verschijnt. NIET nog een parameter gokken - dat is vandaag
+	// zeven keer gedaan en heeft zeven keer niets opgeleverd.
+	// ==================================================================
 	Mark->SetLifeSpan(2.5f);
 	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
 	++ImpactMarksSpawned;
 	UE_LOG(LogEclipse, Display,
-		TEXT("Inslagspoor %d GESPAWND op %s (schaal %s, zichtbaar %d, materiaal %s)"),
+		TEXT("Inslagspoor %d GESPAWND op %s (schaal %s, zichtbaar %d, materiaal %s, MESH %s, straal %.1f, geregistreerd %d, zichtbaar-in-spel %d)"),
 		ImpactMarksSpawned, *Spot.ToCompactString(), *Mark->GetActorScale3D().ToCompactString(),
-		Plate->IsVisible() ? 1 : 0, *GetNameSafe(Plate->GetMaterial(0)));
+		Plate->IsVisible() ? 1 : 0, *GetNameSafe(Plate->GetMaterial(0)),
+		// DE MESH ZELF, en die had hier vanaf het begin moeten staan. Materiaal,
+		// maat, plaats, levensduur en kleur zijn allemaal uitgesloten met een
+		// meting; het enige dat ik nooit heb gecontroleerd is of er echt een mesh
+		// aan hangt en of hij een omvang heeft. Een bolstraal van nul betekent dat
+		// er niets te tekenen valt, hoe zichtbaar de component ook zegt te zijn.
+		*GetNameSafe(Plate->GetStaticMesh()), Plate->Bounds.SphereRadius,
+		Plate->IsRegistered() ? 1 : 0, Mark->IsHidden() ? 0 : 1);
 }
 
 void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row)
