@@ -3637,4 +3637,90 @@ bool FEclipseApparentSizeDuringTheRampUp::RunTest(const FString& Parameters)
 	return true;
 }
 
+/**
+ * VANUIT STILSTAND OMDRAAIEN EN WEGLOPEN (owner-punt 7, 27-07).
+ *
+ * "Ik wil de camera 180 graden kunnen draaien en dan vooruit duwen — mijn
+ * personage draait zich om en loopt die kant op." De owner voegde er zelf bij:
+ * met bOrientRotationToMovement zou dat al moeten kloppen, controleer het.
+ *
+ * ER BESTOND AL EEN 180-TEST (laag 2, punt 3) en die is groen — maar hij begint
+ * op VOLLE SNELHEID (RunUpToTopSpeed vooraf). Dat is de omkering míd-loop, en
+ * niet het geval dat de owner beschrijft. Het verschil is vandaag gaan tellen:
+ * sinds punt 6 volgt het lichaam de camera bij stilstand NIET meer, dus vanuit
+ * stilstand hangt de hele draai aan bOrientRotationToMovement in plaats van aan
+ * de idle-turn die er eerst overheen lag. Precies het soort naad waar "het werkt
+ * toch al" een aanname is en geen meting.
+ *
+ * Twee dingen worden apart afgerekend, want ze kunnen los stukgaan: KIJKT hij
+ * die kant op (rotatie) en GAAT hij die kant op (verplaatsing). Een lichaam dat
+ * netjes omdraait maar achteruit wegschuift zou op alleen de eerste groen zijn.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseTurnAroundFromStandstillAndWalkOff,
+	"Eclipse.Feel.Layer2.TurnAroundFromStandstillAndWalkOff",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseTurnAroundFromStandstillAndWalkOff::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// De muistak, om dezelfde reden als bij de bestaande 180-meting: dit is één
+	// flick van een halve slag, en op de stick bestaat die gebeurtenis niet
+	// (daar is kijken graden per seconde).
+	EclipseFeelTest::FForceGamepadScope Mouse(0);
+
+	// Echt stilstaan. Dit is het hele punt van deze test.
+	Harness.HoldFor(TEXT("Move"), FVector2D::ZeroVector, 1.0, [&Harness]() { return false; });
+	const FVector StartLocation = Harness.Location();
+	const float BodyYawBefore = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+
+	// Camera een halve slag om, en NIETS anders — dit moet het lichaam met rust
+	// laten, want dat is wat punt 6 vraagt.
+	Harness.Inject(TEXT("Look"), FVector2D(180.0f / Harness.Tuning->MouseLookScale, 0.0f));
+	Harness.Step();
+	Harness.Idle(0.5f);
+
+	const float ViewYaw = static_cast<float>(Harness.Controller->GetControlRotation().Yaw);
+	const float BodyYawAfterLook = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+	Report(*this, TEXT("lichaam gedraaid door alleen te kijken"),
+		FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYawBefore, BodyYawAfterLook)), TEXT("gr"),
+		TEXT("hoort ~0 te zijn: rondkijken laat hem staan (punt 6)"));
+
+	// En nu vooruit duwen. De invoer is camera-relatief, dus "vooruit" is de
+	// nieuwe kijkrichting.
+	const FVector ViewForward = FRotator(0.0f, ViewYaw, 0.0f).Vector();
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 2.0);
+
+	const float BodyYawAfterWalk = static_cast<float>(Harness.Body->GetActorRotation().Yaw);
+	const float FacingError = FMath::Abs(FMath::FindDeltaAngleDegrees(BodyYawAfterWalk, ViewYaw));
+	const FVector Travelled = Harness.Location() - StartLocation;
+	const float TravelledCm = static_cast<float>(Travelled.Size2D());
+	const float Alignment = TravelledCm > 1.0f
+		? static_cast<float>(FVector::DotProduct(Travelled.GetSafeNormal2D(), ViewForward)) : 0.0f;
+
+	Report(*this, TEXT("afwijking lichaam t.o.v. de nieuwe kijkrichting"), FacingError, TEXT("gr"),
+		TEXT("klein: hij heeft zich omgedraaid"));
+	Report(*this, TEXT("afgelegde afstand na de omkering"), TravelledCm, TEXT("cm"));
+	Report(*this, TEXT("richting van de verplaatsing t.o.v. de camera"), Alignment, TEXT(""),
+		TEXT("1 = precies de camera uit; -1 = de andere kant op"));
+
+	// KIJKT hij die kant op.
+	TestTrue(FString::Printf(TEXT("omkering: het lichaam draait mee zodra hij loopt (%.0f gr afwijking)"), FacingError),
+		FacingError < 25.0f);
+	// GAAT hij die kant op. Zonder deze tweede zou een lichaam dat netjes
+	// omdraait maar achteruit wegschuift alsnog groen zijn.
+	TestTrue(FString::Printf(TEXT("omkering: hij loopt ook echt die kant op (uitlijning %.2f, %.0f cm)"), Alignment, TravelledCm),
+		Alignment > 0.8f && TravelledCm > 100.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
