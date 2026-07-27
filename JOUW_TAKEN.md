@@ -147,8 +147,18 @@ Elf witte vlakken van een halve meter op 8,6 m zouden elk ruim 50 pixels beslaan
 Er staat niets. **Dat is geen "bijna af" maar een onopgelost defect**, en ik meld
 het als zodanig in plaats van het als geland te tellen.
 
-Wat ik als enige nog niet heb geprobeerd: het spoor zónder eigen materiaal spawnen.
-Rendert hij dan wél, dan ligt het aan het toon-master en niet aan mijn kant.
+Sindsdien nog drie dingen uitgesloten met een **kanarie**: hetzelfde vlak, maar
+neergezet bij het STARTEN in plaats van tijdens het spelen, op open weg, 90 cm groot
+en magenta. Ook onzichtbaar. Daarna met het dikte-recept van de grayboxbouwer (tien
+keer dikker) — onzichtbaar. En met een engine-materiaal dat niet van licht afhangt
+en geen masker heeft — onzichtbaar.
+
+**Elf uitsluitingen, allemaal gemeten, en het rendert nog steeds niet.** Dat is
+vervelend maar het is geen verspilde middag: wie hier verdergaat hoeft geen van
+deze elf nog te proberen. De volgende stap is de editor — één blik op die actor in
+de wereld zegt in tien seconden wat elf ronden niet konden.
+
+*(Ik heb de kanarie weer weggehaald: het was een proef, geen functie.)*
 
 *(oorspronkelijke tekst hieronder)* **Wat er dan wél is: het spoor rendert niet.** Een proef met een spoor van 90 cm —
 tien keer de echte maat, vol in beeld — liet ook niets zien. Dat sluit maat en

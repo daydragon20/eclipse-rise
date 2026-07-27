@@ -142,6 +142,12 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	//   aan de kleur             NEE - knalwit met honderdvoudige emissie: niets
 	//   aan MIJN materiaal       NEE - ook met de engine-standaard: niets
 	//   aan de spawnwijze        NEE - identiek aan de districtblokken die WEL renderen
+	//   aan het MOMENT           NEE - een kanarie bij BeginPlay, op open weg, 90 cm,
+	//                                  geprojecteerd in beeld: even onzichtbaar
+	//   aan de dikte             NEE - ook op de Z-schaal 0,04 van de grondvlakken
+	//                                  van de bouwer (10x dikker dan mijn 0,004)
+	//   aan MIJN materiaalkeuze  NEE - ook met EmissiveMeshMaterial, dat niet van
+	//                                  licht afhangt en geen masker heeft
 	//
 	// Wat dus overblijft ligt buiten wat dit harnas kan zien. Volgende stap is een
 	// ander gereedschap dan de opnameronde: in de editor kijken, of de renderlagen
