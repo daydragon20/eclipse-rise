@@ -171,6 +171,32 @@ de lichtplekken en contactschaduwen van de bouwer wél renderen. Dat heb ik nooi
 gezien — alleen aangenomen omdat de wijk aangekleed oogt. Er staan er **38** in de
 wereld, met precies het recept dat mijn spoor nu ook gebruikt.
 
+### 📍 HET INSLAGSPOOR — DE STAND NU (lees alleen dit; wat eronder staat is het spoor ernaartoe)
+
+**Gebouwd, en niet zichtbaar te krijgen.** Ik heb er een middag aan besteed en drie
+keer een conclusie moeten terugnemen. Dit is wat er ná al die proeven overeind staat:
+
+| | |
+|---|---|
+| **verscheen wél** | een kubus **bij je personage** — de énige proef die ooit iets liet zien |
+| **verscheen niet** | alles op de **inslagplek** (7–9 m vooruit, 1 cm boven de grond) |
+
+Dat tweede geldt bij **elke** variant die ik heb geprobeerd: vanuit het wapen én
+vanuit de game mode, bij het opstarten én tijdens het spelen, op 9, 50 en 90 cm, plat
+en massief, met vier verschillende materialen, met en zonder masker, vrijstaand en
+vastgemaakt aan jou.
+
+**Wat de zichtbare proef onderscheidt is dus zijn PLEK** — niet het moment, niet het
+materiaal, niet de maat, niet de manier. Waar dat aan ligt weet ik niet, en ik ga er
+geen vierde conclusie over opschrijven die het geen half uur houdt.
+
+**Wat het jou kost:** je hoort je missers wel (dat werkt), je ziet ze niet. Dat staat
+zo in de startbat, zodat je het niet als bug meldt.
+
+**De volgende sessie begint hier**, met het gereedschap dat ik niet heb: de editor.
+
+---
+
 ### ❓ EEN VRAAG DIE JIJ IN EEN HALVE RONDE BEANTWOORDT (en ik niet)
 
 Ik heb vastgesteld dat dingen die **tijdens het spelen** worden neergezet niet
