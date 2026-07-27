@@ -118,6 +118,10 @@ private:
 	/** Grootste restvector aan het begin van een duw; >0 betekent dat niemand consumeerde. */
 	float PlayShotIntervalRestBeforePush = 0.0f;
 
+	/** Grootste gat tussen twee duwen; een stal rond de opname zou hier staan. */
+	float PlayShotIntervalLargestGap = 0.0f;
+	double PlayShotLastPushTime = 0.0;
+
 	/** Laagste GetMaxSpeed() van het interval; nul verklaart een pawn die niet loopt. */
 	float PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 

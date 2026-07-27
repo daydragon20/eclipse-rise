@@ -338,6 +338,22 @@ void AEclipseGameMode::DrivePlayShotInput()
 	PlayShotIntervalRestBeforePush = FMath::Max(PlayShotIntervalRestBeforePush,
 		static_cast<float>(Body->GetPendingMovementInputVector().Size()));
 
+	// HET GROOTSTE GAT TUSSEN TWEE DUWEN. Het dode interval begint PRECIES bij
+	// opname 1, en HighResShot schrijft een PNG op de game thread. De duwteller
+	// staat op 100, dus de TIMER liep door — maar dat sluit niet uit dat er een
+	// stal in zit waarin componenten niet tickten. Loopt de rest-vector op tot 19
+	// (bijna 0,4 s aan duwen), dan hoort daar een gat bij als dit de oorzaak is.
+	// Zo niet, dan liepen de duwen gelijkmatig en ligt het niet aan de opname.
+	{
+		const double NowSeconds = Body->GetWorld() != nullptr ? Body->GetWorld()->GetTimeSeconds() : 0.0;
+		if (PlayShotLastPushTime > 0.0)
+		{
+			PlayShotIntervalLargestGap = FMath::Max(PlayShotIntervalLargestGap,
+				static_cast<float>(NowSeconds - PlayShotLastPushTime));
+		}
+		PlayShotLastPushTime = NowSeconds;
+	}
+
 	if (bPlayShotWalking)
 	{
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
@@ -479,7 +495,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, REST VOOR DE DUW %.2f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, GROOTSTE GAT %.3f s), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -488,6 +504,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				// en verder alles gezond. Laatste kandidaat die het patroon dekt.
 				PlayShotBody->IsMoveInputIgnored() ? 1 : 0,
 				PlayShotIntervalRestBeforePush,
+				PlayShotIntervalLargestGap,
 				PlayShotIntervalPathLength,
 				PlayShotIntervalTopAccel,
 				PlayShotIntervalTopSpeed,
@@ -504,6 +521,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalPushes = 0;
 		PlayShotIntervalTopAccel = 0.0f;
 		PlayShotIntervalRestBeforePush = 0.0f;
+		PlayShotIntervalLargestGap = 0.0f;
 		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
