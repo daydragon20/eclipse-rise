@@ -1478,6 +1478,23 @@ void AEclipseGameMode::SpawnMissionActors()
 		SpawnedMissionActors.Add(Enemy);
 	}
 
-	UE_LOG(LogEclipse, Display, TEXT("GameMode: mission actors spawned (%d squadmates, %d enemies)."),
-		Mission->GetDeployedSoldierIds().Num(), EnemyIndex);
+	// GDD 12.4 kent nog een budget dat NU al meetbaar is: hoogstens 40
+	// volwaardige AI-agenten in de gevechtsbubbel. Dat aantal werd wel gelogd
+	// maar nergens tegen de grens gehouden — dezelfde vorm als de frametijd en
+	// de strategische tick, en de derde keer dat ik hem vannacht tegenkom.
+	//
+	// Vandaag zijn het er zeven, dus dit gaat nergens over. Het punt is dat de
+	// marge ZICHTBAAR is voordat hij op raakt: een missie die er ineens vijftig
+	// neerzet, hoort dat te zeggen op de dag dat het gebeurt en niet pas als de
+	// frametijd wegzakt en niemand meer weet waardoor.
+	const int32 AgentCount = Mission->GetDeployedSoldierIds().Num() + EnemyIndex;
+	constexpr int32 AgentBudget = 40; // GDD 12.4
+	UE_LOG(LogEclipse, Display, TEXT("GameMode: mission actors spawned (%d squadmates, %d enemies) — %d van %d agenten, %d marge."),
+		Mission->GetDeployedSoldierIds().Num(), EnemyIndex, AgentCount, AgentBudget, AgentBudget - AgentCount);
+	if (AgentCount > AgentBudget)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("GameMode: %d volwaardige agenten tegen een budget van %d (GDD 12.4) — nog geen fout, wel de kant op."),
+			AgentCount, AgentBudget);
+	}
 }
