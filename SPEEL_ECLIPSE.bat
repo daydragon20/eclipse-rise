@@ -101,7 +101,10 @@ echo   Afsluiten ............ Esc
 echo.
 echo   NIEUW SINDS JE VORIGE SESSIE - waar je op kunt letten:
 echo     - je personage staat stil weer in beeld (was helemaal weg)
-echo     - hij DRAAIT mee als je ver wegkijkt, met een draai-animatie
+echo     - hij draait NIET meer mee als je stilstaat en rondkijkt. Dat stond hier
+echo       andersom en is vandaag omgedraaid op jouw verzoek: je kunt nu om je
+echo       personage heen kijken en zijn VOORKANT zien. Zodra je MIKT draait hij
+echo       wel meteen naar de camera, anders schoot je opzij.
 echo     - HERLADEN heeft nu een houding; die is geleend uit een ander pack
 echo     - er HANGT een wapen in je handen; hier stond het tegenovergestelde en
 echo       dat was onjuist. Het zat verstopt doordat het dezelfde kleur had als je
