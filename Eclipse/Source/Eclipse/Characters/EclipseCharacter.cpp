@@ -927,9 +927,62 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 					*GetName(), SlotIndex, *SlotMaterial->GetName());
 			}
 			UTexture* BaseTexture = FindBaseColorTexture(MeshComponent->GetMaterial(SlotIndex));
+			// HET WAPEN KRIJGT EEN EIGEN WAARDE, GEEN EIGEN KLEUR.
+			//
+			// Owner-beslissing 27-07, letterlijk: "geef het wapen GEEN eigen kleur.
+			// Geef het een eigen WAARDE. Gunmetal — sterk ontzadigd, duidelijk
+			// donkerder dan elk lichaam waar het tegenaan ligt. Het wapen wordt
+			// leesbaar doordat het een gat in het silhouet slaat, niet doordat er
+			// een nieuwe kleur bij komt." Dat breekt de ÉÉN-STIJL-WET niet: het
+			// palet blijft de enige kleur-autoriteit en dit is een andere trede op
+			// dezelfde ladder — hetzelfde principe als het lichtplan, waar de
+			// hiërarchie ook uit helderheid komt en niet uit kleur.
+			//
+			// WAAROM DIT NODIG IS: de restyle schildert ALLE TWAALF slots met
+			// dezelfde factietint, dus haar, ogen, holo-arm én geweer krijgen exact
+			// de kleur van het lichaam waar ze tegenaan liggen. Daarom verdween het
+			// wapen twee dagen lang in het silhouet en werd het als "er hangt geen
+			// wapenmesh" gerapporteerd — een claim die de owner op vier van mijn
+			// eigen opnames heeft moeten weerleggen.
+			//
+			// DE FACTOR IS GEMETEN EN NIET GEKOZEN. Op HighresScreenshot00980:
+			// lichaam mediaan 50,9 van 255, donkerste 5% van het frame onder 11,1.
+			// Twee gebankte waardestappen (x0,72 — dezelfde stap die de floor- en
+			// CoverB-hiërarchie in het district gebruikt) brengen 51 naar ~26: ruim
+			// onder het lichaam, en ruim boven de schaduw waarin het zou wegvallen.
+			// Vandaar 0.72^2. Ontzadigen gebeurt door naar het grijs van de eigen
+			// luminantie te trekken, zodat het wapen geen NIEUWE hue introduceert.
+			//
+			// OP NAAM EN NIET OP INDEX: slotvolgorde is een eigenschap van het
+			// asset, en een hardgecodeerde 4 breekt stil zodra er een lichaam met
+			// een andere indeling bijkomt.
+			FLinearColor SlotLit = BodyDef.TintLit;
+			FLinearColor SlotShade = BodyDef.TintShade;
+			if (const UMaterialInterface* SourceMaterial = MeshComponent->GetMaterial(SlotIndex))
+			{
+				if (SourceMaterial->GetName().Contains(TEXT("Gun")))
+				{
+					constexpr float GunmetalStep = 0.72f * 0.72f;
+					auto ToGunmetal = [](const FLinearColor& In)
+					{
+						const float Grey = In.GetLuminance();
+						// 0,85 richting grijs: ontzadigd, maar niet volledig neutraal —
+						// een wapen dat exact grijs is leest als een gat in het beeld
+						// in plaats van als een voorwerp.
+						const FLinearColor Desaturated = FMath::Lerp(In, FLinearColor(Grey, Grey, Grey, In.A), 0.85f);
+						return Desaturated * GunmetalStep;
+					};
+					SlotLit = ToGunmetal(BodyDef.TintLit);
+					SlotShade = ToGunmetal(BodyDef.TintShade);
+					UE_LOG(LogEclipse, Display,
+						TEXT("%s: slot %d ('%s') krijgt gunmetal — twee waardestappen onder de factietint"),
+						*GetName(), SlotIndex, *SourceMaterial->GetName());
+				}
+			}
+
 			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaster, this);
-			Mid->SetVectorParameterValue(TEXT("LitColor"), BodyDef.TintLit);
-			Mid->SetVectorParameterValue(TEXT("ShadeColor"), BodyDef.TintShade);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), SlotLit);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), SlotShade);
 			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunTravel, 0.0f)));
 			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
 			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
