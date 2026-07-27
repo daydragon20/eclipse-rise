@@ -115,6 +115,22 @@ private:
 	/** Grootste invoervector die de bewegingscomponent in dit interval heeft OPGEHAALD. */
 	float PlayShotIntervalTopConsumed = 0.0f;
 
+	/** Hoeveel de wachtrij van de pawn IN TOTAAL groeide door onze duwen. */
+	float PlayShotIntervalLanded = 0.0f;
+
+	/** Hoeveel er tussen twee duwen door uit die wachtrij VERDWEEN. */
+	float PlayShotIntervalVanished = 0.0f;
+
+	/** Stand van de wachtrij vlak na de vorige duw; -1 = nog geen duw gehad. */
+	float PlayShotLastPendingAfter = -1.0f;
+
+	/** Op hoeveel duwmomenten de component iets in zijn laatste invoer had staan. */
+	int32 PlayShotIntervalSawInput = 0;
+
+	/** Hoe vaak de component met zijn tick UIT stond, en hoe vaak inactief. */
+	int32 PlayShotIntervalTickOff = 0;
+	int32 PlayShotIntervalInactive = 0;
+
 	/** Hoogste acceleratie van het interval; nul bij honderd duwen wijst naar ConsumeInputVector. */
 	float PlayShotIntervalTopAccel = 0.0f;
 

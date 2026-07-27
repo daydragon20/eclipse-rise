@@ -9,6 +9,47 @@
 > morgenrapport hieronder klopt feitelijk nog, maar het beschrijft een werkwijze
 > die de owner op 27-07 heeft afgekeurd. Lees eerst dit.
 
+## ⏸ GEPARKEERD OP OWNER-VERZOEK: de 3-cm-val (27-07, 14:40)
+
+**Owner: "schrijf dat op en laat het liggen. Het is een defect in de opnameronde,
+niet in het spel."** Klopt: de val zit in de opnameronde, de suite is groen en het
+spel loopt. Dit is de stand, zodat het straks in één keer verder kan.
+
+**WAT GEMETEN IS (drie nieuwe metingen vandaag):**
+
+| | moment 2 (dood) | moment 3 (loopt) |
+|---|---|---|
+| duwen | 100 | 100 |
+| component heeft opgehaald (piek) | **0.00** | 11–13 |
+| component zag invoer op … duwmomenten | **0 van 100** | 31 van 100 |
+| geland in de wachtrij / weer verdwenen | 100 / 99 | 100 / 99 |
+| tick uit / inactief | 0 / 0 | 0 / 0 |
+| acceleratie, afgelegde weg | 0, 3 cm | 1400, 229–262 cm |
+
+**DE OWNER SCHREEF "je hebt het mechanisme gevonden (invoer stapelt ongeconsumeerd
+op tot 19)". DAT HEB IK NIET.** Ik heb het tegenovergestelde: een tegenspraak die
+ik niet kan oplossen, en die is meer waard dan een verklaring die het niet is.
+
+De duwen verdwijnen wél uit de wachtrij (99 van de 100), en in de héle engine is er
+precies één plek die die wachtrij leegt — `APawn::Internal_ConsumeMovementInputVector`
+— en die zet ONLOSMAKELIJK ook `LastControlInputVector` op wat hij weghaalde
+(`Pawn.cpp:867-871`, twee regels onder elkaar). Toch las ik dat veld op alle honderd
+duwmomenten als nul. **Beide kunnen niet waar zijn.** Eén van mijn twee tellers meet
+iets anders dan ik denk, en welke weet ik nog niet.
+
+**DE VOLGENDE STAP STAAT AL IN DE CODE EN KOST NIETS.** Er logt nu bij de eerste
+vijf duwen van elk interval één rauwe regel met álle waarden op hetzelfde moment
+(wachtrij voor/na, component-laatste, snelheid, versnelling). Aggregaten kunnen dit
+per definitie niet beslissen — die zijn juist waar de twee metingen uit elkaar
+lopen. De eerstvolgende opnameronde drukt het antwoord dus gratis af; het staat in
+`Eclipse-backup-*.log` onder `[PLAYSHOT RUW]`.
+
+**Uitgesloten (met de engine-bron ernaast, niet door te gissen):** `ShouldSkipUpdate`
+(de enige schakelaar ervoor, `bUpdateOnlyIfRendered`, staat bij ons nergens aan),
+de controller-tak (`IsMoveInputIgnored` = false kán alleen met een lokale controller,
+dus `bShouldPerformControlledCharMove` is waar), tick uit, component inactief, en de
+zeven kandidaten uit de eerdere ronde.
+
 ## De opdracht die alles eronder overstemt
 
 De owner, na twee dagen: *"Geen nieuwe features, geen losse fixes op mijn

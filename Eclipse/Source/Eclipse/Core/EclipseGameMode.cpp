@@ -366,7 +366,30 @@ void AEclipseGameMode::DrivePlayShotInput()
 	{
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
 		const FRotator YawOnly(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+
+		// LANDT DE DUW, EN BLIJFT HIJ LIGGEN? Twee vragen die je alleen uit elkaar
+		// houdt door VLAK VOOR en VLAK NA de duw te kijken.
+		//
+		// De vorige meting zei dat de component nul invoer ophaalde terwijl er
+		// honderd duwen in gingen. Er zijn dan nog maar twee mogelijkheden, en die
+		// zijn hier allebei zichtbaar:
+		//   de wachtrij groeit niet bij de duw  -> hij landt niet (LANDT)
+		//   hij groeit wel maar is er de volgende keer niet -> iets anders haalt hem
+		//        weg voordat de component kijkt (VERDAMPT)
+		// Op het opnamemoment stond de wachtrij op 1.00 terwijl er honderd duwen in
+		// gingen; dat sluit "hij stapelt gewoon op" al uit, maar niet welke van deze
+		// twee het is.
+		const float PendingVoor = Body->GetPendingMovementInputVector().Size();
+		if (PlayShotLastPendingAfter >= 0.0f)
+		{
+			PlayShotIntervalVanished += FMath::Max(0.0f, PlayShotLastPendingAfter - PendingVoor);
+		}
+
 		Body->AddMovementInput(FRotationMatrix(YawOnly).GetUnitAxis(EAxis::X), 1.0f);
+
+		const float PendingNa = Body->GetPendingMovementInputVector().Size();
+		PlayShotIntervalLanded += (PendingNa - PendingVoor);
+		PlayShotLastPendingAfter = PendingNa;
 		// TELLEN DAT HIJ ECHT GEDUWD IS. Het hele 3-cm-dossier staat op de aanname
 		// dat de invoer in dat dode interval wordt aangeboden, en die leidde ik af
 		// uit 'duw 1.00' op het OPNAMEMOMENT - een andere timer, dus die waarde kan
@@ -396,6 +419,47 @@ void AEclipseGameMode::DrivePlayShotInput()
 		{
 			PlayShotIntervalTopConsumed =
 				FMath::Max(PlayShotIntervalTopConsumed, DriveMove->GetLastInputVector().Size());
+
+			// TIKT DE COMPONENT UBERHAUPT? De vorige twee metingen samen laten maar
+			// een ding over: de wachtrij wordt geleegd (99 van de 100 verdwijnen)
+			// terwijl de component zegt dat hij nooit iets heeft opgehaald. Dat kan
+			// alleen als hij niet draait, of als iets anders de wachtrij leegt.
+			//
+			// Dit is de goedkoopste kant van die tweedeling: draait hij, en staat hij
+			// aan. Kost twee vlaggen en sluit de helft af.
+			if (!DriveMove->IsComponentTickEnabled())
+			{
+				++PlayShotIntervalTickOff;
+			}
+			if (!DriveMove->IsActive())
+			{
+				++PlayShotIntervalInactive;
+			}
+			if (!DriveMove->GetLastInputVector().IsNearlyZero())
+			{
+				++PlayShotIntervalSawInput;
+			}
+
+			// DE EERSTE VIJF DUWEN RUW, want mijn samenvattingen spreken elkaar tegen.
+			//
+			// De stand: 99 van de 100 duwen verdwijnen uit de wachtrij, en de enige
+			// plek in de hele engine die die wachtrij leegt (Internal_ConsumeMovement-
+			// InputVector) zet ONLOSMAKELIJK ook LastControlInputVector op wat hij
+			// weghaalde. Toch las ik die op alle honderd duwmomenten als nul. Beide
+			// kunnen niet waar zijn, dus een van mijn twee tellers meet iets anders
+			// dan ik denk.
+			//
+			// Dan houdt samenvatten op. Vijf regels met alle waarden op HETZELFDE
+			// moment beslissen het, en aggregaten kunnen dat per definitie niet: die
+			// zijn juist waar de twee metingen uit elkaar zijn gaan lopen.
+			if (PlayShotIntervalPushes <= 5)
+			{
+				UE_LOG(LogEclipse, Display,
+					TEXT("[PLAYSHOT RUW] duw %d: wachtrij voor=%.2f na=%.2f, component-laatste=%.2f, snelheid=%.0f, accel=%.0f"),
+					PlayShotIntervalPushes, PendingVoor, PendingNa,
+					DriveMove->GetLastInputVector().Size(),
+					DriveMove->Velocity.Size(), DriveMove->GetCurrentAcceleration().Size());
+			}
 		}
 	}
 	if (bPlayShotTurning)
@@ -526,7 +590,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -545,7 +609,12 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
 				Move != nullptr && Move->IsMovingOnGround() ? 1 : 0,
 				PlayShotBody->GetPendingMovementInputVector().Size(),
-				PlayShotIntervalTopConsumed);
+				PlayShotIntervalTopConsumed,
+				PlayShotIntervalLanded,
+				PlayShotIntervalVanished,
+				PlayShotIntervalSawInput,
+				PlayShotIntervalTickOff,
+				PlayShotIntervalInactive);
 		}
 		// Teller op nul voor het volgende interval: hij meet PER interval, en een
 		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
@@ -553,6 +622,12 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalPathLength = 0.0f;
 		PlayShotIntervalPushes = 0;
 		PlayShotIntervalTopConsumed = 0.0f;
+		PlayShotIntervalLanded = 0.0f;
+		PlayShotIntervalVanished = 0.0f;
+		PlayShotLastPendingAfter = -1.0f;
+		PlayShotIntervalSawInput = 0;
+		PlayShotIntervalTickOff = 0;
+		PlayShotIntervalInactive = 0;
 		PlayShotIntervalTopAccel = 0.0f;
 		PlayShotIntervalRestBeforePush = 0.0f;
 		PlayShotIntervalLargestGap = 0.0f;
