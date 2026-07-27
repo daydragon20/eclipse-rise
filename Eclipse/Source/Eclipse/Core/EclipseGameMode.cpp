@@ -141,19 +141,6 @@ void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStru
 			Plate->SetMaterial(0, Mid);
 		}
 	}
-	// PROEF: VASTMAKEN AAN DE SPELER. Het blok dat wel verscheen was vastgemaakt aan
-	// het personage; al mijn sporen staan los. Dat verschil heb ik nooit apart
-	// getest, en het is een van de twee dingen die de werkende kubus onderscheiden
-	// van dit spoor (het andere is het moment). Verschijnt hij hierdoor wel, dan ligt
-	// het aan het vrijstaand zijn en niet aan de tijd.
-	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-	{
-		if (APawn* Speler = PC->GetPawn())
-		{
-			Mark->AttachToActor(Speler, FAttachmentTransformRules::KeepWorldTransform);
-		}
-	}
-	Mark->SetActorScale3D(FVector(0.50f, 0.50f, 0.50f)); // PROEF: zichtbaar formaat
 	Mark->SetLifeSpan(2.5f);
 	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
 	UE_LOG(LogEclipse, Verbose, TEXT("[SPAWNTIJD] inslagspoor op t=%.2f s."), World->GetTimeSeconds());
@@ -161,8 +148,11 @@ void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStru
 	// ================================================================
 	// DE CONCLUSIE VAN 27-07, en hij is groter dan dit ene spoor.
 	//
-	// WERKT WEL:  een blok dat bij BeginPlay wordt neergezet staat groot en helder
-	//             in beeld — bewezen met een magenta kubus aan het personage.
+	// WERKT WEL:  een magenta kubus VASTGEMAAKT AAN HET PERSONAGE, op zijn positie.
+	//             Groot en helder in elk frame. Dat is de ENIGE proef die ooit iets
+	//             liet zien.
+	// (hieronder stond dat het aan de TIJD lag; vastmaken tijdens het spelen hielp
+	//  ook niet, dus dat patroon hield het geen half uur — de tweede keer vandaag.)
 	// WERKT NIET: hetzelfde blok, zelfde mesh, zelfde materiaal, zelfde maat, maar
 	//             neergezet TIJDENS HET SPELEN. Onzichtbaar — zowel vanuit het
 	//             wapencomponent als vanuit deze game mode via de bus, op 9, 50 en
