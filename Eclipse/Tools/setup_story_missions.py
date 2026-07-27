@@ -270,11 +270,19 @@ rows = json.dumps([
      "RewardCredits": 60, "RewardMaterials": 40, "RewardIntel": 4,
      "BriefingText": "Take the tower and the district goes deaf. It will answer - be gone before it does.",
      "BriefingSpeaker": "Mara"},
-    # M1.4 achter de beat van M1.3, en gepind op WorkerHousing. Zelfde gemeten
-    # beperking als bij M1.3: zolang SPEC-P2-05 de eerste regio-flip niet levert,
-    # bezit de speler alleen Underworks en zijn TransitCheckpoint en WorkerHousing
-    # de enige selecteerbare regio's. WorkerHousing komt vrij zodra M1.2 gespeeld
-    # is, dus de keten wisselt netjes tussen die twee.
+    # M1.4 achter de beat van M1.3, gepind op FoundryRow. Ook deze keuze is
+    # GEMETEN, en de meting draaide de vorige om:
+    #
+    #   keten: MT_M14 selecteerbaar — NEE, reden: "Region is already player-held"
+    #
+    # M1.3 zet de SPEC-P2-05 liberation in werking, en die draait de trio
+    # TransitCheckpoint/WorkerHousing/SupplyDepot om naar de speler. Precies de
+    # twee regio's waarop M1.1 t/m M1.3 speelden zijn daarna GEEN doel meer — je
+    # valt je eigen wijk niet aan.
+    #
+    # Dat is geen bug maar het punt van de missie: de Foothold verlegt de rand van
+    # de kaart. FoundryRow is industrieel (een arsenaal hoort in een fabriekswijk)
+    # en grenst aan TransitCheckpoint, dat na de flip van de speler is.
     #
     # NIET GEAUTHORD, en dat hoort hier te staan: de spec belooft bij M1.4 ook
     # "Brick aan het roster" en "UnlockedLoadoutTags += real-rifle tier". Beide
@@ -284,7 +292,7 @@ rows = json.dumps([
     # als een optional die zichzelf afvinkt.
     {"Name": "MT_M14", "MissionId": "MT_M14",
      "MissionAsset": f"{MISSIONS_PATH}/MT_M14.MT_M14",
-     "PinnedRegionId": "WorkerHousing",
+     "PinnedRegionId": "FoundryRow",
      "UnlockBeatTag": {"TagName": "Story.Beat.M13_SignalFire"},
      "CompletionBeatTag": {"TagName": "Story.Beat.M14_Quartermaster"},
      "RewardCredits": 100, "RewardMaterials": 200, "RewardIntel": 0,

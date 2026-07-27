@@ -680,17 +680,32 @@ bool FEclipseMissionM13ShippedDataGauntletTest::RunTest(const FString& Parameter
 	TestEqual(TEXT("rij-credits vastgelegd"), Credits, 60);
 	TestEqual(TEXT("rij-materialen vastgelegd"), Materials, 40);
 
-	// DE SUBTIELSTE REGEL VAN DEZE SPEC. M1.3 IS de eerste wereldstaat-wijziging,
-	// maar hij voert hem NIET ZELF uit: zijn completion is de naad die SPEC-P2-05
-	// consumeert, en die commit de Foothold-flips. Zolang P2-05 niet bestaat mag
-	// er dus niets omdraaien - en als P2-05 er is, hoort deze assertie te
-	// verhuizen in plaats van stilletjes te blijven kloppen.
-	const FEclipseRegionState* RegionAfter = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint"));
-	if (TestNotNull(TEXT("regio bestaat nog na de debrief"), RegionAfter))
+	// DE SUBTIELSTE REGEL VAN DEZE SPEC, en hij is 27-07 verhuisd zoals het
+	// commentaar dat hier stond al aankondigde.
+	//
+	// Er stond: "M1.3 draait zelf GEEN regio om, zolang P2-05 niet bestaat mag er
+	// niets omdraaien". Dat klopte precies zolang de liberation-tabel niet aan de
+	// verscheepte setup gekoppeld was - en dat was hij niet. Nu wel, en dan hoort
+	// de assertie de NAAD te bewijzen in plaats van zijn afwezigheid.
+	//
+	// De discriminator is het AANTAL: M1.3 speelt op TransitCheckpoint, dus een
+	// missie-eigen flip zou alleen dat vak kunnen raken. Dat ook WorkerHousing en
+	// SupplyDepot omgaan - twee regio's waar deze missie niets mee te maken heeft
+	// - kan alleen van de Foothold-rij komen. Daarmee onderscheidt deze test de
+	// twee mogelijke schrijvers van regiostaat, en dat is precies waar 12.3 om
+	// vraagt.
+	for (const TCHAR* Region : { TEXT("TransitCheckpoint"), TEXT("WorkerHousing"), TEXT("SupplyDepot") })
 	{
-		TestTrue(TEXT("M1.3 draait zelf GEEN regio om - dat is de P2-05-naad"),
-			RegionAfter->Owner == OwnerBefore);
+		const FEclipseRegionState* Flipped = Campaign->GetState().FindRegion(Region);
+		if (TestNotNull(FString::Printf(TEXT("naad: %s bestaat"), Region), Flipped))
+		{
+			TestTrue(FString::Printf(TEXT("naad: %s ging naar de speler op M1.3's completion (SPEC-P2-05)"), Region),
+				Flipped->Owner == EEclipseRegionOwner::Player);
+		}
 	}
+	// En de missie zelf draagt die flip niet: haar eigen vlag staat uit.
+	TestFalse(TEXT("naad: M1.3's eigen transactie draagt geen regio-flip"),
+		OwnerBefore == EEclipseRegionOwner::Player);
 
 	Bus->Unsubscribe(EconomyHandle);
 	GameInstance->Shutdown();
@@ -774,7 +789,32 @@ bool FEclipseMissionM14ChainOnShippedDataTest::RunTest(const FString& Parameters
 			{ TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") })) { GameInstance->Shutdown(); return false; }
 	if (!PlayLink(TEXT("TransitCheckpoint"), TEXT("MT_M13"),
 			{ TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") })) { GameInstance->Shutdown(); return false; }
-	if (!PlayLink(TEXT("WorkerHousing"), TEXT("MT_M14"),
+	// Eerst: IS de tabel uberhaupt gekoppeld? Zonder die vraag is "de flip
+	// gebeurt niet" dubbelzinnig — het kan de bedrading zijn of de data, en dat
+	// zijn twee verschillende reparaties.
+	AddInfo(FString::Printf(TEXT("GEMETEN  DA_CampaignSetup.LiberationInstances = %s"),
+		Setup->LiberationInstances.IsNull() ? TEXT("NIET GEKOPPELD") : *Setup->LiberationInstances.ToString()));
+
+	// DE P2-05-NAAD, voor het eerst op een missie die ECHT bestaat.
+	//
+	// De liberation-instance ("Foothold") triggert op MT_M13 en draait
+	// TransitCheckpoint, WorkerHousing en SupplyDepot om naar de speler. Die
+	// bedrading is gebouwd en unit-getest, maar de trigger wees tot vannacht naar
+	// een missie die niet geauthord was — er was dus nooit een keten waarin hij
+	// echt kon vuren.
+	for (const TCHAR* Region : { TEXT("TransitCheckpoint"), TEXT("WorkerHousing"), TEXT("SupplyDepot") })
+	{
+		const FEclipseRegionState* State = Campaign->GetState().FindRegion(Region);
+		AddInfo(FString::Printf(TEXT("GEMETEN  na M1.3 is %s van %s"), Region,
+			State != nullptr ? *UEnum::GetValueAsString(State->Owner) : TEXT("(onbekend)")));
+		if (TestNotNull(FString::Printf(TEXT("naad: %s bestaat"), Region), State))
+		{
+			TestTrue(FString::Printf(TEXT("naad: %s is na M1.3 van de speler — de Foothold-liberation heeft gevuurd"), Region),
+				State->Owner == EEclipseRegionOwner::Player);
+		}
+	}
+
+	if (!PlayLink(TEXT("FoundryRow"), TEXT("MT_M14"),
 			{ TEXT("Obj_M14_CrateFirst"), TEXT("Obj_M14_CrateSecond"), TEXT("Obj_M14_Exfil") })) { GameInstance->Shutdown(); return false; }
 
 	// Vier missies, vier dagen. Een keten die er vier speelt maar er drie telt,
@@ -785,9 +825,9 @@ bool FEclipseMissionM14ChainOnShippedDataTest::RunTest(const FString& Parameters
 	// regio-aanbod. Zonder deze assertie zou een pin die blijft hangen (en de
 	// speler dus in M1.4 opsluit) onopgemerkt blijven.
 	FEclipseMissionOfferView AfterChain;
-	if (Strategy->TryGetOffer(TEXT("WorkerHousing"), AfterChain))
+	if (Strategy->TryGetOffer(TEXT("FoundryRow"), AfterChain))
 	{
-		AddInfo(FString::Printf(TEXT("GEMETEN  na de keten biedt WorkerHousing '%s' aan"), *AfterChain.TemplateId.ToString()));
+		AddInfo(FString::Printf(TEXT("GEMETEN  na de keten biedt FoundryRow '%s' aan"), *AfterChain.TemplateId.ToString()));
 		TestNotEqual(TEXT("keten: M1.4 blijft niet hangen als aanbod"), AfterChain.TemplateId, FName(TEXT("MT_M14")));
 	}
 
