@@ -61,7 +61,31 @@ if ($j.failed -gt 0 -or $j.notRun -gt 0) {
     }
 }
 
-# ---------------------------------------------------------- 3. de opnameronde
+# ------------------------------------------------- 3. validatie + catalogus
+# De owner-regel voor de groene bar is breder dan build+suite: "EclipseValidateData
+# 0 fouten + catalog gedocumenteerd = geimplementeerd". Die twee stonden hier
+# eerst NIET in, en ik heb ze een hele nacht met de hand bij elkaar gezocht - de
+# exacte fout die dit script moest wegnemen. Een controle die je moet onthouden,
+# is geen controle.
+Write-Step "VALIDATIE"
+$p = Start-Process -FilePath $exe -PassThru -NoNewWindow -ArgumentList `
+    "`"$Project`"", '-run=EclipseValidateData', '-unattended', '-nullrhi', '-NoLiveCoding'
+if (-not $p.WaitForExit(600000)) { $p.Kill(); throw "validatie liep vast" }
+$Validation = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "ValidateData: .* errors\." |
+    Select-Object -Last 1
+if ($Validation) {
+    Write-Host ($Validation.Line -replace '^.*Display: ', '')
+    if ($Validation.Line -notmatch ', 0 errors\.') { $Failures += "validatie meldt fouten" }
+} else {
+    Write-Host "GEEN VALIDATIEREGEL gevonden - draaide de commandlet wel?"
+    $Failures += "validatie gaf geen uitslag"
+}
+
+Write-Step "CATALOGUS"
+python "$Root\Tools\check_event_catalog.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "event-catalogus klopt niet" }
+
+# ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"
     # De mapnaam voluit, want die kostte een halve avond: een verkeerde naam laat
