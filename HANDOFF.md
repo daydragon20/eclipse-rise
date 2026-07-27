@@ -1,5 +1,5 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-26 (dagopdracht + drie audits: locomotie, gevecht, squad).*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-27, nacht (verificatielaag die naar het scherm kijkt; vier audits).*
 
 ---
 
@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `6ec6508`
+## VEILIG TE SPELEN: JA, commit `d69a04b`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -22,6 +22,12 @@ gisteren ontbrak.
 
 Op datzelfde beeld vond ik meteen een fout die geen enkele meting ooit had kunnen
 vinden. Zie hieronder.
+
+**En jouw opstartpad is schoon.** Ik heb de regel uit `SPEEL_ECLIPSE.bat` letterlijk
+gedraaid — andere exe, 1920×1080, gids-overlay — en het log bevat nu **nul errors
+en nul echte waarschuwingen**. Gisteren stonden daar een CommonUI-error over
+invoerroutering en twee geluiden die niet bestaan. Dat pad had ik nooit eerder
+gedraaid, en het leverde twee van de vijf bugs van vannacht op.
 
 ---
 
