@@ -171,6 +171,17 @@ de lichtplekken en contactschaduwen van de bouwer wél renderen. Dat heb ik nooi
 gezien — alleen aangenomen omdat de wijk aangekleed oogt. Er staan er **38** in de
 wereld, met precies het recept dat mijn spoor nu ook gebruikt.
 
+**EN DAT IS WAARSCHIJNLIJK ZO — hier is de redenering, met de zwakte erbij.** Mijn
+tweede kanarie stond op `(-8150, 0)`, precies waar de inslagen ook landen: wegdek dat
+in elke uitsnede duidelijk zichtbaar is, dus níét achter dekking. Hij had het
+decal-recept van de bouwer én stond er al bij het starten. Alle drie de dingen die
+een grondvlak van de bouwer heeft — en hij was onzichtbaar.
+
+De bouwer gebruikt hetzelfde recept, op dezelfde soort plek, op hetzelfde moment.
+**Dan is de kans groot dat zijn 38 lichtplekken en contactschaduwen er ook niet
+staan.** Bewijs is het niet: ik heb nooit een van díé 38 onbelemmerd in beeld gehad.
+Maar het is sterker dan een vermoeden, en het verlegt waar dit thuishoort.
+
 **Als die laag ook onzichtbaar is, is dit geen defect van mijn inslagspoor maar van
 alles wat plat op de grond ligt.** Dat is een veel groter verhaal, en het is in de
 editor in tien seconden te beantwoorden: zet de wijk stil en kijk of er onder een
