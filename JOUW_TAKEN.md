@@ -354,3 +354,72 @@ De oorspronkelijke vraag hieronder is er besluit 1 van geworden: Dat maakt "verk
 verkeerde build" detecteerbaar, maar het is een formaatwijziging (v5 → v6). De
 goedkope variant is wat er nu staat: de laadkant gaat ervan uit dat het spel zijn
 campagnedata al kent, en klaagt luid als dat niet zo is.
+
+**Waarom ik die spec niet gebouwd heb:** stap 1 van zijn eigen bouwvolgorde ís de
+schemawijziging, en daar hangt reviewpunt 1 direct aan. Wel gebouwd is stap 4,
+`Eclipse.Save.Report` — het commando dat "waarom is mijn kaart leeg" in één regel
+beantwoordt. Autosave (stap 2) heb ik bewust óók laten liggen: een autosave die
+vrolijk schrijft terwijl laden de setup niet herstelt, vertelt je dat je
+voortgang veilig is en geeft je daarna een leeg bord. De spec zet content-
+identiteit niet voor niets vóór autosave.
+
+---
+
+# Wat er vannacht bij is gekomen (27-07) — vier keuzes voor jou
+
+## 1 · SPEC-P2-07 (UI Stack) ligt klaar als concept
+
+[phase0/specs/SPEC-P2-07_ui_stack_v1.md](phase0/specs/SPEC-P2-07_ui_stack_v1.md).
+Dit is de spec die de debug-UI vervangt door de echte CommonUI-stack: HUD,
+command-interface, basis- en missieschermen, kaart, met pad en muis
+gelijkwaardig.
+
+De kern ervan is geen feature maar een **beperking die ik gemeten heb**: de
+UI-laag is met géén enkele opnamemethode vast te leggen. Daardoor staat er in de
+DoD met zoveel woorden dat "ziet er goed uit op een screenshot" een onhaalbaar
+criterium is en niet geschreven mag worden — alles wordt tegen een state dump
+gecontroleerd.
+
+Drie punten waar jouw oordeel nodig is, elk met mijn aanbeveling:
+
+| Vraag | Mijn voorstel |
+|---|---|
+| Hoe ver gaat "diegetisch leunend" (8.8) voor de HUD? | Munitie en trefteken schermvast houden — op 1920×1080 in een donkere wijk kost dat anders leesbaarheid. Alarmstaat en squadstatus wél diegetisch |
+| Blijven F2/F3/H permanent of alleen tijdens ontwikkeling? | Permanent, achter de bestaande CVar. Ze kosten niets en zijn de enige UI die per ontwerp verifieerbaar is |
+| Moet P2-07 op P2-06 wachten? | Nee. Alleen het save/load-scherm hangt eraan; de rest is onafhankelijk |
+
+## 2 · De vierde bron: startbat genereren of een vertaaltabel?
+
+Je klaagde er terecht over dat dezelfde knop op vier plekken anders beschreven
+stond. Het knoppenschema is nu data, en drie van de vier bronnen hangen eraan.
+De startbat nog niet, en daar zit een keuze in.
+
+De **padknoppen** zijn wél hard te bewaken — RT/LT/LB/RB/A/B/X/Y heten in de bat
+exact zoals in het schema. De **handelingen** niet: de bat schrijft "Soldaat
+onder kruis" waar het schema "Onder kruis" zegt, en "HERLADEN" plus een losse
+regel "Squad hergroeperen" tegen één schemaregel. Dat verschil is opzet — de bat
+praat tegen een speler.
+
+Een vertaaltabel zou een **vijfde** bron van waarheid zijn. En zonder handelingen
+vangt de bewaker juist de fout van vandaag niet: LT was gekoppeld aan "vorige
+soldaat" terwijl LT gewoon in het schema staat — de knop klopte, het páár niet.
+
+**Keuze:** de bat genereren uit het schema (dan is de vriendelijke toon weg), of
+de vertaaltabel accepteren. Tot je kiest laat ik het met de hand kloppen.
+
+## 3 · Kijk of de bevrijdingszin aankomt
+
+Haal je de **Foothold** (na Signal Fire), dan staat er nu een zin in het debrief
+die uitlegt wáárom de wijk kantelde — niet alleen welke vakken omdraaiden. Hij
+komt ná de vakregels, en dat is met opzet: een uitleg vóór de commit zou een
+uitkomst aankondigen die nog afgewezen kon worden.
+
+**Zeg het als die zin niet aankomt, of als hij te vroeg komt.**
+
+## 4 · Nog steeds open van eerder
+
+- De **View-knop** testen (ik kan een gamepad niet headless indrukken)
+- Hoe groot een **baken** hoort te zijn (ze zijn 9 × 9 × 40 cm)
+- Of er een **wapenmesh** aan het skelet moet
+- De **stijlbotsing** tussen de blokkerige aankleedfiguren en jouw personage
+- De drie **squad-stemregels** — dat kost betaalde generatie, dus dat vraag ik eerst
