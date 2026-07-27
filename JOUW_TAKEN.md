@@ -187,17 +187,26 @@ Doe stap 1 nu, laat de downloads lopen, en speel meteen door naar stap 2.
 
 ## De resterende bouwstappen van Fase 2
 
-Dit is de officiële volgorde uit `SPEC-P2-00`. Vijf van de dertien staan al groen:
+Dit is de officiële volgorde uit `SPEC-P2-00`.
+
+> **Deze tabel is op 27-07 tegen de DoD's zelf nagelopen** in plaats van tegen een
+> gevoel. Twee correcties, en ze gaan de tegenovergestelde kant op. Stap 7 stond
+> op "55% — wiring volgt" terwijl die wiring er al is, mét veertien tests. Maar
+> "af" is hij óók niet: zijn DoD vraagt een PIE-controle op de debugkaart, een
+> soak die **drie nachten** groen blijft (ik heb er één), en jouw F1/F2-verdicts.
+> Zo'n restant is geen percentage maar een lijstje, dus staat het er nu als
+> lijstje. Wat er per stap nog open staat, is bijna overal iets dat ALLEEN JIJ
+> kunt afvinken.
 
 | # | Stap | Stand |
 |---|---|---|
 | 1-3 | Milestone-flip, squad van 4 + classes | ✅ geland |
 | 4 | Command Mode final feel | 🟡 Stage A geland, Stage B wacht op jou |
-| 5 | Hollow Point walkable base | 🟡 93% — walkable vault is het restant |
-| 6 | Missies M1.1–M1.4 | 🟡 90% — story-laag geland, authoring loopt |
-| 7 | Liberation-instance | 🟡 55% — pure core geland, wiring volgt |
-| 8 | **Save v1** | ⬜ versioned plugin, migratie, autosaves, checkpoints |
-| 9 | **UI Stack v1** | ⬜ debug-UI eruit, CommonUI erin, controller + muis gelijkwaardig |
+| 5 | Hollow Point walkable base | 🟡 code af — rest is JOUW OGEN: "elke bouwstap verandert de vault zichtbaar" moet in PIE |
+| 6 | Missies M1.1–M1.4 | 🟡 alle vier speelbaar en getest — open: Brick op het roster, de recap cold-reader, en de F-verdicts |
+| 7 | Liberation-instance | 🟡 code + tests compleet (14 tests) — open: PIE-controle, de soak DRIE nachten, jouw F1/F2-verdicts |
+| 8 | **Save v1** | 🟡 SPEC-P2-06 ligt als concept op je review; `Eclipse.Save.Report` gebouwd. Autosave en de schemawijziging wachten bewust op jouw oordeel |
+| 9 | **UI Stack v1** | 🟡 SPEC-P2-07 ligt als concept op je review; de pariteitsbewaker gebouwd. De CommonUI-stack zelf wacht |
 | 10 | **Fidelity-district Kessara** | ⬜ **de echte graphics** — hangt aan jouw env-packs |
 | 11 | **Audio-infrastructuur** | ⬜ adaptieve muziek, combat-audio, squad-barks |
 | 12 | Testlagen compleet | ⬜ alle zes lagen incl. nightly soak |
