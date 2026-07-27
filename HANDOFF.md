@@ -1,11 +1,12 @@
 # ECLIPSE — PROJECT HANDOFF & PROGRESS
-*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-27, nacht (verificatielaag die naar het scherm kijkt; vier audits).*
+*Single "start here" page for a new machine or a new Claude session. Last updated: 2026-07-27, ochtend — de nacht 26→27 is klaar: verificatielaag die naar het scherm kijkt, vier audits, twee specs als concept, en de gatencontrole van alle gelande specs.*
 
 ---
 
-# START HIER — NACHTPROMPT 26→27 juli 2026
+# START HIER — OCHTEND 27 juli 2026
 
-*Plak dit in een verse chat om het nachtwerk te starten.*
+*Je hoeft niets te plakken. Lees de regel hieronder, dan het morgenrapport, dan
+`JOUW_TAKEN.md` voor wat er van jou wordt gevraagd.*
 
 ---
 
@@ -30,8 +31,10 @@ invoerroutering en twee geluiden die niet bestaan. Dat pad had ik nooit eerder
 gedraaid, en het leverde twee van de vijf bugs van vannacht op.
 
 **Opnieuw gedraaid op `161cb92`,** want ik heb daarna nog aan de player-controller
-en de strategielaag gezeten en dat draait allebei in jouw pad. Nul Eclipse-errors,
-nul waarschuwingen, nul degradaties — en het bewijs dat hij echt starttte in
+en de strategielaag gezeten en dat draait allebei in jouw pad. Sindsdien is er
+alleen TESTCODE bij gekomen — geen enkele regel die tijdens het spelen draait —
+dus dit bewijs geldt onverkort voor `d71c119`. Nul Eclipse-errors, nul
+waarschuwingen, nul degradaties, en het bewijs dat hij echt startte in
 plaats van stilletjes af te breken: missie `MT_M11` begonnen op TransitCheckpoint
 met 3 squadleden en 4 vijanden, gids open met 13 stappen, munitieteller zichtbaar
 op `AR_Foundry 30 / 30`, navmesh onder de speler JA. Zes geluidsbanken geladen
@@ -56,6 +59,8 @@ op `AR_Foundry 30 / 30`, navmesh onder de speler JA. Zes geluidsbanken geladen
 | **LT deed nog steeds twee dingen.** De afschaffing van vanochtend was alleen in het commentaar, de tabel en BESTURING.md geland — de `MapKey` stond er nog. | LT draagt nu 1 actie in plaats van 2 |
 | **Een gele engine-waarschuwing liep over je scherm.** Twee directionele lampen streden om "de" zon. | 0 waarschuwingen in het log en weg van het beeld |
 | **Twee voetstapgeluiden bestonden niet.** De code vroeg zeven houtvarianten, het pack levert er vijf — en niets telde die mislukte laadpogingen, want de teller sloeg alleen aan bij een compleet lege bank. De aantallen stonden met de hand in de code; de lader telt nu zelf. | 2 mislukte laadpogingen per start → **0**; en vier van de zes oppervlakken hebben nu méér varianten |
+| **Drie beweringen uit de specs die niemand controleerde, staan nu vast.** Ik heb de Tests-secties van alle gelande specs naast de suite gelegd in plaats van te gokken wat er miste. P2-01 bleek volledig gedekt; P2-02, P2-03 en P2-04 hadden er elk één. Alle drie dezelfde vorm: **de staat klopt en het signaal blijft uit** — dilatatie terug op 1.0 zonder `ModeExited`, campagne correct maar het debrief leeg, een objective die alvast uitkeert terwijl de hash er goed uitziet. | 177 → 180 tests; elk gat gefalsifieerd met het echte defect erin gezet |
+| **"De soak blijft groen" is nu een feit in de repo in plaats van iets dat ik je vertel.** P2-05 eist drie nachten achtereen groen, en dat was onvervulbaar: zonder CI-runner bestond die reeks alleen in mijn hoofd. `verify.ps1` schrijft elke draai weg in `phase0/SOAK_LOG.md` — **ook bij rood**, want een logboek dat alleen successen bewaart kan "drie nachten" per definitie niet aantonen. | Eerste regels staan erin; nog twee groene dagen nodig, en dat is kalender en geen werk |
 | **Na een bevrijding legt het debrief nu UIT waarom.** De geauthorde zin bij een bevrijdingsrij stond alleen in het log; het debriefscherm toonde alleen `wijk: Dominion -> Player`. Eigen feit met een eigen payload, want één rij draait drie vakken om: aan het vak-feit gehangen had die zin er drie keer gestaan. | Precies één zin per rij bij drie omgedraaide vakken, en hij komt ná de vakken (een uitleg vooraf zou een uitkomst aankondigen die nog afgewezen kon worden). Beide beweringen getest; de volgordebewering gefalsifieerd |
 | **"Waarom is mijn kaart leeg?" heeft nu een antwoord van één regel.** `Eclipse.Save.Report` zegt eerst of de campagne zijn setup-asset kent — zonder dat is er wél een campagne maar géén regiograaf, en biedt geen enkel vak een missie aan — en pas daarna wat er in de slots zit. Dat is precies de storing die vandaag drie metingen kostte: de save kwam bit-voor-bit terug en het bord bleef leeg. | Op een gezonde start: `setup DA_CampaignSetup`, `dag=1 regio's=6`, `geen slots`. De tak die een gezonde run nooit haalt ("setup ONTBREEKT") is een pure functie met een eigen test, en die test is gefalsifieerd: tekst weggehaald → rood, tekst terug → groen |
 | **CommonUI draaide in een configuratie die de plugin zelf ongeldig noemt** — "Input routing will not function correctly", als ERROR, bij elke start. Mogelijk de oorzaak van jouw View-knop die niet aankwam. | 0 CommonUI-errors; **jij moet de View-knop nog testen** |
