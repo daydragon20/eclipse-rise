@@ -726,6 +726,28 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// beantwoordt de vraag in plaats van hem open te laten.
 		FScreenshotRequest::RequestScreenshot(TEXT("PlayShot_MetUI"), /*bShowUI*/ true, /*bAddFilenameSuffix*/ false);
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 8] zelfde beeld MET de HUD erop"));
+
+		// DIE BELOFTE HIERBOVEN KLOPT NIET, en dat is op 27-07 met eigen ogen
+		// vastgesteld: op PlayShot_MetUI.png staat GEEN HUD. Geen munitieteller,
+		// geen richtkruis, niets. De comment beweerde het tegendeel, en dat is
+		// precies de vorm waar dit project telkens op valt — een belofte in een
+		// commentaar die niemand tegen de uitkomst hield.
+		//
+		// Zolang dit niet werkt is de owner-eis "controleer het op een screenshot
+		// voordat je het af noemt" voor GEEN ENKEL UI-element te vervullen, en dan
+		// is elk punt van zijn lijst onbewijsbaar. Dat maakt dit geen detail maar
+		// de blokkade.
+		//
+		// DERDE PAD, en het eerste dat niet via FScreenshotRequest loopt: het
+		// engine-eigen consolecommando. Dat gaat door
+		// UGameViewportClient::HandleScreenshotCommand en zet zijn vlag ná de
+		// Slate-tekening in plaats van ervoor — een andere volgorde, en dus een
+		// echte tweede kans in plaats van dezelfde poging met een andere naam.
+		// De bestandsnaam wordt door de engine genummerd; de ronde drukt alle
+		// nieuwe bestanden af, dus hij is terug te vinden.
+		Controller->ConsoleCommand(TEXT("Shot showui"));
+		UE_LOG(LogEclipse, Display,
+			TEXT("[PLAYSHOT 8] tweede poging met de UI, via het consolecommando 'Shot showui' — kijk of dit beeld de HUD wel draagt"));
 		// De liberation-dump meedraaien in de ronde. Niet omdat hij bij een
 		// SCREENSHOT hoort, maar omdat dit de enige plek is waar een echte
 		// campagne draait met een console eronder — en een debug-commando dat
