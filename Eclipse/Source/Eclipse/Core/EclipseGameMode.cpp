@@ -1608,7 +1608,33 @@ void AEclipseGameMode::SpawnMissionActors()
 	// DA_CharacterTuning / DT_Weapons / DT_EnemyArchetypes, not in code defaults).
 	const UEclipseCampaignSetupAsset* Setup = Campaign->GetActiveSetup();
 	const UEclipseCharacterTuningAsset* CharacterTuning = Setup != nullptr ? Setup->CharacterTuning.LoadSynchronous() : nullptr;
-	const FEclipseWeaponRow* PlayerWeaponRow = Setup != nullptr ? FirstRowOf<FEclipseWeaponRow>(Setup->Weapons.LoadSynchronous()) : nullptr;
+	// JE LOADOUT KIEST JE WAPEN NIET — en dat gebeurde tot nu toe STIL.
+	//
+	// FirstRowOf pakt letterlijk de eerste rij van DT_Weapons, ongeacht welke
+	// loadout je koos. Staat er een tweede wapen in de tabel, dan kan niemand het
+	// dragen en niets zegt dat. De owner meldde dat als "mijn loadout-keuze
+	// verandert niets", en hij heeft gelijk.
+	//
+	// De REPARATIE is niet van mij: de loadout-rij draagt een gameplay-tag en geen
+	// wapenverwijzing, dus welk wapen bij welke loadout hoort is een ontwerpkeuze en
+	// staat als vraag in het kliklijstje. Wat wel van mij is: dit hardop zeggen in
+	// plaats van het stil te doen (14.3.5, luid degraderen). Een tabel met meer dan
+	// een rij en een keuze die niets doet, hoort in het log te staan.
+	const UDataTable* LoadoutWeaponTable = Setup != nullptr ? Setup->Weapons.LoadSynchronous() : nullptr;
+	const FEclipseWeaponRow* PlayerWeaponRow = FirstRowOf<FEclipseWeaponRow>(LoadoutWeaponTable);
+	// EEN KEER PER DRAAI EN NIET PER MISSIE. De eerste versie hiervan vuurde bij
+	// elke game-mode-start, en dat waren 29 extra tests met een waarschuwing —
+	// van 46 naar 75. Precies de logbom waar dit bestand elders voor waarschuwt:
+	// een melding die overal staat, leest niemand meer. Dit is een eigenschap van
+	// de DATA, niet van deze missie.
+	static bool bLoadoutGapReported = false;
+	if (!bLoadoutGapReported && LoadoutWeaponTable != nullptr && LoadoutWeaponTable->GetRowMap().Num() > 1)
+	{
+		bLoadoutGapReported = true;
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Loadout: DT_Weapons heeft %d rijen, maar de speler krijgt ALTIJD de eerste — de loadout draagt geen wapenverwijzing, dus je keuze verandert je wapen niet."),
+			LoadoutWeaponTable->GetRowMap().Num());
+	}
 	const UDataTable* ArchetypeTable = Setup != nullptr ? Setup->EnemyArchetypes.LoadSynchronous() : nullptr;
 	const FEclipseEnemyArchetypeRow* ArchetypeRow = FirstRowOf<FEclipseEnemyArchetypeRow>(ArchetypeTable);
 	if (CharacterTuning == nullptr || PlayerWeaponRow == nullptr || ArchetypeRow == nullptr)
