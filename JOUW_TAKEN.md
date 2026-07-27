@@ -73,6 +73,32 @@ schrijft).
 | Het **wapen** is gunmetal en steekt af | het hing er al, maar in je eigen lichaamskleur |
 | Een **misser is hoorbaar** | een schot in een muur liet eerst geen enkel spoor na |
 
+### ✅ WAPENKLEUR GEMETEN — jouw eis is gehaald, oordeel jij
+
+Je eis: geen eigen kleur maar een eigen **waarde**, duidelijk donkerder dan het
+lichaam, en onder de laagste trede van de districthiërarchie. Gemeten op het beeld
+(schermwaarde, lineair gemaakt — het gaat om leesbaarheid ná belichting):
+
+| | wapen | lichaam | verschil |
+|---|---|---|---|
+| mikkend (`01076`) | 0,0128 | 0,0514 | **4,0× donkerder** |
+| heupstand (`01070`) | 0,0531 | 0,1653 | **3,1× donkerder** |
+
+**Tegen DecoLine** (de gele routelijn, de laagste trede): die meet 0,6156 — het
+wapen zit er **12 tot 48× onder**. Ruim onder de laagste trede, zoals gevraagd; het
+concurreert met niets in de wereld.
+
+De factietinten zijn dus **niet** te donker en er is geen kleuruitzondering nodig.
+
+**Jouw frame:** `HighresScreenshot01076` — het geweer op zijn rug is een donker gat
+in het rode silhouet. Ik heb er zelf naar gekeken (uitsnede), dus dit is geen
+claim uit code.
+
+*Twee maskeerpogingen gooide ik eerst weg omdat ze zichzelf verrieden: de eerste
+gaf het wapen 713.810 pixels (77% van het beeld — dat is de weg en de nachtlucht),
+de tweede 124.644, méér dan het lichaam zelf. Pas een uitsnede waar ik naar keek
+gaf een vakje waarvan ik weet dat het op het wapen zit.*
+
 ### ❓ VRAAG AAN JOU: hoe groot mag je personage in beeld staan?
 
 Dit is de enige knop die ik nu niet zelf kan draaien, en punt 1 hangt erop.
