@@ -480,6 +480,33 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SILHOUET] %.0f px hoog in een frame van %d px"),
 				ShotIndex, SilhouettePixels, ViewportY);
 
+			// WAAR IN HET BEELD STAAT HIJ ZIJWAARTS — owner-punt 3, 27-07:
+			// "schuift mijn personage naar de zijkant als ik ren?"
+			//
+			// NIET OP DE ACTOR, en dat is de hele reden dat deze regel bestaat. De
+			// scherm=(x,y) uit de MEET-regel projecteert GetActorLocation(), en de
+			// camera hangt daar via de spring arm STAR aan vast — die waarde is dus
+			// per definitie constant. Gemeten over de negen momenten van de ronde
+			// van 08:49 (stilstand, rennen, twee draaiingen, herladen): negen keer
+			// exact x=500. Een controle die niet kan bewegen, kan de klacht niet
+			// vinden.
+			//
+			// De MESH-bounds kan het wel: die volgt de animatie en het overhellen,
+			// dus als het zichtbare lichaam wegdrijft van waar de camera hem
+			// verwacht, staat het verschil hier. Het VERSCHIL is de meting; de
+			// absolute x zegt alleen waar de socket-offset hem neerzet.
+			FVector2D MeshScreen = FVector2D::ZeroVector;
+			FVector2D ActorScreen = FVector2D::ZeroVector;
+			const bool bMeshOk = Controller->ProjectWorldLocationToScreen(Bounds.Origin, MeshScreen);
+			const bool bActorOk = Controller->ProjectWorldLocationToScreen(Body->GetActorLocation(), ActorScreen);
+			if (bMeshOk && bActorOk)
+			{
+				UE_LOG(LogEclipse, Display,
+					TEXT("[PLAYSHOT %d KADER] lichaam op x=%.0f van %d (midden %d) — %.0f px uit het midden, %.0f px van zijn eigen actor"),
+					ShotIndex, MeshScreen.X, ViewportX, ViewportX / 2,
+					MeshScreen.X - ViewportX / 2.0f, MeshScreen.X - ActorScreen.X);
+			}
+
 			// 1. Wordt hij getekend? Dit is de vraag waar het gisteren op stukliep:
 			//    bounds konden kloppen terwijl de renderer hem oversloeg.
 			if (!Mesh->WasRecentlyRendered(0.2f))
