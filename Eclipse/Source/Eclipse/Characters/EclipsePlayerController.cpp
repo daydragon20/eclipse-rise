@@ -99,6 +99,32 @@ void AEclipsePlayerController::BeginPlay()
 		FConsoleCommandDelegate::CreateWeakLambda(this, [this]() { DumpFeelState(); }),
 		ECVF_Default);
 
+	// Eclipse.UI.Report hoort HIER en niet in de HUD-widget, en dat is 27-07
+	// gebleken toen de bewaker op BESTURING.md viel: geregistreerd door de widget
+	// bestond hij alleen zodra er een missie liep, dus in het hoofdmenu was het
+	// commando er niet. Een commando dat de documentatie adverteert moet er
+	// ALTIJD zijn — en "er is geen missie-HUD" is juist het nuttigste antwoord
+	// dat hij kan geven.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.UI.Report")) == nullptr)
+	{
+		UiReportCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.UI.Report"),
+			TEXT("Dump wat de HUD toont: panelen, zichtbaarheid en regelaantallen. De UI-laag is niet te fotograferen; dit is de weg."),
+			FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+			{
+				if (MissionHud != nullptr)
+				{
+					MissionHud->LogUiReport();
+				}
+				else
+				{
+					UE_LOG(LogEclipse, Display,
+						TEXT("UI: er is geen missie-HUD (geen missie actief, of -EclipseShot onderdrukt hem bewust)."));
+				}
+			}),
+			ECVF_Default);
+	}
+
 	EnsureCampaignStarted();
 	// After EnsureCampaignStarted, because the tuning asset hangs off the active
 	// campaign setup and does not exist before there is one.

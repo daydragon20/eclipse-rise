@@ -39,6 +39,15 @@ class ECLIPSE_API UEclipseMissionHudWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+
+	/**
+	 * Dumpt wat de HUD toont: panelen, zichtbaarheid en regelaantallen, plus een
+	 * FOUT-regel bij een toestand die de speler als kapot ervaart.
+	 *
+	 * Bestaat omdat de UI-laag met geen enkele opnamemethode vast te leggen is;
+	 * zie Eclipse.UI.Report in BESTURING.md.
+	 */
+	void LogUiReport() const;
 	virtual void NativeTick(const FGeometry& Geometry, float DeltaSeconds) override;
 	virtual void NativeDestruct() override;
 
@@ -228,6 +237,5 @@ private:
 
 	IConsoleObject* SummaryCommand = nullptr;
 
-	/** Eclipse.UI.Report: de UI-laag is niet te fotograferen, dus vraagt hij het zelf. */
-	IConsoleObject* UiReportCommand = nullptr;
+
 };

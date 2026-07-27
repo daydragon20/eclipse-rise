@@ -296,6 +296,9 @@ private:
 	/** Eclipse.Feel.Dump — losgekoppeld in EndPlay, want de console overleeft ons. */
 	IConsoleCommand* FeelDumpCommand = nullptr;
 
+	/** Eclipse.UI.Report; hier en niet in de widget, zodat hij ook zonder missie bestaat. */
+	IConsoleCommand* UiReportCommand = nullptr;
+
 	// Command Mode inputs (SPEC-P2-02 Stage A; provisional debug bindings —
 	// the Enhanced Input context stack is a SPEC-P2-07 seam).
 	UPROPERTY()

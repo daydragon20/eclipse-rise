@@ -1027,6 +1027,11 @@ bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Paramete
 		TEXT("Eclipse.Look.InvertY"),
 		TEXT("Eclipse.Input.ForceGamepad"),
 		TEXT("Eclipse.Guide.Overlay"),
+		// 27-07: twee debug-surfaces erbij, en ze horen hier omdat BESTURING.md ze
+		// nu adverteert. Een commando dat in de documentatie staat maar niet
+		// bestaat, kost precies dezelfde avond als een binding die niet aankomt.
+		TEXT("Eclipse.UI.Report"),
+		TEXT("Eclipse.Liberation.Report"),
 	};
 	for (const TCHAR* Name : Documented)
 	{
