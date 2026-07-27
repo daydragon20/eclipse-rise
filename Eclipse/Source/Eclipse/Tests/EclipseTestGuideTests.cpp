@@ -163,6 +163,34 @@ bool FEclipseGuideProgressTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+namespace EclipseTestGuideTest
+{
+	/**
+	 * DE TELLERREGEL OP INHOUD, niet op positie.
+	 *
+	 * Hier stond driemaal `Lines.Last()`. Dat werkte zolang de stappen het paneel
+	 * exact vulden — en ComposeGuidePanelLines vult sinds jaar en dag AAN tot
+	 * GuidePanelLineCount met lege regels, dus zodra deel 1 krimpt is de laatste
+	 * regel leeg en valt de assertie om op een paneel dat perfect klopt. Dat is
+	 * precies de fout die deze test op 27-07 drie draaien rood hield: een toets die
+	 * een TOEVALLIGE indeling vastlegt in plaats van een eigenschap.
+	 *
+	 * De teller is herkenbaar aan zijn eigen tekst, en dat is stabiel onder elke
+	 * paneelhoogte.
+	 */
+	FString FindTallyLine(const TArray<FString>& Lines)
+	{
+		for (const FString& Line : Lines)
+		{
+			if (Line.Contains(TEXT("beoordeeld ")))
+			{
+				return Line;
+			}
+		}
+		return FString();
+	}
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseGuidePanelTest,
 	"Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest",
 	EclipseTestGuideTest::TestFlags)
@@ -250,8 +278,9 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		TestFalse(TEXT("A future step does not shout its expectation"), Lines[3].Contains(Steps[1].Expectation));
 		TestFalse(TEXT("A future step is not marked active"), Lines[3].StartsWith(TEXT(">>")));
 
-		TestTrue(TEXT("The tally line closes the panel"),
-			Lines.Last().Contains(FString::Printf(TEXT("nog open %d"), GetGuideStepCount())));
+		TestTrue(TEXT("De tellerregel staat in het paneel en telt alles nog open"),
+			EclipseTestGuideTest::FindTallyLine(Lines).Contains(
+				FString::Printf(TEXT("nog open %d"), GetGuideStepCount())));
 	}
 
 	// A settled step collapses to marker + label + how it was settled.
@@ -263,9 +292,17 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		TestTrue(TEXT("A settled step is ticked"), Lines[2].StartsWith(TEXT("[v]")));
 		TestFalse(TEXT("A settled step folds its expectation away"), Lines[2].Contains(Steps[0].Expectation));
 		TestTrue(TEXT("The next step became active"), Lines[3].StartsWith(TEXT(">>")));
+		// DE KOP VOLGT DE ACTIEVE STAP, en welke dat is wordt AFGELEID. Hier stond
+		// "stap 2/<aantal in deel 1>", en dat gaat ervan uit dat deel 1 minstens
+		// twee stappen heeft. Is er niets nieuws sinds de vorige sessie, dan telt
+		// deel 1 er één (de placeholder) en staat stap 2 in een ander deel — dan
+		// faalt deze regel op een gids die precies doet wat hij hoort te doen.
+		const EEclipseGuidePart ActivePart = GetPartOfStep(1);
 		TestTrue(TEXT("The header follows along"),
-			Lines[0].Contains(FString::Printf(TEXT("stap 2/%d"), GetPartStepCount(EEclipseGuidePart::Controls))));
-		TestTrue(TEXT("De teller telt de beoordeling"), Lines.Last().Contains(TEXT("beoordeeld 1")));
+			Lines[0].Contains(FString::Printf(TEXT("stap %d/%d"),
+				GetIndexWithinPart(1) + 1, GetPartStepCount(ActivePart))));
+		TestTrue(TEXT("De teller telt de beoordeling"),
+			EclipseTestGuideTest::FindTallyLine(Lines).Contains(TEXT("beoordeeld 1")));
 	}
 
 	// Deel 2's responsiveness row is the one place a live measurement belongs, and
@@ -316,7 +353,8 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		{
 			TestFalse(TEXT("No step is active once the guide is done"), Lines[Line].StartsWith(TEXT(">>")));
 		}
-		TestTrue(TEXT("Nothing is left open"), Lines.Last().Contains(TEXT("nog open 0")));
+		TestTrue(TEXT("Nothing is left open"),
+			EclipseTestGuideTest::FindTallyLine(Lines).Contains(TEXT("nog open 0")));
 	}
 	return true;
 }
