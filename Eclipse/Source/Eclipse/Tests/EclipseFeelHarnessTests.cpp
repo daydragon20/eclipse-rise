@@ -1067,19 +1067,40 @@ bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Paramete
 			// en dat je in een diff nauwelijks ziet.
 			//
 			// Tabs en regeleindes horen er wel te zijn; alles daaronder niet.
-			int32 ControlChars = 0;
-			TCHAR FirstBad = 0;
-			for (const TCHAR Char : Doc)
+			//
+			// ALLE DRIE de owner-bestanden, niet alleen dit document: de fout sloeg
+			// het eerst toe in HANDOFF.md (het startcommando van de nachtprompt) en
+			// pas daarna hier. Een bewaker die alleen dekt waar je hem toevallig
+			// schreef, dekt de volgende keer weer niet.
+			//
+			// De startbat staat er met de meeste reden bij: daar wordt een kapot
+			// teken niet gelezen maar UITGEVOERD.
+			for (const TCHAR* OwnerFile : { TEXT("BESTURING.md"), TEXT("HANDOFF.md"), TEXT("SPEEL_ECLIPSE.bat") })
 			{
-				if (Char < 32 && Char != 10 && Char != 13 && Char != 9)
+				const FString FilePath = FPaths::ConvertRelativePathToFull(
+					FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), OwnerFile));
+				FString Contents;
+				if (!TestTrue(*FString::Printf(TEXT("stuurtekens: %s is leesbaar"), OwnerFile),
+						FFileHelper::LoadFileToString(Contents, *FilePath)))
 				{
-					++ControlChars;
-					if (FirstBad == 0) { FirstBad = Char; }
+					continue;
 				}
+				int32 ControlChars = 0;
+				TCHAR FirstBad = 0;
+				for (const TCHAR Char : Contents)
+				{
+					if (Char < 32 && Char != 10 && Char != 13 && Char != 9)
+					{
+						++ControlChars;
+						if (FirstBad == 0) { FirstBad = Char; }
+					}
+				}
+				// Het CODEPUNT in de melding, want "er zit een raar teken in" is
+				// geen aanwijzing en 0x0B wel.
+				TestEqual(*FString::Printf(TEXT("stuurtekens: %s bevat er geen (eerste: 0x%02X)"),
+						OwnerFile, static_cast<int32>(FirstBad)),
+					ControlChars, 0);
 			}
-			TestEqual(*FString::Printf(TEXT("startvlaggen: BESTURING.md bevat geen stuurtekens (eerste: 0x%02X)"),
-					static_cast<int32>(FirstBad)),
-				ControlChars, 0);
 		}
 	}
 
