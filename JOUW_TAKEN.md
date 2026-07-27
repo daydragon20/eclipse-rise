@@ -83,7 +83,23 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
    meteen leesbaar in silhouet. Maar wélke kleur raakt de ÉÉN-STIJL-WET en de
    waardehiërarchie die in het district al vastligt (Cover > CoverB > DecoLine).
    Dat is art-directie en dus jouw oordeel, niet iets wat ik 's nachts invul.
-3. **Punt 4: mag ik het schadepad aanraken?** Stap 1 is "een schot dat de wereld
+3. **~~Punt 4: mag ik het schadepad aanraken?~~ — JA GEGEVEN, STAP 1 GELAND
+   (`44fd7b8`).** Een schot dat de wereld raakt krijgt nu een uitkomst: geteld en
+   gelogd met impactpunt en physical material. Apart geland zoals je vroeg, verse
+   bar, 184/184 groen.
+
+   Ik had die klus te groot ingeschat: de tak die een personage raakt is
+   **ongewijzigd**, en de enige branch die verandert deed voorheen niets — die kan
+   dus niets breken.
+
+   **Stap 2 (het inslaggeluid) wacht op een verse sessie**, en daar is een
+   technische reden voor: audio reageert hier op FEITEN via de bus, en een
+   wereldtreffer is een ander feit dan `Event.Combat.HitLanded` (die betekent
+   "schade aan een personage" en wordt zo geteld). Er is dus een nieuwe tag nodig
+   plus een regel in `EventCatalog.md`, anders valt de 34/34-controle om. Dat is
+   één samenhangend blokje van drie bestanden.
+
+4. **~~Oude vraag~~ (hierboven beantwoord)** — Stap 1 is "een schot dat de wereld
    raakt krijgt een uitkomst", en dat zit in het schadepad van élk wapen. Zeg het
    en ik doe het met een verse bar en een frame erbij. En zeg het als je de Muzzle
    Flash uit je Fab-bibliotheek wilt ophalen.
