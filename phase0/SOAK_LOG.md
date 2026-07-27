@@ -33,3 +33,7 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 09:17 | `55ffaf6` | **GROEN** | 181 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
 | 2026-07-27 09:33 | `8382a9d` | **ROOD** | 181 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 6 beeld(en) VERANDERD -> stap 4, stap 5, stap 6, stap 7, stap 8, stap 9] |
 | 2026-07-27 09:38 | `8382a9d` | **ROOD** | 181 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 09:47 | `79e9054` | **GROEN** | 182 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 09:50 | `79e9054` | **ROOD** | 182 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Mission.Playthrough.HubStaysClickableAfterDeath |
+| 2026-07-27 10:01 | `79e9054` | **GROEN** | 182 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 10:04 | `6933fa7` | **ROOD** | 182 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 7 beeld(en) VERANDERD -> stap 3, stap 4, stap 5, stap 6, stap 7, stap 8, stap 9] |

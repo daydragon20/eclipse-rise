@@ -24,6 +24,32 @@ gekozen dat de downloads op de achtergrond binnenlopen terwijl jij speelt.
 
 ---
 
+## 🟢 SPEELSESSIE 27-07 — STAND VAN JOUW ACHT PUNTEN
+
+Veilig te spelen: **commit `6933fa7`**. Suite 182 groen, ValidateData 0 fouten.
+
+| # | Jouw punt | Stand |
+|---|---|---|
+| 5 | Na je dood nergens op kunnen klikken | **FASE 1 KLAAR.** Jouw diagnose klopte niet: de overgang wordt wel gemaakt. CommonUI zet de cursor uit zodra je met een controller speelt. Nu vastgezet zolang de hub staat. **Nog open:** de hub met de controller kunnen bedienen (focusnavigatie) |
+| 4 | F3 opent de gids niet | **KLAAR — gebruik nu G.** De engine claimt F1-F5 zelf voor viewmodes (staat in jouw log), en je toetsenbord kan F3 als mediatoets pakken. Welke van de twee doet er niet toe: allebei buiten dit project. F3 blijft ook staan |
+| 2 | Er is geen richtkruis | **KLAAR.** Volledig bevestigd — het enige woord „crosshair” in het project was de vorm van de muisaanwijzer. Er staat nu een kruis, en de startbat vraagt er niet meer naar |
+| 6 | Lichaam draait mee bij stilstand | **KLAAR.** Drempel van 60° naar 0°, en verplaatst van kijkhoek naar toestand: niet mikken = hij blijft staan, mikken = hij sluit meteen aan. Op beeld gecontroleerd (opname 7: camera 238,7°, lichaam 0,0° — je ziet zijn voorkant) |
+| 1 | Schaal-bug is een camera-bug | **JE HEBT GELIJK, en de bat loog.** Daar stond „de schaal-bug is weg”; dat is gecorrigeerd. Meten op schijnbare grootte staat nog open |
+| 3 | Kogelinslagen nauwelijks zichtbaar | **OPEN.** Zeg het als je de Muzzle Flash (Niagara) wilt ophalen — dat is een owner-klik |
+| 7 | Camera 180° draaien en vooruit | **NOG NIET GECONTROLEERD** |
+| 8 | Alle besturing in de gids, één bron | **OPEN** — grootste post: eerst de tabel, dan drie lezers |
+
+**Squad-barks: jouw JA is genoteerd.** Drie zinnen per stem, zes in totaal, één
+betaalde generatie. Staat als eerstvolgende klus na de bugs; ik genereer pas als
+de zes regels in de seed staan, zodat het één aanroep blijft.
+
+**Nog rood in de opnameronde, met opzet:** de speler komt in het eerste
+loopinterval maar 3 cm vooruit (tweede interval 229 cm). Dat is een echt defect
+dat de nieuwe bewaker blootlegde; oorzaak nog niet gevonden. Blokkeert het spelen
+niet.
+
+---
+
 ## ✅ STAP 1 · Env-packs — KLAAR (25-07)
 
 Geverifieerd op schijf in `Eclipse/Content`:
