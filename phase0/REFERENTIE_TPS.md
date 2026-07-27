@@ -186,6 +186,40 @@ if (bAiming)
 - **Er is geen gemeten blendtijd.** Meetopdracht: hoe lang duurt de overgang van
   300→165 en 80→64 nu feitelijk.
 
+### GEMETEN 27-07 — HOE GROOT STAAT HIJ IN BEELD [GEZIEN — HighresScreenshot01036, 01038]
+
+Owner-punt 1 was "meten voordat je repareert", en dit is die meting. Niet uit code
+maar uit het BEELD: de speler geïsoleerd als grootste samenhangende vlek, per
+opname van de ronde.
+
+| | heuphoogte (7 opnames) | tijdens MIKKEN (2 opnames) |
+|---|---|---|
+| beeldhoogte | 59–61 % | **97 %** |
+| beeldbreedte | 10–15 % | **33 %** |
+| oppervlak | ~31.000 px | **~155.000 px** |
+
+**Mikken maakt het personage vijf keer zo groot op je scherm** en zet hem over een
+derde van de breedte. Op `HighresScreenshot01036` is dat aan te wijzen: hij vult de
+hele linkerhelft, van de bovenrand tot voorbij de onderrand.
+
+Waarom vijf: de twee factoren stapelen. De arm gaat 300→165 (×1,82 dichterbij) en
+de FOV 80→64 (nog eens ×1,25). Samen ruim ×2,2 in de lengte, en dat is ×5 in
+oppervlak. Elk van de twee is verdedigbaar; het is hun PRODUCT dat niemand heeft
+uitgerekend.
+
+**En dit wijst mijn eerdere ingreep aan als de goede parameter in de verkeerde
+richting.** Ik liet de zijoffset MEEKRIMPEN met de arm (55 → 30 cm), en draaide dat
+terug toen de opname liet zien dat het personage de vizierlijn juist blokkeerde.
+De referentie hierboven zegt het andersom: "de camera wisselt of VERSTERKT de
+schouderoffset, zodat het vizier vrij komt te liggen van het personage." Bij een
+arm die halveert moet de zijwaartse offset dus OMHOOG, niet omlaag — anders komt
+hij precies in je zicht te staan, wat de meting nu ook laat zien.
+
+**Nog niet geverifieerd:** of dit ook is wat de owner "de schaal-bug" noemt. Hij
+meldde dat het personage van grootte verandert; ik meet dat het bij mikken vijf keer
+zo groot wordt. Dat past, maar hij heeft het niet in die woorden gezegd, en tot hij
+het aanwijst blijft dit een gemeten feit met een vermoede koppeling.
+
 > **HERZIEN 27-07 NA DE EERSTE MIK-OPNAME.** Dit hoofdstuk gaf hierboven een
 > aanbeveling die ik daarna zelf heb moeten terugdraaien, en dat hoort in de
 > maatstaf te staan en niet alleen in een commitbericht.
