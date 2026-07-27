@@ -909,6 +909,37 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				}
 				UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SPOREN] %d levend%s"),
 					ShotIndex, Levend, *Waar);
+
+				// EN DE GRONDVLAKKEN VAN DE BOUWER, want mijn hele redenering leunt op
+				// de aanname dat DIE wel renderen — en die heb ik nooit gecontroleerd.
+				// Zijn ook zij onzichtbaar, dan is dit geen defect in mijn inslagspoor
+				// maar in een hele beeldlaag: lichtplekken, contactschaduwen en vlekken
+				// gebruiken alle drie hetzelfde recept.
+				if (ShotIndex == 1)
+				{
+					int32 Vlakken = 0;
+					FString Waar2;
+					for (TActorIterator<AActor> It2(GetWorld()); It2; ++It2)
+					{
+						const bool bGrondvlak = It2->Tags.Contains(TEXT("Deco_Pool"))
+							|| It2->Tags.Contains(TEXT("Deco_Blob"));
+						if (!bGrondvlak)
+						{
+							continue;
+						}
+						++Vlakken;
+						if (Vlakken > 3)
+						{
+							continue;
+						}
+						FVector2D Scherm2;
+						const bool bIn = Controller->ProjectWorldLocationToScreen(It2->GetActorLocation(), Scherm2);
+						Waar2 += FString::Printf(TEXT(" [%s scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f]"),
+							*It2->Tags[0].ToString(), Scherm2.X, Scherm2.Y, bIn ? 1 : 0,
+							FVector::Dist(It2->GetActorLocation(), CameraLocation));
+					}
+					UE_LOG(LogEclipse, Display, TEXT("[GRONDVLAKKEN] %d gevonden%s"), Vlakken, *Waar2);
+				}
 			}
 
 			// HARDE UITSPRAKEN OVER WAT ER IN HET FRAME STAAT.

@@ -158,7 +158,23 @@ vervelend maar het is geen verspilde middag: wie hier verdergaat hoeft geen van
 deze elf nog te proberen. De volgende stap is de editor — één blik op die actor in
 de wereld zegt in tien seconden wat elf ronden niet konden.
 
-*(Ik heb de kanarie weer weggehaald: het was een proef, geen functie.)*
+*(Ik heb de kanaries weer weggehaald: het waren proeven, geen functies.)*
+
+**EN IK MOET TWEE VAN MIJN EIGEN UITSLUITINGEN AFZWAKKEN.** De kanarie-proeven
+leunden op "staat hij in het kader" — en dat zegt niets over wat er vóór het vlak
+staat. De eerste kanarie bleek achter een pilaar te vallen; toen ik daarna de
+grondvlakken van de grayboxbouwer wilde controleren, viel die achter een muur. Twee
+proeven, twee keer beantwoord door dekking in plaats van door de vraag.
+
+**En daaronder ligt een aanname die ik nooit heb getoetst:** ik ging ervan uit dat
+de lichtplekken en contactschaduwen van de bouwer wél renderen. Dat heb ik nooit
+gezien — alleen aangenomen omdat de wijk aangekleed oogt. Er staan er **38** in de
+wereld, met precies het recept dat mijn spoor nu ook gebruikt.
+
+**Als die laag ook onzichtbaar is, is dit geen defect van mijn inslagspoor maar van
+alles wat plat op de grond ligt.** Dat is een veel groter verhaal, en het is in de
+editor in tien seconden te beantwoorden: zet de wijk stil en kijk of er onder een
+lantaarnpaal een lichtplek ligt. **Daar hoort de volgende sessie mee te beginnen.**
 
 *(oorspronkelijke tekst hieronder)* **Wat er dan wél is: het spoor rendert niet.** Een proef met een spoor van 90 cm —
 tien keer de echte maat, vol in beeld — liet ook niets zien. Dat sluit maat en

@@ -9,6 +9,7 @@
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/GameInstance.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/Texture.h"
 #include "Engine/StaticMeshActor.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "StructUtils/InstancedStruct.h"
@@ -81,8 +82,30 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	Plate->SetAffectDistanceFieldLighting(false);
 	Mark->SetActorEnableCollision(false);
 
-	if (UMaterialInterface* Toon = LoadObject<UMaterialInterface>(
-			nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon")))
+	// HET RECEPT VAN DE GRONDVLAKKEN DIE WEL RENDEREN — de laatste ongeteste
+	// verdachte, en de enige die ik over het hoofd had gezien.
+	//
+	// Ik heb dit spoor met M_EclipseToon geprobeerd, met het engine-standaard, en
+	// met EmissiveMeshMaterial: alle drie onzichtbaar. Maar de lichtplekken en
+	// contactschaduwen van de grayboxbouwer, die aantoonbaar WEL op deze vloer
+	// staan, gebruiken geen van die drie: zij nemen M_EclipseToonDecal MET EEN
+	// MASKER. Dat masker is daar niet optioneel — de bouwer weigert zelfs een vlak
+	// te maken als het ontbreekt, en dat is precies het soort hint waar ik
+	// overheen las omdat ik naar het materiaal keek en niet naar de VOORWAARDE.
+	//
+	// De blob is hier de juiste vorm: een zachte ronde vlek is wat een inslag op
+	// beton achterlaat, en hij bestaat al.
+	UTexture* Masker = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_blob_mask.T_blob_mask"));
+	UMaterialInterface* DecalMaster = LoadObject<UMaterialInterface>(
+		nullptr, TEXT("/Game/Art/M_EclipseToonDecal.M_EclipseToonDecal"));
+	if (Masker == nullptr || DecalMaster == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Inslagspoor: decal-master of masker ontbreekt (master %s, masker %s) — spoor blijft onzichtbaar."),
+			DecalMaster != nullptr ? TEXT("ok") : TEXT("weg"),
+			Masker != nullptr ? TEXT("ok") : TEXT("weg"));
+	}
+	if (UMaterialInterface* Toon = DecalMaster)
 	{
 		if (UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Toon, Mark))
 		{
@@ -109,6 +132,9 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 			// en een UV-modus, mijn spoor als enige niet. Een master die zijn kleur
 			// door een ontbrekende albedo vermenigvuldigt, levert zwart op zwart asfalt.
 			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+			// Het masker rijdt op MeshUV: een vlak van de engine-kubus spant 0..1.
+			Mid->SetTextureParameterValue(TEXT("MaskTex"), Masker);
+			Mid->SetScalarParameterValue(TEXT("OpacityScale"), 1.0f);
 			if (UTexture* White = LoadObject<UTexture>(nullptr, TEXT("/Engine/EngineResources/WhiteSquareTexture.WhiteSquareTexture")))
 			{
 				Mid->SetTextureParameterValue(TEXT("AlbedoTex"), White);
@@ -148,6 +174,24 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	//                                  van de bouwer (10x dikker dan mijn 0,004)
 	//   aan MIJN materiaalkeuze  NEE - ook met EmissiveMeshMaterial, dat niet van
 	//                                  licht afhangt en geen masker heeft
+	//   aan het decal-recept     NEE - ook met M_EclipseToonDecal + T_blob_mask +
+	//                                  OpacityScale, exact het recept van de
+	//                                  grondvlakken van de grayboxbouwer
+	//
+	// TWEE VAN DIE UITSLUITINGEN ZIJN ZWAKKER DAN ZE LIJKEN, en dat hoort erbij:
+	// de kanarie-proeven leunden op "inbeeld=1", en dat zegt NIETS over wat er voor
+	// het vlak staat. De eerste kanarie bleek achter een pilaar te vallen; een
+	// poging om de grondvlakken van de bouwer te controleren viel achter een muur.
+	//
+	// EN DE AANNAME ERONDER IS NOOIT GETOETST: ik ging ervan uit dat de
+	// lichtplekken en contactschaduwen van de bouwer WEL renderen. Dat heb ik nooit
+	// gezien, alleen aangenomen omdat de wijk aangekleed oogt. Er staan er 38 in de
+	// wereld. Is die laag ook onzichtbaar, dan is dit geen defect van mijn spoor
+	// maar van alles wat plat op de grond ligt — en dat is een veel groter verhaal.
+	//
+	// DAT IS DE VRAAG WAARMEE DE VOLGENDE SESSIE HOORT TE BEGINNEN, en hij is in de
+	// editor in tien seconden te beantwoorden: zet de wijk stil en kijk of er onder
+	// een lantaarnpaal een lichtplek ligt.
 	//
 	// Wat dus overblijft ligt buiten wat dit harnas kan zien. Volgende stap is een
 	// ander gereedschap dan de opnameronde: in de editor kijken, of de renderlagen
