@@ -112,6 +112,9 @@ private:
 	/** Hoe vaak AddMovementInput echt is aangeroepen sinds het vorige moment. */
 	int32 PlayShotIntervalPushes = 0;
 
+	/** In welk frame er voor het laatst geduwd is: een speler duwt ook maar een keer per frame. */
+	uint32 PlayShotLastDriveFrame = 0;
+
 	/** Grootste invoervector die de bewegingscomponent in dit interval heeft OPGEHAALD. */
 	float PlayShotIntervalTopConsumed = 0.0f;
 

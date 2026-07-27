@@ -374,6 +374,27 @@ void AEclipseGameMode::SetupPlayShotRound()
 
 void AEclipseGameMode::DrivePlayShotInput()
 {
+	// EEN DUW PER FRAME, en dat is de reparatie van de 3-cm-val.
+	//
+	// Deze functie hangt aan een timer van 0,02 s. Loopt het spel trager dan 50 fps —
+	// en tijdens het wegschrijven van een opname zakt hij naar ~2,5 — dan haalt de
+	// timermanager zijn achterstand in EEN frame in: honderd duwen binnen een
+	// milliseconde. GEMETEN in de rauwe regel: duw 1, 2 en 3 op t=21.088, 21.089 en
+	// 21.089, met een wachtrij die 0 -> 1 -> 2 -> 3 groeit zonder dat er iets
+	// afgaat. De bewegingscomponent tikt in dat frame een keer, dus er is EEN stap
+	// in plaats van honderd — vandaar 3 cm in een interval van twee seconden.
+	//
+	// Er ging dus niets verloren en er werd niets genegeerd; ik heb dat een halve dag
+	// als raadsel behandeld omdat mijn tellers per DUW telden en niet per FRAME.
+	//
+	// Een speler kan ook maar een keer per frame duwen. Meer dan dat meten is meten
+	// wat niemand kan doen.
+	if (PlayShotLastDriveFrame == GFrameNumber)
+	{
+		return;
+	}
+	PlayShotLastDriveFrame = GFrameNumber;
+
 	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
 	AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
 	if (Body == nullptr)
