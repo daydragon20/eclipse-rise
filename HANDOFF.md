@@ -85,8 +85,19 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
     tussentotalen én hun `Since` afdrukken. Eén draai wijst het aan. Dit dossier
     is nu twee keer op redeneren misgegaan.
 - Opnameronde: de speler komt in het eerste loopinterval 3 cm vooruit tegen 229 cm
-  in het tweede. Echt defect, blootgelegd door een gerepareerde bewaker, oorzaak
-  nog niet gevonden.
+  in het tweede. **Nu gekarakteriseerd** (27-07, `e672fdf`):
+  - `TOPSNELHEID in dit interval 0 cm/s` bij een `duw 1.00`. Geen enkele tick
+    snelheid over 2,6 s en ~300 frames — dus geen traag optrekken, en de invoer
+    wordt wel degelijk aangeboden.
+  - `duw 1.00` op het meetmoment betekent dat de pending input NIET geconsumeerd
+    is. Het probleem zit dus tussen `AddMovementInput` en de movement-tick.
+  - **Uitgesloten kandidaat, niet opnieuw onderzoeken:** de actor-tick van
+    `AEclipseCharacter` staat bewust uit (`bStartWithTickEnabled = false`, alleen
+    aan tijdens een camerablend), maar de CharacterMovementComponent tickt
+    zelfstandig — dat verklaart dit dus niet.
+  - **Open kandidaten:** pawn input-disabled uit `EnterBaseMode` die
+    `EnterMissionMode` niet terugdraait, of iets van de missiestart dat de eerste
+    seconden overheen loopt.
 
 ---
 
