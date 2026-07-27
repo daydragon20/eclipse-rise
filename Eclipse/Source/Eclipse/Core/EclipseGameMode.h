@@ -112,6 +112,9 @@ private:
 	/** Hoe vaak AddMovementInput echt is aangeroepen sinds het vorige moment. */
 	int32 PlayShotIntervalPushes = 0;
 
+	/** Hoogste acceleratie van het interval; nul bij honderd duwen wijst naar ConsumeInputVector. */
+	float PlayShotIntervalTopAccel = 0.0f;
+
 	/** Laagste GetMaxSpeed() van het interval; nul verklaart een pawn die niet loopt. */
 	float PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 

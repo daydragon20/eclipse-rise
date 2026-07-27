@@ -279,6 +279,19 @@ void AEclipseGameMode::DrivePlayShotInput()
 		PlayShotIntervalTopSpeed = static_cast<float>(Body->GetVelocity().Size2D());
 	}
 
+	// DE ACCELERATIE ERNAAST. Vijf kandidaten zijn uitgesloten en alles buiten de
+	// pawn is nu aantoonbaar gelijk tussen het dode en het lopende interval: even
+	// vaak geduwd (100), zelfde ondergrond, zelfde modus, zelfde toegestane
+	// snelheid. Wat overblijft is of de aangeboden invoer wel in ACCELERATIE wordt
+	// omgezet. Blijft die nul terwijl er honderd keer geduwd is, dan strandt het
+	// tussen AddMovementInput en ConsumeInputVector — en dan weet de volgende stap
+	// precies waar te kijken in plaats van waar te gokken.
+	if (const UCharacterMovementComponent* AccMove = Body->GetCharacterMovement())
+	{
+		PlayShotIntervalTopAccel = FMath::Max(PlayShotIntervalTopAccel,
+			static_cast<float>(AccMove->GetCurrentAcceleration().Size2D()));
+	}
+
 	// AFGELEGDE WEG NAAST NETTO VERPLAATSING, en dat paar is de discriminator.
 	//
 	// De camera-verplaatsing meet NETTO: waar hij eindigt ten opzichte van waar hij
@@ -452,10 +465,11 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen, AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen, AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				PlayShotIntervalPathLength,
+				PlayShotIntervalTopAccel,
 				PlayShotIntervalTopSpeed,
 				PlayShotIntervalMinMaxSpeed,
 				Move != nullptr ? Move->Velocity.Size() : -1.0f,
@@ -468,6 +482,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalTopSpeed = 0.0f;
 		PlayShotIntervalPathLength = 0.0f;
 		PlayShotIntervalPushes = 0;
+		PlayShotIntervalTopAccel = 0.0f;
 		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
