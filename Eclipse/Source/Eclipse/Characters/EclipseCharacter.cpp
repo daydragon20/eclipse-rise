@@ -697,13 +697,27 @@ void AEclipseCharacter::RefreshCameraTargets()
 	//    de armverhouding houdt de hoek constant: hetzelfde beeld, dichterbij.
 	if (CameraBoom != nullptr && !bFirstPerson)
 	{
-		const float ArmRatio = ThirdPersonArmLength > KINDA_SMALL_NUMBER
-			? TargetArmLength / ThirdPersonArmLength : 1.0f;
-		// ALLEEN DE Y. De Z van deze offset wordt elders al bestuurd (de landingsdip
-		// zakt hem), en die overschrijven zou een tweede eigenaar van hetzelfde veld
-		// maken — precies de vorm waar dit project vandaag drie keer op viel.
+		// DE ZIJOFFSET KRIMPT NIET MEE, EN DAT IS EEN TERUGDRAAIING VAN MIJZELF.
+		//
+		// Ik liet hem eerst meeschalen met de armlengte (55 -> 30 cm bij ADS), met
+		// als redenering: dezelfde 55 cm weegt op een arm van 165 bijna twee keer zo
+		// zwaar in graden, dus meeschalen houdt de hoek constant. Die geometrie
+		// klopt. De CONCLUSIE was omgekeerd.
+		//
+		// GEZIEN op HighresScreenshot00972, de eerste mik-opname: het personage
+		// vult het linkerdeel van het frame en BLOKKEERT de vizierlijn. De ronde
+		// meldde het ook zelf — "de speler staat op (452,763) en dat valt buiten het
+		// frame", op een frame van 720 hoog.
+		//
+		// De offset bestaat juist om het personage UIT die lijn te duwen. Bij een
+		// kortere arm moet hij daarvoor blijven staan of groeien, niet krimpen —
+		// constante HOEK is precies het verkeerde doel, want het houdt hem even ver
+		// in de weg terwijl hij dichterbij komt.
+		//
+		// Wat er van de mik-wijziging OVERBLIJFT is de lag hieronder, en die staat
+		// los van dit: die ging over een vizier dat zwemt, niet over kadering.
 		FVector Offset = CameraBoom->SocketOffset;
-		Offset.Y = BaseSocketOffsetY * ArmRatio;
+		Offset.Y = BaseSocketOffsetY;
 		CameraBoom->SocketOffset = Offset;
 
 		// De lag uit bij het mikken. bCameraLagSuspended blijft leidend: dat is de

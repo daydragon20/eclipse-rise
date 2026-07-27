@@ -768,6 +768,19 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		bPlayShotTurning = false;
 		Controller->ConsoleCommand(TEXT("HighResShot 1280x720"));
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 7] uitgedraaid — lichaam hoort weer met de camera mee te staan"));
+		// MIKKEN AAN, ÉÉN STAP VÓÓR DE OPNAME. Owner-punt 1, en dit is het deel dat
+		// wél te fotograferen is: de UI-laag komt niet mee op een frame, maar het
+		// mik-effect zit in de 3D-CAMERA (arm 300 -> 165 cm, FOV 80 -> 64) en dat
+		// is gewoon zichtbaar. De owner-eis "verandert het beeld als ik mik" is
+		// daarmee toetsbaar zonder de opnameblokkade af te wachten.
+		//
+		// Een stap eerder aanzetten en niet op het moment zelf, om dezelfde reden
+		// als de rest van dit draaiboek: de camerablend heeft tijd nodig, en een
+		// opname midden in de blend meet de overgang in plaats van de eindstand.
+		if (AEclipseCharacter* AimBody = Cast<AEclipseCharacter>(Controller->GetPawn()))
+		{
+			AimBody->SetAiming(true);
+		}
 		break;
 	case 8:
 		// DE HERLAADPOSE OP BEELD. Belica heeft er zelf geen; deze is geleend uit
