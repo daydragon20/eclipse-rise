@@ -313,6 +313,34 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	AEclipseCharacter* HitCharacter = Cast<AEclipseCharacter>(Hit.GetActor());
 	if (HitCharacter == nullptr)
 	{
+		// EEN SCHOT DAT DE WERELD RAAKT KRIJGT EEN UITKOMST. Owner-punt 4, 27-07:
+		// "ik zie de kogelinslagen nauwelijks; ik weet niet of ik mis of dat de
+		// vijand veel leven heeft."
+		//
+		// Hier stond alleen `return false`. Een schot in een muur, een krat, een
+		// dekkingsblok of de grond raakte dus wél iets en werd vervolgens STIL
+		// verworpen — geen feit, geen geluid, geen decal, geen spoor. Alleen
+		// treffers op een personage bestonden. Daarmee is elke MIS onzichtbaar, en
+		// missen is precies waaruit de speler probeert af te leiden of hij raakt.
+		//
+		// DIT RAAKT HET SCHADEPAD NIET. De tak hierboven (een personage geraakt)
+		// blijft ongewijzigd; alleen de tak die niets deed doet nu iets. Dat is
+		// bewust de kleinste stap: de owner vroeg om apart landen zodat een
+		// regressie herleidbaar is, en een branch die eerder niets deed kan niets
+		// breken.
+		//
+		// EERST HET FEIT, DAN PAS HET ZICHTBARE. Wat hier ontbrak was geen effect
+		// maar een UITKOMST — er was niets om een decal of een geluid aan te
+		// hangen. Oppervlak erbij, want dat systeem bestaat al voor voetstappen
+		// (beton/metaal via physical materials) en is straks aan te sluiten zonder
+		// een tweede bron voor hetzelfde gegeven.
+		++WorldHits;
+		const UPhysicalMaterial* Surface = Hit.PhysMaterial.Get();
+		UE_LOG(LogEclipse, Verbose,
+			TEXT("Wapen: wereldtreffer op %s (oppervlak %s) op %s — %d deze missie."),
+			*GetNameSafe(Hit.GetActor()),
+			Surface != nullptr ? *Surface->GetName() : TEXT("onbekend"),
+			*Hit.ImpactPoint.ToCompactString(), WorldHits);
 		return false;
 	}
 

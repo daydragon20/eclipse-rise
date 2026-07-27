@@ -75,6 +75,13 @@ public:
 	 * hoort vóór de gedragswijziging, niet erna.
 	 */
 	int32 GetShotsFired() const { return ShotsFired; }
+
+	/**
+	 * Schoten die de WERELD raakten in plaats van een personage — dus de missers.
+	 * Bestond niet tot 27-07: die tak deed `return false` en liet geen enkel spoor
+	 * na, waardoor elke mis onzichtbaar was. Zie de toelichting bij de branch zelf.
+	 */
+	int32 GetWorldHits() const { return WorldHits; }
 	/**
 	 * MAGAZIJN EN HERLADEN (owner-opdracht 26-07 avond, punt 4).
 	 *
@@ -101,6 +108,9 @@ public:
 
 private:
 	int32 ShotsFired = 0;
+
+	/** Zie GetWorldHits(): de missers, die tot 27-07 helemaal niets achterlieten. */
+	int32 WorldHits = 0;
 
 	/** Kogels in het magazijn. -1 tot ApplyWeaponRow hem vult. */
 	int32 AmmoInMagazine = -1;

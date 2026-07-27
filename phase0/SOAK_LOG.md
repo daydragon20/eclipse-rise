@@ -55,3 +55,4 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 12:01 | `77befb0` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 3 fout(en) in het frame [beeld: 2 beeld(en) VERANDERD -> stap 8, stap 9] |
 | 2026-07-27 12:05 | `77befb0` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 3 fout(en) in het frame |
 | 2026-07-27 12:15 | `b179692` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 3 fout(en) in het frame |
+| 2026-07-27 12:27 | `b673902` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
