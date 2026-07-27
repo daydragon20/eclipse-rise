@@ -414,6 +414,23 @@ speelde hij oude code en kán het kruis er niet zijn.
 > weggooien maar een eigen uitkomst geven met ImpactPoint, normaal en physical
 > material; (2) het bestaande oppervlaktegeluid eraan hangen — dat systeem bestaat
 > al voor voetstappen, dus aansluiten en niet bouwen; (3) pas dan het zichtbare.
+>
+> **STAP 1 EN 2 ZIJN GELAND** (`44fd7b8`, `3bc396b`): de wereldtreffer wordt geteld
+> en gelogd mét physical material, en gaat als eigen feit
+> (`Event.Combat.WorldImpact`) over de bus, waar de audiolaag hem op dezelfde
+> handler als een treffer afspeelt. **Een misser is dus hoorbaar.**
+>
+> **STAP 3 — EEN VALKUIL DIE AL VASTSTAAT, dus niet opnieuw ontdekken.** Het
+> zichtbare kan hier **geen deferred decal** zijn. Het district is UNLIT (de
+> toon-master), en een unlit oppervlak leest de GBuffer niet — dat is precies
+> waarom de contactschaduwen onder de dekkingsblokken doorzichtige QUADS zijn en
+> geen decals, en waarom `SpawnGroundDecal` ondanks zijn naam een platgedrukte
+> kubus spawnt. Een inslagmarkering moet dus dezelfde vorm krijgen: een klein
+> geöriënteerd quad op `Hit.ImpactPoint`, gedraaid naar `Hit.ImpactNormal`, met een
+> bestaand masker en een eigen levensduur.
+>
+> Zonder die notitie is de eerste poging een decal die nergens verschijnt — en dan
+> lijkt het alsof het FEIT niet aankomt, terwijl het alleen niet getekend wordt.
 - De hitmarker is de enige andere visuele terugkoppeling, en die zat tot vandaag op
   een kruis dat niet bestond.
 
