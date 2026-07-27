@@ -127,6 +127,12 @@ private:
 	/** Op hoeveel duwmomenten de component iets in zijn laatste invoer had staan. */
 	int32 PlayShotIntervalSawInput = 0;
 
+	/** Hoe vaak de lichaamsdraai in dit interval van richting omklapte: de maat voor trillen. */
+	int32 PlayShotIntervalYawFlips = 0;
+	float PlayShotIntervalMaxYawStep = 0.0f;
+	float PlayShotLastYaw = -9999.0f;
+	float PlayShotLastYawStep = 0.0f;
+
 	/** Hoe vaak de component met zijn tick UIT stond, en hoe vaak inactief. */
 	int32 PlayShotIntervalTickOff = 0;
 	int32 PlayShotIntervalInactive = 0;

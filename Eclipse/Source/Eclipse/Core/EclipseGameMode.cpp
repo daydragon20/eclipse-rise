@@ -469,6 +469,41 @@ void AEclipseGameMode::DrivePlayShotInput()
 		// verstoppen.
 		Controller->AddYawInput(1.2f);
 	}
+	// TRILT HIJ TIJDENS HET SCHIETEN? Owner-melding 27-07.
+	//
+	// Een beving is niet "veel beweging" maar veel RICHTINGSWISSELINGEN: een nette
+	// draai gaat een kant op, een tril gaat heen en weer. Daarom niet de grootte
+	// van de stap tellen maar hoe vaak het teken omklapt — dat scheidt een tril van
+	// een snelle maar bedoelde draai, en die twee zien er in een gemiddelde
+	// identiek uit.
+	//
+	// Op de ACTOR-rotatie en niet op de camera: de owner zegt dat het PERSONAGE
+	// trilt, en de camera heeft zijn eigen lag die een tril juist zou uitsmeren.
+	{
+		// OP DE MESH EN NIET OP DE ACTOR. Eerste meting stond op de actor-rotatie en
+		// gaf nul omklappen met een grootste stap van 0,00 graden — een perfect
+		// stille as. Dat is geen weerlegging van de owner maar van mijn keuze van as:
+		// hij ziet het LICHAAM, en dat is de mesh. De lichaamsdraai schrijft juist op
+		// de relatieve rotatie van de mesh, dus daar hoort een tril zichtbaar te zijn
+		// en op de actor per definitie niet.
+		const float NowYaw = Body->GetMesh() != nullptr
+			? Body->GetMesh()->GetRelativeRotation().Yaw : Body->GetActorRotation().Yaw;
+		if (PlayShotLastYaw > -1000.0f)
+		{
+			const float Step = FMath::FindDeltaAngleDegrees(PlayShotLastYaw, NowYaw);
+			if (FMath::Abs(Step) > 0.05f)
+			{
+				if (PlayShotLastYawStep != 0.0f && (Step > 0.0f) != (PlayShotLastYawStep > 0.0f))
+				{
+					++PlayShotIntervalYawFlips;
+				}
+				PlayShotLastYawStep = Step;
+				PlayShotIntervalMaxYawStep = FMath::Max(PlayShotIntervalMaxYawStep, FMath::Abs(Step));
+			}
+		}
+		PlayShotLastYaw = NowYaw;
+	}
+
 	if (bPlayShotFiring)
 	{
 		if (UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>())
@@ -605,7 +640,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, LICHAAM-OMKLAPPEN %d (grootste stap %.2f gr, vurend %d), component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -627,6 +662,9 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				PlayShotIntervalTopConsumed,
 				PlayShotIntervalLanded,
 				PlayShotIntervalVanished,
+				PlayShotIntervalYawFlips,
+				PlayShotIntervalMaxYawStep,
+				bPlayShotFiring ? 1 : 0,
 				PlayShotIntervalSawInput,
 				PlayShotIntervalTickOff,
 				PlayShotIntervalInactive);
@@ -639,6 +677,8 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalTopConsumed = 0.0f;
 		PlayShotIntervalLanded = 0.0f;
 		PlayShotIntervalVanished = 0.0f;
+		PlayShotIntervalYawFlips = 0;
+		PlayShotIntervalMaxYawStep = 0.0f;
 		PlayShotLastPendingAfter = -1.0f;
 		PlayShotIntervalSawInput = 0;
 		PlayShotIntervalTickOff = 0;
