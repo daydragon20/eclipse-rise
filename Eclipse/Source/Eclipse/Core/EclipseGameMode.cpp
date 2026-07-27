@@ -143,6 +143,7 @@ void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStru
 	}
 	Mark->SetLifeSpan(2.5f);
 	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
+	UE_LOG(LogEclipse, Verbose, TEXT("[SPAWNTIJD] inslagspoor op t=%.2f s."), World->GetTimeSeconds());
 
 	// ================================================================
 	// DE CONCLUSIE VAN 27-07, en hij is groter dan dit ene spoor.
@@ -167,14 +168,21 @@ void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStru
 	// editor bevestigd te worden voordat er nog iets aan dit spoor verandert. De
 	// code blijft staan: hij klopt zodra dat opgelost is.
 	//
-	// EEN MOGELIJKE TEGENSPRAAK DIE IK ZELF NIET KAN TOETSEN, en die hoort erbij.
-	// Alles hierboven is gemeten in de OPNAMERONDE, en die start de missie meteen
-	// bij het begin — dus daar ontstaat vrijwel alles rond BeginPlay. Start de owner
-	// een missie vanuit de hub, dan worden squadmates en vijanden WEL midden in het
-	// spel neergezet (SpawnMissionActors), en die ziet hij staan. Klopt dat, dan is
-	// mijn vaststelling te breed en ligt het verschil ergens smaller: bij
-	// AStaticMeshActor, of bij spawnen vanuit een bus-callback, en niet bij "tijdens
-	// het spelen" in het algemeen.
+	// EEN TEGENSPRAAK GEZOCHT EN GEMETEN — en hij bleek er niet te zijn.
+	//
+	// De squadmates staan in elk frame en worden neergezet door SpawnMissionActors,
+	// dat via een BUS-CALLBACK loopt (Event.Mission.Started) — precies hetzelfde
+	// mechanisme als dit inslagspoor. Als zij ná het opstarten ontstonden, was mijn
+	// conclusie meteen weerlegd. GEMETEN: t = 0,00 s. Ze ontstaan bij het opstarten,
+	// net als alles wat wél rendert. Geen tegenspraak dus, en de vaststelling staat
+	// er sterker door: ik heb er actief naar gezocht.
+	//
+	// WAT NOG STEEDS OPEN IS, en wat de owner in een halve ronde weet.
+	// De opnameronde start de missie meteen bij het begin, dus daar valt die
+	// spawn op t=0. Start de owner een missie vanuit de HUB, dan loopt dezelfde
+	// functie midden in het spel — en verschijnen zijn squadmates dan gewoon, dan is
+	// het verschil niet "tijdens het spelen" maar iets smallers: AStaticMeshActor
+	// tegenover een pawn met een skeletale mesh.
 	//
 	// Ik zet het er zo bij omdat de owner dat in een halve speelronde weet en ik
 	// niet, en omdat een te brede conclusie de volgende sessie de verkeerde kant op
@@ -1745,6 +1753,15 @@ AEclipseCharacter* AEclipseGameMode::SpawnBodyNear(const FVector& Location, cons
 
 void AEclipseGameMode::SpawnMissionActors()
 {
+	// WANNEER GEBEURT DIT — de toets op mijn eigen conclusie.
+	//
+	// Ik heb vastgesteld dat wat TIJDENS het spelen wordt neergezet niet getekend
+	// wordt. Maar deze functie loopt via een bus-callback (Event.Mission.Started),
+	// precies zoals mijn inslagspoor, en de squadmates die hij neerzet STAAN in elk
+	// frame. Zijn zij ná het opstarten ontstaan, dan is mijn conclusie weerlegd en
+	// ligt het verschil ergens anders. Eén tijdstempel beslist dat.
+	UE_LOG(LogEclipse, Display, TEXT("[SPAWNTIJD] missie-actoren op t=%.2f s."),
+		GetWorld() != nullptr ? GetWorld()->GetTimeSeconds() : -1.0f);
 	UGameInstance* GameInstance = GetGameInstance();
 	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
 	UEclipseSquadSubsystem* Squad = GetWorld()->GetSubsystem<UEclipseSquadSubsystem>();
