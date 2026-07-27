@@ -1221,6 +1221,29 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 	FillFrom(LocomotionSet.RunBack, LocomotionSet.WalkBack);
 	FillFrom(LocomotionSet.RunLeft, LocomotionSet.WalkLeft);
 	FillFrom(LocomotionSet.RunRight, LocomotionSet.WalkRight);
+	// WELKE RICHTINGEN DIT LICHAAM ECHT HEEFT — één regel per lichaam.
+	//
+	// "Vijf lichamen missen hun zijcycli" staat al sinds de locomotie-audit op de
+	// lijst, maar zonder namen en zonder datum, en de packs zijn sindsdien
+	// veranderd. Dit maakt er een actueel lijstje van: wat er ontbreekt, en of de
+	// kruislingse terugval het heeft opgevangen. Zonder dat is "aansluiten" een
+	// zoektocht en met dit een klusje.
+	{
+		auto Merk = [](const TObjectPtr<UAnimSequence>& Klip, const TObjectPtr<UAnimSequence>& Eigen)
+		{
+			return Eigen != nullptr ? TEXT("eigen") : (Klip != nullptr ? TEXT("geleend") : TEXT("GEEN"));
+		};
+		UE_LOG(LogEclipse, Display,
+			TEXT("Richtingen van %s: walk-back %s, walk-links %s, walk-rechts %s, run-back %s, run-links %s, run-rechts %s"),
+			*GetName(),
+			Merk(LocomotionSet.WalkBack, ResolveClip(BodyDef.WalkBackAnim, TEXT("walk-back"))),
+			Merk(LocomotionSet.WalkLeft, ResolveClip(BodyDef.WalkLeftAnim, TEXT("walk-left"))),
+			Merk(LocomotionSet.WalkRight, ResolveClip(BodyDef.WalkRightAnim, TEXT("walk-right"))),
+			Merk(LocomotionSet.RunBack, ResolveClip(BodyDef.RunBackAnim, TEXT("run-back"))),
+			Merk(LocomotionSet.RunLeft, ResolveClip(BodyDef.RunLeftAnim, TEXT("run-left"))),
+			Merk(LocomotionSet.RunRight, ResolveClip(BodyDef.RunRightAnim, TEXT("run-right"))));
+	}
+
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"), /*bAllowAdditive=*/true);
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"), /*bAllowAdditive=*/true);
