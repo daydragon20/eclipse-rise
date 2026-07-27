@@ -181,7 +181,34 @@ bool FEclipseGuidePanelTest::RunTest(const FString& Parameters)
 		// Kop + de look-waardenregel + elke stap + de teller. Het paneel bouwt zijn
 		// rijen één keer, dus de bovengrens staat vast; het AANTAL stappen niet meer,
 		// want deel 1 toont wat er veranderd is.
-		TestEqual(TEXT("Kop + de stappen + de teller"), Lines.Num(), GetGuideStepCount() + 3);
+		// HERZIEN 27-07 NA EEN GEMETEN DIAGNOSE. Hier stond
+		// `Lines.Num() == GetGuideStepCount() + 3`, en die assertie legde een
+		// CONSTANTE naast een VARIABELE. ComposeGuidePanelLines eindigt met
+		//   while (Lines.Num() < GuidePanelLineCount) { Lines.Add(FString()); }
+		//   Lines.SetNum(GuidePanelLineCount);
+		// dus het paneel geeft ALTIJD precies GuidePanelLineCount regels terug —
+		// het vult aan en kapt af, want de widget bouwt zijn rijen één keer en doet
+		// daarna alleen nog SetText. Die 'stappen + 3' klopte alleen zolang deel 1
+		// vol zat; zodra er niets nieuws sinds de vorige sessie is (één placeholder
+		// in plaats van drie wijzigingen) liep de verwachting weg en werd de bar
+		// rood op code waar niemand aan had gezeten.
+		//
+		// Drie draaien lang rood, en drie verklaringen van mij die alle drie fout
+		// waren (datum-race, teller-tegen-lus, en een rekensom). Wat het oploste
+		// waren twee logregels: LUS en TELLER meldden allebei 8 stappen, dus de
+		// bronnen waren het eens en zat het verschil in het paneel — precies waar
+		// ik eerst keek en mezelf toen uit had gepraat.
+		//
+		// WAT ER NU GETOETST WORDT is het contract zelf: de vaste hoogte, én dat
+		// alle stappen daar ook echt in PASSEN. Dat tweede is waar de assertie
+		// tanden houdt — zonder die regel zou een gids die groeit tot voorbij zijn
+		// paneel stilletjes stappen afkappen, en dat is de fout die de vaste hoogte
+		// kan veroorzaken.
+		TestEqual(TEXT("Het paneel houdt zijn vaste hoogte"), Lines.Num(), GuidePanelLineCount);
+		TestTrue(FString::Printf(
+				TEXT("Alle %d stappen passen in het paneel (%d regels, waarvan %d omlijsting)"),
+				Steps.Num(), GuidePanelLineCount, 3),
+			Steps.Num() + 3 <= GuidePanelLineCount);
 		TestTrue(TEXT("En dat past binnen de vaste paneelhoogte"), Lines.Num() <= GuidePanelLineCount);
 
 		// BREEDTE, en niet alleen hoogte. Het paneel rendert de actieve stap op één

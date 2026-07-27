@@ -46,3 +46,4 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 10:58 | `cb48bfb` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 9 | Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest; opnameronde: 1 fout(en) in het frame [beeld: 9 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 5, stap 6, stap 7, stap 8, stap 9] |
 | 2026-07-27 11:10 | `5ffc8ae` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest |
 | 2026-07-27 11:14 | `114cfed` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest |
+| 2026-07-27 11:20 | `2c5b9c4` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest |
