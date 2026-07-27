@@ -97,6 +97,78 @@ void AEclipseGameMode::InitGame(const FString& MapName, const FString& Options, 
 	}
 }
 
+void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStruct& Payload)
+{
+	const FEclipseCombatEventPayload* Impact = Payload.GetPtr<FEclipseCombatEventPayload>();
+	UWorld* World = GetWorld();
+	if (Impact == nullptr || World == nullptr)
+	{
+		return;
+	}
+	UStaticMesh* Quad = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (Quad == nullptr)
+	{
+		return;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// De payload draagt de plek maar niet de normaal: een inslag op de grond ligt
+	// plat, en dat is verreweg het meeste. Komt de normaal er ooit bij, dan kan hij
+	// hier meteen de rotatie dragen.
+	AStaticMeshActor* Mark = World->SpawnActor<AStaticMeshActor>(
+		Impact->Origin + FVector(0.0f, 0.0f, 1.0f), FRotator::ZeroRotator, Params);
+	if (Mark == nullptr)
+	{
+		return;
+	}
+	Mark->SetMobility(EComponentMobility::Movable);
+	UStaticMeshComponent* Plate = Mark->GetStaticMeshComponent();
+	Plate->SetStaticMesh(Quad);
+	Mark->SetActorScale3D(FVector(0.09f, 0.09f, 0.004f));
+	Plate->SetCastShadow(false);
+	Plate->SetAffectDistanceFieldLighting(false);
+	Mark->SetActorEnableCollision(false);
+	if (UMaterialInterface* Toon = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon")))
+	{
+		if (UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Toon, Mark))
+		{
+			const FLinearColor Spark(1.00f, 0.62f, 0.22f, 1.0f);
+			const FVector Zon = FRotator(-25.0f, 55.0f, 0.0f).Vector();
+			Mid->SetVectorParameterValue(TEXT("LitColor"), Spark);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Spark * 0.45f);
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(Zon, 0.0f)));
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
+			Plate->SetMaterial(0, Mid);
+		}
+	}
+	Mark->SetLifeSpan(2.5f);
+	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
+
+	// ================================================================
+	// DE CONCLUSIE VAN 27-07, en hij is groter dan dit ene spoor.
+	//
+	// WERKT WEL:  een blok dat bij BeginPlay wordt neergezet staat groot en helder
+	//             in beeld — bewezen met een magenta kubus aan het personage.
+	// WERKT NIET: hetzelfde blok, zelfde mesh, zelfde materiaal, zelfde maat, maar
+	//             neergezet TIJDENS HET SPELEN. Onzichtbaar — zowel vanuit het
+	//             wapencomponent als vanuit deze game mode via de bus, op 9, 50 en
+	//             90 cm, met en zonder RF_Transient, met en zonder levensduur, met
+	//             vier verschillende materialen, plat en massief.
+	//
+	// Alles wat een spoor van een blok kan onderscheiden is daarmee uitgesloten.
+	// Wat overblijft is WANNEER het ontstaat. Dat raakt niet alleen dit inslagspoor
+	// maar alles wat tijdens het spelen zichtbaar moet verschijnen: muzzle flash,
+	// kogelsporen, oppakbare dingen, elk effect.
+	//
+	// De sporen BESTAAN aantoonbaar: geregistreerd, zichtbaar, bolstraal 63,7, en
+	// met een dot-product gemeten VOOR de camera op 8,5 m. Ze worden niet getekend.
+	//
+	// Dit is geen gok meer maar een reproduceerbare vaststelling, en hij hoort in de
+	// editor bevestigd te worden voordat er nog iets aan dit spoor verandert. De
+	// code blijft staan: hij klopt zodra dat opgelost is.
+	// ================================================================
+}
+
 void AEclipseGameMode::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)
 {
 	const FEclipseCombatEventPayload* Shot = Payload.GetPtr<FEclipseCombatEventPayload>();
@@ -176,6 +248,23 @@ void AEclipseGameMode::StartPlay()
 		ShotFiredHandle = Bus->Subscribe(
 			EclipseTags::Event_Combat_ShotFired,
 			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnShotFired),
+			FEclipseCombatEventPayload::StaticStruct());
+
+		// HET ZICHTBARE INSLAGSPOOR KOMT NU HIERVANDAAN, en dat is twee dingen
+		// tegelijk: een proef en de juiste plek.
+		//
+		// DE PROEF: een blok dat de game mode neerzet is aantoonbaar zichtbaar; een
+		// identiek blok dat het wapencomponent tijdens het vuren neerzet is dat niet.
+		// Alles daarbuiten is uitgesloten. Dit verplaatst precies dat ene verschil.
+		//
+		// DE JUISTE PLEK: het feit reist al over de bus (Event.Combat.WorldImpact) en
+		// de audiolaag luistert er al op. Een tweede luisteraar voor het BEELD is
+		// dezelfde vorm, geen nieuw systeem, en het beantwoordt meteen de vraag waar
+		// visuele feedback hoort te leven: bij wie het feit hoort, niet bij wie het
+		// veroorzaakt.
+		WorldImpactHandle = Bus->Subscribe(
+			EclipseTags::Event_Combat_WorldImpact,
+			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnWorldImpact),
 			FEclipseCombatEventPayload::StaticStruct());
 	}
 
@@ -1506,6 +1595,14 @@ void AEclipseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
 	{
 		Bus->Unsubscribe(MissionEventsHandle);
+		// ALLE DRIE EN NIET ALLEEN DE EERSTE. Hier stond alleen de missie-handle;
+		// het schot-abonnement werd nooit opgezegd. Dat is precies het lek dat de
+		// contracttest vanochtend bij MIJ ving in de audiolaag — daar telt hij de
+		// levende abonnementen, en kennelijk kijkt hij niet naar de game mode.
+		// Opgeruimd bij het toevoegen van de derde, want een lek dat je ziet en laat
+		// liggen is een keuze en geen erfenis.
+		Bus->Unsubscribe(ShotFiredHandle);
+		Bus->Unsubscribe(WorldImpactHandle);
 	}
 	Super::EndPlay(EndPlayReason);
 }

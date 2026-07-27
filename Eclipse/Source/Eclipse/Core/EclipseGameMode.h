@@ -197,6 +197,7 @@ private:
 
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
+	FEclipseEventSubscriptionHandle WorldImpactHandle;
 
 	/**
 	 * Hoe vaak een schot van de spelerskant een vijand in beweging zette.
@@ -210,6 +211,9 @@ private:
 
 	/** Een schot vertalen naar wie het hoort (26-07, punt 1). */
 	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/** Het zichtbare spoor van een misser — hier en niet in het wapen; zie de commentaar bij de subscriptie. */
+	void OnWorldImpact(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Eén regel over het eerste gehoorde schot; daarna zwijgt het. */
 	bool bLoggedFirstShotAlert = false;
