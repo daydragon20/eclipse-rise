@@ -113,8 +113,21 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
     oorzaak; dat is de duurste fout van deze dag geweest.
   - **Wat wél is nagekeken en het NIET verklaart:** `DisableMovement()` hangt
     alleen aan neergaan (de speler leeft in dat interval), en de tickopzet van het
-    bewegingscomponent is standaard. De projectcode is daarmee uitgeput; de rest
-    vraagt de engine-kant volgen.
+    bewegingscomponent is standaard.
+  - **BEGIN NIET MET EEN DEBUGGER — er liggen nog GOEDKOPE vragen open.** Ik heb
+    dit eerst weggeschreven als "vraagt de engine-kant volgen"; dat is een
+    inschatting en geen meting, en zulke inschattingen zaten er vandaag zes van de
+    zeven keer naast. Deze twee zijn met een logregel te beantwoorden:
+    1. **Wordt de pawn tussentijds opnieuw geregistreerd?** Log identiteit én
+       `IsActorTickEnabled()` van de pawn per drive-tick. Een component dat
+       opnieuw registreert, tickt een window lang niet — en de missiestart
+       teleporteert hem, dus er gebeurt daar iets.
+    2. **Blokkeert `HighResShot` de componenttick terwijl timers doorlopen?** Het
+       dode interval begint precies bij opname 1. De duwteller staat op 100, dus
+       de TIMER liep door; dat sluit een volledige stall uit maar niet dat
+       componenten overgeslagen werden. Log de wereldtijd per duw en kijk of er
+       een gat van ~0,4 s in zit dat samenvalt met de opname.
+    Pas als die twee niets opleveren, is de engine-kant aan de beurt.
   - **Tweede uitgesloten kandidaat:** de pawn is NIET input-disabled gebleven.
     `EnterMissionMode` roept `ControlledPawn->EnableInput(this)` aan
     (`EclipsePlayerController.cpp:507`), direct tegenover de `DisableInput` van
