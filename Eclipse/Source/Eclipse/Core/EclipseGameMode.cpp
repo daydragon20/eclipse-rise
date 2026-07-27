@@ -359,22 +359,56 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		}
 	}
 
-	// KOMT BEWEGING IN HET BEELD AAN? Moment 2 en 3 zijn de loopmomenten, en
-	// tussen die twee hoort het uitzicht verschoven te zijn. Zonder deze controle
-	// zou een speler die wel invoer krijgt maar niet beweegt (of een camera die
-	// losgekoppeld is) negen keurige opnames opleveren van hetzelfde plaatje.
+	// KOMT BEWEGING IN HET BEELD AAN? Zonder deze controle zou een speler die wel
+	// invoer krijgt maar niet beweegt (of een camera die losgekoppeld is) negen
+	// keurige opnames opleveren van hetzelfde plaatje.
 	//
 	// Op de camera en niet op de pawn: het gaat er hier om of de beweging het
 	// SCHERM haalt, niet of er een getal in het bewegingscomponent verandert.
-	if (ShotIndex == 3)
+	//
+	// STOND TOT 27-07 OP `ShotIndex == 3` EN MAT DUS ÉÉN INTERVAL. Aangewezen door
+	// een tweede sessie, en het is dezelfde vorm als de fout uit d3bcaa1: de
+	// controle stond op het punt waar het al goed ging. Interval 1->2 is óók een
+	// loopinterval — `bPlayShotWalking` gaat aan in case 1, ná de opname — en werd
+	// niet getoetst.
+	//
+	// WELKE INTERVALLEN LOOPINTERVALLEN ZIJN, WORDT NU AFGELEID en niet meer
+	// opgeschreven. `bPlayShotWalking` staat op dit punt nog op de waarde die het
+	// hele afgelopen interval gold (case 3 zet hem pas ná deze meting uit), dus
+	// het vlag ZELF zegt of er gelopen werd. Verschuift het draaiboek, dan
+	// verschuift de controle mee — precies wat er nu één keer mis ging.
+	//
+	// De marge staat er altijd bij, ook als hij ruim is, net als bij het
+	// frametijdbudget hierboven: dan zie je het AFLOPEN in plaats van omvallen.
+	if (ShotIndex >= 2)
 	{
 		const float Moved = FVector::Dist(CameraLocation, PlayShotLastCamera);
-		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 3 BEWEGING] uitzicht %.0f cm verschoven sinds moment 2"), Moved);
-		if (Moved < 50.0f)
+		UE_LOG(LogEclipse, Display,
+			TEXT("[PLAYSHOT %d BEWEGING] uitzicht %.0f cm verschoven sinds moment %d (%s)"),
+			ShotIndex, Moved, ShotIndex - 1,
+			bPlayShotWalking ? TEXT("loopinterval") : TEXT("geen invoer, geen eis"));
+
+		// WAAROM hij niet opschoot, in dezelfde regel als DAT hij niet opschoot.
+		// Zonder dit staat er alleen "3 cm" en begint het gissen: landt de invoer
+		// niet, of landt hij wel en komt de pawn niet los? Snelheid plus modus
+		// scheidt die twee, en `LaatsteDuw` zegt of DrivePlayShotInput uberhaupt
+		// aan het duwen was op het moment van de opname.
+		if (const ACharacter* PlayShotBody = Cast<ACharacter>(Controller->GetPawn()))
+		{
+			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
+			UE_LOG(LogEclipse, Display,
+				TEXT("[PLAYSHOT %d BEWEGING] snelheid %.0f cm/s  modus %d  op de grond %d  duw %.2f"),
+				ShotIndex,
+				Move != nullptr ? Move->Velocity.Size() : -1.0f,
+				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
+				Move != nullptr && Move->IsMovingOnGround() ? 1 : 0,
+				PlayShotBody->GetPendingMovementInputVector().Size());
+		}
+		if (bPlayShotWalking && Moved < 50.0f)
 		{
 			UE_LOG(LogEclipse, Error,
-				TEXT("[PLAYSHOT 3 FOUT] het uitzicht schoof maar %.0f cm op tussen twee loopmomenten — beweging bereikt het beeld niet"),
-				Moved);
+				TEXT("[PLAYSHOT %d FOUT] het uitzicht schoof maar %.0f cm op in een loopinterval van 2 s — beweging bereikt het beeld niet"),
+				ShotIndex, Moved);
 		}
 	}
 	PlayShotLastCamera = CameraLocation;
