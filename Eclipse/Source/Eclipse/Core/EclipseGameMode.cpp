@@ -18,6 +18,7 @@
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/PlayerInput.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
 #include "Engine/ExponentialHeightFog.h"
@@ -846,6 +847,28 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// HUD draait met een console eronder, en de UI-laag is niet te
 		// fotograferen. Zonder deze regel zou het commando bestaan zonder ooit
 		// gedraaid te hebben.
+		// KOMT DE GIDSTOETS DOOR DE HELE KETEN? Owner-punt 6, 27-07: "ik druk F3 en
+		// er gebeurt niets; G doet ook niets. Zoek uit WAAROM het niet aankomt in
+		// plaats van nog een toets te proberen."
+		//
+		// Eén verdenking is al weerlegd: in het log van zijn eigen sessie staat
+		// "Mission mode: debug HUD mounted", dus de widget waar de gids, het
+		// richtkruis en de munitieteller in hangen wás gemonteerd. Wat dan
+		// overblijft is de INVOERKETEN, en die is hier te meten in plaats van te
+		// beredeneren: InputKey duwt de toets erin op precies de plek waar een
+		// echte toetsaanslag binnenkomt, dus hij loopt door dezelfde
+		// Enhanced-Input-afhandeling, dezelfde mapping context en dezelfde
+		// actie-binding. Komt de gids daarna open, dan ligt het aan het APPARAAT
+		// van de owner (mediatoets, of de engine-viewmodes op F1-F5); blijft hij
+		// dicht, dan ligt het hier en heb ik de plek.
+		//
+		// Beide antwoorden zijn bruikbaar, en dat is precies waarom dit een meting
+		// is en geen zoveelste toets erbij.
+		Controller->InputKey(FInputKeyParams(EKeys::G, IE_Pressed, 1.0, false));
+		Controller->InputKey(FInputKeyParams(EKeys::G, IE_Released, 1.0, false));
+		UE_LOG(LogEclipse, Display,
+			TEXT("[PLAYSHOT 8 GIDSTOETS] G door de invoerketen geduwd — de UI-regels hieronder zeggen of het paneel opengaat"));
+
 		Controller->ConsoleCommand(TEXT("Eclipse.UI.Report"));
 		// En de savestand, om de derde keer dezelfde reden. Deze ronde start een
 		// verse campagne, dus hij hoort "setup DA_CampaignSetup" te melden en nul
