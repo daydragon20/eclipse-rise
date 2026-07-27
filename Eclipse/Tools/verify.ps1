@@ -24,6 +24,8 @@ $ErrorActionPreference = "Stop"
 $Project = "C:\Dev\ECLIPSE_GDD\Eclipse\Eclipse.uproject"
 $Root = "C:\Dev\ECLIPSE_GDD\Eclipse"
 $Failures = @()
+$script:Counts = "niet gedraaid"
+$script:ShotCount = 0
 
 function Write-Step($Text) { Write-Host ""; Write-Host "=== $Text ===" }
 
@@ -52,6 +54,7 @@ $j = Get-Content "$Report\index.json" -Raw | ConvertFrom-Json
 # succeeded telt alleen de SCHONE tests; wie die optelt bij failed komt structureel
 # te laag uit en denkt dat de suite gekrompen is. Het totaal is tests.Count.
 $Total = $j.tests.Count
+$script:Counts = "$Total tests / $($j.failed) gefaald / $($j.notRun) niet gedraaid"
 Write-Host "$Total tests — $($j.succeeded) schoon, $($j.succeededWithWarnings) met waarschuwing, $($j.failed) GEFAALD, $($j.notRun) niet gedraaid"
 if ($j.failed -gt 0 -or $j.notRun -gt 0) {
     $j.tests | Where-Object { $_.state -ne 'Success' } | ForEach-Object {
@@ -100,6 +103,7 @@ if (-not $SkipShots) {
 
     $Shots = Get-ChildItem -Recurse "$Root\Saved\Screenshots" -Filter *.png -ErrorAction SilentlyContinue |
         Where-Object { $_.LastWriteTime -gt $Start } | Sort-Object LastWriteTime
+    $script:ShotCount = $Shots.Count
     Write-Host "$($Shots.Count) opnames:"
     $Shots | ForEach-Object { Write-Host "  $($_.FullName)" }
     if ($Shots.Count -eq 0) {
@@ -128,6 +132,42 @@ if (-not $SkipShots) {
     Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "SPELER|PLAYSHOT \d+ (WAPEN|DRAAI|SILHOUET|BEWEGING)\]" |
         ForEach-Object { ($_.Line -replace '^.*Display: ', '') }
 }
+
+# --------------------------------------------------------- 5. het soak-logboek
+# SPEC-P2-05 vraagt een soak die DRIE NACHTEN groen blijft, en SPEC-P2-03 vraagt
+# hetzelfde van zijn econ-paden. Dat is niet te bewijzen zonder geheugen: er is
+# geen CI-runner (Fase 0-restje), dus tot nu bestond "drie nachten" alleen in het
+# hoofd van wie het draaide.
+#
+# HIJ SCHRIJFT OOK BIJ ROOD, en dat is de hele truc. Een logboek dat alleen
+# successen bewaart kan "drie nachten achtereen" per definitie niet aantonen -
+# dan zie je drie groene regels en niet de rode nacht ertussen. Wie de reeks
+# leest moet de onderbrekingen kunnen zien.
+#
+# Geen BOM in het logbestand: dit is een repo-document dat door mensen en door
+# git gelezen wordt, en een BOM belandt anders in de eerste tabelcel.
+$LogPath = "C:\Dev\ECLIPSE_GDD\phase0\SOAK_LOG.md"
+$Utf8NoBom = New-Object System.Text.UTF8Encoding $false
+if (-not (Test-Path $LogPath)) {
+    $Header = @(
+        "# Soak-logboek",
+        "",
+        "Elke draai van ``Eclipse\Tools\verify.ps1`` schrijft hier een regel — GROEN en ROOD.",
+        "Zonder de rode nachten is ``drie nachten achtereen`` niet te bewijzen.",
+        "",
+        "| Wanneer | Commit | Uitslag | Suite | Opnames | Waarop het viel |",
+        "|---|---|---|---|---|---|",
+        ""
+    ) -join "`r`n"
+    [System.IO.File]::WriteAllText($LogPath, $Header, $Utf8NoBom)
+}
+$Commit = (& git -C "C:\Dev\ECLIPSE_GDD" rev-parse --short HEAD 2>$null)
+if (-not $Commit) { $Commit = "onbekend" }
+$Verdict = if ($Failures.Count -gt 0) { "ROOD" } else { "GROEN" }
+$Reason = if ($Failures.Count -gt 0) { ($Failures -join "; ") } else { "-" }
+$Row = "| {0} | ``{1}`` | **{2}** | {3} | {4} | {5} |`r`n" -f `
+    (Get-Date -Format "yyyy-MM-dd HH:mm"), $Commit, $Verdict, $script:Counts, $script:ShotCount, $Reason
+[System.IO.File]::AppendAllText($LogPath, $Row, $Utf8NoBom)
 
 Write-Step "STAND"
 if ($Failures.Count -gt 0) {
