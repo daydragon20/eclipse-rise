@@ -26,6 +26,7 @@ $Root = "C:\Dev\ECLIPSE_GDD\Eclipse"
 $Failures = @()
 $script:Counts = "niet gedraaid"
 $script:ShotCount = 0
+$script:ChangedShots = ""
 
 function Write-Step($Text) { Write-Host ""; Write-Host "=== $Text ===" }
 
@@ -155,7 +156,19 @@ if (-not $SkipShots) {
     # stellen.
     Write-Host ""
     Write-Host "VERANDERD SINDS DE VORIGE RONDE:"
-    python "$Root\Tools\shot_diff.py"
+    $DiffOut = & python "$Root\Tools\shot_diff.py"
+    $DiffOut | ForEach-Object { Write-Host $_ }
+    # DE UITSLAG MOET HET MOMENT OVERLEVEN.
+    #
+    # shot_diff werkt zijn ijkbeelden ALTIJD bij, ook als er iets veranderd is -
+    # anders blijft hij eeuwig hetzelfde melden. Gevolg: een verandering die ik
+    # één ronde negeer, is de ronde daarna onzichtbaar. Dat is precies het gat
+    # dat het soak-logboek voor de suite dicht, dus gaat het hier net zo: staat
+    # er iets in de regel, dan komt het in het logboek terecht, gelezen of niet.
+    $script:ChangedShots = ($DiffOut | Where-Object { $_ -match 'VERANDERD ->' }) -join ''
+    if ($script:ChangedShots) {
+        $script:ChangedShots = ($script:ChangedShots -replace '^shot-diff:\s*', '')
+    }
 
     # DE BUDGETBAND. GDD 12.4 zegt 16,7 ms; de harde fout staat pas op 33,3.
     # Daartussen zat niets, en een waarschuwing die niemand leest is precies zo
@@ -206,6 +219,7 @@ $Commit = (& git -C "C:\Dev\ECLIPSE_GDD" rev-parse --short HEAD 2>$null)
 if (-not $Commit) { $Commit = "onbekend" }
 $Verdict = if ($Failures.Count -gt 0) { "ROOD" } else { "GROEN" }
 $Reason = if ($Failures.Count -gt 0) { ($Failures -join "; ") } else { "-" }
+if ($script:ChangedShots) { $Reason = ($Reason -replace '^-$', '') + " [beeld: $script:ChangedShots]" }
 $Row = "| {0} | ``{1}`` | **{2}** | {3} | {4} | {5} |`r`n" -f `
     (Get-Date -Format "yyyy-MM-dd HH:mm"), $Commit, $Verdict, $script:Counts, $script:ShotCount, $Reason
 [System.IO.File]::AppendAllText($LogPath, $Row, $Utf8NoBom)
