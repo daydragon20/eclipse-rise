@@ -668,11 +668,34 @@ void AEclipseCharacter::RefreshCameraTargets()
 		TargetFOV = bFirstPerson ? FirstPersonFOV : ThirdPersonFOV;
 		if (bAiming)
 		{
-			// Aiming pulls in and narrows: 0.55 of the boom and 0.8 of the FOV.
-			// Relative to whichever view you are in, so ADS works the same in
-			// first and third person instead of needing two more constants.
-			TargetArmLength *= 0.55f;
-			TargetFOV *= 0.80f;
+			// Mikken trekt in en vernauwt — maar veel minder in dan het deed, en
+			// dat is de reparatie van owner-punt 1: "ik kan niet eens deftig
+			// kijken."
+			//
+			// GEMETEN 27-07 op de opnames, niet aangenomen: op heuphoogte vult het
+			// personage 59-61% van de beeldhoogte en ~31.000 px; MIKKEND werd dat
+			// 97% en ~155.000 px. VIJF KEER ZO VEEL OPPERVLAK. Niemand had dat
+			// gekozen — het was het PRODUCT van twee ingrepen die los allebei
+			// verdedigbaar zijn: 1/0,55 = x1,82 dichterbij, en de FOV van 80 naar 64
+			// nog eens x1,25. Samen x2,24 in de lengte, en dat kwadrateert.
+			//
+			// WAAROM DE ARM HET DUURSTE HALF IS — en de FOV niet. De camera 45%
+			// dichter op je eigen lichaam brengen vergroot DAT lichaam bijna dubbel,
+			// terwijl een doelwit op 20 m nauwelijks verandert: het staat al ver
+			// weg, dus 135 cm minder afstand is verwaarloosbaar. De FOV vernauwen
+			// vergroot ALLES even hard, dus ook je doelwit — en dat is precies
+			// waarvoor je mikt. De arm-inpull kocht dus je eigen rug, niet je zicht.
+			// Vandaar: arm-inpull grotendeels weg, FOV-vernauwing grotendeels
+			// gehouden.
+			//
+			// NIET DE ZIJOFFSET, hoewel de owner daarom vroeg. Zijn opdracht kwam
+			// uit een zin van mij van 14:00, en die heb ik om 14:30 zelf weerlegd
+			// met een meting: het kruis wordt in geen enkele stand bedekt en bij
+			// mikken is er MEER lucht (124 px tegen 40). De vizierlijn is dus al
+			// vrij; het is zuivere vergroting. Aan die offset zit ik niet meer op
+			// grond van redenering — dat ging vandaag drie keer mis.
+			TargetArmLength *= 0.90f;   // was 0.55 — 300 -> 270 i.p.v. 165
+			TargetFOV       *= 0.85f;   // was 0.80 — 80 -> 68 i.p.v. 64
 		}
 	}
 

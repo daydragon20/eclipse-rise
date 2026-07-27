@@ -253,6 +253,42 @@ hoogte van de socket — staat hier met opzet nog niet.** Dat is precies het soo
 invulling waar ik vandaag drie keer op ben teruggekomen, en de referentie noemt
 geen beeldvullingsgetal om aan te bouwen. Eerst de norm, dan de knop.
 
+### GEREPAREERD 27-07 [GEZIEN — HighresScreenshot01076]
+
+Owner: *"Repareer dat. Ik wil een getal terug, geen 'gefixt'."* Zelfde meting,
+zelfde script, nieuwe opnames:
+
+| | vóór | ná |
+|---|---|---|
+| beeldhoogte mikkend | 97–100 % | **66 %** |
+| beeldbreedte mikkend | 33–34 % | **19 %** |
+| oppervlak mikkend | 155.000–164.000 px | **58.000 px** |
+| t.o.v. de heupstand | **×5,0–5,3** | **×1,9** |
+
+De heupstand is onveranderd (59–61 %, ~31.000 px), zoals bedoeld: alleen mikken is
+aangeraakt.
+
+```cpp
+TargetArmLength *= 0.90f;   // was 0.55 — 300 -> 270 i.p.v. 165
+TargetFOV       *= 0.85f;   // was 0.80 — 80 -> 68 i.p.v. 64
+```
+
+**De arm was het dure half, en dat is meetkunde en geen smaak.** De camera 45%
+dichter op je eigen lichaam brengen vergroot dát lichaam bijna dubbel, terwijl een
+doelwit op 20 m nauwelijks verandert — 135 cm minder afstand is daar
+verwaarloosbaar. De FOV vernauwen vergroot álles even hard, dus ook je doelwit, en
+dat is precies waarvoor je mikt. **De arm-inpull kocht dus je eigen rug, niet je
+zicht.** Vandaar: arm-inpull grotendeels weg, FOV-vernauwing grotendeels gehouden.
+
+**Niet de zijoffset**, hoewel de owner daarom vroeg — zijn opdracht kwam uit mijn
+zin van 14:00 die ik om 14:30 zelf met een meting heb weerlegd (het kruis wordt in
+geen enkele stand bedekt). Zie het doorgestreepte blok hierboven.
+
+**Nog niet geverifieerd:** hoe dit VOELT. 66% is een getal; of mikken nu nog als
+mikken voelt of te vlak is geworden, kan alleen de owner zeggen. De FOV vernauwt
+nog steeds 12° en de camera komt nog 30 cm dichterbij, dus de beweging is er — maar
+of dat genoeg punch is, is niet iets wat ik kan meten.
+
 **Nog niet geverifieerd:** of dit ook is wat de owner "de schaal-bug" noemt. Hij
 meldde dat het personage van grootte verandert; ik meet dat het bij mikken vijf keer
 zo groot wordt. Dat past, maar hij heeft het niet in die woorden gezegd, en tot hij
