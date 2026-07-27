@@ -225,6 +225,19 @@ Uitbouwen, in deze volgorde:
   plaatje. Wil je UI op beeld, dan is dat een aparte opgave; tot die tijd is de
   zelfrapportage de betrouwbare weg.
 
+  **Daarvoor is `Eclipse.UI.Report`.** Hij draait mee in elke ronde, mét de gids
+  aan (zoals jouw startbat het spel opstart), en hij oordeelt ook:
+
+  ```
+  UI: missie-HUD inViewport=1
+  UI:   munitieteller zichtbaarheid=3 tekst='AR_Foundry   19 / 30'
+  UI:   F3 testgids   open=1  regels=13
+  ```
+
+  Vier gevallen worden een fout waar `verify.ps1` op valt: HUD niet in de
+  viewport, een wapen met een verborgen munitieteller, en een paneel dat open
+  staat met nul regels — want dat is voor jou niet te onderscheiden van dicht.
+
 ### 2. ~~TURN-IN-PLACE~~ — STAAT, zie het morgenrapport
 
 Gemeten en op beeld. Wat er nog ligt: de drempel van 60 graden is bij deze
