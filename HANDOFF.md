@@ -9,6 +9,51 @@
 > morgenrapport hieronder klopt feitelijk nog, maar het beschrijft een werkwijze
 > die de owner op 27-07 heeft afgekeurd. Lees eerst dit.
 
+## 📌 EINDSTAND 27 JULI, AVOND — lees dit eerst, daarna pas de rest
+
+**De bar is groen.** 185 tests, ValidateData 0 fouten, 9 opnames, en de geparkeerde
+3-cm-val staat er als `BEKEND` bij zonder mee te tellen — een bar die permanent rood
+staat verbergt de volgende echte fout.
+
+**Wat er vandaag geland is, elk met een meting:**
+
+| | gemeten |
+|---|---|
+| Mikken maakte het personage 5× zo groot | oppervlak **×5,0 → ×1,9** (arm 300→270, FOV 80→68) |
+| Schieten/herladen ging over het hele lijf | nu bovenlichaamslaag; **voet-omklappen 18 → 2** |
+| Looprichtingen klapten om op 45° | mengen nu; test valt om op de oude formule |
+| Het wapen verdween in het silhouet | gunmetal, **3–4× donkerder** dan het lichaam |
+| De gids toonde niets van vandaag | bron van de datumvervuiling dicht |
+| Een misser liet geen enkel spoor na | feit + geluid; het ZICHTBARE spoor blijft open |
+
+**Owner-opdracht die de dag stuurde:** *"bouw alle schietanimaties en movements van
+Fortnite of Borderlands en ga daar niet vanaf tot het klaar is."* Uitgewerkt als
+hoofdstuk 6 van `phase0/REFERENTIE_TPS.md` — mechanisme, gemeten afwijking, en per
+punt of het code of content is. Alles wat code was, is af. Wat rest (additieve
+terugslag, aim-offset) vraagt assets die dit project niet heeft.
+
+**De twee open dossiers, allebei GEMETEN en geen van beide opgelost:**
+
+1. **Het zichtbare inslagspoor.** Zie `JOUW_TAKEN.md`, bovenaan. Kort: alleen een
+   kubus bij het personage was ooit zichtbaar; alles op de inslagplek niet, bij elke
+   variant. Ik heb er drie conclusies over teruggenomen — schrijf er geen vierde,
+   maar kijk in de EDITOR.
+2. **Het trillen bij het schieten.** Gelokaliseerd: de schietpose pulseert per schot
+   (27 richtingsomkeringen van de hand tegen hoogstens 2 daarbuiten). Twee
+   reparaties geprobeerd en allebei teruggedraaid omdat ze hun eigen meting niet
+   haalden. Wat rest is de take zelf — een additieve terugslag in plaats van een
+   volledige pose. Dat is content.
+
+**Wat op de owner wacht** staat in `JOUW_TAKEN.md`; het zwaarste is de **wapenbron**,
+want daar hangen punt 5 én zijn nieuwe wapen-opdracht (zweven, aparte onderdelen,
+vizier) allemaal aan.
+
+**De regel die deze dag heeft opgeleverd:** een controle die niet rood kan worden is
+geen controle — en een bar die altijd rood staat net zomin. Beide vormen zijn vandaag
+meermaals langsgekomen, en beide zijn nu gerepareerd.
+
+---
+
 ## ⏸ GEPARKEERD OP OWNER-VERZOEK: de 3-cm-val (27-07, 14:40)
 
 **Owner: "schrijf dat op en laat het liggen. Het is een defect in de opnameronde,
