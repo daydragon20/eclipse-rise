@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `d69a04b`
+## VEILIG TE SPELEN: JA, commit `e100330`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -105,6 +105,28 @@ schoten) en de ontbrekende HUD is de opnamemethode. Beide teruggenomen.
    getekend.
 8. **Je squad komt mee in beeld**, en niet alleen in de logica: 2 tot 3 lichamen
    die de renderer daadwerkelijk tekent binnen 15 m, ook na het lopen.
+
+### En daarna is de milestone zelf een stuk opgeschoten
+
+De nachtopdracht was af, dus ik ben doorgegaan met SPEC-P2-04: **M1.2, M1.3 en
+M1.4 zijn geauthord**, elk met een Gauntlet op de verscheepte data, plus een
+ketentest die alle vier achter elkaar speelt. De missietabel van de vertical slice
+is daarmee compleet.
+
+Drie dingen die alleen uit het spélen kwamen:
+
+- **Een pin naar een regio waar je niet heen kunt, is een missie die nooit
+  verschijnt.** Alle zes de regio's hádden aanbod; selecteren kon maar bij twee.
+  Aanbod hebben en selecteerbaar zijn zijn twee verschillende dingen.
+- **De liberation-naad van SPEC-P2-05 had nog nooit gevuurd.** Tien groene
+  unit-tests, gevulde tabel, werkende bedrading — en de tabel hing niet aan het
+  verscheepte setup-asset. Dat kon pas nu blijken, want de trigger wijst naar
+  M1.3 en die missie bestond niet. **Unit-tests bewijzen de logica, niet de
+  verbinding.**
+- **Zodra de naad vuurde, kon M1.4 niet meer** ("Region is already player-held").
+  De Foothold-flip maakt precies de regio's waarop M1.1–M1.3 speelden tot eigen
+  gebied. Geen bug: dat ís het punt van die missie — de Foothold verlegt de rand
+  van de kaart.
 
 **Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
 laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
