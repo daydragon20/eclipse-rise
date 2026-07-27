@@ -108,9 +108,27 @@ namespace EclipseTestGuide
 	ECLIPSE_API int32 GetGuideStepCount();
 
 	/** Header + one row per step + tally. Fixed, so the panel builds its rows once and afterwards only ever SetText (GDD 12.4: no widget churn in a firefight). */
+	/**
+	 * Hoeveel wijzigingen deel 1 hoogstens TOONT — niet hoeveel de tabel er mag
+	 * bevatten.
+	 *
+	 * Bij de vorige regel stond "drie wijzigingen is het meeste wat één sessie
+	 * oplevert", en ik heb die aanname op 27-07 weersproken omdat die dag er vijf
+	 * opleverde. DAT WAS EEN VERKEERDE LEZING VAN MIJN EIGEN GETAL: de 3 is geen
+	 * gok over hoeveel een dag brengt maar het GEVOLG van de korte-gids-regel van
+	 * de owner. Twee systeemstappen plus vijf 13.2-vragen is zeven, en de gids mag
+	 * er tien; dan blijven er drie over. De suite bewaakt dat ook echt — mijn
+	 * poging om er vijf bij te zetten viel meteen rood met "de gids is kort
+	 * gebleven (15 stappen)". Precies waarvoor die test bestaat.
+	 *
+	 * De tabel groeit dus door als geschiedenis, en deel 1 toont de NIEUWSTE drie
+	 * die de speler nog niet gezien heeft. Wat afvalt is niet weg, alleen niet in
+	 * beeld — en het staat met de hand in het kliklijstje.
+	 */
+	inline constexpr int32 MaxChangeStepCount = 3;
+
 	/** Kop + de look-waardenregel + elke stap + de tellerregel. */
-	/** Bovengrens: drie wijzigingen is het meeste wat één sessie oplevert. */
-	inline constexpr int32 GuidePanelLineCount = 3 + SystemStepCount + EclipseGauntletOverlay::PlaytestQuestionCount + 3;
+	inline constexpr int32 GuidePanelLineCount = MaxChangeStepCount + SystemStepCount + EclipseGauntletOverlay::PlaytestQuestionCount + 3;
 
 	/** One step: what to do, on both devices, and what you must SEE if it works. */
 	struct FEclipseGuideStep

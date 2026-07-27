@@ -27,7 +27,23 @@ namespace EclipseTestGuide
 			{ TEXT("2026-07-26"), TEXT("RB buiten Command Mode is nu WAPENWISSEL (was camerastandpunt). Het camerastandpunt houdt C op het toetsenbord — een bumper is beter voor iets wat je middenin een vuurgevecht doet") },
 			{ TEXT("2026-07-26"), TEXT("X en R zijn HERLADEN buiten Command Mode. Zit je magazijn vol, dan valt dezelfde knop terug op de snelle hergroepeer-order") },
 			{ TEXT("2026-07-26"), TEXT("Y tijdens Command Mode cycelt door VIER DOCTRINES — recon, ready, overwatch, aggressive — en die gelden meteen voor de hele squad. Y deed tot vandaag niets") },
+			// DE VOLGORDE BINNEN EEN DAG IS HIER EEN KEUZE, geen toeval. Deel 1 toont
+			// de NIEUWSTE MaxChangeStepCount rijen, dus als er op een dag meer dan
+			// drie landen valt de KOP van die dag af. Op 27-07 waren het er vijf, en
+			// dan horen de drie die ALLEEN de owner kan beoordelen onderaan te staan:
+			// of G de gids opent en of het richtkruis er staat kan ik zelf niet zien,
+			// en over de wapenkleur wil hij zelf oordelen. De twee die hierboven
+			// staan zijn niet minder waar, alleen makkelijker zelf te merken — en ze
+			// staan met de hand in het kliklijstje.
+			{ TEXT("2026-07-27"), TEXT("Een MISSER is nu hoorbaar. Een schot in een muur werd stil weggegooid, dus je kon niet horen dat je miste. Het zichtbare spoor komt nog") },
+			{ TEXT("2026-07-27"), TEXT("Je personage draait NIET meer mee als je stilstaat en rondkijkt, dus je kunt om hem heen kijken. Ga je MIKKEN, dan sluit zijn lichaam meteen aan") },
+			{ TEXT("2026-07-27"), TEXT("Er staat een RICHTKRUIS (+) in het midden van je scherm. Dat was er nooit: je moest raden waar je heen schoot") },
+			{ TEXT("2026-07-27"), TEXT("G opent en sluit deze gids. F3 blijft werken, maar de engine claimt F1-F5 zelf en sommige toetsenborden pakken F3 als mediatoets") },
+			{ TEXT("2026-07-27"), TEXT("Het WAPEN in je handen is gunmetal en steekt af. Het hing er altijd al, maar het kreeg exact de kleur van je lichaam en verdween in het silhouet") },
 		};
+
+		// De tabel mag doorgroeien: hij is de geschiedenis. Wat begrensd is, is wat
+		// deel 1 ERVAN TOONT — zie CollectFreshChanges hieronder.
 
 		/** One judgement row: no detection, the tester's word settles it. */
 		struct FGuideJudgementStep
@@ -201,6 +217,41 @@ namespace EclipseTestGuide
 		return Date;
 	}
 
+	namespace
+	{
+		/**
+		 * De nieuwste wijzigingen die deze speler nog niet zag, hoogstens
+		 * MaxChangeStepCount.
+		 *
+		 * WAAROM ÉÉN FUNCTIE EN NIET TWEE FILTERS. De teller en de stappenlus
+		 * filterden allebei zelf op dezelfde tabel, en op 27-07 liepen ze twee
+		 * stappen uiteen (teller 1, lus 3) omdat hun Since van de schijf komt en
+		 * daartussen kon verschuiven. Twee kopieën van dezelfde regel zijn altijd
+		 * één kopie te veel; nu is er één plek die het beslist en lezen beiden die.
+		 *
+		 * ACHTERSTEVOREN, want bij een volle tabel wil je de NIEUWSTE zien en niet
+		 * de oudste. De rijen komen daarna weer in tabelvolgorde terug te staan.
+		 */
+		TArray<int32> CollectFreshChanges()
+		{
+			const FString Since = FindLastSessionDate();
+			TArray<int32> Fresh;
+			for (int32 Index = UE_ARRAY_COUNT(GuideChanges) - 1; Index >= 0; --Index)
+			{
+				if (Fresh.Num() >= EclipseTestGuide::MaxChangeStepCount)
+				{
+					break;
+				}
+				if (Since.IsEmpty() || FString(GuideChanges[Index].Date) > Since)
+				{
+					Fresh.Add(Index);
+				}
+			}
+			Algo::Reverse(Fresh);
+			return Fresh;
+		}
+	}
+
 	int32 GetChangeStepCount()
 	{
 		// Alles wat NA het nieuwste eindrapport geland is. De datums in de tabel
@@ -213,18 +264,7 @@ namespace EclipseTestGuide
 		// comment waar ik vandaag drie keer over gestruikeld ben, dus nu doet hij
 		// het echt.
 		const FString Since = FindLastSessionDate();
-		if (Since.IsEmpty())
-		{
-			return UE_ARRAY_COUNT(GuideChanges);
-		}
-		int32 Count = 0;
-		for (const FGuideChange& Change : GuideChanges)
-		{
-			if (FString(Change.Date) > Since)
-			{
-				++Count;
-			}
-		}
+		const int32 Count = CollectFreshChanges().Num();
 		// ZEG WELKE DATUM HIJ GEBRUIKTE. De teller en GetGuideSteps hieronder
 		// filteren op dezelfde manier op dezelfde tabel, en toch liepen ze op
 		// 27-07 twee stappen uiteen (teller 1, lus 3). Dat kan alleen als hun
@@ -247,13 +287,9 @@ namespace EclipseTestGuide
 		Steps.Reserve(GetGuideStepCount());
 
 		// ---- deel 1: wat er veranderd is sinds je vorige sessie ---------------
-		const FString Since = FindLastSessionDate();
-		for (const FGuideChange& Change : GuideChanges)
+		for (const int32 Index : CollectFreshChanges())
 		{
-			if (!Since.IsEmpty() && FString(Change.Date) <= Since)
-			{
-				continue; // die kende hij al toen hij vorige keer speelde
-			}
+			const FGuideChange& Change = GuideChanges[Index];
 			FEclipseGuideStep& Step = Steps.AddDefaulted_GetRef();
 			Step.Part = EEclipseGuidePart::Controls;
 			Step.Label = TEXT("VERANDERD");
@@ -296,13 +332,17 @@ namespace EclipseTestGuide
 			Step.Expectation = GuideQuestionExpectations[Index];
 		}
 
-		// En de andere kant van dezelfde vraag: waarop filterde de LUS, en hoeveel
-		// stappen leverde dat op. Staan deze twee regels straks met een
-		// verschillende datum in het log, dan is de race bewezen; staan ze met
-		// dezelfde datum en toch verschillende aantallen, dan ligt het aan de
-		// filtering en niet aan de timing. Eén draai beslist het.
-		UE_LOG(LogEclipse, Display, TEXT("Gids: LUS filtert op '%s' en bouwde %d stappen; teller zegt %d."),
-			*Since, Steps.Num(), GetGuideStepCount());
+		// HIER STOND EEN RACE-DETECTOR: deze regel drukte af waarop de LUS filterde,
+		// zodat een vergelijking met de TELLER-regel liet zien of die twee op een
+		// andere datum werkten. Dat had zin toen ze allebei zelf filterden. Nu ze
+		// dezelfde CollectFreshChanges lezen, KAN dat verschil niet meer bestaan —
+		// dus de detector is geen meting meer maar decoratie, en die haal ik weg
+		// in plaats van hem aan de praat te houden.
+		//
+		// Wat blijft is de uitkomst zelf: hoeveel stappen er staan, en of de teller
+		// hetzelfde zegt. Lopen die uiteen, dan is dat nu een echte fout.
+		UE_LOG(LogEclipse, Display, TEXT("Gids: LUS bouwde %d stappen; teller zegt %d."),
+			Steps.Num(), GetGuideStepCount());
 		return Steps;
 	}
 
