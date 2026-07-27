@@ -1195,4 +1195,213 @@ bool FEclipseProgressSurvivesASaveLoadTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+// ---------------------------------------------------------------------------
+// De overdracht-asserties van de soak (SPEC-P2-05, laatste testregel)
+// ---------------------------------------------------------------------------
+//
+// De spec vraagt drie dingen van de soak, en NIET het getal dat er het meest
+// uitspringt. "Flip ≈ dag 9" staat er met zoveel woorden bij als een aanname van
+// het soak-script en NOOIT als een poort voor de speler (regel 209). Een test die
+// `Dag == 9` eist zou dus een tuningwaarde tot contract bombarderen: DT_Facilities
+// een dag laten schuiven en de bar wordt rood terwijl het spel klopt. Precies de
+// fout die deze week drie keer gemaakt is.
+//
+// Wat er WEL te beweren valt, is de bouw eronder:
+//
+//   1. de Foothold landt op de dag waarop M1.3 afrekent - zonder dat er nog een
+//      dagtick nodig is. De commit loopt binnen TryResolveMission (commit ->
+//      broadcast), dus na ResolveDebrief is het al gebeurd.
+//   2. de nieuwe inkomensband geldt vanaf de EERSTVOLGENDE tick, niet later.
+//   3. een BLUTTE campagne krijgt zijn Foothold net zo goed. Credits staan
+//      midden in de slice bij nul en `Wages_Short` vuurt - dat is het bedoelde
+//      6.5-gevoel, geen storing - en de overdracht mag daar niet op stuklopen.
+//
+// Bewering 3 zou zonder tekort niets bewijzen: op een rijke campagne staat hij
+// groen zonder iets te zeggen. Daarom eist hij dat Wages_Short ECHT gevuurd
+// heeft.
+//
+// NAGEMETEN, en het antwoord was niet wat ik verwachtte: zonder de kas leeg te
+// halen vuurt Wages_Short ook. De slice is uit zichzelf al blut - 150 credits
+// aan het begin dekken de soldij van acht soldaten niet. Het leeghalen MAAKT het
+// tekort dus niet, het maakt het DETERMINISTISCH: zonder die stap hangt de
+// premisse aan een startsaldo dat een balansronde zo verandert.
+//
+// Die assertie is daarmee geen discriminator maar een bewaker op de PREMISSE.
+// Wordt de economie ooit ruim genoeg om de soldij te betalen, dan valt hij om en
+// zegt hij precies het juiste: deze test meet niet meer wat hij belooft.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseBrokeCampaignStillGetsItsFootholdTest,
+	"Eclipse.Missions.BrokeCampaignStillGetsItsFoothold",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseBrokeCampaignStillGetsItsFootholdTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// Meeluisteren op de twee feiten die dit verhaal vertellen.
+	bool bWagesFellShort = false;
+	FEclipseEventSubscriptionHandle EconomyHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&bWagesFellShort](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseEconomyEventPayload* Fact = Payload.GetPtr<FEclipseEconomyEventPayload>())
+			{
+				if (Fact->Reason == FName(TEXT("Wages_Short")))
+				{
+					bWagesFellShort = true;
+				}
+			}
+		}),
+		FEclipseEconomyEventPayload::StaticStruct());
+
+	int32 FlipDay = INDEX_NONE;
+	int32 FlippedRegions = 0;
+	FEclipseEventSubscriptionHandle LiberationHandle = Bus->Subscribe(
+		EclipseTags::Event_Strategy_LiberationResolved,
+		FEclipseEventNativeDelegate::CreateLambda([&](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			// De dag WAAROP het gebeurt, gelezen op het moment zelf. Achteraf de
+			// staat aflezen zou een latere dagtick meetellen.
+			FlipDay = Campaign->GetState().Day;
+			if (const FEclipseLiberationEventPayload* Fact = Payload.GetPtr<FEclipseLiberationEventPayload>())
+			{
+				FlippedRegions = Fact->RegionCount;
+			}
+		}),
+		FEclipseLiberationEventPayload::StaticStruct());
+
+	auto AdvanceOneDay = [&](int32& OutCredits, int32& OutMaterials) -> bool
+	{
+		const int32 CreditsBefore = Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag());
+		const int32 MaterialsBefore = Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag());
+
+		FEclipseCampaignMutation Advance;
+		Advance.Type = EEclipseCampaignMutationType::AdvanceDay;
+		FEclipseCampaignTransaction Transaction;
+		Transaction.Source = TEXT("SoakHandoff");
+		Transaction.Mutations.Add(Advance);
+
+		FString TickError;
+		if (!Campaign->CommitTransaction(Transaction, TickError))
+		{
+			AddError(FString::Printf(TEXT("dagtick geweigerd: %s"), *TickError));
+			return false;
+		}
+		OutCredits = Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()) - CreditsBefore;
+		OutMaterials = Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag()) - MaterialsBefore;
+		return true;
+	};
+
+	// DE KAS LEEGHALEN. Niet om het spel te pesten: de slice IS blut rond deze
+	// dagen (SPEC-P2-03 eerlijkheidsregel, ~1484 C binnen tegen ~1920 C soldij),
+	// en de dagtick liep vóór de Foothold gemeten op -84 C. Hier wordt dat
+	// gegarandeerd bereikt in plaats van afgewacht, want een test die toevallig
+	// wel of niet blut is, meet elke nacht iets anders.
+	{
+		FEclipseCampaignMutation Drain;
+		Drain.Type = EEclipseCampaignMutationType::AdjustResource;
+		Drain.ResourceType = EclipseTags::Resource_Credits.GetTag();
+		Drain.Amount = -Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag());
+		FEclipseCampaignTransaction Transaction;
+		Transaction.Source = TEXT("SoakHandoff_Drain");
+		Transaction.Mutations.Add(Drain);
+		if (!Campaign->CommitTransaction(Transaction, Error))
+		{
+			AddError(FString::Printf(TEXT("kas leeghalen geweigerd: %s"), *Error));
+			GameInstance->Shutdown();
+			return false;
+		}
+	}
+	TestEqual(TEXT("opzet: de kas staat op nul voor we beginnen"),
+		Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()), 0);
+
+	int32 CreditsPreFlip = 0;
+	int32 MaterialsPreFlip = 0;
+	if (!AdvanceOneDay(CreditsPreFlip, MaterialsPreFlip))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  dagtick op een lege kas: %+d C, %+d M"), CreditsPreFlip, MaterialsPreFlip));
+
+	auto Play = [&](const TCHAR* Region, const TArray<FName>& Objectives) -> bool
+	{
+		if (!Strategy->SelectMission(Region, Error)) { AddError(FString::Printf(TEXT("select %s: %s"), Region, *Error)); return false; }
+		if (!Prep->AutoLaunch(Error)) { AddError(Error); return false; }
+		for (const FName& Objective : Objectives)
+		{
+			if (!Mission->CompleteObjective(Objective, Error)) { AddError(Error); return false; }
+		}
+		return Mission->ResolveDebrief(true, Error);
+	};
+
+	if (!Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M11_PatrolLeader"), TEXT("Obj_M11_Exfil") })
+		|| !Play(TEXT("WorkerHousing"), { TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") }))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// Vlak voor de missie die de Foothold trekt: welke dag staat er op de kalender?
+	const int32 DayBeforeM13 = Campaign->GetState().Day;
+
+	if (!Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") }))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// (1) HET IS AL GEBEURD. Geen extra dagtick, geen tweede commit: na de debrief
+	//     van M1.3 zijn de drie vakken van de speler.
+	TestEqual(TEXT("de Foothold draaide drie vakken om"), FlippedRegions, 3);
+	for (const TCHAR* RegionId : { TEXT("TransitCheckpoint"), TEXT("WorkerHousing"), TEXT("SupplyDepot") })
+	{
+		const FEclipseRegionState* Region = Campaign->GetState().FindRegion(RegionId);
+		TestTrue(FString::Printf(TEXT("'%s' is van de speler zodra de debrief klaar is"), RegionId),
+			Region != nullptr && Region->Owner == EEclipseRegionOwner::Player);
+	}
+
+	// (2) OP DE DAG VAN DE AFREKENING, niet later. Geen hard getal 9 - dat is een
+	//     aanname van het script - maar de band: de flip hoort bij de dag die M1.3
+	//     zelf oplevert, en die ligt op of net na de dag ervoor.
+	TestTrue(FString::Printf(TEXT("de flip landde op de dag van de M1.3-afrekening (dag %d, ervoor %d)"), FlipDay, DayBeforeM13),
+		FlipDay != INDEX_NONE && FlipDay >= DayBeforeM13 && FlipDay <= DayBeforeM13 + 1);
+
+	// (3) EN DE BAND GELDT VANAF DE EERSTVOLGENDE TICK.
+	int32 CreditsPostFlip = 0;
+	int32 MaterialsPostFlip = 0;
+	if (!AdvanceOneDay(CreditsPostFlip, MaterialsPostFlip))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  eerste dagtick NA de Foothold: %+d C, %+d M"), CreditsPostFlip, MaterialsPostFlip));
+	TestTrue(TEXT("de eerste tick na de flip levert al meer materialen op"), MaterialsPostFlip > MaterialsPreFlip);
+
+	// DE DISCRIMINATOR. Zonder een echt tekort zegt dit alles niets.
+	TestTrue(TEXT("discriminator: de soldij kwam echt tekort (Wages_Short gevuurd)"), bWagesFellShort);
+
+	Bus->Unsubscribe(EconomyHandle);
+	Bus->Unsubscribe(LiberationHandle);
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
