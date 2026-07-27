@@ -49,3 +49,4 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 11:20 | `2c5b9c4` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest |
 | 2026-07-27 11:24 | `8466469` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
 | 2026-07-27 11:30 | `ecd5bcd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 11:37 | `907509c` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |

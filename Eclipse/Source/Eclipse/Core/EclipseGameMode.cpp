@@ -278,6 +278,23 @@ void AEclipseGameMode::DrivePlayShotInput()
 		PlayShotIntervalTopSpeed = static_cast<float>(Body->GetVelocity().Size2D());
 	}
 
+	// AFGELEGDE WEG NAAST NETTO VERPLAATSING, en dat paar is de discriminator.
+	//
+	// De camera-verplaatsing meet NETTO: waar hij eindigt ten opzichte van waar hij
+	// begon. Die stond op 3 cm. Maar netto 3 cm kan twee heel verschillende dingen
+	// betekenen, en tot nu toe kon niets ze scheiden:
+	//   - hij heeft nooit bewogen        -> weg ~ 0
+	//   - hij liep en werd teruggezet    -> weg groot, netto klein
+	// Dat tweede is nu de openstaande kandidaat (de missiestart teleporteert de
+	// pawn naar Entry_Main), en dit is de goedkoopste manier om hem te toetsen
+	// zonder er nog een systeem bij te bouwen: elke tick het stukje optellen.
+	const FVector Here = Body->GetActorLocation();
+	if (!PlayShotLastDriveLocation.IsZero())
+	{
+		PlayShotIntervalPathLength += static_cast<float>(FVector::Dist2D(Here, PlayShotLastDriveLocation));
+	}
+	PlayShotLastDriveLocation = Here;
+
 	if (bPlayShotWalking)
 	{
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
@@ -412,8 +429,9 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] TOPSNELHEID in dit interval %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
+				PlayShotIntervalPathLength,
 				PlayShotIntervalTopSpeed,
 				Move != nullptr ? Move->Velocity.Size() : -1.0f,
 				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
@@ -423,6 +441,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		// Teller op nul voor het volgende interval: hij meet PER interval, en een
 		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
 		PlayShotIntervalTopSpeed = 0.0f;
+		PlayShotIntervalPathLength = 0.0f;
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
 			UE_LOG(LogEclipse, Error,

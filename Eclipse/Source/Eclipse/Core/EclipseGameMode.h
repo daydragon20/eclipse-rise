@@ -102,6 +102,16 @@ private:
 	 */
 	float PlayShotIntervalTopSpeed = 0.0f;
 
+	/**
+	 * Opgetelde afgelegde weg sinds het vorige opnamemoment. Naast de NETTO
+	 * verplaatsing van de camera scheidt dit "hij heeft nooit bewogen" (weg ~ 0)
+	 * van "hij liep en werd teruggezet" (weg groot, netto klein).
+	 */
+	float PlayShotIntervalPathLength = 0.0f;
+
+	/** Positie bij de vorige drive-tick, nodig voor die optelling. */
+	FVector PlayShotLastDriveLocation = FVector::ZeroVector;
+
 	/** Duwt elke tick beweging/vuur door zodat de opnames een LOPEND spel vangen. */
 	void DrivePlayShotInput();
 
