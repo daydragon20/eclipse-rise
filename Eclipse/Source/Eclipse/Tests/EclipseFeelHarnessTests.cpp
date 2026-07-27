@@ -3526,4 +3526,115 @@ bool FEclipseReloadAndSwapReachTheBusWithTheirDurationTest::RunTest(const FStrin
 	return true;
 }
 
+/**
+ * DE SCHIJNBARE GROOTTE TIJDENS DE AANLOOP, niet alleen in de eindstand.
+ *
+ * Owner-melding 27-07: "mijn wapen/personage wordt groter naarmate ik sneller
+ * loop, en is pas helemaal zichtbaar als ik vol loop." Hij had daarbij zelf al
+ * uitgezocht dat het GEEN mesh-probleem is — SetRelativeScale3D draait eenmalig
+ * in ApplyBodyDef en niet per frame — en dat klopt: de mesh-schaal meet 0,000
+ * verschil en die meting was juist. Ze mat alleen het verkeerde ding.
+ *
+ * EN DE BESTAANDE CAMERATEST DEKT HET OOK NIET, en dat is geen toeval. S1 meet
+ * na RunUpToTopSpeed plus 1,5 s vasthouden, met in zijn eigen commentaar de
+ * reden: "de lag moet uitgeconvergeerd zijn, anders meten we de aanloop en niet
+ * de eindstand". Precies de aanloop is wat de owner beschrijft. Dat is voor de
+ * derde keer vandaag dezelfde vorm: de controle stond op het punt waar het al
+ * goed ging.
+ *
+ * Deze test meet daarom ELKE STAP van stilstand tot topsnelheid en houdt de
+ * uitersten bij. Nog geen assertie op de spreiding: eerst het getal zien, dan
+ * pas een grens — de drempel van vanochtend is uit meting geboren en deze hoort
+ * dat ook te worden.
+ *
+ * EERSTE UITSLAG (27-07), en die spreekt de hypothese tegen:
+ *   stilstand 31,517 gr · topsnelheid 30,971 gr · spreiding over de hele
+ *   aanloop 1,761% · camera-afstand 311,8 -> 317,6 cm, binnen de klem van 6,0.
+ * Hij wordt tijdens de aanloop dus KLEINER en niet groter, en met minder dan
+ * twee procent. Dat is wat de camera-lag hoort te doen zolang hij geklemd is.
+ *
+ * WAT DIT NIET UITSLUIT, en dat hoort er meteen bij:
+ *   1. De 650 cm/s is hier NIET gehaald (sprint stond uit; tot ~420 gemeten).
+ *   2. Dit meet de CAPSULE. De owner ziet het op zijn wapen, en er hangt geen
+ *      wapenmesh — dus wat hij ziet zijn de armen, en dat is meshgeometrie.
+ *   3. "Pas helemaal zichtbaar als ik vol loop" is geen uitspraak over GROOTTE
+ *      maar over KADERING: waar hij in het beeld staat. De socket-offset staat
+ *      55 cm naar rechts en die schuift met de lag mee. Dat is de volgende
+ *      meting — schermpositie, niet schijnbare hoogte — en die staat hier
+ *      opgeschreven in plaats van dat ik nu een oorzaak aanwijs.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseApparentSizeDuringTheRampUp,
+	"Eclipse.Feel.Layer1.ApparentSizeDuringTheRampUp",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseApparentSizeDuringTheRampUp::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	Harness.Idle(0.5f);
+	const FEclipseFeelSample AtRest = Harness.Body->SampleFeelState();
+
+	// Elke stap bemonsteren terwijl hij optrekt. De predicaat-variant van HoldFor
+	// tickt zelf; door hem altijd false te laten teruggeven loopt hij de volle
+	// duur en kunnen we per stap meten.
+	float MinDegrees = AtRest.ApparentHeightDegrees;
+	float MaxDegrees = AtRest.ApparentHeightDegrees;
+	float SpeedAtMin = AtRest.SpeedCm;
+	float SpeedAtMax = AtRest.SpeedCm;
+	float MaxCameraDistance = AtRest.CameraToPawnCm;
+	// De drie snelheden die de owner noemt, elk met de grootte die daarbij hoort.
+	// -1 betekent "die snelheid is niet gehaald", en dat is een andere uitkomst
+	// dan "gehaald en gelijk".
+	float DegreesAt180 = -1.0f;
+	float DegreesAt420 = -1.0f;
+	float DegreesAt650 = -1.0f;
+
+	Harness.HoldFor(TEXT("Move"), FVector2D(0.0f, 1.0f), 3.0, [&]()
+	{
+		const FEclipseFeelSample Now = Harness.Body->SampleFeelState();
+		if (Now.ApparentHeightDegrees < MinDegrees) { MinDegrees = Now.ApparentHeightDegrees; SpeedAtMin = Now.SpeedCm; }
+		if (Now.ApparentHeightDegrees > MaxDegrees) { MaxDegrees = Now.ApparentHeightDegrees; SpeedAtMax = Now.SpeedCm; }
+		MaxCameraDistance = FMath::Max(MaxCameraDistance, Now.CameraToPawnCm);
+		if (DegreesAt180 < 0.0f && Now.SpeedCm >= 180.0f) { DegreesAt180 = Now.ApparentHeightDegrees; }
+		if (DegreesAt420 < 0.0f && Now.SpeedCm >= 420.0f) { DegreesAt420 = Now.ApparentHeightDegrees; }
+		if (DegreesAt650 < 0.0f && Now.SpeedCm >= 650.0f) { DegreesAt650 = Now.ApparentHeightDegrees; }
+		return false;
+	});
+
+	const FEclipseFeelSample AtTop = Harness.Body->SampleFeelState();
+
+	Report(*this, TEXT("schijnbare hoogte in stilstand"), AtRest.ApparentHeightDegrees, TEXT("gr"));
+	Report(*this, TEXT("schijnbare hoogte op topsnelheid"), AtTop.ApparentHeightDegrees, TEXT("gr"));
+	Report(*this, TEXT("KLEINSTE tijdens de aanloop"), MinDegrees, TEXT("gr"),
+		*FString::Printf(TEXT("bij %.0f cm/s"), SpeedAtMin));
+	Report(*this, TEXT("GROOTSTE tijdens de aanloop"), MaxDegrees, TEXT("gr"),
+		*FString::Printf(TEXT("bij %.0f cm/s"), SpeedAtMax));
+	Report(*this, TEXT("schijnbare hoogte bij 180 cm/s"), DegreesAt180, TEXT("gr"), TEXT("-1 = niet gehaald"));
+	Report(*this, TEXT("schijnbare hoogte bij 420 cm/s"), DegreesAt420, TEXT("gr"), TEXT("-1 = niet gehaald"));
+	Report(*this, TEXT("schijnbare hoogte bij 650 cm/s"), DegreesAt650, TEXT("gr"), TEXT("-1 = niet gehaald"));
+	Report(*this, TEXT("grootste camera-afstand tijdens de aanloop"), MaxCameraDistance, TEXT("cm"),
+		*FString::Printf(TEXT("stilstand %.1f; klem %.1f"), AtRest.CameraToPawnCm, Harness.Tuning->CameraLagMaxDistance));
+
+	const float Spread = MinDegrees > KINDA_SMALL_NUMBER
+		? (MaxDegrees - MinDegrees) / MinDegrees * 100.0f : 0.0f;
+	Report(*this, TEXT("SPREIDING over de hele aanloop"), Spread, TEXT("%"),
+		TEXT("dit is wat de owner ziet; de eindstandtest van S1 kan hier per definitie niet bij"));
+
+	// EEN ENKELE ASSERTIE, en die gaat niet over de spreiding maar over de
+	// meting zelf: zonder aanloop is er niets gemeten en zou dit stil groen
+	// blijven — de val waar deze hele nacht over ging.
+	TestTrue(FString::Printf(TEXT("aanloop: hij is echt gaan lopen (%.0f cm/s)"), AtTop.SpeedCm),
+		AtTop.SpeedCm > 100.0f);
+
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
