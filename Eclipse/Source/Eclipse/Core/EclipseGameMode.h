@@ -140,6 +140,12 @@ private:
 	FVector PlayShotLastBoneStep = FVector::ZeroVector;
 	FName PlayShotBoneName;
 
+	/** Dezelfde maat op een VOET: bewijst of het onderlichaam doorloopt tijdens het vuren. */
+	int32 PlayShotIntervalVoetFlips = 0;
+	FVector PlayShotLastVoet = FVector::ZeroVector;
+	FVector PlayShotLastVoetStep = FVector::ZeroVector;
+	FName PlayShotVoetName;
+
 	/** Hoe vaak de component met zijn tick UIT stond, en hoe vaak inactief. */
 	int32 PlayShotIntervalTickOff = 0;
 	int32 PlayShotIntervalInactive = 0;

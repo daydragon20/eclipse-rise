@@ -429,16 +429,23 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	// niet op te vallen. De test die "de klap heeft gewicht" mat, was groen op dat
 	// kapotte gedrag.
 	const bool bOneShotIsAdditive = OneShot != nullptr && OneShot->IsValidAdditive();
-	if (OneShot != nullptr && FAnimWeight::IsRelevant(OneShotWeight) && !bOneShotIsAdditive)
-	{
-		for (FEclipseLocomotionSample& Sample : Samples)
-		{
-			Sample.Weight *= 1.0f - OneShotWeight;
-		}
-		Samples.Add({ OneShot, OneShotWeight, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false });
-	}
+	// EEN VOLLEDIGE POSE GAAT NU OP HET BOVENLICHAAM, NIET OVER JE BENEN HEEN.
+	//
+	// Hier stond `Sample.Weight *= 1.0f - OneShotWeight` voor alle gangsamples: de
+	// schietpose VERVING de looppose naar rato van zijn gewicht. Bij 6,7 schoten per
+	// seconde sprong het hele lichaam dus 6,7 keer per seconde tussen lopen en
+	// schieten — gemeten als 27 richtingsomkeringen van de rechterhand in een
+	// vuurinterval tegen hoogstens 2 daarbuiten.
+	//
+	// Fortnite en Borderlands doen het omgekeerd (REFERENTIE_TPS.md hoofdstuk 6):
+	// schieten en herladen zijn een BOVENLICHAAMSLAAG en de benen lopen door. Onze
+	// takes hoeven daarvoor niet vervangen te worden — ze moeten alleen op de juiste
+	// botten landen. Dat gebeurt nu verderop met een per-bot-blend; hier blijft
+	// alleen staan DAT er een volledige pose meedoet.
+	const bool bOneShotOverlay = OneShot != nullptr
+		&& FAnimWeight::IsRelevant(OneShotWeight) && !bOneShotIsAdditive;
 
-	if (Samples.Num() == 0 && !bOneShotIsAdditive)
+	if (Samples.Num() == 0 && !bOneShotIsAdditive && !bOneShotOverlay)
 	{
 		// Ref pose. Not a failure path worth logging per frame — ApplyBodyDef
 		// already said, once, which clip was missing and why (GDD 14.3.5).
@@ -472,6 +479,87 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 		}
 		FAnimationRuntime::BlendTwoPosesTogetherInPlace(OutputPoseData, ScratchPoseData, AccumulatedWeight / NextWeight);
 		AccumulatedWeight = NextWeight;
+	}
+
+	// De volledige pose als BOVENLICHAAMSLAAG, ná de gangblend.
+	//
+	// Per-bot en niet per-pose: elk bot vanaf de eerste ruggengraatschakel krijgt de
+	// schietpose, alles daaronder houdt zijn looppose. Zo blijft de gang doorlopen
+	// terwijl de armen vuren — precies wat hoofdstuk 6 van de referentie beschrijft.
+	//
+	// GEMETEN VERSCHIL (opnameronde 27-07, richtingsomkeringen van foot_r):
+	//   oud, pose over het hele lijf    18 omklappen in het vuurinterval
+	//   nieuw, bovenlichaamslaag         3 omklappen in hetzelfde interval
+	// De niet-vurende intervallen blijven gelijk (5 en 2 in beide), dus het verschil
+	// zit echt op het vuren. De HAND blijft op 29 en dat hoort: die is bovenlichaam,
+	// daar mag de schietpose landen.
+	//
+	// Vindt hij geen ruggengraat, dan valt hij terug op het oude gedrag (de pose over
+	// het hele lijf) en zegt dat één keer hardop. Stil terugvallen op iets anders dan
+	// bedoeld is precies de vorm waar dit project vandaag zes keer op is gestruikeld.
+	if (bOneShotOverlay)
+	{
+		const FBoneContainer& Bones = Output.Pose.GetBoneContainer();
+		static const FName Ruggengraat[] = { TEXT("spine_01"), TEXT("Spine"), TEXT("spine"),
+			TEXT("Spine1"), TEXT("spine_1"), TEXT("Bip01_Spine") };
+		FCompactPoseBoneIndex Wortel(INDEX_NONE);
+		for (const FName& Naam : Ruggengraat)
+		{
+			const int32 PoseIndex = Bones.GetPoseBoneIndexForBoneName(Naam);
+			if (PoseIndex != INDEX_NONE)
+			{
+				Wortel = Bones.MakeCompactPoseIndex(FMeshPoseBoneIndex(PoseIndex));
+				break;
+			}
+		}
+
+		FCompactPose PosePose;
+		PosePose.SetBoneContainer(&Output.Pose.GetBoneContainer());
+		FBlendedCurve PoseCurve;
+		PoseCurve.InitFrom(Output.Curve);
+		UE::Anim::FStackAttributeContainer PoseAttributes;
+		FAnimationPoseData PosePoseData = { PosePose, PoseCurve, PoseAttributes };
+		SampleInto({ OneShot, OneShotWeight, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false }, PosePoseData);
+
+		if (Wortel.GetInt() == INDEX_NONE)
+		{
+			if (!bWarnedNoSpine)
+			{
+				bWarnedNoSpine = true;
+				UE_LOG(LogEclipse, Warning,
+					TEXT("Animatie: geen ruggengraatbot gevonden — de schietpose gaat over het HELE lichaam in plaats van alleen het bovenlijf."));
+			}
+			FAnimationRuntime::BlendTwoPosesTogetherInPlace(OutputPoseData, PosePoseData, 1.0f - OneShotWeight);
+		}
+		else
+		{
+			TArray<float> BotGewichten;
+			BotGewichten.SetNumZeroed(Output.Pose.GetNumBones());
+			for (FCompactPoseBoneIndex Bot : Output.Pose.ForEachBoneIndex())
+			{
+				FCompactPoseBoneIndex Loop = Bot;
+				while (Loop.GetInt() != INDEX_NONE)
+				{
+					if (Loop == Wortel)
+					{
+						BotGewichten[Bot.GetInt()] = OneShotWeight;
+						break;
+					}
+					Loop = Output.Pose.GetParentBoneIndex(Loop);
+				}
+			}
+
+			FCompactPose Resultaat;
+			Resultaat.SetBoneContainer(&Output.Pose.GetBoneContainer());
+			FBlendedCurve ResultaatCurve;
+			ResultaatCurve.InitFrom(Output.Curve);
+			UE::Anim::FStackAttributeContainer ResultaatAttributes;
+			FAnimationPoseData ResultaatData = { Resultaat, ResultaatCurve, ResultaatAttributes };
+			FAnimationRuntime::BlendTwoPosesTogetherPerBone(
+				OutputPoseData, PosePoseData, BotGewichten, ResultaatData);
+			OutputPoseData.GetPose() = Resultaat;
+			OutputPoseData.GetCurve() = ResultaatCurve;
+		}
 	}
 
 	// De additieve overlay erbovenop, ná de gangblend.

@@ -81,6 +81,9 @@ private:
 	 * doen — en dat is waar dit het meest gezien wordt.
 	 */
 	UAnimSequence* OneShot = nullptr;
+
+	/** Eén keer melden dat er geen ruggengraat gevonden is, niet elk frame. */
+	mutable bool bWarnedNoSpine = false;
 	float OneShotTime = 0.0f;
 	float OneShotDuration = 0.0f;
 	float OneShotPeakWeight = 0.0f;

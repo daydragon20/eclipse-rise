@@ -519,6 +519,12 @@ void AEclipseGameMode::DrivePlayShotInput()
 		{
 			static const FName Kandidaten[] = { TEXT("hand_r"), TEXT("RightHand"),
 				TEXT("hand_right"), TEXT("weapon_r"), TEXT("Hand_R") };
+			// EN EEN VOET, want de hand hoort bij het bovenlichaam en blijft dus
+			// bewegen als de schietpose daar landt — dat is de bedoeling. Of de
+			// bovenlichaamsblend werkt, is te zien aan de BENEN: die hoorden vroeger
+			// mee te springen met elke schietpuls en horen nu door te lopen.
+			static const FName Voeten[] = { TEXT("foot_r"), TEXT("RightFoot"),
+				TEXT("foot_right"), TEXT("Foot_R") };
 			if (PlayShotBoneName.IsNone())
 			{
 				for (const FName& Naam : Kandidaten)
@@ -544,6 +550,39 @@ void AEclipseGameMode::DrivePlayShotInput()
 						TEXT("[PLAYSHOT BOT] geen bekende handbot; eerste botten: %s"), *Eerste);
 					PlayShotBoneName = TEXT("-");
 				}
+			}
+			if (PlayShotVoetName.IsNone())
+			{
+				for (const FName& Naam : Voeten)
+				{
+					if (Skel->GetBoneIndex(Naam) != INDEX_NONE)
+					{
+						PlayShotVoetName = Naam;
+						break;
+					}
+				}
+				if (PlayShotVoetName.IsNone())
+				{
+					PlayShotVoetName = TEXT("-");
+				}
+			}
+			if (PlayShotVoetName != TEXT("-"))
+			{
+				const FVector NuVoet = Skel->GetBoneTransform(
+					Skel->GetBoneIndex(PlayShotVoetName), FTransform::Identity).GetLocation();
+				if (!PlayShotLastVoet.IsZero())
+				{
+					const FVector Stap = NuVoet - PlayShotLastVoet;
+					if (Stap.Size() > 0.01f)
+					{
+						if (!PlayShotLastVoetStep.IsZero() && (Stap | PlayShotLastVoetStep) < 0.0f)
+						{
+							++PlayShotIntervalVoetFlips;
+						}
+						PlayShotLastVoetStep = Stap;
+					}
+				}
+				PlayShotLastVoet = NuVoet;
 			}
 			if (PlayShotBoneName != TEXT("-"))
 			{
@@ -705,7 +744,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, LICHAAM-OMKLAPPEN %d (grootste stap %.2f gr), HAND-OMKLAPPEN %d (grootste stap %.2f cm), vurend %d, component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, LICHAAM-OMKLAPPEN %d (grootste stap %.2f gr), HAND-OMKLAPPEN %d (grootste stap %.2f cm), VOET-OMKLAPPEN %d, vurend %d, component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -731,6 +770,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				PlayShotIntervalMaxYawStep,
 				PlayShotIntervalBoneFlips,
 				PlayShotIntervalMaxBoneStep,
+				PlayShotIntervalVoetFlips,
 				bPlayShotFiring ? 1 : 0,
 				PlayShotIntervalSawInput,
 				PlayShotIntervalTickOff,
@@ -748,6 +788,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalMaxYawStep = 0.0f;
 		PlayShotIntervalBoneFlips = 0;
 		PlayShotIntervalMaxBoneStep = 0.0f;
+		PlayShotIntervalVoetFlips = 0;
 		PlayShotLastPendingAfter = -1.0f;
 		PlayShotIntervalSawInput = 0;
 		PlayShotIntervalTickOff = 0;
