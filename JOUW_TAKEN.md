@@ -277,8 +277,20 @@ configuratie die de plugin zelf ongeldig noemt. Dat is nu gezet.
 
 **Wil je bij je volgende sessie even proberen of de View-knop de gids opent?** Ik
 kan een gamepad niet headless indrukken, dus dit is het enige stuk dat ik niet zelf
-kan afvinken. Werkt het nog steeds niet, dan weten we dat het hier níét aan lag —
-ook dat is winst.
+kan afvinken.
+
+Wat ik wél heb kunnen scheiden: **de gids zelf werkt.** Via de andere weg
+aangezet en nagemeten:
+
+```
+Test guide: CVar set after mount -> panel OPEN (13 rows).
+HUD: munitieteller zichtbaarheid=3 tekst='AR_Foundry   30 / 30' inViewport=1
+```
+
+Het paneel gaat open met dertien stappen, en de HUD tekent. Als de View-knop bij
+jou nog steeds niets doet, ligt dat dus **aan de knop en niet aan de gids** — en
+dan is de CommonUI-configuratie die ik vannacht heb gezet de eerstvolgende
+verdachte om af te strepen.
 
 ## Lichtronde 1 ligt klaar om te beoordelen (26-07 laat)
 
