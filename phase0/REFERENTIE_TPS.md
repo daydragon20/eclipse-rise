@@ -227,12 +227,20 @@ if (bAiming)
 > daar ís een constante hoek precies wat je wilt. Dezelfde ingreep, tegengesteld
 > oordeel, omdat het effect verschilt.
 >
-> **Let bij het bouwen op de tweede eigenaar:** `SocketOffset.Z` wordt ook door de
-> landingsdip bestuurd, en die draait in Tick terwijl `RefreshCameraTargets` alleen
-> op toestandswissels loopt. Wie de Z hier overschrijft, vecht met de dip. De
-> ingreep hoort dus in de dip-berekening te landen of via een aparte
-> ADS-vermenigvuldiger die de dip respecteert — niet als tweede schrijver op
-> hetzelfde veld.
+> **De tweede eigenaar, nagekeken in plaats van geschat (27-07).** Ik schreef eerst
+> dat `UpdateLandingDip` de Z per frame bestuurt en dat de ADS-ingreep dus in die
+> berekening moest landen. Nagekeken klopt dat maar half: de dip stapt meteen uit
+> als er geen dip loopt (`LandingDipSecondsLeft <= 0` → `return`), dus hij is
+> **geen** per-frame eigenaar en buiten een landing schrijft niemand anders de Z.
+>
+> **Wat er wél is:** aan het eind van een dip zet hij de Z terug op de BASISwaarde.
+> Een ADS-geschaalde Z zou dus na elke landing worden weggevaagd, en dan is het
+> personage weer uit beeld tot je opnieuw mikt — een fout die alleen optreedt ná
+> springen, dus precies het soort dat je in een testronde mist.
+>
+> **De vorm van de fix volgt daaruit:** één functie die zegt welke Z nu hoort te
+> gelden (basis × ADS-factor), en zowel `RefreshCameraTargets` als het einde van de
+> dip roept die aan. Eén bron, twee lezers — geen tweede schrijver.
 - **Hoe het kruis zich verhoudt tot waar de kogel gaat is NIET geverifieerd.** De
   hitscan vuurt vanaf een oorsprong met een richting; of dat exact door het
   schermmidden loopt is nooit gemeten. Meetopdracht, en die hoort vóór elke
