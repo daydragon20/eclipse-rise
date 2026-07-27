@@ -1647,4 +1647,112 @@ bool FEclipseThreeEconPathsSurviveTheSliceTest::RunTest(const FString& Parameter
 	return true;
 }
 
+
+// Halverwege stoppen laat de campagne ONGEMOEID (SPEC-P2-04, save-integriteit).
+//
+// De spec vraagt: "quit mid-mission at every outer phase -> strategic state hash
+// unchanged". Er was geen test voor. DeterministicStateHash bewijst iets anders -
+// dat de hash reproduceerbaar is - en niet dat een lopende missie er buiten
+// blijft.
+//
+// De belofte die eronder ligt is er een aan de speler: wat je in een missie doet
+// telt pas bij de debrief. Sluit je halverwege af, dan ben je je voortgang kwijt
+// maar je campagne niet. De omgekeerde fout is de vervelende: als een objective
+// onderweg al credits of een story-beat commit, dan kan de speler een missie
+// half spelen, afsluiten, en de opbrengst houden - en dat sloopt zowel de
+// economie als de verhaalvolgorde.
+//
+// Dat is geen theoretisch risico. De verleiding om "even meteen te committen"
+// zit precies in de objective-afhandeling, en 12.3 zegt niet voor niets dat er
+// EEN schrijver van campagnestaat is.
+//
+// Gemeten op de hash en niet op losse velden: die dekt dag, credits, roster,
+// regio-eigenaars en story-flags in een keer, en hij is expliciet veldvolgorde-
+// vast (geen reflectie-iteratie).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseQuittingMidMissionLeavesTheCampaignUntouchedTest,
+	"Eclipse.Missions.QuittingMidMissionLeavesTheCampaignUntouched",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseQuittingMidMissionLeavesTheCampaignUntouchedTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// De nulmeting: alles wat de strategische laag over zichzelf weet, in een getal.
+	const uint32 HashVoor = Campaign->GetState().ComputeStateHash();
+	const int32 DagVoor = Campaign->GetState().Day;
+
+	if (!TestTrue(TEXT("opzet: missie geselecteerd"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error))
+		|| !TestTrue(TEXT("opzet: missie gelanceerd"), Prep->AutoLaunch(Error)))
+	{
+		AddError(Error);
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// De nulmeting wordt hier OPNIEUW genomen omdat selecteren en lanceren prep
+	// is en geen missie: zou prep iets kosten, dan mag deze test dat niet als lek
+	// aanzien. De vraag is wat er tijdens de MISSIE verandert.
+	//
+	// Gemeten valt dat mee: prep kost op de verscheepte data NIETS in
+	// campagnestaat - beide hashes zijn gelijk. Dat is een waarneming en geen
+	// eis; verandert prep ooit wel iets, dan blijft deze test kloppen zonder
+	// aanpassing, en dat is precies waarom hij op twee nulmetingen staat.
+	const uint32 HashNaLancering = Campaign->GetState().ComputeStateHash();
+	AddInfo(FString::Printf(TEXT("GEMETEN  hash bij start %u, na lancering %u"),
+		HashVoor, HashNaLancering));
+
+	// Elke buitenfase langslopen en na elke stap kijken of de campagne bewoog.
+	auto ControleerOngemoeid = [&](const TCHAR* Waar)
+	{
+		TestEqual(*FString::Printf(TEXT("campagne ongemoeid %s"), Waar),
+			Campaign->GetState().ComputeStateHash(), HashNaLancering);
+	};
+
+	ControleerOngemoeid(TEXT("bij insertie"));
+
+	// M1.1 helemaal uitspelen TOT de debrief, maar hem niet afrekenen.
+	for (const FName& Objective : { FName(TEXT("Obj_M11_PatrolLeader")), FName(TEXT("Obj_M11_Exfil")) })
+	{
+		if (!TestTrue(*FString::Printf(TEXT("opzet: %s voltooid"), *Objective.ToString()),
+				Mission->CompleteObjective(Objective, Error)))
+		{
+			AddError(Error);
+			GameInstance->Shutdown();
+			return false;
+		}
+		ControleerOngemoeid(*FString::Printf(TEXT("na objective %s"), *Objective.ToString()));
+	}
+
+	ControleerOngemoeid(TEXT("met alle objectives klaar, voor de debrief"));
+	TestEqual(TEXT("en de kalender staat nog stil"), Campaign->GetState().Day, DagVoor);
+
+	// DE DISCRIMINATOR. Zonder deze helft zou een spel waarin de debrief OOK
+	// niets doet net zo groen zijn - en dan meet de test niets. Pas als de
+	// debrief de hash wel beweegt, weet je dat "onveranderd" iets betekende.
+	if (TestTrue(TEXT("discriminator: de debrief rekent wel degelijk af"), Mission->ResolveDebrief(true, Error)))
+	{
+		TestNotEqual(TEXT("discriminator: en DAAR verandert de campagne pas"),
+			Campaign->GetState().ComputeStateHash(), HashNaLancering);
+		TestEqual(TEXT("de debrief zet de dag een verder"), Campaign->GetState().Day, DagVoor + 1);
+	}
+
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
