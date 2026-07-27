@@ -260,13 +260,28 @@ zelfde script, nieuwe opnames:
 
 | | vóór | ná |
 |---|---|---|
-| beeldhoogte mikkend | 97–100 % | **66 %** |
+| beeldhoogte mikkend | 97–100 % | **74 %** |
 | beeldbreedte mikkend | 33–34 % | **19 %** |
 | oppervlak mikkend | 155.000–164.000 px | **58.000 px** |
 | t.o.v. de heupstand | **×5,0–5,3** | **×1,9** |
 
 De heupstand is onveranderd (59–61 %, ~31.000 px), zoals bedoeld: alleen mikken is
 aangeraakt.
+
+> **HERZIEN 27-07 16:20 — DE HOOGTE WAS 66 %, GEMETEN OVER DE HELE RONDE IS HET
+> 74 %.** Mijn eerste getal kwam van ÉÉN opname, en dat draagt zo'n claim niet. Over
+> alle negen momenten: heupstand 59–60 % en 30–33.000 px (zes momenten), mikkend
+> 74 % en 58.300 px (twee momenten), plus één moment waarop de grootste warme vlek
+> het STOP-bord is en niet de speler.
+>
+> **Het oppervlak — de claim die ertoe doet — houdt wél stand:** 58.300 tegen
+> ~31.000 px is ×1,9, precies wat er stond. Oppervlak is hier de betrouwbare maat
+> omdat de hoogte afhangt van de pose én van de onderrand die hij raakt.
+>
+> Aanleiding was mijn eigen logregel: op moment 9 stond een silhouet van 772 px in
+> een frame van 720. Dat is een ANDERE meting (de projectie van de actorgrenzen,
+> inclusief armen en wapen) en geen tegenspraak — maar het was genoeg reden om het
+> getal dat ik had gemeld niet te laten staan op één opname.
 
 ```cpp
 TargetArmLength *= 0.90f;   // was 0.55 — 300 -> 270 i.p.v. 165
