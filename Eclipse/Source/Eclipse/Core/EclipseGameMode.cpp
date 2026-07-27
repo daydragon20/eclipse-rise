@@ -748,6 +748,36 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				Weapon != nullptr ? Weapon->GetWorldHits() : -1,
 				Weapon != nullptr ? Weapon->GetCleanMisses() : -1);
 
+			// STAAN DE INSLAGSPOREN IN HET KADER? Ze spawnen aantoonbaar (log zegt
+			// zichtbaar=1, met materiaal) en zijn op geen enkele opname te zien, ook
+			// niet als knalwitte halve meter. Dan is de vraag niet meer of ze bestaan
+			// maar of de camera erheen kijkt — en dat is te projecteren in plaats van
+			// te gissen. Dit is dezelfde stap die de KADER-regel voor het personage
+			// al doet.
+			{
+				int32 Levend = 0;
+				FString Waar;
+				for (TActorIterator<AActor> SpoorIt(GetWorld()); SpoorIt; ++SpoorIt)
+				{
+					if (!SpoorIt->Tags.Contains(TEXT("Eclipse_ImpactMark")))
+					{
+						continue;
+					}
+					++Levend;
+					if (Levend > 3)
+					{
+						continue;
+					}
+					FVector2D Scherm;
+					const bool bInBeeld = Controller->ProjectWorldLocationToScreen(SpoorIt->GetActorLocation(), Scherm);
+					Waar += FString::Printf(TEXT(" [scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f]"),
+						Scherm.X, Scherm.Y, bInBeeld ? 1 : 0,
+						FVector::Dist(SpoorIt->GetActorLocation(), CameraLocation));
+				}
+				UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SPOREN] %d levend%s"),
+					ShotIndex, Levend, *Waar);
+			}
+
 			// HARDE UITSPRAKEN OVER WAT ER IN HET FRAME STAAT.
 			//
 			// De opnameronde leverde tot nu alleen beelden, en een beeld beoordeelt

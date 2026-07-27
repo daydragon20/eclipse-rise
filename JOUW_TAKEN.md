@@ -98,7 +98,26 @@ Wat het uitzoeken opleverde is belangrijker dan het spoor:
 > afstand staat er nu apart bij, en hij is 7 tot 9 meter. Er is niets mis met de
 > grond.
 
-**Wat er dan wél is: het spoor rendert niet.** Een proef met een spoor van 90 cm —
+**HET SPOOR RENDERT NIET, EN IK WEET NOG NIET WAAROM.** Wat wel vaststaat, met een
+meting per stap:
+
+| gecontroleerd | uitkomst |
+|---|---|
+| ontstaat de actor? | **ja** — 11 stuks, `zichtbaar=1`, met een echt materiaal |
+| staat hij in het kader? | **ja** — geprojecteerd op (587,499), `inbeeld=1`, op 8,6 m |
+| ligt het aan de maat? | nee — ook op 50 cm en 90 cm niets |
+| aan de levensduur? | nee — 2,5 s, en er leven er 11 op het opnamemoment |
+| aan de kleur? | nee — ook knalwit met honderdvoudige emissie niets |
+| aan de materiaalparameters? | nee — UVMode, albedo én LightDir gezet zoals de lichamen |
+
+Elf witte vlakken van een halve meter op 8,6 m zouden elk ruim 50 pixels beslaan.
+Er staat niets. **Dat is geen "bijna af" maar een onopgelost defect**, en ik meld
+het als zodanig in plaats van het als geland te tellen.
+
+Wat ik als enige nog niet heb geprobeerd: het spoor zónder eigen materiaal spawnen.
+Rendert hij dan wél, dan ligt het aan het toon-master en niet aan mijn kant.
+
+*(oorspronkelijke tekst hieronder)* **Wat er dan wél is: het spoor rendert niet.** Een proef met een spoor van 90 cm —
 tien keer de echte maat, vol in beeld — liet ook niets zien. Dat sluit maat en
 plaats uit en laat het materiaal over: elke andere gebruiker van het toon-master
 (de lichamen, de grayboxblokken) zet een textuur en een UV-modus, mijn spoor als

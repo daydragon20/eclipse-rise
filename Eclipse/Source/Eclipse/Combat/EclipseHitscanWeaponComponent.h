@@ -121,6 +121,9 @@ private:
 	/** Schoten waarbij de trace niets raakte. */
 	int32 CleanMisses = 0;
 
+	/** Hoeveel zichtbare inslagsporen er echt zijn ontstaan. */
+	int32 ImpactMarksSpawned = 0;
+
 	/** Kogels in het magazijn. -1 tot ApplyWeaponRow hem vult. */
 	int32 AmmoInMagazine = -1;
 	bool bReloading = false;

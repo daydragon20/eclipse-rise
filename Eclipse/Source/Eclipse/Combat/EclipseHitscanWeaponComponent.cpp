@@ -38,9 +38,20 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	// subsysteem betekenen voor precies een gebruiker; dat mag terugkomen zodra er
 	// een TWEEDE visuele verbruiker is (muzzle flash staat al op de rol) — dan is
 	// het extraheren en niet vooruit bouwen.
+	// EERST MELDEN OF HET DING ER KOMT, en dat had hier vanaf het begin moeten staan.
+	//
+	// Ik heb dit spoor drie keer proberen zichtbaar te maken en telkens iets anders
+	// uitgesloten: de maat (een proef op 90 cm), de plaats (7-9 m recht vooruit),
+	// de levensduur (2,5 s) en het materiaal. Wat ik NOOIT heb gecontroleerd is of
+	// de actor uberhaupt ontstaat — precies de fout waar ik vandaag vijf keer op
+	// heb gewezen bij anderen: aannemen dat de bron werkt en alleen aan de uitvoer
+	// meten. Een stille `return` bij een mislukte laadpoging is dezelfde vorm als de
+	// twee stille afwijzingen in dit bestand.
 	UStaticMesh* Quad = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
 	if (Quad == nullptr)
 	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Inslagspoor: /Engine/BasicShapes/Cube.Cube laadde NIET — geen spoor mogelijk."));
 		return;
 	}
 
@@ -55,6 +66,8 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 		Spot, FRotationMatrix::MakeFromZ(Hit.ImpactNormal).Rotator(), Params);
 	if (Mark == nullptr)
 	{
+		UE_LOG(LogEclipse, Warning, TEXT("Inslagspoor: SpawnActor gaf niets terug op %s."),
+			*Spot.ToCompactString());
 		return;
 	}
 
@@ -78,6 +91,15 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 			const FLinearColor Spark(1.00f, 0.62f, 0.22f, 1.0f);
 			Mid->SetVectorParameterValue(TEXT("LitColor"), Spark);
 			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Spark * 0.45f);
+			// LIGHTDIR — de enige parameter die ik nooit had gezet, en elke andere
+			// gebruiker van dit master zet hem wel (de lichamen op regel 1035 van
+			// EclipseCharacter.cpp, met dezelfde zonrichting). Een toon-master mengt
+			// zijn licht- en schaduwkleur op N·L; met een LightDir van nul is die
+			// term nul en valt er niets te mengen. Dat past op alle bewijs tot nu toe:
+			// de spawn lukt, zichtbaar=1, hij staat aantoonbaar in het kader
+			// (scherm 589,499 — inbeeld=1, 8,6 m) en er komt niets uit de shader.
+			const FVector SunTravel = FRotator(-25.0f, 55.0f, 0.0f).Vector();
+			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunTravel, 0.0f)));
 			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
 			// UVMode EN een albedo, want zonder die twee bleef het spoor onzichtbaar.
 			// GEMETEN: met een proefspoor van 90 cm - tien keer de echte maat, op 7 tot
@@ -107,6 +129,11 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	// de muur om te zien waar je zat.
 	Mark->SetLifeSpan(2.5f);
 	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
+	++ImpactMarksSpawned;
+	UE_LOG(LogEclipse, Display,
+		TEXT("Inslagspoor %d GESPAWND op %s (schaal %s, zichtbaar %d, materiaal %s)"),
+		ImpactMarksSpawned, *Spot.ToCompactString(), *Mark->GetActorScale3D().ToCompactString(),
+		Plate->IsVisible() ? 1 : 0, *GetNameSafe(Plate->GetMaterial(0)));
 }
 
 void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row)
