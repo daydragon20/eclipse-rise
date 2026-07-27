@@ -835,4 +835,99 @@ bool FEclipseMissionM14ChainOnShippedDataTest::RunTest(const FString& Parameters
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// Besluit 6: alleen M1.3 verandert de wereldstaat
+// ---------------------------------------------------------------------------
+//
+// SPEC-P2-05 vraagt deze test met zoveel woorden ("Regression - P2-04 decision 6
+// enforced"), en hij was tot vandaag niet te bouwen: M1.2 en M1.4 bestonden niet.
+//
+// Wat hij bewaakt is geen detail. Besluit 6 zegt dat er precies EEN schrijver van
+// regiostaat is - de liberation-instance - en dat de andere drie missies alleen
+// rewards, beat en dag committen. Twee schrijvers van dezelfde staat is de
+// divergentiebug waar GDD 12.3 voor bestaat, en die merk je pas als de kaart iets
+// anders zegt dan het verhaal.
+//
+// De meting is het aantal RegionControlChanged-feiten per missie, geteld op de
+// bus. Niet de eindstand van de regio: die kan toevallig gelijk blijven terwijl
+// er wel degelijk iets is omgedraaid en teruggezet.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseOnlyM13FlipsRegionsTest,
+	"Eclipse.Missions.OnlyM13FlipsRegions",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseOnlyM13FlipsRegionsTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	int32 Flips = 0;
+	FEclipseEventSubscriptionHandle Handle = Bus->Subscribe(
+		EclipseTags::Event_Strategy_RegionControlChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&Flips](FGameplayTag, const FInstancedStruct&) { ++Flips; }));
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	auto Play = [&](const TCHAR* Region, const TArray<FName>& Objectives) -> bool
+	{
+		if (!TestTrue(FString::Printf(TEXT("besluit 6: %s selecteerbaar (reden: '%s')"), Region, *Error),
+				Strategy->SelectMission(Region, Error))) { return false; }
+		if (!TestTrue(TEXT("besluit 6: gelanceerd"), Prep->AutoLaunch(Error))) { return false; }
+		for (const FName& Objective : Objectives)
+		{
+			if (!TestTrue(FString::Printf(TEXT("besluit 6: %s voltooid"), *Objective.ToString()),
+					Mission->CompleteObjective(Objective, Error))) { return false; }
+		}
+		return TestTrue(TEXT("besluit 6: debrief"), Mission->ResolveDebrief(true, Error));
+	};
+
+	// M1.1 - mag niets omdraaien.
+	if (!Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M11_PatrolLeader"), TEXT("Obj_M11_Exfil") }))
+	{
+		Bus->Unsubscribe(Handle); GameInstance->Shutdown(); return false;
+	}
+	TestEqual(TEXT("besluit 6: M1.1 draait nul regio's om"), Flips, 0);
+
+	// M1.2 - ook niet.
+	if (!Play(TEXT("WorkerHousing"), { TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") }))
+	{
+		Bus->Unsubscribe(Handle); GameInstance->Shutdown(); return false;
+	}
+	TestEqual(TEXT("besluit 6: M1.2 draait nul regio's om"), Flips, 0);
+
+	// M1.3 - DEZE wel, en precies drie: de Foothold-trio in rijvolgorde. Dit is
+	// meteen de discriminator voor de twee nullen hierboven: als de teller sowieso
+	// nooit oploopt, bewijzen die niets.
+	if (!Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") }))
+	{
+		Bus->Unsubscribe(Handle); GameInstance->Shutdown(); return false;
+	}
+	TestEqual(TEXT("besluit 6: M1.3 draait precies de drie Foothold-regio's om"), Flips, 3);
+
+	// M1.4 - weer nul. Teller op nul zetten zodat we alleen deze missie meten.
+	Flips = 0;
+	if (!Play(TEXT("FoundryRow"), { TEXT("Obj_M14_CrateFirst"), TEXT("Obj_M14_CrateSecond"), TEXT("Obj_M14_Exfil") }))
+	{
+		Bus->Unsubscribe(Handle); GameInstance->Shutdown(); return false;
+	}
+	TestEqual(TEXT("besluit 6: M1.4 draait nul regio's om"), Flips, 0);
+
+	Bus->Unsubscribe(Handle);
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
