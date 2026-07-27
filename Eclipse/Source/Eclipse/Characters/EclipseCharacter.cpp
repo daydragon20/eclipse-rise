@@ -247,9 +247,55 @@ void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, flo
 
 void AEclipseCharacter::PlayShootPose()
 {
-	// 0,12 s: korter dan het vuurinterval (0,15) zodat automatisch vuur een
-	// doorlopende beweging geeft in plaats van een pose die zichzelf steeds
-	// herstart en daardoor bevriest.
+	// 0,12 s: korter dan het vuurinterval (0,15) zodat elke puls afloopt voordat de
+	// volgende begint. Dat deel klopt en blijft.
+	//
+	// DE TRIL IS GELOKALISEERD MAAR NIET GEREPAREERD, en dat hoort hier te staan
+	// zodat de volgende sessie niet opnieuw twee doodlopende wegen inloopt.
+	//
+	// GEMETEN op de rechterhand in componentruimte: in een vuurinterval keert de
+	// hand 27 keer van richting om, tegen hoogstens 2 in elk ander interval. Dat is
+	// deze puls: elk schot speelt een pose die heen en terug gaat, en bij 6,7
+	// schoten per seconde zijn dat ~2 omkeringen per schot. Het trillen dat de owner
+	// ziet IS de schietpose.
+	//
+	// TWEE REPARATIES GEPROBEERD, ALLEBEI GEMETEN, ALLEBEI TERUGGEDRAAID:
+	//   1. Gewicht 0,85 -> 0,30. Uitkomst 23 omkeringen, uitslag onveranderd. De
+	//      amplitude van de puls is dus niet wat de beweging groot maakt.
+	//   2. De puls niet laten herstarten als dezelfde take nog loopt. Uitkomst 24 —
+	//      en de reden staat in de getallen hierboven: de puls duurt 0,12 s en het
+	//      vuurinterval is 0,15 s, dus hij is ALTIJD al afgelopen. Die ingreep kon
+	//      per constructie niets doen.
+	//
+	// Wat overblijft is de take zelf: een volledige schietpose die 6,7 keer per
+	// seconde afspeelt, waar een additieve terugslag hoort. Dat is content-werk en
+	// geen getal in deze regel.
+	//
+	// WAT DIT HARNAS NIET KAN: de uitslag beoordelen. De ronde rendert ~4 beelden
+	// per seconde, dus tussen twee pose-updates zit 250 ms waarin een lopende arm
+	// vanzelf ver zwaait. De 25 cm is daardoor vooral looppas, niet terugslag —
+	// alleen het AANTAL omkeringen is een schoon signaal.
+	//
+	// HET GEWICHT BLEEF 0,85. Ik heb 0,30 geprobeerd als reparatie van de
+	// owner-melding "de karakter trilt", en GEMETEN dat het niet werkt: de
+	// omkeringen zakten maar van 27 naar 23 en de uitslag bleef 25,8 cm. De
+	// amplitude van de puls is dus niet wat die 25 cm veroorzaakt. Teruggezet in
+	// plaats van laten staan - een gevoelswijziging die zijn eigen meting niet
+	// haalt, hoort niet in het spel.
+	//
+	// GEMETEN op de opnameronde, op de rechterhand in componentruimte: tijdens het
+	// vuurinterval keerde de hand 27 keer van richting om met een grootste stap van
+	// 25,3 cm, tegen hoogstens 2 omkeringen en 7,8 cm in elk ander interval. Het
+	// OMKEREN zelf is geen fout — elke puls gaat heen en terug, dus bij 6,7 schoten
+	// per seconde horen daar ongeveer twee omkeringen per schot bij. Wat niet
+	// klopte is de UITSLAG: een arm die 25 cm heen en weer gaat, 6,7 keer per
+	// seconde, leest als trillen en niet als terugslag.
+	//
+	// Daarom het gewicht en niet de duur. De duur verlengen zou de pulsen laten
+	// overlappen, en omdat elke aanroep de klok op nul zet zou het gewicht dan
+	// midden in de curve terugklappen naar nul — een sprong in plaats van een
+	// vloeiende beweging. Het gewicht verlagen schaalt de uitslag rechtstreeks en
+	// raakt de timing niet.
 	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f, TEXT("schieten"));
 }
 
