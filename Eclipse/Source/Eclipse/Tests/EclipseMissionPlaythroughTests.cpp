@@ -1198,7 +1198,22 @@ bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
 	// staat — dat is precies het gat dat de grote ronde openlaat.
 	const bool bEngaged = DamageTaken > 0.0f || FurthestHostileMove > 200.0f;
 	TestTrue(TEXT("contact: de vijand doet iets als je zijn bereik in loopt (nadert of vuurt terug)"), bEngaged);
-	TestTrue(TEXT("contact: de speler is daadwerkelijk binnen hun waarnemingsbereik gekomen"),
+	// DE GETALLEN IN DE MELDING, want zonder dat is een val niet te lezen.
+	//
+	// Deze test viel op 27-07 een keer om in de volle suite en meldde alleen
+	// "Expected ... to be true". Om te weten WAAROM moest ik hem apart draaien,
+	// de harnastijd natrekken en de aanlooplus lezen. De Report-regels hierboven
+	// zijn AddInfo en die staan er bij een val niet bij.
+	//
+	// De aanloop gebruikt GEEN pathfinding: rechtdoor lopen, en bij een halve
+	// seconde zonder voortgang een stap opzij (de compoundmuur van de eerste
+	// ronde). Of je aankomt hangt dus af van waar je vastloopt en welke kant die
+	// recovery kiest, met vijanden die ondertussen zelf bewegen. Loopt hij een
+	// keer vast, dan wil je in EEN oogopslag zien hoe ver hij kwam en of hij nog
+	// bewoog - niet dit onderzoek nog eens overdoen.
+	TestTrue(*FString::Printf(
+		TEXT("contact: de speler is binnen hun waarnemingsbereik gekomen — dichtste nadering %.0f cm van de 3000, verste vijandbeweging %.0f cm, schade %.0f hp"),
+		ClosestApproach, FurthestHostileMove, DamageTaken),
 		ClosestApproach < 3000.0f);
 
 	Harness.Shutdown();
