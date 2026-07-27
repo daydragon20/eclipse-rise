@@ -127,7 +127,24 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
        de TIMER liep door; dat sluit een volledige stall uit maar niet dat
        componenten overgeslagen werden. Log de wereldtijd per duw en kijk of er
        een gat van ~0,4 s in zit dat samenvalt met de opname.
-    Pas als die twee niets opleveren, is de engine-kant aan de beurt.
+    **BEIDE ZIJN INMIDDELS UITGEVOERD (27-07 laat) en beide leverden een EXCLUSIE
+    op** — niet de oorzaak. Vraag 2 is gemeten: er zijn stalls, maar in BEIDE
+    intervallen (0,400 s tegen 0,230 s), en interval 3 legt met dezelfde stal 246
+    cm af. Ook `GetMaxAcceleration()` is nagemeten: **1400 in allebei**.
+
+  - **DE MEETLAAG IS DAARMEE UITGEPUT, en dat is nu een uitkomst en geen
+    inschatting.** Alles wat het bewegingscomponent van BUITENAF stuurt is
+    vastgelegd en identiek tussen het dode en het lopende interval: 100 duwen,
+    genegeerd 0, op de grond, modus Walking, max snelheid 420, max acceleratie
+    1400, en zelfs vergelijkbare stalls. **Alle ingangen gelijk, de uitgang
+    verschilt** — versnelling 0 tegen 1400.
+  - **NEGEN KANDIDATEN UITGESLOTEN**, elk met de meting erbij: actor-tick
+    (teruggedraaid, want geredeneerd), input-disabled, teleport-reset,
+    snelheidslimiet, invoer-niet-aangeboden, alles-buiten-de-pawn,
+    IgnoreMoveInput, de opname-stal, en de acceleratielimiet.
+  - **NU pas is de engine-kant aan de beurt** — de CharacterMovementComponent van
+    binnenuit volgen. De meetregels blijven in de ronde staan, dus wie dit oppakt
+    begint met kijken en niet met opbouwen.
   - **Tweede uitgesloten kandidaat:** de pawn is NIET input-disabled gebleven.
     `EnterMissionMode` roept `ControlledPawn->EnableInput(this)` aan
     (`EclipsePlayerController.cpp:507`), direct tegenover de `DisableInput` van
