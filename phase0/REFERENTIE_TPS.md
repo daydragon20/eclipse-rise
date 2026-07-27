@@ -185,6 +185,34 @@ if (bAiming)
   verder naar het midden van je vizierlijn in plaats van eruit.
 - **Er is geen gemeten blendtijd.** Meetopdracht: hoe lang duurt de overgang van
   300→165 en 80→64 nu feitelijk.
+
+> **HERZIEN 27-07 NA DE EERSTE MIK-OPNAME.** Dit hoofdstuk gaf hierboven een
+> aanbeveling die ik daarna zelf heb moeten terugdraaien, en dat hoort in de
+> maatstaf te staan en niet alleen in een commitbericht.
+>
+> **WAT IK FOUT AANBEVAL: de zijoffset laten meekrimpen met de arm.** De
+> redenering was dat dezelfde 55 cm op een arm van 165 bijna twee keer zo zwaar
+> weegt in graden, dus meeschalen houdt de hoek constant. De geometrie klopt; de
+> conclusie was omgekeerd. Die offset bestaat om het personage **uit** de
+> vizierlijn te duwen, en een constante hoek houdt hem even ver in de weg terwijl
+> hij dichterbij komt. [GEZIEN — `HighresScreenshot00972`: het personage vulde het
+> linkerdeel van het frame en blokkeerde de vizierlijn.] Teruggedraaid.
+>
+> **DE LES ERONDER, en die geldt breder dan dit getal:** een geometrisch juiste
+> redenering geeft nog geen juiste ontwerpkeuze. Wat de camera bij ADS moet doen
+> is niet "de hoek constant houden" maar "de lijn vrijmaken". Waar dit document
+> een parameter aanbeveelt, hoort er dus bij te staan WELK EFFECT hij moet dienen
+> — anders is de volgende plausibele afleiding weer net zo overtuigend en net zo
+> mis.
+>
+> **EN EEN GAT DAT ER AL STOND, nu voor het eerst gefotografeerd:** bij het mikken
+> projecteert de speler op **y=763 in een frame van 720** — hij zakt onder de
+> onderrand. De arm trekt in tot 165 cm terwijl de hoogte-offset op 65 blijft
+> staan. Dat is geen gevolg van mijn wijziging (het bleef staan na de
+> terugdraaiing) en het was nooit opgevallen omdat er geen mik-opname bestond.
+> **Nog niet gerepareerd**, met opzet: één mik-parameter is vandaag al op een
+> plausibele redenering aangepast en bleek omgekeerd, dus de volgende krijgt een
+> frame ernaast in plaats van een tweede gok.
 - **Hoe het kruis zich verhoudt tot waar de kogel gaat is NIET geverifieerd.** De
   hitscan vuurt vanaf een oorsprong met een richting; of dat exact door het
   schermmidden loopt is nooit gemeten. Meetopdracht, en die hoort vóór elke
