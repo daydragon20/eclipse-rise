@@ -263,6 +263,21 @@ void AEclipseGameMode::DrivePlayShotInput()
 	{
 		return;
 	}
+	// DE HOOGSTE SNELHEID VAN HET INTERVAL, en niet die van het meetmoment.
+	//
+	// De eerste diagnostiek bij de 3-cm-val mat de snelheid op het opnamemoment en
+	// gaf 0 cm/s op moment 2 EN op moment 3 — terwijl er tussen 2 en 3 wel 222 cm
+	// werd afgelegd. Die steekproef viel dus op een niet-representatief ogenblik en
+	// scheidde niets. Deze teller loopt mee op 50 Hz, dus hij mist geen piek.
+	//
+	// Hij scheidt wat de camera-verplaatsing alleen niet kan: blijft het maximum op
+	// 0, dan is de invoer nooit aangekomen; loopt hij op tot loopsnelheid terwijl
+	// het uitzicht 3 cm opschuift, dan bewóóg de pawn wel en werd hij tegengehouden.
+	if (Body->GetVelocity().Size2D() > PlayShotIntervalTopSpeed)
+	{
+		PlayShotIntervalTopSpeed = static_cast<float>(Body->GetVelocity().Size2D());
+	}
+
 	if (bPlayShotWalking)
 	{
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
@@ -397,13 +412,17 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] snelheid %.0f cm/s  modus %d  op de grond %d  duw %.2f"),
+				TEXT("[PLAYSHOT %d BEWEGING] TOPSNELHEID in dit interval %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
+				PlayShotIntervalTopSpeed,
 				Move != nullptr ? Move->Velocity.Size() : -1.0f,
 				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
 				Move != nullptr && Move->IsMovingOnGround() ? 1 : 0,
 				PlayShotBody->GetPendingMovementInputVector().Size());
 		}
+		// Teller op nul voor het volgende interval: hij meet PER interval, en een
+		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
+		PlayShotIntervalTopSpeed = 0.0f;
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
 			UE_LOG(LogEclipse, Error,

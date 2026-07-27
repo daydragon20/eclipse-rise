@@ -95,6 +95,13 @@ private:
 	/** Waar de camera stond bij de vorige opname; om te zien of beweging het beeld haalt. */
 	FVector PlayShotLastCamera = FVector::ZeroVector;
 
+	/**
+	 * Hoogste snelheid sinds het vorige opnamemoment, bijgehouden in de 50 Hz-duw.
+	 * Een momentopname op het opnamemoment gaf 0 cm/s terwijl er 222 cm was
+	 * afgelegd — die viel op een niet-representatief ogenblik. Zie DrivePlayShotInput.
+	 */
+	float PlayShotIntervalTopSpeed = 0.0f;
+
 	/** Duwt elke tick beweging/vuur door zodat de opnames een LOPEND spel vangen. */
 	void DrivePlayShotInput();
 
