@@ -1121,6 +1121,18 @@ bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
 	float DownedAt = -1.0f;
 	float LowestHealth = HealthAtStart;
 
+	// VANAF WELKE AFSTAND VERTREKT HIJ. Nodig om "heeft hij afstand overbrugd" te
+	// kunnen beoordelen in plaats van "is hij dichtbij genoeg gekomen" - dat
+	// tweede faalt zodra hij onderweg sneuvelt, en dat gebeurt (gemeten 27-07:
+	// neer op 4331 cm). Nog geen assertie: eerst het getal zien.
+	float StartClosest = TNumericLimits<float>::Max();
+	ForEachHostile([&](AEclipseCharacter& Hostile)
+	{
+		StartClosest = FMath::Min(StartClosest,
+			static_cast<float>(FVector::Dist(Hostile.GetActorLocation(), Harness.Location())));
+	});
+	Report(*this, TEXT("afstand tot de dichtstbijzijnde vijand bij vertrek"), StartClosest, TEXT("cm"));
+
 	constexpr double LegSeconds = 0.5;
 	constexpr double ApproachBudget = 90.0;
 	const double ApproachStart = Harness.ElapsedSeconds;
@@ -1196,25 +1208,40 @@ bool FEclipseEnemiesEngageTest::RunTest(const FString& Parameters)
 	// waar de squad staat; dat vastpinnen levert een test op die op toeval rood
 	// gaat. Wat NIET mag is dat er niets gebeurt terwijl je binnen hun bereik
 	// staat — dat is precies het gat dat de grote ronde openlaat.
+	Report(*this, TEXT("afstand die de speler overbrugde"), StartClosest - ClosestApproach, TEXT("cm"),
+		TEXT("bewijst dat de aanloop werkte, ook als hij onderweg sneuvelt"));
+
 	const bool bEngaged = DamageTaken > 0.0f || FurthestHostileMove > 200.0f;
 	TestTrue(TEXT("contact: de vijand doet iets als je zijn bereik in loopt (nadert of vuurt terug)"), bEngaged);
-	// DE GETALLEN IN DE MELDING, want zonder dat is een val niet te lezen.
+	// DE BEWAKER TOETST DE AANLOOP, NIET DE EINDAFSTAND.
 	//
-	// Deze test viel op 27-07 een keer om in de volle suite en meldde alleen
-	// "Expected ... to be true". Om te weten WAAROM moest ik hem apart draaien,
-	// de harnastijd natrekken en de aanlooplus lezen. De Report-regels hierboven
-	// zijn AddInfo en die staan er bij een val niet bij.
+	// Hier stond "dichtste nadering < 3000 cm". Dat leek een redelijke garantie
+	// dat de test iets zinnigs mat, en het viel op 27-07 twee keer om. De
+	// meetregels die de bar sinds die ochtend bij een val afdrukt, gaven het
+	// antwoord in één oogopslag: dichtste nadering 4331 cm, schade 100 hp, neer
+	// na 24,0 s, van eerste treffer tot neer 0,0 s. De speler wordt op 43 METER
+	// neergeschoten en gaat binnen één meetvenster van 100 naar 0 - daarna stopt
+	// de aanlooplus omdat hij ligt, en die 3000 cm haalt hij nooit.
 	//
-	// De aanloop gebruikt GEEN pathfinding: rechtdoor lopen, en bij een halve
-	// seconde zonder voortgang een stap opzij (de compoundmuur van de eerste
-	// ronde). Of je aankomt hangt dus af van waar je vastloopt en welke kant die
-	// recovery kiest, met vijanden die ondertussen zelf bewegen. Loopt hij een
-	// keer vast, dan wil je in EEN oogopslag zien hoe ver hij kwam en of hij nog
-	// bewoog - niet dit onderzoek nog eens overdoen.
+	// Twee eerdere verklaringen van mij waren fout (belasting: de harnastijd is
+	// gesimuleerd; vastlopen op de compoundmuur: hij loopt niet vast, hij
+	// sterft). Pas het derde antwoord klopte, en het kwam uit de meting.
+	//
+	// Wat de bewaker MOET aantonen is dat de aanloop echt gebeurd is - anders
+	// betekent "de vijand doet iets" niets. Dat is de AFGELEGDE WEG en niet de
+	// eindafstand: sterven op 43 meter is geen mislukte aanloop maar een zeer
+	// geslaagde, van de verkeerde kant bekeken.
+	//
+	// Drempel uit meting, niet uit smaak. Startafstand is constant 14.142 cm; de
+	// speler overbrugt daarvan 97-99% in een gezonde run en 69% in de run die
+	// omviel. Een speler die nooit vertrekt zit op ~0%. De helft ligt daar ruim
+	// tussenin en scheidt "de aanloop werkte" van "er bewoog niets".
+	const float Closed = StartClosest - ClosestApproach;
+	const float ClosedFraction = StartClosest > KINDA_SMALL_NUMBER ? Closed / StartClosest : 0.0f;
 	TestTrue(*FString::Printf(
-		TEXT("contact: de speler is binnen hun waarnemingsbereik gekomen — dichtste nadering %.0f cm van de 3000, verste vijandbeweging %.0f cm, schade %.0f hp"),
-		ClosestApproach, FurthestHostileMove, DamageTaken),
-		ClosestApproach < 3000.0f);
+		TEXT("contact: de speler heeft de aanloop echt gelopen — %.0f van de %.0f cm overbrugd (%.0f%%), dichtste nadering %.0f cm, schade %.0f hp"),
+		Closed, StartClosest, ClosedFraction * 100.0f, ClosestApproach, DamageTaken),
+		ClosedFraction > 0.5f);
 
 	Harness.Shutdown();
 	return true;
