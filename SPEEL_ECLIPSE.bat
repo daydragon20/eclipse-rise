@@ -97,6 +97,9 @@ echo     - je personage staat stil weer in beeld (was helemaal weg)
 echo     - hij DRAAIT mee als je ver wegkijkt, met een draai-animatie
 echo     - HERLADEN heeft nu een houding; die is geleend uit een ander pack
 echo     - er hangt nog GEEN wapen in je handen - dat is bekend, geen bug
+echo     - haal je de FOOTHOLD (na Signal Fire), dan staat er in het debrief
+echo       nu een ZIN die uitlegt waarom de wijk kantelde - niet alleen welke
+echo       vakken omdraaiden. Zeg het als die zin niet aankomt of te vroeg komt.
 echo.
 echo   Muis en controller werken tegelijk - gewoon oppakken, niets omzetten.
 echo.
