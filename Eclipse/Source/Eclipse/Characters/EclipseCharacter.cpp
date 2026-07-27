@@ -205,7 +205,7 @@ bool AEclipseCharacter::ShotLineHitsHead(const FVector& Start, const FVector& En
 	return FVector::DistSquared(Closest, Centre) <= FMath::Square(HeadHitbox->GetScaledSphereRadius());
 }
 
-void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, const TCHAR* PoseName)
+void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, const TCHAR* PoseName, bool bUpperBodyOnly)
 {
 	if (Clip == nullptr)
 	{
@@ -262,7 +262,7 @@ void AEclipseCharacter::PlayOneShotPose(UAnimSequence* Clip, float Duration, flo
 	}
 	if (UEclipseAnimInstance* Anim = Cast<UEclipseAnimInstance>(GetMesh() != nullptr ? GetMesh()->GetAnimInstance() : nullptr))
 	{
-		Anim->PlayOneShotPose(Clip, Duration, PeakWeight);
+		Anim->PlayOneShotPose(Clip, Duration, PeakWeight, bUpperBodyOnly);
 	}
 }
 
@@ -317,7 +317,7 @@ void AEclipseCharacter::PlayShootPose()
 	// midden in de curve terugklappen naar nul — een sprong in plaats van een
 	// vloeiende beweging. Het gewicht verlagen schaalt de uitslag rechtstreeks en
 	// raakt de timing niet.
-	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f, TEXT("schieten"));
+	PlayOneShotPose(LocomotionSet.Shoot, 0.12f, 0.85f, TEXT("schieten"), /*bUpperBodyOnly*/ true);
 }
 
 void AEclipseCharacter::PlayReloadPose(float Seconds)
@@ -325,7 +325,7 @@ void AEclipseCharacter::PlayReloadPose(float Seconds)
 	// Half gewicht, net als de schietpose: herladen is een handeling van de armen
 	// en mag de looppose niet overrulen. Wie herlaadt terwijl hij rent, moet nog
 	// steeds rennen.
-	PlayOneShotPose(LocomotionSet.Reload, FMath::Max(Seconds, 0.1f), 0.85f, TEXT("herladen"));
+	PlayOneShotPose(LocomotionSet.Reload, FMath::Max(Seconds, 0.1f), 0.85f, TEXT("herladen"), /*bUpperBodyOnly*/ true);
 }
 
 void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
@@ -368,7 +368,11 @@ void AEclipseCharacter::PlayTurnPose(bool bTurningRight)
 	// dus afkappen geeft geen sprong: sin(PI) is nul, ongeacht waar de take dan
 	// staat.
 	const float TurnPoseSeconds = FMath::Min(Clip->GetPlayLength(), 0.8f);
-	PlayOneShotPose(Clip, FMath::Max(TurnPoseSeconds, 0.15f), 0.85f, TEXT("draaien"));
+	// DRAAIEN IS GEEN BOVENLICHAAM. Toen de bovenlichaamslaag landde ging deze pose
+	// er per ongeluk in mee — dan draait alleen je romp terwijl je voeten blijven
+	// staan. Gevonden door na de wijziging ALLE zes de aanroepers na te lopen in
+	// plaats van alleen de twee waar het om ging.
+	PlayOneShotPose(Clip, FMath::Max(TurnPoseSeconds, 0.15f), 0.85f, TEXT("draaien"), /*bUpperBodyOnly*/ false);
 }
 
 void AEclipseCharacter::PlayHitReactPose()
@@ -377,7 +381,7 @@ void AEclipseCharacter::PlayHitReactPose()
 	// 0,2-0,35 s voor een flinch; korter leest als ruis, langer onderbreekt het
 	// vuurgevecht. Vol gewicht omdat dit een VIJAND is die je neerschiet: dat is
 	// waar de klap gezien wordt, en daar mag hij duidelijk zijn.
-	PlayOneShotPose(LocomotionSet.HitReact, 0.25f, 1.0f, TEXT("klap"));
+	PlayOneShotPose(LocomotionSet.HitReact, 0.25f, 1.0f, TEXT("klap"), /*bUpperBodyOnly*/ false);
 }
 
 void AEclipseCharacter::NotifyControllerChanged()
@@ -1307,14 +1311,14 @@ void AEclipseCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHe
 	// 0,3 s: de capsule krimpt onmiddellijk, dus de pose moet het verschil
 	// overbruggen zonder de speler te laten wachten. Halve piek — dit is een
 	// houdingswissel, geen klap.
-	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"));
+	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"), /*bUpperBodyOnly*/ false);
 	PlaceHeadHitboxOnCapsule(); // gehurkt zit het hoofd lager
 }
 
 void AEclipseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
-	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"));
+	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"), /*bUpperBodyOnly*/ false);
 	PlaceHeadHitboxOnCapsule();
 }
 

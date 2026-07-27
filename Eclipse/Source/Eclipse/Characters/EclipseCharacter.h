@@ -338,7 +338,12 @@ private:
 	/** Hoofd-hitbox op de capsule zetten (terugval voor lichamen zonder mesh). */
 	void PlaceHeadHitboxOnCapsule();
 
-	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, const TCHAR* PoseName);
+	/**
+	 * @param bUpperBodyOnly  Landt de pose alleen vanaf de ruggengraat omhoog?
+	 *   Schieten en herladen: JA — je benen horen door te lopen (Fortnite/Borderlands,
+	 *   REFERENTIE_TPS.md hoofdstuk 6). Draaien en hurken: NEE — dat ZIJN je benen.
+	 */
+	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, const TCHAR* PoseName, bool bUpperBodyOnly);
 
 	/** Landingsdip (audit punt 12): hoeveel de camera zakt en hoe lang nog. */
 	float LandingDipCm = 0.0f;

@@ -264,7 +264,7 @@ void FEclipseLocomotionProxy::ClearObjects()
 	RunRight = nullptr;
 }
 
-void FEclipseLocomotionProxy::PlayOneShot(UAnimSequence* Clip, float Duration, float PeakWeight)
+void FEclipseLocomotionProxy::PlayOneShot(UAnimSequence* Clip, float Duration, float PeakWeight, bool bUpperBodyOnly)
 {
 	if (Clip == nullptr || Duration <= 0.0f)
 	{
@@ -274,6 +274,7 @@ void FEclipseLocomotionProxy::PlayOneShot(UAnimSequence* Clip, float Duration, f
 	OneShotTime = 0.0f;
 	OneShotDuration = Duration;
 	OneShotPeakWeight = FMath::Clamp(PeakWeight, 0.0f, 1.0f);
+	bOneShotUpperBodyOnly = bUpperBodyOnly;
 }
 
 void FEclipseLocomotionProxy::SetLocomotionState(const FEclipseLocomotionBlend& InBlend, float InStrideRate, bool bInIsInAir, bool bInIsDowned,
@@ -444,8 +445,19 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	// alleen staan DAT er een volledige pose meedoet.
 	const bool bOneShotOverlay = OneShot != nullptr
 		&& FAnimWeight::IsRelevant(OneShotWeight) && !bOneShotIsAdditive;
+	// ALLEEN POSEN DIE HET BOVENLICHAAM BEDOELEN krijgen de per-bot-blend. Draaien,
+	// hurken en een klap zijn hele-lichaamsbewegingen: die gaan de oude weg, want
+	// een draai die alleen je romp meeneemt zet je voeten vast.
+	if (bOneShotOverlay && !bOneShotUpperBodyOnly)
+	{
+		for (FEclipseLocomotionSample& Sample : Samples)
+		{
+			Sample.Weight *= 1.0f - OneShotWeight;
+		}
+		Samples.Add({ OneShot, OneShotWeight, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false });
+	}
 
-	if (Samples.Num() == 0 && !bOneShotIsAdditive && !bOneShotOverlay)
+	if (Samples.Num() == 0 && !bOneShotIsAdditive && !(bOneShotOverlay && bOneShotUpperBodyOnly))
 	{
 		// Ref pose. Not a failure path worth logging per frame — ApplyBodyDef
 		// already said, once, which clip was missing and why (GDD 14.3.5).
@@ -497,7 +509,7 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	// Vindt hij geen ruggengraat, dan valt hij terug op het oude gedrag (de pose over
 	// het hele lijf) en zegt dat één keer hardop. Stil terugvallen op iets anders dan
 	// bedoeld is precies de vorm waar dit project vandaag zes keer op is gestruikeld.
-	if (bOneShotOverlay)
+	if (bOneShotOverlay && bOneShotUpperBodyOnly)
 	{
 		const FBoneContainer& Bones = Output.Pose.GetBoneContainer();
 		static const FName Ruggengraat[] = { TEXT("spine_01"), TEXT("Spine"), TEXT("spine"),
@@ -594,9 +606,9 @@ FAnimInstanceProxy* UEclipseAnimInstance::CreateAnimInstanceProxy()
 	return new FEclipseLocomotionProxy(this);
 }
 
-void UEclipseAnimInstance::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight)
+void UEclipseAnimInstance::PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, bool bUpperBodyOnly)
 {
-	GetProxyOnGameThread<FEclipseLocomotionProxy>().PlayOneShot(Clip, Duration, PeakWeight);
+	GetProxyOnGameThread<FEclipseLocomotionProxy>().PlayOneShot(Clip, Duration, PeakWeight, bUpperBodyOnly);
 	// De spiegel voor de testlaag meteen bijwerken: de proxy leeft op de
 	// werkthread en is daar niet veilig uit te lezen.
 	bOneShotActive = Clip != nullptr && Duration > 0.0f;

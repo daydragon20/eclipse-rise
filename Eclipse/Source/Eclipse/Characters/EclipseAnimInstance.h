@@ -46,7 +46,7 @@ struct FEclipseLocomotionProxy : public FAnimInstanceProxy
 		float InMoveDirectionDegrees);
 
 	/** Start een eenmalige pose (schot of klap). Duur 0 = niets doen. */
-	void PlayOneShot(UAnimSequence* Clip, float Duration, float PeakWeight);
+	void PlayOneShot(UAnimSequence* Clip, float Duration, float PeakWeight, bool bUpperBodyOnly);
 
 	virtual void Initialize(UAnimInstance* InAnimInstance) override;
 	virtual void InitializeObjects(UAnimInstance* InAnimInstance) override;
@@ -84,6 +84,10 @@ private:
 
 	/** Eén keer melden dat er geen ruggengraat gevonden is, niet elk frame. */
 	mutable bool bWarnedNoSpine = false;
+
+	/** Landt de lopende eenmalige pose alleen op het bovenlichaam? Schieten en
+	    herladen wel, draaien en hurken niet — dat ZIJN je benen. */
+	bool bOneShotUpperBodyOnly = false;
 	float OneShotTime = 0.0f;
 	float OneShotDuration = 0.0f;
 	float OneShotPeakWeight = 0.0f;
@@ -146,7 +150,7 @@ public:
 	void SetLocomotionSet(const FEclipseLocomotionSet& InSet);
 
 	/** Eenmalige pose over de gang heen (schot of klap; 26-07). */
-	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight);
+	void PlayOneShotPose(UAnimSequence* Clip, float Duration, float PeakWeight, bool bUpperBodyOnly);
 
 	/** Diagnostiek: hoeveel voetstappen er gespeeld zijn (testlaag, geen speaker nodig). */
 	int32 GetFootstepCount() const { return FootstepCount; }
