@@ -10,7 +10,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `d71c119`
+## VEILIG TE SPELEN: JA, commit `bb58c00`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -32,8 +32,8 @@ gedraaid, en het leverde twee van de vijf bugs van vannacht op.
 
 **Opnieuw gedraaid op `161cb92`,** want ik heb daarna nog aan de player-controller
 en de strategielaag gezeten en dat draait allebei in jouw pad. Sindsdien is er
-alleen TESTCODE bij gekomen — geen enkele regel die tijdens het spelen draait —
-dus dit bewijs geldt onverkort voor `d71c119`. Nul Eclipse-errors, nul
+alleen testcode en één meetregel bij gekomen (de budgetband in de opnameronde,
+die niets aan het spel verandert), dus dit bewijs geldt onverkort voor `bb58c00`. Nul Eclipse-errors, nul
 waarschuwingen, nul degradaties, en het bewijs dat hij echt startte in
 plaats van stilletjes af te breken: missie `MT_M11` begonnen op TransitCheckpoint
 met 3 squadleden en 4 vijanden, gids open met 13 stappen, munitieteller zichtbaar
