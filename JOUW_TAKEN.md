@@ -34,10 +34,15 @@ Veilig te spelen: **commit `6933fa7`**. Suite 182 groen, ValidateData 0 fouten.
 | 4 | F3 opent de gids niet | **KLAAR — gebruik nu G.** De engine claimt F1-F5 zelf voor viewmodes (staat in jouw log), en je toetsenbord kan F3 als mediatoets pakken. Welke van de twee doet er niet toe: allebei buiten dit project. F3 blijft ook staan |
 | 2 | Er is geen richtkruis | **KLAAR.** Volledig bevestigd — het enige woord „crosshair” in het project was de vorm van de muisaanwijzer. Er staat nu een kruis, en de startbat vraagt er niet meer naar |
 | 6 | Lichaam draait mee bij stilstand | **KLAAR.** Drempel van 60° naar 0°, en verplaatst van kijkhoek naar toestand: niet mikken = hij blijft staan, mikken = hij sluit meteen aan. Op beeld gecontroleerd (opname 7: camera 238,7°, lichaam 0,0° — je ziet zijn voorkant) |
-| 1 | Schaal-bug is een camera-bug | **JE HEBT GELIJK, en de bat loog.** Daar stond „de schaal-bug is weg”; dat is gecorrigeerd. Meten op schijnbare grootte staat nog open |
+| 1 | Schaal-bug is een camera-bug | **GEMETEN, en de uitslag weerlegt de hypothese.** Over de hele aanloop varieert de schijnbare hoogte 1,76% en hij wordt KLEINER (31,52 → 30,97 gr), niet groter. De bestaande cameratest keek alleen naar de eindstand — die is nu aangevuld met de aanloop. **Wat dit niet uitsluit:** 650 cm/s werd niet gehaald, en “pas helemaal zichtbaar” gaat over KADERING (waar hij in beeld staat), niet over grootte. Dat is de volgende meting |
 | 3 | Kogelinslagen nauwelijks zichtbaar | **OPEN.** Zeg het als je de Muzzle Flash (Niagara) wilt ophalen — dat is een owner-klik |
 | 7 | Camera 180° draaien en vooruit | **NOG NIET GECONTROLEERD** |
 | 8 | Alle besturing in de gids, één bron | **OPEN** — grootste post: eerst de tabel, dan drie lezers |
+
+> ⚠️ **EEN KLIKJE: sluit de editor / het spel als je klaar bent met spelen.**
+> “Unable to build while Live Coding is active” — zolang jij speelt kan ik niet
+> compileren. Ik werk ondertussen door aan dingen die geen build nodig hebben,
+> maar de volgende codewijziging blijft liggen tot de editor dicht is.
 
 **Squad-barks: jouw JA is genoteerd.** Drie zinnen per stem, zes in totaal, één
 betaalde generatie. Staat als eerstvolgende klus na de bugs; ik genereer pas als
