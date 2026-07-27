@@ -141,6 +141,19 @@ void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStru
 			Plate->SetMaterial(0, Mid);
 		}
 	}
+	// PROEF: VASTMAKEN AAN DE SPELER. Het blok dat wel verscheen was vastgemaakt aan
+	// het personage; al mijn sporen staan los. Dat verschil heb ik nooit apart
+	// getest, en het is een van de twee dingen die de werkende kubus onderscheiden
+	// van dit spoor (het andere is het moment). Verschijnt hij hierdoor wel, dan ligt
+	// het aan het vrijstaand zijn en niet aan de tijd.
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (APawn* Speler = PC->GetPawn())
+		{
+			Mark->AttachToActor(Speler, FAttachmentTransformRules::KeepWorldTransform);
+		}
+	}
+	Mark->SetActorScale3D(FVector(0.50f, 0.50f, 0.50f)); // PROEF: zichtbaar formaat
 	Mark->SetLifeSpan(2.5f);
 	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
 	UE_LOG(LogEclipse, Verbose, TEXT("[SPAWNTIJD] inslagspoor op t=%.2f s."), World->GetTimeSeconds());
