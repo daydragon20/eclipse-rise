@@ -23,6 +23,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
 #include "Misc/FileHelper.h"
+#include "Audio/EclipseAudioSubsystem.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Characters/EclipseCommandModeComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -3055,6 +3056,84 @@ bool FEclipseLauncherTeachesNoDeadButtonsTest::RunTest(const FString& Parameters
 	TestTrue(FString::Printf(TEXT("startbat: er zijn %d padknop-regels herkend"), Checked),
 		Checked >= 5);
 
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// Twee invarianten uit de nacht van 26 op 27 juli
+// ---------------------------------------------------------------------------
+//
+// Allebei zijn ze geboren uit een bug die er al dagen zat en die pas opviel toen
+// er een GETAL naast werd gelegd. Ze staan bewust in één test: het is dezelfde
+// les, twee keer.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDistrictCountsAddUpTest,
+	"Eclipse.Feel.District.CountsAddUp",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseDistrictCountsAddUpTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// 1. HOEVEEL ARMATUREN STAAN ER ECHT.
+	//
+	// De graybox plaatst er dertien (5 bakens, 8 routes) en zegt dat ook hardop.
+	// Op 26-07 belandde de gedeelde tag in SpawnBlock in plaats van SpawnFixture,
+	// waardoor 226 districtblokken "armatuur" heetten — en het BEELD dat daaruit
+	// rolde zag er volstrekt plausibel uit. Alleen het getal verried het.
+	//
+	// Dertien is hier geen magisch getal maar een GEDOCUMENTEERD aantal, in
+	// dezelfde geest als de catalogus-regel "documented = implemented". Komen er
+	// armaturen bij, dan hoort deze regel mee te veranderen — dat is precies de
+	// bedoeling en geen last.
+	int32 Fixtures = 0;
+	for (TActorIterator<AActor> It(Harness.World); It; ++It)
+	{
+		if (It->ActorHasTag(TEXT("EclipseFixture")))
+		{
+			++Fixtures;
+		}
+	}
+	TestEqual(TEXT("district: precies de dertien geplaatste armaturen dragen de armatuur-tag"),
+		Fixtures, 13);
+
+	// 2. HEEFT ELK OPPERVLAK NOG GELUID.
+	//
+	// De voetstaplader vroeg zeven houtvarianten terwijl het pack er vijf levert,
+	// en telde die twee mislukte laadpogingen niet: hij meldde alleen iets als een
+	// bank HELEMAAL leeg bleef. Dat is opgelost door de aantallen weg te halen —
+	// de lader telt nu zelf — maar een pack dat verdwijnt of leegloopt hoort nog
+	// steeds rood te worden.
+	const UEclipseAudioSubsystem* Audio = Harness.GameInstance != nullptr
+		? Harness.GameInstance->GetSubsystem<UEclipseAudioSubsystem>() : nullptr;
+	if (TestNotNull(TEXT("district: het audiosubsysteem draait"), Audio))
+	{
+		// De zes oppervlaktetypes uit DefaultEngine.ini.
+		const TCHAR* SurfaceNames[] = { TEXT("metaal"), TEXT("straat"), TEXT("modder"),
+			TEXT("gras"), TEXT("zand"), TEXT("hout") };
+		for (uint8 Surface = 1; Surface <= 6; ++Surface)
+		{
+			const int32 Variants = Audio->GetFootstepVariantCount(Surface);
+			AddInfo(FString::Printf(TEXT("GEMETEN  oppervlak %s: %d voetstapvarianten"),
+				SurfaceNames[Surface - 1], Variants));
+			TestTrue(*FString::Printf(
+					TEXT("district: %s heeft voetstapgeluid (%d varianten) — lopen op dat oppervlak mag niet stil zijn"),
+					SurfaceNames[Surface - 1], Variants),
+				Variants > 0);
+		}
+	}
+
+	Harness.Shutdown();
 	return true;
 }
 
