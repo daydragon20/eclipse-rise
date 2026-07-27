@@ -40,6 +40,20 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
 | **5** wapenwissel | **HET WAPEN IS EEN APART MATERIAALSLOT** (`M_Belica_Guns`, slot 4 van 12). Zichtbaar máken vraagt dus geen mesh-operatie, alleen een eigen tint. Wisselbaar maken vraagt het nog steeds wel |
 | **6** de gids | **DE KETEN WERKT — end-to-end gemeten.** Toets → actie → handler → paneel open met 13 regels. G kon je niet hebben (toegevoegd ná je sessie); F3 is door de engine geclaimd als `viewmode lit` |
 
+### ⛔ GEPARKEERD MET OPZET: de squad-barks (jouw JA staat nog open)
+
+Je gaf eerder **"JA"** op drie zinnen per stem, zes in totaal — **één betaalde
+ElevenLabs-generatie**. Daarna kwam je reset: *"Alles wat op de rij staat blijft op
+de rij tot ik één keer normaal kan spelen."*
+
+Die twee spreken elkaar tegen, en bij twijfel over **uitgeven** doe ik niets. De
+zes zinnen zijn dus **niet** gegenereerd en de generatie is **niet** gestart.
+
+Zeg het expliciet als je hem alsnog wilt — dan is het één aanroep, want de tekst
+staat vast: *Contact.* / *Taking fire!* / *Reloading!*, per stem. Er is ook nog
+bus-werk voor nodig (drie momenten waarop een soldaat uit zichzelf handelt), dus
+het is geen losse klik.
+
 ### 🟡 EEN VIERDE VRAAG, en die had ik bijna als "engine-werk" weggeschreven
 
 **Waar hoort visuele feedback te wonen?** Stap 1 en 2 van punt 4 staan: de misser
