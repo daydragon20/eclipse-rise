@@ -26,6 +26,9 @@
 #include "Audio/EclipseAudioSubsystem.h"
 #include "Characters/EclipsePlayerController.h"
 #include "Characters/EclipseCommandModeComponent.h"
+#include "Core/EclipseEventBusSubsystem.h"
+#include "Core/EclipseEventPayloads.h"
+#include "Core/EclipseGameplayTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -3282,6 +3285,107 @@ bool FEclipseEveryMissingDeviceSideCarriesAReasonTest::RunTest(const FString& Pa
 	// vrijstellingen. Drie is wat er nu staat; verandert dat bewust, dan hoort
 	// dit getal mee te veranderen en niet stilletjes te blijven kloppen.
 	TestEqual(TEXT("er zijn precies drie bewuste asymmetrieen"), Exempted, 3);
+	return true;
+}
+
+
+// ModeEntered en ModeExited komen ALTIJD als paar (SPEC-P2-02, Stage A).
+//
+// GEVONDEN ALS GAT, niet als bug. De spec eist dit met zoveel woorden, en er was
+// geen enkele test die zich op die twee feiten abonneerde: de bestaande
+// Command-tests vegen de pure staatslogica (ApplySignal, DesiredDilation) en
+// raken de bus nooit. De component broadcast ze wel.
+//
+// Waarom het uitmaakt, en waarom een dilatatie-test het NIET afdekt: de bestaande
+// fail-safe test bewijst dat de tijdschaal terugspringt naar exact 1.0. Dat is de
+// WERELD. De FEITEN zijn wat iedereen erbuiten hoort. SPEC-P2-09 laat de audio op
+// ModeEntered duiken en op ModeExited weer opkomen; blijft die tweede weg, dan
+// staat de wereld weer op snelheid terwijl het geluid gedempt blijft - precies de
+// vorm die vannacht al twee keer toesloeg (de staat klopt, het feit blijft uit,
+// en elke consument stroomafwaarts blijft in de verkeerde modus staan).
+//
+// Drie manieren waarop het paar kan breken, alle drie hier:
+//   1. een gewone cyclus levert niet een-op-een
+//   2. twee keer indrukken tijdens dezelfde hold levert een DUBBELE entered
+//   3. een los-signaal terwijl je er niet in zit levert een WEZE exited
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseModeEnteredAndExitedAlwaysComeInPairsTest,
+	"Eclipse.Feel.Input.ModeEnteredAndExitedAlwaysComeInPairs",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseModeEnteredAndExitedAlwaysComeInPairsTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	FHarness Harness;
+	if (!Harness.Start(*this))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	UEclipseCommandModeComponent* CommandMode =
+		Harness.Controller != nullptr ? Harness.Controller->FindComponentByClass<UEclipseCommandModeComponent>() : nullptr;
+	UEclipseEventBusSubsystem* Bus = Harness.Controller != nullptr && Harness.Controller->GetGameInstance() != nullptr
+		? Harness.Controller->GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("paar: de command-component bestaat"), CommandMode)
+		|| !TestNotNull(TEXT("paar: de bus bestaat"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	// Een enkele reeks, zodat de VOLGORDE zichtbaar is en niet alleen het aantal.
+	// Twee losse tellers zouden "IN IN UIT UIT" ook groen noemen.
+	TArray<FString> Reeks;
+	FEclipseEventSubscriptionHandle InHandle = Bus->Subscribe(
+		EclipseTags::Event_Command_ModeEntered,
+		FEclipseEventNativeDelegate::CreateLambda([&Reeks](FGameplayTag, const FInstancedStruct&)
+		{
+			Reeks.Add(TEXT("IN"));
+		}),
+		FEclipseCommandEventPayload::StaticStruct());
+	FEclipseEventSubscriptionHandle UitHandle = Bus->Subscribe(
+		EclipseTags::Event_Command_ModeExited,
+		FEclipseEventNativeDelegate::CreateLambda([&Reeks](FGameplayTag, const FInstancedStruct&)
+		{
+			Reeks.Add(TEXT("UIT"));
+		}),
+		FEclipseCommandEventPayload::StaticStruct());
+
+	// (1) Vijf gewone cycli.
+	constexpr int32 Cycli = 5;
+	for (int32 Index = 0; Index < Cycli; ++Index)
+	{
+		CommandMode->OnHoldPressed();
+		CommandMode->OnHoldReleased();
+	}
+	TestEqual(TEXT("paar: vijf cycli geven tien feiten"), Reeks.Num(), Cycli * 2);
+	bool bAfwisselend = true;
+	for (int32 Index = 0; Index < Reeks.Num(); ++Index)
+	{
+		if (Reeks[Index] != ((Index % 2 == 0) ? TEXT("IN") : TEXT("UIT")))
+		{
+			bAfwisselend = false;
+			break;
+		}
+	}
+	TestTrue(*FString::Printf(TEXT("paar: strikt afwisselend IN/UIT (%s)"), *FString::Join(Reeks, TEXT(" "))), bAfwisselend);
+
+	// (2) Twee keer indrukken binnen dezelfde hold mag GEEN tweede IN geven.
+	Reeks.Reset();
+	CommandMode->OnHoldPressed();
+	CommandMode->OnHoldPressed();
+	TestEqual(TEXT("paar: dubbel indrukken geeft een enkele IN"), Reeks.Num(), 1);
+
+	// (3) En loslaten terwijl je er al uit bent, geeft geen weesfeit.
+	CommandMode->OnHoldReleased();
+	CommandMode->OnHoldReleased();
+	TestEqual(TEXT("paar: dubbel loslaten geeft een enkele UIT"), Reeks.Num(), 2);
+	TestFalse(TEXT("paar: de modus staat aan het eind uit"), CommandMode->IsHeld());
+
+	Bus->Unsubscribe(InHandle);
+	Bus->Unsubscribe(UitHandle);
+	Harness.Shutdown();
 	return true;
 }
 
