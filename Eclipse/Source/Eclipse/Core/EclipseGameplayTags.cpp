@@ -27,6 +27,11 @@ namespace EclipseTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_WeaponSwapped, "Event.Combat.WeaponSwapped", "Er is van wapen gewisseld: welke familie er nu in de handen ligt en hoe lang het optillen duurt (26-07 avond, punt 5).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_ReloadStarted, "Event.Combat.ReloadStarted", "Er wordt herladen: welke wapenfamilie en hoe lang het duurt. De foley-keten hangt aan de FASEN van dit feit, niet aan een enkel geluid bij de start (26-07 avond).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_HitLanded, "Event.Combat.HitLanded", "Een schot RAAKT iemand: plek, of het een kopschot was, en hoeveel schade. Het tegenovergestelde feit van ShotFired, dat ook bij een misser vuurt (26-07).")
+	// EEN EIGEN FEIT EN GEEN VELD OP HitLanded, om dezelfde reden als de
+	// bevrijdingszin: HitLanded betekent 'schade aan een personage' en wordt door
+	// consumenten zo geteld — de hitmarker hangt eraan. Een muur die geraakt wordt
+	// hoort daar niet tussen te staan, want dan telt elke misser als treffer.
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_WorldImpact, "Event.Combat.WorldImpact", "Een schot raakt de WERELD in plaats van een personage: de misser. Tot 27-07 werd die tak stil verworpen, waardoor elke mis onzichtbaar en onhoorbaar was — en juist daaruit leidt de speler af of hij raakt (owner-punt 4).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Combat_ShotFired, "Event.Combat.ShotFired", "Er is geschoten: oorsprong plus de geluidsradius van het wapen. Raak of mis maakt niet uit — de loop maakt het lawaai (26-07, punt 1).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_OrderRefused, "Event.Squad.OrderRefused", "Squadmate refused an order with a reason; silent failure is a release blocker (GDD 8.4).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Squad_SoldierDowned, "Event.Squad.SoldierDowned", "A squadmate went down in mission; resolution to dead/wounded happens at debrief (SPEC-P1-06/07).")

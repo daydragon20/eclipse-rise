@@ -280,6 +280,14 @@ void UEclipseAudioSubsystem::BindToBus(UEclipseEventBusSubsystem& Bus)
 		EclipseTags::Event_Combat_HitLanded,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnHitLanded),
 		FEclipseCombatEventPayload::StaticStruct());
+	// DE MISSER IS OOK EEN FEIT. Dezelfde handler als HitLanded, want het geluid
+	// van een inslag is hetzelfde ongeacht of er een muur of een mens achter zat —
+	// alleen het feit verschilt, en dat scheiden hoort in de tags te zitten en niet
+	// in twee bijna gelijke handlers.
+	WorldImpactHandle = Bus.Subscribe(
+		EclipseTags::Event_Combat_WorldImpact,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnHitLanded),
+		FEclipseCombatEventPayload::StaticStruct());
 	ReloadStartedHandle = Bus.Subscribe(
 		EclipseTags::Event_Combat_ReloadStarted,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseAudioSubsystem::OnReloadStarted),
@@ -299,6 +307,7 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 		Bus->Unsubscribe(OrderRefusedHandle);
 		Bus->Unsubscribe(ShotFiredHandle);
 		Bus->Unsubscribe(HitLandedHandle);
+		Bus->Unsubscribe(WorldImpactHandle);
 		Bus->Unsubscribe(ReloadStartedHandle);
 		Bus->Unsubscribe(WeaponSwappedHandle);
 	}
@@ -307,6 +316,7 @@ void UEclipseAudioSubsystem::UnbindFromBus()
 	OrderRefusedHandle = FEclipseEventSubscriptionHandle();
 	ShotFiredHandle = FEclipseEventSubscriptionHandle();
 	HitLandedHandle = FEclipseEventSubscriptionHandle();
+	WorldImpactHandle = FEclipseEventSubscriptionHandle();
 	ReloadStartedHandle = FEclipseEventSubscriptionHandle();
 	WeaponSwappedHandle = FEclipseEventSubscriptionHandle();
 	LastBarkSeconds.Reset();

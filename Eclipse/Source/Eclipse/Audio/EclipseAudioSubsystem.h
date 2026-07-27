@@ -173,6 +173,9 @@ private:
 	FEclipseEventSubscriptionHandle OrderRefusedHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
 	FEclipseEventSubscriptionHandle HitLandedHandle;
+
+	/** De MISSER, sinds 27-07 een eigen feit; deelt de handler met HitLanded. */
+	FEclipseEventSubscriptionHandle WorldImpactHandle;
 	FEclipseEventSubscriptionHandle ReloadStartedHandle;
 	FEclipseEventSubscriptionHandle WeaponSwappedHandle;
 

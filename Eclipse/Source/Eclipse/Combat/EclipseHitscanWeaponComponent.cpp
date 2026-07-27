@@ -341,6 +341,27 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 			*GetNameSafe(Hit.GetActor()),
 			Surface != nullptr ? *Surface->GetName() : TEXT("onbekend"),
 			*Hit.ImpactPoint.ToCompactString(), WorldHits);
+
+		// EN HET FEIT OP DE BUS, want een teller die alleen in dit component leeft
+		// is precies de vorm waar dit project telkens op valt: staat in de data,
+		// wordt nergens gelezen. De audiolaag luistert hier al op HitLanded voor
+		// het inslaggeluid; die abonneert zich nu ook hierop, zodat een MISSER
+		// hoorbaar wordt. Zelfde payloadtype — schutter en oorsprong zijn precies
+		// wat een inslag nodig heeft — maar een EIGEN tag, omdat HitLanded
+		// 'schade aan een personage' betekent en de hitmarker eraan hangt.
+		if (UWorld* BusWorld = GetWorld())
+		{
+			if (UGameInstance* GameInstance = BusWorld->GetGameInstance())
+			{
+				if (UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>())
+				{
+					FEclipseCombatEventPayload Impact;
+					Impact.Shooter = GetOwner();
+					Impact.Origin = Hit.ImpactPoint;
+					Bus->Broadcast(EclipseTags::Event_Combat_WorldImpact, FInstancedStruct::Make(Impact));
+				}
+			}
+		}
 		return false;
 	}
 
