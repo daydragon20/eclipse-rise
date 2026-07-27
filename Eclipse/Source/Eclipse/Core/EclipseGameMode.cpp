@@ -878,37 +878,32 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, LICHAAM-OMKLAPPEN %d (grootste stap %.2f gr), HAND-OMKLAPPEN %d (grootste stap %.2f cm), VOET-OMKLAPPEN %d, vurend %d, component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
+				// OPGERUIMD 27-07 AVOND: van 569 tekens naar de helft.
+				//
+				// Deze regel groeide vandaag uit tot vijftien velden omdat elk ervan
+				// een kandidaat in het 3-cm-dossier uitsloot: genegeerde invoer, de
+				// laagste toegestane maxsnelheid, de rust voor een duw, wat de
+				// component had opgehaald, wat er landde en verdampte, of de component
+				// tikte, of hij actief was. DAT DOSSIER IS GESLOTEN — de aanstuurlus
+				// vuurde honderd duwen af in een frame — en een teller die zijn vraag
+				// beantwoord heeft is geen meting meer maar ruis. Wie ze terug wil,
+				// vindt ze in de geschiedenis van dit bestand.
+				//
+				// Wat blijft is wat elke ronde nog iets kan zeggen: hoeveel frames er
+				// in het interval zaten, hoe ver hij kwam, hoe hard, en of zijn
+				// lichaam trilde.
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (= frames), AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s, topversnelling %.0f, grootste framegat %.3f s, modus %d, op de grond %d, HAND-OMKLAPPEN %d, VOET-OMKLAPPEN %d, vurend %d"),
 				ShotIndex,
 				PlayShotIntervalPushes,
-				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
-				// heeft staan — en dat is een TELLER, dus hij kan blijven hangen.
-				// Dat geeft exact het gemeten beeld: honderd duwen, acceleratie nul,
-				// en verder alles gezond. Laatste kandidaat die het patroon dekt.
-				PlayShotBody->IsMoveInputIgnored() ? 1 : 0,
-				PlayShotIntervalRestBeforePush,
-				PlayShotIntervalLargestGap,
-				PlayShotIntervalMinMaxAccel,
 				PlayShotIntervalPathLength,
-				PlayShotIntervalTopAccel,
 				PlayShotIntervalTopSpeed,
-				PlayShotIntervalMinMaxSpeed,
-				Move != nullptr ? Move->Velocity.Size() : -1.0f,
+				PlayShotIntervalTopAccel,
+				PlayShotIntervalLargestGap,
 				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
 				Move != nullptr && Move->IsMovingOnGround() ? 1 : 0,
-				PlayShotBody->GetPendingMovementInputVector().Size(),
-				PlayShotIntervalTopConsumed,
-				PlayShotIntervalLanded,
-				PlayShotIntervalVanished,
-				PlayShotIntervalYawFlips,
-				PlayShotIntervalMaxYawStep,
 				PlayShotIntervalBoneFlips,
-				PlayShotIntervalMaxBoneStep,
 				PlayShotIntervalVoetFlips,
-				bPlayShotFiring ? 1 : 0,
-				PlayShotIntervalSawInput,
-				PlayShotIntervalTickOff,
-				PlayShotIntervalInactive);
+				bPlayShotFiring ? 1 : 0);
 		}
 		// Teller op nul voor het volgende interval: hij meet PER interval, en een
 		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
