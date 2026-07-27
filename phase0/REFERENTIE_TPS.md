@@ -315,6 +315,22 @@ speelde hij oude code en kán het kruis er niet zijn.
   blijft dus een uitspraak uit codelezing, en zo staat hij hier.
 - **Geen flinch en geen schadegetal** — eveneens uit code, niet visueel bevestigd
   om dezelfde reden.
+
+> **HERZIEN 27-07 — DE OORZAAK ZIT DIEPER DAN DE VFX.** Nagekeken waar een inslag
+> in de code landt, en het antwoord is: nergens. `EclipseHitscanWeaponComponent`
+> traceert op `ECC_Pawn` en gooit daarna alles weg wat geen personage is
+> (`if (HitCharacter == nullptr) return false;`). Een schot in een muur, een krat
+> of de grond raakt dus wél iets en wordt vervolgens **stil verworpen** — geen
+> feit, geen geluid, geen decal.
+>
+> Punt 4 is daarmee niet "voeg inslag-VFX toe" maar **"geef een schot dat de
+> wereld raakt überhaupt een uitkomst"**. Een particle op het huidige pad blijft
+> bij elke MIS onzichtbaar, en missen is juist het geval waarover de klacht gaat.
+>
+> Volgorde, elk apart falsifieerbaar: (1) het niet-personage-geval niet meer
+> weggooien maar een eigen uitkomst geven met ImpactPoint, normaal en physical
+> material; (2) het bestaande oppervlaktegeluid eraan hangen — dat systeem bestaat
+> al voor voetstappen, dus aansluiten en niet bouwen; (3) pas dan het zichtbare.
 - De hitmarker is de enige andere visuele terugkoppeling, en die zat tot vandaag op
   een kruis dat niet bestond.
 
