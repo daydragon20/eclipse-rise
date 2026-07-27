@@ -209,10 +209,21 @@ Uitbouwen, in deze volgorde:
 - Deze ronde bij ELKE landing draaien, naast de suite.
 - `NobodyIsAGiant` is de enige assertie in de SUITE die uit een beeld geboren is;
   de vier hierboven draaien alleen in de ronde. Zoek de volgende.
-- De opname met UI (moment 8) gaat via `FScreenshotRequest` met `bShowUI`, want
-  `HighResShot` tekent alleen de 3D-scene. **Ook dat pakt de UMG-laag niet mee** —
-  de HUD mount aantoonbaar wel. Wie de HUD op beeld wil, moet een andere weg
-  zoeken; reken er tot die tijd niet op dat een lege hoek iets bewijst.
+- **DE HUD IS NIET TE FOTOGRAFEREN, en hij werkt wél.** Drie methodes geprobeerd —
+  `HighResShot`, `FScreenshotRequest` met `bShowUI`, en een Slate-vensteropname —
+  en geen van drieën pakt de UMG-laag mee. Ze leveren alle drie hetzelfde
+  3D-beeld.
+
+  Uitgezocht zonder beeld, door de HUD zelf te vragen wat hij toont:
+
+  ```
+  HUD: munitieteller zichtbaarheid=3 (HitTestInvisible) tekst='AR_Foundry   30 / 30' inViewport=1
+  ```
+
+  De teller staat er dus gewoon. **Een lege hoek op een screenshot bewijst hier
+  niets** — ik heb twee keer bijna een kapotte HUD gerapporteerd op grond van een
+  plaatje. Wil je UI op beeld, dan is dat een aparte opgave; tot die tijd is de
+  zelfrapportage de betrouwbare weg.
 
 ### 2. ~~TURN-IN-PLACE~~ — STAAT, zie het morgenrapport
 

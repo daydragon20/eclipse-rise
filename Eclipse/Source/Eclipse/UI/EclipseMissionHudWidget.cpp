@@ -140,6 +140,27 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 
 void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
 {
+	// EEN KEER HARDOP WAT DE HUD DENKT DAT HIJ TOONT, en met opzet NA de refresh
+	// van de vorige frame in plaats van ervoor.
+	//
+	// Eerste versie stond bovenaan RefreshAmmoReadout en meldde 'tekst=""' —
+	// logisch, want daar had de functie zijn werk nog niet gedaan. Dat is meten
+	// vóór de gebeurtenis, de spiegelbeeldfout van meten erna.
+	//
+	// Waarom dit er staat: op geen enkele opname van de speelronde is de
+	// munitieteller te zien, en drie opnamemethodes pakken de UMG-laag geen van
+	// alle mee. "Ik zie hem niet" is dus geen bewijs dat hij er niet is — deze
+	// regel beantwoordt het zonder beeld.
+	if (!bLoggedAmmoState && AmmoReadout != nullptr && GetWorld() != nullptr && GetWorld()->TimeSeconds > 3.0f)
+	{
+		bLoggedAmmoState = true;
+		UE_LOG(LogEclipse, Display,
+			TEXT("HUD: munitieteller zichtbaarheid=%d tekst='%s' inViewport=%d"),
+			static_cast<int32>(AmmoReadout->GetVisibility()),
+			*AmmoReadout->GetText().ToString(),
+			IsInViewport() ? 1 : 0);
+	}
+
 	Super::NativeTick(Geometry, DeltaSeconds);
 
 	// Alleen werk als er iets te doven valt. Deze widget tikt toch al voor Slate;

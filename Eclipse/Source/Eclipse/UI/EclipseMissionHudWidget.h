@@ -200,6 +200,9 @@ private:
 
 	/** Manual criterion state (the only state this widget owns — nothing else knows the tester's answers). */
 	int32 CleanPicks = 0;
+
+	/** Zodat de HUD zich EEN keer bekendmaakt en niet elke frame. */
+	bool bLoggedAmmoState = false;
 	int32 MisPicks = 0;
 	EclipseGauntletOverlay::EEclipseGauntletAnswer ComfortAnswer = EclipseGauntletOverlay::EEclipseGauntletAnswer::Unanswered;
 	EclipseGauntletOverlay::EEclipseGauntletAnswer ConfidenceAnswer = EclipseGauntletOverlay::EEclipseGauntletAnswer::Unanswered;
