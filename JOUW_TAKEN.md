@@ -374,7 +374,7 @@ identiteit niet voor niets vóór autosave.
 
 ---
 
-# Wat er vannacht bij is gekomen (27-07) — vier keuzes voor jou
+# Wat er vannacht bij is gekomen (27-07) — vijf punten voor jou
 
 ## 1 · SPEC-P2-07 (UI Stack) ligt klaar als concept
 
@@ -425,7 +425,25 @@ uitkomst aankondigen die nog afgewezen kon worden.
 
 **Zeg het als die zin niet aankomt, of als hij te vroeg komt.**
 
-## 4 · Nog steeds open van eerder
+## 4 · Wanneer telt een nacht als "groen"? (nieuw, 27-07)
+
+`verify.ps1` schrijft nu elke draai weg in
+[phase0/SOAK_LOG.md](phase0/SOAK_LOG.md), groen én rood. Daarmee wordt de eis van
+SPEC-P2-05 — *soak drie nachten achtereen groen* — voor het eerst aantoonbaar.
+
+Maar er zit een leesregel onder die ik niet in mijn eentje wil vastleggen, want
+hij bepaalt wanneer een DoD-regel afgevinkt mag worden. Ik draai die bar tien
+keer per sessie; midden in het werk is een rode draai gewoon normaal.
+
+| Regel | Gevolg |
+|---|---|
+| **De LAATSTE volledige draai van een dag telt** *(mijn voorstel)* | Sluit aan bij wat "nightly soak" betekent: de stand aan het eind van de dag. Rode draaien tijdens het sleutelen tellen niet mee, maar staan er wel |
+| Élke draai van die dag moet groen zijn | Strenger en niet te sjoemelen, maar dan haalt geen enkele werkdag het ooit — dan is de eis opnieuw onvervulbaar |
+
+De data ondersteunt allebei: een draai met `-SkipShots` staat er met **0 opnames**
+in, dus een volledige draai is herkenbaar zonder extra administratie.
+
+## 5 · Nog steeds open van eerder
 
 - De **View-knop** testen (ik kan een gamepad niet headless indrukken)
 - Hoe groot een **baken** hoort te zijn (ze zijn 9 × 9 × 40 cm)
