@@ -59,8 +59,20 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
 ## Bekend rood, allebei verantwoord en geen van beide een basisgat
 
 - `Eclipse.Guide.PanelShowsTheActiveExpectation` — paneel 13 regels, teller
-  verwacht 11. De telling klopt op 3 wijzigingen; het verschil van 2 zit in het
-  PANEEL. Eerste hypothese (race op de datum uit Saved/Logs) is gefalsifieerd.
+  verwacht 11. **Zo ver is het uitgezocht, en dit is het aanknopingspunt:**
+  - `ComposeGuidePanelLines` schrijft exact **één regel per stap plus drie vaste
+    regels** (kop, look-samenvatting, teller). Het paneel telt dus goed.
+  - De mismatch zit dus tussen de twee BRONNEN: `GetGuideSteps()` levert **10**
+    stappen terwijl `GetGuideStepCount()` er **8** meldt.
+  - De invoer is voor allebei dezelfde: `GuideChanges` heeft **3 rijen**, alle
+    gedateerd 2026-07-26, en `FindLastSessionDate()` geeft 2026-07-25 — dus alle
+    drie passeren het filter, in beide functies.
+  - **Vraag voor de volgende sessie: waar komen die 2 extra stappen vandaan?**
+    Zet een regel in beide functies die hun eigen tussentotalen afdrukt
+    (changes / systems / questions), dan wijst de eerste draai het aan. Niet
+    verder redeneren — dat is hier twee keer misgegaan.
+  - Gefalsifieerde hypothese, niet nog eens proberen: een race op de datum uit
+    `Saved/Logs` (die cachen veranderde niets, en de poging is teruggedraaid).
 - Opnameronde: de speler komt in het eerste loopinterval 3 cm vooruit tegen 229 cm
   in het tweede. Echt defect, blootgelegd door een gerepareerde bewaker, oorzaak
   nog niet gevonden.
