@@ -95,9 +95,15 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
     `AEclipseCharacter` staat bewust uit (`bStartWithTickEnabled = false`, alleen
     aan tijdens een camerablend), maar de CharacterMovementComponent tickt
     zelfstandig — dat verklaart dit dus niet.
-  - **Open kandidaten:** pawn input-disabled uit `EnterBaseMode` die
-    `EnterMissionMode` niet terugdraait, of iets van de missiestart dat de eerste
-    seconden overheen loopt.
+  - **Tweede uitgesloten kandidaat:** de pawn is NIET input-disabled gebleven.
+    `EnterMissionMode` roept `ControlledPawn->EnableInput(this)` aan
+    (`EclipsePlayerController.cpp:507`), direct tegenover de `DisableInput` van
+    `EnterBaseMode`. Ook dit niet opnieuw onderzoeken.
+  - **Wat er wél opvalt op diezelfde plek:** meteen na `EnableInput` teleporteert
+    de controller de pawn naar `Entry_Main` met `SetActorLocation`. Een teleport
+    aan het begin van de missie is de enige gebeurtenis die nu nog samenvalt met
+    het dode interval. Dat is de volgende kandidaat, en hij is te toetsen door de
+    positie van de pawn per drive-tick te loggen in plaats van per opnamemoment.
 
 ---
 
