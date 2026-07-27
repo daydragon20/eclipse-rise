@@ -374,6 +374,29 @@ void AEclipseGameMode::DrivePlayShotInput()
 		// die ik nergens tegenaan hield onjuist; dit is de laatste die er nog onder
 		// zit.
 		++PlayShotIntervalPushes;
+
+		// WAT DE COMPONENT ZELF HEEFT OPGEHAALD — de laatste onbekende in dit dossier.
+		//
+		// Alles wat ik tot nu toe mat zit aan MIJN kant van de streep: dat ik duwde,
+		// dat de invoer niet genegeerd werd, dat hij op de grond stond. De component
+		// haalt die invoer op met ConsumeInputVector() en bewaart wat hij kreeg in
+		// GetLastInputVector(). Dat getal is dus precies de overkant van de brug.
+		//
+		// Het snijdt het dossier in tweeen en er is geen derde uitkomst:
+		//   nul, terwijl wij honderd keer duwden -> iemand anders haalt de invoer
+		//        weg voordat de component hem ziet. Dan ligt het VOOR de component.
+		//   niet nul, en toch acceleratie nul   -> de invoer komt aan en er gebeurt
+		//        daarna niets mee. Dan ligt het IN de component.
+		//
+		// Waarom hier en niet op het opnamemoment: een momentopname kan legitiem nul
+		// zijn (de tick-volgorde van dat ene frame), en op zo'n momentopname heb ik
+		// dit dossier al een keer verkeerd gelezen. De PIEK over het interval kan dat
+		// niet: als er ergens invoer is aangekomen, staat hij hier.
+		if (const UCharacterMovementComponent* DriveMove = Body->GetCharacterMovement())
+		{
+			PlayShotIntervalTopConsumed =
+				FMath::Max(PlayShotIntervalTopConsumed, DriveMove->GetLastInputVector().Size());
+		}
 	}
 	if (bPlayShotTurning)
 	{
@@ -503,7 +526,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -521,13 +544,15 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				Move != nullptr ? Move->Velocity.Size() : -1.0f,
 				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
 				Move != nullptr && Move->IsMovingOnGround() ? 1 : 0,
-				PlayShotBody->GetPendingMovementInputVector().Size());
+				PlayShotBody->GetPendingMovementInputVector().Size(),
+				PlayShotIntervalTopConsumed);
 		}
 		// Teller op nul voor het volgende interval: hij meet PER interval, en een
 		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
 		PlayShotIntervalTopSpeed = 0.0f;
 		PlayShotIntervalPathLength = 0.0f;
 		PlayShotIntervalPushes = 0;
+		PlayShotIntervalTopConsumed = 0.0f;
 		PlayShotIntervalTopAccel = 0.0f;
 		PlayShotIntervalRestBeforePush = 0.0f;
 		PlayShotIntervalLargestGap = 0.0f;

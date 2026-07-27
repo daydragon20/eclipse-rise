@@ -112,6 +112,9 @@ private:
 	/** Hoe vaak AddMovementInput echt is aangeroepen sinds het vorige moment. */
 	int32 PlayShotIntervalPushes = 0;
 
+	/** Grootste invoervector die de bewegingscomponent in dit interval heeft OPGEHAALD. */
+	float PlayShotIntervalTopConsumed = 0.0f;
+
 	/** Hoogste acceleratie van het interval; nul bij honderd duwen wijst naar ConsumeInputVector. */
 	float PlayShotIntervalTopAccel = 0.0f;
 
