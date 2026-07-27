@@ -318,3 +318,21 @@ Twee vragen voor jou, allebei ontwerpkeuzes en geen bugs:
 - Wil je de rangorde op vorm bouwen in plaats van alleen op helderheid?
 
 Tot je erover hebt besloten komen er geen armaturen bij.
+
+## Een vraag voor de save-spec (P2-06), gevonden op 27-07
+
+De campagne-setup — de regiograaf, de missietabellen, de tuning — komt **niet** uit
+het savebestand, en dat hoort ook niet: dat is geauthorde inhoud, geen
+spelerstoestand. Maar er moet er wel één zijn tegen de tijd dat er geladen wordt,
+en dat werd nergens gecontroleerd.
+
+Zonder setup laadt een save keurig: de juiste dag, de juiste credits, de juiste
+voortgang — en een strategische kaart waarop **geen enkele regio nog een missie
+aanbiedt**. Gemeten in een verse instantie: alle zes leeg, zonder één regel in het
+log. Nu zegt hij het hardop.
+
+**Wat jij hierover kunt beslissen als SPEC-P2-06 geschreven wordt:** moet een save
+vastleggen bij welke campagne-setup hij hoort? Dat maakt "verkeerde save bij
+verkeerde build" detecteerbaar, maar het is een formaatwijziging (v5 → v6). De
+goedkope variant is wat er nu staat: de laadkant gaat ervan uit dat het spel zijn
+campagnedata al kent, en klaagt luid als dat niet zo is.

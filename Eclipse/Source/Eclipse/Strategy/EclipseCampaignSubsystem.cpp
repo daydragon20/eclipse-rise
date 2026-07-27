@@ -732,6 +732,37 @@ bool UEclipseCampaignSubsystem::ReadSaveData(FArchive& Archive)
 	}
 
 	State = MoveTemp(Loaded);
+
+	// DE SETUP KOMT NIET UIT DE SAVE, EN DAT HOORT OOK NIET: de regiograaf, de
+	// missietabellen en de tuning zijn GEAUTHORDE inhoud, geen spelerstoestand.
+	// Ze horen bij de build, niet bij het bestand.
+	//
+	// Maar dan moet er wel EEN zijn tegen de tijd dat er geladen wordt, en tot
+	// 27-07 werd dat nergens gecontroleerd. Een laadbeurt zonder setup levert een
+	// campagne op met de juiste dag, de juiste credits en de juiste beats — en
+	// een strategische kaart waarop GEEN ENKELE regio nog een missie aanbiedt.
+	// Gemeten in een verse instantie: alle zes de regio's leeg, zonder één regel
+	// in het log.
+	//
+	// Dat is precies het stille falen waar 14.3.5 over gaat: de speler ziet een
+	// leeg bord en heeft geen idee waarom.
+	// WAARSCHUWING en geen fout, en dat is een bewuste keuze met een prijs.
+	//
+	// Error zou hier de zeven migratietests laten vallen die met opzet ZONDER
+	// setup laden: die toetsen het bestandsformaat, niet het spel, en voor hen is
+	// een lege kaart geen probleem. Een assertie die rood wordt op correct gebruik
+	// is de ene fout die een controle onbruikbaar maakt.
+	//
+	// Warning is hier bovendien de juiste ERNST: dit is degradatie (14.3.5) en
+	// geen programmeerfout. De regel zegt precies wat er wél is hersteld en wat
+	// er ontbreekt, zodat "mijn kaart is leeg" een antwoord heeft in plaats van
+	// een raadsel.
+	if (ActiveSetup == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Save geladen ZONDER campagne-setup: staat is hersteld (dag %d, %d story-beats) maar er is geen regiograaf, dus geen enkele regio biedt een missie aan (14.3.5). Start de campagne met een setup vóór je laadt."),
+			State.Day, State.StoryFlags.Num());
+	}
 	return true;
 }
 

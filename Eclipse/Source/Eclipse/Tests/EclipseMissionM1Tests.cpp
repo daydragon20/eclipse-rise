@@ -26,6 +26,8 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
 #include "Strategy/EclipseStrategySubsystem.h"
+#include "HAL/FileManager.h"
+#include "EclipseSaveSubsystem.h"
 #include "StructUtils/InstancedStruct.h"
 #include "UObject/Package.h"
 
@@ -1078,6 +1080,118 @@ bool FEclipseFootholdReachesTheLedgerTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("ledger: en levert meer materialen op"), MaterialsAfter > MaterialsBefore);
 
 	GameInstance->Shutdown();
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// Overleeft verdiende voortgang een herstart?
+// ---------------------------------------------------------------------------
+//
+// De bestaande save-tests dekken de story-tail wel, maar op campagnes ZONDER
+// beats - een van die tests zegt het zelfs hardop: "Sanity: the scripted campaign
+// has no beats yet". Er was dus niets dat bewees dat een SPELER die M1.1 heeft
+// uitgespeeld die voortgang terugkrijgt na het laden.
+//
+// Dat is sinds vannacht geen theoretisch risico meer: M1.2 t/m M1.4 hangen achter
+// beats. Gaan die verloren bij het laden, dan staat de speler na een herstart
+// weer voor een dichte deur - met zijn credits en zijn dagen intact, wat het nog
+// verwarrender maakt.
+//
+// De assertie die telt is niet "de tag zit in de array" maar "het spel gedraagt
+// zich nog alsof je die missie gespeeld hebt". Daarom staat de poort erin.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseProgressSurvivesASaveLoadTest,
+	"Eclipse.Missions.ProgressSurvivesASaveLoad",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseProgressSurvivesASaveLoadTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	const FString SlotName = TEXT("AutomationStoryProgress");
+	const FString SlotPath = UEclipseSaveSubsystem::GetSlotFilePath(SlotName);
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+
+	// --- spelen en opslaan
+	UGameInstance* Source = NewObject<UGameInstance>(GEngine);
+	Source->InitializeStandalone();
+	UEclipseCampaignSubsystem* SourceCampaign = Source->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* SourceStrategy = Source->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* SourcePrep = Source->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* SourceMission = Source->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseSaveSubsystem* SourceSave = Source->GetSubsystem<UEclipseSaveSubsystem>();
+
+	SourceCampaign->StartNewCampaign(Setup);
+	FString Error;
+	TestTrue(TEXT("save: M1.1 geselecteerd"), SourceStrategy->SelectMission(TEXT("TransitCheckpoint"), Error));
+	TestTrue(TEXT("save: M1.1 gelanceerd"), SourcePrep->AutoLaunch(Error));
+	TestTrue(TEXT("save: hinderlaag"), SourceMission->CompleteObjective(TEXT("Obj_M11_PatrolLeader"), Error));
+	TestTrue(TEXT("save: extractie"), SourceMission->CompleteObjective(TEXT("Obj_M11_Exfil"), Error));
+	TestTrue(TEXT("save: debrief"), SourceMission->ResolveDebrief(true, Error));
+
+	const int32 BeatsEarned = SourceCampaign->GetState().StoryFlags.Num();
+	AddInfo(FString::Printf(TEXT("GEMETEN  na M1.1 staan er %d story-beats in de staat"), BeatsEarned));
+	// Discriminator: als M1.1 helemaal geen beat zet, bewijst de rest niets.
+	if (!TestTrue(TEXT("save: M1.1 heeft daadwerkelijk een beat gezet"), BeatsEarned > 0))
+	{
+		Source->Shutdown();
+		return false;
+	}
+
+	const uint32 HashBefore = SourceCampaign->GetState().ComputeStateHash();
+	TestTrue(TEXT("save: opslaan lukt"), SourceSave->SaveToSlot(SlotName, Error));
+
+	// --- laden in een VERSE instantie
+	UGameInstance* Target = NewObject<UGameInstance>(GEngine);
+	Target->InitializeStandalone();
+	UEclipseCampaignSubsystem* TargetCampaign = Target->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* TargetStrategy = Target->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipseSaveSubsystem* TargetSave = Target->GetSubsystem<UEclipseSaveSubsystem>();
+
+	// De setup EERST, want die komt niet uit het bestand: de regiograaf en de
+	// missietabellen zijn geauthorde inhoud en horen bij de build. Zo boot een
+	// echte sessie ook — het spel kent zijn campagnedata voordat er een slot
+	// opengaat. Doe je dat niet, dan laadt de staat wel maar is het hele
+	// aanbodbord leeg; sinds 27-07 zegt de engine dat hardop in plaats van stil.
+	TargetCampaign->StartNewCampaign(Setup);
+	TestTrue(TEXT("laden lukt"), TargetSave->LoadFromSlot(SlotName, Error));
+	TestEqual(TEXT("laden: evenveel beats terug"), TargetCampaign->GetState().StoryFlags.Num(), BeatsEarned);
+	TestEqual(TEXT("laden: de hele staat is bit-voor-bit dezelfde"),
+		TargetCampaign->GetState().ComputeStateHash(), HashBefore);
+
+	// DE ASSERTIE DIE ER ECHT TOE DOET. Een tag in een array is geen voortgang;
+	// voortgang is dat de volgende missie op je wacht. Zonder deze regel zou een
+	// beat die wel bewaard maar nergens meer gelezen wordt, gewoon groen zijn.
+	// Eerst breed meten: heeft er NA het laden nog ergens een missie-aanbod?
+	// "WorkerHousing is leeg" en "het hele bord is leeg" zijn twee heel
+	// verschillende bugs.
+	for (const TCHAR* Region : { TEXT("Underworks"), TEXT("TransitCheckpoint"), TEXT("FoundryRow"),
+		TEXT("WorkerHousing"), TEXT("SupplyDepot"), TEXT("CommsRelay") })
+	{
+		FEclipseMissionOfferView View;
+		AddInfo(TargetStrategy->TryGetOffer(Region, View)
+			? FString::Printf(TEXT("GEMETEN  na het laden biedt %s '%s' aan"), Region, *View.TemplateId.ToString())
+			: FString::Printf(TEXT("GEMETEN  na het laden heeft %s GEEN aanbod"), Region));
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  na het laden is de campagne-setup %s"),
+		TargetCampaign->GetActiveSetup() != nullptr ? TEXT("aanwezig") : TEXT("WEG")));
+
+	FEclipseMissionOfferView Offer;
+	if (TestTrue(TEXT("laden: WorkerHousing heeft aanbod"), TargetStrategy->TryGetOffer(TEXT("WorkerHousing"), Offer)))
+	{
+		AddInfo(FString::Printf(TEXT("GEMETEN  na het laden biedt WorkerHousing '%s' aan"), *Offer.TemplateId.ToString()));
+		TestEqual(TEXT("laden: M1.2 staat nog steeds open — de poort onthoudt dat je M1.1 speelde"),
+			Offer.TemplateId, FName(TEXT("MT_M12")));
+	}
+
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+	Source->Shutdown();
+	Target->Shutdown();
 	return true;
 }
 
