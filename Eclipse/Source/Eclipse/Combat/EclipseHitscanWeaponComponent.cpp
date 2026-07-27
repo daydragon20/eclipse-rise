@@ -8,6 +8,9 @@
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/GameInstance.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "StructUtils/InstancedStruct.h"
 
 #include "Characters/EclipseCharacter.h"
@@ -16,6 +19,82 @@
 UEclipseHitscanWeaponComponent::UEclipseHitscanWeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false; // event-driven (GDD 14.2)
+}
+
+void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitResult& Hit)
+{
+	// HET ZICHTBARE SPOOR — stap 3 van owner-punt 4, en de reden dat hij dacht dat
+	// er niets gebeurde als hij schoot: elke MIS was onzichtbaar, en missen doe je
+	// het vaakst.
+	//
+	// WAAROM EEN QUAD EN GEEN DECAL. De wijk staat unlit, en een deferred decal
+	// heeft een G-buffer nodig die er dan niet is: hij rendert simpelweg niet. Dat
+	// is eerder in dit project vastgesteld en het is de reden dat ook de
+	// grondcues van de grayboxbouwer platte kubussen zijn en geen decals. Zelfde
+	// recept dus, alleen op de inslagplek in plaats van op de vloer.
+	//
+	// WAAROM HIER EN NIET IN EEN VFX-SUBSYSTEEM. De owner-opdracht is expliciet
+	// "geen nieuwe systemen". Een eigen verbruiker van de bus zou een nieuw
+	// subsysteem betekenen voor precies een gebruiker; dat mag terugkomen zodra er
+	// een TWEEDE visuele verbruiker is (muzzle flash staat al op de rol) — dan is
+	// het extraheren en niet vooruit bouwen.
+	UStaticMesh* Quad = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (Quad == nullptr)
+	{
+		return;
+	}
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.ObjectFlags |= RF_Transient;   // een inslag hoort nooit in een save
+
+	// Een centimeter langs de normaal, anders vecht het vlak met het oppervlak
+	// waar het op ligt en flikkert het per frame.
+	const FVector Spot = Hit.ImpactPoint + Hit.ImpactNormal * 1.0f;
+	AStaticMeshActor* Mark = World.SpawnActor<AStaticMeshActor>(
+		Spot, FRotationMatrix::MakeFromZ(Hit.ImpactNormal).Rotator(), Params);
+	if (Mark == nullptr)
+	{
+		return;
+	}
+
+	Mark->SetMobility(EComponentMobility::Movable);
+	UStaticMeshComponent* Plate = Mark->GetStaticMeshComponent();
+	Plate->SetStaticMesh(Quad);
+	// 9 cm in het vierkant, 0,4 mm dik: groot genoeg om op 20 m te lezen, plat
+	// genoeg om als spoor te lezen en niet als blokje.
+	Mark->SetActorScale3D(FVector(0.09f, 0.09f, 0.004f));
+	Plate->SetCastShadow(false);
+	Plate->SetAffectDistanceFieldLighting(false);
+	Mark->SetActorEnableCollision(false);
+
+	if (UMaterialInterface* Toon = LoadObject<UMaterialInterface>(
+			nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon")))
+	{
+		if (UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Toon, Mark))
+		{
+			// Warm en helder, want in een unlit wijk is een inslag die zijn
+			// helderheid van het licht moet halen geen inslag.
+			const FLinearColor Spark(1.00f, 0.62f, 0.22f, 1.0f);
+			Mid->SetVectorParameterValue(TEXT("LitColor"), Spark);
+			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Spark * 0.45f);
+			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
+			Plate->SetMaterial(0, Mid);
+		}
+	}
+
+	// Kort: dit is een treffer-bevestiging en geen kogelgat dat blijft liggen. Met
+	// SetLifeSpan ruimt de engine hem zelf op, dus er is geen pool en geen teller
+	// die kan blijven hangen — bij tien schoten per seconde leven er hooguit een
+	// stuk of acht tegelijk.
+	// 2,5 s en niet 0,8. De eerste keus was 0,8 en dat bleek om twee redenen te
+	// kort: op de opname van 12:56 stonden elf gemeten wereldtreffers en was er GEEN
+	// spoor te zien, want de opname valt na het vuurinterval en bij frames van 0,4 s
+	// is 0,8 s twee frames. En los daarvan: een kogelspoor dat binnen een seconde
+	// weg is, is precies de klacht die dit moet oplossen — je kijkt na een salvo naar
+	// de muur om te zien waar je zat.
+	Mark->SetLifeSpan(2.5f);
+	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
 }
 
 void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row)
@@ -307,6 +386,20 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	const FVector End = ViewLocation + ShotDirection * Weapon.RangeCm;
 	if (!World->LineTraceSingleByChannel(Hit, ViewLocation, End, ECC_Pawn, Params))
 	{
+		// DE TWEEDE STILLE AFWIJZING, en die had ik vanochtend gemist.
+		//
+		// Toen repareerde ik de tak "raakt wel iets, maar geen personage" en noemde
+		// dat 'de misser bestaat nu'. Onvolledig: HIER keert een schot terug dat
+		// HELEMAAL NIETS raakte - de lucht in, of over alles heen - en dat gebeurde
+		// net zo stil. Gevonden doordat de opnameronde WERELDTREFFERS=0 bleef melden
+		// terwijl er elf schoten vielen; zonder dat getal had ik het niet gezien en
+		// had "de misser is hoorbaar" ongetoetst blijven staan.
+		//
+		// Alleen tellen, geen feit op de bus: een schot in het niets IS een uitkomst
+		// voor de speler (hij hoort zijn wapen, hij ziet geen inslag) maar er is geen
+		// plek om iets aan te hangen. Het getal maakt het verschil zichtbaar tussen
+		// "er gebeurde niets" en "er gebeurde iets dat ik niet toon".
+		++CleanMisses;
 		return false;
 	}
 
@@ -336,7 +429,7 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 		// een tweede bron voor hetzelfde gegeven.
 		++WorldHits;
 		const UPhysicalMaterial* Surface = Hit.PhysMaterial.Get();
-		UE_LOG(LogEclipse, Verbose,
+		UE_LOG(LogEclipse, Display,
 			TEXT("Wapen: wereldtreffer op %s (oppervlak %s) op %s — %d deze missie."),
 			*GetNameSafe(Hit.GetActor()),
 			Surface != nullptr ? *Surface->GetName() : TEXT("onbekend"),
@@ -361,6 +454,7 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 					Bus->Broadcast(EclipseTags::Event_Combat_WorldImpact, FInstancedStruct::Make(Impact));
 				}
 			}
+			SpawnImpactMark(*BusWorld, Hit);
 		}
 		return false;
 	}

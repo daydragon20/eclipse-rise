@@ -474,7 +474,22 @@ void AEclipseGameMode::DrivePlayShotInput()
 		if (UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>())
 		{
 			const FVector Origin = Body->GetPawnViewLocation();
-			Weapon->Fire(Origin, Controller->GetControlRotation().Vector(), TEXT("PlayShot"));
+
+			// IETS OMLAAG MIKKEN, EN DAT IS GEEN DETAIL.
+			//
+			// GEMETEN: elf schoten uit deze ronde raakten HELEMAAL NIETS
+			// (MIST-ALLES=11, WERELDTREFFERS=0). De ronde kijkt recht vooruit over
+			// een lege weg naar een skyline op kilometers, dus elk schot liep zijn
+			// bereik uit zonder iets te raken. Daarmee oefende de ronde het hele
+			// inslagpad NOOIT uit: geen wereldtreffer, geen missergeluid, geen
+			// zichtbaar spoor - en een groene bar zei er niets over.
+			//
+			// Twaalf graden omlaag zet de inslag op het wegdek een meter of tien
+			// vooruit, binnen beeld. Dat is bewust een testrichting en niet wat de
+			// speler doet: de ronde bestaat om dingen te FOTOGRAFEREN, en iets wat
+			// nooit gebeurt valt niet te fotograferen.
+			const FRotator AimedDown = Controller->GetControlRotation() + FRotator(-12.0f, 0.0f, 0.0f);
+			Weapon->Fire(Origin, AimedDown.Vector(), TEXT("PlayShot"));
 		}
 	}
 }
@@ -681,11 +696,17 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 			// schoten — drie waarnemingen die één oorzaak kunnen hebben. Dit
 			// zegt welke.
 			const UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
-			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d WAPEN] component=%d magazijn=%d munitie=%d"),
+			// WERELDTREFFERS ERBIJ, want zonder dat getal is "ik zie geen inslag" niet
+			// te scheiden van "er is niets ingeslagen". Het zichtbare spoor hangt aan
+			// die tak, dus als dit nul blijft valt er ook niets te zien en ligt de
+			// vraag ergens anders.
+			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d WAPEN] component=%d magazijn=%d munitie=%d WERELDTREFFERS=%d MIST-ALLES=%d"),
 				ShotIndex,
 				Weapon != nullptr ? 1 : 0,
 				Weapon != nullptr ? Weapon->GetMagazineSize() : -1,
-				Weapon != nullptr ? Weapon->GetAmmoInMagazine() : -1);
+				Weapon != nullptr ? Weapon->GetAmmoInMagazine() : -1,
+				Weapon != nullptr ? Weapon->GetWorldHits() : -1,
+				Weapon != nullptr ? Weapon->GetCleanMisses() : -1);
 
 			// HARDE UITSPRAKEN OVER WAT ER IN HET FRAME STAAT.
 			//

@@ -73,6 +73,32 @@ schrijft).
 | Het **wapen** is gunmetal en steekt af | het hing er al, maar in je eigen lichaamskleur |
 | Een **misser is hoorbaar** | een schot in een muur liet eerst geen enkel spoor na |
 
+### ⚠️ PUNT 4 STAP 3: gebouwd, NIET visueel bevestigd — en er ligt iets groters onder
+
+Het zichtbare spoor is gebouwd (een platte quad op de inslagplek; geen decal, want
+in een unlit wijk rendert die niet). **Maar ik kan het je niet op een frame
+aanwijzen, dus volgens jouw eigen regel is het niet af.**
+
+Wat het uitzoeken opleverde is belangrijker dan het spoor:
+
+1. **Er zat een TWEEDE stille afwijzing in het vuurpad**, en die had ik vanochtend
+   gemist. Ik repareerde "raakt iets dat geen personage is". Maar een schot dat
+   **helemaal niets** raakt keerde net zo stil terug. Nu geteld.
+2. **De opnameronde schoot elf keer raak op niets**: `MIST-ALLES=11`,
+   `WERELDTREFFERS=0`. De ronde kijkt over een lege weg naar een skyline op
+   kilometers. Het hele inslagpad — feit, geluid, spoor — werd dus **nooit
+   uitgeoefend**, en de groene bar zei daar niets over.
+3. Toen ik de testschoten 12° omlaag liet mikken: `WERELDTREFFERS=11`. Maar de
+   inslagen landen op **79 meter**, niet op het wegdek 7 meter vooruit.
+   **Je kogels gaan dus door de grond vlak voor je heen.** Ook op 90 cm groot
+   (proef) is er niets te zien — het spoor ligt gewoon 79 m verderop.
+
+**Dat laatste is een betere verklaring voor jouw "ik zie de inslagen nauwelijks"
+dan alles wat ik vanmiddag heb opgeschreven.** Als de vloer en het nabije dekking
+je schot niet stoppen, is er in je blikveld nooit een inslag. Dat wil ik uitzoeken
+voordat ik nog iets aan het spoor sleutel — het spoor kan kloppen terwijl er niets
+is om het aan te hangen.
+
 ### ✅ WAPENKLEUR GEMETEN — jouw eis is gehaald, oordeel jij
 
 Je eis: geen eigen kleur maar een eigen **waarde**, duidelijk donkerder dan het
