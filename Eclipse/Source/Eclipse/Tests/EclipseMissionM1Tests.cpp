@@ -814,6 +814,28 @@ bool FEclipseMissionM14ChainOnShippedDataTest::RunTest(const FString& Parameters
 		}
 	}
 
+	// HET AANBODBORD ANTWOORDT (SPEC-P2-05 Gauntlet). De Foothold verlegt de rand
+	// van de kaart, en dat hoort aan twee kanten te zien te zijn: wat er BIJ komt
+	// en wat er AF valt.
+	{
+		FString BoardError;
+		const bool bTrioStillSelectable = Strategy->SelectMission(TEXT("WorkerHousing"), BoardError);
+		AddInfo(FString::Printf(TEXT("GEMETEN  WorkerHousing na de flip: %s (%s)"),
+			bTrioStillSelectable ? TEXT("nog steeds kiesbaar") : TEXT("niet meer kiesbaar"), *BoardError));
+		TestFalse(TEXT("bord: de bevrijde trio is geen doelwit meer — je valt je eigen wijk niet aan"),
+			bTrioStillSelectable);
+
+		FEclipseMissionOfferView Beyond;
+		const bool bCommsRelayOpen = Strategy->TryGetOffer(TEXT("CommsRelay"), Beyond);
+		AddInfo(FString::Printf(TEXT("GEMETEN  CommsRelay na de flip: %s"),
+			bCommsRelayOpen ? *Beyond.TemplateId.ToString() : TEXT("geen aanbod")));
+		// CommsRelay grenst aan SupplyDepot, dat nu van de speler is. Voor de flip
+		// was hij onbereikbaar; dat de kaart nu verder reikt is precies wat een
+		// bevrijding hoort te betekenen.
+		TestTrue(TEXT("bord: CommsRelay is na de flip bereikbaar geworden"),
+			Strategy->SelectMission(TEXT("CommsRelay"), BoardError));
+	}
+
 	if (!PlayLink(TEXT("FoundryRow"), TEXT("MT_M14"),
 			{ TEXT("Obj_M14_CrateFirst"), TEXT("Obj_M14_CrateSecond"), TEXT("Obj_M14_Exfil") })) { GameInstance->Shutdown(); return false; }
 

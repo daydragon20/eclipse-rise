@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `e100330`
+## VEILIG TE SPELEN: JA, commit `4bd5fea`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -126,7 +126,15 @@ Drie dingen die alleen uit het spélen kwamen:
 - **Zodra de naad vuurde, kon M1.4 niet meer** ("Region is already player-held").
   De Foothold-flip maakt precies de regio's waarop M1.1–M1.3 speelden tot eigen
   gebied. Geen bug: dat ís het punt van die missie — de Foothold verlegt de rand
-  van de kaart.
+  van de kaart. Gemeten: de bevrijde wijk valt van het bord, en CommsRelay — dat
+  vóór de flip onbereikbaar was — komt erbij.
+
+**En een getal dat je als ontwerper wilt weten:** de dagbalans gaat van
+**−84 credits per dag naar precies nul**, en materialen van 8 naar 28. De
+economie is netto (de soldij van je acht soldaten gaat eraf), dus je begint de
+campagne met een dagelijks verlies — en **de Foothold is exact het moment waarop
+je squad zichzelf betaalt.** Dat is niet getuned, dat rolt uit de opbrengsten van
+de drie regio's die je bevrijdt.
 
 **Wat me verder opviel en op jou wacht:** de aankleedfiguren zijn blokkerig
 laag-poly met grote koppen, jouw personage is realistisch geproportioneerd. Naast
