@@ -67,12 +67,23 @@ tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
   - De invoer is voor allebei dezelfde: `GuideChanges` heeft **3 rijen**, alle
     gedateerd 2026-07-26, en `FindLastSessionDate()` geeft 2026-07-25 — dus alle
     drie passeren het filter, in beide functies.
-  - **Vraag voor de volgende sessie: waar komen die 2 extra stappen vandaan?**
-    Zet een regel in beide functies die hun eigen tussentotalen afdrukt
-    (changes / systems / questions), dan wijst de eerste draai het aan. Niet
-    verder redeneren — dat is hier twee keer misgegaan.
-  - Gefalsifieerde hypothese, niet nog eens proberen: een race op de datum uit
-    `Saved/Logs` (die cachen veranderde niets, en de poging is teruggedraaid).
+  - **De rekensom pint het vast.** `SystemStepCount` = 2 en `QuestionStepCount`
+    = 5, samen 7. De teller meldt 8, dus `FMath::Max(GetChangeStepCount(), 1)`
+    levert **1** — terwijl de lus in `GetGuideSteps()` er **3** toevoegt (10 = 3
+    + 7). **De teller ziet dus 0 of 1 wijziging waar de lus er 3 ziet.**
+  - En dat kán alleen als hun `Since` verschilt: de filterlogica zelf is
+    identiek (`Date > Since` tegenover `Date <= Since` overslaan), en ze lezen
+    dezelfde `GuideChanges` van 3 rijen.
+  - **Daarmee leeft de race-hypothese wéér, en dat is een correctie op mezelf.**
+    Ik noemde hem gefalsifieerd omdat cachen niets veranderde — maar die cache
+    had een fout: `CachedDate` werd alleen op het succespad gezet, dus een
+    eerste aanroep die vroeg uitstapte zette hem permanent op leeg. Die proef
+    kon dus niets bewijzen. Denk aan `EmitVerdictSummary`, dat tijdens de suite
+    een `EclipseGauntletR3_*.txt` van VANDAAG in `Saved/Logs` schrijft en
+    `FindLastSessionDate()` daarmee midden in een run verschuift.
+  - **Volgende stap, en niet verder redeneren:** laat beide functies hun eigen
+    tussentotalen én hun `Since` afdrukken. Eén draai wijst het aan. Dit dossier
+    is nu twee keer op redeneren misgegaan.
 - Opnameronde: de speler komt in het eerste loopinterval 3 cm vooruit tegen 229 cm
   in het tweede. Echt defect, blootgelegd door een gerepareerde bewaker, oorzaak
   nog niet gevonden.
