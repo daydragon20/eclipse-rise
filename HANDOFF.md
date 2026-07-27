@@ -71,6 +71,34 @@ spel loopt. Dit is de stand, zodat het straks in één keer verder kan.
 | tick uit / inactief | 0 / 0 | 0 / 0 |
 | acceleratie, afgelegde weg | 0, 3 cm | 1400, 229–262 cm |
 
+### ✅ HET MECHANISME IS ALSNOG GEVONDEN — gratis, uit de rauwe regel (27-07, 18:10)
+
+De rauwe logregel die bij het parkeren in de code bleef staan, heeft de tegenspraak
+opgelost zonder dat er nog werk aan is besteed:
+
+```
+[PLAYSHOT RUW] duw 1: wachtrij voor=0.00 na=1.00, component-laatste=0.00, snelheid=0, accel=0   (t=21.088)
+[PLAYSHOT RUW] duw 2: wachtrij voor=1.00 na=2.00, component-laatste=0.00, snelheid=0, accel=0   (t=21.089)
+[PLAYSHOT RUW] duw 3: wachtrij voor=2.00 na=3.00, component-laatste=0.00, snelheid=0, accel=0   (t=21.089)
+```
+
+**De duwen vallen ALLEMAAL binnen één milliseconde en de wachtrij groeit gewoon door:
+0 → 1 → 2 → 3.** Er verdwijnt niets tussendoor. In het lopende interval staat bij duw
+1 meteen `component-laatste=1.00, snelheid=326, accel=1400`.
+
+**Wat er dus gebeurt:** de aanstuurlus vuurt zijn honderd duwen in één frame af, niet
+verspreid over twee seconden. De bewegingscomponent tikt in dat frame één keer, dus
+er is één stap in plaats van honderd. Het "dode interval" van 2 seconden wandkloktijd
+is voor het spel maar een paar frames — precies wat de gaten van 0,4 s al zeiden.
+
+**Dat bevestigt het oordeel van de owner:** dit is een defect in de OPNAMERONDE en
+niet in het spel. De aansturing gaat sneller dan het spel loopt.
+
+**En het corrigeert mijn eigen conclusie:** ik schreef dat 99 van de 100 duwen
+"verdampten". Dat was mijn teller die twee patronen niet kon scheiden — er verdwijnt
+niets, ze stapelen op. De tegenspraak die ik niet kon oplossen zat in mijn eigen maat,
+niet in de engine.
+
 **DE OWNER SCHREEF "je hebt het mechanisme gevonden (invoer stapelt ongeconsumeerd
 op tot 19)". DAT HEB IK NIET.** Ik heb het tegenovergestelde: een tegenspraak die
 ik niet kan oplossen, en die is meer waard dan een verklaring die het niet is.
