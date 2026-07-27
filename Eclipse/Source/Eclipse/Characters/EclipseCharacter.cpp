@@ -809,10 +809,36 @@ void AEclipseCharacter::UpdateCameraBlend(float DeltaSeconds)
 	const float TargetRise = bCommandModeCamera ? CommandModeCameraRise : 0.0f;
 	const float RiseRate = ViewToggleBlendTime > KINDA_SMALL_NUMBER
 		? FMath::Max(CommandModeCameraRise, 1.0f) / ViewToggleBlendTime : BIG_NUMBER;
+	// DE HOOGTE KRIMPT MEE BIJ HET MIKKEN, en dat is precies het tegenovergestelde
+	// oordeel van de zijoffset hierboven — met opzet.
+	//
+	// GEMETEN (opnameronde 27-07): bij het mikken projecteert de speler op y=763 in
+	// een frame van 720. Hij zakt onder de onderrand, en dat was nooit opgevallen
+	// omdat er tot vandaag geen mik-opname bestond. De oorzaak is meetkundig: 65 cm
+	// staat onder atan(65/300) = 12,2 graden bij normale arm en atan(65/165) = 21,5
+	// graden bij ADS. Bijna dubbel, dus het personage schuift ver naar beneden.
+	//
+	// WAAROM MEESCHALEN HIER WEL JUIST IS. Ik draaide vandaag de Y-schaling terug
+	// omdat een constante hoek dáár verkeerd was: die offset dient "maak de
+	// vizierlijn vrij", en dan houdt een gelijke hoek het personage even ver in de
+	// weg terwijl hij dichterbij komt. De Z dient "houd hem in beeld", en dan IS
+	// een constante hoek precies het doel. Zelfde formule, tegengesteld oordeel,
+	// omdat het EFFECT verschilt — en dat is de regel die hierdoor in
+	// REFERENTIE_TPS.md hoofdstuk 2 is komen te staan.
+	//
+	// HIER EN NERGENS ANDERS. Ik dacht eerst dat de landingsdip een tweede eigenaar
+	// van dit veld was; nagekeken schrijft die de socket helemaal niet, maar zet
+	// alleen CurrentDipCm dat hier wordt opgeteld (zie het commentaar in
+	// UpdateLandingDip: "twee schrijvers op één waarde is altijd een verliezer").
+	// Deze functie is de enige schrijver, dus de ingreep hoort in dit doel en
+	// nergens anders.
+	const float AimHeightRatio = (bAiming && !bFirstPerson && ThirdPersonArmLength > KINDA_SMALL_NUMBER)
+		? TargetArmLength / ThirdPersonArmLength : 1.0f;
 	FVector Offset = CameraBoom->SocketOffset;
 	// Vanaf de ONGEDIPTE hoogte interpoleren, anders trekt de dip het doel mee en
 	// komt de camera na een sprong lager te hangen dan hij begon.
-	Offset.Z = FMath::FInterpConstantTo(Offset.Z + CurrentDipCm, BaseSocketOffsetZ + TargetRise, DeltaSeconds, RiseRate);
+	Offset.Z = FMath::FInterpConstantTo(Offset.Z + CurrentDipCm,
+		BaseSocketOffsetZ * AimHeightRatio + TargetRise, DeltaSeconds, RiseRate);
 	const float SettledZ = Offset.Z;
 	Offset.Z -= CurrentDipCm;
 	CameraBoom->SocketOffset = Offset;

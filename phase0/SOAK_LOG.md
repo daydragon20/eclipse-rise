@@ -58,3 +58,4 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 12:27 | `b673902` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
 | 2026-07-27 12:34 | `4dd040a` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Audio.Subsystem.BusContract |
 | 2026-07-27 12:37 | `4dd040a` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 12:43 | `42de670` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
