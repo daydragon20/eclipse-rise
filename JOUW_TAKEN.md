@@ -343,8 +343,14 @@ voortgang — en een strategische kaart waarop **geen enkele regio nog een missi
 aanbiedt**. Gemeten in een verse instantie: alle zes leeg, zonder één regel in het
 log. Nu zegt hij het hardop.
 
-**Wat jij hierover kunt beslissen als SPEC-P2-06 geschreven wordt:** moet een save
-vastleggen bij welke campagne-setup hij hoort? Dat maakt "verkeerde save bij
+**SPEC-P2-06 IS NU GESCHREVEN** — als concept, in
+[phase0/specs/SPEC-P2-06_save_system_v1.md](phase0/specs/SPEC-P2-06_save_system_v1.md).
+Hij is falsificatie-eerst opgezet rond de claim die vannacht al één keer sneuvelde:
+*een save die perfect herstelt kan de speler nog steeds met niets te doen
+achterlaten.* Er staan drie review-punten in waar jouw oordeel nodig is (blokkeren
+of waarschuwen bij een mismatch, hoeveel autosave-slots, hoe breed de content-hash).
+
+De oorspronkelijke vraag hieronder is er besluit 1 van geworden: Dat maakt "verkeerde save bij
 verkeerde build" detecteerbaar, maar het is een formaatwijziging (v5 → v6). De
 goedkope variant is wat er nu staat: de laadkant gaat ervan uit dat het spel zijn
 campagnedata al kent, en klaagt luid als dat niet zo is.
