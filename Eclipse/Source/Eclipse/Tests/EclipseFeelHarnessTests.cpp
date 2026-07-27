@@ -1032,6 +1032,7 @@ bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Paramete
 		// bestaat, kost precies dezelfde avond als een binding die niet aankomt.
 		TEXT("Eclipse.UI.Report"),
 		TEXT("Eclipse.Liberation.Report"),
+		TEXT("Eclipse.Save.Report"),
 	};
 	for (const TCHAR* Name : Documented)
 	{

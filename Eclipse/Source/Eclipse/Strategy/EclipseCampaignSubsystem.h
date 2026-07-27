@@ -9,6 +9,25 @@
 class IConsoleObject;
 class UEclipseCampaignSetupAsset;
 
+namespace EclipseSaveReport
+{
+	/**
+	 * De eerste twee regels van Eclipse.Save.Report, als PURE functie.
+	 *
+	 * Staat hier los omdat de belangrijkste regel van dat rapport degene is die
+	 * een gezonde start nooit haalt: "setup ONTBREEKT". Zolang die tak alleen in
+	 * een console-lambda leeft, is hij niet te falsifieren — en precies die tak
+	 * moet op een avond werken waarop verder niets meer werkt.
+	 *
+	 * Slots op schijf horen er bewust NIET bij: dat is IO, en die vraag komt pas
+	 * nadat deze twee regels beantwoord zijn.
+	 */
+	ECLIPSE_API void BuildStateLines(
+		const UEclipseCampaignSetupAsset* Setup,
+		const FEclipseCampaignState& State,
+		TArray<FString>& OutLines);
+}
+
 /**
  * Owner of the campaign state (GDD 12.2 rule 4). Read access is const-only;
  * the single write path is CommitTransaction, which validates atomically,

@@ -25,6 +25,8 @@
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "UI/EclipseBaseHubWidget.h"
 #include "UI/EclipseMissionHudWidget.h"
+#include "HAL/FileManager.h"
+#include "EclipseSaveSubsystem.h"
 #include "UI/EclipseTestGuideLogic.h"
 
 namespace
@@ -120,6 +122,65 @@ void AEclipsePlayerController::BeginPlay()
 				{
 					UE_LOG(LogEclipse, Display,
 						TEXT("UI: er is geen missie-HUD (geen missie actief, of -EclipseShot onderdrukt hem bewust)."));
+				}
+			}),
+			ECVF_Default);
+	}
+
+	// Eclipse.Save.Report (SPEC-P2-06 bouwvolgorde stap 4).
+	//
+	// Dit is het commando dat "mijn kaart is leeg" in EEN regel beantwoordt. Op
+	// 27-07 kostte precies die vraag drie metingen: de campagne kwam bit-voor-bit
+	// terug uit een save - dag, credits, story-beats, state-hash allemaal gelijk -
+	// en geen enkele regio bood nog een missie aan, omdat het setup-asset niet in
+	// het bestand zit en niemand het opnieuw legde.
+	//
+	// Vandaar de volgorde: eerst of de campagne UBERHAUPT zijn geauthorde inhoud
+	// kent, dan pas de slots. Een rapport dat met "0 slots" begint laat de
+	// interessante helft weg.
+	//
+	// Geen formaatwijziging: dit leest alleen wat er nu al is. De
+	// content-identiteit in het bestand (besluit 1 van de spec) wacht op review.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.Save.Report")) == nullptr)
+	{
+		SaveReportCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.Save.Report"),
+			TEXT("Dump de savestand: kent de campagne zijn setup, welke slots bestaan er, en hoe groot zijn ze."),
+			FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+			{
+				const UEclipseCampaignSubsystem* Campaign = GetGameInstance() != nullptr
+					? GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>() : nullptr;
+				if (Campaign == nullptr)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("Save: geen campagne-subsysteem."));
+					return;
+				}
+
+				// De twee regels die ertoe doen komen uit een pure functie, zodat de
+				// ONTBREEKT-tak een test heeft in plaats van een belofte.
+				TArray<FString> Lines;
+				EclipseSaveReport::BuildStateLines(Campaign->GetActiveSetup(), Campaign->GetState(), Lines);
+				for (const FString& Line : Lines)
+				{
+					UE_LOG(LogEclipse, Display, TEXT("%s"), *Line);
+				}
+
+				// Dan de slots op schijf. Alleen naam en grootte: het formaat lezen
+				// zou dit een tweede loader maken, en twee lezers van hetzelfde
+				// bestand is precies wat 12.3 verbiedt.
+				const FString SaveDir = FPaths::GetPath(UEclipseSaveSubsystem::GetSlotFilePath(TEXT("x")));
+				TArray<FString> Files;
+				IFileManager::Get().FindFiles(Files, *(SaveDir / TEXT("*.sav")), true, false);
+				if (Files.Num() == 0)
+				{
+					UE_LOG(LogEclipse, Display, TEXT("Save: geen slots in %s"), *SaveDir);
+					return;
+				}
+				for (const FString& File : Files)
+				{
+					const FString FullPath = SaveDir / File;
+					UE_LOG(LogEclipse, Display, TEXT("Save:   %s  %lld bytes"),
+						*File, IFileManager::Get().FileSize(*FullPath));
 				}
 			}),
 			ECVF_Default);

@@ -772,4 +772,48 @@ bool FEclipseCampaignStoryFlagCommitTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+// Eclipse.Save.Report meldt een ontbrekende setup, want DAT is de lege kaart.
+//
+// Deze test bestaat omdat de regel die hij bewaakt in een gezonde run nooit
+// gedraaid wordt: bij een normale start staat er "campagne-setup
+// DA_CampaignSetup" en klaar. De tak die ertoe doet is de andere, en die zag ik
+// op 27-07 pas nadat de kaart al leeg was.
+//
+// Beide richtingen, want een controle die altijd rood staat is net zo waardeloos
+// als een die nooit rood staat.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseSaveReportNamesTheMissingSetup,
+	"Eclipse.Campaign.SaveReportNamesTheMissingSetup", EclipseCampaignTest::TestFlags)
+bool FEclipseSaveReportNamesTheMissingSetup::RunTest(const FString&)
+{
+	FEclipseCampaignState State;
+	State.Day = 4;
+
+	// Zonder setup: het rapport moet het WOORD zeggen, niet een lege naam of een
+	// nette nul. "campagne-setup " met niets erachter leest als "in orde".
+	TArray<FString> Zonder;
+	EclipseSaveReport::BuildStateLines(nullptr, State, Zonder);
+	if (TestEqual(TEXT("rapport zonder setup: twee regels"), Zonder.Num(), 2))
+	{
+		TestTrue(TEXT("rapport zonder setup: noemt ONTBREEKT"), Zonder[0].Contains(TEXT("ONTBREEKT")));
+		TestTrue(TEXT("rapport zonder setup: zegt ook WAT dat betekent"),
+			Zonder[0].Contains(TEXT("bord blijft leeg")));
+		TestTrue(TEXT("rapport zonder setup: de staat staat er nog steeds bij"),
+			Zonder[1].Contains(TEXT("dag=4")));
+	}
+
+	// Met setup: geen vals alarm. Zonder deze helft zou een rapport dat ALTIJD
+	// ONTBREEKT roept ook groen zijn.
+	UEclipseCampaignSetupAsset* Setup = NewObject<UEclipseCampaignSetupAsset>(GetTransientPackage(), TEXT("DA_TestSetup"));
+	TArray<FString> Met;
+	EclipseSaveReport::BuildStateLines(Setup, State, Met);
+	if (TestEqual(TEXT("rapport met setup: twee regels"), Met.Num(), 2))
+	{
+		TestFalse(TEXT("rapport met setup: geen vals ONTBREEKT"), Met[0].Contains(TEXT("ONTBREEKT")));
+		TestTrue(TEXT("rapport met setup: noemt het asset bij naam"), Met[0].Contains(TEXT("DA_TestSetup")));
+	}
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

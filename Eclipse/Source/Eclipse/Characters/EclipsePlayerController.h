@@ -299,6 +299,9 @@ private:
 	/** Eclipse.UI.Report; hier en niet in de widget, zodat hij ook zonder missie bestaat. */
 	IConsoleCommand* UiReportCommand = nullptr;
 
+	/** Eclipse.Save.Report (SPEC-P2-06 stap 4): waarom is het bord leeg. */
+	IConsoleCommand* SaveReportCommand = nullptr;
+
 	// Command Mode inputs (SPEC-P2-02 Stage A; provisional debug bindings —
 	// the Enhanced Input context stack is a SPEC-P2-07 seam).
 	UPROPERTY()

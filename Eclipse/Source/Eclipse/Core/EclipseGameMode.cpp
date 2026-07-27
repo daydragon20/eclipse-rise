@@ -684,6 +684,10 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// fotograferen. Zonder deze regel zou het commando bestaan zonder ooit
 		// gedraaid te hebben.
 		Controller->ConsoleCommand(TEXT("Eclipse.UI.Report"));
+		// En de savestand, om de derde keer dezelfde reden. Deze ronde start een
+		// verse campagne, dus hij hoort "setup DA_CampaignSetup" te melden en nul
+		// slots — precies de gezonde nulmeting waartegen een lege kaart afsteekt.
+		Controller->ConsoleCommand(TEXT("Eclipse.Save.Report"));
 		break;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));

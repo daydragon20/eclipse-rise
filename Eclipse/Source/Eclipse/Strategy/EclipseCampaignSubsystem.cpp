@@ -271,6 +271,23 @@ namespace
 	}
 }
 
+void EclipseSaveReport::BuildStateLines(
+	const UEclipseCampaignSetupAsset* Setup,
+	const FEclipseCampaignState& State,
+	TArray<FString>& OutLines)
+{
+	// DE BELANGRIJKSTE REGEL EERST. Zonder setup is er wel een campagne maar geen
+	// regiograaf, en dan blijft het bord leeg terwijl de save "hersteld" meldt.
+	// Dat is de meting van 27-07: dag, credits en story-beats kwamen bit-voor-bit
+	// terug en geen enkel vak bood nog een missie aan.
+	OutLines.Add(FString::Printf(TEXT("Save: campagne-setup %s"),
+		Setup != nullptr
+			? *Setup->GetName()
+			: TEXT("ONTBREEKT - het bord blijft leeg, hoe goed de save ook is")));
+	OutLines.Add(FString::Printf(TEXT("Save: staat dag=%d  story-beats=%d  regio's=%d"),
+		State.Day, State.StoryFlags.Num(), State.Regions.Num()));
+}
+
 void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
