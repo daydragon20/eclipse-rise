@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `4bd5fea`
+## VEILIG TE SPELEN: JA, commit `437799c`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -226,10 +226,15 @@ De modus is een veld in plaats van proza in een cel, en alle vier de bronnen
 worden ertegen gehouden. De vondst was dat LT nog steeds twee dingen deed terwijl
 drie beschrijvingen al zeiden van niet; zie het morgenrapport.
 
-### 4. HET LICHTPLAN, ronde 2
+### 4. HET LICHTPLAN — de vaste-camera ronde is GEDRAAID
 
-Goedgekeurd. 13 armaturen staan; wacht op de vaste-camera ronde vóór er meer
-bijkomen.
+Zeven frames staan er, ik heb ze bekeken, en de uitkomst is niet wat we dachten:
+de armaturen lichten helemaal niet op omdat ze **9 × 9 × 40 cm** zijn. Zie
+`phase0/LICHTRONDE_REVIEW.md` voor de hele redeneerketen (vier hypotheses
+uitgesloten voordat de maat de verklaring bleek).
+
+**Wacht nu op één getal van de owner:** hoe groot hoort een baken te zijn. De
+reparatie is daarna triviaal — dezelfde normalisatie als bij de aankleedfiguren.
 
 ### 5. ~~LOCOMOTIE-AUDIT~~ — RONDE 3 STAAT
 
@@ -248,7 +253,27 @@ Zie `phase0/LOCOMOTIE_AUDIT.md`. Wat er uit die ronde nog open ligt:
   Een start-take moet de cyclus INLEIDEN, niet vervangen — dus een eigen gewicht
   dat eroverheen mengt.
 
-### 6. HET KNOPPENSCHEMA, FASE 2
+### 6. DE MILESTONE ZELF — SPEC-P2-04 en P2-05 zijn afgemaakt
+
+Toen de nachtlijst leeg was ben ik doorgegaan met de bouwvolgorde:
+
+- **M1.2, M1.3 en M1.4 geauthord**, elk met een Gauntlet op de verscheepte data
+  plus een ketentest die alle vier achter elkaar speelt.
+- **De liberation-naad van P2-05 vuurt voor het eerst** — de tabel hing niet aan
+  het setup-asset, wat pas kon blijken toen M1.3 bestond.
+- **Besluit 6 afgedwongen** (M1.1/2/4 = 0 flips, M1.3 = 3), **de ledger antwoordt**
+  (van −84 C/dag naar 0), en **het aanbodbord** verlegt zijn rand.
+- **Voortgang overleeft een save/load**, en de stille lege-kaart-faalmodus die
+  daaronder lag is nu luid.
+
+Wat er van die twee specs nog open staat: de nachtelijke soak met de dag-9-asserts
+(meerdaags werk), en de ContextLine van de liberation staat wel in het log maar
+nog niet op het debriefscherm.
+
+**Voor P2-06 t/m P2-09 bestaat nog geen spec.** Spec-vóór-code is hier de regel,
+dus daar is niet aan begonnen — dat is een keuze die bij jou ligt.
+
+### 7. HET KNOPPENSCHEMA, FASE 2
 
 De data en twee validators staan (`GetBindings()`, `NoButtonMeansTwoThingsInOneMode`,
 `EveryPadButtonIsDescribed`). Wat nog niet staat: `BESTURING.md`, de F3-gids en
