@@ -9,7 +9,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `e2f27fb`
+## VEILIG TE SPELEN: JA, commit `890f7b7`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
