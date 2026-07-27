@@ -3389,4 +3389,109 @@ bool FEclipseModeEnteredAndExitedAlwaysComeInPairsTest::RunTest(const FString& P
 	return true;
 }
 
+
+// De INHOUD van het herlaadfeit: duur en wapenfamilie.
+//
+// Deze test is kleiner dan hij eerst zou worden, en dat is een correctie op mijn
+// eigen meting. Ik telde welke van de 34 catalogus-events nooit in een
+// testbestand voorkomen en kwam op zes, met ReloadStarted erbij. Dat was te grof
+// geteld: MagazineEmptiesAndReloads telt de FOLEY-stappen, en die worden
+// gedreven door het abonnement van de audiolaag op precies dit feit. Sneuvelt de
+// broadcast, dan valt die telling om. De AANKOMST van het feit is dus wel
+// gedekt, alleen indirect.
+//
+// Wat niemand bekeek is de PAYLOAD. De foley-keten hangt aan de FASEN van dit
+// feit: het pack levert vier takes (magazijn pakken, laten vallen, insteken,
+// grendel) die over de herlaadbeurt verdeeld horen te worden. Zonder
+// DurationSeconds in het feit zou de audiolaag de wapentabel moeten gaan lezen
+// om te weten wanneer de grendel valt - en dan zijn er twee bronnen voor een en
+// hetzelfde getal. Een duur van 0 zou alle vier de takes op elkaar stapelen
+// zonder dat er iets "kapot" is.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseReloadAndSwapReachTheBusWithTheirDurationTest,
+	"Eclipse.Feel.Combat.ReloadAndSwapReachTheBusWithTheirDuration",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseReloadAndSwapReachTheBusWithTheirDurationTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseFeelHarness;
+
+	// bRealGameMode: zonder echte missiestart hangt er geen wapen aan het lichaam
+	// (gemeten - mijn eerste versie viel daarop om).
+	FHarness::FOptions Options;
+	Options.bRealGameMode = true;
+
+	FHarness Harness;
+	if (!Harness.Start(*this, Options))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	// En de missie moet ECHT lopen: de loadout bereikt het wapen pas bij
+	// missiestart, dus zonder deze twee regels hangt er niets aan het lichaam.
+	UEclipseStrategySubsystem* Strategy = Harness.GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = Harness.GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	FString LaunchError;
+	if (!TestNotNull(TEXT("feit: strategie"), Strategy) || !TestNotNull(TEXT("feit: prep"), Prep)
+		|| !TestTrue(FString::Printf(TEXT("feit: missie gelanceerd (%s)"), *LaunchError),
+			Strategy->SelectMission(TEXT("TransitCheckpoint"), LaunchError) && Prep->AutoLaunch(LaunchError)))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+	Harness.Idle(0.5f);
+
+	UEclipseHitscanWeaponComponent* Weapon =
+		Harness.Body != nullptr ? Harness.Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
+	UEclipseEventBusSubsystem* Bus = Harness.GameInstance != nullptr
+		? Harness.GameInstance->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("feit: wapencomponent bestaat"), Weapon)
+		|| !TestNotNull(TEXT("feit: bus bestaat"), Bus))
+	{
+		Harness.Shutdown();
+		return false;
+	}
+
+	int32 HerlaadFeiten = 0;
+	float HerlaadDuur = -1.0f;
+	FName HerlaadFamilie = NAME_None;
+	FEclipseEventSubscriptionHandle ReloadHandle = Bus->Subscribe(
+		EclipseTags::Event_Combat_ReloadStarted,
+		FEclipseEventNativeDelegate::CreateLambda([&](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			++HerlaadFeiten;
+			if (const FEclipseCombatEventPayload* Fact = Payload.GetPtr<FEclipseCombatEventPayload>())
+			{
+				HerlaadDuur = Fact->DurationSeconds;
+				HerlaadFamilie = Fact->WeaponSoundFamily;
+			}
+		}),
+		FEclipseCombatEventPayload::StaticStruct());
+
+	// Vol magazijn: herladen hoort NIET te vuren. Zonder deze helft zou een
+	// component die bij elke druk een feit uitzendt ook groen staan, en dan telt
+	// de audiolaag straks vier grendels op een magazijn dat al vol was.
+	Weapon->StartReload(TEXT("TestVol"));
+	TestEqual(TEXT("feit: een vol magazijn stuurt geen herlaadfeit"), HerlaadFeiten, 0);
+
+	// EEN schot is genoeg om het magazijn niet-vol te maken. Leegschieten zou de
+	// vuurcadans in het spel brengen en bovendien de automatische herlaadbeurt
+	// triggeren - dan meet ik twee dingen tegelijk en kan ik niet meer op EEN
+	// feit asserteren.
+	const int32 AmmoVoor = Weapon->GetAmmoInMagazine();
+	Weapon->Fire(FVector::ZeroVector, FVector::ForwardVector, TEXT("TestSchot"));
+	TestEqual(TEXT("opzet: er is een kogel uit"), Weapon->GetAmmoInMagazine(), AmmoVoor - 1);
+
+	Weapon->StartReload(TEXT("TestHerladen"));
+	AddInfo(FString::Printf(TEXT("GEMETEN  herlaadfeiten: %d, duur %.2f s, familie '%s'"),
+		HerlaadFeiten, HerlaadDuur, *HerlaadFamilie.ToString()));
+
+	TestEqual(TEXT("feit: het herlaadfeit bereikt de bus, precies een keer"), HerlaadFeiten, 1);
+	TestTrue(TEXT("feit: met een duur waar de foley-keten iets aan heeft"), HerlaadDuur > 0.0f);
+	TestTrue(TEXT("feit: en met de wapenfamilie erbij"), !HerlaadFamilie.IsNone());
+
+	Bus->Unsubscribe(ReloadHandle);
+	Harness.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
