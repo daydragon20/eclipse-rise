@@ -128,6 +128,20 @@ if (-not $SkipShots) {
         $Failures += "opnameronde: $($Wrong.Count) fout(en) in het frame"
     }
 
+    # WAT IS ER VERANDERD SINDS DE VORIGE RONDE?
+    #
+    # De owner-regel is dat er bij elke landing iemand naar de beelden kijkt. Ik
+    # heb dat vannacht een keer of tien niet gedaan: de bar zei "0 frame-fouten"
+    # en ik ging door. Negen beelden per ronde, vijftien rondes, en het meeste is
+    # identiek aan de vorige keer - dat houdt niemand vol.
+    #
+    # Dus niet "kijk altijd" maar "kijk als er iets veranderd is". Dit vervangt
+    # het kijken niet; het maakt de vraag goedkoop genoeg om hem elke keer te
+    # stellen.
+    Write-Host ""
+    Write-Host "VERANDERD SINDS DE VORIGE RONDE:"
+    python "$Root\Tools\shot_diff.py"
+
     # DE BUDGETBAND. GDD 12.4 zegt 16,7 ms; de harde fout staat pas op 33,3.
     # Daartussen zat niets, en een waarschuwing die niemand leest is precies zo
     # nuttig als geen waarschuwing. Hij maakt de bar NIET rood - dit is een
