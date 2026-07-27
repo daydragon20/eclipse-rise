@@ -344,6 +344,43 @@ void UEclipseMissionHudWidget::NativeConstruct()
 			[this](FPlatformUserId, FInputDeviceId) { RefreshDeviceHighlight(); });
 	}
 
+	// WAT STAAT ER OP HET SCHERM (27-07).
+	//
+	// De UI-laag is met geen enkele opnamemethode vast te leggen - HighResShot,
+	// FScreenshotRequest met bShowUI en een Slate-vensteropname leveren alle drie
+	// hetzelfde 3D-beeld zonder widgets. Twee keer op een nacht heb ik daardoor
+	// bijna een defect gemeld dat er niet was: de munitieteller stond er gewoon
+	// ('AR_Foundry 30 / 30'), en de gids ging netjes open met dertien stappen.
+	//
+	// "Ik zie het niet" is hier dus geen bewijs. Dit commando maakt de vraag
+	// beantwoordbaar zonder beeld, in dezelfde vorm als Eclipse.Liberation.Report:
+	// eerst OF het ding er is, dan wat erin staat.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.UI.Report")) == nullptr)
+	{
+		UiReportCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.UI.Report"),
+			TEXT("Dump wat de HUD toont: panelen, zichtbaarheid en regelaantallen. De UI is niet te fotograferen; dit is de weg."),
+			FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+			{
+				UE_LOG(LogEclipse, Display, TEXT("UI: missie-HUD inViewport=%d"), IsInViewport() ? 1 : 0);
+				UE_LOG(LogEclipse, Display, TEXT("UI:   munitieteller zichtbaarheid=%d tekst='%s'"),
+					AmmoReadout != nullptr ? static_cast<int32>(AmmoReadout->GetVisibility()) : -1,
+					AmmoReadout != nullptr ? *AmmoReadout->GetText().ToString() : TEXT("(bestaat niet)"));
+				UE_LOG(LogEclipse, Display, TEXT("UI:   trefteken zichtbaarheid=%d"),
+					HitMarker != nullptr ? static_cast<int32>(HitMarker->GetVisibility()) : -1);
+				// Per paneel: staat de vlag aan EN hoeveel regels hangen eronder.
+				// Een open paneel zonder regels ziet er voor de speler net zo leeg
+				// uit als een dicht paneel, en dat zijn twee verschillende bugs.
+				UE_LOG(LogEclipse, Display, TEXT("UI:   F2 controls  open=%d"), bControlsVisible ? 1 : 0);
+				UE_LOG(LogEclipse, Display, TEXT("UI:   F3 testgids   open=%d  regels=%d"),
+					bGuideVisible ? 1 : 0, GuideRows.Num());
+				UE_LOG(LogEclipse, Display, TEXT("UI:   H playtest    open=%d  regels=%d"),
+					bPlaytestVisible ? 1 : 0, PlaytestRows.Num());
+				UE_LOG(LogEclipse, Display, TEXT("UI:   R3-verdict    regels=%d"), GauntletRows.Num());
+			}),
+			ECVF_Default);
+	}
+
 	// The guide CVar is also honoured LIVE, not only at mount. Reading it once
 	// here loses the common case: -ExecCmds fires after the world is up, and with
 	// -EclipseStartMission the mission (and this HUD) already exist by then — so

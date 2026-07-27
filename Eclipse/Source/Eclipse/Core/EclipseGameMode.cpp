@@ -673,6 +673,11 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// nooit wordt aangeroepen, is precies zo betrouwbaar als een test die
 		// nooit rood kan worden.
 		Controller->ConsoleCommand(TEXT("Eclipse.Liberation.Report"));
+		// En de UI-dump, om dezelfde reden: dit is de enige plek waar een echte
+		// HUD draait met een console eronder, en de UI-laag is niet te
+		// fotograferen. Zonder deze regel zou het commando bestaan zonder ooit
+		// gedraaid te hebben.
+		Controller->ConsoleCommand(TEXT("Eclipse.UI.Report"));
 		break;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));

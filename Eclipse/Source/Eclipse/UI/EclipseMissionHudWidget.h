@@ -227,4 +227,7 @@ private:
 	double LastGuideRefreshWallSeconds = 0.0;
 
 	IConsoleObject* SummaryCommand = nullptr;
+
+	/** Eclipse.UI.Report: de UI-laag is niet te fotograferen, dus vraagt hij het zelf. */
+	IConsoleObject* UiReportCommand = nullptr;
 };
