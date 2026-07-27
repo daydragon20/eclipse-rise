@@ -79,6 +79,28 @@ if ($j.failed -gt 0 -or $j.notRun -gt 0) {
     }
 }
 
+# BUDGET-WAARSCHUWINGEN UIT GESLAAGDE TESTS.
+#
+# Gemeten op 27-07: 47 tests dragen Warning-regels en ALLE 47 hebben state
+# 'Success'. De lus hierboven loopt alleen over tests die NIET Success zijn, dus
+# geen enkele testwaarschuwing kwam ooit in beeld - inclusief de
+# budgetwaarschuwing op de strategische tick die ik dezelfde nacht had gebouwd.
+# Dat is dezelfde fout als het Error-only filter van een uur eerder: een
+# waarschuwing die niemand ziet, is geen waarschuwing.
+#
+# NIET ALLE 47 afdrukken. Het overgrote deel is bewuste degradatie uit tests die
+# expres zonder setup-asset draaien ("no DT_Facilities linked", "recruits start
+# classless") plus engine-afbraakruis. Die horen daar en zijn geen signaal. Wat
+# hier hoort te schreeuwen is de klasse "nog niets kapot, wel de kant op", en die
+# is aan het woord BUDGET te herkennen.
+$BudgetWarnings = $j.tests | ForEach-Object { $_.entries } |
+    Where-Object { $_.event.type -eq 'Warning' -and $_.event.message -match 'budget' }
+if ($BudgetWarnings) {
+    Write-Host ""
+    Write-Host "BOVEN EEN BUDGET (nog geen fout, wel de kant op):"
+    $BudgetWarnings | ForEach-Object { Write-Host "  $($_.event.message)" }
+}
+
 # ------------------------------------------------- 3. validatie + catalogus
 # De owner-regel voor de groene bar is breder dan build+suite: "EclipseValidateData
 # 0 fouten + catalog gedocumenteerd = geimplementeerd". Die twee stonden hier

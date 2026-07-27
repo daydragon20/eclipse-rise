@@ -28,3 +28,5 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 08:51 | `250ae38` | **ROOD** | 181 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Playthrough.EnemiesEngageWhenYouWalkIntoTheirRange |
 | 2026-07-27 08:54 | `250ae38` | **GROEN** | 181 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
 | 2026-07-27 09:01 | `5b81d52` | **GROEN** | 181 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 9 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 5, stap 6, stap 7, stap 8, stap 9] |
+| 2026-07-27 09:05 | `f6f581e` | **ROOD** | 181 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Playthrough.EnemiesEngageWhenYouWalkIntoTheirRange |
+| 2026-07-27 09:08 | `f6f581e` | **GROEN** | 181 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
