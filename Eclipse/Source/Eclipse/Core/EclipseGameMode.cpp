@@ -324,14 +324,39 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 	UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d TEMPO] %.1f ms per frame (%.0f fps) op %dx%d"),
 		ShotIndex, GAverageMS, GAverageFPS, ViewportX, ViewportY);
 
-	// GDD 12.4 legt het budget op 16,7 ms (60 fps). Ruim daarboven is geen
-	// smaakkwestie meer: dan voelt mikken traag, en dat is precies het soort
-	// oordeel waar de owner voor moet spelen.
-	if (GAverageMS > 33.3f && GAverageMS > 0.0f)
+	// TWEE GRENZEN, en dat is met opzet.
+	//
+	// GDD 12.4 legt het budget op 16,7 ms (60 fps). De harde fout staat op 33,3:
+	// ruim daarboven is het geen smaakkwestie meer, dan voelt mikken traag.
+	//
+	// Tussen die twee zat tot 27-07 NIETS, en dat is precies de vorm die deze
+	// nacht drie keer opdook: gemeten maar niet afgedwongen. Op 25 ms bleef de
+	// bar groen terwijl het project 50% over zijn eigen budget zat, en dan merk
+	// je het pas als het al 33 is — twee keer het budget.
+	//
+	// De 16,7-grens is bewust een WAARSCHUWING en geen fout. Dit is een
+	// graybox in een editor-build op 1280x720; die hard laten falen op het
+	// shipping-budget zou rood gaan op werk dat klopt, en dat is de ene fout die
+	// een controle nooit mag maken. De marge staat er altijd bij, ook als hij
+	// ruim is, zodat je het ziet AFLOPEN in plaats van omvallen.
+	constexpr float BudgetMs = 16.7f;   // GDD 12.4
+	constexpr float HardFailMs = 33.3f; // 30 fps: de speler voelt het
+	if (GAverageMS > 0.0f)
 	{
-		UE_LOG(LogEclipse, Error,
-			TEXT("[PLAYSHOT %d FOUT] %.1f ms per frame — onder de 30 fps, dat voelt de speler"),
-			ShotIndex, GAverageMS);
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d BUDGET] %.1f van %.1f ms — %.1f ms marge"),
+			ShotIndex, GAverageMS, BudgetMs, BudgetMs - GAverageMS);
+		if (GAverageMS > HardFailMs)
+		{
+			UE_LOG(LogEclipse, Error,
+				TEXT("[PLAYSHOT %d FOUT] %.1f ms per frame — onder de 30 fps, dat voelt de speler"),
+				ShotIndex, GAverageMS);
+		}
+		else if (GAverageMS > BudgetMs)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("[PLAYSHOT %d BUDGET OVERSCHREDEN] %.1f ms tegen een budget van %.1f (GDD 12.4) — nog geen fout, wel de kant op"),
+				ShotIndex, GAverageMS, BudgetMs);
+		}
 	}
 
 	// KOMT BEWEGING IN HET BEELD AAN? Moment 2 en 3 zijn de loopmomenten, en

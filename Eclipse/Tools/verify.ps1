@@ -128,6 +128,18 @@ if (-not $SkipShots) {
         $Failures += "opnameronde: $($Wrong.Count) fout(en) in het frame"
     }
 
+    # DE BUDGETBAND. GDD 12.4 zegt 16,7 ms; de harde fout staat pas op 33,3.
+    # Daartussen zat niets, en een waarschuwing die niemand leest is precies zo
+    # nuttig als geen waarschuwing. Hij maakt de bar NIET rood - dit is een
+    # graybox in een editor-build, dus hard falen op het shipping-budget zou rood
+    # gaan op werk dat klopt - maar hij komt wel bovenaan te staan.
+    $Budget = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "BUDGET OVERSCHREDEN"
+    if ($Budget) {
+        Write-Host ""
+        Write-Host "BOVEN HET 12.4-BUDGET (nog geen fout, wel de kant op):"
+        $Budget | ForEach-Object { Write-Host "  $(($_.Line -replace '^.*Warning: ', ''))" }
+    }
+
     Write-Host ""
     Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "SPELER|PLAYSHOT \d+ (WAPEN|DRAAI|SILHOUET|BEWEGING)\]" |
         ForEach-Object { ($_.Line -replace '^.*Display: ', '') }
