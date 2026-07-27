@@ -93,8 +93,35 @@ zit verder weg, Borderlands zit dichter op het personage met een bredere FOV.
   dus het personage staat **140 px links van het midden**. Dat is de socket-offset
   van 55 cm naar rechts, en dat klopt met de bedoeling.
 
-  **DE JUISTE MEETOPDRACHT is de horizontale positie van het SILHOUET, niet van de
-  actor.** De ronde berekent al een silhouethoogte in pixels (`[PLAYSHOT n
+  **UITGEVOERD, en de uitslag wijst een ANDERE OORZAAK aan — niet "weerlegd".**
+  De mesh-bounds volgt de animatie wel, en meet dit (ronde van 09:29):
+
+  ```
+  stilstand 519 · lopend en vurend 509 · draaien 118 gr 477 · herladen 541
+  ```
+
+  Spreiding 64 px op 1280, dus de meting KAN de klacht vinden. Maar de uitslagen
+  vallen bij **draaien** en **herladen**, en juist rennen ligt 10 px van stilstand.
+
+  **De owner-lezing hierbij, en die is scherper dan de mijne** (27-07): hij meldde
+  het als "tijdens rennen gaat het wapen naar de zijkant", en waarschijnlijk heeft
+  hij de oorzaak verkeerd toegeschreven — hij rént, hij draait daarbij, en hij zag
+  het verband met snelheid omdat hij op dat moment toevallig rende. Dat staat hier
+  dus als **andere oorzaak aangewezen, nog niet bevestigd**, en niet als
+  weerlegging van de klacht: er IS een verschuiving, alleen niet waar we hem
+  zochten.
+
+  **Wat de volgende speelronde gericht toetst**, op verzoek van de owner: draaien
+  tijdens STILSTAND, en herladen tijdens STILSTAND. Twee gevallen zonder snelheid
+  erin, dus als de verschuiving daar zichtbaar is, is de toeschrijving rond.
+
+  **Wat deze maat NIET is:** `Bounds.Origin` is het midden van de bounding box en
+  telt de armen mee, dus een herlaadpose die een arm uitzwaait verschuift hem
+  zonder dat het lichaam beweegt. Beter dan de actor, maar geen
+  silhouetzwaartepunt — en dat is precies waarom "herladen 541" nog geen bewijs is.
+
+  **DE OORSPRONKELIJKE MEETOPDRACHT, voor de volledigheid: de horizontale positie
+  van het SILHOUET, niet van de actor.** De ronde berekent al een silhouethoogte in pixels (`[PLAYSHOT n
   SILHOUET] 482 px hoog`), dus er is al een silhouetbepaling; die moet ook zijn
   x-midden afgeven. Dat meet wél wat de owner ziet, want een personage dat
   overhelt of achterblijft verschuift met zijn silhouet en niet met zijn
