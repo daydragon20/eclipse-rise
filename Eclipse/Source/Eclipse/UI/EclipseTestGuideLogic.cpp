@@ -139,6 +139,34 @@ namespace EclipseTestGuide
 		// draagt de datum al — geen bestand hoeven openen.
 		TArray<FString> Reports;
 		IFileManager::Get().FindFiles(Reports, *(FPaths::ProjectLogDir() / TEXT("EclipseGauntletR3_*.txt")), true, false);
+
+		// RAPPORTEN VAN DE HUIDIGE DRAAI TELLEN NIET MEE.
+		//
+		// GEMETEN op 27-07, en dit was de oorzaak van een rood dat drie draaien
+		// standhield: de filter las 'vorige sessie was 2026-07-27
+		// (EclipseGauntletR3_20260727_101401.txt)' — een eindrapport dat de suite
+		// een uur eerder ZELF had weggeschreven via EmitVerdictSummary. De vraag
+		// "wat is er nieuw sinds je vorige sessie" beantwoordde zichzelf dus met
+		// "niets, ik heb net een sessie afgesloten".
+		//
+		// Erger nog: hij deed dat niet consequent. GetChangeStepCount() en
+		// GetGuideSteps() lazen de map op verschillende momenten, dus de teller zag
+		// 0 wijzigingen en de lus 3 — een paneel van 13 regels tegen een teller die
+		// er 11 verwachtte, zonder dat er iets aan de gids veranderd was.
+		//
+		// WAAROM DIT EN GEEN CACHE. Een cache bevriest de eerste waarde, en dan
+		// hangt de uitkomst alsnog af van WANNEER die eerste aanroep viel. Deze weg
+		// heeft die volgorde-afhankelijkheid niet: een bestand dat na de start van
+		// dit proces is geschreven, kan per definitie niet van een vorige sessie
+		// zijn. Dat is een eigenschap van het bestand, niet van de aanroepvolgorde.
+		const FDateTime ProcessStart =
+			FDateTime::UtcNow() - FTimespan::FromSeconds(FPlatformTime::Seconds() - GStartTime);
+		Reports.RemoveAll([&ProcessStart](const FString& Name)
+		{
+			const FDateTime Written = IFileManager::Get().GetTimeStamp(*(FPaths::ProjectLogDir() / Name));
+			return Written != FDateTime::MinValue() && Written >= ProcessStart;
+		});
+
 		if (Reports.Num() == 0)
 		{
 			return FString(); // eerste sessie: alles tonen
