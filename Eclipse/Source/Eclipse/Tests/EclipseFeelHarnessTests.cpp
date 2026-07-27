@@ -2848,6 +2848,27 @@ bool FEclipseWhichTakesCouldFillTheGapsTest::RunTest(const FString& Parameters)
 		AddInfo(Shared * 2 >= Theirs.GetNum()
 			? TEXT("GEMETEN  -> lenen is kansrijk: de botnamen overlappen grotendeels")
 			: TEXT("GEMETEN  -> LENEN KAN NIET: te weinig gedeelde botnamen, de take zou op de verkeerde botten landen"));
+
+		// EN DE ANDERE RICHTING. De locomotie-audit laat open of de acht
+		// niet-speler-lichamen de DRAAITAKES van Belica kunnen lenen; die bestaan
+		// alleen in haar pack. Dat is een andere vraag dan hierboven: een take
+		// speelt alleen af als het doelskelet de botten heeft die de take
+		// aanstuurt, en Belica heeft er 90 meer dan de mannequin.
+		//
+		// De maat die telt is dus: hoeveel van BELICA's botten kent de mannequin?
+		// Wat hij niet kent wordt bij het afspelen overgeslagen — pas als dat een
+		// groot deel is, gaat de beweging verloren.
+		int32 SharedBack = 0;
+		for (int32 Index = 0; Index < Mine.GetNum(); ++Index)
+		{
+			if (Theirs.FindBoneIndex(Mine.GetBoneName(Index)) != INDEX_NONE)
+			{
+				++SharedBack;
+			}
+		}
+		AddInfo(FString::Printf(
+			TEXT("GEMETEN  omgekeerd: van de %d botten van de speler kent het mannequin-skelet er %d (%.0f%%)"),
+			Mine.GetNum(), SharedBack, Mine.GetNum() > 0 ? 100.0f * SharedBack / Mine.GetNum() : 0.0f));
 	}
 	else
 	{

@@ -345,3 +345,31 @@ inleiden.
 maar aan een eigen gewicht dat óver de loopcyclus heen mengt in plaats van hem te
 vervangen — en meet het op een beeld, niet op een getal.
 
+### Ronde 3, vierde aanvulling: kunnen de acht andere lichamen de draaitake lenen?
+
+Die vraag stond open. Gemeten, beide richtingen:
+
+| Richting | Overlap |
+|---|---|
+| mannequin-takes → **Belica** | 68 van 68 botnamen (**100%**) |
+| Belica-takes → **mannequin** | 68 van 158 botnamen (**43%**) |
+
+Die 43% klinkt slechter dan hij is. Het Paragon-rig is een superset: **de mannequin
+kent zijn eigen hiërarchie volledig**, en Belica's overige 90 botten zijn extra's
+(twist-botten, IK, de drone, het gezicht). Animatie op die extra's bestaat op het
+doelskelet niet en wordt bij het afspelen overgeslagen.
+
+Wat betekent dat voor de draaitake? Die draagt **geen netto rotatie** en zijn
+beweging zit in de heup — een bot dat aan beide kanten bestaat. **Mechanisch is
+lenen dus mogelijk.**
+
+**Toch niet gedaan, en met reden.** `DONOR_PACKS` kent één donor per pack voor
+*alle* ontbrekende takes. Belica als donor aanwijzen voor de acht SciFi-lichamen
+zou niet alleen de draai lenen maar elk gat dat die packs hebben — en dat verandert
+in één klap de animatie van elk lichaam in het spel, voor een winst die in de
+audit zelf als mild is beoordeeld (turn-in-place is een speler-ervaring).
+
+Wat het wél waard is als iemand dit oppakt: een donor **per take-soort** in plaats
+van per pack. Dat is een kleine uitbreiding van het picker-script en het maakt dit
+soort gerichte leningen mogelijk zonder de rest te raken.
+
