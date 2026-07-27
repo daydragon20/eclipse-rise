@@ -193,15 +193,18 @@ namespace EclipseGauntletOverlay
 			// Geen padknop: RB draagt hier de wapenwissel, en dat is een bewuste
 			// ruil — wisselen doe je tientallen keren per missie, standpunt kies
 			// je één keer.
-			{ EMode::OnFoot, TEXT("1e/3e persoon"),  TEXT("C"),              nullptr },
-			{ EMode::OnFoot, TEXT("Wapenwissel"),    nullptr,                TEXT("RB") },
+			{ EMode::OnFoot, TEXT("1e/3e persoon"),  TEXT("C"),              nullptr,
+			  TEXT("bewuste ruil: RB draagt op de pad de wapenwissel. Wisselen doe je tientallen keren per missie, standpunt kies je een keer") },
+			{ EMode::OnFoot, TEXT("Wapenwissel"),    nullptr,                TEXT("RB"),
+			  TEXT("geen toets nodig: op muis+toetsenbord kiest de speler zijn wapen rechtstreeks met de cijfertoetsen van de loadout") },
 			{ EMode::OnFoot, TEXT("Command Mode"),   TEXT("Q vasthouden"),   TEXT("LB vasthouden") },
 
 			// COMMAND MODE
 			{ EMode::CommandMode, TEXT("Volgende soldaat"), TEXT("Tab"),     TEXT("RB") },
 			// Geen padknop: RB wrapt rond, en bij vier soldaten is drie keer
 			// vooruit hetzelfde als één keer terug.
-			{ EMode::CommandMode, TEXT("Vorige soldaat"),   TEXT("scroll neer"), nullptr },
+			{ EMode::CommandMode, TEXT("Vorige soldaat"),   TEXT("scroll neer"), nullptr,
+			  TEXT("RB wrapt rond: bij vier soldaten is drie keer vooruit hetzelfde als een keer terug") },
 			{ EMode::CommandMode, TEXT("Onder kruis"),      TEXT("E"),       TEXT("X") },
 			{ EMode::CommandMode, TEXT("Orders"),           TEXT("1 2 3 4"), TEXT("D-pad") },
 			{ EMode::CommandMode, TEXT("Doctrine"),         TEXT("LeftAlt"), TEXT("Y") },

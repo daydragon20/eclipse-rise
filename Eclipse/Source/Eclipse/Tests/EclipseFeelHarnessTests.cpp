@@ -3229,4 +3229,60 @@ bool FEclipseDistrictCountsAddUpTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+// Een lege apparaatkant draagt een reden (SPEC-P2-07 besluit 5, vooruit gebouwd
+// omdat geen enkel open reviewpunt van die spec hieraan raakt).
+//
+// Drie van de zestien bindingen hebben maar een van de twee apparaten:
+// 1e/3e persoon heeft geen padknop, Wapenwissel geen toets, Vorige soldaat geen
+// padknop. Alle drie zijn BEWUST, en alle drie stonden tot vandaag verantwoord
+// in commentaarregels boven de rij - leesbaar voor een mens, onzichtbaar voor
+// elke controle. Precies de vorm die vandaag vier keer achterliep op de code.
+//
+// De owner speelt op een pad. Een handeling zonder padknop is voor hem
+// onbereikbaar, en aan een nullptr is niet te zien of dat een ruil was of een
+// vergissing. Deze test dwingt af dat het verschil in de DATA staat.
+//
+// Twee richtingen, want een controle die alleen "vul iets in" eist, nodigt uit
+// tot een vrijstelling op een rij die er geen nodig heeft - en dan verbergt de
+// tekst juist wat hij hoort te tonen.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseEveryMissingDeviceSideCarriesAReasonTest,
+	"Eclipse.Feel.EveryMissingDeviceSideCarriesAReason",
+	EclipseFeelTest::TestFlags)
+
+bool FEclipseEveryMissingDeviceSideCarriesAReasonTest::RunTest(const FString& Parameters)
+{
+	int32 Exempted = 0;
+	for (const EclipseGauntletOverlay::FEclipseBinding& Binding : EclipseGauntletOverlay::GetBindings())
+	{
+		const bool bHasKey = Binding.Key != nullptr && FCString::Strlen(Binding.Key) > 0;
+		const bool bHasPad = Binding.Pad != nullptr && FCString::Strlen(Binding.Pad) > 0;
+		const bool bHasReason = Binding.ExemptionReason != nullptr && FCString::Strlen(Binding.ExemptionReason) > 0;
+		const FString Label = FString::Printf(TEXT("%s / %s"),
+			EclipseGauntletOverlay::ModeName(Binding.Mode), Binding.Action);
+
+		// Geen van beide apparaten is nooit goed: dan is de handeling nergens te
+		// geven en hoort de rij niet te bestaan.
+		TestTrue(*FString::Printf(TEXT("%s: minstens een apparaat draagt de handeling"), *Label), bHasKey || bHasPad);
+
+		if (bHasKey && bHasPad)
+		{
+			TestFalse(*FString::Printf(TEXT("%s: volledige pariteit, dus GEEN vrijstellingstekst"), *Label), bHasReason);
+		}
+		else
+		{
+			++Exempted;
+			TestTrue(*FString::Printf(TEXT("%s: mist %s en moet dus zeggen waarom"),
+				*Label, bHasKey ? TEXT("een padknop") : TEXT("een toets")), bHasReason);
+		}
+	}
+
+	// De discriminator: zonder deze regel zou een schema waarin ELKE binding
+	// beide apparaten heeft ook groen staan, en dan bewijst de lus niets over
+	// vrijstellingen. Drie is wat er nu staat; verandert dat bewust, dan hoort
+	// dit getal mee te veranderen en niet stilletjes te blijven kloppen.
+	TestEqual(TEXT("er zijn precies drie bewuste asymmetrieen"), Exempted, 3);
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

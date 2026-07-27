@@ -140,6 +140,19 @@ namespace EclipseGauntletOverlay
 		const TCHAR* Action = nullptr;
 		const TCHAR* Key = nullptr;
 		const TCHAR* Pad = nullptr;
+
+		/**
+		 * WAAROM een van de twee kanten leeg is. Verplicht zodra Key of Pad
+		 * ontbreekt, en verboden als ze er allebei zijn.
+		 *
+		 * De owner speelt op een pad. Een handeling zonder padknop is voor hem
+		 * onbereikbaar, en het verschil tussen "bewuste ruil" en "vergeten" is
+		 * niet aan de nullptr te zien. Tot 27-07 stond die verantwoording in
+		 * commentaarregels bóven de rij — leesbaar voor mij, onzichtbaar voor
+		 * elke controle, en commentaar is precies wat vandaag vier keer
+		 * achterliep op de code.
+		 */
+		const TCHAR* ExemptionReason = nullptr;
 	};
 
 	/**
