@@ -910,6 +910,14 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SPOREN] %d levend%s"),
 					ShotIndex, Levend, *Waar);
 
+				// UITKOMST 27-07: 38 grondvlakken gevonden, en GEEN ENKELE projecteert
+				// op wegdek dat de camera in dit frame vrij ziet — ze vallen allemaal
+				// buiten het strookje open weg vooraan. Met dit harnas is de vraag dus
+				// niet te beantwoorden: de vaste rig-standen kijken nergens naar een
+				// plek waar zo'n vlak onbelemmerd ligt. Die regel blijft staan omdat
+				// hij dat elke ronde opnieuw vaststelt, en omdat hij meteen antwoord
+				// geeft zodra er een rig-stand bij komt die wel de goede kant op kijkt.
+				//
 				// EN DE GRONDVLAKKEN VAN DE BOUWER, want mijn hele redenering leunt op
 				// de aanname dat DIE wel renderen — en die heb ik nooit gecontroleerd.
 				// Zijn ook zij onzichtbaar, dan is dit geen defect in mijn inslagspoor
@@ -928,7 +936,12 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 							continue;
 						}
 						++Vlakken;
-						if (Vlakken > 3)
+						// ALLEMAAL, niet de eerste drie. De eerste poging pakte er drie
+						// en die vielen alle drie achter geometrie — "inbeeld=1" zegt
+						// niets over wat ervoor staat. Met de hele lijst kan ik er een
+						// kiezen die op ZICHTBAAR wegdek valt en daar de pixels
+						// vergelijken.
+						if (Vlakken > 40)
 						{
 							continue;
 						}
