@@ -672,6 +672,12 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// campagne draait met een console eronder — en een debug-commando dat
 		// nooit wordt aangeroepen, is precies zo betrouwbaar als een test die
 		// nooit rood kan worden.
+		// DE GIDS AAN, want zo start de owner het spel (SPEEL_ECLIPSE.bat zet
+		// Eclipse.Guide.Overlay op 1). Mijn ronde draaide hem uit, en dan blijven
+		// juist de controles op het gids-paneel ongeoefend — ik zou een toestand
+		// bewaken waar hij nooit in zit. Dezelfde les als het draaien van zijn
+		// eigen startregel: test de configuratie die de speler gebruikt.
+		Controller->ConsoleCommand(TEXT("Eclipse.Guide.Overlay 1"));
 		Controller->ConsoleCommand(TEXT("Eclipse.Liberation.Report"));
 		// En de UI-dump, om dezelfde reden: dit is de enige plek waar een echte
 		// HUD draait met een console eronder, en de UI-laag is niet te
