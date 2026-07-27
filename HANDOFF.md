@@ -45,7 +45,19 @@ Dat is een gat in de verificatielaag, niet in de features. **Vijfde weg, nog nie
 geprobeerd: `FWidgetRenderer` die de widget rechtstreeks naar een render target
 tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
 
-## Drie regels die deze dag heeft opgeleverd
+## Vier regels die deze dag heeft opgeleverd
+
+0. **KIJK IN DE CODE VOORDAT JE DE OMVANG UITSPREEKT.** Vier keer op één dag schreef
+   ik een klus af als "te groot voor nu" op een schatting, en alle vier klopten ze
+   niet zodra ik keek. Het schadepad raakte de damage-tak helemaal niet (alleen de
+   branch die niets deed), het inslagfeit had geen nieuwe payload nodig, en de
+   ADS-hoogte had geen tweede eigenaar — die "tweede schrijver" bestond niet, wat
+   in de betreffende functie zelfs in een comment stond. Drie ervan heb ik daarna
+   alsnog gedaan, elk met een groene bar. Een verkeerde inschatting kost precies
+   zoveel als een verkeerde diagnose, en het is dezelfde fout: een aanname die
+   nergens tegenaan gehouden wordt.
+
+## De drie regels die deze dag heeft opgeleverd
 
 1. **Kijk naar het beeld VOORDAT je iets over zichtbaarheid schrijft.** Ik
    beweerde "er hangt geen wapenmesh" uit codelezing; de owner wees het geweer aan

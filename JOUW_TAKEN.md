@@ -32,6 +32,7 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
 
 | # | Stand |
 |---|---|
+| **1** mikken (2e) | **ADS-HOOGTE OOK GEREPAREERD** (`39db0fa`): je zakte bij het mikken onder de onderrand (y=763 op een frame van 720). 65 cm staat onder 12,2° bij normale arm en 21,5° bij ADS — bijna dubbel. De hoogte schaalt nu mee, en de twee foutregels in de ronde zijn weg. Op beeld gecontroleerd. **Niet geclaimd:** of de kadering *lekker* is; hij vult nog stevig de linkerhelft |
 | **1** mikken | **GEBOUWD, niet visueel bevestigd.** De camera-lag ging nooit uit tijdens ADS — je kruis staat schermvast terwijl de camera achterloopt, dus de wéreld schuift eronder door. Nu uit. En de zijoffset (55 cm) kromp niet mee met de arm (300→165), waardoor je personage júíst je vizierlijn in kroop; die schaalt nu mee |
 | **2** richtkruis | **BESTAAT EN WORDT GETEKEND** (`richtkruis zichtbaarheid=3 tekst='+'`). Niet te fotograferen: vier opnamemethodes vangen de UI-laag niet |
 | **3** camera | **GEMETEN, en de uitslag spreekt de klacht tegen.** Twee bestaande metingen kónden hem niet vinden (negen keer exact x=500). De derde beweegt wel — spreiding 64 px — maar de uitslagen vallen bij **draaien** en **herladen**, niet bij rennen |
