@@ -40,6 +40,24 @@ telkens bij, want dat verandert wat er gebouwd moet worden.
 | **5** wapenwissel | **HET WAPEN IS EEN APART MATERIAALSLOT** (`M_Belica_Guns`, slot 4 van 12). Zichtbaar máken vraagt dus geen mesh-operatie, alleen een eigen tint. Wisselbaar maken vraagt het nog steeds wel |
 | **6** de gids | **DE KETEN WERKT — end-to-end gemeten.** Toets → actie → handler → paneel open met 13 regels. G kon je niet hebben (toegevoegd ná je sessie); F3 is door de engine geclaimd als `viewmode lit` |
 
+### 🟡 EEN VIERDE VRAAG, en die had ik bijna als "engine-werk" weggeschreven
+
+**Waar hoort visuele feedback te wonen?** Stap 1 en 2 van punt 4 staan: de misser
+is een feit op de bus en de audiolaag speelt hem af. Stap 3 (de zichtbare inslag)
+loopt vast op iets wat geen technisch probleem is maar een ontwerpkeuze:
+
+- De audiolaag reageert op **feiten via de bus** — dat is de architectuurregel
+  hier, en `Event.Combat.WorldImpact` ligt er klaar voor.
+- Voor VFX bestaat zo'n consument **niet**. Er is geen laag die naar feiten
+  luistert en er iets zichtbaars van maakt.
+- Er een maken is een **nieuw systeem**, en dat heb je verboden. Het alternatief —
+  het wapen laat zelf een quad los — schendt de scheiding die de audiolaag wél
+  volgt, en dan staat er over een week een tweede plek waar visuele keuzes wonen.
+
+**Ik vul dat niet zelf in.** Zeg welke kant je op wilt en ik bouw het; tot dan
+blijft stap 3 liggen met de valkuil al vastgelegd (het moet een georiënteerd QUAD
+worden, geen deferred decal — het district is unlit, dus decals renderen er niet).
+
 ### 🟡 DRIE BESLISSINGEN DIE BIJ JOU LIGGEN
 
 1. **Speel na een verse build en druk G.** Dat sluit punt 6 én bevestigt of je het
