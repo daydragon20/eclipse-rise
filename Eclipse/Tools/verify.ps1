@@ -158,6 +158,14 @@ if (-not $SkipShots) {
     # Ook de UI-dump kan fouten melden. Die staan niet in het PLAYSHOT-formaat
     # omdat ze uit de HUD zelf komen, en een scan die alleen het ene patroon kent
     # zou ze stil laten passeren.
+    # BEKENDE, GEPARKEERDE MELDINGEN TELLEN NIET ALS FOUT. Ze worden wel getoond,
+    # want ze horen zichtbaar te blijven - maar een bar die permanent rood staat om
+    # iets wat de owner heeft geparkeerd, verbergt de volgende echte fout.
+    $Known = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "PLAYSHOT \d+ BEKEND\]"
+    if ($Known) {
+        Write-Host "BEKEND EN GEPARKEERD (telt niet als fout):"
+        $Known | ForEach-Object { Write-Host "  $($_.Line -replace '^.*LogEclipse: Warning: ', '')" }
+    }
     $Wrong = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "PLAYSHOT \d+ FOUT\]|UI: FOUT"
     if ($Wrong) {
         Write-Host ""

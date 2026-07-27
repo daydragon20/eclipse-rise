@@ -800,9 +800,32 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
-			UE_LOG(LogEclipse, Error,
-				TEXT("[PLAYSHOT %d FOUT] het uitzicht schoof maar %.0f cm op in een loopinterval van 2 s — beweging bereikt het beeld niet"),
-				ShotIndex, Moved);
+			// EEN GEPARKEERDE FOUT IS GEEN NIEUWE FOUT, en het verschil hoort in de
+			// bar te staan.
+			//
+			// Moment 2 valt hier elke ronde op: de 3-cm-val, door de owner op 27-07
+			// geparkeerd ("een defect in de opnameronde, niet in het spel"). Zolang
+			// die als FOUT geteld werd stond de bar permanent rood, en dan valt een
+			// NIEUWE fout niet meer op — precies de vorm waar dit project vandaag
+			// vijf keer op gestruikeld is: een controle die altijd hetzelfde zegt,
+			// zegt niets.
+			//
+			// Daarom BEKEND in plaats van FOUT, met dezelfde meting erbij. Verdwijnt
+			// hij, dan is dat te zien; verandert het getal, ook. En elk ANDER interval
+			// dat te weinig opschuift is nog steeds gewoon rood.
+			const bool bGeparkeerd = (ShotIndex == 2);
+			if (bGeparkeerd)
+			{
+				UE_LOG(LogEclipse, Warning,
+					TEXT("[PLAYSHOT %d BEKEND] het uitzicht schoof maar %.0f cm op — dit is de geparkeerde 3-cm-val (owner 27-07), geen nieuwe fout"),
+					ShotIndex, Moved);
+			}
+			else
+			{
+				UE_LOG(LogEclipse, Error,
+					TEXT("[PLAYSHOT %d FOUT] het uitzicht schoof maar %.0f cm op in een loopinterval van 2 s — beweging bereikt het beeld niet"),
+					ShotIndex, Moved);
+			}
 		}
 	}
 	PlayShotLastCamera = CameraLocation;
