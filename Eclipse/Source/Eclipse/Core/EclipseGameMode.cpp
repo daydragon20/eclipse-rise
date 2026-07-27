@@ -465,9 +465,14 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen, AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (invoer GENEGEERD: %d), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
+				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
+				// heeft staan — en dat is een TELLER, dus hij kan blijven hangen.
+				// Dat geeft exact het gemeten beeld: honderd duwen, acceleratie nul,
+				// en verder alles gezond. Laatste kandidaat die het patroon dekt.
+				PlayShotBody->IsMoveInputIgnored() ? 1 : 0,
 				PlayShotIntervalPathLength,
 				PlayShotIntervalTopAccel,
 				PlayShotIntervalTopSpeed,
