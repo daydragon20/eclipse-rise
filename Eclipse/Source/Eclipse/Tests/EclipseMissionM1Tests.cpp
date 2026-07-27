@@ -546,4 +546,155 @@ bool FEclipseMissionM12ShippedDataGauntletTest::RunTest(const FString& Parameter
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// M1.3 "Signal Fire" op de verscheepte data
+// ---------------------------------------------------------------------------
+//
+// Derde schakel van de keten, en de eerste die iets nieuws bewaakt: WELKE REGIO
+// een verhaalmissie kan dragen. Een pin is pas een missie als de regio op dat
+// punt in de campagne ook echt aanbiedbaar is, en dat volgt uit de graaf plus wie
+// wat bezit - niet uit wat thematisch mooi klinkt.
+//
+// Daarom logt deze test eerst het aanbod van ELKE regio na de M1.2-beat. Die
+// regels zijn geen decoratie: ze zijn de reden dat de pin op SupplyDepot staat
+// en niet op CommsRelay.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionM13ShippedDataGauntletTest,
+	"Eclipse.Missions.M13GauntletOnShippedData",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseMissionM13ShippedDataGauntletTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt - draai Tools/create_phase1_content.py + Tools/setup_story_missions.py."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// De keten tot en met M1.2 uitspelen: dat is de enige manier om de sleutel
+	// van M1.3 te verdienen.
+	TestTrue(TEXT("M1.1 geselecteerd"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error));
+	TestTrue(TEXT("M1.1 gelanceerd"), Prep->AutoLaunch(Error));
+	TestTrue(TEXT("M1.1 hinderlaag"), Mission->CompleteObjective(TEXT("Obj_M11_PatrolLeader"), Error));
+	TestTrue(TEXT("M1.1 extractie"), Mission->CompleteObjective(TEXT("Obj_M11_Exfil"), Error));
+	TestTrue(TEXT("M1.1 debrief"), Mission->ResolveDebrief(true, Error));
+
+	TestTrue(TEXT("M1.2 geselecteerd"), Strategy->SelectMission(TEXT("WorkerHousing"), Error));
+	TestTrue(TEXT("M1.2 gelanceerd"), Prep->AutoLaunch(Error));
+	TestTrue(TEXT("M1.2 cache noord"), Mission->CompleteObjective(TEXT("Obj_M12_CacheNorth"), Error));
+	TestTrue(TEXT("M1.2 cache zuid"), Mission->CompleteObjective(TEXT("Obj_M12_CacheSouth"), Error));
+	TestTrue(TEXT("M1.2 extractie"), Mission->CompleteObjective(TEXT("Obj_M12_Exfil"), Error));
+	TestTrue(TEXT("M1.2 debrief"), Mission->ResolveDebrief(true, Error));
+
+	// DE BEREIKBAARHEIDSMETING. Wat biedt elke regio nu aan? Zonder deze regels
+	// is "de pin staat op de goede regio" een aanname, en een pin naar een regio
+	// die niet aanbiedbaar is levert een missie op die nooit verschijnt - stil,
+	// en niet zichtbaar in de data.
+	const TCHAR* Regions[] = { TEXT("Underworks"), TEXT("TransitCheckpoint"), TEXT("FoundryRow"),
+		TEXT("WorkerHousing"), TEXT("SupplyDepot"), TEXT("CommsRelay") };
+	for (const TCHAR* Region : Regions)
+	{
+		FEclipseMissionOfferView View;
+		AddInfo(Strategy->TryGetOffer(Region, View)
+			? FString::Printf(TEXT("GEMETEN  na M1.2 biedt %s '%s' aan"), Region, *View.TemplateId.ToString())
+			: FString::Printf(TEXT("GEMETEN  na M1.2 heeft %s GEEN aanbod"), Region));
+	}
+
+	FEclipseMissionOfferView Offer;
+	if (!TestTrue(TEXT("de gepinde regio heeft aanbod - anders verschijnt M1.3 nooit"),
+			Strategy->TryGetOffer(TEXT("TransitCheckpoint"), Offer)))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	TestEqual(TEXT("de pin wint van het regio-aanbod"), Offer.TemplateId, FName(TEXT("MT_M13")));
+	TestEqual(TEXT("rij-credits op het aanbod"), Offer.RewardCredits, 60);
+	TestEqual(TEXT("rij-materialen op het aanbod"), Offer.RewardMaterials, 40);
+
+	TArray<FEclipseEconomyEventPayload> RewardFacts;
+	FEclipseEventSubscriptionHandle EconomyHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&RewardFacts](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseEconomyEventPayload* Economy = Payload.GetPtr<FEclipseEconomyEventPayload>();
+				Economy != nullptr && Economy->Reason == TEXT("MissionReward"))
+			{
+				RewardFacts.Add(*Economy);
+			}
+		}));
+
+	// De REDEN meelezen. Een geweigerde selectie zonder reden is precies het
+	// stille falen dat deze codebase overal aan het opruimen is.
+	const bool bSelected = Strategy->SelectMission(TEXT("TransitCheckpoint"), Error);
+	AddInfo(FString::Printf(TEXT("GEMETEN  SelectMission(TransitCheckpoint) = %s, reden: '%s'"),
+		bSelected ? TEXT("ja") : TEXT("NEE"), *Error));
+	if (!TestTrue(TEXT("M1.3 geselecteerd"), bSelected))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	TestTrue(TEXT("M1.3 gelanceerd"), Prep->AutoLaunch(Error));
+
+	const TArray<FEclipseObjectiveDef>& Active = Mission->GetActiveObjectives();
+	TestEqual(TEXT("2 verplichte doelen, geen optional"), Active.Num(), 2);
+	if (Active.Num() == 2)
+	{
+		TestTrue(TEXT("jammer is DestroyTarget"),
+			Active[0].ObjectiveId == TEXT("Obj_M13_Jammer") && Active[0].Type == EEclipseObjectiveType::DestroyTarget);
+		TestTrue(TEXT("extractie sluit af"),
+			Active[1].ObjectiveId == TEXT("Obj_M13_Exfil") && Active[1].Type == EEclipseObjectiveType::ExtractSquad);
+	}
+
+	const FEclipseRegionState* RegionBefore = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint"));
+	if (RegionBefore == nullptr)
+	{
+		AddError(TEXT("De verscheepte regiograaf kent geen TransitCheckpoint - de M1.3-pin wijst naar een regio die niet bestaat."));
+		GameInstance->Shutdown();
+		return false;
+	}
+	const EEclipseRegionOwner OwnerBefore = RegionBefore->Owner;
+
+	TestTrue(TEXT("jammer neer"), Mission->CompleteObjective(TEXT("Obj_M13_Jammer"), Error));
+	TestTrue(TEXT("extractie voltooid"), Mission->CompleteObjective(TEXT("Obj_M13_Exfil"), Error));
+	TestTrue(TEXT("debrief commit"), Mission->ResolveDebrief(true, Error));
+
+	int32 Credits = 0;
+	int32 Materials = 0;
+	for (const FEclipseEconomyEventPayload& Fact : RewardFacts)
+	{
+		if (Fact.ResourceType == EclipseTags::Resource_Credits.GetTag())   { Credits += Fact.Delta; }
+		if (Fact.ResourceType == EclipseTags::Resource_Materials.GetTag()) { Materials += Fact.Delta; }
+	}
+	TestEqual(TEXT("rij-credits vastgelegd"), Credits, 60);
+	TestEqual(TEXT("rij-materialen vastgelegd"), Materials, 40);
+
+	// DE SUBTIELSTE REGEL VAN DEZE SPEC. M1.3 IS de eerste wereldstaat-wijziging,
+	// maar hij voert hem NIET ZELF uit: zijn completion is de naad die SPEC-P2-05
+	// consumeert, en die commit de Foothold-flips. Zolang P2-05 niet bestaat mag
+	// er dus niets omdraaien - en als P2-05 er is, hoort deze assertie te
+	// verhuizen in plaats van stilletjes te blijven kloppen.
+	const FEclipseRegionState* RegionAfter = Campaign->GetState().FindRegion(TEXT("TransitCheckpoint"));
+	if (TestNotNull(TEXT("regio bestaat nog na de debrief"), RegionAfter))
+	{
+		TestTrue(TEXT("M1.3 draait zelf GEEN regio om - dat is de P2-05-naad"),
+			RegionAfter->Owner == OwnerBefore);
+	}
+
+	Bus->Unsubscribe(EconomyHandle);
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

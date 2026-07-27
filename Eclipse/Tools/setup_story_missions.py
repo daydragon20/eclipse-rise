@@ -130,6 +130,44 @@ if created:
     eal.save_loaded_asset(m12)
     unreal.log("MT_M12 authored: 3 mandatory + 1 ghost-optional, no region flip.")
 
+# --- MT_M13 "Signal Fire" (SPEC-P2-04: DestroyTarget jammer + ExtractSquad).
+#
+# GEEN regio-flip, ook hier niet, en dat is de subtielste regel van deze spec:
+# M1.3 IS de eerste wereldstaat-wijziging (besluit 6), maar hij voert hem niet
+# zelf uit. Zijn Event.Mission.Completed is de naad die SPEC-P2-05 consumeert, en
+# die commit de Foothold-flips. Twee schrijvers van regiostaat is precies de
+# divergentiebug waar 12.3 voor bestaat.
+m13, created = get_or_create_mission("MT_M13")
+if created:
+    m13.set_editor_property("template_id", "MT_M13")
+    m13.set_editor_property("display_name", unreal.Text("Signal Fire"))
+    m13.set_editor_property("progress_region_on_success", False)
+
+    jammer = unreal.EclipseObjectiveDef()
+    jammer.set_editor_property("objective_id", "Obj_M13_Jammer")
+    jammer.set_editor_property("type", unreal.EclipseObjectiveType.DESTROY_TARGET)
+    jammer.set_editor_property("description", unreal.Text("Bring down the jammer tower"))
+    jammer.set_editor_property("target_id", "Site_AlarmRelay")
+
+    exfil13 = unreal.EclipseObjectiveDef()
+    exfil13.set_editor_property("objective_id", "Obj_M13_Exfil")
+    exfil13.set_editor_property("type", unreal.EclipseObjectiveType.EXTRACT_SQUAD)
+    exfil13.set_editor_property("description", unreal.Text("Extract under pressure"))
+    exfil13.set_editor_property("target_id", "Site_Extraction")
+
+    # GEEN OPTIONAL. De spec noemt er een ("SupplyDepot stores captured intact,
+    # +60 M windfall"), maar die hangt aan een wereldfeit dat nog niet bestaat:
+    # het schema kent alleen bRequiresNoAlarm en bRequiresNoCasualties. Een
+    # optional die niet te evalueren is, leest op de HUD als "behaald" zodra de
+    # missie slaagt - en een liegende regel verscheept nooit (14.3.6). Dezelfde
+    # reden waarom M1.1 zijn optional pas in wave 2 kreeg.
+    m13.set_editor_property("objectives", [jammer, exfil13])
+    # De spec belooft twee routes die er echt toe doen: het torenplein of de
+    # dienstgang. Entry_Roof is de luide, Entry_Sewer de stille.
+    m13.set_editor_property("insertion_point_ids", ["Entry_Roof", "Entry_Sewer"])
+    eal.save_loaded_asset(m13)
+    unreal.log("MT_M13 authored: 2 mandatory, no optional (schema), no region flip.")
+
 # --- DT_StoryMissions: the M1.1 pin (M1.2-M1.4 rows land as their missions are
 # authored, each behind its predecessor's completion beat).
 table_path = f"{DATA_PATH}/DT_StoryMissions"
@@ -158,6 +196,33 @@ rows = json.dumps([
      "CompletionBeatTag": {"TagName": "Story.Beat.M12_DeadDrop"},
      "RewardCredits": 30, "RewardMaterials": 15, "RewardIntel": 8,
      "BriefingText": "Two caches, two blocks, and a patrol that never learned our faces. Keep it that way.",
+     "BriefingSpeaker": "Mara"},
+    # M1.3 achter de beat van M1.2, en gepind op TransitCheckpoint. Die keuze is
+    # GEMETEN en niet beredeneerd, en de meting legde een spanning in de spec
+    # bloot die je alleen ziet als je de keten echt uitspeelt:
+    #
+    #   SelectMission(SupplyDepot) = NEE, reden: "No adjacent player-held region
+    #   (GDD 3.1 rule 1: no lane, no movement)"
+    #
+    # Besluit 6 zegt dat M1.1, M1.2 en M1.4 GEEN regio omdraaien, en dat M1.3's
+    # flip bij SPEC-P2-05 hoort. Gevolg: zolang P2-05 er niet is, bezit de speler
+    # alleen Underworks — en dan zijn TransitCheckpoint en WorkerHousing de enige
+    # twee regio's die hij kan kiezen. De hele M1-keten speelt zich dus af op die
+    # twee, hoe verleidelijk CommsRelay ook klinkt voor een jammer-toren.
+    #
+    # Een AANBOD hebben en SELECTEERBAAR zijn zijn twee dingen: na M1.2 hebben
+    # alle zes de regio's aanbod, inclusief CommsRelay. Alleen kun je er niet
+    # heen. Dat verschil is precies waarom deze pin gemeten moest worden.
+    #
+    # TransitCheckpoint is vrij zodra M1.1 gespeeld is: een verbruikte pin valt
+    # terug op het regio-aanbod (gemeten: MT_Assault), dus M1.3 kan hem overnemen.
+    {"Name": "MT_M13", "MissionId": "MT_M13",
+     "MissionAsset": f"{MISSIONS_PATH}/MT_M13.MT_M13",
+     "PinnedRegionId": "TransitCheckpoint",
+     "UnlockBeatTag": {"TagName": "Story.Beat.M12_DeadDrop"},
+     "CompletionBeatTag": {"TagName": "Story.Beat.M13_SignalFire"},
+     "RewardCredits": 60, "RewardMaterials": 40, "RewardIntel": 4,
+     "BriefingText": "Take the tower and the district goes deaf. It will answer - be gone before it does.",
      "BriefingSpeaker": "Mara"},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(table, rows):
