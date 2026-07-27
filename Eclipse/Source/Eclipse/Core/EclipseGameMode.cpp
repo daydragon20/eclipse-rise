@@ -502,6 +502,68 @@ void AEclipseGameMode::DrivePlayShotInput()
 			}
 		}
 		PlayShotLastYaw = NowYaw;
+
+		// EN NU DE BOTTEN, want beide rotatie-assen liggen stil (0 omklappen, 0,00
+		// graden) terwijl de owner het lichaam ziet trillen. Een tril in de POSE
+		// zit per definitie niet in de rotatie van de actor of de mesh: die zit in
+		// waar de botten staan. Kandidaat is de schietpose die per schot opnieuw
+		// begint tegen de idle-take in.
+		//
+		// Op de HAND en niet op de heup: een schietpose beweegt de armen, en de hand
+		// is het uiteinde van die keten - daar is een tril het grootst. Component-
+		// ruimte, dus het meet de POSE en niet het rondlopen van het personage.
+		if (USkeletalMeshComponent* Skel = Body->GetMesh())
+		{
+			static const FName Kandidaten[] = { TEXT("hand_r"), TEXT("RightHand"),
+				TEXT("hand_right"), TEXT("weapon_r"), TEXT("Hand_R") };
+			if (PlayShotBoneName.IsNone())
+			{
+				for (const FName& Naam : Kandidaten)
+				{
+					if (Skel->GetBoneIndex(Naam) != INDEX_NONE)
+					{
+						PlayShotBoneName = Naam;
+						UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT BOT] meet op '%s'."), *Naam.ToString());
+						break;
+					}
+				}
+				if (PlayShotBoneName.IsNone())
+				{
+					// ZEG WELKE ER WEL ZIJN in plaats van stil niets meten. Een
+					// meting die op een niet-bestaand bot draait geeft nul, en nul
+					// leest als "geen tril" — precies de fout van vandaag.
+					FString Eerste;
+					for (int32 i = 0; i < FMath::Min(8, Skel->GetNumBones()); ++i)
+					{
+						Eerste += Skel->GetBoneName(i).ToString() + TEXT(" ");
+					}
+					UE_LOG(LogEclipse, Warning,
+						TEXT("[PLAYSHOT BOT] geen bekende handbot; eerste botten: %s"), *Eerste);
+					PlayShotBoneName = TEXT("-");
+				}
+			}
+			if (PlayShotBoneName != TEXT("-"))
+			{
+				const FVector Nu = Skel->GetBoneTransform(
+					Skel->GetBoneIndex(PlayShotBoneName), FTransform::Identity).GetLocation();
+				if (!PlayShotLastBone.IsZero())
+				{
+					const FVector Stap = Nu - PlayShotLastBone;
+					if (Stap.Size() > 0.01f)
+					{
+						if (!PlayShotLastBoneStep.IsZero() &&
+							(Stap | PlayShotLastBoneStep) < 0.0f)
+						{
+							++PlayShotIntervalBoneFlips;   // richting omgekeerd
+						}
+						PlayShotLastBoneStep = Stap;
+						PlayShotIntervalMaxBoneStep =
+							FMath::Max(PlayShotIntervalMaxBoneStep, Stap.Size());
+					}
+				}
+				PlayShotLastBone = Nu;
+			}
+		}
 	}
 
 	if (bPlayShotFiring)
@@ -640,7 +702,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, LICHAAM-OMKLAPPEN %d (grootste stap %.2f gr, vurend %d), component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f), COMPONENT HEEFT OPGEHAALD (piek over het interval) %.2f, GELAND %.1f, VERDAMPT %.1f, LICHAAM-OMKLAPPEN %d (grootste stap %.2f gr), HAND-OMKLAPPEN %d (grootste stap %.2f cm), vurend %d, component zag invoer op %d van de duwmomenten (tick uit %d, inactief %d)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -664,6 +726,8 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				PlayShotIntervalVanished,
 				PlayShotIntervalYawFlips,
 				PlayShotIntervalMaxYawStep,
+				PlayShotIntervalBoneFlips,
+				PlayShotIntervalMaxBoneStep,
 				bPlayShotFiring ? 1 : 0,
 				PlayShotIntervalSawInput,
 				PlayShotIntervalTickOff,
@@ -679,6 +743,8 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalVanished = 0.0f;
 		PlayShotIntervalYawFlips = 0;
 		PlayShotIntervalMaxYawStep = 0.0f;
+		PlayShotIntervalBoneFlips = 0;
+		PlayShotIntervalMaxBoneStep = 0.0f;
 		PlayShotLastPendingAfter = -1.0f;
 		PlayShotIntervalSawInput = 0;
 		PlayShotIntervalTickOff = 0;

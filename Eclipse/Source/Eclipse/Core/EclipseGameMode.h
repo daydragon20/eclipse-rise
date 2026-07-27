@@ -133,6 +133,13 @@ private:
 	float PlayShotLastYaw = -9999.0f;
 	float PlayShotLastYawStep = 0.0f;
 
+	/** De pose-laag: hoe vaak de HAND van richting omkeert, en hoe groot die stap is. */
+	int32 PlayShotIntervalBoneFlips = 0;
+	float PlayShotIntervalMaxBoneStep = 0.0f;
+	FVector PlayShotLastBone = FVector::ZeroVector;
+	FVector PlayShotLastBoneStep = FVector::ZeroVector;
+	FName PlayShotBoneName;
+
 	/** Hoe vaak de component met zijn tick UIT stond, en hoe vaak inactief. */
 	int32 PlayShotIntervalTickOff = 0;
 	int32 PlayShotIntervalInactive = 0;
