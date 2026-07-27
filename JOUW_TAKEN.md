@@ -171,6 +171,32 @@ de lichtplekken en contactschaduwen van de bouwer wél renderen. Dat heb ik nooi
 gezien — alleen aangenomen omdat de wijk aangekleed oogt. Er staan er **38** in de
 wereld, met precies het recept dat mijn spoor nu ook gebruikt.
 
+### 🔬 DE CONTROLEPROEF FAALDE — en dat betekent dat één van mijn twee gereedschappen liegt
+
+Ik heb twaalf oorzaken uitgesloten voor een plat vlak dat niet rendert, en telkens
+geconcludeerd "hij staat er wel, hij is alleen onzichtbaar". Toen bedacht ik dat ik
+de controleproef nooit had gedaan: **is daar überhaupt iets zichtbaar?**
+
+Een **massieve magenta kubus van 90 cm**, zwevend op ooghoogte, 9 meter van de
+camera, met open lucht erachter zodat er per constructie niets voor kan staan. Op
+die afstand zou hij ongeveer 90 pixels breed zijn — onmisbaar.
+
+**Hij is er niet.**
+
+Daarmee is er iets belangrijkers stuk dan mijn inslagspoor, en er zijn twee
+mogelijkheden:
+
+1. **Wat ik na het starten in de wereld zet, rendert niet** — dan verklaart dat het
+   inslagspoor volledig, en het raakt alles wat tijdens het spelen wordt neergezet.
+2. **Mijn projectie liegt over waar dingen op het scherm staan** — dan heb ik de
+   hele middag naar de verkeerde pixels gekeken en is elke "hij staat in het kader"
+   waardeloos, inclusief de elf uitsluitingen hierboven.
+
+**Ik weet niet welke van de twee het is, en dat is precies waarom dit hier staat.**
+Wat ik wel weet: één van mijn twee meetgereedschappen deugt niet, en alles wat ik
+vandaag over dit onderwerp heb opgeschreven staat op één van die twee. De editor
+beslist het in tien seconden — zet de wijk stil en kijk of er een magenta blok hangt.
+
 **EN DAT IS WAARSCHIJNLIJK ZO — hier is de redenering, met de zwakte erbij.** Mijn
 tweede kanarie stond op `(-8150, 0)`, precies waar de inslagen ook landen: wegdek dat
 in elke uitsnede duidelijk zichtbaar is, dus níét achter dekking. Hij had het
