@@ -73,11 +73,32 @@ zit verder weg, Borderlands zit dichter op het personage met een bredere FOV.
   koppelen aan de armlengte, want de offset bepaalt hoeveel graden het personage
   uit het midden staat — en dat verandert zodra de arm korter wordt. Zie hoofdstuk
   2: bij het mikken krimpt onze arm wél en blijft de offset staan.
-- **"Schuift mijn personage naar de zijkant als ik ren" is nog NIET gemeten.**
-  Alle bestaande metingen gaan over GROOTTE (schijnbare hoogte) en AFSTAND, geen
-  enkele over SCHERMPOSITIE. Dat is de meetopdracht die hieruit volgt en het is
-  precies de klacht van de owner. **Meet: de horizontale schermpositie van het
-  personage bij 0, 180, 420 en 650 cm/s.**
+- **"Schuift mijn personage naar de zijkant als ik ren" is nog NIET gemeten — en
+  de meting die ernaar lijkt te kijken KAN het niet vinden.** De opnameronde drukt
+  per moment `scherm=(x,y)` af, en dat leek de meetopdracht al te dekken. Nagemeten
+  over alle negen momenten van de ronde van 08:49 — stilstand, rennen, draaien over
+  118° en 238°, herladen:
+
+  ```
+  opname 1..9:  scherm x=500  y=525   afstand=312cm     (negen keer identiek)
+  ```
+
+  **Een waarde die onder geen enkele omstandigheid beweegt, meet niet wat ze
+  belooft.** De oorzaak is constructie, geen toeval: deze regel projecteert
+  `Body->GetActorLocation()`, en de camera hangt daar via de spring arm star aan
+  vast. Die projectie is dus per definitie constant, hoe hard je ook loopt. Dat is
+  dezelfde vorm als de rest van deze dag — een controle die niet rood kán worden.
+
+  De 500 is trouwens wel informatief: op een frame van 1280 ligt het midden op 640,
+  dus het personage staat **140 px links van het midden**. Dat is de socket-offset
+  van 55 cm naar rechts, en dat klopt met de bedoeling.
+
+  **DE JUISTE MEETOPDRACHT is de horizontale positie van het SILHOUET, niet van de
+  actor.** De ronde berekent al een silhouethoogte in pixels (`[PLAYSHOT n
+  SILHOUET] 482 px hoog`), dus er is al een silhouetbepaling; die moet ook zijn
+  x-midden afgeven. Dat meet wél wat de owner ziet, want een personage dat
+  overhelt of achterblijft verschuift met zijn silhouet en niet met zijn
+  actor-oorsprong.
 
 ---
 
