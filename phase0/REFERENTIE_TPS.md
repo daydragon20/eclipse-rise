@@ -213,6 +213,26 @@ if (bAiming)
 > **Nog niet gerepareerd**, met opzet: één mik-parameter is vandaag al op een
 > plausibele redenering aangepast en bleek omgekeerd, dus de volgende krijgt een
 > frame ernaast in plaats van een tweede gok.
+>
+> **DE VORM VAN DE FIX IS WEL AL DUIDELIJK, en hij is leerzaam omdat hij LIJKT op
+> de fout hierboven.** De hoogte-offset van 65 cm staat onder een hoek van
+> `atan(65/300)` = 12,2° bij normale arm, maar `atan(65/165)` = 21,5° bij ADS —
+> bijna dubbel, en dát is waarom het personage onder de rand zakt. De Z meeschalen
+> met de armverhouding houdt die hoek constant en lost het op.
+>
+> **Waarom dat voor Z wél klopt en voor Y niet**, en dit is het punt dat vandaag
+> geld heeft gekost: het is dezelfde formule voor een ánder doel. De Y-offset
+> dient "maak de vizierlijn vrij" — daar is een constante hoek verkeerd, want die
+> houdt het personage even ver in de weg. De Z-offset dient "houd hem in beeld" —
+> daar ís een constante hoek precies wat je wilt. Dezelfde ingreep, tegengesteld
+> oordeel, omdat het effect verschilt.
+>
+> **Let bij het bouwen op de tweede eigenaar:** `SocketOffset.Z` wordt ook door de
+> landingsdip bestuurd, en die draait in Tick terwijl `RefreshCameraTargets` alleen
+> op toestandswissels loopt. Wie de Z hier overschrijft, vecht met de dip. De
+> ingreep hoort dus in de dip-berekening te landen of via een aparte
+> ADS-vermenigvuldiger die de dip respecteert — niet als tweede schrijver op
+> hetzelfde veld.
 - **Hoe het kruis zich verhoudt tot waar de kogel gaat is NIET geverifieerd.** De
   hitscan vuurt vanaf een oorsprong met een richting; of dat exact door het
   schermmidden loopt is nooit gemeten. Meetopdracht, en die hoort vóór elke
