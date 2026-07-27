@@ -119,6 +119,11 @@ private:
 
 	/** One-shot 14.3.5 warnings: missing table once per lifetime; no-row/gate-closed once per mission id. */
 	mutable bool bWarnedMissingLiberationTable = false;
+
+#if !UE_BUILD_SHIPPING
+	/** Eclipse.Liberation.Report (SPEC-P2-05 stap 4); alleen in dev-builds. */
+	IConsoleObject* LiberationReportCommand = nullptr;
+#endif
 	TSet<FName> WarnedUntriggeredLiberationMissionIds;
 
 	FEclipseEventSubscriptionHandle MissionCompletedHandle;

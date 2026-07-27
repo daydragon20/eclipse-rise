@@ -98,6 +98,81 @@ void UEclipseStrategySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}),
 			ECVF_Default);
 	}
+
+	// DE LIBERATIE-DUMP (SPEC-P2-05 bouwvolgorde stap 4).
+	//
+	// Dit commando bestond nog niet, en het had de bug van 27-07 in een seconde
+	// zichtbaar gemaakt: de Foothold-rij stond klaar, de logica was tien keer
+	// unit-getest, en DA_CampaignSetup.LiberationInstances was simpelweg NIET
+	// GEKOPPELD. Op de kaart was daar niets van te zien - er draaide gewoon nooit
+	// een regio om, precies zoals een spel waarin die missie er nog niet is.
+	//
+	// Vandaar dat de eerste regel hieronder de KOPPELING is en niet de inhoud. Een
+	// rapport dat met "0 rijen" begint laat in het midden of de tabel leeg is of
+	// niet gevonden, en dat zijn twee verschillende reparaties.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.Liberation.Report")) == nullptr)
+	{
+		LiberationReportCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.Liberation.Report"),
+			TEXT("Dump de liberation-staat: tabel gekoppeld, rijen, welke rij al gevuurd is, en wat er nog zou omdraaien."),
+			FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+			{
+				const UEclipseCampaignSubsystem* Campaign = GetGameInstance() != nullptr
+					? GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>() : nullptr;
+				if (Campaign == nullptr)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("Liberatie: geen campagne actief."));
+					return;
+				}
+
+				const UEclipseCampaignSetupAsset* Setup = Campaign->GetActiveSetup();
+				const bool bLinked = Setup != nullptr && !Setup->LiberationInstances.IsNull();
+				UE_LOG(LogEclipse, Display, TEXT("Liberatie: tabel %s"),
+					bLinked ? *Setup->LiberationInstances.ToString() : TEXT("NIET GEKOPPELD aan DA_CampaignSetup"));
+				if (!bLinked)
+				{
+					UE_LOG(LogEclipse, Display,
+						TEXT("Liberatie: er draait dus NOOIT een regio om. Draai Tools/setup_liberation_data.py."));
+					return;
+				}
+
+				const UDataTable* Table = GetValidatedLiberationTable(*Campaign);
+				if (Table == nullptr)
+				{
+					UE_LOG(LogEclipse, Warning, TEXT("Liberatie: tabel gekoppeld maar niet bruikbaar (verkeerde rijstruct?)."));
+					return;
+				}
+
+				int32 Rows = 0;
+				Table->ForeachRow<FEclipseLiberationRow>(TEXT("LiberationReport"),
+					[this, &Rows, &Campaign](const FName& RowName, const FEclipseLiberationRow& Row)
+					{
+						++Rows;
+						// Al gevuurd of niet: dat is de vraag die je stelt als er
+						// iets NIET omdraaide, dus die staat vooraan.
+						const bool bComplete = EclipseLiberationLogic::IsLiberationComplete(Campaign->GetState(), Row);
+						UE_LOG(LogEclipse, Display,
+							TEXT("Liberatie: rij '%s' trigger=%s beat=%s -> %d regio's, staat: %s"),
+							*RowName.ToString(),
+							*Row.TriggerMissionId.ToString(),
+							Row.RequiredBeatTag.IsValid() ? *Row.RequiredBeatTag.ToString() : TEXT("(ongepoort)"),
+							Row.RegionIds.Num(),
+							bComplete ? TEXT("AL GEVUURD") : TEXT("wacht"));
+
+						// Per regio de huidige eigenaar. Zonder die regels weet je
+						// wel DAT hij nog wacht, niet wat er straks verandert.
+						for (const FName& RegionId : Row.RegionIds)
+						{
+							const FEclipseRegionState* State = Campaign->GetState().FindRegion(RegionId);
+							UE_LOG(LogEclipse, Display, TEXT("Liberatie:   %s is nu %s"),
+								*RegionId.ToString(),
+								State != nullptr ? *UEnum::GetValueAsString(State->Owner) : TEXT("(BESTAAT NIET in de graaf)"));
+						}
+					});
+				UE_LOG(LogEclipse, Display, TEXT("Liberatie: %d rij(en) in de tabel."), Rows);
+			}),
+			ECVF_Default);
+	}
 #endif
 }
 

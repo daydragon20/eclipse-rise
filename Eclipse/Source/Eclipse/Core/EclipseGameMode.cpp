@@ -664,6 +664,12 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// beantwoordt de vraag in plaats van hem open te laten.
 		FScreenshotRequest::RequestScreenshot(TEXT("PlayShot_MetUI"), /*bShowUI*/ true, /*bAddFilenameSuffix*/ false);
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 8] zelfde beeld MET de HUD erop"));
+		// De liberation-dump meedraaien in de ronde. Niet omdat hij bij een
+		// SCREENSHOT hoort, maar omdat dit de enige plek is waar een echte
+		// campagne draait met een console eronder — en een debug-commando dat
+		// nooit wordt aangeroepen, is precies zo betrouwbaar als een test die
+		// nooit rood kan worden.
+		Controller->ConsoleCommand(TEXT("Eclipse.Liberation.Report"));
 		break;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));
