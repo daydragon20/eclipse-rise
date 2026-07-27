@@ -79,6 +79,18 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 			Mid->SetVectorParameterValue(TEXT("LitColor"), Spark);
 			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Spark * 0.45f);
 			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
+			// UVMode EN een albedo, want zonder die twee bleef het spoor onzichtbaar.
+			// GEMETEN: met een proefspoor van 90 cm - tien keer de echte maat, op 7 tot
+			// 9 m voor de speler en dus vol in beeld - was er nog steeds niets te zien.
+			// Dat sluit maat en plaats uit en laat het materiaal over: elke andere
+			// gebruiker van dit master (de lichamen, de grayboxblokken) zet een textuur
+			// en een UV-modus, mijn spoor als enige niet. Een master die zijn kleur
+			// door een ontbrekende albedo vermenigvuldigt, levert zwart op zwart asfalt.
+			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+			if (UTexture* White = LoadObject<UTexture>(nullptr, TEXT("/Engine/EngineResources/WhiteSquareTexture.WhiteSquareTexture")))
+			{
+				Mid->SetTextureParameterValue(TEXT("AlbedoTex"), White);
+			}
 			Plate->SetMaterial(0, Mid);
 		}
 	}
@@ -430,10 +442,15 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 		++WorldHits;
 		const UPhysicalMaterial* Surface = Hit.PhysMaterial.Get();
 		UE_LOG(LogEclipse, Display,
-			TEXT("Wapen: wereldtreffer op %s (oppervlak %s) op %s — %d deze missie."),
+			TEXT("Wapen: wereldtreffer op %s (oppervlak %s) op %s, %.0f cm ver — %d deze missie."),
 			*GetNameSafe(Hit.GetActor()),
 			Surface != nullptr ? *Surface->GetName() : TEXT("onbekend"),
-			*Hit.ImpactPoint.ToCompactString(), WorldHits);
+			*Hit.ImpactPoint.ToCompactString(),
+			// DE AFSTAND EN NIET ALLEEN DE PLEK. Ik las hierboven een WERELDCOORDINAAT
+			// (X=-7900) als een afstand en schreef 'de inslagen landen op 79 meter'.
+			// Dat is precies de fout die dit project telkens maakt: een getal aflezen
+			// zonder te weten waarin het staat. Nu staat de afstand er los bij.
+			FVector::Dist(Hit.ImpactPoint, ViewLocation), WorldHits);
 
 		// EN HET FEIT OP DE BUS, want een teller die alleen in dit component leeft
 		// is precies de vorm waar dit project telkens op valt: staat in de data,

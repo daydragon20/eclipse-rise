@@ -88,16 +88,22 @@ Wat het uitzoeken opleverde is belangrijker dan het spoor:
    `WERELDTREFFERS=0`. De ronde kijkt over een lege weg naar een skyline op
    kilometers. Het hele inslagpad — feit, geluid, spoor — werd dus **nooit
    uitgeoefend**, en de groene bar zei daar niets over.
-3. Toen ik de testschoten 12° omlaag liet mikken: `WERELDTREFFERS=11`. Maar de
-   inslagen landen op **79 meter**, niet op het wegdek 7 meter vooruit.
-   **Je kogels gaan dus door de grond vlak voor je heen.** Ook op 90 cm groot
-   (proef) is er niets te zien — het spoor ligt gewoon 79 m verderop.
+3. Toen ik de testschoten 12° omlaag liet mikken: `WERELDTREFFERS=11`, en de
+   inslagen liggen op **707–879 cm** — precies waar een schot van 12° omlaag de
+   vloer raakt, en dus vol in beeld.
 
-**Dat laatste is een betere verklaring voor jouw "ik zie de inslagen nauwelijks"
-dan alles wat ik vanmiddag heb opgeschreven.** Als de vloer en het nabije dekking
-je schot niet stoppen, is er in je blikveld nooit een inslag. Dat wil ik uitzoeken
-voordat ik nog iets aan het spoor sleutel — het spoor kan kloppen terwijl er niets
-is om het aan te hangen.
+> ~~Punt 3 zei eerst: "de inslagen landen op 79 meter, je kogels gaan door de grond
+> heen."~~ **Dat was fout en ik heb het binnen het uur zelf rechtgezet.** Ik las
+> `X=-7900` uit het log als een AFSTAND, terwijl het een wereldcoördinaat is. De
+> afstand staat er nu apart bij, en hij is 7 tot 9 meter. Er is niets mis met de
+> grond.
+
+**Wat er dan wél is: het spoor rendert niet.** Een proef met een spoor van 90 cm —
+tien keer de echte maat, vol in beeld — liet ook niets zien. Dat sluit maat en
+plaats uit en laat het materiaal over: elke andere gebruiker van het toon-master
+(de lichamen, de grayboxblokken) zet een textuur en een UV-modus, mijn spoor als
+enige niet. Dat is nu rechtgezet; of het daarmee zichtbaar is, staat in het
+volgende bericht.
 
 ### ✅ WAPENKLEUR GEMETEN — jouw eis is gehaald, oordeel jij
 
