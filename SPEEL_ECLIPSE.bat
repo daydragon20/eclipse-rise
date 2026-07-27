@@ -109,6 +109,19 @@ echo     - HERLADEN heeft nu een houding; die is geleend uit een ander pack
 echo     - er HANGT een wapen in je handen; hier stond het tegenovergestelde en
 echo       dat was onjuist. Het zat verstopt doordat het dezelfde kleur had als je
 echo       lichaam; sinds vandaag is het gunmetal en steekt het af.
+echo     - MIKKEN MAAKT JE PERSONAGE VEEL MINDER GROOT. Hij vulde 97%% van je
+echo       beeldhoogte en vijf keer zo veel oppervlak als vanaf de heup; nu is dat
+echo       x1,9. De camera trekt nog steeds in en de FOV vernauwt nog steeds, maar
+echo       minder ver. Zeg het als mikken daardoor te vlak aanvoelt - dat is de
+echo       enige kant die ik niet kan meten.
+echo     - JE BENEN LOPEN NU DOOR TERWIJL JE SCHIET EN HERLAADT. Die poses gingen
+echo       eerst over je hele lijf, dus je sprong 6,7 keer per seconde tussen lopen
+echo       en schieten. Dat was de trilling die je meldde.
+echo     - SCHUIN LOPEN klapt niet meer om op 45 graden; naburige looprichtingen
+echo       lopen nu in elkaar over.
+echo     - EEN MISSER IS HOORBAAR, maar je ZIET nog geen inslag. Ik heb dat spoor
+echo       gebouwd en het rendert niet - elf oorzaken uitgesloten en nog steeds
+echo       onzichtbaar. Meld het dus niet als bug: het is bekend en onopgelost.
 echo     - haal je de FOOTHOLD (na Signal Fire), dan staat er in het debrief
 echo       nu een ZIN die uitlegt waarom de wijk kantelde - niet alleen welke
 echo       vakken omdraaiden. Zeg het als die zin niet aankomt of te vroeg komt.
