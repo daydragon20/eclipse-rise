@@ -24,6 +24,37 @@ gekozen dat de downloads op de achtergrond binnenlopen terwijl jij speelt.
 
 ---
 
+## ✅ JE ZES PUNTEN: ALLE ZES GEDIAGNOSTICEERD (27-07)
+
+Suite **184/184 groen**, ValidateData 0 errors. Bij drie punten bleek de
+oorspronkelijke formulering niet te kloppen met wat de code doet — dat staat er
+telkens bij, want dat verandert wat er gebouwd moet worden.
+
+| # | Stand |
+|---|---|
+| **1** mikken | **GEBOUWD, niet visueel bevestigd.** De camera-lag ging nooit uit tijdens ADS — je kruis staat schermvast terwijl de camera achterloopt, dus de wéreld schuift eronder door. Nu uit. En de zijoffset (55 cm) kromp niet mee met de arm (300→165), waardoor je personage júíst je vizierlijn in kroop; die schaalt nu mee |
+| **2** richtkruis | **BESTAAT EN WORDT GETEKEND** (`richtkruis zichtbaarheid=3 tekst='+'`). Niet te fotograferen: vier opnamemethodes vangen de UI-laag niet |
+| **3** camera | **GEMETEN, en de uitslag spreekt de klacht tegen.** Twee bestaande metingen kónden hem niet vinden (negen keer exact x=500). De derde beweegt wel — spreiding 64 px — maar de uitslagen vallen bij **draaien** en **herladen**, niet bij rennen |
+| **4** kogels | **ER IS GEEN WERELD-INSLAG om zichtbaar te maken.** De hitscan gooit alles weg wat geen personage is, dus een schot in een muur wordt stil verworpen: geen feit, geen geluid, geen decal. VFX op dat pad blijft bij elke MIS onzichtbaar |
+| **5** wapenwissel | **HET WAPEN IS EEN APART MATERIAALSLOT** (`M_Belica_Guns`, slot 4 van 12). Zichtbaar máken vraagt dus geen mesh-operatie, alleen een eigen tint. Wisselbaar maken vraagt het nog steeds wel |
+| **6** de gids | **DE KETEN WERKT — end-to-end gemeten.** Toets → actie → handler → paneel open met 13 regels. G kon je niet hebben (toegevoegd ná je sessie); F3 is door de engine geclaimd als `viewmode lit` |
+
+### 🟡 DRIE BESLISSINGEN DIE BIJ JOU LIGGEN
+
+1. **Speel na een verse build en druk G.** Dat sluit punt 6 én bevestigt of je het
+   richtkruis ziet. Werkt G niet, dan ligt het aan je toetsenbord — en dat weten we
+   dan ook, want de keten is gemeten.
+2. **Punt 5: welke kleur krijgt het wapen?** Een eigen tint op slot 4 maakt het
+   meteen leesbaar in silhouet. Maar wélke kleur raakt de ÉÉN-STIJL-WET en de
+   waardehiërarchie die in het district al vastligt (Cover > CoverB > DecoLine).
+   Dat is art-directie en dus jouw oordeel, niet iets wat ik 's nachts invul.
+3. **Punt 4: mag ik het schadepad aanraken?** Stap 1 is "een schot dat de wereld
+   raakt krijgt een uitkomst", en dat zit in het schadepad van élk wapen. Zeg het
+   en ik doe het met een verse bar en een frame erbij. En zeg het als je de Muzzle
+   Flash uit je Fab-bibliotheek wilt ophalen.
+
+---
+
 ## 🔴 NA DE REFERENTIE-OPDRACHT — STAND EN ÉÉN KLIK
 
 **De maatstaf staat: [phase0/REFERENTIE_TPS.md](phase0/REFERENTIE_TPS.md).**
