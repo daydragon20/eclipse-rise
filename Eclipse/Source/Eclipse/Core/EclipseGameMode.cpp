@@ -324,6 +324,20 @@ void AEclipseGameMode::DrivePlayShotInput()
 		PlayShotIntervalMinMaxSpeed = FMath::Min(PlayShotIntervalMinMaxSpeed, Allowed);
 	}
 
+	// WIE HEEFT DE VECTOR LEEGGEHAALD. Als Acceleration nul blijft terwijl er
+	// honderd keer geduwd is, zijn er nog maar twee mogelijkheden: de
+	// CharacterMovementComponent leest de vector niet, of IEMAND ANDERS heeft hem
+	// al geconsumeerd voordat hij erbij kon. Dat is van hieruit te scheiden zonder
+	// debugger: de pending vector aan het BEGIN van deze tick, vóór mijn eigen
+	// AddMovementInput.
+	//   rest > 0  -> niemand consumeerde de duw van de vorige tick; de CMC leest
+	//                hem dus niet, en het ligt in de movement-tick zelf.
+	//   rest == 0 -> er IS geconsumeerd, alleen belandt het niet in Acceleration.
+	// De eerdere 'duw 1.00' mat dit niet: die werd op het opnamemoment gelezen,
+	// ná de duw van diezelfde tick, en kon dus nooit iets scheiden.
+	PlayShotIntervalRestBeforePush = FMath::Max(PlayShotIntervalRestBeforePush,
+		static_cast<float>(Body->GetPendingMovementInputVector().Size()));
+
 	if (bPlayShotWalking)
 	{
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
@@ -465,7 +479,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (invoer GENEGEERD: %d), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, REST VOOR DE DUW %.2f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -473,6 +487,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				// Dat geeft exact het gemeten beeld: honderd duwen, acceleratie nul,
 				// en verder alles gezond. Laatste kandidaat die het patroon dekt.
 				PlayShotBody->IsMoveInputIgnored() ? 1 : 0,
+				PlayShotIntervalRestBeforePush,
 				PlayShotIntervalPathLength,
 				PlayShotIntervalTopAccel,
 				PlayShotIntervalTopSpeed,
@@ -488,6 +503,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalPathLength = 0.0f;
 		PlayShotIntervalPushes = 0;
 		PlayShotIntervalTopAccel = 0.0f;
+		PlayShotIntervalRestBeforePush = 0.0f;
 		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{

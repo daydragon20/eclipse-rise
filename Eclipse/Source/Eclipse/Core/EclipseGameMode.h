@@ -115,6 +115,9 @@ private:
 	/** Hoogste acceleratie van het interval; nul bij honderd duwen wijst naar ConsumeInputVector. */
 	float PlayShotIntervalTopAccel = 0.0f;
 
+	/** Grootste restvector aan het begin van een duw; >0 betekent dat niemand consumeerde. */
+	float PlayShotIntervalRestBeforePush = 0.0f;
+
 	/** Laagste GetMaxSpeed() van het interval; nul verklaart een pawn die niet loopt. */
 	float PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 
