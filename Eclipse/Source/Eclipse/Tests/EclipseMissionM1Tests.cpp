@@ -388,4 +388,162 @@ bool FEclipseMissionM11LossKeepsStoryColdTest::RunTest(const FString& Parameters
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// M1.2 "The Dead Drop" op de verscheepte data
+// ---------------------------------------------------------------------------
+//
+// Zelfde vorm als de M1.1-Gauntlet hierboven, en met opzet: SPEC-P2-04 eist dat
+// M1.1 groen is VOORDAT M1.2-M1.4 geauthord worden, en dat het bewijs dezelfde
+// vorm heeft - spawnen, via script voltooien, campagnestaat nakijken.
+//
+// Wat deze test bewaakt dat de M1.1-versie niet kon: DE POORT. M1.2 hangt achter
+// Story.Beat.M11_ThirteenBullets, en een poort die niet dicht kan, is geen poort.
+// Daarom staat de eerste stap op de AFWEZIGHEID van het aanbod.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionM12ShippedDataGauntletTest,
+	"Eclipse.Missions.M12GauntletOnShippedData",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseMissionM12ShippedDataGauntletTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt - draai Tools/create_phase1_content.py + Tools/setup_story_missions.py."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// 1. DE POORT IS DICHT. WorkerHousing is vanaf dag 1 bereikbaar vanuit
+	//    Underworks, dus als de unlock-beat niet gehonoreerd wordt, staat de dode
+	//    brief hier meteen naast de openingsmissie.
+	//
+	//    Beide uitkomsten zijn goed - geen aanbod, of een ander aanbod - maar ze
+	//    moeten uit elkaar te houden zijn. Een `if (TryGetOffer)` met de assertie
+	//    erbinnen slaat stilletjes over zodra er niets terugkomt, en bewijst dan
+	//    niets terwijl hij groen staat.
+	FEclipseMissionOfferView BeforeBeat;
+	const bool bOfferedBeforeBeat = Strategy->TryGetOffer(TEXT("WorkerHousing"), BeforeBeat);
+	AddInfo(bOfferedBeforeBeat
+		? FString::Printf(TEXT("GEMETEN  voor de beat biedt WorkerHousing '%s' aan"), *BeforeBeat.TemplateId.ToString())
+		: FString(TEXT("GEMETEN  voor de beat heeft WorkerHousing geen enkel aanbod")));
+	if (bOfferedBeforeBeat)
+	{
+		TestNotEqual(TEXT("M1.2 staat NIET in het aanbod voordat M1.1 gespeeld is"),
+			BeforeBeat.TemplateId, FName(TEXT("MT_M12")));
+	}
+
+	// 2. M1.1 uitspelen - geen herhaling van de vorige test, maar de enige manier
+	//    om de sleutel te verdienen die stap 3 nodig heeft.
+	TestTrue(TEXT("M1.1 geselecteerd"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error));
+	TestTrue(TEXT("M1.1 gelanceerd"), Prep->AutoLaunch(Error));
+	TestTrue(TEXT("M1.1 hinderlaag voltooid"), Mission->CompleteObjective(TEXT("Obj_M11_PatrolLeader"), Error));
+	TestTrue(TEXT("M1.1 extractie voltooid"), Mission->CompleteObjective(TEXT("Obj_M11_Exfil"), Error));
+	TestTrue(TEXT("M1.1 debrief"), Mission->ResolveDebrief(true, Error));
+
+	// 3. DE POORT IS OPEN.
+	FEclipseMissionOfferView Offer;
+	if (!TestTrue(TEXT("aanbod bestaat voor WorkerHousing"), Strategy->TryGetOffer(TEXT("WorkerHousing"), Offer)))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	TestEqual(TEXT("de pin wint van het regio-aanbod"), Offer.TemplateId, FName(TEXT("MT_M12")));
+	TestEqual(TEXT("rij-credits op het aanbod"), Offer.RewardCredits, 30);
+	TestEqual(TEXT("rij-materialen op het aanbod"), Offer.RewardMaterials, 15);
+
+	TArray<FEclipseEconomyEventPayload> RewardFacts;
+	FEclipseEventSubscriptionHandle EconomyHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&RewardFacts](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseEconomyEventPayload* Economy = Payload.GetPtr<FEclipseEconomyEventPayload>();
+				Economy != nullptr && Economy->Reason == TEXT("MissionReward"))
+			{
+				RewardFacts.Add(*Economy);
+			}
+		}));
+
+	TestTrue(TEXT("M1.2 geselecteerd"), Strategy->SelectMission(TEXT("WorkerHousing"), Error));
+	TestTrue(TEXT("M1.2 gelanceerd"), Prep->AutoLaunch(Error));
+	TestTrue(TEXT("M1.2 draait"), Mission->GetPhase() == EEclipseMissionPhase::Objectives);
+
+	// 4. DE GEAUTHORDE VORM: twee caches in gescheiden zones, extractie, ghost.
+	const TArray<FEclipseObjectiveDef>& Active = Mission->GetActiveObjectives();
+	TestEqual(TEXT("3 verplichte doelen + 1 optional"), Active.Num(), 4);
+	if (Active.Num() == 4)
+	{
+		TestTrue(TEXT("eerste cache is CollectItem"),
+			Active[0].ObjectiveId == TEXT("Obj_M12_CacheNorth") && Active[0].Type == EEclipseObjectiveType::CollectItem);
+		TestTrue(TEXT("tweede cache is CollectItem"),
+			Active[1].ObjectiveId == TEXT("Obj_M12_CacheSouth") && Active[1].Type == EEclipseObjectiveType::CollectItem);
+		TestTrue(TEXT("extractie sluit af"),
+			Active[2].ObjectiveId == TEXT("Obj_M12_Exfil") && Active[2].Type == EEclipseObjectiveType::ExtractSquad);
+		// Verschillende sites is niet cosmetisch: twee patrouilles lezen in plaats
+		// van een is de hele les van deze missie.
+		TestNotEqual(TEXT("de twee caches liggen op verschillende sites"),
+			Active[0].TargetId, Active[1].TargetId);
+
+		const FEclipseObjectiveDef& Ghost = Active[3];
+		TestEqual(TEXT("vierde doel is de ghost"), Ghost.ObjectiveId, FName(TEXT("Obj_M12_Ghost")));
+		TestTrue(TEXT("ghost is optioneel"), Ghost.bOptional);
+		TestTrue(TEXT("ghost hangt aan het alarm-feit"), Ghost.bRequiresNoAlarm);
+		TestEqual(TEXT("ghost betaalt de +10 materialen uit de spec"), Ghost.OptionalRewardMaterials, 10);
+		TestEqual(TEXT("ghost betaalt de +4 intel uit de spec"), Ghost.OptionalRewardIntel, 4);
+	}
+
+	const FEclipseRegionState* RegionBefore = Campaign->GetState().FindRegion(TEXT("WorkerHousing"));
+	if (RegionBefore == nullptr)
+	{
+		AddError(TEXT("De verscheepte regiograaf kent geen WorkerHousing - de M1.2-pin wijst naar een regio die niet bestaat."));
+		GameInstance->Shutdown();
+		return false;
+	}
+	const int32 DayBefore = Campaign->GetState().Day;
+	const EEclipseRegionOwner OwnerBefore = RegionBefore->Owner;
+
+	TestTrue(TEXT("eerste cache voltooid"), Mission->CompleteObjective(TEXT("Obj_M12_CacheNorth"), Error));
+	TestTrue(TEXT("tweede cache voltooid"), Mission->CompleteObjective(TEXT("Obj_M12_CacheSouth"), Error));
+	TestTrue(TEXT("extractie voltooid"), Mission->CompleteObjective(TEXT("Obj_M12_Exfil"), Error));
+	TestTrue(TEXT("debrief commit"), Mission->ResolveDebrief(true, Error));
+
+	int32 Credits = 0;
+	int32 Materials = 0;
+	int32 Intel = 0;
+	for (const FEclipseEconomyEventPayload& Fact : RewardFacts)
+	{
+		if (Fact.ResourceType == EclipseTags::Resource_Credits.GetTag())   { Credits += Fact.Delta; }
+		if (Fact.ResourceType == EclipseTags::Resource_Materials.GetTag()) { Materials += Fact.Delta; }
+		if (Fact.ResourceType == EclipseTags::Resource_Intel.GetTag())     { Intel += Fact.Delta; }
+	}
+	TestEqual(TEXT("rij-credits vastgelegd"), Credits, 30);
+	TestEqual(TEXT("rij-materialen vastgelegd"), Materials, 15);
+	TestEqual(TEXT("rij-intel vastgelegd - M1.2 is de eerste missie die intel betaalt"), Intel, 8);
+	TestEqual(TEXT("klok precies een dag verder"), Campaign->GetState().Day, DayBefore + 1);
+
+	// 5. GEEN REGIO-FLIP. Spec-besluit 6: M1.3 is de EERSTE wereldstaat-wijziging,
+	//    en twee schrijvers van regiostaat is precies de divergentiebug waar 12.3
+	//    voor bestaat.
+	const FEclipseRegionState* RegionAfter = Campaign->GetState().FindRegion(TEXT("WorkerHousing"));
+	if (TestNotNull(TEXT("regio bestaat nog na de debrief"), RegionAfter))
+	{
+		TestTrue(TEXT("M1.2 draait GEEN regio om (besluit 6: M1.3 is de eerste)"),
+			RegionAfter->Owner == OwnerBefore);
+	}
+
+	Bus->Unsubscribe(EconomyHandle);
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
