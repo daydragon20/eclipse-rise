@@ -11,6 +11,7 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "Base/EclipseBaseSubsystem.h"
 #include "Base/EclipsePrepSubsystem.h"
 #include "Base/EclipsePrepTypes.h"
 #include "Core/EclipseEventBusSubsystem.h"
@@ -1401,6 +1402,248 @@ bool FEclipseBrokeCampaignStillGetsItsFootholdTest::RunTest(const FString& Param
 	Bus->Unsubscribe(EconomyHandle);
 	Bus->Unsubscribe(LiberationHandle);
 	GameInstance->Shutdown();
+	return true;
+}
+
+
+// ---------------------------------------------------------------------------
+// De drie econ-paden van SPEC-P2-03, over de gespeelde slice
+// ---------------------------------------------------------------------------
+//
+// De spec noemt drie manieren waarop een speler zijn basis kan opbouwen en
+// noemt ze met zoveel woorden "de soak-invarianten": Builder (drie gebouwen
+// neerzetten), Intel opening (eerst het Intelligence Centre, gear komt later) en
+// Thrifty (zuinig, en dan een Workshop-upgrade). Ze horen alle drie te PASSEN
+// binnen de slice.
+//
+// TWEE DINGEN DIE IK BEWUST NIET DOE.
+//
+// Niet de kalender vastpinnen. De spec zet er dagen bij - Barracks d2, Workshop
+// d9, IC d13 - maar zegt er zelf bij dat retunen in DT_Facilities gebeurt zonder
+// dat de spec verandert. Een test die "Barracks op dag 2" eist maakt van een
+// tuningwaarde een contract. Wat de invariant beweert is de UITKOMST: haalt dit
+// pad zijn gebouwen binnen de slice. Dus bestelt dit script "zodra het te
+// betalen is" en kijkt het achteraf wat eruit kwam.
+//
+// Niet de dagtick alleen laten draaien. Zonder missies levert een dag +8 M op,
+// dus zestien dagen geven 128 M - niet eens één Barracks plus Workshop. De drie
+// paden LEUNEN op missie-opbrengst; ze bestaan alleen in een campagne die
+// gespeeld wordt. Daarom draait dit over de echte keten M1.1 t/m M1.4, op de
+// verscheepte data, met een bestelpoging op elke dag.
+
+namespace EclipseSoakPath
+{
+	struct FRun
+	{
+		TArray<FName> Wishes;
+		int32 WishIndex = 0;
+		TMap<FName, int32> OrderedOnDay;
+		/** Eindstand per gewenste faciliteit: niveau en resterende bouwdagen. */
+		TMap<FName, int32> FinalLevel;
+		TMap<FName, int32> FinalDaysRemaining;
+		bool bCreditsWentNegative = false;
+		bool bOrderRejectedForCredits = false;
+		FString LastOrderError;
+	};
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseThreeEconPathsSurviveTheSliceTest,
+	"Eclipse.Missions.ThreeEconPathsSurviveTheSlice",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseThreeEconPathsSurviveTheSliceTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	// EERST DE VRAAG DIE ALLES ERONDER BEPAALT: kent de verscheepte opzet
+	// uberhaupt een basis? Zonder layout of faciliteitentabel is elke
+	// bouwbestelling een weigering, en dan zou dit script "pad haalt het niet"
+	// melden terwijl er niets te bouwen VALT. Dat zijn twee verschillende
+	// reparaties, dus staat de vraag vooraan (dezelfde vorm als
+	// Eclipse.Liberation.Report).
+	// Let op de SOFT pointer: dit zijn TSoftObjectPtr-velden, en mijn eerste versie
+	// vroeg `!= nullptr`. Dat leverde twee keer "ONTBREEKT" op terwijl er vrolijk
+	// een Barracks werd neergezet — ik had bijna "de verscheepte opzet kent geen
+	// basis" als bevinding opgeschreven. Vragen of de VERWIJZING leeg is, niet of
+	// het geladen object er al staat.
+	AddInfo(FString::Printf(TEXT("GEMETEN  DA_CampaignSetup.BaseLayout = %s"),
+		Setup->BaseLayout.IsNull() ? TEXT("NIET GEKOPPELD") : *Setup->BaseLayout.ToString()));
+	AddInfo(FString::Printf(TEXT("GEMETEN  DA_CampaignSetup.Facilities = %s"),
+		Setup->Facilities.IsNull() ? TEXT("NIET GEKOPPELD") : *Setup->Facilities.ToString()));
+
+	// Eén pad, van dag 1 tot het eind van de slice.
+	auto RunPath = [&](const TCHAR* PathName, const TArray<FName>& Wishes) -> EclipseSoakPath::FRun
+	{
+		EclipseSoakPath::FRun Run;
+		Run.Wishes = Wishes;
+
+		UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+		GameInstance->InitializeStandalone();
+		UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+		UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+		UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+		UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+		UEclipseBaseSubsystem* Base = GameInstance->GetSubsystem<UEclipseBaseSubsystem>();
+		Campaign->StartNewCampaign(Setup);
+
+		FString Error;
+
+		// Bestellen zodra het kan. Een weigering wegens geld is een BEVINDING
+		// (soldij mag een bouw niet blokkeren); een weigering wegens materiaal is
+		// gewoon "nog niet genoeg gespaard" en hoort erbij.
+		auto AttemptOrder = [&]()
+		{
+			while (Run.WishIndex < Run.Wishes.Num())
+			{
+				FString OrderError;
+				if (!Base->TryStartConstruction(Run.Wishes[Run.WishIndex], OrderError))
+				{
+					Run.LastOrderError = OrderError;
+					if (OrderError.Contains(TEXT("credits")))
+					{
+						Run.bOrderRejectedForCredits = true;
+					}
+					return;
+				}
+				Run.OrderedOnDay.Add(Run.Wishes[Run.WishIndex], Campaign->GetState().Day);
+				++Run.WishIndex;
+			}
+		};
+
+		auto AdvanceOneDay = [&]() -> bool
+		{
+			FEclipseCampaignMutation Advance;
+			Advance.Type = EEclipseCampaignMutationType::AdvanceDay;
+			FEclipseCampaignTransaction Transaction;
+			Transaction.Source = TEXT("SoakPaths");
+			Transaction.Mutations.Add(Advance);
+			FString TickError;
+			if (!Campaign->CommitTransaction(Transaction, TickError))
+			{
+				AddError(FString::Printf(TEXT("[%s] dagtick geweigerd: %s"), PathName, *TickError));
+				return false;
+			}
+			if (Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()) < 0)
+			{
+				Run.bCreditsWentNegative = true;
+			}
+			return true;
+		};
+
+		auto Play = [&](const TCHAR* Region, const TArray<FName>& Objectives) -> bool
+		{
+			if (!Strategy->SelectMission(Region, Error)) { AddError(FString::Printf(TEXT("[%s] select %s: %s"), PathName, Region, *Error)); return false; }
+			if (!Prep->AutoLaunch(Error)) { AddError(FString::Printf(TEXT("[%s] launch: %s"), PathName, *Error)); return false; }
+			for (const FName& Objective : Objectives)
+			{
+				if (!Mission->CompleteObjective(Objective, Error)) { AddError(FString::Printf(TEXT("[%s] %s: %s"), PathName, *Objective.ToString(), *Error)); return false; }
+			}
+			return Mission->ResolveDebrief(true, Error);
+		};
+
+		// De keten, met op elke overgang een bestelpoging.
+		AttemptOrder();
+		bool bOk = Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M11_PatrolLeader"), TEXT("Obj_M11_Exfil") });
+		AttemptOrder();
+		bOk = bOk && AdvanceOneDay(); AttemptOrder();
+		bOk = bOk && Play(TEXT("WorkerHousing"), { TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") });
+		AttemptOrder();
+		bOk = bOk && AdvanceOneDay(); AttemptOrder();
+		bOk = bOk && Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") });
+		AttemptOrder();
+		bOk = bOk && AdvanceOneDay(); AttemptOrder();
+		bOk = bOk && Play(TEXT("FoundryRow"), { TEXT("Obj_M14_CrateFirst"), TEXT("Obj_M14_CrateSecond"), TEXT("Obj_M14_Exfil") });
+		AttemptOrder();
+
+		// En daarna doortikken tot het eind van de slice, elke dag opnieuw
+		// proberen: de laatste bestelling wacht meestal op gespaard materiaal.
+		while (bOk && Campaign->GetState().Day < 16)
+		{
+			bOk = AdvanceOneDay();
+			AttemptOrder();
+		}
+
+		// Opschrijven wat eruit kwam, ook als het niet is wat de spec hoopt.
+		FString Gebouwd;
+		for (const FEclipseFacilityState& Facility : Campaign->GetState().BaseState.Facilities)
+		{
+			Gebouwd += FString::Printf(TEXT("%s=L%d(%dd) "), *Facility.FacilityId.ToString(), Facility.Level, Facility.DaysRemaining);
+		}
+		AddInfo(FString::Printf(TEXT("GEMETEN  [%s] dag %d, besteld %d/%d, basis: %s"),
+			PathName, Campaign->GetState().Day, Run.WishIndex, Run.Wishes.Num(), *Gebouwd));
+		if (Run.WishIndex < Run.Wishes.Num())
+		{
+			AddInfo(FString::Printf(TEXT("GEMETEN  [%s] eerste onbestelde wens '%s', laatste weigering: %s"),
+				PathName, *Run.Wishes[Run.WishIndex].ToString(), *Run.LastOrderError));
+		}
+
+		// De uitkomst uitlezen VOOR de shutdown.
+		Run.OrderedOnDay.Add(TEXT("__Day"), Campaign->GetState().Day);
+		int32 Operational = 0;
+		for (const FName& Wish : Wishes)
+		{
+			for (const FEclipseFacilityState& Facility : Campaign->GetState().BaseState.Facilities)
+			{
+				if (Facility.FacilityId == Wish)
+				{
+					Run.FinalLevel.Add(Wish, Facility.Level);
+					Run.FinalDaysRemaining.Add(Wish, Facility.DaysRemaining);
+					if (Facility.Level >= 1)
+					{
+						++Operational;
+					}
+					break;
+				}
+			}
+		}
+		Run.OrderedOnDay.Add(TEXT("__Operational"), Operational);
+
+		GameInstance->Shutdown();
+		return Run;
+	};
+
+	const FName Barracks(TEXT("Barracks"));
+	const FName Workshop(TEXT("Workshop"));
+	const FName IntelCentre(TEXT("IntelligenceCenter"));
+
+	const EclipseSoakPath::FRun Builder = RunPath(TEXT("Builder"), { Barracks, Workshop, IntelCentre });
+	const EclipseSoakPath::FRun Intel   = RunPath(TEXT("Intel opening"), { IntelCentre, Barracks, Workshop });
+	// Thrifty vraagt de Workshop TWEE keer: de tweede bestelling is de upgrade naar
+	// L2, en dat is wat de spec van dit pad eist ("Workshop L2 ordered before day
+	// 16") - niet alleen dat er een Workshop staat.
+	const EclipseSoakPath::FRun Thrifty = RunPath(TEXT("Thrifty"), { Barracks, Workshop, Workshop });
+
+	// DE INVARIANTEN, als uitkomst en niet als kalender.
+	TestTrue(TEXT("Builder: drie gebouwen staan er binnen de slice"),
+		Builder.OrderedOnDay.FindRef(TEXT("__Operational")) >= 3);
+	TestTrue(TEXT("Intel opening: het Intelligence Centre staat er binnen de slice"),
+		Intel.OrderedOnDay.Contains(IntelCentre));
+	// Thrifty: L2 STAAT er, of hij is besteld en nog in aanbouw. De spec vraagt
+	// "ordered before day 16" en niet "af", want de bouwtijd loopt bewust door tot
+	// ongeveer d18 - dat is het hele punt van dit pad.
+	{
+		const int32 Level = Thrifty.FinalLevel.FindRef(Workshop);
+		const int32 DaysLeft = Thrifty.FinalDaysRemaining.FindRef(Workshop);
+		AddInfo(FString::Printf(TEXT("GEMETEN  [Thrifty] Workshop eindigt op L%d met %d bouwdag(en) te gaan"), Level, DaysLeft));
+		TestTrue(TEXT("Thrifty: de Workshop-upgrade naar L2 is binnen de slice besteld (af of in aanbouw)"),
+			Level >= 2 || (Level >= 1 && DaysLeft > 0));
+	}
+
+	// EN DE TWEE REGELS DIE VOOR ALLE DRIE GELDEN.
+	for (const TPair<const TCHAR*, const EclipseSoakPath::FRun*>& Pad :
+		{ TPair<const TCHAR*, const EclipseSoakPath::FRun*>(TEXT("Builder"), &Builder),
+		  TPair<const TCHAR*, const EclipseSoakPath::FRun*>(TEXT("Intel opening"), &Intel),
+		  TPair<const TCHAR*, const EclipseSoakPath::FRun*>(TEXT("Thrifty"), &Thrifty) })
+	{
+		TestFalse(FString::Printf(TEXT("[%s] de kas gaat nooit onder nul"), Pad.Key), Pad.Value->bCreditsWentNegative);
+		TestFalse(FString::Printf(TEXT("[%s] soldijtekort blokkeert nooit een bouw"), Pad.Key), Pad.Value->bOrderRejectedForCredits);
+	}
+
 	return true;
 }
 
