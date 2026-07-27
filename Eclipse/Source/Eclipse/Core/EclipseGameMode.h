@@ -109,6 +109,9 @@ private:
 	 */
 	float PlayShotIntervalPathLength = 0.0f;
 
+	/** Laagste GetMaxSpeed() van het interval; nul verklaart een pawn die niet loopt. */
+	float PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
+
 	/** Positie bij de vorige drive-tick, nodig voor die optelling. */
 	FVector PlayShotLastDriveLocation = FVector::ZeroVector;
 

@@ -295,6 +295,21 @@ void AEclipseGameMode::DrivePlayShotInput()
 	}
 	PlayShotLastDriveLocation = Here;
 
+	// DE TOEGESTANE MAXIMUMSNELHEID, laagste waarde van het interval.
+	//
+	// Drie kandidaten zijn uitgesloten (actor-tick, input-disabled, teleport-reset)
+	// en wat overblijft is: het bewegingscomponent doet niets met invoer die het
+	// wél krijgt. Een pawn die op de grond staat, in modus Walking, met invoer, en
+	// die geen enkele tick snelheid haalt, kan simpelweg een maximum van nul
+	// hebben — en EclipseCharacterMovementComponent OVERSCHRIJFT GetMaxSpeed()
+	// (mikken drukt hem naar AimSpeed). Het LAAGSTE punt van het interval is wat
+	// telt: één tick op nul verklaart geen 2,6 s, een heel interval op nul wel.
+	if (const UCharacterMovementComponent* DriveMove = Body->GetCharacterMovement())
+	{
+		const float Allowed = DriveMove->GetMaxSpeed();
+		PlayShotIntervalMinMaxSpeed = FMath::Min(PlayShotIntervalMinMaxSpeed, Allowed);
+	}
+
 	if (bPlayShotWalking)
 	{
 		// Rechtdoor, camera-relatief — precies wat de speler doet.
@@ -429,10 +444,11 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] AFGELEGDE WEG %.0f cm, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
 				PlayShotIntervalPathLength,
 				PlayShotIntervalTopSpeed,
+				PlayShotIntervalMinMaxSpeed,
 				Move != nullptr ? Move->Velocity.Size() : -1.0f,
 				Move != nullptr ? static_cast<int32>(Move->MovementMode) : -1,
 				Move != nullptr && Move->IsMovingOnGround() ? 1 : 0,
@@ -442,6 +458,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		// teller die nooit reset zou na moment 3 alleen nog de piek van toen tonen.
 		PlayShotIntervalTopSpeed = 0.0f;
 		PlayShotIntervalPathLength = 0.0f;
+		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
 			UE_LOG(LogEclipse, Error,
