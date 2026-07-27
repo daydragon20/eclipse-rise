@@ -73,6 +73,39 @@ schrijft).
 | Het **wapen** is gunmetal en steekt af | het hing er al, maar in je eigen lichaamskleur |
 | Een **misser is hoorbaar** | een schot in een muur liet eerst geen enkel spoor na |
 
+### 💰 PUNT 5 — WAT HET KOST OM HET WAPEN UIT DE MESH TE HALEN (je vroeg dit vóór ik begin)
+
+Uitgezocht in plaats van geschat. Het valt in vier stukken, en **één ervan is de
+hele rekening**.
+
+**A. Het ingebouwde geweer verbergen — goedkoop, ~40 regels code.**
+Het wapen is een materiaalslot op je karaktermesh, dus het is te verbergen met
+`ShowMaterialSection(..., false)` per LOD. Geen editor nodig, geen asset nodig.
+**Maar alleen dit doen maakt het slechter:** dan staan je handen leeg.
+
+**B. Een wapen om op te hangen — DIT IS DE KOSTEN. Er is er geen.**
+Projectbreed gezocht: er bestaat **nergens een los wapenmesh**. Niet in de vier
+nieuwe packs (Factory_Pack_V1, IBuilding_49, Sci_fi_hallway, Uniblocks), niet in de
+soldaten-packs (die hebben alleen `SK_` personages en een `SM_Background`), en niet
+bij Belica — daar zit het geweer ín `Belica.uasset` zelf. Drie wegen:
+- **een gratis Fab-wapenpack halen** — dat is jouw klik, net als de muzzle flash;
+- **er een bouwen in Blender** — dagwerk, en dan is het één wapen;
+- **de geweergeometrie uit de Belica-mesh snijden** — editorwerk, en jouw editor
+  open blokkeert mijn builds.
+
+**C. Ophangen aan de hand — klein, zodra B er is.** Aan een bot hangen werkt al
+(de hoofd-hitbox doet het). Of het skelet een echte wapen-socket heeft, kan ik van
+buiten het uasset niet zien — dat is een onbekende van een half uur, geen dag.
+
+**D. Jouw nieuwe punten van vanmiddag zitten allemaal ACHTER B.** Zweven bij
+herladen, aparte onderdelen, en een vizier om doorheen te kijken: geen daarvan kan
+zolang het wapen deel van het lichaam is. Het trillen staat er los van en is al
+gemeten (twee assen uitgesloten, de pose blijft over).
+
+**De hele klus hangt dus aan één beslissing van jou: waar komt het wapen vandaan.**
+Zeg je "haal een Fab-pack", dan is de rest een halve dag. Zeg je niets, dan blijft
+het staan — want A alleen levert je lege handen op, en dat is een verslechtering.
+
 ### ⚠️ PUNT 4 STAP 3: gebouwd, NIET visueel bevestigd — en er ligt iets groters onder
 
 Het zichtbare spoor is gebouwd (een platte quad op de inslagplek; geen decal, want
