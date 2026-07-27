@@ -120,6 +120,9 @@ private:
 
 	/** Grootste gat tussen twee duwen; een stal rond de opname zou hier staan. */
 	float PlayShotIntervalLargestGap = 0.0f;
+
+	/** Laagste GetMaxAcceleration() van het interval; nul verklaart alles. */
+	float PlayShotIntervalMinMaxAccel = TNumericLimits<float>::Max();
 	double PlayShotLastPushTime = 0.0;
 
 	/** Laagste GetMaxSpeed() van het interval; nul verklaart een pawn die niet loopt. */

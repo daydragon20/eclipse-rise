@@ -322,6 +322,14 @@ void AEclipseGameMode::DrivePlayShotInput()
 	{
 		const float Allowed = DriveMove->GetMaxSpeed();
 		PlayShotIntervalMinMaxSpeed = FMath::Min(PlayShotIntervalMinMaxSpeed, Allowed);
+		// EN DE TOEGESTANE ACCELERATIE. De vraag is verschoven: consumptie levert in
+		// het dode interval geen acceleratie op terwijl alles eromheen gezond is.
+		// ScaleInputAcceleration schaalt de invoervector met GetMaxAcceleration();
+		// is die nul, dan komt er per definitie nul uit, hoe vaak je ook duwt. Dat
+		// is precies zo meetbaar als de snelheidslimiet die hier al staat - en die
+		// bleek gezond, dus dit is de logische opvolger.
+		PlayShotIntervalMinMaxAccel = FMath::Min(PlayShotIntervalMinMaxAccel,
+			static_cast<float>(DriveMove->GetMaxAcceleration()));
 	}
 
 	// WIE HEEFT DE VECTOR LEEGGEHAALD. Als Acceleration nul blijft terwijl er
@@ -495,7 +503,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		{
 			const UCharacterMovementComponent* Move = PlayShotBody->GetCharacterMovement();
 			UE_LOG(LogEclipse, Display,
-				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, GROOTSTE GAT %.3f s), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
+				TEXT("[PLAYSHOT %d BEWEGING] %d duwen (genegeerd %d, rest %.2f, gat %.3f s, MAX ACCEL TOEGESTAAN %.0f), AFGELEGDE WEG %.0f cm, topversnelling %.0f, topsnelheid %.0f cm/s, LAAGSTE TOEGESTANE max %.0f cm/s (momentopname %.0f, modus %d, op de grond %d, duw %.2f)"),
 				ShotIndex,
 				PlayShotIntervalPushes,
 				// AddMovementInput doet STIL NIETS als de controller IgnoreMoveInput
@@ -505,6 +513,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				PlayShotBody->IsMoveInputIgnored() ? 1 : 0,
 				PlayShotIntervalRestBeforePush,
 				PlayShotIntervalLargestGap,
+				PlayShotIntervalMinMaxAccel,
 				PlayShotIntervalPathLength,
 				PlayShotIntervalTopAccel,
 				PlayShotIntervalTopSpeed,
@@ -522,6 +531,7 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 		PlayShotIntervalTopAccel = 0.0f;
 		PlayShotIntervalRestBeforePush = 0.0f;
 		PlayShotIntervalLargestGap = 0.0f;
+		PlayShotIntervalMinMaxAccel = TNumericLimits<float>::Max();
 		PlayShotIntervalMinMaxSpeed = TNumericLimits<float>::Max();
 		if (bPlayShotWalking && Moved < 50.0f)
 		{
