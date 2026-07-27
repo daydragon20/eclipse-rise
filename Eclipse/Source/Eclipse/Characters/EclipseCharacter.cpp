@@ -901,6 +901,17 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 		const FVector SunTravel = FRotator(-25.0f, 55.0f, 0.0f).Vector();
 		for (int32 SlotIndex = 0; SlotIndex < MeshComponent->GetNumMaterials(); ++SlotIndex)
 		{
+			// WELKE SLOTS DIT LICHAAM HEEFT, bij naam. Owner-punt 5: het wapen zit
+			// IN de mesh en heeft daardoor exact de factietint van het lichaam —
+			// het verdwijnt in het silhouet. Of daar een goedkope tussenstap voor
+			// bestaat (het wapenslot een eigen tint geven) hangt volledig aan één
+			// feit: is het wapen een APART slot of versmolten met de huid. Dat is
+			// niet af te leiden, alleen af te lezen, en dus staat het hier.
+			if (const UMaterialInterface* SlotMaterial = MeshComponent->GetMaterial(SlotIndex))
+			{
+				UE_LOG(LogEclipse, Display, TEXT("%s: materiaalslot %d = '%s'"),
+					*GetName(), SlotIndex, *SlotMaterial->GetName());
+			}
 			UTexture* BaseTexture = FindBaseColorTexture(MeshComponent->GetMaterial(SlotIndex));
 			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaster, this);
 			Mid->SetVectorParameterValue(TEXT("LitColor"), BodyDef.TintLit);
