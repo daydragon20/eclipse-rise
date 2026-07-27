@@ -156,6 +156,21 @@ namespace EclipseLocomotion
 	inline constexpr float MinStrideRate = 0.6f;
 	inline constexpr float MaxStrideRate = 1.8f;
 
+	/**
+	 * Looprichting (graden, 0 = vooruit, + = rechts) -> aandeel per richtingsklip.
+	 *
+	 * DIT IS DE FORTNITE/BORDERLANDS-KANT VAN HET ONDERLICHAAM. Er stond een harde
+	 * keuze: onder 45 graden vooruit, daarboven opzij. Daardoor KLAPTE de gangpose om
+	 * op het moment dat je koers die grens passeerde. In beide referenties lopen
+	 * naburige richtingen in elkaar over, en dat is wat deze verdeling doet.
+	 *
+	 * De vier klippen staan 90 graden uit elkaar, dus een driehoekige kern van 90
+	 * graden breed geeft: op een as telt één klip volledig, ertussenin verdelen de
+	 * twee buren zich, en de som is altijd 1. Vrij van assets — dezelfde vier takes.
+	 */
+	ECLIPSE_API void DirectionalWeights(float Degrees, float& OutFwd, float& OutRight,
+		float& OutLeft, float& OutBack);
+
 	/** Which rung of the ladder a set of resolved clips lands on. */
 	ECLIPSE_API EEclipseLocomotionTier ClassifyTier(bool bHasIdle, bool bHasWalk, bool bHasRun);
 

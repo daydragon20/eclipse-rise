@@ -60,6 +60,19 @@ namespace
 // The pure half. No world, no assets, no time — see EclipseLocomotionTypes.h.
 // ---------------------------------------------------------------------------
 
+void EclipseLocomotion::DirectionalWeights(float Degrees, float& OutFwd, float& OutRight,
+	float& OutLeft, float& OutBack)
+{
+	// Naar -180..180 brengen: de aanroeper mag elke hoek aanleveren, en 190 graden
+	// is hetzelfde als -170.
+	const float A = FMath::UnwindDegrees(Degrees);
+	constexpr float Kern = 90.0f;
+	OutFwd   = FMath::Max(0.0f, 1.0f - FMath::Abs(A) / Kern);
+	OutRight = FMath::Max(0.0f, 1.0f - FMath::Abs(A - 90.0f) / Kern);
+	OutLeft  = FMath::Max(0.0f, 1.0f - FMath::Abs(A + 90.0f) / Kern);
+	OutBack  = FMath::Max(0.0f, 1.0f - (180.0f - FMath::Abs(A)) / Kern);
+}
+
 EEclipseLocomotionTier EclipseLocomotion::ClassifyTier(bool bHasIdle, bool bHasWalk, bool bHasRun)
 {
 	// Idle is the floor, not a nicety: without a standing pose there is nothing
@@ -390,32 +403,53 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	// dichtstbijzijnde kiezen is precies wat je bij dat interval ziet. Ontbreekt
 	// die richting, dan valt hij terug op vooruit — moonwalken, maar zichtbaar
 	// beter dan de ref-pose (14.3.5).
-	auto PickDirectional = [this](UAnimSequence* Fwd, UAnimSequence* Back, UAnimSequence* Left, UAnimSequence* Right) -> UAnimSequence*
+	// MENGEN TUSSEN DE TWEE DICHTSTBIJZIJNDE RICHTINGEN, niet naar één toe snappen.
+	//
+	// Hier stond een harde keuze: onder 45 graden vooruit, daarboven opzij, boven
+	// 135 achteruit. Dat betekent dat je gangpose OMKLAPT op het moment dat je
+	// looprichting die grens passeert — bij schuin lopen, bij een bocht, bij elke
+	// koerscorrectie. Fortnite en Borderlands doen dat niet: hun onderlichaam leeft
+	// in één blend-ruimte waarin naburige richtingen in elkaar overlopen
+	// (REFERENTIE_TPS.md hoofdstuk 6, punt 3).
+	//
+	// De vier klippen staan 90 graden uit elkaar, dus een driehoekige kern van 90
+	// graden breed geeft precies dat: op een as telt één klip volledig, ertussenin
+	// verdelen de twee buren zich, en de som is altijd 1. Geen extra assets, geen
+	// blend-space-asset — dezelfde vier takes, alleen niet meer met een schakelaar.
+	//
+	// ONTBREEKT EEN RICHTING, dan gaat zijn aandeel naar vooruit. Dat is wat er
+	// eerder ook gebeurde (moonwalken is zichtbaar beter dan de ref-pose), maar nu
+	// verdeeld in plaats van alles-of-niets — en vijf van onze lichamen missen hun
+	// zijcycli, dus dit pad is de regel en niet de uitzondering.
+	auto AddDirectional = [this, &Samples](UAnimSequence* Fwd, UAnimSequence* Back,
+		UAnimSequence* Left, UAnimSequence* Right, float GaitWeight, float Phase)
 	{
-		const float Abs = FMath::Abs(MoveDirectionDegrees);
-		UAnimSequence* Chosen = Fwd;
-		if (Abs > 135.0f)
+		if (!FAnimWeight::IsRelevant(GaitWeight))
 		{
-			Chosen = Back;
+			return;
 		}
-		else if (Abs > 45.0f)
+		float WFwd = 0.0f, WRight = 0.0f, WLeft = 0.0f, WBack = 0.0f;
+		EclipseLocomotion::DirectionalWeights(MoveDirectionDegrees, WFwd, WRight, WLeft, WBack);
+
+		// Ontbrekende richtingen schuiven hun aandeel naar vooruit.
+		if (Right == nullptr) { WFwd += WRight; WRight = 0.0f; }
+		if (Left  == nullptr) { WFwd += WLeft;  WLeft  = 0.0f; }
+		if (Back  == nullptr) { WFwd += WBack;  WBack  = 0.0f; }
+
+		const TPair<UAnimSequence*, float> Vier[] = {
+			{ Fwd, WFwd }, { Right, WRight }, { Left, WLeft }, { Back, WBack } };
+		for (const TPair<UAnimSequence*, float>& Paar : Vier)
 		{
-			Chosen = MoveDirectionDegrees > 0.0f ? Right : Left;
+			if (Paar.Key != nullptr && Paar.Value > KINDA_SMALL_NUMBER)
+			{
+				Samples.Add({ Paar.Key, GaitWeight * Paar.Value,
+					Phase * Paar.Key->GetPlayLength(), true });
+			}
 		}
-		return Chosen != nullptr ? Chosen : Fwd;
 	};
 
-	UAnimSequence* const WalkClip = PickDirectional(Walk, WalkBack, WalkLeft, WalkRight);
-	UAnimSequence* const RunClip = PickDirectional(Run, RunBack, RunLeft, RunRight);
-
-	if (WalkClip != nullptr && FAnimWeight::IsRelevant(Blend.WalkWeight))
-	{
-		Samples.Add({ WalkClip, Blend.WalkWeight, GaitPhase * WalkClip->GetPlayLength(), true });
-	}
-	if (RunClip != nullptr && FAnimWeight::IsRelevant(Blend.RunWeight))
-	{
-		Samples.Add({ RunClip, Blend.RunWeight, GaitPhase * RunClip->GetPlayLength(), true });
-	}
+	AddDirectional(Walk, WalkBack, WalkLeft, WalkRight, Blend.WalkWeight, GaitPhase);
+	AddDirectional(Run, RunBack, RunLeft, RunRight, Blend.RunWeight, GaitPhase);
 
 	// De overlay bovenop. TWEE WEGEN, want een eenmalige pose mag additief zijn en
 	// dan mag hij juist NIET als volledige pose meegeblend worden:

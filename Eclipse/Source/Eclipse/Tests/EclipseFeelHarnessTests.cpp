@@ -3724,3 +3724,50 @@ bool FEclipseTurnAroundFromStandstillAndWalkOff::RunTest(const FString& Paramete
 }
 
 #endif // WITH_DEV_AUTOMATION_TESTS
+
+// ---------------------------------------------------------------------------
+// Het onderlichaam mengt tussen richtingen in plaats van er een te KIEZEN.
+//
+// Owner-opdracht 27-07: baseer movement op Fortnite of Borderlands. In beide
+// referenties lopen naburige looprichtingen in elkaar over; bij ons stond een
+// harde grens op 45 graden, waardoor de gangpose omklapte zodra je koers die
+// passeerde. Deze test pint dat vast: op een as telt een klip volledig, ertussenin
+// tellen er TWEE mee, en de som blijft altijd 1.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseDirectionalBlendTest,
+	"Eclipse.Feel.LocomotionBlendsBetweenDirections",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FEclipseDirectionalBlendTest::RunTest(const FString& Parameters)
+{
+	float F = 0.0f, R = 0.0f, L = 0.0f, B = 0.0f;
+
+	EclipseLocomotion::DirectionalWeights(0.0f, F, R, L, B);
+	TestEqual(TEXT("Recht vooruit is volledig de vooruit-klip"), F, 1.0f);
+	TestEqual(TEXT("Recht vooruit gebruikt geen zijklip"), R + L + B, 0.0f);
+
+	EclipseLocomotion::DirectionalWeights(90.0f, F, R, L, B);
+	TestEqual(TEXT("Recht naar rechts is volledig de rechts-klip"), R, 1.0f);
+
+	EclipseLocomotion::DirectionalWeights(-90.0f, F, R, L, B);
+	TestEqual(TEXT("Recht naar links is volledig de links-klip"), L, 1.0f);
+
+	EclipseLocomotion::DirectionalWeights(180.0f, F, R, L, B);
+	TestEqual(TEXT("Recht achteruit is volledig de achteruit-klip"), B, 1.0f);
+
+	// DIT IS DE HELE REDEN VOOR DEZE TEST. Op 45 graden koos de oude code er EEN;
+	// nu horen er twee mee te tellen, allebei half.
+	EclipseLocomotion::DirectionalWeights(45.0f, F, R, L, B);
+	TestTrue(TEXT("Schuin vooruit-rechts mengt vooruit mee"), F > 0.4f && F < 0.6f);
+	TestTrue(TEXT("Schuin vooruit-rechts mengt rechts mee"), R > 0.4f && R < 0.6f);
+	TestEqual(TEXT("Schuin vooruit-rechts gebruikt geen links of achteruit"), L + B, 0.0f);
+
+	// En de som blijft 1 over de hele cirkel, anders zou het lichaam op sommige
+	// koersen half in de ref-pose staan.
+	for (int32 Graden = -180; Graden <= 180; Graden += 15)
+	{
+		EclipseLocomotion::DirectionalWeights(static_cast<float>(Graden), F, R, L, B);
+		TestTrue(FString::Printf(TEXT("Som is 1 op %d graden (was %.3f)"), Graden, F + R + L + B),
+			FMath::IsNearlyEqual(F + R + L + B, 1.0f, 0.001f));
+	}
+	return true;
+}
