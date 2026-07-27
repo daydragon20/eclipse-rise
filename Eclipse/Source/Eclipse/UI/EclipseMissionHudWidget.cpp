@@ -494,7 +494,31 @@ void UEclipseMissionHudWidget::NativeDestruct()
 	// verdict block must survive it. Nothing measured or answered = nothing to
 	// say, and a shot round is not a gauntlet at all. A half-walked test guide is
 	// evidence too, so it counts as something to say.
-	if (IsDebugHudAllowed()
+	// EEN AUTOMATISCHE DRAAI IS GEEN SESSIE, en mag er ook geen achterlaten.
+	//
+	// GEMETEN op 27-07: deel 1 van de gids ("wat is er veranderd sinds je vorige
+	// sessie") filtert op de datum van het NIEUWSTE eindrapport in Saved/Logs — en
+	// dat rapport bleek door de SUITE zelf geschreven, om 10:14. De gids liet
+	// daardoor alles van die dag weg, inclusief alle vijf de dingen die diezelfde
+	// dag voor de owner waren gebouwd. Hij zou "niets sinds je vorige sessie" te
+	// zien krijgen terwijl er vijf dingen te controleren waren.
+	//
+	// De filter is niet fout: een eindrapport HOORT een sessie te markeren. Wat
+	// fout is, is dat de automatisering er een achterlaat. Gereedschap dat sporen
+	// nalaat die op echt werk lijken, vervuilt precies het signaal dat het moet
+	// bewaken — dezelfde vorm als de contracttest die ik vandaag zelf liet lekken.
+	//
+	// Vandaar hier en niet in de filter: de bron dicht in plaats van de lezer
+	// leren omgaan met rommel.
+	// -EclipseShotPlay staat er NIET voor de sier en was zelfs de belangrijkste:
+	// het rapport van 10:14 dat de gids blind maakte, kwam uit de OPNAMERONDE, en
+	// die draait als gewoon spel — geen commandlet, geen automation. Mijn eerste
+	// versie van deze guard dekte alleen die twee en had dus precies de dader
+	// gemist. Gevonden door te kijken hoe verify.ps1 de ronde start in plaats van
+	// aan te nemen dat "automatisch" één ding betekent.
+	const bool bAutomatedRun = GIsAutomationTesting || IsRunningCommandlet()
+		|| FParse::Param(FCommandLine::Get(), TEXT("EclipseShotPlay"));
+	if (!bAutomatedRun && IsDebugHudAllowed()
 		&& (ComposeVerdict(GatherCriteria()).OpenCount < CriterionCount || GuideProgress.HasAnyProgress()))
 	{
 		EmitVerdictSummary();
