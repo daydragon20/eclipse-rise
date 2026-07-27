@@ -3,6 +3,70 @@
 
 ---
 
+# START HIER — 27 juli 2026, MIDDAG: DE KOERS IS GEWIJZIGD
+
+> **Alles onder deze kop is nieuwer dan de rest van dit document.** Het
+> morgenrapport hieronder klopt feitelijk nog, maar het beschrijft een werkwijze
+> die de owner op 27-07 heeft afgekeurd. Lees eerst dit.
+
+## De opdracht die alles eronder overstemt
+
+De owner, na twee dagen: *"Geen nieuwe features, geen losse fixes op mijn
+meldingen meer. De BASIS van een third-person shooter staat niet."*
+
+De diagnose die hij erbij gaf is de kern: ik reageerde op losse SYMPTOMEN in
+plaats van te bouwen tegen een REFERENTIE. Hij meldt een symptoom, ik fix dat
+symptoom, en het volgende gat komt pas boven als hij er weer tegenaan loopt.
+
+**De maatstaf staat nu: [phase0/REFERENTIE_TPS.md](phase0/REFERENTIE_TPS.md).**
+Camera, mikken, richtkruis, wapen in beeld, kogels en treffers — elk met wat de
+referentie doet, wat wij nu doen mét getal en vindplaats, en of dat een keuze is
+of een gat. **Een fout in dat document weegt zwaarder dan een fout in een commit,
+want elke volgende keuze gaat erop staan.**
+
+## De bouwvolgorde (owner, op volgorde van hoe erg het speelt)
+
+1. Mikken moet een vizier geven dat STILSTAAT — *gebouwd, niet visueel bevestigd*
+2. Richtkruis dat er is en klopt — *bestaat volgens het zelfrapport, niet te fotograferen*
+3. De camera — *twee metingen konden de klacht niet vinden; de derde kan het wel en bevestigt hem niet*
+4. Kogels zichtbaar — *hulzen zijn er; tracer niet; inslag ONGEVERIFIEERD*
+5. Wapenwissel zichtbaar — *van opdracht veranderd: het wapen zit IN de mesh*
+6. De gids opent niet — *waaróm is nog niet uitgezocht, en dat is wat gevraagd is*
+
+## DE BLOKKADE, en die geldt voor bijna alles hierboven
+
+**De opnameronde kan geen UI vastleggen.** Vier methodes geprobeerd — HighResShot,
+FScreenshotRequest met bShowUI, een Slate-vensteropname, en `Shot showui` — en alle
+vier leveren hetzelfde 3D-beeld zonder widgets. Daarmee is de owner-regel
+*"als je het niet op een screenshot kunt aanwijzen, is het niet af"* voor GEEN
+ENKEL UI-element te vervullen.
+
+Dat is een gat in de verificatielaag, niet in de features. **Vijfde weg, nog niet
+geprobeerd: `FWidgetRenderer` die de widget rechtstreeks naar een render target
+tekent, buiten de viewport om.** Dat is de eerstvolgende bouwstap.
+
+## Drie regels die deze dag heeft opgeleverd
+
+1. **Kijk naar het beeld VOORDAT je iets over zichtbaarheid schrijft.** Ik
+   beweerde "er hangt geen wapenmesh" uit codelezing; de owner wees het geweer aan
+   op vier van mijn eigen opnames.
+2. **Zeg expliciet wat je NIET geverifieerd hebt.** Liever "gebouwd, niet visueel
+   bevestigd" dan een claim die de owner moet weerleggen — dat is vandaag drie
+   keer gebeurd.
+3. **Een controle die niet rood kan worden, is geen controle.** Vandaag vier keer
+   gevonden, twee keer in mijn eigen gereedschap.
+
+## Bekend rood, allebei verantwoord en geen van beide een basisgat
+
+- `Eclipse.Guide.PanelShowsTheActiveExpectation` — paneel 13 regels, teller
+  verwacht 11. De telling klopt op 3 wijzigingen; het verschil van 2 zit in het
+  PANEEL. Eerste hypothese (race op de datum uit Saved/Logs) is gefalsifieerd.
+- Opnameronde: de speler komt in het eerste loopinterval 3 cm vooruit tegen 229 cm
+  in het tweede. Echt defect, blootgelegd door een gerepareerde bewaker, oorzaak
+  nog niet gevonden.
+
+---
+
 # START HIER — OCHTEND 27 juli 2026
 
 *Je hoeft niets te plakken. Lees de regel hieronder, dan het morgenrapport, dan
