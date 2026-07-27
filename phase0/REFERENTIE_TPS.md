@@ -207,13 +207,38 @@ de FOV 80→64 (nog eens ×1,25). Samen ruim ×2,2 in de lengte, en dat is ×5 i
 oppervlak. Elk van de twee is verdedigbaar; het is hun PRODUCT dat niemand heeft
 uitgerekend.
 
-**En dit wijst mijn eerdere ingreep aan als de goede parameter in de verkeerde
-richting.** Ik liet de zijoffset MEEKRIMPEN met de arm (55 → 30 cm), en draaide dat
-terug toen de opname liet zien dat het personage de vizierlijn juist blokkeerde.
-De referentie hierboven zegt het andersom: "de camera wisselt of VERSTERKT de
-schouderoffset, zodat het vizier vrij komt te liggen van het personage." Bij een
-arm die halveert moet de zijwaartse offset dus OMHOOG, niet omlaag — anders komt
-hij precies in je zicht te staan, wat de meting nu ook laat zien.
+~~En dit wijst mijn eerdere ingreep aan als de goede parameter in de verkeerde
+richting: bij een arm die halveert moet de zijwaartse offset OMHOOG, anders komt hij
+precies in je zicht te staan.~~
+
+> **DOORGESTREEPT, EEN HALF UUR NA HET SCHRIJVEN, DOOR EEN METING.** Ik schreef dat
+> hierboven zonder te toetsen en toetste het daarna alsnog: waar liggen zijn randen
+> ten opzichte van het kruis?
+>
+> | | linkerrand | rechterrand | lucht tot het kruis (640) | kruis bedekt |
+> |---|---|---|---|---|
+> | heuphoogte | 450 | 600 | 40 px | nee |
+> | **mikkend** | 96 | 516 | **124 px** | nee |
+>
+> **Het kruis wordt nooit bedekt, en bij mikken staat hij er VERDER vanaf.** De
+> schouderoffset doet in graden dus precies wat hij moet doen. Mijn "hij komt in je
+> zicht te staan" was onjuist — de derde keer vandaag dat een meetkundig argument
+> van mij over deze ene parameter de meting niet overleefde. Ik hou daar nu mee op:
+> aan de zijoffset raak ik niet meer op grond van redeneren.
+
+**WAT ER DAN WEL AAN DE HAND IS — twee dingen, allebei gemeten:**
+
+1. **Zuivere vergroting.** Niet de plaatsing maar het formaat: ×5 in oppervlak.
+   De vizierlijn is vrij, maar een derde van je scherm is personage.
+2. **Zijn voeten staan NOOIT in beeld.** Ook niet op heuphoogte: in 11 van de 15
+   opnames raakt zijn silhouet de onderrand, dus de gemeten hoogte is telkens een
+   ondergrens. De camera kijkt op zijn romp en zijn benen lopen het beeld uit.
+
+Punt 2 is de bredere: het geldt ook zonder te mikken en is dus geen ADS-kwestie.
+**Welke van de vier knoppen dat hoort te repareren — boomlengte, FOV, pitch of de
+hoogte van de socket — staat hier met opzet nog niet.** Dat is precies het soort
+invulling waar ik vandaag drie keer op ben teruggekomen, en de referentie noemt
+geen beeldvullingsgetal om aan te bouwen. Eerst de norm, dan de knop.
 
 **Nog niet geverifieerd:** of dit ook is wat de owner "de schaal-bug" noemt. Hij
 meldde dat het personage van grootte verandert; ik meet dat het bij mikken vijf keer
