@@ -1755,4 +1755,120 @@ bool FEclipseQuittingMidMissionLeavesTheCampaignUntouchedTest::RunTest(const FSt
 	return true;
 }
 
+
+// De grootboekregels van de dagtick komen BINNEN het debrief-venster
+// (SPEC-P2-03 regressieregel, GDD 7.6 transparantie).
+//
+// De spec vraagt dat het debriefscherm de grootboekregels van diezelfde dagtick
+// toont - soldij, opbrengsten - zodat de speler ziet WAAROM zijn getallen
+// veranderden. Er was geen test voor.
+//
+// Die eis wordt hier NIET op de widget gemeten maar op de bus, en dat is met
+// opzet: het debriefscherm verzamelt feiten tussen Mission.Started en
+// Mission.Completed, dus of het scherm iets KAN tonen hangt volledig af van de
+// VOLGORDE waarin die feiten langskomen. Vuurt de dagtick pas na
+// Mission.Completed, dan sluit het venster voor de cijfers binnen zijn en blijft
+// het debrief leeg - zonder dat er iets kapot is. Dat is precies de vorm waarin
+// de HUD-regel eerder stukging: op zichzelf correct, alleen op het verkeerde
+// moment.
+//
+// Een widget-test zou hetzelfde aantonen maar met een wereld en pixels eromheen,
+// en dan meet je de widget in plaats van het contract.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLedgerLinesArriveBeforeTheDebriefClosesTest,
+	"Eclipse.Missions.LedgerLinesArriveBeforeTheDebriefCloses",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseLedgerLinesArriveBeforeTheDebriefClosesTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+	UEclipseEventBusSubsystem* Bus = GameInstance->GetSubsystem<UEclipseEventBusSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// Een gedeelde reeks: de volgorde is de hele bewering, niet de aantallen.
+	TArray<FString> Reeks;
+	FEclipseEventSubscriptionHandle EconomyHandle = Bus->Subscribe(
+		EclipseTags::Event_Economy_ResourcesChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&Reeks](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseEconomyEventPayload* Fact = Payload.GetPtr<FEclipseEconomyEventPayload>())
+			{
+				Reeks.Add(Fact->Reason.ToString());
+			}
+		}),
+		FEclipseEconomyEventPayload::StaticStruct());
+	FEclipseEventSubscriptionHandle DoneHandle = Bus->Subscribe(
+		EclipseTags::Event_Mission_Completed,
+		FEclipseEventNativeDelegate::CreateLambda([&Reeks](FGameplayTag, const FInstancedStruct&)
+		{
+			Reeks.Add(TEXT("<<DEBRIEF SLUIT>>"));
+		}),
+		FEclipseMissionEventPayload::StaticStruct());
+
+	if (!TestTrue(TEXT("opzet: missie geselecteerd"), Strategy->SelectMission(TEXT("TransitCheckpoint"), Error))
+		|| !TestTrue(TEXT("opzet: missie gelanceerd"), Prep->AutoLaunch(Error)))
+	{
+		AddError(Error);
+		GameInstance->Shutdown();
+		return false;
+	}
+	for (const FName& Objective : { FName(TEXT("Obj_M11_PatrolLeader")), FName(TEXT("Obj_M11_Exfil")) })
+	{
+		if (!Mission->CompleteObjective(Objective, Error)) { AddError(Error); GameInstance->Shutdown(); return false; }
+	}
+	Reeks.Reset(); // alleen de afrekening zelf telt
+	if (!TestTrue(TEXT("opzet: debrief afgerekend"), Mission->ResolveDebrief(true, Error)))
+	{
+		AddError(Error);
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	AddInfo(FString::Printf(TEXT("GEMETEN  volgorde bij de afrekening: %s"), *FString::Join(Reeks, TEXT(" | "))));
+
+	const int32 Sluiting = Reeks.IndexOfByKey(FString(TEXT("<<DEBRIEF SLUIT>>")));
+	if (!TestTrue(TEXT("het debrief-venster sluit ook echt (Mission.Completed gezien)"), Sluiting != INDEX_NONE))
+	{
+		Bus->Unsubscribe(EconomyHandle);
+		Bus->Unsubscribe(DoneHandle);
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	// Er moet MINSTENS EEN grootboekregel voor de sluiting staan, anders heeft het
+	// debriefscherm niets te tonen en is 7.6 een dode letter.
+	TestTrue(TEXT("er staan grootboekregels VOOR de sluiting"), Sluiting > 0);
+
+	// En de soldij hoort erbij: dat is de regel die het duurst is om te missen,
+	// want dat is de post die de speler elke dag armer maakt.
+	bool bSoldijVoorSluiting = false;
+	for (int32 Index = 0; Index < Sluiting; ++Index)
+	{
+		if (Reeks[Index].StartsWith(TEXT("Wages")))
+		{
+			bSoldijVoorSluiting = true;
+			break;
+		}
+	}
+	TestTrue(TEXT("de soldijregel van de dagtick valt binnen het venster"), bSoldijVoorSluiting);
+
+	Bus->Unsubscribe(EconomyHandle);
+	Bus->Unsubscribe(DoneHandle);
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
