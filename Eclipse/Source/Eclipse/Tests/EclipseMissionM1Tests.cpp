@@ -1871,4 +1871,141 @@ bool FEclipseLedgerLinesArriveBeforeTheDebriefClosesTest::RunTest(const FString&
 	return true;
 }
 
+
+// De strategische tick tegen zijn 12.4-budget (2 ms game thread).
+//
+// GDD 12.4 noemt vier budgetten naast de framerate, en dit is de enige die nu al
+// relevant en meetbaar is: "<=2 ms game thread for strategic tick". Er heeft nog
+// nooit iemand naar gekeken - niets in de hele module meet hem.
+//
+// De dagtick is geen kleinigheid: hij betaalt soldij, rekent per regio de
+// opbrengst uit, tikt de bouwprojecten door en keert faciliteitsopbrengsten uit,
+// allemaal binnen EEN atomaire commit. Dat werk groeit mee met de campagne, dus
+// het meten op een verse campagne zegt te weinig. Daarom twee metingen: voor en
+// na de Foothold, als er drie regio's bij zijn gekomen.
+//
+// DE ASSERTIE IS RUIM EN HET BUDGET STAAT ERNAAST, met opzet - dezelfde
+// driedeling als bij de frametijd. Dit draait in een Development-editorbuild op
+// een gedeelde machine, dus een harde 2 ms zou rood gaan op werk dat klopt zodra
+// er iets anders op de machine draait. Wat hier hoort te vallen is een
+// REGRESSIE van een orde van grootte, niet de ruis van een testrunner.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseStrategicTickStaysInsideItsBudgetTest,
+	"Eclipse.Missions.StrategicTickStaysInsideItsBudget",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseStrategicTickStaysInsideItsBudgetTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	constexpr double BudgetMs = 2.0;     // GDD 12.4
+	constexpr double RegressionMs = 50.0; // een orde van grootte eroverheen: dat is een defect
+
+	// De SLECHTSTE van een reeks, niet het gemiddelde: een tick die eens in de
+	// tien keer uitschiet, voelt de speler net zo goed als een die het altijd
+	// doet. Een gemiddelde verstopt precies die uitschieter.
+	//
+	// EN DE EERSTE APART VAN DE REST. Eerste meting gaf 1,459 ms op een verse
+	// campagne en 0,030 ms na de Foothold - vijftig keer sneller MET drie regio's
+	// erbij, en meer werk kan niet sneller zijn. Dat verschil is dus geen
+	// dagelijkse kost maar een eenmalige: de eerste tick betaalt het laden van de
+	// tabellen die hij aanraakt. Die twee op een hoop gooien zou een laadkost als
+	// tickkost rapporteren, en dan staat er een getal in het dashboard dat drie
+	// kwart van het budget opeet terwijl het spel dat nooit betaalt.
+	double Eerste = -1.0;
+	auto MeetTicks = [&](const TCHAR* Wanneer, int32 Aantal) -> double
+	{
+		double Slechtste = 0.0;
+		for (int32 Index = 0; Index < Aantal; ++Index)
+		{
+			FEclipseCampaignMutation Advance;
+			Advance.Type = EEclipseCampaignMutationType::AdvanceDay;
+			FEclipseCampaignTransaction Transaction;
+			Transaction.Source = TEXT("TickBudget");
+			Transaction.Mutations.Add(Advance);
+
+			const double Start = FPlatformTime::Seconds();
+			FString TickError;
+			const bool bOk = Campaign->CommitTransaction(Transaction, TickError);
+			const double Ms = (FPlatformTime::Seconds() - Start) * 1000.0;
+			if (!bOk)
+			{
+				AddError(FString::Printf(TEXT("dagtick geweigerd: %s"), *TickError));
+				return -1.0;
+			}
+			if (Eerste < 0.0)
+			{
+				Eerste = Ms; // de allereerste tick van de hele campagne
+				continue;    // telt niet mee in "slechtste": dat is laadkost
+			}
+			Slechtste = FMath::Max(Slechtste, Ms);
+		}
+		AddInfo(FString::Printf(TEXT("GEMETEN  strategische tick %s: slechtste van %d = %.3f ms (budget %.1f)"),
+			Wanneer, Aantal, Slechtste, BudgetMs));
+		return Slechtste;
+	};
+
+	const double VoorFoothold = MeetTicks(TEXT("op een verse campagne, eerste niet meegeteld"), 6);
+	if (VoorFoothold < 0.0) { GameInstance->Shutdown(); return false; }
+	AddInfo(FString::Printf(
+		TEXT("GEMETEN  de ALLEREERSTE tick kostte %.3f ms — eenmalig, want daarna zakt hij naar %.3f ms"),
+		Eerste, VoorFoothold));
+
+	// En nu met drie regio's erbij, want dat is wat de tick duurder maakt.
+	auto Play = [&](const TCHAR* Region, const TArray<FName>& Objectives) -> bool
+	{
+		if (!Strategy->SelectMission(Region, Error)) { AddError(Error); return false; }
+		if (!Prep->AutoLaunch(Error)) { AddError(Error); return false; }
+		for (const FName& Objective : Objectives)
+		{
+			if (!Mission->CompleteObjective(Objective, Error)) { AddError(Error); return false; }
+		}
+		return Mission->ResolveDebrief(true, Error);
+	};
+	const bool bChain =
+		Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M11_PatrolLeader"), TEXT("Obj_M11_Exfil") })
+		&& Play(TEXT("WorkerHousing"), { TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") })
+		&& Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") });
+	if (!TestTrue(TEXT("opzet: de keten tot de Foothold speelt uit"), bChain))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	const double NaFoothold = MeetTicks(TEXT("na de Foothold (3 regio's erbij)"), 5);
+	if (NaFoothold < 0.0) { GameInstance->Shutdown(); return false; }
+
+	// Wat hier hoort te vallen is een regressie van een orde van grootte.
+	TestTrue(*FString::Printf(TEXT("verse campagne: %.3f ms blijft ver onder de regressiegrens van %.0f ms"), VoorFoothold, RegressionMs),
+		VoorFoothold < RegressionMs);
+	TestTrue(*FString::Printf(TEXT("na de Foothold: %.3f ms blijft ver onder de regressiegrens van %.0f ms"), NaFoothold, RegressionMs),
+		NaFoothold < RegressionMs);
+
+	// En het budget zelf: geen assertie maar een zichtbare uitspraak, zodat een
+	// overschrijding opvalt zonder dat de bar rood gaat op machineruis.
+	if (NaFoothold > BudgetMs)
+	{
+		AddWarning(FString::Printf(
+			TEXT("strategische tick %.3f ms tegen een budget van %.1f ms (GDD 12.4) — nog geen fout, wel de kant op"),
+			NaFoothold, BudgetMs));
+	}
+
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
