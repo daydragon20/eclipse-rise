@@ -105,6 +105,14 @@ private:
 	/** Build the panels whose rows never change identity — once, at construct. */
 	void BuildStaticPanels();
 
+	/**
+	 * Het richtkruis, apart en VÓÓR de debug-poort. Zie de toelichting in
+	 * BuildStaticPanels: een kruis is spelbesturing en geen debugtekst, dus het
+	 * hoort ook op een review-frame te staan — anders is "richt dit ergens op"
+	 * niet te beoordelen.
+	 */
+	void BuildCrosshair();
+
 	/** In-place refresh of the gauntlet rows; wall-clock throttled, and free when the panel is hidden. */
 	void RefreshGauntletRows(bool bForce);
 
