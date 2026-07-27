@@ -930,4 +930,133 @@ bool FEclipseOnlyM13FlipsRegionsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// Antwoordt de kaart op de Foothold?
+// ---------------------------------------------------------------------------
+//
+// SPEC-P2-05 belooft dat de dagtick na de flip een hogere band betaalt (de spec
+// noemt 28 M / 110 C / 2 I voor de vier regio's die de speler dan houdt). Dat is
+// de vraag "verandert er iets in de WERELD", en die is een andere dan "draait de
+// eigenaar om" - een regio kan van eigenaar wisselen zonder dat er ooit een
+// credit binnenkomt.
+//
+// De assertie is een VERGELIJKING en geen vast getal: opbrengsten zijn
+// tuningwaarden (6.5 levers) en horen te mogen bewegen zonder deze test te
+// breken. Wat niet mag bewegen is de richting - drie regio's erbij hoort meer op
+// te leveren. De absolute getallen staan in de uitvoer, zodat de spec-band met
+// het oog na te kijken is.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseFootholdReachesTheLedgerTest,
+	"Eclipse.Missions.FootholdReachesTheLedger",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseFootholdReachesTheLedgerTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// Wat levert een dag op VOOR de Foothold? Alleen de Underworks is dan van de
+	// speler.
+	// EEN ECHTE DAG LATEN VERSTRIJKEN, via het pad dat het spel ook gebruikt: een
+	// AdvanceDay-transactie op de campagne, waarna het economiesubsysteem zijn
+	// tick zelf bouwt en commit op Event.Campaign.DayAdvanced. Een handgemaakte
+	// FEclipseEconomyTickParams zou een FIXTURE meten in plaats van het spel — en
+	// dat is precies het verschil dat deze nacht steeds de fout in ging.
+	auto AdvanceOneDay = [&](int32& OutCredits, int32& OutMaterials) -> bool
+	{
+		const int32 CreditsBeforeTick = Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag());
+		const int32 MaterialsBeforeTick = Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag());
+
+		FEclipseCampaignMutation Advance;
+		Advance.Type = EEclipseCampaignMutationType::AdvanceDay;
+		FEclipseCampaignTransaction Transaction;
+		Transaction.Source = TEXT("LedgerTest");
+		Transaction.Mutations.Add(Advance);
+
+		FString TickError;
+		if (!Campaign->CommitTransaction(Transaction, TickError))
+		{
+			AddError(FString::Printf(TEXT("dagtick geweigerd: %s"), *TickError));
+			return false;
+		}
+		OutCredits = Campaign->GetState().GetBalance(EclipseTags::Resource_Credits.GetTag()) - CreditsBeforeTick;
+		OutMaterials = Campaign->GetState().GetBalance(EclipseTags::Resource_Materials.GetTag()) - MaterialsBeforeTick;
+		return true;
+	};
+
+	int32 CreditsBefore = 0;
+	int32 MaterialsBefore = 0;
+	if (!AdvanceOneDay(CreditsBefore, MaterialsBefore))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  dagtick VOOR de Foothold: %+d C, %+d M"), CreditsBefore, MaterialsBefore));
+
+	auto Play = [&](const TCHAR* Region, const TArray<FName>& Objectives) -> bool
+	{
+		if (!Strategy->SelectMission(Region, Error)) { AddError(FString::Printf(TEXT("select %s: %s"), Region, *Error)); return false; }
+		if (!Prep->AutoLaunch(Error)) { AddError(Error); return false; }
+		for (const FName& Objective : Objectives)
+		{
+			if (!Mission->CompleteObjective(Objective, Error)) { AddError(Error); return false; }
+		}
+		return Mission->ResolveDebrief(true, Error);
+	};
+
+	if (!Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M11_PatrolLeader"), TEXT("Obj_M11_Exfil") })
+		|| !Play(TEXT("WorkerHousing"), { TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") })
+		|| !Play(TEXT("TransitCheckpoint"), { TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") }))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+
+	int32 CreditsAfter = 0;
+	int32 MaterialsAfter = 0;
+	if (!AdvanceOneDay(CreditsAfter, MaterialsAfter))
+	{
+		GameInstance->Shutdown();
+		return false;
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  dagtick NA de Foothold: %+d C, %+d M"), CreditsAfter, MaterialsAfter));
+
+	// NIET "meer dan nul", maar "beter dan ervoor". De dagtick is NETTO: hij trekt
+	// de soldij van je acht soldaten af van de opbrengst, en dat is de reden dat
+	// het spel begint met een verlies. Gemeten:
+	//
+	//   voor de Foothold  -84 C  +8 M   per dag
+	//   na de Foothold      0 C +28 M   per dag
+	//
+	// De drie regio's brengen de kas dus van een dagelijks verlies naar precies
+	// quitte, en de materialen van 8 naar 28 — de band die SPEC-P2-05 belooft
+	// (28 M) komt er exact uit. Een assertie op "positief" zou hier rood zijn
+	// geworden op een volkomen gezonde economie: dat is de fout die een test
+	// onbruikbaar maakt.
+	//
+	// De discriminator zit ingebakken: bij een lege tick zijn beide nul en is
+	// "na > voor" onwaar, dus de test kan niet groen worden zonder dat er echt
+	// iets binnenkomt.
+	TestTrue(TEXT("ledger: de materialen lopen echt op (geen lege tick)"), MaterialsAfter > 0);
+	TestTrue(TEXT("ledger: de Foothold verbetert de dagbalans in credits"), CreditsAfter > CreditsBefore);
+	TestTrue(TEXT("ledger: en levert meer materialen op"), MaterialsAfter > MaterialsBefore);
+
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
