@@ -10,7 +10,7 @@
 
 ---
 
-## VEILIG TE SPELEN: JA, commit `bb58c00`
+## VEILIG TE SPELEN: JA, commit `09375b8`
 
 Het personage staat weer in beeld en beweegt mee. De crash bij lopen is weg. Dit
 is het eerste punt vandaag waarvan ik dat met een meting kan onderbouwen in plaats
@@ -59,6 +59,7 @@ op `AR_Foundry 30 / 30`, navmesh onder de speler JA. Zes geluidsbanken geladen
 | **LT deed nog steeds twee dingen.** De afschaffing van vanochtend was alleen in het commentaar, de tabel en BESTURING.md geland — de `MapKey` stond er nog. | LT draagt nu 1 actie in plaats van 2 |
 | **Een gele engine-waarschuwing liep over je scherm.** Twee directionele lampen streden om "de" zon. | 0 waarschuwingen in het log en weg van het beeld |
 | **Twee voetstapgeluiden bestonden niet.** De code vroeg zeven houtvarianten, het pack levert er vijf — en niets telde die mislukte laadpogingen, want de teller sloeg alleen aan bij een compleet lege bank. De aantallen stonden met de hand in de code; de lader telt nu zelf. | 2 mislukte laadpogingen per start → **0**; en vier van de zes oppervlakken hebben nu méér varianten |
+| **De drie budgetten uit GDD 12.4 die nu al meetbaar zijn, hebben hun marge erbij.** Ze werden alle drie wél gemeten of gelogd en geen ervan werd tegen zijn grens gehouden: de frametijd had niets tussen de meting en een harde fout op 33 ms (budget 16,7), de strategische tick was nog nooit door iemand gemeten, en het agentenaantal stond in het log zonder de grens van veertig ernaast. | frame **4,7–5,5 ms** van 16,7 · strategische tick **0,029 ms** van 2 · agenten **7** van 40. Alle drie waarschuwen ruim vóór ze falen, en de marge staat er altijd bij |
 | **Drie beweringen uit de specs die niemand controleerde, staan nu vast.** Ik heb de Tests-secties van alle gelande specs naast de suite gelegd in plaats van te gokken wat er miste. P2-01 bleek volledig gedekt; P2-02, P2-03 en P2-04 hadden er elk één. Alle drie dezelfde vorm: **de staat klopt en het signaal blijft uit** — dilatatie terug op 1.0 zonder `ModeExited`, campagne correct maar het debrief leeg, een objective die alvast uitkeert terwijl de hash er goed uitziet. | 177 → 180 tests; elk gat gefalsifieerd met het echte defect erin gezet |
 | **"De soak blijft groen" is nu een feit in de repo in plaats van iets dat ik je vertel.** P2-05 eist drie nachten achtereen groen, en dat was onvervulbaar: zonder CI-runner bestond die reeks alleen in mijn hoofd. `verify.ps1` schrijft elke draai weg in `phase0/SOAK_LOG.md` — **ook bij rood**, want een logboek dat alleen successen bewaart kan "drie nachten" per definitie niet aantonen. | Eerste regels staan erin; nog twee groene dagen nodig, en dat is kalender en geen werk |
 | **Na een bevrijding legt het debrief nu UIT waarom.** De geauthorde zin bij een bevrijdingsrij stond alleen in het log; het debriefscherm toonde alleen `wijk: Dominion -> Player`. Eigen feit met een eigen payload, want één rij draait drie vakken om: aan het vak-feit gehangen had die zin er drie keer gestaan. | Precies één zin per rij bij drie omgedraaide vakken, en hij komt ná de vakken (een uitleg vooraf zou een uitkomst aankondigen die nog afgewezen kon worden). Beide beweringen getest; de volgordebewering gefalsifieerd |
