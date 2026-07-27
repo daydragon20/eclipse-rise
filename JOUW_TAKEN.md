@@ -171,6 +171,20 @@ de lichtplekken en contactschaduwen van de bouwer wél renderen. Dat heb ik nooi
 gezien — alleen aangenomen omdat de wijk aangekleed oogt. Er staan er **38** in de
 wereld, met precies het recept dat mijn spoor nu ook gebruikt.
 
+### ❓ EEN VRAAG DIE JIJ IN EEN HALVE RONDE BEANTWOORDT (en ik niet)
+
+Ik heb vastgesteld dat dingen die **tijdens het spelen** worden neergezet niet
+getekend worden — bewezen met blokken van 9, 50 en 90 cm, vier materialen, plat en
+massief. Maar alles daarvan is gemeten in de **opnameronde**, en die start de missie
+meteen bij het begin; daar ontstaat vrijwel alles rond het opstarten.
+
+**Start jij een missie vanuit de hub, dan worden je squadmates en de vijanden wél
+middenin het spel neergezet.** Zie je die gewoon staan, dan is mijn conclusie te
+breed en ligt het verschil ergens smaller.
+
+**Dus: verschijnen je squadmates normaal als je een missie start?** Eén zin
+volstaat, en hij scheelt de volgende sessie een verkeerde richting.
+
 ### 🔬 DE CONTROLEPROEF FAALDE — en dat betekent dat één van mijn twee gereedschappen liegt
 
 Ik heb twaalf oorzaken uitgesloten voor een plat vlak dat niet rendert, en telkens

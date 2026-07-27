@@ -166,6 +166,19 @@ void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStru
 	// Dit is geen gok meer maar een reproduceerbare vaststelling, en hij hoort in de
 	// editor bevestigd te worden voordat er nog iets aan dit spoor verandert. De
 	// code blijft staan: hij klopt zodra dat opgelost is.
+	//
+	// EEN MOGELIJKE TEGENSPRAAK DIE IK ZELF NIET KAN TOETSEN, en die hoort erbij.
+	// Alles hierboven is gemeten in de OPNAMERONDE, en die start de missie meteen
+	// bij het begin — dus daar ontstaat vrijwel alles rond BeginPlay. Start de owner
+	// een missie vanuit de hub, dan worden squadmates en vijanden WEL midden in het
+	// spel neergezet (SpawnMissionActors), en die ziet hij staan. Klopt dat, dan is
+	// mijn vaststelling te breed en ligt het verschil ergens smaller: bij
+	// AStaticMeshActor, of bij spawnen vanuit een bus-callback, en niet bij "tijdens
+	// het spelen" in het algemeen.
+	//
+	// Ik zet het er zo bij omdat de owner dat in een halve speelronde weet en ik
+	// niet, en omdat een te brede conclusie de volgende sessie de verkeerde kant op
+	// stuurt.
 	// ================================================================
 }
 
