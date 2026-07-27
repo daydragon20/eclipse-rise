@@ -79,6 +79,7 @@ $Validation = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "Valid
 if ($Validation) {
     Write-Host ($Validation.Line -replace '^.*Display: ', '')
     if ($Validation.Line -notmatch ', 0 errors\.') { $Failures += "validatie meldt fouten" }
+    $script:ValidationLine = ($Validation.Line -replace '^.*Display: ', '')
 } else {
     Write-Host "GEEN VALIDATIEREGEL gevonden - draaide de commandlet wel?"
     $Failures += "validatie gaf geen uitslag"
@@ -201,5 +202,19 @@ if ($Failures.Count -gt 0) {
     $Failures | ForEach-Object { Write-Host "  $_" }
     exit 1
 }
-Write-Host "Suite groen. NU ZELF NAAR DE BEELDEN KIJKEN en opschrijven wat je ziet —"
-Write-Host "een groene bar bewijst niet dat er iets op het scherm staat."
+# EEN OVERZICHT AAN HET EIND, want er hangen inmiddels zeven controles onder
+# deze bar en die stonden verspreid over honderden regels engine-uitvoer. Wie
+# alleen "groen" leest, weet niet WAT er groen is - en dat is precies hoe je
+# gaat vertrouwen op een vinkje in plaats van op een meting.
+Write-Host "Suite groen."
+Write-Host ""
+Write-Host "  tests        $script:Counts"
+if ($script:ValidationLine) { Write-Host "  validatie    $script:ValidationLine" }
+Write-Host "  opnames      $script:ShotCount"
+if (-not $SkipShots) {
+    Write-Host "  beelden      zie 'VERANDERD SINDS DE VORIGE RONDE' hierboven"
+}
+Write-Host "  logboek      phase0\SOAK_LOG.md"
+Write-Host ""
+Write-Host "NU ZELF NAAR DE BEELDEN KIJKEN als er iets veranderd is — en anders"
+Write-Host "steekproefsgewijs. Een groene bar bewijst niet dat er iets op het scherm staat."
