@@ -798,4 +798,86 @@ bool FEclipseLiberationDebriefSeamTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+
+// De bevrijdingszin komt EEN keer aan, na de vakken.
+//
+// Twee beweringen, en de eerste is de reden dat dit feit een eigen struct heeft:
+// de Foothold draait DRIE vakken om met EEN zin. Had die zin in het vak-feit
+// gezeten, dan stond hij drie keer op het debriefscherm - een fout die alleen
+// zichtbaar wordt als je telt, want drie keer dezelfde zin leest als een zin.
+//
+// De tweede is de volgorde. Het feit vuurt NA de commit en dus na de vak-feiten,
+// omdat een uitleg vooraf een uitkomst zou aankondigen die nog kon worden
+// afgewezen. Je leest dus eerst wat er kantelde en dan waarom.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseLiberationLineReachesTheDebriefTest,
+	"Eclipse.Strategy.Liberation.LineReachesTheDebrief",
+	EclipseLiberationTest::TestFlags)
+
+bool FEclipseLiberationLineReachesTheDebriefTest::RunTest(const FString& Parameters)
+{
+	const FText Zin = FText::FromString(TEXT("De doorgang is van ons; de wijk kan ademen."));
+
+	FEclipseLiberationRow Row = EclipseLiberationTest::MakeFootholdRow();
+	Row.ContextLine = Zin;
+
+	EclipseLiberationTest::FWiringFixture Fixture = EclipseLiberationTest::FWiringFixture::Make(
+		EclipseLiberationTest::MakeLiberationTable(Row));
+	if (!TestNotNull(TEXT("Campaign subsystem exists"), Fixture.Campaign))
+	{
+		return false;
+	}
+	TestTrue(TEXT("Debrief beat commits first (as-built order)"), EclipseLiberationTest::CommitM13Beat(*Fixture.Campaign));
+
+	// Een gedeelde volgorde-lijst: zonder die ene lijst kun je wel tellen maar
+	// niet zien wat er eerst kwam, en de volgorde is hier de halve bewering.
+	TArray<FString> Volgorde;
+	TArray<FText> Zinnen;
+	int32 GemeldeVakken = 0;
+
+	FEclipseEventSubscriptionHandle VakHandle = Fixture.Bus->Subscribe(
+		EclipseTags::Event_Strategy_RegionControlChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&Volgorde](FGameplayTag, const FInstancedStruct&)
+		{
+			Volgorde.Add(TEXT("vak"));
+		}),
+		FEclipseStrategyEventPayload::StaticStruct());
+
+	FEclipseEventSubscriptionHandle ZinHandle = Fixture.Bus->Subscribe(
+		EclipseTags::Event_Strategy_LiberationResolved,
+		FEclipseEventNativeDelegate::CreateLambda([&](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			Volgorde.Add(TEXT("zin"));
+			if (const FEclipseLiberationEventPayload* Fact = Payload.GetPtr<FEclipseLiberationEventPayload>())
+			{
+				Zinnen.Add(Fact->ContextLine);
+				GemeldeVakken = Fact->RegionCount;
+			}
+		}),
+		FEclipseLiberationEventPayload::StaticStruct());
+
+	EclipseLiberationTest::BroadcastCompleted(*Fixture.Bus, TEXT("MT_M13"));
+
+	// EEN zin, niet drie. Dit is de assertie waar het ontwerp op staat.
+	TestEqual(TEXT("Precies EEN bevrijdingszin, ook al kantelden er drie vakken"), Zinnen.Num(), 1);
+	if (Zinnen.Num() == 1)
+	{
+		TestTrue(TEXT("Het is de geauthorde zin en niet een samengestelde tekst"), Zinnen[0].EqualTo(Zin));
+	}
+	TestEqual(TEXT("Het feit meldt hoeveel vakken er ECHT omdraaiden"), GemeldeVakken, 3);
+
+	// En de volgorde: drie vakken, dan de uitleg.
+	TestEqual(TEXT("Vier feiten in totaal"), Volgorde.Num(), 4);
+	if (Volgorde.Num() == 4)
+	{
+		TestTrue(TEXT("De uitleg komt NA de vakken, niet ervoor"),
+			Volgorde[0] == TEXT("vak") && Volgorde[1] == TEXT("vak")
+			&& Volgorde[2] == TEXT("vak") && Volgorde[3] == TEXT("zin"));
+	}
+
+	Fixture.Bus->Unsubscribe(VakHandle);
+	Fixture.Bus->Unsubscribe(ZinHandle);
+	Fixture.Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

@@ -12,6 +12,7 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_RegionControlChanged, "Event.Strategy.RegionControlChanged", "A region changed owner; emitted by CampaignState commit only (SPEC-P1-02/04).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_MissionSelected, "Event.Strategy.MissionSelected", "Player picked a mission offer on the mini-map (SPEC-P1-04).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_LiberationResolved, "Event.Strategy.LiberationResolved", "Een bevrijdingsrij is gecommit: rijnaam, aantal omgedraaide vakken en de geauthorde zin die uitlegt WAAROM. Vuurt per RIJ, waar RegionControlChanged per VAK vuurt (SPEC-P2-05 bouwvolgorde stap 4).")
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Prep_MissionLaunchRequested, "Event.Prep.MissionLaunchRequested", "Preparation flow requests mission start with squad/loadout/insertion/intel payload (SPEC-P1-08).")
 

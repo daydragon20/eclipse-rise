@@ -82,6 +82,32 @@ struct FEclipseStrategyEventPayload
 	FName TemplateId;
 };
 
+/**
+ * Event.Strategy.LiberationResolved — EEN rij bevrijding is gecommit.
+ *
+ * Eigen struct en geen veld op FEclipseStrategyEventPayload, omdat de schaal
+ * verschilt: RegionControlChanged vuurt PER VAK, dit feit vuurt per RIJ. De
+ * Foothold draait drie vakken om met een zin; die zin in het vak-feit zetten
+ * betekent hem drie keer op het debriefscherm.
+ */
+USTRUCT(BlueprintType)
+struct FEclipseLiberationEventPayload
+{
+	GENERATED_BODY()
+
+	/** Rijnaam uit DT_LiberationInstances — het audit-spoor. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName RowName;
+
+	/** Hoeveel vakken deze rij daadwerkelijk omdraaide (niet hoeveel er in de rij staan). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 RegionCount = 0;
+
+	/** De geauthorde zin: WAAROM dit gebied kantelde, in mensentaal. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FText ContextLine;
+};
+
 /** Event.Prep.* — the full launch request composed by preparation (SPEC-P1-08). */
 USTRUCT(BlueprintType)
 struct FEclipsePrepEventPayload

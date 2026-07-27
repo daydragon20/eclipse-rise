@@ -23,6 +23,7 @@ namespace EclipseTags
 	// Strategy (SPEC-P1-02/04)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Strategy_RegionControlChanged)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Strategy_MissionSelected)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Strategy_LiberationResolved)
 
 	// Preparation (SPEC-P1-08)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Prep_MissionLaunchRequested)

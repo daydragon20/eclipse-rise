@@ -142,6 +142,15 @@ void UEclipseBaseHubWidget::OnAnyFact(FGameplayTag EventTag, const FInstancedStr
 				DebriefLines.Add(FString::Printf(TEXT("Wounded — out %d days"), Roster->DaysOut));
 			}
 		}
+		else if (const FEclipseLiberationEventPayload* Liberation = Payload.GetPtr<FEclipseLiberationEventPayload>())
+		{
+			if (EventTag == EclipseTags::Event_Strategy_LiberationResolved.GetTag() && !Liberation->ContextLine.IsEmpty())
+			{
+				// De enige regel in het debrief die geen getal is. Alle andere
+				// regels melden WAT er veranderde; deze zegt wat het betekent.
+				DebriefLines.Add(Liberation->ContextLine.ToString());
+			}
+		}
 		else if (const FEclipseStrategyEventPayload* Strategy = Payload.GetPtr<FEclipseStrategyEventPayload>())
 		{
 			if (EventTag == EclipseTags::Event_Strategy_RegionControlChanged.GetTag())

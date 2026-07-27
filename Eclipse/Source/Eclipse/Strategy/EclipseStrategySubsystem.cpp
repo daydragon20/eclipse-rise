@@ -388,10 +388,26 @@ void UEclipseStrategySubsystem::OnMissionCompleted(FGameplayTag EventTag, const 
 			}
 
 			// The commit above already broadcast the RegionControlChanged facts
-			// in row order; this line is the audit trail + the row's ContextLine
-			// until the step-4 debrief surface lands (SPEC-P2-05 build order).
+			// in row order; this line stays as the audit trail in the log.
 			UE_LOG(LogEclipse, Display, TEXT("Strategy: liberation '%s' flipped %d region(s) on '%s'. %s"),
 				*RowName.ToString(), Transaction.Mutations.Num(), *Mission->MissionId.ToString(), *Row.ContextLine.ToString());
+
+			// En NU pas het feit voor het debriefscherm (SPEC-P2-05 stap 4). Na de
+			// commit en dus na de vak-feiten: de zin verklaart iets dat gebeurd is,
+			// en een uitleg vooraf zou een uitkomst aankondigen die nog kon worden
+			// afgewezen. Op het scherm lees je daardoor eerst WAT er kantelde en
+			// dan WAAROM; dat is de eerlijke volgorde, niet de mooiste.
+			if (UEclipseEventBusSubsystem* Bus = Campaign->GetGameInstance() != nullptr
+				? Campaign->GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+			{
+				FEclipseLiberationEventPayload Fact;
+				Fact.RowName = RowName;
+				Fact.RegionCount = Transaction.Mutations.Num();
+				Fact.ContextLine = Row.ContextLine;
+				Bus->Broadcast(EclipseTags::Event_Strategy_LiberationResolved.GetTag(),
+					FInstancedStruct::Make(Fact));
+			}
+
 		});
 
 	if (!bAnyRowTriggered)
