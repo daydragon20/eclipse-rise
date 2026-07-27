@@ -61,6 +61,20 @@ if ($j.failed -gt 0 -or $j.notRun -gt 0) {
         Write-Host "  FAAL: $($_.fullTestPath)"
         $Failures += $_.fullTestPath
         $_.entries | Where-Object { $_.event.type -eq 'Error' } | ForEach-Object { Write-Host "     $($_.event.message)" }
+        # EN DE METINGEN VAN DIE TEST ERBIJ.
+        #
+        # Op 27-07 viel de contacttest om en er stond alleen "Expected ... to be
+        # true". Ik heb er een uur in gestoken: test apart gedraaid, harnastijd
+        # nagetrokken, de aanlooplus gelezen. Daarna bleek het rapport van die
+        # ene val 122 Info-regels te bevatten met alle GEMETEN-waarden erin -
+        # dichtste nadering, schade, tijdstippen. Dit script gooide ze weg omdat
+        # het alleen op type 'Error' filterde.
+        #
+        # Het bewijs lag er dus al en het gereedschap liet het niet zien. Alleen
+        # de GEMETEN-regels, alleen bij een gevallen test: de rest van de 122 is
+        # ruis, en een dump die niemand leest is precies waar dit tegen is.
+        $_.entries | Where-Object { $_.event.type -ne 'Error' -and $_.event.message -like '*GEMETEN*' } |
+            ForEach-Object { Write-Host "       $($_.event.message)" }
     }
 }
 
