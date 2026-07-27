@@ -168,6 +168,52 @@ if created:
     eal.save_loaded_asset(m13)
     unreal.log("MT_M13 authored: 2 mandatory, no optional (schema), no region flip.")
 
+# --- MT_M14 "The Quartermaster" (SPEC-P2-04: 2x CollectItem wapenkisten +
+# ExtractSquad). Geen regio-flip, besluit 6.
+m14, created = get_or_create_mission("MT_M14")
+if created:
+    m14.set_editor_property("template_id", "MT_M14")
+    m14.set_editor_property("display_name", unreal.Text("The Quartermaster"))
+    m14.set_editor_property("progress_region_on_success", False)
+
+    crate_a = unreal.EclipseObjectiveDef()
+    crate_a.set_editor_property("objective_id", "Obj_M14_CrateFirst")
+    crate_a.set_editor_property("type", unreal.EclipseObjectiveType.COLLECT_ITEM)
+    crate_a.set_editor_property("description", unreal.Text("Break open the first weapon crate"))
+    crate_a.set_editor_property("target_id", "Site_Pens")
+
+    crate_b = unreal.EclipseObjectiveDef()
+    crate_b.set_editor_property("objective_id", "Obj_M14_CrateSecond")
+    crate_b.set_editor_property("type", unreal.EclipseObjectiveType.COLLECT_ITEM)
+    crate_b.set_editor_property("description", unreal.Text("Take the second crate - this one wakes the armory"))
+    crate_b.set_editor_property("target_id", "Site_ControlPost")
+
+    exfil14 = unreal.EclipseObjectiveDef()
+    exfil14.set_editor_property("objective_id", "Obj_M14_Exfil")
+    exfil14.set_editor_property("type", unreal.EclipseObjectiveType.EXTRACT_SQUAD)
+    exfil14.set_editor_property("description", unreal.Text("Get the crates out"))
+    exfil14.set_editor_property("target_id", "Site_Extraction")
+
+    # DEZE OPTIONAL KAN WEL. De spec vraagt "no soldier downed (+15 M)", en dat
+    # is precies bRequiresNoCasualties - hetzelfde veld dat M1.1 in wave 2 kreeg.
+    # Bij M1.3 moest de optional juist wegblijven omdat "SupplyDepot intact"
+    # nergens als feit bestaat. Het verschil is niet hoe belangrijk de optional
+    # is, maar of hij te EVALUEREN is.
+    intact = unreal.EclipseObjectiveDef()
+    intact.set_editor_property("objective_id", "Obj_M14_NoCasualties")
+    intact.set_editor_property("type", unreal.EclipseObjectiveType.EXTRACT_SQUAD)
+    intact.set_editor_property("description", unreal.Text("Bring everyone home standing"))
+    intact.set_editor_property("target_id", "Site_Extraction")
+    intact.set_editor_property("optional", True)
+    intact.set_editor_property("requires_no_casualties", True)
+    intact.set_editor_property("optional_reward_materials", 15)
+
+    m14.set_editor_property("objectives", [crate_a, crate_b, exfil14, intact])
+    # Breekpunt of zijrooster (besluit 8).
+    m14.set_editor_property("insertion_point_ids", ["Entry_Vault", "Entry_Sewer"])
+    eal.save_loaded_asset(m14)
+    unreal.log("MT_M14 authored: 3 mandatory + 1 no-casualties optional, no region flip.")
+
 # --- DT_StoryMissions: the M1.1 pin (M1.2-M1.4 rows land as their missions are
 # authored, each behind its predecessor's completion beat).
 table_path = f"{DATA_PATH}/DT_StoryMissions"
@@ -223,6 +269,26 @@ rows = json.dumps([
      "CompletionBeatTag": {"TagName": "Story.Beat.M13_SignalFire"},
      "RewardCredits": 60, "RewardMaterials": 40, "RewardIntel": 4,
      "BriefingText": "Take the tower and the district goes deaf. It will answer - be gone before it does.",
+     "BriefingSpeaker": "Mara"},
+    # M1.4 achter de beat van M1.3, en gepind op WorkerHousing. Zelfde gemeten
+    # beperking als bij M1.3: zolang SPEC-P2-05 de eerste regio-flip niet levert,
+    # bezit de speler alleen Underworks en zijn TransitCheckpoint en WorkerHousing
+    # de enige selecteerbare regio's. WorkerHousing komt vrij zodra M1.2 gespeeld
+    # is, dus de keten wisselt netjes tussen die twee.
+    #
+    # NIET GEAUTHORD, en dat hoort hier te staan: de spec belooft bij M1.4 ook
+    # "Brick aan het roster" en "UnlockedLoadoutTags += real-rifle tier". Beide
+    # zijn commit-effecten die NIET uit een missie-asset komen - het asset draagt
+    # alleen de completion-beat. Story.Beat.BrickRecruited bestaat als tag maar
+    # wordt door niets geconsumeerd. Dat als "af" melden zou dezelfde leugen zijn
+    # als een optional die zichzelf afvinkt.
+    {"Name": "MT_M14", "MissionId": "MT_M14",
+     "MissionAsset": f"{MISSIONS_PATH}/MT_M14.MT_M14",
+     "PinnedRegionId": "WorkerHousing",
+     "UnlockBeatTag": {"TagName": "Story.Beat.M13_SignalFire"},
+     "CompletionBeatTag": {"TagName": "Story.Beat.M14_Quartermaster"},
+     "RewardCredits": 100, "RewardMaterials": 200, "RewardIntel": 0,
+     "BriefingText": "Their armory has been feeding this district for years. Tonight it feeds us.",
      "BriefingSpeaker": "Mara"},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(table, rows):

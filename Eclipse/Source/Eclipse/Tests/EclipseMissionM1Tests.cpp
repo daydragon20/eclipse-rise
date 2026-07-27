@@ -697,4 +697,102 @@ bool FEclipseMissionM13ShippedDataGauntletTest::RunTest(const FString& Parameter
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// De hele M1-keten, in een run
+// ---------------------------------------------------------------------------
+//
+// De drie Gauntlets hierboven bewijzen elk hun eigen missie. Deze bewijst de
+// KETEN: vier missies achter elkaar, elk achter de beat van zijn voorganger, op
+// de twee regio's die de speler zonder SPEC-P2-05 kan bereiken.
+//
+// Waarom dat een eigen test verdient: elke schakel apart kan kloppen terwijl de
+// keten vastloopt. Precies dat gebeurde bij het authoren van M1.3 - het aanbod
+// stond er, en selecteren kon niet.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMissionM14ChainOnShippedDataTest,
+	"Eclipse.Missions.M14ChainOnShippedData",
+	EclipseMissionM1Test::TestFlags)
+
+bool FEclipseMissionM14ChainOnShippedDataTest::RunTest(const FString& Parameters)
+{
+	UEclipseCampaignSetupAsset* Setup = LoadObject<UEclipseCampaignSetupAsset>(nullptr, TEXT("/Game/Data/DA_CampaignSetup.DA_CampaignSetup"));
+	if (Setup == nullptr)
+	{
+		AddError(TEXT("Verscheepte DA_CampaignSetup ontbreekt - draai Tools/create_phase1_content.py + Tools/setup_story_missions.py."));
+		return false;
+	}
+
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	GameInstance->InitializeStandalone();
+	UEclipseCampaignSubsystem* Campaign = GameInstance->GetSubsystem<UEclipseCampaignSubsystem>();
+	UEclipseStrategySubsystem* Strategy = GameInstance->GetSubsystem<UEclipseStrategySubsystem>();
+	UEclipsePrepSubsystem* Prep = GameInstance->GetSubsystem<UEclipsePrepSubsystem>();
+	UEclipseMissionSubsystem* Mission = GameInstance->GetSubsystem<UEclipseMissionSubsystem>();
+
+	Campaign->StartNewCampaign(Setup);
+	FString Error;
+
+	// Eén schakel: kies de regio, controleer dat de verwachte missie wint, speel
+	// hem uit. De reden van een weigering gaat mee in de melding - een keten die
+	// vastloopt moet zeggen WAAR, niet alleen DAT.
+	auto PlayLink = [&](const TCHAR* Region, const TCHAR* Expected, const TArray<FName>& Objectives) -> bool
+	{
+		FEclipseMissionOfferView View;
+		if (!TestTrue(FString::Printf(TEXT("keten: %s heeft aanbod"), Region), Strategy->TryGetOffer(Region, View)))
+		{
+			return false;
+		}
+		if (!TestEqual(FString::Printf(TEXT("keten: %s biedt %s"), Region, Expected), View.TemplateId, FName(Expected)))
+		{
+			return false;
+		}
+		const bool bSelected = Strategy->SelectMission(Region, Error);
+		if (!TestTrue(FString::Printf(TEXT("keten: %s selecteerbaar (reden bij weigering: '%s')"), Expected, *Error), bSelected))
+		{
+			return false;
+		}
+		if (!TestTrue(FString::Printf(TEXT("keten: %s gelanceerd"), Expected), Prep->AutoLaunch(Error)))
+		{
+			return false;
+		}
+		for (const FName& Objective : Objectives)
+		{
+			if (!TestTrue(FString::Printf(TEXT("keten: %s voltooit %s"), Expected, *Objective.ToString()),
+					Mission->CompleteObjective(Objective, Error)))
+			{
+				return false;
+			}
+		}
+		return TestTrue(FString::Printf(TEXT("keten: %s debrieft"), Expected), Mission->ResolveDebrief(true, Error));
+	};
+
+	const int32 DayAtStart = Campaign->GetState().Day;
+
+	if (!PlayLink(TEXT("TransitCheckpoint"), TEXT("MT_M11"),
+			{ TEXT("Obj_M11_PatrolLeader"), TEXT("Obj_M11_Exfil") })) { GameInstance->Shutdown(); return false; }
+	if (!PlayLink(TEXT("WorkerHousing"), TEXT("MT_M12"),
+			{ TEXT("Obj_M12_CacheNorth"), TEXT("Obj_M12_CacheSouth"), TEXT("Obj_M12_Exfil") })) { GameInstance->Shutdown(); return false; }
+	if (!PlayLink(TEXT("TransitCheckpoint"), TEXT("MT_M13"),
+			{ TEXT("Obj_M13_Jammer"), TEXT("Obj_M13_Exfil") })) { GameInstance->Shutdown(); return false; }
+	if (!PlayLink(TEXT("WorkerHousing"), TEXT("MT_M14"),
+			{ TEXT("Obj_M14_CrateFirst"), TEXT("Obj_M14_CrateSecond"), TEXT("Obj_M14_Exfil") })) { GameInstance->Shutdown(); return false; }
+
+	// Vier missies, vier dagen. Een keten die er vier speelt maar er drie telt,
+	// heeft ergens een debrief overgeslagen.
+	TestEqual(TEXT("keten: vier missies, vier dagen verder"), Campaign->GetState().Day, DayAtStart + 4);
+
+	// En na de vierde is er niets meer gepind: WorkerHousing valt terug op zijn
+	// regio-aanbod. Zonder deze assertie zou een pin die blijft hangen (en de
+	// speler dus in M1.4 opsluit) onopgemerkt blijven.
+	FEclipseMissionOfferView AfterChain;
+	if (Strategy->TryGetOffer(TEXT("WorkerHousing"), AfterChain))
+	{
+		AddInfo(FString::Printf(TEXT("GEMETEN  na de keten biedt WorkerHousing '%s' aan"), *AfterChain.TemplateId.ToString()));
+		TestNotEqual(TEXT("keten: M1.4 blijft niet hangen als aanbod"), AfterChain.TemplateId, FName(TEXT("MT_M14")));
+	}
+
+	GameInstance->Shutdown();
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
