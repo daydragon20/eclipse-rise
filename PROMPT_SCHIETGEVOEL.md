@@ -1,163 +1,186 @@
-# Prompt: schietgevoel bouwen zoals de demo's
+# HTML-kwaliteit in Unreal krijgen
 
-*Dit bestand is kort gehouden, en dat is de hele pointe. De demo's die je zag
-draaiden op ongeveer 60 woorden instructie. Alles wat je hier extra bijplakt
-gaat af van de aandacht voor het probleem zelf.*
+*Herzien nadat de owner corrigeerde: er is een wapen, en de agent opent de game
+zelf elke 5-10 minuten, kijkt en speelt. De lus is dus dicht. Dit document gaat
+over waarom dat nog niet genoeg is.*
 
 ---
 
-## Waarom de demo's lukten en Eclipse niet
+## Wat een HTML-bestand eigenlijk geeft
 
-De demo's zijn **geen Unreal**. Bewijs staat in de screenshots zelf: "built with
-Three.js", een Chrome-tab op `localhost:8080/fps.html`, en "a painterly world in
-one HTML file". Het zijn losse HTML-bestanden in een browser.
+De demo's die de vraag opriepen draaien in de browser — "built with Three.js",
+`localhost:8080/fps.html`, "one HTML file". Het verleidelijke antwoord is "het
+model kan zijn resultaat zien". Dat klopt hier niet meer: jouw agent ziet zijn
+resultaat ook.
 
-Dat is geen detail — het is het hele verschil:
+Een HTML-bestand geeft twee dingen die daar los van staan:
 
-| | HTML-demo | Eclipse (UE5) |
+| | HTML | Eclipse nu |
 |---|---|---|
-| Wie schrijft de wereld | het model, 100% | het model schrijft ~5%, de rest is engine + assets |
-| Wapenpositie | drie getallen in de code die het net schreef | een socket op een skeleton in een editor |
-| Textuur | procedureel, in code | een `.uasset` |
-| Terugkoppeling | screenshot in 10 seconden, zelf bekijken | build (minuten) → editor → jij moet kijken |
-| Aantal iteraties per uur | tientallen | een handvol |
+| Eén iteratie kost | ~3 seconden (bewerk, F5) | 5-10 minuten (bewerk, build, start, speel) |
+| Iteraties per uur | honderden | zes tot twaalf |
+| Waar de staat leeft | tekst, in het bestand dat hij net schreef | binaire `.uasset` + een C++-struct |
+| Welk frame hij ziet | elk frame dat hij wil | wat er toevallig op het scherm staat |
 
-Schietgevoel is puur een terugkoppel-probleem. Het is niet uit te denken, alleen
-uit te proberen. In de demo's zit die lus dicht; in Eclipse is hij open aan beide
-kanten. **Daarom lukt het daar in één prompt en hier niet in 24 uur.**
+Schietgevoel is een zoektocht door ~25 gekoppelde continue parameters:
+terugslag verticaal, horizontaal, hersteltijd en -curve, spreiding heup vs. ADS
+vs. lopend, shake-amplitude en -frequentie, mondingsvuur-duur, tracer-snelheid en
+-dikte, hitmarker-vorm/-duur/-vertraging, hit-reactie, hulzen, sway. Die
+parameters zijn niet los af te stellen — terugslag zonder shake voelt anders dan
+terugslag mét.
 
-## Wat er in Eclipse feitelijk ontbreekt
-
-Uit `EclipseHitscanWeaponComponent.cpp` (202 regels) en een zoekactie over alle
-39.424 regels source:
-
-- **Geen wapenmesh.** Geen `WeaponMesh`, geen muzzle-socket, geen attach naar
-  `hand_r`. De trace vertrekt vanaf `ViewLocation` — de camera.
-- **Geen tracer, geen mondingsvuur, geen camera-shake.** Nergens in de source.
-- Uit je eigen `GEVECHT_AUDIT.md`: geen terugslag (9), geen hitmarker (4), geen
-  richtingsindicator (14), geen munitie (10).
-
-Je audit concludeert het zelf: *"vier van de vijf omissies gingen over FEEDBACK,
-niet over mechaniek."* Het gevecht rékent goed. Er is alleen niets te zien.
-
-**Dat is dus geen promptprobleem.** Het is een lijst bouwbare dingen, en die
-lijst heb je al.
+Zo'n zoektocht heeft honderden rondes nodig, ongeacht de engine. Bij zes rondes
+per uur is dat geen langzame convergentie, het is **geen** convergentie: de
+sessie loopt af voordat het gevoel er is. Dat is het hele verschil. Niet
+modelkwaliteit, niet Unreal-zwaarte — het aantal rondes.
 
 ---
 
-## PROMPT A — bouw de referentie in de browser (doe deze eerst)
+## De drie concrete gaten
 
-Plak dit in een verse chat. Buiten de Eclipse-repo, in een lege map.
+### 1. De binnenlus kost nog steeds een compile
 
-```
-Bouw één HTML-bestand: een first-person schietbaan in Three.js, geen externe
-assets, alles procedureel in code.
-
-Doel: het SCHIETGEVOEL, niets anders. Een gang, wat dekking, drie doelen die
-omvallen. Geen menu, geen missie, geen AI.
-
-Deze getallen liggen vast (uit mijn eigen ontwerp):
-- vuursnelheid 7 schoten/s
-- speler doodt vijand in ~0,6 s goedgericht, kopschot ×2,5
-- vijand doodt speler in ~2,5 s
-- FOV 90, mikken maakt je 2,86× trager in het kijken
-- looptempo 4,2 m/s, mikken zet dat op 1,45 m/s
-- input naar beeld onder 100 ms
-
-Alles wat gevoel maakt, wil ik als benoemde constanten bovenaan het bestand,
-met een commentaarregel per constante over wat hij doet:
-wapenpositie t.o.v. de camera, ADS-positie, terugslag (verticaal, horizontaal,
-hersteltijd), spreiding heup vs. mikken, camera-shake, mondingsvuur-duur,
-tracer-snelheid, hitmarker-vorm en -duur, hit-reactie van het doel,
-hulzenuitworp, ademhaling-sway.
-
-Werkwijze, en hier ligt het echte werk:
-1. Bouw het.
-2. Open het in een headless browser, maak screenshots van: heupvuur, ADS,
-   het frame van het schot, het frame van de treffer.
-3. KIJK naar je eigen screenshots. Benoem wat er goedkoop uitziet.
-4. Stel de constanten bij en herhaal.
-
-Doe stap 2-4 minstens acht keer voordat je me iets laat zien. Rapporteer per
-ronde in één regel wat je zag en wat je veranderde. Ik wil de eindtabel met
-alle constanten en hun uiteindelijke waarde.
-```
-
-Waarom dit werkt: elke knop is een getal in een bestand dat het model zelf
-schreef, en het kan het resultaat bekijken. Reken op een half uur tot een uur.
-
-## PROMPT B — de getallen naar Unreal brengen
-
-Pas nadat A een tabel heeft opgeleverd. In de Eclipse-repo.
+Er staan negentien console-commando's geregistreerd:
 
 ```
-Lees ALLEEN deze drie: phase0/GEVECHT_AUDIT.md, phase0/graybox_feel_targets.md,
-Eclipse/Source/Eclipse/Combat/EclipseHitscanWeaponComponent.cpp.
-Niet HANDOFF.md, niet de GDD-delen. Ik heb ze gelezen, jij hebt de ruimte nodig.
-
-Hieronder staat een tabel met afgestelde gevoelsconstanten uit een werkende
-browser-prototype. [PLAK TABEL UIT PROMPT A]
-
-Opdracht: breng punt 4, 5, 7, 9 en 14 van GEVECHT_AUDIT.md naar de build, met
-deze getallen als startwaarde. Dus: hitmarker, kopschot-signaal, terugslag,
-schutter-reactie, richting van de klap.
-
-Harde eis: elk van deze constanten wordt een veld in DT_Weapons of een nieuwe
-DT_WeaponFeel — geen enkele hardcoded (14.2). Ik moet ze in de editor kunnen
-draaien zonder build.
-
-Tweede harde eis, en dit is de belangrijkste: breid EclipseFeelHarness.cpp uit
-zodat het deze vijf MEET, net zoals het nu locomotie meet. Terugslag in graden
-na drie schoten, spreidingsdiameter op 20 m heup vs. ADS, hitmarker-duur in
-frames, tijd tussen trekker en zichtbaar signaal. Draai het en zet de gemeten
-waarden naast de doelwaarden.
-
-Bouw met -NoUba. Eindig groen. Commit per systeem.
+Eclipse.Base.Build          Eclipse.Feel.Dump          Eclipse.Mission.RaiseAlarm
+Eclipse.Base.Report         Eclipse.Gauntlet.Summary   Eclipse.Prep.AutoLaunch
+Eclipse.Base.Vault          Eclipse.Campaign.*         Eclipse.Roster.Kill
+Eclipse.Command.Dump        Eclipse.Economy.Report     Eclipse.Squad.DumpOrders
+Eclipse.Events.Dump         Eclipse.Mission.*          Eclipse.Strategy.*
 ```
 
-## Wat er nog vóór B moet gebeuren — de wapenmesh
+**Geen enkele daarvan schrijft een gevoelswaarde.** `Eclipse.Feel.Dump` leest.
+De rest zijn toestandsacties. En de terugslag- en spreidingsvelden staan in
+`EclipseCharacterTypes.h` — een C++-struct. Eén getal veranderen kost een build.
 
-Punt 9 (terugslag) en jouw vraag over "positie en textuur" lopen allebei stuk op
-hetzelfde: **er is geen wapen in de wereld.** Geen mesh, geen socket, geen
-muzzle. Een agent kan die twee niet plaatsen, want plaatsen gebeurt in de editor.
+Dat is de 5-10 minuten. Die zit niet in Unreal, die zit hier.
 
-Dat is een owner-actie, en het is een kwartier werk:
+**Wat het moet worden:**
 
-1. Zet één wapenmesh op de `hand_r`-socket van het speler-skeleton.
-2. Voeg een socket `Muzzle` toe op de loop.
-3. Maak `DT_WeaponFeel` met twee rijen offsets: heup en ADS (locatie + rotatie).
+```
+Eclipse.Feel.Set   Recoil.VerticalDeg 1.4     — zet live, dit frame nog
+Eclipse.Feel.List                             — alle padden + huidige waarde
+Eclipse.Feel.Save                             — schrijf terug naar DT_WeaponFeel
+Eclipse.Feel.Revert                           — terug naar de tabel
+```
 
-Daarna kan de agent de positie wél afstellen — want dan zijn het zes getallen in
-een data-table in plaats van een handeling in een venster dat hij niet ziet.
+Implementatie: één `UEclipseFeelTuningSubsystem` met een `TMap<FName, float*>`
+die naar de live struct-velden wijst, gevuld bij startup uit de DataTable.
+`Set` schrijft door het pointer, dus het volgende schot gebruikt de nieuwe
+waarde. `Save` serialiseert terug zodat de sessie niet verdampt.
 
-Textuur is hetzelfde verhaal, één laag dieper: in de demo is de textuur code
-(canvas-ruis naar roughness/normal). In UE is het een asset. Laat de agent het
-materiaal procedureel opzetten via `Tools/author_toon_material.py` — je hebt dat
-script al — zodat parameters weer getallen worden.
+Effect: de agent start de game **één keer** en doet er driehonderd rondes in.
+Dat is de HTML-lus, in Unreal. De 5-10 minuten worden 5-10 seconden.
 
-## De maat van de rode draad
+Dit is verreweg de belangrijkste van de drie. De andere twee zijn de moeite
+alleen waard nádat deze er ligt.
 
-Buiten `Eclipse/` staat ~800 KB markdown. `HANDOFF.md` alleen is 101 KB, en er
-liggen 41 documenten in `phase0/`. Een agent die volgens `NIEUWE_CHAT_PROMPT.txt`
-begint, leest eerst over de economie-ledger en de story-bible en komt daarna pas
-bij terugslag.
+### 2. De screenshot landt op het verkeerde frame
 
-Een rode draad van die lengte geeft geen richting meer, hij verdunt. Voor een
-gevoelstaak is `GEVECHT_AUDIT.md` in zijn eentje meer waard dan alle 17
-GDD-delen samen — want die staat vol benoemde ontbrekende dingen, en de GDD staat
-vol intentie. Intentie is al binnen. Zeg voor gevoelstaken expliciet wélke drie
-bestanden gelezen mogen worden, zoals in prompt B hierboven.
+Schietgevoel leeft in ongeveer twaalf frames na de trekker:
+
+| frame | wat er hoort te gebeuren |
+|---|---|
+| +0 | mondingsvuur aan, shake begint |
+| +1..2 | wapen kickt, kruis loopt omhoog |
+| +2..4 | tracer onderweg, mondingsvuur uit |
+| +4 | inslag, hitmarker aan, hit-reactie start |
+| +6..10 | herstel, kruis zakt terug |
+| +12 | hitmarker uit |
+
+Een vaste-camera screenshot, of "de agent speelt even", landt daar nooit op. Hij
+levert een plaatje van de kamer. Dat is prima voor de art-review — waar
+`art-reviewer` ook precies voor bedoeld is — en het zegt niets over of het schot
+leest.
+
+In HTML bestaat dit probleem niet omdat het model de render-lus zelf schrijft en
+frame N kan pakken.
+
+**Wat het moet worden:** koppel capture aan de event-bus die je al hebt.
+`Event.Combat.ShotFired` en `Event.Combat.HitLanded` triggeren een opname van
+frame +0 t/m +12, en die worden getegeld tot één PNG-strip.
+
+De agent kijkt naar die strip. Niet naar de kamer — naar het schot. Dat is het
+enige artefact waarop schietgevoel te beoordelen valt, en er is er nu geen.
+
+Bijvangst: de strip legt dode frames meteen bloot. Twaalf identieke plaatjes
+betekent dat er niets gebeurt, en dat zie je in één blik.
+
+### 3. De engine-staat is niet leesbaar
+
+`Eclipse.Feel.Dump` is precies het goede idee en het gaat niet ver genoeg. Als
+een shot er goedkoop uitziet kan het model in HTML de shader herschrijven — hij
+schreef hem zelf. In Unreal moet het weten welke van honderden engine-defaults
+het doet, en het kan ze niet lézen, want `.uasset` is binair.
+
+Daarom is een HTML-bestand zo sterk: **staat is tekst.** Dat is te reproduceren.
+
+**Wat het moet worden:** `Eclipse.Look.Dump` dat post-process-volume-waarden,
+de parameters van het toon-materiaal, `PP_EclipseOutline`-instellingen, exposure,
+Lumen-kwaliteit en de camera als platte tekst uitschrijft. Plus `Eclipse.Look.Set`
+langs dezelfde weg als 1.
+
+Je hebt hier al de helft van: `author_toon_material.py`, `setup_look_tuning.py`,
+`measure_frame_values.py`. Wat ontbreekt is dat de agent het tijdens het spelen
+kan lezen en zetten.
 
 ---
+
+## De prompt
+
+Pas te gebruiken nadat gat 1 dicht is. Ervoor is het zinloos — dan vraag je om
+honderd rondes in een lus die er zes toelaat.
+
+```
+Je gaat het schietgevoel afstellen. Eén sessie, niet herstarten.
+
+Start de game één keer. Gebruik Eclipse.Feel.Set om waarden te veranderen —
+NOOIT een rebuild, NOOIT de editor. Als een waarde niet via Set bereikbaar is,
+meld dat en sla hem over; hem alsnog via een build willen doen is de fout die
+deze hele opdracht moet voorkomen.
+
+Per ronde:
+1. Vuur drie schoten uit de heup en drie uit ADS.
+2. Pak de frame-strips (Eclipse.Feel.Set Capture.Strip 1 zet ze aan).
+3. KIJK naar de strips. Schrijf in één regel wat er dood of goedkoop uitziet.
+4. Eén parameter tegelijk bijstellen. Herhaal.
+
+Minimaal veertig rondes voordat je iets aan mij laat zien.
+
+Wat ik terug wil:
+- het logboek van veertig regels, één per ronde
+- de eindtabel: parameter, beginwaarde, eindwaarde, waarom
+- de frame-strip van ronde 1 en van ronde 40 naast elkaar
+- Eclipse.Feel.Save gedraaid, en de DataTable-diff in de commit
+
+Leesregel: alleen phase0/GEVECHT_AUDIT.md en phase0/graybox_feel_targets.md.
+Niet HANDOFF.md, niet de GDD-delen. Die staan vol intentie en die is al binnen;
+je hebt de ruimte nodig voor de strips.
+```
+
+Die laatste alinea is geen bijzaak. `HANDOFF.md` is 101 KB, er liggen 41
+documenten in `phase0/`, en buiten `Eclipse/` staat ~800 KB markdown. Een
+gevoelssessie die daarmee begint, begint met een halfvolle context. De demo's
+kregen 100% van de ruimte voor het probleem zelf.
+
+---
+
+## Waarom hier geen code in zit
+
+Deze repo loopt achter op je werkkopie — er is een wapen dat hier niet in staat.
+`Eclipse.Feel.Set` schrijven tegen deze versie van `EclipseCharacterTypes.h`
+levert een conflict met wat je lokaal al hebt. De spec hierboven is precies
+genoeg om hem lokaal te laten bouwen; push eerst, dan kan het hier ook.
 
 ## Samengevat
 
-1. De demo's zijn browser-HTML. Eén prompt lukt daar omdat het model zijn eigen
-   resultaat kan zien.
-2. Geef Opus diezelfde lus: bouw het schietgevoel eerst in de browser, met
-   screenshots als terugkoppeling.
-3. Neem alleen de getallen mee naar Unreal, en meet ze daar met het harnas dat je
-   al hebt.
-4. Zet zelf één wapenmesh en één muzzle-socket klaar. Zonder dat kan geen enkele
-   prompt het schietgevoel raken.
-5. Beperk de leeslijst per taak tot drie bestanden.
+De lus is dicht, dat klopt. Hij is alleen **traag, grof en gericht op het
+verkeerde frame.**
+
+1. `Eclipse.Feel.Set/List/Save` — één sessie, honderden rondes in plaats van zes.
+2. Frame-strips op `ShotFired`/`HitLanded` — kijk naar het schot, niet naar de kamer.
+3. `Eclipse.Look.Dump/Set` — maak de engine-staat leesbaar zoals een HTML-bestand.
+4. Drie leesbare bestanden per gevoelstaak, verder niets.
+
+Punt 1 alleen al haalt het grootste deel van het verschil weg.
