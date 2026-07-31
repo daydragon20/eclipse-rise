@@ -213,10 +213,58 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	// ander gereedschap dan de opnameronde: in de editor kijken, of de renderlagen
 	// uitzetten tot hij verschijnt. NIET nog een parameter gokken - dat is vandaag
 	// zeven keer gedaan en heeft zeven keer niets opgeleverd.
+	//
+	// STAND 31-07 - DE PLEK IS UITGESLOTEN, MET EEN METING.
+	//
+	// Alles hierboven blijft staan als geschiedenis, maar twee regels erin zijn
+	// achterhaald. "HET ENIGE VERSCHIL DAT OVERBLIJFT IS WIE ZE NEERZET" is langs
+	// twee kanten weerlegd: de game mode zet er via OnWorldImpact al een TWEEDE neer
+	// met een ander materiaal en een andere rotatie, en die is even onzichtbaar. En
+	// de plek zelf is geen verdachte meer:
+	// Eclipse.Combat.ImpactMarkLandsOnTheHitAndNotOnTheShooter loopt twintig
+	// gevarieerde schoten headless na en vindt het spoor elke keer OP de inslagplek
+	// en nooit bij de schutter - met een controleproef die aantoont dat die meting
+	// ook rood kan worden.
+	//
+	// De getallen staan hier niet, en dat is opzet: ze staan in
+	// phase0/DEBUG_DISCIPLINE.md §4.3. Een tweede exemplaar van een meting veroudert
+	// los van het origineel, en dit bestand heeft daar al een blok vol van.
 	// ==================================================================
 	Mark->SetLifeSpan(2.5f);
 	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
 	++ImpactMarksSpawned;
+
+	// DE DRIE GETALLEN DIE HIER NOOIT STONDEN, en zonder welke elke conclusie in
+	// §4.3 een gok blijft.
+	//
+	// De regel hieronder logde tot 31-07 alleen `Spot` — de plek waar ik het spoor
+	// NAARTOE stuurde. Waar het daarna werkelijk staat is in dit dossier nog nooit
+	// gemeten, en juist dat is de vraag: de controleproef die "transform-bug, geen
+	// rendering-bug" moest dragen, was een blok dat PER CONSTRUCTIE aan het
+	// personage vastzat en daar dus per definitie stond. Zo'n proef kan over
+	// gespawnde sporen niets zeggen.
+	//
+	//   ECHT      = Mark->GetActorLocation() ná het spawnen. Wijkt hij van `bedoeld`
+	//               af, dan zit de fout in de spawn/transform-keten.
+	//   schutter  = waar de eigenaar van dit wapen staat. Landt het spoor daar,
+	//               dan is het een lokale-ruimte- of attach-fout.
+	//   geraakt   = Hit.GetActor(), zodat een spoor herleidbaar is naar het
+	//               oppervlak dat de trace vond.
+	//
+	// De twee AFSTANDEN staan er los bij, want dit project heeft eerder een
+	// wereldcoördinaat voor een afstand aangezien (zie de wereldtrefferregel in
+	// Fire) en twee coördinaten naast elkaar leggen is precies waar dat misgaat.
+	const AActor* ShooterActor = GetOwner();
+	const FVector ShooterSpot = ShooterActor != nullptr ? ShooterActor->GetActorLocation() : FVector::ZeroVector;
+	const FVector Landed = Mark->GetActorLocation();
+	UE_LOG(LogEclipse, Display,
+		TEXT("Inslagspoor %d PLEK: bedoeld %s, ECHT %s (verschil %.2f cm), inslagpunt %s (%.2f cm), schutter %s (%.1f cm, %s), geraakt %s."),
+		ImpactMarksSpawned, *Spot.ToCompactString(), *Landed.ToCompactString(),
+		FVector::Dist(Landed, Spot), *Hit.ImpactPoint.ToCompactString(),
+		FVector::Dist(Landed, Hit.ImpactPoint), *ShooterSpot.ToCompactString(),
+		FVector::Dist(Landed, ShooterSpot), ShooterActor != nullptr ? TEXT("eigenaar bekend") : TEXT("GEEN eigenaar"),
+		*GetNameSafe(Hit.GetActor()));
+
 	UE_LOG(LogEclipse, Display,
 		TEXT("Inslagspoor %d GESPAWND op %s (schaal %s, zichtbaar %d, materiaal %s, MESH %s, straal %.1f, geregistreerd %d, zichtbaar-in-spel %d)"),
 		ImpactMarksSpawned, *Spot.ToCompactString(), *Mark->GetActorScale3D().ToCompactString(),

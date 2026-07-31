@@ -239,9 +239,18 @@ C:/Users/natha/AppData/Local/Programs/Git/Game/Maps/GrayboxDistrict
 | staan ze er ná alle twintig spawns nog steeds | 20/20, slechtste afwijking onveranderd 1,000 cm |
 | **controleproef**: een spoor met de hand OP de schutter gezet, langs hetzelfde zoek- en meetpad | 250,0 cm van de inslag, 0,0 cm van de schutter — **beide eisen keuren het af**, dus deze meting kán rood worden |
 
-**Weerlegd:** de transform-diagnose. `SpawnImpactMark` zet het spoor in wereldruimte precies waar de `FHitResult` het wil hebben, op elke afstand en elke hoek, met een schutter ver van de oorsprong. Geen lokale-ruimte-fout, geen niet-losgemaakte attach, geen vergeten offset.
+**En dezelfde meting in het echte spel.** De uitgebreide logregel in `SpawnImpactMark` drukt sinds 31-07 naast `bedoeld` ook de **werkelijke actor-locatie na spawnen**, de **schutterspositie** en `Hit.GetActor()` af. In de opnameronde van 31-07 (11 wereldtreffers, 11 sporen):
 
-**Niet bewezen, en dus geen nieuwe aanname:** dit meet de keten *ná* de `FHitResult`. Of de trace in het spel een goed inslagpunt oplevert, meet deze test niet — dat doet sinds 31-07 de uitgebreide logregel in `SpawnImpactMark`, die naast `bedoeld` ook de **werkelijke actor-locatie na spawnen**, de **schutterspositie** en `Hit.GetActor()` afdrukt. En de testwereld tickt nooit, dus over frame-tijd zegt hij niets.
+- `verschil 0.00 cm` tussen bedoeld en werkelijk — **bij alle elf**;
+- `1.00 cm` van het inslagpunt — de lift, bij alle elf;
+- **627,8 tot 848,5 cm** van de schutter;
+- `[PLAYSHOT 3 SPOREN] 22 levend` — 22 en niet 11, want de game mode zet er via `OnWorldImpact` een tweede naast — geprojecteerd op **scherm (592,497)** in een frame van 1280×720, `inbeeld=1`, **884 cm VÓÓR** de camera.
+
+Dus niet alleen in een synthetische wereld: in de draaiende game staan de sporen op de inslagplek, meters van de schutter, midden in beeld, vóór de camera — en ze zijn niet te zien.
+
+**Weerlegd:** de transform-diagnose. `SpawnImpactMark` zet het spoor in wereldruimte precies waar de `FHitResult` het wil hebben, op elke afstand en elke hoek, headless én in het spel. Geen lokale-ruimte-fout, geen niet-losgemaakte attach, geen vergeten offset.
+
+**Niet bewezen, en dus geen nieuwe aanname:** de testwereld tickt nooit, dus over frame-tijd zegt de headless meting niets. En `inbeeld=1` blijft zeggen wat het altijd zei — niets over wat er vóór het vlak staat.
 
 **Het dossier gaat terug naar de renderkant**, met een kleinere zoekruimte dan in juli: er staan inmiddels **twee onafhankelijke spawners** van hetzelfde spoor in de code — `UEclipseHitscanWeaponComponent::SpawnImpactMark` (M_EclipseToonDecal + masker, rotatie uit de normaal) en `AEclipseGameMode::OnWorldImpact` (M_EclipseToon, geen rotatie) — en ze zijn allebei onzichtbaar. Dat sluit "het ligt aan wie hem neerzet" én "het ligt aan dit ene materiaal" in één klap uit.
 
