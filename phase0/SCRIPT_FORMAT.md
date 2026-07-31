@@ -173,12 +173,14 @@ Scenes under six lines are exempt from register and spread: a four-line scene ha
 A radio scene that contains a firefight needs callout-length lines inside it. That is most combat scenes in the game, so it gets a field rather than a convention:
 
 ```yaml
-  - id:      M1.1.S04.070
+  - id:      M0.0.S00.010     # illustrative id only — act 0 does not exist
     speaker: MARA
     voice:   mara
     band:    callout          # overrides the scene's type-derived band for THIS line
     text:    "Take it."
 ```
+
+> **Examples in this document use `M0.0.S00.*`, never a real ID.** The first draft of this section pointed at `M1.1.S04.070`, whose actual shipped text is something else entirely. IDs are permanent and forty writers copy from this file; an example that collides with a real line is how a scene loses its audio. Act 0 cannot exist, so `M0.0` can never collide.
 
 Lines carrying `band:` are checked against the override and are **excluded from the register check** (they are not trying to use the scene's register). They still count toward spread.
 

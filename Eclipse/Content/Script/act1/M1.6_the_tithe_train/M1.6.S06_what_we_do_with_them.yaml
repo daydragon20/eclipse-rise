@@ -19,7 +19,42 @@ words:        428
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      MARA, VOSS, SELA, REYES, DEX, BRICK, dozens of newcomers (unnamed)
-# flags-in:  Story.Choice.M15_ShiftBossSpared · Story.Choice.M16_TrainRun
+# flags-in:  story.m15_shiftboss ("killed" | "prevented" | "warned")  ·  story.m16_train
+#
+# *** CORRECTED 2026-07-31 - RULING L1-R12. THIS WAS MY ERROR, NOT THE WRITER'S. ***
+# Ruling L1-R3 turned the shift-boss choice into three leaves and I propagated it to the
+# SETTER (M1.5.S04) and to the flag ledger, and never to the READER - which lives in a
+# different mission with a different writer. Story.Choice.M15_ShiftBossSpared does not
+# exist and nothing sets it. Lines .250 and .260 read it today.
+#
+# Player impact if shipped: one player in three closes this thread on the wrong scene.
+# The player who WARNED the man told him "be gone by the second horn", heard "He's running.
+# Wonder who to." in M1.5.S05.260 - and would then be told either that the shift boss was
+# at his gate on Tuesday (an event that contradicts what he did) or that he was killed
+# (he was not). M1.8 may not reopen this; it closes here or it never closes.
+#
+# THREE BRANCHES REQUIRED:
+#   .250  condition: 'story.m15_shiftboss == "prevented"'   (existing line - correct as
+#         written, only the condition changes. He is still at his gate.)
+#   .260  condition: 'story.m15_shiftboss == "killed"'      (existing line, unchanged)
+#   .270  condition: 'story.m15_shiftboss == "warned"'      *** NEW - WRITE THIS ***
+#
+# Requirements for .270 (the line is the writer's, these are not):
+#   - he is alive, he is gone, the list went unfiled exactly once, and there is now a man
+#     out there who knows the faces of two cells
+#   - it CLOSES. It does not ask a question and nobody answers it
+#   - the word "mercy" does not appear, and neither does a reproach
+#   - it sits with M1.5.S05.260 "He's running. Wonder who to." WITHOUT repeating it
+#   - architect's addition: this is the branch where SELA IS LEAST CERTAIN. Killed and
+#     prevented are both positions she can judge; warned is Voss being clever rather than
+#     principled, and her arc is learning what clever costs. Let that show once, in the
+#     line, and never again.
+#
+# CONTINUITY - the warned branch creates a living loose end, so it gets closed, not left:
+# M1.8.S99's P3-d offers THREE explanations for how Threx knew. In the warned branch ONLY,
+# one of those three becomes "the man we let run" in place of one of the others. Still
+# three, never four - the cap in BEATS_M1.8.md section 4 stands. Requirement carried into
+# that stub.
 # flags-out: Story.Flag.IntakeUnvetted ✚ (silent) · Story.Choice.M16_LettersAllowed ✚ ·
 #            Story.Thread.ConscriptLetters_Open ✚   (NEW TAGS - systems task)
 #

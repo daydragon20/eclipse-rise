@@ -17,6 +17,46 @@ status:       draft
 critic:       null
 words:        264
 
+# ---- RULING L1-R18, 2026-07-31: THE APPROACH CHOICE IS WITHDRAWN. Option (b). ----
+#
+# .210 "The span. I want the height." / .220 "The drain. Let them walk over us."
+# COLLAPSE TO ONE VOSS LINE. No flag, no choice: block, no conditional variants in S02/S04.
+#
+# THIS WAS MY ERROR, NOT THE WRITER'S - and it is the same family as L1-R12. My stub asked
+# for "een keuze in de planning (de overbrugging of de onderdoorgang)" while the SAME beat
+# sheet fixes S02 at the Overpass and S04 on the rail. I specified a branch point and its
+# contradiction in one document.
+#
+# WHY (b) AND NOT (a) - and the deciding reason is not the budget:
+# 1. THE LEVEL HAS NO DRAIN. SPEC-P2-04 gives M1.1 one site: the overlook lane, with the
+#    ambush arming when the squad holds position there. Option (a) would have me writing
+#    dialogue for a route the mission asset cannot instantiate. That is the exact inverse
+#    of what L1 is for.
+# 2. M1.1'S REAL CHOICE IS S04, and it is better. Voss re-solves the ambush when the patrol
+#    walks in the wrong order - decided in the moment, under pressure, with the ground in
+#    front of him. A map-table choice made before seeing the ground is a weaker version of
+#    the same beat, arriving three scenes early.
+# 3. THE INSERTION CHOICE BELONGS TO M1.3, where it is the designed agency beat (plaza vs
+#    service tunnel) with two full branches. Doing it in M1.1 first makes M1.3's version a
+#    repeat instead of an escalation.
+# 4. Budget is the fourth reason, not the first.
+#
+# WHAT THE SURVIVING LINE DOES - it is not a leftover, it is an upgrade:
+# Beat 4 of this scene is "Voss reads the route off the map and says something technical
+# nobody asked for". Make that line about THE HEIGHT, and make it the thing that pays off
+# in S04 when the patrol order is wrong and the height is what lets him re-solve it. A
+# decorative choice becomes a plant with a payoff two scenes later.
+#
+# 18.7 PARTICIPATION IS STILL SATISFIED. It asks for "a choice, an interjection, or a
+# movement beat" in scenes over six turns. This is now an INTERJECTION: full Voss axis
+# variants on the surviving line, so the player picks HOW he says it, not WHAT is chosen.
+# Costs nothing beyond what a Voss line already costs. No new flag, no S02/S04 variants.
+#
+# AND FOR THE MOULD: M1.1 keeps exactly ONE real choice (S05 - flag, reader, three
+# branches). That is the model. A second decorative choice in the calibration mission would
+# teach forty writers that choices are a texture you sprinkle. The mission is a STRONGER
+# demonstration with one real choice than with one real and one fake.
+#
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, two Ember fighters (bark-level or silent)
 # flags-in:  none (opening mission, UnlockBeatTag empty)

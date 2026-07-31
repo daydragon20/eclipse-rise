@@ -49,12 +49,22 @@ def save(img, name):
 #
 # an equilateral triangle enclosing a ringed eye. That is the reverse of the
 # Great Seal of the United States (1782), freemasonry, "Illuminati" in popular
-# culture - a datable Earth institution mark, and it was the brightest graphic
-# element in the district's widest review camera. §20.2 forbids it flat out,
-# and line 5 of THIS file already forbade it thirty-odd lines earlier ("no
-# real-world marks"): the contract was written and then broken. Same class of
-# error as the ISO-361 radiation trefoil replaced the same evening, only older
-# and more heavily loaded.
+# culture - a datable Earth institution mark on six surfaces of the district.
+# §20.2 forbids it flat out, and line 5 of THIS file already forbade it thirty
+# lines earlier ("no real-world marks"): the contract was written and then
+# broken. Same class of error as the ISO-361 radiation trefoil replaced the
+# same evening, only older and more heavily loaded.
+#
+# ONE CORRECTION TO THE BRIEF, because it was measured rather than assumed.
+# The eye was reported as "the brightest graphic element in the widest shot".
+# It is not, and it could not have been: all three wall posters hang on
+# compound faces that every fixed review camera sees within ~25 degrees of
+# edge-on, so in the wide overview they are a sub-15-pixel sliver. Projected
+# and then checked against the frames, the bright mark in that shot is the
+# REBEL STENCIL's black plate on the warehouse wall. The eye was legible in
+# exactly zero review frames until this round added a camera for it - which is
+# the real reason it survived an art review, and a worse fact than the one in
+# the brief: not "it was loud", but "nobody could see it".
 #
 # THE REPLACEMENT IS NOT A NEW SYSTEM. Tools/generate_dominion_signs.py had
 # already authored the district's signage family hours earlier, and its rule 1

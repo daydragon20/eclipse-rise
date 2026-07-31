@@ -282,6 +282,63 @@ Dus niet alleen in een synthetische wereld: in de draaiende game staan de sporen
 
 *Geen dertiende hypothese. Eén meting — en die is nu gedaan.*
 
+#### GESLOTEN — 31-07 laat. Het was een maat, en de maat is gemeten.
+
+**Eerst de dubbele bouwer weg, want zonder dat was niets meetbaar.** `AEclipseGameMode::OnWorldImpact`
+zette op elke wereldtreffer een tweede, exact samenvallend spoor neer. De verschilmethode
+verbergt precies één object en telt de veranderde pixels — bij een tweeling vult de
+tweede het gat en leest **elk** differentieel nul, hoe groot het spoor ook wordt. Het was
+bovendien een duplicaat in verscheept gedrag: de payload draagt geen oppervlaknormaal, dus
+die versie legde zijn spoor altijd plat in wereld-Z en stak op een muur dwars door het
+oppervlak. Weggehaald; het recept woont nu op één plek (`Combat/EclipseImpactMark.{h,cpp}`),
+die het spel én het meetharnas gebruiken — een harnas dat zijn eigen kopie bouwt meet een
+object dat niemand ooit ziet.
+
+**Gemeten in de opnameronde:** 11 wereldtreffers → **11 sporen**, `[PLAYSHOT 3 SPOREN] 11
+levend` (was 22).
+
+**De maat, met het doel vóór de bouw genoemd.** De bindende eis is de **kleinste as**, niet
+het aantal pixels: een spoor van 24 px breed en 2 hoog is aliasing. Eis per sport:
+≥150 px / kleinste as ≥5 op 8 m, ≥80 / ≥4 op 10 m, ≥30 / ≥4 op 15 m.
+
+| afstand | nulmeting 9 cm plat | ná | eis | kleinste as vóór → ná |
+|---|---|---|---|---|
+| 8 m | 16 px | **327 px** | 150 | 2 → **19** |
+| 10 m | 6 px | **240 px** | 80 | 1 → **15** |
+| 15 m | 4 px | **105 px** | 30 | 1 → **10** |
+
+Gemeten met `-EclipseSpoorLadder` (`Core/EclipseRenderProof.cpp`): 1280×720, FOV 80°,
+763 px/radiaal, oog op 155 cm. **Controleproef op elke sport**: het oude spoor van 9 cm
+loopt door dezelfde code met andere getallen, vanuit dezelfde camerapositie in hetzelfde
+venster, en wordt op alle drie nog steeds afgekeurd. Een ladder die na de wijziging alles
+groen noemt, meet niets meer.
+
+**En de reden dat het antwoord niet "één schaal verdubbelen" is.** Een plat vlak van S cm
+op afstand D vanaf ooghoogte h projecteert op k·S/D pixels breed maar k·S·h/D² **hoog** —
+de hoogte valt met het *kwadraat* van de afstand, want de scherende hoek knijpt hem dicht.
+Een **opstaand** element van H cm geeft k·H/D, lineair, zonder cosinusverlies. Om op 15 m
+met een plat vlak te evenaren wat 5 cm hoogte doet, zou de voetafdruk naar ~46 cm moeten —
+een halve stoeptegel per kogel. Vandaar vier knoppen: maat (9 → 28 cm), rand (blob-falloff
+eruit, hard masker), **opbouw** (kern van 18 cm die 11 cm uitsteekt — dit doet op afstand
+het werk), en felheid (emissie 10 → 20, tilt gedeeltelijk bedekte randpixels boven de
+drempel zonder één cm extra grond).
+
+**Twee dingen die alleen de meting kon vinden, en die geen redenering had opgeleverd:**
+
+1. **Er zat een gat in het midden.** `FillCm = 15` klonk als 15 cm heet, maar het masker
+   dekte tot r=0,50 — dus 7,5 cm, met de binnenrand van de ring op 14 cm en niets ertussen.
+   *Een maat in centimeters op een quad is niet de maat van wat je ziet; het masker beslist
+   mee.* Twee getallen die allebei "de maat" heten en niet hetzelfde meten.
+2. **Een holle ring is de verkeerde vorm voor een scherende blik.** Boven- en onderband
+   worden subpixel; er blijven twee flanken over. Ronde 1 gaf een kader van 19×8 px waarin
+   maar 45 van de 152 pixels veranderden — het silhouet klopte, het oppervlak niet.
+
+**Een bijvangst die het melden waard is:** het HUD-kruis stond in ronde 1 **bovenop** het
+spoor, want de inslag landt per definitie waar je richt. Voor de telling maakt dat weinig
+uit (het kruis staat in beide opnames), maar het bedekt wel pixels. De ladder kantelt de
+camera nu zo dat het spoor onder het midden valt. Dat het kruis de inslagbevestiging
+afdekt, is een **echte schermlaag-vraag** en geen meetartefact.
+
 ### 4.5 GPU-crash "Device Removed" — **GEEN TDR-TIMEOUT, een PAGE FAULT**
 
 **Symptoom (31-07, 19:20):** `GPU crash detected — Device 0 Removed: DXGI_ERROR_DEVICE_HUNG`,

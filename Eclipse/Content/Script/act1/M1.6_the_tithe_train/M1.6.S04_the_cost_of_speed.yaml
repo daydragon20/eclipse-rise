@@ -30,8 +30,31 @@ words:        318
 #   run    - drive on to the Underworks spur. Slower, everybody comes, the train is a
 #            target, S05 is a harder fight, civilian deaths possible
 #   empty  - stop and unload. Faster, safer for Ember, some are re-taken at the yard
-#   split  - only with the Iron Chorus pact. They take the second car and Ember does not
-#            know where those people go
+#   split  - PACT ONLY. They take the second car and Ember does not know where those people go
+#
+# *** RULING L1-R13 - SPLIT IS GATED ON THE PACT, AND THE LIMITED BRANCH GETS NO
+#     REPLACEMENT THIRD OPTION. Escalated by the writer of M1.5.S99; ruled here. ***
+#
+# condition on .120:  story.m15_ironchoruspact == "pact"
+#
+# THREE REASONS, IN ORDER OF WEIGHT:
+# 1. FICTION. You cannot hand custody of a car of people to a cell you have no operating
+#    agreement with. There is no mechanism to hand them to. The pact IS that mechanism. In
+#    the limited branch the Iron Chorus is an ally of convenience standing in the same
+#    street, not a party you can transfer forty people to. This is not a restriction
+#    imposed for tidiness - it is the absence of a thing that was never built.
+# 2. STRUCTURE. 2.11 needs act 2 to reach fusion, schism OR tragedy, and it can only tell
+#    those apart if the two act-1 branches stay distinguishable. If split is available on
+#    both, the branches converge on identical act-2 evidence. That was exactly the writer's
+#    argument and it is correct.
+# 3. CHARACTER. In the limited branch Voss said "We fight beside them. We don't take names
+#    off a list." A game that then offers him the names-off-a-list option one mission later
+#    has made his sentence decoration. Gating it makes it load-bearing.
+#
+# THE LIMITED BRANCH GETS TWO OPTIONS AND THAT IS COMPLETE - do not "fix" this later by
+# inventing a third. Run/empty IS the 2.7 archetype "The Cost of Speed", whole on its own.
+# The pact unlocking a darker third option is the correct reward shape: the alliance buys
+# you more room and more rope.
 #
 # beats:     1) the switch is coming up
 #            2) MARA HANDS THE DECISION TO VOSS - third time (after M1.1.S05 and M1.5.S04).

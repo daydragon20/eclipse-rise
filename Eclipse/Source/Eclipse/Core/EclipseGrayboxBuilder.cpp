@@ -1647,7 +1647,20 @@ void BuildDistrict(UWorld& World)
 			}
 			else
 			{
-				const FLinearColor StencilLit(0.300f, 0.060f, 0.050f), StencilShade(0.110f, 0.030f, 0.035f);
+				// TINT x2.5, AND THAT IS ARITHMETIC, NOT TASTE. On the opaque
+				// path the toon master multiplied the cel colour by the albedo's
+				// luminance x AlbedoGain, CLAMPED at 2.5 (author_toon_material.py:
+				// "min(dot(albedo,lum)*AlbedoGain, 2.5)"). The old stencil's paint
+				// pixels were value 225 -> linear 0.7011, x gain 7.1 = 4.98, i.e.
+				// hard against that clamp: every painted pixel rendered at exactly
+				// 2.5x LitColor. The mask path has no albedo term at all, so
+				// coverage 1.0 renders at 1.0x — the first masked round measured
+				// exactly that, a mark 2.5x darker than the one the 15.8 look-round
+				// tuned (seen in frame, gate + wide cameras). Restoring the factor
+				// keeps the shipped value where it was authored; the hue and the
+				// lit/shade ratio are untouched, so the palette keeps hue authority
+				// (15.5) and this is a translation between two paths, not a nudge.
+				const FLinearColor StencilLit(0.750f, 0.150f, 0.125f), StencilShade(0.275f, 0.075f, 0.088f);
 				const struct { FVector Location; FVector Scale; } Stencils[] = {
 					{ FVector(-9944, 420, 240), FVector(0.04f, 2.0f, 2.0f) },   // west wall by Entry_Main
 					{ FVector(-4300, 2146, 220), FVector(1.8f, 0.04f, 1.8f) },  // warehouse south face
@@ -2677,16 +2690,131 @@ void BuildDistrict(UWorld& World)
 		// readable occupation story on the empty plaza (15.5 "occupation &
 		// story"), all no-collision deco — nav/cover/missions untouched.
 		{
-			// East-west artery: Entry_Main to the control-post compound.
-			SpawnBlock(TEXT("DecoLine"), FVector(0, 460, 3), FVector(190.0f, 0.16f, 0.06f));
-			SpawnBlock(TEXT("DecoLine"), FVector(0, -460, 3), FVector(190.0f, 0.16f, 0.06f));
-			for (int32 Index = 0; Index < 24; ++Index)
+			// --- THE GROUND SPEAKS DOMINION NOW (20.2 fictiewet, owner-besluit
+			// O-11 "vervangen", 2026-07-31) -------------------------------------
+			//
+			// WHAT STOOD HERE, and why it was never just "yellow paint":
+			//   SpawnBlock(DecoLine, ( 0,  460, 3), (190, 0.16, 0.06))
+			//   SpawnBlock(DecoLine, ( 0, -460, 3), (190, 0.16, 0.06))
+			//   24x SpawnBlock(DecoLine, (-9200 + i*800, 0, 3), (1.6, 0.14, 0.06))
+			//   SpawnBlock(DecoLine, (-4460, 0, 3), (0.16, 190, 0.06))
+			//   SpawnBlock(DecoLine, (-3540, 0, 3), (0.16, 190, 0.06))
+			// Two CONTINUOUS longitudinal edge lines, 190 m long and 9,2 m apart,
+			// with a BROKEN centre line of 1,6 m dashes on 6,4 m gaps down the axis
+			// between them. That is Vienna Convention annex 8 verbatim: continuous
+			// = edge of carriageway, broken = lane divider where overtaking is
+			// permitted. Yellow on grey asphalt is on top of that the North
+			// American code for "separates opposing traffic". A sign says "careful";
+			// this markup encodes a TRAFFIC RULE — the most specific piece of Earth
+			// legislation in the district, and it was on nearly every frame as the
+			// longest line in shot.
+			//
+			// THE REPLACEMENT KEEPS THE JOB AND DROPS THE LAW. §20.2 names it
+			// outright: "Lane-codes en sectornummers, niet straatnamen." But §20.3
+			// binds just as hard — these markings were the district's only readable
+			// circulation cue, and a mark that is fictionally correct while telling
+			// the player nothing is a prop. So the new language carries all three
+			// jobs the old one did:
+			//
+			//   WHERE THE ROUTE IS  ->  paired edge RIBS: short bars laid ACROSS the
+			//       lane edge at a fixed cadence, like the sleepers of a haul track.
+			//       A rhythm reads as a corridor from any angle and any distance,
+			//       and it cannot mean "edge of carriageway" — that meaning depends
+			//       on the line being unbroken, which is exactly what is gone.
+			//   WHICH ROUTE IT IS   ->  lane TALLIES on the axis, every third
+			//       station, replacing the dashes. Grammar rule 4: numbers are tick
+			//       groups, never digits. FIVE on the artery, TWO on the cross
+			//       street — and those are not invented. The placard already on the
+			//       pole at the second crossing lamp (T_sign_dom_lane_diff) reads
+			//       "lane two peels off, lane five runs on". The ground now names
+			//       the same two lanes the sign names, which turns "one
+			//       civilization" from a nice sentence into a checkable claim.
+			//   WHO IS SPEAKING     ->  carrier shape (grammar rule 3), not hue.
+			//       Bare ticks = operational instruction from the works. The single
+			//       RINGED mark in the whole ground language is the junction seal
+			//       below, and a ring means the state.
+			//
+			// Hue authority stays with the palette (15.5): every ground mark rides
+			// the one existing DecoLine entry, exactly as before. The fiction moved,
+			// the colour did not.
+			constexpr float LaneEdge = 460.0f;      // unchanged: the 9,2 m carriageway
+			constexpr float StationStep = 2400.0f;  // 24 m between ribs
+			constexpr int32 Stations = 9;           // -9600 .. +9600, the same 190 m
+			const FVector RibAlongX(0.16f, 0.9f, 0.06f);   // 16 cm along travel, 90 cm across
+			const FVector RibAlongY(0.9f, 0.16f, 0.06f);
+			for (int32 Index = 0; Index < Stations; ++Index)
 			{
-				SpawnBlock(TEXT("DecoLine"), FVector(-9200.0f + Index * 800.0f, 0, 3), FVector(1.6f, 0.14f, 0.06f));
+				const float Along = -9600.0f + Index * StationStep;
+				// East-west artery: Entry_Main to the control-post compound.
+				SpawnBlock(TEXT("DecoLine"), FVector(Along, LaneEdge, 3), RibAlongX);
+				SpawnBlock(TEXT("DecoLine"), FVector(Along, -LaneEdge, 3), RibAlongX);
+				// North-south cross street toward the warehouse yard. Its edges keep
+				// their banked X (-4460 / -3540), so the crossing geometry the rest
+				// of the dressing was composed against does not move.
+				SpawnBlock(TEXT("DecoLine"), FVector(-4460, Along, 3), RibAlongY);
+				SpawnBlock(TEXT("DecoLine"), FVector(-3540, Along, 3), RibAlongY);
+				// Every third station carries the lane's own code.
+				if (Index % 3 != 1)
+				{
+					continue;
+				}
+				constexpr float TickStep = 70.0f;
+				for (int32 Tick = 0; Tick < 5; ++Tick)   // the artery is lane five
+				{
+					SpawnBlock(TEXT("DecoLine"), FVector(Along + (Tick - 2) * TickStep, 0, 3), RibAlongX);
+				}
+				for (int32 Tick = 0; Tick < 2; ++Tick)   // the cross street is lane two
+				{
+					SpawnBlock(TEXT("DecoLine"), FVector(-4000, Along + (Tick - 1) * TickStep + 35.0f, 3), RibAlongY);
+				}
 			}
-			// North-south cross street toward the warehouse yard.
-			SpawnBlock(TEXT("DecoLine"), FVector(-4460, 0, 3), FVector(0.16f, 190.0f, 0.06f));
-			SpawnBlock(TEXT("DecoLine"), FVector(-3540, 0, 3), FVector(0.16f, 190.0f, 0.06f));
+
+			// THE JUNCTION SEAL: the state signs the crossing it controls.
+			//
+			// The crossing is where the old grammar was loudest — four continuous
+			// lines meeting — so it is where the new grammar has to answer. Ring
+			// (rule 3: the state, non-negotiable) around the Radiance (rule 1), over
+			// the same code strip every placard in the district ends with (rule 5),
+			// whose tallies read two and five: the two lanes that cross here.
+			//
+			// On the MASKED path for the same reason the rebel stencil is: road
+			// paint delivered as an opaque quad brings its own rectangle with it,
+			// and a rectangle of paint on asphalt is the carpet-tile failure with a
+			// seal printed on it. Coverage IS the paint, so the asphalt's grain and
+			// the crossing's own oil staining run through the worn patches — and the
+			// mask's two wheel tracks put the wear exactly where the traffic runs,
+			// which is itself a circulation cue (§20.5).
+			UTexture* SealMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_ground_seal_mask.T_ground_seal_mask"));
+			if (SealMask == nullptr || ToonDecalMaterial == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning,
+					TEXT("Graybox: kruispuntzegel overgeslagen (mask %s, M_EclipseToonDecal %s) — draai Tools/generate_decals.py + import_generated_decals.py."),
+					SealMask != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"),
+					ToonDecalMaterial != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"));
+			}
+			else
+			{
+				const FPaletteDef& LineDef = PaletteForLabel(TEXT("DecoLine"));
+				UMaterialInstanceDynamic* SealMid = UMaterialInstanceDynamic::Create(ToonDecalMaterial, &World);
+				SealMid->SetVectorParameterValue(TEXT("LitColor"), LineDef.Lit);
+				SealMid->SetVectorParameterValue(TEXT("ShadeColor"), LineDef.Shade);
+				SealMid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+				SealMid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				SealMid->SetTextureParameterValue(TEXT("MaskTex"), SealMask);
+				SealMid->SetScalarParameterValue(TEXT("OpacityScale"), 1.0f);
+				AStaticMeshActor* SealActor = World.SpawnActor<AStaticMeshActor>(FVector(-4000.0f, 0.0f, 3.0f), FRotator::ZeroRotator, Params);
+				if (SealActor != nullptr)
+				{
+					SealActor->SetMobility(EComponentMobility::Movable);
+					SealActor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
+					SealActor->SetActorScale3D(FVector(7.6f, 7.6f, 0.04f));
+					SealActor->GetStaticMeshComponent()->SetMaterial(0, SealMid);
+					SealActor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+					SealActor->GetStaticMeshComponent()->SetCastShadow(false);
+					SealActor->SetActorEnableCollision(false);
+					SealActor->Tags.Add(TEXT("Deco_Decal"));
+				}
+			}
 			// Oil and rust staining, biased toward the driven crossing.
 			FRandomStream DecoRng(77);
 			// Per-instance yaw rides its OWN stream (15.8 art-fix): the 14

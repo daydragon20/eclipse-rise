@@ -33,6 +33,14 @@ words:        0
 #               the intake, the Veil's informant networks, or bad luck. The conversation
 #               moves on. NOBODY RESOLVES IT. This is the plant for twist 3 AND twist 4,
 #               and the player must be left holding anger with no address
+#
+#               CONDITIONAL VARIANT - L1-R12. On story.m15_shiftboss == "warned" ONLY, one
+#               of the three becomes "the man we let run" IN PLACE OF one of the others.
+#               STILL THREE. NEVER FOUR - the cap in BEATS_M1.8.md section 4 stands.
+#               Reason: a warned shift boss who fled knows the faces of two cells, and any
+#               player who chose that branch will think of him here. If the game never
+#               says it, that player is ahead of the writers; if the game adds it as a
+#               fourth, P3-d turns into a list and stops being a wound. Swap, do not add.
 #            5) THE NAME. Somebody in the crowd - not a principal - uses the word "Cinder".
 #               It comes from how he looked coming up, or from something Mara once said.
 #               VOSS NEVER CALLS HIMSELF THAT
