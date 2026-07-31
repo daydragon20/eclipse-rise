@@ -86,6 +86,36 @@ def _http_ok(pad):
         return code is not None and 200 <= code < 400
 
 
+def _beantwoorde_ids(tekst):
+    """De vraag-ids uit OWNER_ANSWERS.md, uit de TWEEDE tabelkolom.
+
+    HIER ZAT EEN FOUT IN, EN HET WAS PRECIES DE FOUT DIE DEZE TOOL BESTRIJDT.
+    De eerste versie zocht de id aan het BEGIN van een regel. Het echte bestand
+    is een markdown-tabel -- `| 2026-07-31 19:32 | O-7 | agent-kiest |` -- dus
+    de id staat er nooit vooraan en de controle kon NOOIT vuren. Hij las nul
+    beantwoorde vragen waar er tweeentwintig staan. De zelftest gaf hem groen
+    omdat die een kopvorm (`## X-1`) voerde die in de repo niet voorkomt:
+    een controleproef tegen invoer die niet bestaat.
+
+    Kolom twee, en niet "ergens in de regel", want in de toelichtingskolom staat
+    prose als "hoort bij O-5 volledig" -- dat zou elke vraag die door een ander
+    antwoord genoemd wordt als beantwoord aanmerken.
+    """
+    ids = set()
+    for regel in tekst.splitlines():
+        r = regel.strip()
+        if not r.startswith("|"):
+            continue
+        kolommen = [k.strip() for k in r.strip("|").split("|")]
+        if len(kolommen) >= 2 and re.fullmatch(r"[A-Z]{1,5}-\d+", kolommen[1]):
+            ids.add(kolommen[1])
+    # De kopvorm (`## O-9 beantwoord`) blijft ook gelden: die kwam voor voordat
+    # de tabel er was, en een oud bestand hoort niet stil door de controle te vallen.
+    for m in re.finditer(r"^\s*#{1,6}\s*([A-Z]{1,5}-\d+)\b", tekst, re.M):
+        ids.add(m.group(1))
+    return ids
+
+
 def controleer(pad_vragen=VRAGEN, pad_antwoorden=ANTWOORDEN, doe_http=None):
     bevindingen = []
     overgeslagen = []
@@ -147,7 +177,7 @@ def controleer(pad_vragen=VRAGEN, pad_antwoorden=ANTWOORDEN, doe_http=None):
                                         "de kaart stuurt naar %s%s en dat geeft geen 200"
                                         % (DASH, pad)))
 
-        if beantwoord and re.search(r"^\s*[#|*\-]*\s*%s\b" % re.escape(vid), beantwoord, re.M):
+        if vid in _beantwoorde_ids(beantwoord):
             bevindingen.append((vid, "DUBBEL",
                                 "staat al beantwoord in OWNER_ANSWERS.md -- je vraagt hem "
                                 "iets dat hij al besloten heeft"))
@@ -213,8 +243,25 @@ def zelftest():
         if not any(s == "AUDIO" for _, s, _ in draai(dict(goed, audio_map=rel))):
             fouten.append("LEGE audio_map werd niet gemeld -- dit IS de O-3-fout")
 
+    # HET ECHTE FORMAAT EERST. De eerste versie van deze test voerde `## X-1` in,
+    # een kopvorm die in OWNER_ANSWERS.md nergens voorkomt -- groen op invoer die
+    # niet bestaat is geen bewijs, en de controle las daardoor nul beantwoorde
+    # vragen waar er tweeentwintig staan.
+    TABEL = ("| Wanneer | Vraag | Antwoord | Toelichting |\n|---|---|---|---|\n"
+             "| 2026-07-31 19:32 | X-1 | agent-kiest |  |\n")
+    if not any(s == "DUBBEL" for _, s, _ in draai(goed, antwoorden=TABEL)):
+        fouten.append("een al beantwoorde vraag werd niet gemeld IN HET ECHTE TABELFORMAAT")
+
     if not any(s == "DUBBEL" for _, s, _ in draai(goed, antwoorden="## X-1 beantwoord\n")):
-        fouten.append("een al beantwoorde vraag werd niet gemeld")
+        fouten.append("de oude kopvorm wordt niet meer herkend")
+
+    # Negatieve controle: een vraag die alleen in de TOELICHTING van een ander
+    # antwoord genoemd wordt, is niet beantwoord.
+    VALS = ("| Wanneer | Vraag | Antwoord | Toelichting |\n|---|---|---|---|\n"
+            "| 2026-07-31 19:32 | Y-9 | ja | hoort bij X-1, zie daar |\n")
+    if any(s == "DUBBEL" for _, s, _ in draai(goed, antwoorden=VALS)):
+        fouten.append("VALS ALARM: X-1 gold als beantwoord omdat een ANDER "
+                      "antwoord hem in zijn toelichting noemt")
 
     _, _, over = controleer(doe_http=False)
     if not over:
@@ -223,7 +270,12 @@ def zelftest():
     for f in fouten:
         print("  ROOD  " + f)
     if not fouten:
-        print("  Zelftest groen: 8 controles, elk bewijst dat de checker kan bewegen.")
+        # Het aantal wordt GETELD uit de bron en niet opgeschreven: een
+        # hardgecodeerd getal dat niet meebeweegt als er een controle bij komt,
+        # is precies zo'n kleine onwaarheid als deze tool moet vangen. Het stond
+        # op 8 terwijl er inmiddels meer waren.
+        n = len(re.findall(r"fouten\.append\(", io.open(__file__, encoding="utf-8").read()))
+        print("  Zelftest groen: %d controles, elk bewijst dat de checker kan bewegen." % n)
     return 1 if fouten else 0
 
 
