@@ -135,6 +135,26 @@ namespace EclipseWeaponStatusFeed
 		/** Terug naar "nog nooit iets verstuurd"; het volgende monster is weer bInitial. */
 		void Reset();
 
+		/**
+		 * Vergeet WAT er het laatst uit ging, maar niet DAT er iets uit ging.
+		 *
+		 * Bestaat voor de ene situatie die een event-bus zonder geheugen structureel
+		 * niet dekt: een consument die LATER aankomt dan de producent. De HUD wordt
+		 * gemonteerd op Event.Mission.Started en dat is ruim ná de bezetting, dus het
+		 * eerste feit van het wapen is al langs geweest voordat er iemand luisterde.
+		 * Zonder een manier om het opnieuw te vragen zou de teller leeg blijven tot het
+		 * eerste schot — en een teller die pas na je eerste schot iets zegt, is precies
+		 * het gat waar deze hele laag voor gebouwd is.
+		 *
+		 * NIET Reset(), en dat verschil is het hele bestaansrecht van deze functie:
+		 * Reset zet ook BroadcastCount op nul, en dat is een MEETINSTRUMENT (zie
+		 * UEclipseHitscanWeaponComponent::GetWeaponStatusBroadcastCount — het scheidt
+		 * "de poort wees het af" van "de feed vond geen verandering" van "de bus
+		 * leverde niet af"). Een HUD die bij zijn montage het bewijsmateriaal uitgumt,
+		 * maakt precies de meting kapot waarmee je zijn eigen stilte zou onderzoeken.
+		 */
+		void ForgetLastBroadcast();
+
 		bool HasBroadcast() const { return bHasBroadcast; }
 		const FEclipseWeaponSnapshot& GetLastBroadcast() const { return LastBroadcast; }
 

@@ -123,6 +123,18 @@ void UEclipseMissionHudWidget::LogUiReport() const
 		bPlaytestVisible ? 1 : 0, PlaytestRows.Num());
 	UE_LOG(LogEclipse, Display, TEXT("UI:   R3-verdict    regels=%d"), GauntletRows.Num());
 
+	// DE MUNITIEHOEK ALS KETEN EN NIET ALS TEKST. Sinds de hoek aan
+	// Event.Player.WeaponStatusChanged hangt, zijn er drie plekken waar hij stil kan
+	// vallen — het wapen zendt niet, de bus levert niet af, of de HUD tekent niet —
+	// en een regel die alleen "tekst='23'" meldt, scheidt die drie niet. Deze regel
+	// zet ze naast elkaar, en dat is de bisectie die je op een frame nooit krijgt.
+	UE_LOG(LogEclipse, Display,
+		TEXT("UI:   munitiebron  feiten=%d getekend=%d · gecachet %d/%d%s · op het scherm '%s'"),
+		WeaponStatusEventsReceived, AmmoDrawCount,
+		WeaponStatus.AmmoInMagazine, WeaponStatus.MagazineSize,
+		bHasWeaponStatus ? TEXT("") : TEXT(" (NOG GEEN FEIT)"),
+		*GetMagazineTextOnScreen());
+
 	// EN OORDELEN WAAR HET KAN. Een dump die je moet lezen is beter dan
 	// niets, maar hij vangt alleen wat iemand toevallig naleest. Deze
 	// drie gevallen zijn voor de speler kapot en horen dus op te vallen
@@ -142,6 +154,31 @@ void UEclipseMissionHudWidget::LogUiReport() const
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — er is een wapen met een magazijn van %d, maar de munitieteller staat verborgen."),
 			ReportWeapon->GetMagazineSize());
+	}
+	// EN DE ENIGE ECHTE REGRESSIE DIE DEZE OMZETTING KAN OPLEVEREN: het scherm loopt
+	// achter op het wapen.
+	//
+	// Dit is de plek waar het wapen en de schermlaag naast elkaar te leggen zijn,
+	// juist omdat de teken-functie dat sinds vandaag NIET meer doet. Zolang de HUD
+	// per frame polde, kon dit verschil per constructie niet bestaan en was er dus
+	// ook niets te bewaken; nu wel. Een teller die vastzit op een oud getal ziet er
+	// op een frame volstrekt gezond uit — dat is precies waarom dit een LOGREGEL moet
+	// zijn en geen kwestie van kijken.
+	if (ReportWeapon != nullptr && ReportWeapon->GetMagazineSize() > 0 && !ReportWeapon->IsReloading()
+		&& bHasWeaponStatus && WeaponStatus.AmmoInMagazine != ReportWeapon->GetAmmoInMagazine())
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("UI: FOUT — het wapen heeft %d kogels en de HUD toont er %d; het scherm loopt achter op de bus (%d feiten aangenomen, %d keer getekend)."),
+			ReportWeapon->GetAmmoInMagazine(), WeaponStatus.AmmoInMagazine,
+			WeaponStatusEventsReceived, AmmoDrawCount);
+	}
+	// Feiten die aankomen zonder dat er ooit getekend wordt: de teller staat dan op
+	// zijn beginstand en liegt stil.
+	if (WeaponStatusEventsReceived > 0 && AmmoDrawCount == 0)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("UI: FOUT — %d wapenfeiten aangekomen en de munitiehoek is nul keer getekend."),
+			WeaponStatusEventsReceived);
 	}
 	// Een wapen zonder richtkruis: dan schiet je zonder te weten WAAR je
 	// richt. Dit is de owner-melding van 27-07 als vaste controle, zodat
@@ -177,29 +214,46 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 {
 	if (AmmoReadout == nullptr)
 	{
+		// HIER WORDT MET OPZET NIET GETELD. AmmoDrawCount blijft staan, en de
+		// aanroeper (OnWeaponStatusChanged) ziet daaraan dat er een feit binnenkwam
+		// zonder dat er iets op het scherm gebeurde. Een stille return die zichzelf
+		// niet meldt, is precies hoe deze laag twee dagen onzichtbaar bleef.
 		return;
 	}
+	++AmmoDrawCount;
 
-	const APawn* Body = GetOwningPlayerPawn();
-	const UEclipseHitscanWeaponComponent* Weapon = Body != nullptr
-		? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
-
-	// ALLE BESLISSINGEN KOMEN UIT DE PURE KERN (EclipseHudReadoutLogic). Deze functie
-	// mag alleen nog aflezen en tekenen — dat is de laagscheiding waar de drie
-	// defecten van 31-07 doorheen glipten: "toon HERLADEN in plaats van de kogels",
-	// "plak de rijnaam op het scherm" en "zet hem 48 px van de rand" waren alledrie
-	// beslissingen in een opmaakfunctie, en dus per constructie niet te toetsen
-	// zonder de game te starten.
+	// DE BRON IS DE BUS EN NIET HET WAPEN, en dat is de hele verandering.
+	//
+	// WAT ER STOND: zeven getters op UEclipseHitscanWeaponComponent, per frame
+	// aangeroepen vanuit NativeTick. Drie bezwaren, en de derde is de zwaarste:
+	//
+	//   1. ZESTIG KEER PER SECONDE VOOR ZES FEITEN. Munitie verandert bij aanhoudend
+	//      vuur zo'n 6,7 keer per seconde; de andere 53 vragen leverden hetzelfde
+	//      antwoord op als de vorige (GDD 12.4 geldt ook voor de HUD).
+	//   2. DE HUD MOEST HET WAPEN KENNEN. Een widget die FindComponentByClass doet,
+	//      is geen consument van de spelstaat maar een tweede eigenaar ervan
+	//      (GDD 12.1 / 8.8).
+	//   3. TWEE PADEN NAAR HETZELFDE GETAL. `Event.Player.WeaponStatusChanged` bestaat
+	//      sinds vandaag en draagt exact deze feiten. Wie ernaast blijft pollen, heeft
+	//      twee bronnen die uit elkaar kunnen lopen — en dan is de vraag "welke van de
+	//      twee liegt" niet meer te beantwoorden vanaf een frame.
+	//
+	// Wat blijft: ALLE BESLISSINGEN KOMEN UIT DE PURE KERN (EclipseHudReadoutLogic).
+	// Deze functie mag alleen aflezen en tekenen — dat is de laagscheiding waar de
+	// drie defecten van 31-07 doorheen glipten: "toon HERLADEN in plaats van de
+	// kogels", "plak de rijnaam op het scherm" en "zet hem 48 px van de rand" waren
+	// alledrie beslissingen in een opmaakfunctie, en dus per constructie niet te
+	// toetsen zonder de game te starten.
 	EclipseHudReadout::FEclipseWeaponReadoutFacts Facts;
-	if (Weapon != nullptr)
+	if (bHasWeaponStatus)
 	{
-		Facts.DisplayName = Weapon->GetActiveWeaponDisplayName();
-		Facts.RowName = Weapon->GetActiveWeaponName();
-		Facts.AmmoInMagazine = Weapon->GetAmmoInMagazine();
-		Facts.MagazineSize = Weapon->GetMagazineSize();
-		Facts.bReloading = Weapon->IsReloading();
-		Facts.ReloadProgress = Weapon->GetReloadProgress();
-		Facts.SlotCount = Weapon->GetSlotCount();
+		Facts.DisplayName = WeaponStatus.WeaponDisplayName;
+		Facts.RowName = WeaponStatus.WeaponRowName;
+		Facts.AmmoInMagazine = WeaponStatus.AmmoInMagazine;
+		Facts.MagazineSize = WeaponStatus.MagazineSize;
+		Facts.bReloading = WeaponStatus.bReloading;
+		Facts.ReloadProgress = WeaponStatus.ReloadProgress;
+		Facts.SlotCount = WeaponStatus.SlotCount;
 	}
 
 	const EclipseHudReadout::FEclipseAmmoReadout Readout = EclipseHudReadout::ComposeAmmoReadout(Facts);
@@ -208,7 +262,11 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 	// opgepoetste rijnaam op het scherm; dat is een noodverband en hoort gemeld te
 	// worden, anders blijft het stil bestaan tot iemand het toevallig op een frame
 	// ziet — precies hoe `Sidearm_Scrap` daar twee dagen kon staan.
-	if (Weapon != nullptr && Facts.SlotCount > 1 && !EclipseHudReadout::DisplayNameCameFromData(Facts)
+	//
+	// De regel is niet veranderd, alleen de BRON: hij leest nu uit de payload. Dat
+	// maakt hem zelfs scherper dan eerst — het feit draagt rijnaam én leestekst naast
+	// elkaar, dus de vergelijking gaat over precies wat er verstuurd is.
+	if (bHasWeaponStatus && Facts.SlotCount > 1 && !EclipseHudReadout::DisplayNameCameFromData(Facts)
 		&& !Facts.RowName.IsNone() && !ReportedMissingDisplayNames.Contains(Facts.RowName))
 	{
 		ReportedMissingDisplayNames.Add(Facts.RowName);
@@ -278,6 +336,70 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 			FillSlot->SetSize(FVector2D(ReloadBarWidthPx * Readout.ReloadProgress, Size.Y));
 		}
 	}
+}
+
+void UEclipseMissionHudWidget::OnWeaponStatusChanged(FGameplayTag /*EventTag*/, const FInstancedStruct& Payload)
+{
+	const FEclipseWeaponStatusPayload* Status = Payload.GetPtr<FEclipseWeaponStatusPayload>();
+	if (Status == nullptr)
+	{
+		// De bus controleert het type al bij de inschrijving, dus dit hoort niet te
+		// kunnen. Toch luid en niet stil: een teller die zwijgt omdat het feit de
+		// verkeerde vorm had, ziet er op het scherm identiek uit aan een teller
+		// waarvan de bron ontbreekt, en dat zijn twee heel verschillende bugs.
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: Event.Player.WeaponStatusChanged kwam aan met een payload van een ander type — de munitiehoek beweegt niet mee."));
+		return;
+	}
+
+	++WeaponStatusEventsReceived;
+	WeaponStatus = *Status;
+	bHasWeaponStatus = true;
+
+	// TEKENEN OP HET FEIT, niet bij de volgende tick. Dat is het verschil tussen "de
+	// HUD loopt hooguit één frame achter" en "de HUD loopt hooguit één frame achter,
+	// en tussendoor 59 keer voor niets".
+	const int32 DrawsBefore = AmmoDrawCount;
+	RefreshAmmoReadout();
+
+	// HET SCHERM MAG NOOIT STILLER ZIJN DAN DE BUS.
+	//
+	// Dit is de belangrijkste controle van deze hele omzetting, en met opzet zo
+	// geformuleerd dat hij ROOD kan worden. Bij het pollen was een gemiste
+	// verandering onmogelijk (elke frame werd alles opnieuw uit het wapen gehaald) en
+	// dus was er niets te bewaken; bij een event-gedreven HUD is een feit dat
+	// aankomt zonder dat het scherm beweegt de enige echte regressie die deze stap
+	// kan opleveren. Een stil scherm is erger dan pollen, want dan LIJKT de teller
+	// nog te kloppen.
+	if (AmmoDrawCount == DrawsBefore && !bReportedSilentScreen)
+	{
+		bReportedSilentScreen = true;
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: FOUT — er kwam een wapenfeit binnen (%d in totaal, magazijn %d/%d) en de munitiehoek is niet getekend; het scherm is stiller dan de bus."),
+			WeaponStatusEventsReceived, WeaponStatus.AmmoInMagazine, WeaponStatus.MagazineSize);
+	}
+}
+
+FString UEclipseMissionHudWidget::GetMagazineTextOnScreen() const
+{
+	// Uit het WIDGET, en verborgen telt als leeg: een getal dat er staat maar
+	// gecollapseerd is, leest de speler niet.
+	if (AmmoReadout == nullptr || AmmoReadout->GetVisibility() == ESlateVisibility::Hidden
+		|| AmmoReadout->GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		return FString();
+	}
+	return AmmoReadout->GetText().ToString();
+}
+
+FString UEclipseMissionHudWidget::GetWeaponTextOnScreen() const
+{
+	if (WeaponReadout == nullptr || WeaponReadout->GetVisibility() == ESlateVisibility::Hidden
+		|| WeaponReadout->GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		return FString();
+	}
+	return WeaponReadout->GetText().ToString();
 }
 
 void UEclipseMissionHudWidget::SetVisibilityIfChanged(UWidget* Widget, bool bVisible)
@@ -359,9 +481,29 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 	// De marge eerst: hij hangt aan de viewportmaat, en die kan tussen twee frames
 	// veranderen (venster slepen, resolutiewissel).
 	ApplySafeAreaLayout();
-	RefreshAmmoReadout();
+
+	// HIER STOND RefreshAmmoReadout(), EN DAT IS DE HELE STAP VAN VANDAAG.
+	//
+	// De munitiehoek hangt nu aan Event.Player.WeaponStatusChanged
+	// (OnWeaponStatusChanged). Een frame zonder wapenfeit hoort het tekenpad NUL keer
+	// te lopen, en dat is meetbaar gemaakt in plaats van beweerd: GetAmmoDrawCount()
+	// mag over zestig stille frames niet bewegen.
+	//
+	// Waarom die nul niet vanzelf spreekt: het is precies de meting die je pas kunt
+	// doen NADAT je hebt bewezen dat de teller überhaupt kan bewegen. Een HUD die
+	// nooit tekent haalt deze nul ook. De controleproef (één schot verlaagt het
+	// getal op het scherm) staat daarom vóór de nul in
+	// Tests/EclipseHudAmmoFeedTests.cpp.
+
 	// Het kruis reageert op de spreiding, dus hij hoort per frame na te kijken —
 	// maar hij doet alleen werk als er iets veranderde (zie RefreshCrosshair).
+	//
+	// EN DIT IS GEEN VERGETEN POLL. Spreiding is geen gebeurtenis maar een KLOK die
+	// per frame een andere stand heeft (opbouw tijdens vuren, verval op de klok, zie
+	// GetCurrentSpreadDegrees). Een feit per verandering zou hier één feit per frame
+	// betekenen, en dan is de bus duurder dan de vraag. Het onderscheid is precies
+	// hetzelfde als bij de herlaadvoortgang, alleen valt die kant de andere op:
+	// daar is de stap grof genoeg om te kwantiseren, hier niet.
 	RefreshCrosshair();
 
 	if (HitMarkerSecondsLeft > 0.0f)
@@ -473,10 +615,28 @@ void UEclipseMissionHudWidget::NativeConstruct()
 
 	// De BOOM staat in NativeOnInitialized (zie daar waarom). Hier staat alleen wat
 	// per montage opnieuw moet: abonnementen, per-run-tellers en de eerste vulling.
+	//
+	// EEN MONTAGE IS EEN VERSE RONDE, ook voor de meetpunten: de widget wordt door de
+	// controller bewaard en per missie opnieuw geconstrueerd, dus tellers uit de
+	// vorige missie zouden een nul-meting over deze missie waardeloos maken.
+	WeaponStatusEventsReceived = 0;
+	AmmoDrawCount = 0;
+	bHasWeaponStatus = false;
+	bReportedSilentScreen = false;
+	WeaponStatus = FEclipseWeaponStatusPayload();
+
 	SubscribePlayerEvents();
-	// Meteen één keer vullen. NativeTick doet het daarna elke frame, maar de eerste
-	// frame ná het monteren is precies het frame dat een opnameronde vastlegt.
+
+	// Meteen één keer vullen — met de LEGE stand, zodat de hoek verborgen staat in
+	// plaats van met de resten van de vorige missie op het scherm. NativeTick tekent
+	// hem sinds vandaag niet meer, dus dit is de enige garantie dat de eerste frame
+	// ná het monteren (precies het frame dat een opnameronde vastlegt) klopt.
 	RefreshAmmoReadout();
+
+	// En dan het echte beginbeeld ophalen. Dit gaat via de bus en dus via
+	// OnWeaponStatusChanged; zie RequestInitialWeaponStatus voor waarom de volgorde
+	// (wapen zendt vroeg, HUD monteert laat) dit noodzakelijk maakt.
+	RequestInitialWeaponStatus();
 
 	if (!IsDebugHudAllowed())
 	{
@@ -860,6 +1020,49 @@ void UEclipseMissionHudWidget::SubscribePlayerEvents()
 		EclipseTags::Event_Combat_HitLanded,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnHitLanded),
 		FEclipseCombatEventPayload::StaticStruct()));
+
+	// DE MUNITIEHOEK, sinds vandaag ook een abonnee in plaats van een polling-klant.
+	//
+	// Eigen abonnement en niet de familie-route (Event.Player), om dezelfde reden als
+	// de treffer hierboven: dit feit komt bij aanhoudend vuur zo'n zeven keer per
+	// seconde langs en tijdens een herlaadbeurt negen, en OnAnyFact herbouwt de hele
+	// tekstlijst. Het typeveld staat er expliciet bij, zodat producent/consument-drift
+	// wordt gemeld op de naad waar hij ontstaat in plaats van diep in de teken-functie.
+	EventHandles.Add(Bus->Subscribe(
+		EclipseTags::Event_Player_WeaponStatusChanged,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnWeaponStatusChanged),
+		FEclipseWeaponStatusPayload::StaticStruct()));
+}
+
+void UEclipseMissionHudWidget::RequestInitialWeaponStatus()
+{
+	// DE BUS HEEFT GEEN GEHEUGEN, en dat is precies waar een event-gedreven HUD op
+	// stukloopt als je er niet op rekent.
+	//
+	// GEMETEN aan de aanroepvolgorde: het wapen zendt zijn eerste feit uit vanuit
+	// AEclipseCharacter::NotifyControllerChanged (bezetting) en vanuit ApplyLoadout;
+	// deze widget wordt gemonteerd door AEclipsePlayerController::EnterMissionMode, en
+	// die hangt aan Event.Mission.Started. Die volgorde is niet "meestal goed" — hij
+	// is structureel de verkeerde kant op. Zonder deze regel zou de teller bij elke
+	// missiestart leeg blijven tot het eerste schot, en dat is exact de klasse fout
+	// waar deze omzetting NIET in mag vervallen: een HUD die stiller is dan de bus.
+	//
+	// EEN VERZOEK EN GEEN UITLEZING. De HUD vraagt het wapen om het feit opnieuw te
+	// VERSTUREN; hij leest er geen waarde uit. Het antwoord komt via dezelfde bus en
+	// dezelfde handler als elk ander feit, dus er is maar één pad naar het scherm.
+	APawn* Body = GetOwningPlayerPawn();
+	UEclipseHitscanWeaponComponent* Weapon = Body != nullptr
+		? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
+	if (Weapon == nullptr)
+	{
+		// Geen wapen bij montage is normaal (basis-hub, of een pawn die nog moet
+		// landen): dan komt het eerste feit vanzelf bij het uitrusten. Wel zeggen, op
+		// Verbose, zodat een LEGE teller naderhand te scheiden is van een STILLE bus.
+		UE_LOG(LogEclipse, Verbose,
+			TEXT("HUD: bij montage is er nog geen wapen — de munitiehoek wacht op het eerste feit van de bus."));
+		return;
+	}
+	Weapon->RequestStatusResend();
 }
 
 void UEclipseMissionHudWidget::BuildHitMarker()

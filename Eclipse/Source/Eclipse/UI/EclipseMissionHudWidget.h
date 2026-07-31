@@ -2,6 +2,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Core/EclipseEventBusSubsystem.h"
+#include "Core/EclipseEventPayloads.h"
 #include "CoreMinimal.h"
 #include "UI/EclipseGauntletOverlayLogic.h"
 #include "UI/EclipseTestGuideLogic.h"
@@ -115,9 +116,48 @@ public:
 	/** Log + archive the R3-VERDICT INPUT block (console: Eclipse.Gauntlet.Summary; also on teardown). */
 	void EmitVerdictSummary();
 
+	// ---------------------------------------------------------------------------
+	// MEETPUNTEN VAN DE MUNITIEHOEK — publiek, want een falsificatie die de HUD van
+	// binnenuit moet openbreken, is geen falsificatie.
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Hoe vaak het TEKENPAD van de munitiehoek werkelijk gelopen heeft.
+	 *
+	 * Dit is het getal waarmee "de HUD polt niet meer" een NUL wordt in plaats van
+	 * een bewering: zestig frames zonder wapenfeit horen dit getal niet te bewegen.
+	 * Zolang RefreshAmmoReadout in NativeTick stond, liep hij per definitie 60 keer
+	 * per seconde op, en er was geen manier om dat verschil te meten.
+	 */
+	int32 GetAmmoDrawCount() const { return AmmoDrawCount; }
+
+	/** Hoeveel Event.Player.WeaponStatusChanged deze HUD van de bus heeft aangenomen. */
+	int32 GetWeaponStatusEventCount() const { return WeaponStatusEventsReceived; }
+
+	/**
+	 * Wat er NU in het magazijnveld staat — de tekst uit het WIDGET en niet uit de
+	 * cache. Bewust die kant op: een test die de cache uitleest, bewijst dat de HUD
+	 * het feit heeft ONTVANGEN, niet dat hij het heeft GETEKEND. Precies dat verschil
+	 * is "het scherm mag nooit stiller zijn dan de bus".
+	 */
+	FString GetMagazineTextOnScreen() const;
+
+	/** Idem voor de wapennaam; leeg als het veld verborgen staat. */
+	FString GetWeaponTextOnScreen() const;
+
 private:
 	void OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnAnyFact(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/**
+	 * Event.Player.WeaponStatusChanged: de ENIGE bron van de munitiehoek.
+	 *
+	 * Neemt het feit over in de cache en tekent meteen — één frame na het feit, niet
+	 * bij de volgende tick. De schermlaag rekent hier niets uit en vraagt het wapen
+	 * niets; wie in deze functie een GetAmmoInMagazine() ziet verschijnen, kijkt naar
+	 * een terugval naar het pollen (GDD 12.1/8.8: UI is consument).
+	 */
+	void OnWeaponStatusChanged(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Rebuild the live sections only (objectives, orders, Command Mode state). */
 	void Rebuild();
@@ -195,8 +235,18 @@ private:
 	 */
 	void BuildDamageIndicator();
 
-	/** Het ENIGE abonnement van de spelerlaag: treffers (marker + richting van de klap). */
+	/** De abonnementen van de spelerlaag: treffers (marker + richting) en de wapenstand. */
 	void SubscribePlayerEvents();
+
+	/**
+	 * Het wapen vragen zijn huidige stand OPNIEUW uit te zenden, één keer bij montage.
+	 *
+	 * De bus levert synchroon af en bewaart niets, en deze widget wordt gemonteerd op
+	 * Event.Mission.Started — ruim ná het feit dat bij de bezetting is verstuurd. Zonder
+	 * dit verzoek zou de teller tot het eerste schot leeg blijven. Zie de implementatie
+	 * voor waarom dit een VERZOEK is en geen uitlezing.
+	 */
+	void RequestInitialWeaponStatus();
 
 	/**
 	 * Donkere rand rond een lichte glyph, zodat hij op ELKE ondergrond leesbaar is.
@@ -333,6 +383,32 @@ private:
 
 	/** Rijen waarover al geklaagd is dat hun DisplayName ontbreekt — één keer melden, niet per frame. */
 	TSet<FName> ReportedMissingDisplayNames;
+
+	/**
+	 * DE LAATSTE STAND ZOALS DE BUS HEM AFLEVERDE — de enige bron waaruit de
+	 * munitiehoek tekent.
+	 *
+	 * Hier stond niets, en dat was het probleem: RefreshAmmoReadout haalde zeven
+	 * feiten rechtstreeks uit het wapencomponent en NativeTick riep hem elke frame
+	 * aan. Zestig keer per seconde een vraag stellen die zes keer per seconde een
+	 * ander antwoord heeft, is niet alleen duur — het is een tweede pad naar dezelfde
+	 * waarheid, en twee paden kunnen uit elkaar lopen (GDD 12.2 regel 2).
+	 *
+	 * Een KOPIE en geen pointer naar het wapen: zodra hier een verwijzing zou staan,
+	 * kan de teken-functie er alsnog doorheen vragen en is de scheiding weg.
+	 */
+	UPROPERTY(Transient)
+	FEclipseWeaponStatusPayload WeaponStatus;
+
+	/** Is er ooit een wapenfeit binnengekomen? Zonder feit hoort de hele hoek weg te blijven. */
+	bool bHasWeaponStatus = false;
+
+	/** Aantal aangenomen wapenfeiten en aantal keren dat de hoek daadwerkelijk getekend is. */
+	int32 WeaponStatusEventsReceived = 0;
+	int32 AmmoDrawCount = 0;
+
+	/** Eén keer melden dat een feit niet getekend kon worden; daarna zou het per feit spammen. */
+	bool bReportedSilentScreen = false;
 
 	void RefreshAmmoReadout();
 

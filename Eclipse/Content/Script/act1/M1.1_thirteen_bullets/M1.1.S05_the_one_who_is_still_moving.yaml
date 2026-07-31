@@ -14,8 +14,8 @@ turn:         "Whatever Voss decides, the cell watches him decide it, and that i
 
 # ---- state ----
 status:       draft
-critic:       null
-words:        236
+critic:       GO
+words:        235
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      VOSS, MARA, one wounded Dominion conscript, one Ember fighter

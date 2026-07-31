@@ -473,9 +473,15 @@ void AEclipseCharacter::NotifyControllerChanged()
 	// ApplyLoadout het al gedaan). Alleen het tweede geval dekken zou betekenen dat
 	// de teller op sommige startpaden leeg blijft tot het eerste schot, en welk pad
 	// dat is, is niet aan dit lichaam om te weten.
+	//
+	// RequestStatusResend en niet PublishWeaponStatus, en dat is de wapenhelft van de
+	// VitalsTracker.Reset() hierboven. Een lichaam kan opnieuw bezet worden zonder dat
+	// er iets aan het wapen verandert (de spelerspawn overleeft tussen missies); een
+	// kale Publish zou dan niets uitzenden, want de tracker vindt geen verschil, en de
+	// nieuwe HUD zou tot het eerste schot leeg blijven.
 	if (UEclipseHitscanWeaponComponent* Weapon = FindComponentByClass<UEclipseHitscanWeaponComponent>())
 	{
-		Weapon->PublishWeaponStatus();
+		Weapon->RequestStatusResend();
 	}
 }
 

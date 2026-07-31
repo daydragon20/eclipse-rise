@@ -119,4 +119,11 @@ namespace EclipseWeaponStatusFeed
 		bHasBroadcast = false;
 		BroadcastCount = 0;
 	}
+
+	void FEclipseWeaponStatusTracker::ForgetLastBroadcast()
+	{
+		// BroadcastCount blijft met opzet staan; zie de toelichting in de header.
+		LastBroadcast = FEclipseWeaponSnapshot();
+		bHasBroadcast = false;
+	}
 }

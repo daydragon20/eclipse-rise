@@ -216,6 +216,27 @@ public:
 	void PublishWeaponStatus();
 
 	/**
+	 * De huidige stand OPNIEUW uitzenden, ook als er niets veranderd is.
+	 *
+	 * Voor een consument die te laat aankomt om het eerste feit te horen. De bus
+	 * heeft geen geheugen (UEclipseEventBusSubsystem levert synchroon af en bewaart
+	 * niets), en de HUD wordt gemonteerd op Event.Mission.Started — ruim ná de
+	 * bezetting die het eerste wapenfeit verstuurde. Zonder deze functie zou de
+	 * schermlaag pas bij het EERSTE SCHOT iets te tonen hebben.
+	 *
+	 * De alternatieven zijn allebei slechter en allebei al geprobeerd in dit
+	 * project: de HUD het component laten POLLEN (dat is precies wat hier wordt
+	 * afgeschaft) of de HUD zijn eigen kopie van de wapenlogica geven (dan hebben
+	 * twee lagen een mening over hetzelfde getal). Eén verzoek bij montage houdt de
+	 * schermlaag een zuivere consument van de bus.
+	 *
+	 * Het uitgaande feit draagt bInitial: het is een FOTO en geen verandering, dus
+	 * een vol magazijn bij het monteren mag niet als een geland herlaadfeit over het
+	 * scherm rollen.
+	 */
+	void RequestStatusResend();
+
+	/**
 	 * TIKT ALLEEN TIJDENS EEN HERLAADBEURT, en alleen voor het wapen van een lokale
 	 * speler.
 	 *

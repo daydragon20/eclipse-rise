@@ -100,6 +100,16 @@ void UEclipseHitscanWeaponComponent::PublishWeaponStatus()
 	}
 }
 
+void UEclipseHitscanWeaponComponent::RequestStatusResend()
+{
+	// Vergeten WAT er het laatst uit ging, zodat het volgende monster gegarandeerd
+	// een feit oplevert. ForgetLastBroadcast en niet Reset: de uitzendteller is een
+	// meetinstrument en mag door een montage niet worden uitgegumd (zie
+	// EclipseWeaponStatusFeed.h).
+	StatusTracker.ForgetLastBroadcast();
+	PublishWeaponStatus();
+}
+
 void UEclipseHitscanWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

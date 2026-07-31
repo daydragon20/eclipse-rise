@@ -14,7 +14,7 @@ turn:         "She hands him the number back as a promise instead of a limit."
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        21
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
