@@ -1455,6 +1455,11 @@ void AEclipsePlayerController::ApplySprintDrive()
 		// the fallbacks mirror the locked feel targets so a missing asset lands
 		// on the same numbers (GDD 14.3.5).
 		Body->GetCharacterMovement()->MaxWalkSpeed = bSprinting ? SprintSpeedCm : RunSpeedCm;
+
+		// Het lichaam moet zijn eigen houding kennen — de schermlaag vraagt het aan
+		// de pawn, niet aan de controller. Dezelfde ene schrijver als hierboven, dus
+		// hold en latch kunnen elkaar ook hier niet uitzetten.
+		Body->SetSprinting(bSprinting);
 	}
 }
 

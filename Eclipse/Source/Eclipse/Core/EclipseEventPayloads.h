@@ -334,6 +334,100 @@ struct FEclipseStoryEventPayload
 	int32 Day = 0;
 };
 
+/**
+ * Wat het lichaam van de speler op DIT moment doet, als één woord.
+ *
+ * Eén waarde en geen losse vlaggen in de payload, omdat de schermlaag één regel
+ * heeft om het in te zetten: "STAAND / HURKEN / SPRINT / DEKKING". Wie drie bools
+ * doorgeeft, laat de widget de voorrangsregel bedenken — en dan bedenkt elke
+ * widget hem opnieuw, net iets anders. De voorrang staat in EclipseVitalsFeed.
+ *
+ * InCover heeft vandaag GEEN producent, en dat is met opzet zo opgeschreven in
+ * plaats van weggelaten: de dekking die er wél is (SelectCoverPointNear in de
+ * squad-AI) is een BESTEMMING om heen te lopen, niet een toestand van een
+ * lichaam. Zodra er een echte dekkingstoestand komt, zet die bInCover op het
+ * monster aan — zonder dat het schema, de catalogus of de HUD meeverandert.
+ */
+UENUM(BlueprintType)
+enum class EEclipseStance : uint8
+{
+	Standing,
+	Crouched,
+	Sprinting,
+	InCover,
+};
+
+/**
+ * Event.Player.VitalsChanged — de toestand van het spelerslichaam is veranderd.
+ *
+ * Bestaat omdat de HUD anders moet POLLEN (UI/EclipseMissionHudWidget deed dat
+ * met de munitie) of rechtstreeks aan de pawn moet hangen. Beide breken GDD 12.2
+ * regel 2: de schermlaag is een consument van de bus, niet een lezer van
+ * gameplay-objecten.
+ *
+ * Huidige ÉN maximum, geen percentage: een balk heeft een lengte nodig en een
+ * getal heeft twee helften ("62 / 100"). Een percentage gooit de helft van dat
+ * antwoord weg en is niet terug te rekenen.
+ *
+ * Vorige én nieuwe waarde, want een overgang is het feit dat je op het scherm
+ * ziet: rood knipperen hoort bij schade, niet bij genezen, en die twee zijn
+ * alleen uit elkaar te houden met het getal van ervoor erbij. Zonder dat zou
+ * elke widget zijn eigen kopie van de vorige toestand bijhouden — precies de
+ * verborgen staat die een event-gedreven HUD moet vermijden.
+ */
+USTRUCT(BlueprintType)
+struct FEclipsePlayerVitalsPayload
+{
+	GENERATED_BODY()
+
+	/** Gezondheid na de verandering. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float Health = 0.0f;
+
+	/** Het maximum waar die gezondheid tegen afgezet hoort te worden. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float MaxHealth = 0.0f;
+
+	/** Gezondheid vóór de verandering — het teken van het verschil is de klap of het verband. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float PreviousHealth = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	EEclipseStance Stance = EEclipseStance::Standing;
+
+	/** De houding waaruit hij komt; gelijk aan Stance als deze gebeurtenis niet over houding ging. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	EEclipseStance PreviousStance = EEclipseStance::Standing;
+
+	/** Ligt dit lichaam? Apart van Stance: neer zijn is geen houding maar een uitkomst. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bDowned = false;
+
+	/**
+	 * WELK deel veranderde. Zonder deze drie zou de HUD elk feit als "alles opnieuw
+	 * tekenen" moeten lezen, en zou een houdingswissel een schadeflits geven.
+	 * bHealthChanged dekt Health én MaxHealth: allebei veranderen wat de balk toont.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bHealthChanged = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bStanceChanged = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bDownedChanged = false;
+
+	/**
+	 * De EERSTE foto van dit lichaam, niet een verandering eraan. De HUD hoort hier
+	 * zijn beginwaarden uit te zetten zónder overgangsanimatie: bij bezetting van de
+	 * pawn is er niets veranderd, er was alleen nog niets bekend. Alle drie de
+	 * vlaggen hierboven staan dan op false — anders zou "vol leven" bij spawn als
+	 * een treffer op het scherm landen.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bInitial = false;
+};
+
 /** Event.Command.* — Command Mode lifecycle facts (SPEC-P2-02). */
 USTRUCT(BlueprintType)
 struct FEclipseCommandEventPayload

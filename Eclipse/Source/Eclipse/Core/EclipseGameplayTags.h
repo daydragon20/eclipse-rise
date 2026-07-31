@@ -60,6 +60,20 @@ namespace EclipseTags
 	 */
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_SelfAction)
 
+	/**
+	 * Het lichaam van de SPELER is van toestand veranderd: gezondheid, houding of
+	 * neer. Eén feit voor de drie, want ze horen bij hetzelfde lichaam op hetzelfde
+	 * moment en de schermlaag tekent ze in één beeld; de payload zegt welk deel
+	 * bewoog (bHealthChanged / bStanceChanged / bDownedChanged).
+	 *
+	 * Een EIGEN familie naast Event.Squad.*, en niet SoldierDowned hergebruiken:
+	 * die feiten gaan over ROSTER-soldaten met een FGuid en worden door de
+	 * missielaag geteld voor de debriefing. De speler heeft geen soldier-id, gaat
+	 * niet naar de debriefing, en zijn gezondheid is geen squad-feit — het is wat
+	 * er op zijn eigen scherm hoort te staan.
+	 */
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Player_VitalsChanged)
+
 	// Command Mode lifecycle (SPEC-P2-02)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeEntered)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeExited)

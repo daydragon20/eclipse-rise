@@ -9,6 +9,11 @@
 #include "Characters/EclipseCharacterMovementComponent.h"
 #include "Characters/EclipseCharacterTypes.h"
 #include "Components/CapsuleComponent.h"
+#include "Core/EclipseEventBusSubsystem.h"
+#include "Core/EclipseGameplayTags.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+#include "GameFramework/Controller.h"
 #include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -392,6 +397,14 @@ void AEclipseCharacter::NotifyControllerChanged()
 	// in de constructor, omdat een lichaam pas bij bezetting weet of er een speler
 	// of een AI achter zit — en de game mode spawnt beide uit dezelfde klasse.
 	SetCameraRelativeOrientation(IsPlayerControlled());
+
+	// De EERSTE foto voor de schermlaag. Hier, want dit is het vroegste moment
+	// waarop dit lichaam weet dat er een speler achter zit — en het is ook het
+	// moment waarop de HUD zijn pawn krijgt. De tracker begint schoon, zodat een
+	// hergebruikt lichaam (de spelerspawn overleeft tussen missies) zijn nieuwe
+	// beginwaarden opnieuw als bInitial verstuurt in plaats van als "genezing".
+	VitalsTracker.Reset();
+	PublishVitals();
 }
 
 void AEclipseCharacter::SetCameraRelativeOrientation(bool bEnabled)
@@ -1373,6 +1386,12 @@ void AEclipseCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHe
 	// houdingswissel, geen klap.
 	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"), /*bUpperBodyOnly*/ false);
 	PlaceHeadHitboxOnCapsule(); // gehurkt zit het hoofd lager
+
+	// HIER en niet in de invoerlaag: het bewegingscomponent kan het hurken ook
+	// zelf beëindigen (te weinig hoogte om op te staan, een herleving, een
+	// missiereset). Wie het aan de KNOP hangt, mist die gevallen en het scherm
+	// blijft "HURKEN" tonen terwijl je staat.
+	PublishVitals();
 }
 
 void AEclipseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
@@ -1380,6 +1399,7 @@ void AEclipseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeig
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	PlayOneShotPose(LocomotionSet.CrouchTransition, 0.3f, 0.6f, TEXT("hurken"), /*bUpperBodyOnly*/ false);
 	PlaceHeadHitboxOnCapsule();
+	PublishVitals();
 }
 
 void AEclipseCharacter::Landed(const FHitResult& Hit)
@@ -1457,6 +1477,12 @@ void AEclipseCharacter::InitializeHealth(float MaxHealth)
 	HealthAttributes->SetMaxHealth(MaxHealth);
 	HealthAttributes->SetHealth(MaxHealth);
 	bDowned = false;
+
+	// Ook hier melden, en niet leunen op de gezondheids-delegate: die kijkt alleen
+	// naar Health. Een lichaam dat zijn MAXIMUM uit DA_CharacterTuning krijgt terwijl
+	// het al vol staat, verandert wel degelijk wat de balk moet tonen — en een
+	// herleving zet bovendien bDowned terug, wat helemaal buiten die delegate om gaat.
+	PublishVitals();
 }
 
 void AEclipseCharacter::ReviveForMission()
@@ -1498,10 +1524,75 @@ float AEclipseCharacter::GetHealth() const
 	return HealthAttributes->GetHealth();
 }
 
+float AEclipseCharacter::GetMaxHealth() const
+{
+	return HealthAttributes->GetMaxHealth();
+}
+
+void AEclipseCharacter::SetSprinting(bool bNewSprinting)
+{
+	if (bSprinting == bNewSprinting)
+	{
+		return;
+	}
+	bSprinting = bNewSprinting;
+	PublishVitals();
+}
+
+void AEclipseCharacter::PublishVitals()
+{
+	// Alleen het lichaam waar een LOKALE SPELER doorheen kijkt. Zonder deze poort
+	// zou elke vijand op de kaart zijn gezondheid over de spelersbus sturen — dat
+	// is geen HUD-voer maar ruis, en precies het soort "alles broadcasten" waar de
+	// bus aan onderdoor gaat. Squadmates hebben hun eigen familie (Event.Squad.*).
+	//
+	// NIET APawn::IsPlayerControlled(), en dat is een gemeten les: die functie
+	// vraagt niets over de bestuurder maar leest `GetPlayerState() &&
+	// !IsABot()`. Een PlayerState bestaat pas als een GameMode er een spawnt, dus
+	// hing "toont de HUD iets" aan een object dat er niets mee te maken heeft. De
+	// bedradingstest (WiredToBus) viel er meteen over: nul feiten op de bus in een
+	// wereld zonder game mode, terwijl de pure laag groen stond. De vraag is "zit
+	// er een lokale speler achter dit lichaam", dus dat is wat er nu staat.
+	const AController* Driver = GetController();
+	if (Driver == nullptr || !Driver->IsPlayerController() || !Driver->IsLocalController())
+	{
+		return;
+	}
+
+	EclipseVitalsFeed::FEclipseVitalsSnapshot Snapshot;
+	Snapshot.Health = HealthAttributes->GetHealth();
+	Snapshot.MaxHealth = HealthAttributes->GetMaxHealth();
+	Snapshot.bCrouched = bIsCrouched;
+	Snapshot.bSprinting = bSprinting;
+	// bInCover blijft false tot er een echte dekkingstoestand is; zie EEclipseStance.
+	Snapshot.bDowned = bDowned;
+
+	const EclipseVitalsFeed::FEclipseVitalsDecision Decision = VitalsTracker.Submit(Snapshot);
+	if (!Decision.bShouldBroadcast)
+	{
+		return;
+	}
+
+	// Geen bus (test zonder GameInstance, of een lichaam dat buiten een wereld
+	// leeft): het feit is dan al geteld door de tracker, en er gebeurt verder
+	// niets. Stil degraderen, nooit crashen (GDD 14.3.5).
+	const UWorld* World = GetWorld();
+	UGameInstance* GameInstance = World != nullptr ? World->GetGameInstance() : nullptr;
+	if (UEclipseEventBusSubsystem* Bus = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+	{
+		Bus->Broadcast(EclipseTags::Event_Player_VitalsChanged, FInstancedStruct::Make(Decision.Payload));
+	}
+}
+
 void AEclipseCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
 {
 	if (bDowned || Data.NewValue > 0.0f)
 	{
+		// Nog overeind: de gezondheid zelf is het feit. Vóór deze regel stond hier
+		// niets — de HUD kon dus alleen horen dat je NEER was, nooit dat je geraakt
+		// werd. Dat is de reden dat de schermlaag wel een poort had en niets om te
+		// tonen.
+		PublishVitals();
 		return;
 	}
 
@@ -1518,6 +1609,11 @@ void AEclipseCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
 		IsPlayerSide() ? TEXT("Player-side") : TEXT("Hostile"), *GetName(),
 		*GetActorLocation().ToCompactString(),
 		LastDamageCause.IsNone() ? TEXT("Unknown") : *LastDamageCause.ToString());
+
+	// Neergaan is óók een vitals-feit, en het gaat de deur uit vóór OnDowned:
+	// het scherm hoort de laatste gezondheid en de neer-toestand te tonen op het
+	// moment dat de rest van het spel erop begint te reageren, niet erna.
+	PublishVitals();
 
 	// One fact, broadcast once: squad/mission listeners resolve dead-vs-wounded
 	// at debrief (SPEC-P1-07); the body itself only reports.

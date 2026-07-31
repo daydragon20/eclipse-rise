@@ -2,6 +2,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "Characters/EclipseLocomotionTypes.h"
+#include "Characters/EclipseVitalsFeed.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EclipseCharacter.generated.h"
@@ -183,6 +184,27 @@ public:
 
 	bool IsDowned() const { return bDowned; }
 	float GetHealth() const;
+	float GetMaxHealth() const;
+
+	/**
+	 * Sprint aan of uit op DIT lichaam (de controller drijft het, zie
+	 * ApplySprintDrive). Het lichaam moet het zelf weten en niet alleen de
+	 * controller, want de houding is een feit OVER HET LICHAAM: de schermlaag,
+	 * de animatielaag en straks de stamina-laag vragen het aan de pawn, niet aan
+	 * de speler die hem toevallig bestuurt.
+	 *
+	 * Zet niets aan de beweging — MaxWalkSpeed blijft van ApplySprintDrive, want
+	 * twee schrijvers naar één getal is precies de knoop die daar is ontward.
+	 */
+	void SetSprinting(bool bNewSprinting);
+	bool IsSprinting() const { return bSprinting; }
+
+	/**
+	 * Hoeveel Event.Player.VitalsChanged dit lichaam werkelijk heeft uitgezonden.
+	 * Het meetpunt voor "hij spamt de bus niet": een teller die alleen bij een
+	 * echte verzending oploopt, en dus geen twee verklaringen door elkaar haalt.
+	 */
+	int32 GetVitalsBroadcastCount() const { return VitalsTracker.GetBroadcastCount(); }
 
 	/** Campaign identity for roster soldiers (invalid for enemies/player in Phase 1). */
 	FGuid GetSoldierId() const { return SoldierId; }
@@ -282,6 +304,18 @@ private:
 
 	void HandleHealthChanged(const struct FOnAttributeChangeData& Data);
 
+	/**
+	 * Neem een monster van dit lichaam en stuur het feit de bus op ALS er iets
+	 * veranderd is. De rem zit in EclipseVitalsFeed, niet hier: deze functie mag
+	 * gerust vaker aangeroepen worden dan er feiten zijn, en dat is met opzet —
+	 * elke plek die de toestand aanraakt roept hem aan, zonder eerst te moeten
+	 * uitzoeken of het "genoeg" veranderd is. Zo kan er geen verandering
+	 * wegvallen doordat één aanroeper vergat te melden (hang gedrag aan het feit).
+	 *
+	 * Alleen het door een SPELER bestuurde lichaam zendt uit; zie de catalogusrij.
+	 */
+	void PublishVitals();
+
 	/** Animation half of ApplyBodyDef: resolve the row's takes against the mesh's
 	 *  own skeleton and pick a rung of the locomotion ladder (GDD 14.3.5). */
 	void ApplyBodyDefAnimation(const struct FEclipseBodyDefRow& BodyDef, const USkeletalMesh* BodyMesh, USkeletalMeshComponent& MeshComponent);
@@ -319,6 +353,17 @@ public:
 
 private:
 	bool bDowned = false;
+
+	/** Sprint-toestand van dit lichaam; de controller zet hem via SetSprinting. */
+	bool bSprinting = false;
+
+	/**
+	 * Het geheugen achter Event.Player.VitalsChanged: wat er het laatst is
+	 * UITGEZONDEN. Per lichaam en niet per subsysteem, want het is de toestand van
+	 * dit lichaam — en zo houdt een tweede bestuurbaar lichaam (voertuig, later
+	 * co-op) zijn eigen ijkpunt zonder dat er iets aan deze laag verandert.
+	 */
+	EclipseVitalsFeed::FEclipseVitalsTracker VitalsTracker;
 
 	// Camera state. Defaults mirror the tuning asset's defaults so a pawn that
 	// never receives tuning still frames correctly instead of sitting at 0.
