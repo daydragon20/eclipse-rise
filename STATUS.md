@@ -10,9 +10,19 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (gemeten 31-07 ~20:00): build groen `-NoUba` · **193 tests, 0 gefaald, 0 niet
+Bar (gemeten 01-08 ~01:00): build groen `-NoUba` · **226 tests, 0 gefaald, 0 niet
 gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog
-**37/37**.
+**39/39** · creditmeter-poort groen.
+
+> **Spoor A staat verder dan spoor B.** Act 1 is **geschreven**: 40 scènes, ~9.400 woorden,
+> M1.1 t/m M1.6 plus de proloog. De critic-poort is voor 13 van de 20 beoordeelde scènes
+> door; de rest wacht op kleine reparaties (conditienamen, één woord, zes bandvelden — geen
+> scène hoeft herschreven). M1.7 en M1.8 wachten bewust op M1.5/M1.6-GO, want ze betalen
+> plant-ketens uit die daar gelegd zijn.
+>
+> **Generatie is technisch open** (Nathan zette de scopes aan) maar staat stil op **O-12**:
+> er zijn 2.475 credits op het verkéérde model gegaan en de vraag is of die 51 clips
+> opnieuw moeten. Saldo **gemeten** op 125.612 — de ledger klopt tot op de credit.
 
 Spoor-B-prioriteit 1 is de **schermlaag**. Nathan speelt pas als die op niveau is.
 
