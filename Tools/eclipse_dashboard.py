@@ -1087,15 +1087,22 @@ def scan_casting() -> dict:
         kand = []
         for k in r.get("kandidaten", []):
             bestand = str(k.get("bestand", "")).replace("\\", "/")
+            # Verse kandidaten uit de bibliotheek hebben geen lokaal bestand
+            # maar een preview-URL bij ElevenLabs; die speelt net zo goed af.
+            if bestand:
+                url = "/" + urllib.parse.quote(bestand)
+            else:
+                url = k.get("preview_url", "")
             kand.append({
                 "nr": k.get("nr"),
                 "stem": k.get("stem", ""),
                 "voice_id": k.get("voice_id", ""),
                 "eigenschappen": _leesbaar(k.get("eigenschappen", "")),
-                "ruw": k.get("eigenschappen", ""),
                 "waarom": k.get("waarom", ""),
+                "beschrijving": k.get("beschrijving", ""),
                 "categorie": k.get("categorie", ""),
-                "url": "/" + urllib.parse.quote(bestand) if bestand else "",
+                "bron": k.get("bron", "premade"),
+                "url": url,
                 "gekozen": k.get("nr") in gekozen,
             })
         rollen.append({

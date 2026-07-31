@@ -1,0 +1,1520 @@
+{
+ "stage": "stage1-ververst",
+ "credits": 0,
+ "rollen": [
+  {
+   "rol": "dominion_conscript",
+   "label": "Dominion-conscript A/B/C",
+   "prio": 1,
+   "tier": "Tier 1 - barks",
+   "fingerprint": "Jong en procedureel. Bang, maar houdt zich aan de voorschriften (§18.5).",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Will",
+     "voice_id": "bIHbv24MWmeRgasZH58o",
+     "eigenschappen": "male / young / american / chill",
+     "waarom": "Vlak en jong; leest protocol af zonder kleur - en breekt geloofwaardig.",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat1_Will.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Liam",
+     "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+     "eigenschappen": "male / young / american / confident",
+     "waarom": "De gedrilde rekruut die de training nog gelooft.",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat2_Liam.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Harry",
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "eigenschappen": "male / young / american / rough",
+     "waarom": "Ruwer; de conscript die er al te lang in zit.",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat3_Harry.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Sarah",
+     "voice_id": "EXAVITQu4vr4xnSDxMaL",
+     "eigenschappen": "female / young / american / professional",
+     "waarom": "Vrouwelijke conscript; heldere protocolstem, houdt zich vast aan de procedure.",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat4_Sarah.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
+     "stem": "Charlie",
+     "voice_id": "IKne3meq5aSn9XLyUdCD",
+     "eigenschappen": "male / young / australian / hyped",
+     "waarom": "Paniekregister. LET OP: Australisch accent - breekt de accent-neutraliteit.",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat5_Charlie.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "veil_operative",
+   "label": "Veil-operative A/B",
+   "prio": 1,
+   "tier": "Tier 1 - barks",
+   "fingerprint": "Kalm en klinisch. Het gruwelijke zit in de vlakheid (§18.5).",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "River",
+     "voice_id": "SAz9YHcvj6GT2YYXdXww",
+     "eigenschappen": "neutral / middle_aged / american / calm",
+     "waarom": "Genderneutraal en kalm - een gezichtloze geheime dienst. Sterkste match.",
+     "bestand": "progress_media/casting/veil_operative/veil_operative_kandidaat1_River.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Eric",
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "Glad en betrouwbaar klinkend; de vriendelijke ondervrager.",
+     "bestand": "progress_media/casting/veil_operative/veil_operative_kandidaat2_Eric.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "waarom": "Institutionele koelte, docentachtige precisie.",
+     "bestand": "progress_media/casting/veil_operative/veil_operative_kandidaat3_Alice.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "waarom": "Procedurele autoriteit, formeel.",
+     "bestand": "progress_media/casting/veil_operative/veil_operative_kandidaat4_Daniel.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "eclipse_fighter",
+   "label": "Eclipse-fighter A/B/C/D",
+   "prio": 1,
+   "tier": "Tier 1 - barks",
+   "fingerprint": "Geimproviseerd en persoonlijk. Gebruikt namen (§18.5 regel 6).",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Chris",
+     "voice_id": "iP95p4xoKVk53GoZ742B",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "De buurman die een geweer heeft opgepakt. Ongepolijst, warm.",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat1_Chris.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "waarom": "Warm en improviserend; vrouwelijke fighter.",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat2_Matilda.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Harry",
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "eigenschappen": "male / young / american / rough",
+     "waarom": "De kwaaie. Ruw, kort aangebonden.",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat3_Harry.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Jessica",
+     "voice_id": "cgSgspJ2msm6clMCkdW9",
+     "eigenschappen": "female / young / american / cute",
+     "waarom": "De te jonge, die hier niet hoort te staan.",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat4_Jessica.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "De veteraan; laag en laconiek.",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat5_Roger.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "voss_m",
+   "label": "Voss \"Cinder\" (M)",
+   "prio": 2,
+   "tier": "Tier 2 - elke scene",
+   "fingerprint": "Technicus-vocabulaire, ziet systemen. Claimt nooit de eer (§18.4).",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Chris",
+     "voice_id": "iP95p4xoKVk53GoZ742B",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Geaard en onopgesmukt - een avatar mag de speler niet overstemmen.",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat1_Chris.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Will",
+     "voice_id": "bIHbv24MWmeRgasZH58o",
+     "eigenschappen": "male / young / american / chill",
+     "waarom": "Jonge technicus zonder bravoure.",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat2_Will.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Liam",
+     "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+     "eigenschappen": "male / young / american / confident",
+     "waarom": "Naar voren, zelfverzekerder; de pragmatische as.",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat3_Liam.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Harry",
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "eigenschappen": "male / young / american / rough",
+     "waarom": "Hardere lezing van Voss.",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat4_Harry.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
+     "stem": "Callum",
+     "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+     "eigenschappen": "male / middle_aged / american",
+     "waarom": "Korreliger, gietvloer-gesleten.",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat5_Callum.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 6,
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "Oudere lezing; meer gezag vanaf regel een.",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat6_Roger.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "voss_f",
+   "label": "Voss \"Cinder\" (V)",
+   "prio": 2,
+   "tier": "Tier 2 - elke scene",
+   "fingerprint": "Zelfde fingerprint als Voss (M); de speler kiest het geslacht.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Sarah",
+     "voice_id": "EXAVITQu4vr4xnSDxMaL",
+     "eigenschappen": "female / young / american / professional",
+     "waarom": "Geaard, warm-zeker; draagt zowel idealist als pragmatist.",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat1_Sarah.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "waarom": "Warm en helder, accent-neutraal.",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat2_Bella.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "waarom": "Nuchter, vakkundig - past bij de technicus.",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat3_Matilda.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Laura",
+     "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+     "eigenschappen": "female / young / american / sassy",
+     "waarom": "Drogere, wrangere lezing.",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat4_Laura.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
+     "stem": "Lily",
+     "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+     "eigenschappen": "female / middle_aged / british / confident",
+     "waarom": "Meer acteerbereik. LET OP: Brits accent.",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat5_Lily.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 6,
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "waarom": "Precies en koel. LET OP: Brits accent.",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat6_Alice.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "mara",
+   "label": "Mara Sovann (52)",
+   "prio": 2,
+   "tier": "Tier 2 + 4",
+   "fingerprint": "Korte mededelingen. Zegt 'wij' waar ieder ander 'ik' zegt. Nooit sarcastisch.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Lily",
+     "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+     "eigenschappen": "female / middle_aged / british / confident",
+     "waarom": "Het meeste acteerbereik in de pool; draagt haar sterfscene.",
+     "bestand": "progress_media/casting/mara/mara_kandidaat1_Lily.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "waarom": "Warm en accent-neutraal; de mentor die je vertrouwt.",
+     "bestand": "progress_media/casting/mara/mara_kandidaat2_Bella.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "waarom": "Docentachtig - past bij wie de basis uitlegt.",
+     "bestand": "progress_media/casting/mara/mara_kandidaat3_Alice.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "waarom": "Warmer, minder zwaartekracht.",
+     "bestand": "progress_media/casting/mara/mara_kandidaat4_Matilda.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "dex",
+   "label": "Dex Callum (31)",
+   "prio": 2,
+   "tier": "Tier 2 + 4",
+   "fingerprint": "Fragmenten. Technische zelfstandige naamwoorden als scheldwoord. Ontwijkt met hardwaregrap.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Callum",
+     "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+     "eigenschappen": "male / middle_aged / american",
+     "waarom": "Letterlijk de 'husky trickster' - de ontwijker.",
+     "bestand": "progress_media/casting/dex/dex_kandidaat1_Callum.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Chris",
+     "voice_id": "iP95p4xoKVk53GoZ742B",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Charmant en nuchter; de grap landt zonder aandacht te vragen.",
+     "bestand": "progress_media/casting/dex/dex_kandidaat2_Chris.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Liam",
+     "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+     "eigenschappen": "male / young / american / confident",
+     "waarom": "Sneller, jonger, drukker.",
+     "bestand": "progress_media/casting/dex/dex_kandidaat3_Liam.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Will",
+     "voice_id": "bIHbv24MWmeRgasZH58o",
+     "eigenschappen": "male / young / american / chill",
+     "waarom": "Droger, laconieker.",
+     "bestand": "progress_media/casting/dex/dex_kandidaat4_Will.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
+     "stem": "Harry",
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "eigenschappen": "male / young / american / rough",
+     "waarom": "Als Dex meer bitter dan grappig mag zijn.",
+     "bestand": "progress_media/casting/dex/dex_kandidaat5_Harry.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "brick",
+   "label": "Brick / Oram Bex (34)",
+   "prio": 2,
+   "tier": "Tier 4",
+   "fingerprint": "De minste woorden van iedereen. Vaak een enkel zelfstandig naamwoord.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Brian",
+     "voice_id": "nPczCjzI2devNBz1zQrb",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "Diep en geruststellend - de stille reus. Sterkste match.",
+     "bestand": "progress_media/casting/brick/brick_kandidaat1_Brian.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Adam",
+     "voice_id": "pNInz6obpgDQGcFmaJgB",
+     "eigenschappen": "male / middle_aged / american",
+     "waarom": "Harder, dwingender.",
+     "bestand": "progress_media/casting/brick/brick_kandidaat2_Adam.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "Resonant en laconiek.",
+     "bestand": "progress_media/casting/brick/brick_kandidaat3_Roger.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Harry",
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "eigenschappen": "male / young / american / rough",
+     "waarom": "Jonger en ruwer dan de andere drie.",
+     "bestand": "progress_media/casting/brick/brick_kandidaat4_Harry.mp3",
+     "categorie": "premade"
+    }
+   ]
+  },
+  {
+   "rol": "reyes",
+   "label": "Dr. Elin Reyes (38)",
+   "prio": 2,
+   "tier": "Tier 4",
+   "fingerprint": "Volledige, klinische zinnen. Laat samentrekkingen vallen onder stress.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Heather - Warm, Raspy American Female",
+     "voice_id": "plP9aw1rizYgjFfuvLQ7",
+     "eigenschappen": "female / middle_aged / american / mature",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "Warm, conversational American female narrator specializing in immersive storytelling. My voice is calm, authentic, and inviting, with a natural warmth that draws listeners into every story. Perfect for audiobooks, docume",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/plP9aw1rizYgjFfuvLQ7/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJkYzI2NjM0MTM1N2M0MTJjYjUyZTRjN2Q5NDhkMzRlZiIsImZpbGVuYW1lIjoibkdvT3pOOEx6STVXR0tIZ1ZCMTcubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Unique - Calm & Mature",
+     "voice_id": "eCSy9OgFTA9PnboGzvrs",
+     "eigenschappen": "female / middle_aged / american / calm",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "Warm, calm, and reassuring female voice with a mature, professional presence. Clear, articulate, and naturally conversational, with a trustworthy and compassionate tone. Ideal for corporate training, educational content,",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/b31209bdf3f44be6aeb520b45763b340/voices/eCSy9OgFTA9PnboGzvrs/6f2dfa6c-54ed-42e2-9761-437b404bbb77.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Amie - Pro",
+     "voice_id": "d2TIsnZlkvBAy2oXD9Dp",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "Professional, clear, warm, and confident female voice with a calm delivery and natural conversational tone. Well suited for training videos, presentations, educational content, corporate narration, and professional commu",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/9269c3aef21c42718f2401e20387b4db/voices/d2TIsnZlkvBAy2oXD9Dp/mxzMcjXJfdvyHqE8fsNl.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Ida Freeist - Warm & Professional",
+     "voice_id": "uod6Nn3FGhzBRM6gqPSU",
+     "eigenschappen": "female / middle_aged / american / calm",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "Ida Freeist offers a voice that is both deeply reassuring and professionally precise. Her tone is naturally grounded and soothing, making her the perfect choice for narration that requires a 'human touch'—such as healthc",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/uod6Nn3FGhzBRM6gqPSU/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiI1ZGZiZDYwYjRmZmU0NjBmYWM0ODg1MWM2NjNlNGU2ZiIsImZpbGVuYW1lIjoieEhPdlFKcmlUYnJJZFFicnF6b1IubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Kai - Real AI Receptionist ",
+     "voice_id": "gh9yOzacZabdERF6GI7O",
+     "eigenschappen": "female / middle_aged / american / calm",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "Warm, clear, professional female AI receptionist voice with a friendly beauty-business tone. Calm, helpful, natural, and confident. Best for answering calls, greeting customers, collecting lead details, booking appointme",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/gh9yOzacZabdERF6GI7O/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiI3NTU4MDcxODY5ZTk0YmRkYjc5Y2IyMjkyZDRmMGFlNCIsImZpbGVuYW1lIjoiYjhkZjI4MWEtZTAxZS00MTAwLTlhOWEtYzdkMjEzYmFmZDcyLm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Ai Receptionist Real Kai",
+     "voice_id": "ZdyAfACRd8Z6GqeWRPeo",
+     "eigenschappen": "female / middle-aged / american / calm",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "Warm, clear, professional female AI receptionist voice with a friendly beauty-business tone. Calm, helpful, natural, and confident. Best for answering calls, greeting customers, collecting lead details, booking appointme",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/22e2c838c46345219fcaecbd47d6e208/voices/ZdyAfACRd8Z6GqeWRPeo/11a53485-0f00-494a-bae3-7cf4300b84de.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Jennifer - AI Explainer ",
+     "voice_id": "IDHS58OMlK9jZvRdhEVy",
+     "eigenschappen": "female / middle_aged / american / calm",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "A calm, clear, and structured voice designed for explaining complex ideas in a simple, human way.Ideal for AI tutorials, online courses, content, and professional training materials.\n\nThis voice works well for:* Step-by-",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/IDHS58OMlK9jZvRdhEVy/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJiZDUwNTg4NjI5NGU0ODFlOGM0MGI3MTExOTk4YTExNSIsImZpbGVuYW1lIjoiV3I0bFZuYVV1SlF3VEFjRzk0eXoubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Gia - Clear, Firm & Confident American English",
+     "voice_id": "qWRrMoaOJUg6mVvRBiwM",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Klinisch en beheerst — de arts die onder druk juist preciezer wordt.",
+     "beschrijving": "A clear, firm female voice with a calm, confident tone, designed for professional communication.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/34260a4f068146a6904fad0ead378134/voices/qWRrMoaOJUg6mVvRBiwM/dccce1db-fc29-4635-a1cd-3f1bdbfa7403.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "torren",
+   "label": "Torren Vale (45)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "fingerprint": "Militaire zuinigheid. Bevelen als suggestie. Verheft nooit zijn stem. Lange [pause].",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Alan - Deep & Relaxing",
+     "voice_id": "xnE95MBpjoyVGssERCrJ",
+     "eigenschappen": "male / middle_aged / american / confident",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "A great mature male voice that provides calm and authoritative tones.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/837494288f2441029b64498226760cfb/voices/xnE95MBpjoyVGssERCrJ/70868652-5409-4efc-865c-f92e6e2489b3.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Oliver",
+     "voice_id": "dJMW35Lc3PhFbOwMnA3k",
+     "eigenschappen": "male / middle_aged / american / deep",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "Deep, mature male narrator with a calm, authoritative, faith-based delivery. Reflective, motivational, steady, and serious with natural pauses, clear diction, and mentor-like conviction.",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/dJMW35Lc3PhFbOwMnA3k/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIzNTI5OTYwNGRhMmY0M2ZiODg2YmEzY2YwMmYzOTYxNCIsImZpbGVuYW1lIjoiMmZhOGFlM2EtNmZkZi00OTg3LWEwOTgtNWY4YzJjNDJmZDc3Lm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "MDT Taylor ",
+     "voice_id": "8yzDY77ueHoQaQE3Q7JV",
+     "eigenschappen": "male / middle_aged / american / mature",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "African American Male voice, mid-to-deep tone, calm and authoritative delivery. Speaks at a moderate pace with clear articulation and structured phrasing. Professional and instructional style, similar to a university lec",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/8yzDY77ueHoQaQE3Q7JV/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIyNjMwZGJiMDRmZmE0MmE3YmQyNGI2NmY5OTY0MjllMiIsImZpbGVuYW1lIjoiZmVhNmQyMDgtNjdiNS00Y2QxLWIyNWQtN2Y0ZDc1OTMyN2I0Lm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Stefan - Warm, Grounded & Mature",
+     "voice_id": "Fi3dLHel1zm7aneSMnph",
+     "eigenschappen": "male / middle_aged / canadian / confident",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "Mature Canadian male voice with a warm, grounded mid-to-low baritone, natural grit, and strong emotional presence. Direct, plainspoken, faith-rooted, and deeply sincere, with measured pacing, clear articulation, and a co",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/4492bc86df5146f087c7adfc46d1cdd5/voices/Fi3dLHel1zm7aneSMnph/4dc44f71-5cc3-41cd-ac9a-bce30ae3529d.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Steve - Deep & Authoritative",
+     "voice_id": "lPVHDJjq0RhPU2UxBOD3",
+     "eigenschappen": "male / middle_aged / american / professional",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "A grounded, deep-baritone voice with steady, unhurried delivery that is well suited for documentary narration, audiobooks, and long-form storytelling where a calm authoritative presence matters.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/8c405f66c9904d3ab8842a6cfcb83627/voices/lPVHDJjq0RhPU2UxBOD3/4be9dc30-056b-45e7-aed0-0fc4d27a4869.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Bytafa",
+     "voice_id": "A9g1rzCQV1lHhRtFxlG5",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "A calm, deep, and mature 46-year-old male voice. Features a smooth, grounded, and reassuring tone with an even pacing. Perfect for documentaries, storytelling, educational content, audiobooks, and history videos",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/672bf3b3d3cd4691a5d312a95867c30a/voices/A9g1rzCQV1lHhRtFxlG5/458c0208-7274-4592-96f9-0540a4e2497d.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Matt - Deep Authoritative Narrator",
+     "voice_id": "0aXOy31Cjamp6gJcyqYu",
+     "eigenschappen": "male / middle_aged / american / deep",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "Deep, resonant American baritone built for audiobooks, documentary narration, and long‑form YouTube content. Authoritative, smooth, and calm — a voice that makes any story feel serious and compelling. ",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/d29022fbdecc43698b30b6540d29690a/voices/0aXOy31Cjamp6gJcyqYu/nDiSY7XOZsSOf04JlpXb.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Dr. Youngblood - Authority & Southern",
+     "voice_id": "Q5WaVTqnkn6nqR4w9Hzv",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "beschrijving": "Authority, Louisiana Southern dialect, with an international tone, trusting, slightly deep, calm, confident, deeply authentic. Speaks like a seasoned mentor with decades of real-world experience, using a warm, mature Ame",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/829f0ec951d747d1b4bb3cef7c9db794/voices/Q5WaVTqnkn6nqR4w9Hzv/l0BeHQhFKOdsBRBO20wz.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "sela",
+   "label": "Sela Vann (23)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "fingerprint": "Retorische structuur, zelfs onder vier ogen. Tweede persoon meervoud.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Jenna - Clear & Articulate",
+     "voice_id": "332kujZw1ryYrnmOyJJY",
+     "eigenschappen": "female / young / american / confident",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Warm, friendly, and clear American female voice with a gentle Northeastern accent. Naturally expressive, approachable, and soothing - perfect for podcasts, storytelling, audiobooks, social media, customer service, and re",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/e28c223ee2a14d26aab2e583997b3fd9/voices/332kujZw1ryYrnmOyJJY/h0nuz4uX0FUvxCsqrlAb.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Hailey - Warm Female, Soft, Clear",
+     "voice_id": "VrUPKj92idNr4XrmO032",
+     "eigenschappen": "female / young / american / pleasant",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "A calm, close, and naturally soothing female voice with soft warmth and quiet emotional clarity. Grounded and gently expressive, with a relaxed conversational flow that feels intimate, steady, and sincere. The tone is sm",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/VrUPKj92idNr4XrmO032/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJiNmY0ZDczOTc5MDc0N2RkOTMwZWIxMmY1OTkxNzY5NSIsImZpbGVuYW1lIjoiM2Y2YWFkODUtYzY1YS00ZmRjLTg5NTYtZDcyMjFjODc5MDliLm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Dalida - Warm Global American",
+     "voice_id": "E3mW95MIKt5YUzwjsfbi",
+     "eigenschappen": "female / young / american / confident",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Warm, confident American English with a subtle global undertone. Dalida’s voice is clear, expressive, and emotionally engaging, shaped by years living in Kazakhstan, Spain, and the U.S. The accent is mostly neutral Ameri",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/b20ab73c6afd4df5b574d00e7a058f4a/voices/E3mW95MIKt5YUzwjsfbi/VbmLkNTZhFvUUKM8vThE.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Emme",
+     "voice_id": "QI7MqdLSOT7Xq48Th0oc",
+     "eigenschappen": "female / young / american / confident",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Bright, youthful American female voice with friendly, upbeat energy and expressive inflection. Clear, articulate, and naturally conversational, with a warm smile and subtle musicality. Highly versatile and adaptable—well",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/QI7MqdLSOT7Xq48Th0oc/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ1c2VyX2lkIjoiWWRnR0RDVXdTU1JrQ1FzMk03M2xDM3U2dDJLMiIsImZpbGVuYW1lIjoieEtKWlY1NXB1ZmtpNHpxV09sQjMubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Rachel - Fun, Casual, Australian Woman, English speaker",
+     "voice_id": "U9VgC8Xinl7nnNsyDd3J",
+     "eigenschappen": "female / young / australian / casual",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Fun, warm, conversational Australian female voice in her 30s.\nNatural Aussie accent with a friendly, relaxed delivery that feels authentic and engaging. Perfect for TikTok, Instagram Reels, YouTube Shorts, podcasts, audi",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/user/8wrT6aCxUvPuvjkbGuzefvE1DyE3/voices/U9VgC8Xinl7nnNsyDd3J/4D2RwuPZ3AgPE4fW26qe.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Silvia - Italian Accent English",
+     "voice_id": "NeTWyxKL7qMefrZEowed",
+     "eigenschappen": "female / young / italian / cute",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Warm, clear English with an authentic Italian accent. Smooth, expressive, and conversational, with natural pacing, precise pronunciation, and a friendly, confident tone. Ideal for storytelling, videos, podcasts, audioboo",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/56a9e8b0a9c74ee3886855113f059d69/voices/NeTWyxKL7qMefrZEowed/44b1ce37-66b6-422f-8bd7-e592b4c0311a.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Monica - Sultry Latina Storyteller",
+     "voice_id": "0aLkhNYQFqOzWIqVTl94",
+     "eigenschappen": "female / young / spanish / deep",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Sultry Latina voice with a low, smooth tone and controlled delivery. Slight natural huskiness. Clear, confident, and emotionally expressive without sounding forced. Works well for storytelling, relationship and lifestyle",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/3d3b27a369d642ad93c2bb266c8f35fc/voices/0aLkhNYQFqOzWIqVTl94/UYSJzcoqN9NhVYsqCQTc.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Sonal – Premium Indian English Voice",
+     "voice_id": "NyZqLdjqUb8SpOUKIlWT",
+     "eigenschappen": "female / young / indian / formal",
+     "waarom": "Spreekt ook in een kamer alsof er een menigte staat.",
+     "beschrijving": "Sonal is a studio-grade female voice combining confident authority with natural warmth. Designed for enterprise use, she delivers polished narration ideal for AI agents, FinTech support, B2B SaaS, eLearning, and podcasts",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/732fe2ac4bbe4281b2c1342d6aabdeb5/voices/NyZqLdjqUb8SpOUKIlWT/7epHiBagEHlPmbKrGQid.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "kaya",
+   "label": "Kaya Renn (27)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "fingerprint": "Doorlopende zinnen, onderbreekt zichzelf, jargon. Ondermijnt elke serieuze zin.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Margot - Bright, friendly & upbeat",
+     "voice_id": "tAtHhBlA3E0eKZJKNSKE",
+     "eigenschappen": "female / young / american / upbeat",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "Perfect for kids books. I sound like the person who sits down across from you at a coffee shop and immediately makes the conversation feel easy. My voice is bright, expressive, and naturally conversational. There is an e",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/eb51f67f71f0486daf225aa117f05ea4/voices/tAtHhBlA3E0eKZJKNSKE/9aB6mcogNQ9FavXuhXZ5.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Kadiana - Expressive & Youthful",
+     "voice_id": "R0xjlTsYe2M5tSma6Eka",
+     "eigenschappen": "female / young / american / casual",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "If your project needs a voice that sounds like a real conversation with a good friend, this is it. With a bright, clear mid-range pitch and flawless pacing, this female voice brings an immediate sense of trust and approa",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/R0xjlTsYe2M5tSma6Eka/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIyMzVlNTZjMWRmODI0OTJiYWJkMzYzNjJhMTI0M2MyNCIsImZpbGVuYW1lIjoiYTU1OTAwY2YtMmZlNy00Y2Y3LTg1OGItZTU5OTA5Zjg1MWE1Lm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Mia - Lively, Crisp, Expressive",
+     "voice_id": "052jzHJceQiZr7ltnY0C",
+     "eigenschappen": "female / young / american / upbeat",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "A natural, expressive female voice with a warm, conversational tone and dynamic emotional range. Effortlessly shifting from casual, chatty moments to focused storytelling, this voice feels engaging, relatable, and easy t",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/052jzHJceQiZr7ltnY0C/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJkODFmYjcyMWIyMDE0NWM1OWVhZmIyMzgzMzFlNDM0NiIsImZpbGVuYW1lIjoiTG5INUpkR2lMQUM5M1Y2aVZ2bVAubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Hallie - Fun, Young & Feminine",
+     "voice_id": "jpICOesdLlRSc39O1UB5",
+     "eigenschappen": "female / young / american / cute",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "Cute, high-energy feminine voice specifically optimized for short-form trendy content on social media. Conversational style, best friend vibe. Ideal for Social Media and voiceovers  Clear, upbeat, energetic, engaging, ex",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/8c64bd1a3a36497ba665798b40694c48/voices/jpICOesdLlRSc39O1UB5/QK71SDCyKmeko61Tp6Q8.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Candy - Young and Sweet",
+     "voice_id": "Nggzl2QAXh3OijoXD116",
+     "eigenschappen": "female / young / american / cute",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "Youthful, cute, sassy, energetic, bubbly, expressive, high pitched, excited, happy, sparkly, giggly, whimsical, bright, cheerful, playful, cartoony, fun, lighthearted, kawaii, magical voice. It is perfect for animation, ",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/Nggzl2QAXh3OijoXD116/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ1c2VyX2lkIjoiV2F1YUtsdmhTWlFsVDhIbUR1NHhwVThaWHlqMSIsImZpbGVuYW1lIjoiUzExZHBEQXE2RW5NY3RjOWlqcXkubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Yu - Natural & Energetic Asian Female",
+     "voice_id": "49GHemjSs7Dp4fi77m6O",
+     "eigenschappen": "female / young / chinese / casual",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "A warm, natural and energetic female voice with a friendly conversational style. Expressive, engaging and easy to listen to, making it ideal for videos, social media, storytelling, podcasts, advertisements, AI assistants",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/04d1893f47944ee291793cebf27112cf/voices/49GHemjSs7Dp4fi77m6O/DuPfWd9ReGde1spAd67l.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Annakay",
+     "voice_id": "RRIjxt3K1iKEkfsLGRXU",
+     "eigenschappen": "female / young / jamaican / upbeat",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "Warm expressive Jamaican female voice, great for creators looking for a natural Gen Z or young millennial female narrator. Perfect for social media videos, storytelling, narration, audio-books, gaming,  relaxing commenta",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/RRIjxt3K1iKEkfsLGRXU/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJmZTg4NzA3ZmU1NDI0ZTk1YjIzZDQyMWU5NzExZjJiYSIsImZpbGVuYW1lIjoiQkt1RHh4MHlJWjBHUzE2YUl4djQubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Anjura – Expressive Social Media Voice \t",
+     "voice_id": "bspiLwZDEcpIbBf6zWeq",
+     "eigenschappen": "female / young / indian / upbeat",
+     "waarom": "Praat te snel, onderbreekt zichzelf, maakt een serieuze zin nooit af.",
+     "beschrijving": "Anjura brings an engaging, energetic, and youthful voice built for social media impact. Perfect for reels, shorts, influencer content, ads, explainers, trends, and fun storytelling. Her expressive delivery adds personali",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/ed9b05e6324c457685490352e9a1ec90/voices/bspiLwZDEcpIbBf6zWeq/d6PC0muxKloIU0SnbGYa.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "whisper",
+   "label": "Whisper (stem-only tot Act 3)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "fingerprint": "Geen samentrekkingen. Voorwaardelijk, lijdende vorm. Zegt nooit 'ik'.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Chris - Calm, Smooth, Soft",
+     "voice_id": "2pTaNcW4nveUAOQ0Fgml",
+     "eigenschappen": "male / middle_aged / british / calm",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "British voice. Quite calm and smooth. Good for voiceovers and instructional videos among other things.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/23ee5778269a44658de773aefbbfb857/voices/2pTaNcW4nveUAOQ0Fgml/R14OL3YFKFqF0X8rY7bc.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Den - Soft & Neutral",
+     "voice_id": "4VfJEo3aIN3tq60EfJUU",
+     "eigenschappen": "male / middle_aged / canadian / calm",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "The voice belongs to a male who is middle-aged and professional. It has a soft and neutral North American accent, which also shows influences from Chinese and Filipino heritage. The quality of this voice is warm and expr",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/4VfJEo3aIN3tq60EfJUU/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIzZjBjZTU3YTAzZTQ0NzIyODgxMTNlYTcxNmVkNTVlMyIsImZpbGVuYW1lIjoiUU11emo0M3RZTXlqWXRlckowV3AubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Bytafa",
+     "voice_id": "A9g1rzCQV1lHhRtFxlG5",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "A calm, deep, and mature 46-year-old male voice. Features a smooth, grounded, and reassuring tone with an even pacing. Perfect for documentaries, storytelling, educational content, audiobooks, and history videos",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/672bf3b3d3cd4691a5d312a95867c30a/voices/A9g1rzCQV1lHhRtFxlG5/458c0208-7274-4592-96f9-0540a4e2497d.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Rory - Mellow & Calm",
+     "voice_id": "iObeGmp9cQqqHByD4hTs",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "African american male voice that is smooth and slightly deep, that is good for the radio.  Voice can calm people down and even put them to sleep at times.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/68f2af5ecb61483bbe7741b818b0a0f6/voices/iObeGmp9cQqqHByD4hTs/04bf2e4b-9212-4b85-a574-3ccf53f94f3d.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Kyle F - Technical & Soft",
+     "voice_id": "wdeEOw9iMDHzRDUDlgPC",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "A older Californian voice useful for telephone audio or mathematics instruction.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/6da855872fd94a778b9ce072b5e1dc98/voices/wdeEOw9iMDHzRDUDlgPC/68c9fe93-08f3-47d8-b4e7-be3c9f8f8d2a.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Qquincy - Calm & Smooth",
+     "voice_id": "2j8dgVqg7te79m2mifIV",
+     "eigenschappen": "male / middle_aged / american / confident",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "Great for a smooth and relaxing read.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/6aab7358ca9e4dceb6a56bc138bcaebb/voices/2j8dgVqg7te79m2mifIV/b166e66e-4039-4642-8a26-146e1283f00f.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Tom Hershel - Soft & Personal",
+     "voice_id": "0PixcqQ6AlotHOeU9Xlh",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "A mid-twenties authentic American voice that is soft and can be used to create more personal sounding generations.",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/0PixcqQ6AlotHOeU9Xlh/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiI1NWUxZmIzMmMyMTE0NDdkODJjYjVlMTg0MWE4NGY1YyIsImZpbGVuYW1lIjoiZmE5YWRmOWItMTcxNy00N2ZlLTgwOTgtZDllMzMzNzc4OWUyLm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "David J. ",
+     "voice_id": "ov9gV2radaGSCSYuY2k3",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Alleen een stem tot act 3. Zegt nooit 'ik', bevestigt nooit — impliceert.",
+     "beschrijving": "Velvety Smooth, deep, and Confident.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/f63a3e45c21d4c3284eac5f03d17c67a/voices/ov9gV2radaGSCSYuY2k3/b55dbd07-20f8-4001-b488-7a92bad2410c.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "threx",
+   "label": "Inquisiteur Dahl Threx (41)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "fingerprint": "Warm, intiem, veel vragen. Complimenteert je oprecht terwijl hij je pijn doet.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Hamza - Warm & Expressive Narrative",
+     "voice_id": "dhfxzFzHqOdJPw2XTcSN",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "Deep, friendly, and expressive male voice perfect for content creators, YouTube narrations, podcasts, video essays, storytelling, and ad voiceovers. Offers a smooth, confident delivery with authentic pacing.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/65f333ea70414bd6a9d3b5d61ab5e454/voices/dhfxzFzHqOdJPw2XTcSN/SsPDId75E3vWK0vw8Tiu.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Bala",
+     "voice_id": "GYWmRxXVwMaFJvJclh2j",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "A natural, Crispy, smooth, and highly expressive voice with a warm, balanced tone and medium vocal weight. The voice has a clear, confident delivery with a neutral accent, excellent articulation, and crisp consonants pai",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/GYWmRxXVwMaFJvJclh2j/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiI3ZTU0YjEyMGI2OTM0Y2Y2ODI1M2NjZTBhZGI3OTc0OSIsImZpbGVuYW1lIjoiTHhHY1FTN3NKREMzZUlpRWg1UEkubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Youssif Nayyef",
+     "voice_id": "Mk9f6ik9SZC9B78kIbVA",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "A clear, expressive male voice with a natural international accent. Warm, engaging tone that balances professionalism with a conversational style. Adaptable for narration, storytelling, and educational content. Smooth pa",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/19715c4c58b14ae187e44584a655c01c/voices/Mk9f6ik9SZC9B78kIbVA/GNl4w4qAH2ZZ9WFo7VAT.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Chris Atlas - Calm Clear Global Warm",
+     "voice_id": "kI6Ez54Ronod550ifE5g",
+     "eigenschappen": "male / middle_aged / british / calm",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "A smooth, globally adaptable male voice with a calm, clear, authoritative and warm tone. Ideal for Social Media narration, documentaries, storytelling, ads, and educational content. Neutral international accent ensures b",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/50939c892f2344bfa233d7dba371ef26/voices/kI6Ez54Ronod550ifE5g/B18ca9SB4veKvFDXna0d.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Atlas - Relaxed & Confident",
+     "voice_id": "0TTwKSIQ86QJLXc7gGsR",
+     "eigenschappen": "male / middle_aged / arabic / serious",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "A warm, natural male voice with a relaxed, confident delivery that feels genuine and approachable. Perfect for storytelling, podcasts, narration, educational content, AI assistants, and professional voiceovers. Smooth, c",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/d12672876dc94034b82751c5e8a0b859/voices/0TTwKSIQ86QJLXc7gGsR/f45ba139-4354-4d1a-ba87-7b8a98de9934.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Den - Soft & Neutral",
+     "voice_id": "4VfJEo3aIN3tq60EfJUU",
+     "eigenschappen": "male / middle_aged / canadian / calm",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "The voice belongs to a male who is middle-aged and professional. It has a soft and neutral North American accent, which also shows influences from Chinese and Filipino heritage. The quality of this voice is warm and expr",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/4VfJEo3aIN3tq60EfJUU/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIzZjBjZTU3YTAzZTQ0NzIyODgxMTNlYTcxNmVkNTVlMyIsImZpbGVuYW1lIjoiUU11emo0M3RZTXlqWXRlckowV3AubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Tazo",
+     "voice_id": "dIFtF9RFFX18hv8XjOA9",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "Warm, deep, and expressive.",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/dIFtF9RFFX18hv8XjOA9/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiI0YzllYjFhM2VmOTA0YTk2YmY2OWNhZDUyMzgwYjRiZiIsImZpbGVuYW1lIjoiOTBiYzBhZGEtMGMzZC00ZjkyLWE5MzItMmIzYTllYjcwOWQyLm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Dane Narrates",
+     "voice_id": "TzptfaWtKpXd5WOhBc9B",
+     "eigenschappen": "male / young / american / calm",
+     "waarom": "Warm en onverdraaglijk. Complimenteert je oprecht terwijl hij je pijn doet.",
+     "beschrijving": "Young American male voice with natural warmth, clear articulation, and conversational energy. Perfect for social media storytelling, short-form narratives, social media, and relatable explanations. Smooth pacing with att",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/d5b6029f6c964b1da9645a36c5935a75/voices/TzptfaWtKpXd5WOhBc9B/OrlGbW3uUKnr7yD4gF34.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "aegis",
+   "label": "AEGIS",
+   "prio": 2,
+   "tier": "Tier 2",
+   "fingerprint": "Tegenwoordige tijd. Geen persoonlijk voornaamwoord. Stelt vast, overtuigt niet.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Joys Killian",
+     "voice_id": "f4My6HzDSl8g2Ai0BztA",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "A young male voice, twenty-seven years old, with a neutral global accent—a blend of American and African influences. It’s warm, clear, and slightly conversational, perfect for storytelling in a documentary style.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/72f2e937775946c7bd69211676cf2343/voices/f4My6HzDSl8g2Ai0BztA/96436ef3-821f-4105-b78b-680bf303277e.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "American Joshua - Calm & Professional",
+     "voice_id": "KCO0afdAdW1HAOmQjNUc",
+     "eigenschappen": "male / middle_aged / american / confident",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "A warm, confident middle-aged male voice with a neutral American accent. Deep-to-medium pitch with natural resonance and a relaxed, conversational pace. The tone carries authority and approachability — clear articulation",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/4fdc2a5702ab47b780374cc91d5ef179/voices/KCO0afdAdW1HAOmQjNUc/1704ff7d-cc33-4522-9afc-0ec9b4988c83.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Aldric",
+     "voice_id": "ZjtfW0vceFXh1wtJqpTH",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "A smooth, mid-deep voice with a natural storytelling quality. Warm and engaging, with a relaxed tone that draws listeners in. Ideal for audiobooks, fantasy narration, documentaries, and epic storytelling. Neutral accent ",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/112fc98276994055b773af03af791bd4/voices/ZjtfW0vceFXh1wtJqpTH/H6DcMyyxO2InNBpSsOHQ.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Andy",
+     "voice_id": "CTeVHnseNx3T2skRQGCQ",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": " Warm, smooth, and naturally conversational American male voice with a neutral accent and a calm, trustworthy delivery. Ideal for narration, audiobooks, e-learning, corporate training, podcasts, videos, documentaries, an",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/46a5658394bf4247b03f5616fb11be8e/voices/CTeVHnseNx3T2skRQGCQ/59176dfc-2cf6-474c-a43c-e2a3a438b27f.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Veronica ",
+     "voice_id": "2tM0Teq5Piex0mNtlZnm",
+     "eigenschappen": "female / middle_aged / american / casual",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "Warm, clear female voice, perfect for corporate business and audio book narration. Neutral American accent. Friendly and approachable with a natural, conversational tone. Smooth pacing, medium pitch, and articulate but r",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/4bd50480962b4c7cbe4339804628ae69/voices/2tM0Teq5Piex0mNtlZnm/dd3b6fa2-7a0c-4ace-80c0-69bca4302369.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Eryn – Professional IVR Voicemail American Female Voice",
+     "voice_id": "mzQCmfsyI83WHJxXgieu",
+     "eigenschappen": "female / middle_aged / american / formal",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "This voice is a calm, professional American female voice with clear articulation and realistic, human delivery. Ideal for IVR systems, voicemail greetings, phone trees, on-hold messaging, and customer service lines. A ba",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/mzQCmfsyI83WHJxXgieu/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIwNWJmMTkyNTk2NWE0Y2VhYTI1ZTcyYjMwOTliNWQ3YSIsImZpbGVuYW1lIjoiaDRaUllrVWVUWERxdFJ6UUxqWnMubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Eryn - Confident Corporate Training American Female Voice",
+     "voice_id": "8tsLeAV5vPVuzCCvqbbU",
+     "eigenschappen": "female / middle_aged / american / calm",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "This voice is a confident, professional American female voice with clear articulation and realistic, human delivery. Ideal for corporate training, business presentations, onboarding modules, compliance content, explainer",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/user/DXCrxxc55DZsEPNKieedZbV9YeB3/voices/8tsLeAV5vPVuzCCvqbbU/QVTZ3aU8tGMDyyruxYHL.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Sedona - Calm Grounded Female",
+     "voice_id": "Y02DpjDrIqEQiinPoGZG",
+     "eigenschappen": "female / middle_aged / american / calm",
+     "waarom": "Geen zelfverwijzing, tegenwoordige tijd, overtuigt nooit — stelt alleen vast.",
+     "beschrijving": "Neutral American accent with a warm calming tone. Clear and steady delivery suitable for narration, audiobooks, meditation, educational content, and long-form listening. Grounded presence with natural pacing and minimal ",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/user/user_7101kefpsjq2egy98rr2bpwtctk2/voices/Y02DpjDrIqEQiinPoGZG/TFZutUhBL6MBZGA45H9H.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "vex",
+   "label": "Hoog-Arbiter Malachar Vex (68)",
+   "prio": 3,
+   "tier": "Act 3-4",
+   "fingerprint": "Langste zinnen van het spel, bijzinnen, zacht register. Zegt 'men', nooit 'ik'.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Victor - Deep, Dark Psychology",
+     "voice_id": "U1nBX3lzKSM937PaYYfk",
+     "eigenschappen": "male / old / british / deep",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "Professional deep male voice designed for dark psychology, self-improvement, and mindset content.\n\nPerfect for psychology channels, motivational narration, documentary storytelling, and high-impact educational content.\n\n",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/0bef4667c08f4209abf1d88fcd140393/voices/U1nBX3lzKSM937PaYYfk/CxEkOprLWXTf6z2PQxim.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Steve - Deep & Authoritative",
+     "voice_id": "lPVHDJjq0RhPU2UxBOD3",
+     "eigenschappen": "male / middle_aged / american / professional",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "A grounded, deep-baritone voice with steady, unhurried delivery that is well suited for documentary narration, audiobooks, and long-form storytelling where a calm authoritative presence matters.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/8c405f66c9904d3ab8842a6cfcb83627/voices/lPVHDJjq0RhPU2UxBOD3/4be9dc30-056b-45e7-aed0-0fc4d27a4869.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Dak",
+     "voice_id": "CPcy0Dnz30Ix06J8m95k",
+     "eigenschappen": "male / old / american / deep",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "Deep, calm, High emotional intelligence in delivery – builds curiosity and shock without being overdramatic. Rich, resonant voice that commands attention and makes people lean in. Perfect for dark psychological facts and",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/CPcy0Dnz30Ix06J8m95k/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJmODE5Y2M1NjMzNGY0Y2MyOGZhMDYyOWFmM2UwYjQ3YSIsImZpbGVuYW1lIjoiZWIyNzQ1ZGQtMGYwNS00NTk4LWJhOTctYTZkZjNjNTM0MjZkLm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Matt - Deep Authoritative Narrator",
+     "voice_id": "0aXOy31Cjamp6gJcyqYu",
+     "eigenschappen": "male / middle_aged / american / deep",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "Deep, resonant American baritone built for audiobooks, documentary narration, and long‑form YouTube content. Authoritative, smooth, and calm — a voice that makes any story feel serious and compelling. ",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/d29022fbdecc43698b30b6540d29690a/voices/0aXOy31Cjamp6gJcyqYu/nDiSY7XOZsSOf04JlpXb.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Alan - Deep & Relaxing",
+     "voice_id": "xnE95MBpjoyVGssERCrJ",
+     "eigenschappen": "male / middle_aged / american / confident",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "A great mature male voice that provides calm and authoritative tones.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/837494288f2441029b64498226760cfb/voices/xnE95MBpjoyVGssERCrJ/70868652-5409-4efc-865c-f92e6e2489b3.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Oliver",
+     "voice_id": "dJMW35Lc3PhFbOwMnA3k",
+     "eigenschappen": "male / middle_aged / american / deep",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "Deep, mature male narrator with a calm, authoritative, faith-based delivery. Reflective, motivational, steady, and serious with natural pauses, clear diction, and mentor-like conviction.",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/dJMW35Lc3PhFbOwMnA3k/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIzNTI5OTYwNGRhMmY0M2ZiODg2YmEzY2YwMmYzOTYxNCIsImZpbGVuYW1lIjoiMmZhOGFlM2EtNmZkZi00OTg3LWEwOTgtNWY4YzJjNDJmZDc3Lm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Arthur",
+     "voice_id": "ca7REQGRQ5JssBZnoS5E",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "A versatile, resonance-rich voice blending the grounded wisdom of a seasoned mentor with the sharp precision of a technical expert. Marked by a calm, deliberate cadence and a warm, authoritative texture, this vocal signa",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/4e5bae5b9a434ae3b5aa2cbbfc412a7d/voices/ca7REQGRQ5JssBZnoS5E/9uyfKEUZNLGTpXnRilaa.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "MDT Taylor ",
+     "voice_id": "8yzDY77ueHoQaQE3Q7JV",
+     "eigenschappen": "male / middle_aged / american / mature",
+     "waarom": "De zachtste stem in de game, en de langste zinnen. Verheft zich nooit.",
+     "beschrijving": "African American Male voice, mid-to-deep tone, calm and authoritative delivery. Speaks at a moderate pace with clear articulation and structured phrasing. Professional and instructional style, similar to a university lec",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/8yzDY77ueHoQaQE3Q7JV/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIyNjMwZGJiMDRmZmE0MmE3YmQyNGI2NmY5OTY0MjllMiIsImZpbGVuYW1lIjoiZmVhNmQyMDgtNjdiNS00Y2QxLWIyNWQtN2Y0ZDc1OTMyN2I0Lm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "kaine",
+   "label": "Grootmaarschalk Sera Kaine (49)",
+   "prio": 3,
+   "tier": "Act 2-4",
+   "fingerprint": "Precies, eerlijk, geen eufemisme. Zegt exact wat ze gaat doen. Liegt nooit.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Kristen - Authoritative E-Learning Expert",
+     "voice_id": "V7B32P84B67izVMXFkfr",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "TED-style Professional Narration. Optimized for High-Volume Podcasts, and Audiobooks. Expertise: True Crime, Tech History, Documentaries, Video Essays, Computer Science, SaaS Tutorials, AI Agents, Edutainment, and Medica",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/V7B32P84B67izVMXFkfr/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiI5N2IyYTY1NmIwYjM0MjE0OTk3MGMxM2YyODcxY2NmNyIsImZpbGVuYW1lIjoicHFSbk5jSHY2ZEx0TUlPVDgwVkMubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Chelsie - Approchable Female Scientist",
+     "voice_id": "cU70YoaYtJoQxnsPXDng",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Warm, articulate American female voice specializing in science, medicine, and education. Conversational yet authoritative, with a natural podcast-style delivery. Ideal for medical narration, e-learning, documentaries, co",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/74d22e8703c74856851677955164af76/voices/cU70YoaYtJoQxnsPXDng/sPuFdFARYAfs0XNoLa2c.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Dr NovaDay",
+     "voice_id": "6uykfKXTYWBWUemH6V6G",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Warm, grounded, and authoritative. A feminine voice with the cadence of an educator and the presence of a spiritual leader. Measured pace, rich tone, calm confidence. Designed for podcast hosting, audio books, and inspir",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/f80421775ca74504a8fa382b91092dd4/voices/6uykfKXTYWBWUemH6V6G/130c0a49-4d93-4eda-abb5-c0dec9bd8d3f.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Deborah - Trustworthy, confident",
+     "voice_id": "lVpo6IOLjDX4LxkYRZyj",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Warm, authoritative American female voice with a polished broadcast feel. Ideal for corporate training, executive explainers, compliance videos, e-learning, documentary narration, public-sector messaging, product demos, ",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/9ef82927ee58462fa9429ef93abe605d/voices/lVpo6IOLjDX4LxkYRZyj/zG2ffkeUUTVPvZwhhr2o.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Miss B. - Inspirational, Authoritative, Confident Narrator",
+     "voice_id": "PFqo8D2UY6vd5tzJUrsl",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Miss B. is an inspiring, captivating, commanding voice that speaks to the soul of anyone needing a pick me up, support, vision or guidance. Great for audio books, storytelling, faceless video content on any social media ",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/PFqo8D2UY6vd5tzJUrsl/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiJhMTAwYTk4Nzg3M2Y0ODliYTdhOTU2MzA2OGQ5NWMwYSIsImZpbGVuYW1lIjoibTQ0S1dDQVlsNzFtcFVvcnRJZ1QubXAzIiwidGltZXN0YW1wIjoxNzg1NTI0NDAwMDAwMDAwfQ%3D%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Monique - Professional Audiobook Narrator",
+     "voice_id": "tJ8LOFTaeHnV8MwJjjDK",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Warm, engaging female voice with a clear, articulate delivery and slightly elevated pitch. Combines grounded confidence with a lighter, approachable tone. Smooth and resonant with crisp diction, offering a polished yet c",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/8b8827e04b494c8b9105f9d9a57ad80e/voices/tJ8LOFTaeHnV8MwJjjDK/s87UCt1juRp6mfD3D2IB.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Glinda - Confident, Sly, Sultry",
+     "voice_id": "o9yXv9EFSasRrRM3x6xK",
+     "eigenschappen": "female / middle_aged / american / serious",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Confident, a bit sly and a tad sultry, with a hint of a smirk.  She's definitely in charge. (Is she a good witch or a bad witch?  Probably the latter...)",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/ee5fe73b76e34cbfa7b1f9f2c67a15ae/voices/o9yXv9EFSasRrRM3x6xK/aTjBBLTwZNtmTKMypiyT.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Simone - Warm & Direct",
+     "voice_id": "47ztMLq1EmhhslNSINCu",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "waarom": "Zegt precies wat ze gaat doen, en doet het. Geen eufemisme.",
+     "beschrijving": "Confident, clear female voice with warm but direct delivery. Natural conversational style perfect for business courses, coaching content, and professional training. Authoritative yet approachable. Ideal for entrepreneurs",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/user/wzJL5sbxOeeoDZwzrkt0uO5JC2n1/voices/47ztMLq1EmhhslNSINCu/AjXSielG1v087FS9FhCQ.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  },
+  {
+   "rol": "callis",
+   "label": "Magistraat Oren Callis (56)",
+   "prio": 3,
+   "tier": "systemisch",
+   "fingerprint": "Lijdende vorm. Bureaucratisch indekken. Legt elk besluit bij het beleid.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Malcolm Gooding - Calm trused gravitas",
+     "voice_id": "VC6vCXhVaI8BZefRtXZV",
+     "eigenschappen": "male / old / british / professional",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "Malcolm Gooding is a legendary South African voice artist & broadcaster. He rose to fame narrating Squad Cars (800+ eps) and hosting Going Gooding (iconic music). His rich, mellifluous voice  “a blend of fine sand and sm",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/934086188b3c48bbb8d263d37ab6f9ba/voices/VC6vCXhVaI8BZefRtXZV/rdBONpff7Cq8hQm4MWbh.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 2,
+     "stem": "Uyi - Nigerian American Male ",
+     "voice_id": "NwBN5lRnglDs8TBVmser",
+     "eigenschappen": "male / middle_aged / nigerian / confident",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "Warm, confident Nigerian-American male voice with the mature presence of a middle-aged man. Blends subtle West African cadence with natural American fluency. Smooth, articulate, and conversational with a rich tone, stead",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/41c8ab51b1fd422183e9976d668b1a14/voices/NwBN5lRnglDs8TBVmser/E8aThE2zcymGnlOPemXO.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 3,
+     "stem": "Dean - Business Owner",
+     "voice_id": "Fz9DTenaCNLwUrd0tLaf",
+     "eigenschappen": "male / old / american / confident",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "This is my voiceover for presenting a professional voice to describe your product or service.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/11028a6561d34eed9c0df6db67c8ec17/voices/Fz9DTenaCNLwUrd0tLaf/En3HaSktq1BTHvre72tQ.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 4,
+     "stem": "Big Jim",
+     "voice_id": "nihj1mr9WzTd5ZKkYWXK",
+     "eigenschappen": "male / old / american / professional",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "Charismatic on-air personality with a confident, engaging delivery, ideal for radio, broadcasting, and live presentations.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/2f95ffdc244947faa598514a5ac15eda/voices/nihj1mr9WzTd5ZKkYWXK/g27rB4dHf1oIpNStu0vk.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 5,
+     "stem": "Michael Stevens - Calm, Warm, Friendly",
+     "voice_id": "vzUquQTlMvdV6PkeYguD",
+     "eigenschappen": "male / middle_aged / american / professional",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "Calm and smooth male narration with natural conversational tone, professionally recorded. Sounds great especially with the V3 Model.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/911060d4c3ed4425a6d9c0163f777bbe/voices/vzUquQTlMvdV6PkeYguD/LOYQoyPjJegP6Y8GzJbg.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 6,
+     "stem": "Stone",
+     "voice_id": "5plmkCgF4k1hmflEMKh3",
+     "eigenschappen": "male / middle_aged / american / confident",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "A polished, high-fidelity voice optimized for professional B-roll voiceovers. Smooth, natural, and cinematic, it delivers clear, engaging narration with a refined and professional presence.",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/d76e11c1125a4d19a51269eea4b045b8/voices/5plmkCgF4k1hmflEMKh3/8zvUsXJDREBrMRrjRcYK.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 7,
+     "stem": "Luther ",
+     "voice_id": "36IbGO5bVpyvzW9gIDIl",
+     "eigenschappen": "male / middle_aged / american / mature",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "Calm and professional.",
+     "preview_url": "https://api.us.elevenlabs.io/v1/voices/36IbGO5bVpyvzW9gIDIl/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaWQiOiIwYmY5YmRkZTU2ZmE0MGU4YWFjMDZmODA3ZTc4ZmY0MSIsImZpbGVuYW1lIjoiMWVjMWY4NzQtOWIzYi00YjE0LWJiYzItNzNiMjNlODk2ZjVmLm1wMyIsInRpbWVzdGFtcCI6MTc4NTUyNDQwMDAwMDAwMH0%3D",
+     "categorie": "professional",
+     "bron": "shared-library"
+    },
+    {
+     "nr": 8,
+     "stem": "Youssif Nayyef",
+     "voice_id": "Mk9f6ik9SZC9B78kIbVA",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "Lijdende vorm, bureaucratische omhaal, verbindt zich nooit in één zin.",
+     "beschrijving": "A clear, expressive male voice with a natural international accent. Warm, engaging tone that balances professionalism with a conversational style. Adaptable for narration, storytelling, and educational content. Smooth pa",
+     "preview_url": "https://storage.googleapis.com/eleven-public-prod/database/workspace/19715c4c58b14ae187e44584a655c01c/voices/Mk9f6ik9SZC9B78kIbVA/GNl4w4qAH2ZZ9WFo7VAT.mp3",
+     "categorie": "professional",
+     "bron": "shared-library"
+    }
+   ]
+  }
+ ],
+ "stem_conflicten": {
+  "Will": [
+   "Dominion-conscript A/B/C",
+   "Voss \"Cinder\" (M)",
+   "Dex Callum (31)"
+  ],
+  "Liam": [
+   "Dominion-conscript A/B/C",
+   "Voss \"Cinder\" (M)",
+   "Dex Callum (31)"
+  ],
+  "Harry": [
+   "Dominion-conscript A/B/C",
+   "Eclipse-fighter A/B/C/D",
+   "Voss \"Cinder\" (M)",
+   "Dex Callum (31)",
+   "Brick / Oram Bex (34)"
+  ],
+  "Sarah": [
+   "Dominion-conscript A/B/C",
+   "Voss \"Cinder\" (V)",
+   "Sela Vann (23)",
+   "Kaya Renn (27)"
+  ],
+  "River": [
+   "Veil-operative A/B",
+   "Whisper (stem-only tot Act 3)",
+   "AEGIS"
+  ],
+  "Eric": [
+   "Veil-operative A/B",
+   "Whisper (stem-only tot Act 3)",
+   "Inquisiteur Dahl Threx (41)",
+   "Magistraat Oren Callis (56)"
+  ],
+  "Alice": [
+   "Veil-operative A/B",
+   "Voss \"Cinder\" (V)",
+   "Mara Sovann (52)",
+   "Dr. Elin Reyes (38)",
+   "AEGIS",
+   "Grootmaarschalk Sera Kaine (49)"
+  ],
+  "Daniel": [
+   "Veil-operative A/B",
+   "Torren Vale (45)",
+   "Whisper (stem-only tot Act 3)",
+   "AEGIS",
+   "Hoog-Arbiter Malachar Vex (68)",
+   "Magistraat Oren Callis (56)"
+  ],
+  "Chris": [
+   "Eclipse-fighter A/B/C/D",
+   "Voss \"Cinder\" (M)",
+   "Dex Callum (31)",
+   "Inquisiteur Dahl Threx (41)"
+  ],
+  "Matilda": [
+   "Eclipse-fighter A/B/C/D",
+   "Voss \"Cinder\" (V)",
+   "Mara Sovann (52)",
+   "Dr. Elin Reyes (38)",
+   "Kaya Renn (27)",
+   "Grootmaarschalk Sera Kaine (49)"
+  ],
+  "Jessica": [
+   "Eclipse-fighter A/B/C/D",
+   "Sela Vann (23)",
+   "Kaya Renn (27)"
+  ],
+  "Roger": [
+   "Eclipse-fighter A/B/C/D",
+   "Voss \"Cinder\" (M)",
+   "Brick / Oram Bex (34)",
+   "Torren Vale (45)",
+   "Magistraat Oren Callis (56)"
+  ],
+  "Callum": [
+   "Voss \"Cinder\" (M)",
+   "Dex Callum (31)",
+   "Inquisiteur Dahl Threx (41)"
+  ],
+  "Bella": [
+   "Voss \"Cinder\" (V)",
+   "Mara Sovann (52)",
+   "Dr. Elin Reyes (38)",
+   "Sela Vann (23)",
+   "Grootmaarschalk Sera Kaine (49)"
+  ],
+  "Laura": [
+   "Voss \"Cinder\" (V)",
+   "Sela Vann (23)",
+   "Kaya Renn (27)"
+  ],
+  "Lily": [
+   "Voss \"Cinder\" (V)",
+   "Mara Sovann (52)",
+   "Dr. Elin Reyes (38)",
+   "Grootmaarschalk Sera Kaine (49)"
+  ],
+  "Brian": [
+   "Brick / Oram Bex (34)",
+   "Torren Vale (45)",
+   "Hoog-Arbiter Malachar Vex (68)"
+  ],
+  "Adam": [
+   "Brick / Oram Bex (34)",
+   "Torren Vale (45)"
+  ],
+  "Bill": [
+   "Torren Vale (45)",
+   "Whisper (stem-only tot Act 3)",
+   "AEGIS",
+   "Hoog-Arbiter Malachar Vex (68)",
+   "Magistraat Oren Callis (56)"
+  ],
+  "George": [
+   "Inquisiteur Dahl Threx (41)",
+   "Hoog-Arbiter Malachar Vex (68)"
+  ]
+ }
+}

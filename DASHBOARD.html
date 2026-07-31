@@ -191,6 +191,7 @@ h3{font-size:17px;margin:0 0 8px}
 .kand-kop strong{font-size:14.5px}
 .kand .eig{font-size:12px;color:var(--dim2)}
 .kand-waarom{font-size:13px;color:var(--dim);margin:7px 0 9px}
+.kand-eigen{font-size:12.5px;color:var(--dim2);font-style:italic;margin:0 0 9px;line-height:1.45}
 .kand audio{width:100%;height:32px}
 .kies{
   background:transparent;border:1px solid var(--line);color:var(--dim);
@@ -739,6 +740,7 @@ function vCasting(){
               ${k.categorie&&k.categorie!=="premade"?`<span class="tag warn">licentie nakijken</span>`:""}
             </div>
             <div class="kand-waarom">${esc(k.waarom)}</div>
+            ${k.beschrijving?`<div class="kand-eigen">"${esc(k.beschrijving)}"</div>`:""}
             ${k.url?`<audio controls preload="none" src="${k.url}"></audio>`:'<div class="note">geen fragment</div>'}
           </div>`).join("")}
       </div>
