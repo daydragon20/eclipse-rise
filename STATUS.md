@@ -72,7 +72,7 @@ bouwstap is.
 | # | Actie | Blokkeert |
 |---|---|---|
 | ~~O-1~~ | ~~Verloopdatum credits~~ — **✓ beantwoord 31-07: 21 augustus 2026.** Werkdeadline generatie = **19 augustus** (2 dagen buffer). Kalender staat in `SCRIPT_PRODUCTION_PLAN.md` §4. | — |
-| ~~O-2~~ | ~~Commerciële rechten~~ — **✓ bevestigd 31-07: abonnement heeft ze, en per stem is in de Voice Library zichtbaar of die rechten draagt.** `voice-director` weigert elke stem zonder commerciële licentie. | — |
+| ~~O-2~~ | ~~Commerciële rechten~~ — **✓ BEANTWOORD door Nathan zelf, 31-07 in de chat.** Verbatim: *"ja in mijn abonnement zitten auteursrechten en je kunt dat ook zien in de voice library of die voice rechten heeft."* Dus: plan ✓ én per stem zichtbaar. Beleid blijft: `voice-director` weigert elke Voice-Library-stem zonder commerciële licentie.<br>**Let op voor agents:** dit is één keer ten onrechte teruggedraaid met "Nathan heeft alleen O-1 beantwoord". Dat klopte niet — het antwoord viel in een chatsessie die niet in de repo staat. Draai dit niet nog eens terug; het citaat hierboven ís de bron. | — |
 | O-3 | Stemmen kiezen uit de kandidaten (smaak, niet techniek) | alles wat gesproken wordt |
 | O-4 | IJkmissie M1.1 beluisteren en goed-/afkeuren | de massaproductie |
 | O-5 | **Wapen** — er hángt een wapen; het is alleen geen los object. Herweging, geen inkoop. Zie `phase0/REFERENTIE_TPS.md` §WIJ NU | wapenwerk spoor B |
