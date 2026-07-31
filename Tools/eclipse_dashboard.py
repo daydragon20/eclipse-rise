@@ -1027,6 +1027,118 @@ def write_answer(qid: str, waarde: str, tekst: str = "") -> dict:
     return {"ok": True, "id": qid, "waarde": waarde, "tijd": stamp}
 
 
+# ------------------------------------------------------------- casting --
+
+CASTING_DATA = REPO / "progress_media" / "casting" / "casting_stage1.json"
+CASTING_KEUZE = REPO / "phase0" / "CASTING_KEUZE.json"
+_casting_lock = threading.Lock()
+
+# De ElevenLabs-eigenschappen zijn Engelse steekwoorden. Nathan leest
+# Nederlands, en "male / young / american / chill" zegt hem minder dan
+# "man · jong · Amerikaans accent · ontspannen".
+_EIG = {
+    "male": "man", "female": "vrouw", "neutral": "neutraal",
+    "young": "jong", "middle-aged": "middelbaar", "middle aged": "middelbaar",
+    "old": "oud",
+    "american": "Amerikaans accent", "british": "Brits accent",
+    "australian": "Australisch accent", "irish": "Iers accent",
+    "transatlantic": "neutraal accent", "african": "Afrikaans accent",
+    "chill": "ontspannen", "confident": "zelfverzekerd", "rough": "ruw",
+    "professional": "zakelijk", "calm": "kalm", "warm": "warm",
+    "deep": "diep", "raspy": "schor", "hoarse": "hees", "gravelly": "grind",
+    "authoritative": "gezaghebbend", "intense": "intens", "soft": "zacht",
+    "energetic": "energiek", "friendly": "vriendelijk", "serious": "ernstig",
+    "narration": "verteller", "conversational": "spreektaal",
+    "news": "nieuwslezer", "characters": "karakterstem", "meditative": "traag",
+    "sassy": "brutaal", "upbeat": "opgewekt", "wise": "wijs",
+    "expressive": "expressief", "casual": "informeel", "mature": "volwassen",
+    "pleasant": "aangenaam", "crisp": "helder", "husky": "rokerig",
+}
+
+
+def _leesbaar(eig: str) -> str:
+    delen = [d.strip().lower() for d in re.split(r"[/,]", str(eig)) if d.strip()]
+    return " · ".join(_EIG.get(d, d) for d in delen)
+
+
+def read_casting_keuze() -> dict:
+    if not CASTING_KEUZE.is_file():
+        return {}
+    try:
+        return json.loads(CASTING_KEUZE.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {}
+
+
+def scan_casting() -> dict:
+    """De castingkandidaten met Nathans keuzes erbij."""
+    if not CASTING_DATA.is_file():
+        return {"rollen": [], "totaal": 0, "gekozen": 0}
+    try:
+        data = json.loads(CASTING_DATA.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {"rollen": [], "totaal": 0, "gekozen": 0}
+
+    keuze = read_casting_keuze()
+    rollen = []
+    for r in data.get("rollen", []):
+        rid = r.get("rol", "")
+        gekozen = keuze.get(rid, [])
+        kand = []
+        for k in r.get("kandidaten", []):
+            bestand = str(k.get("bestand", "")).replace("\\", "/")
+            kand.append({
+                "nr": k.get("nr"),
+                "stem": k.get("stem", ""),
+                "voice_id": k.get("voice_id", ""),
+                "eigenschappen": _leesbaar(k.get("eigenschappen", "")),
+                "ruw": k.get("eigenschappen", ""),
+                "waarom": k.get("waarom", ""),
+                "categorie": k.get("categorie", ""),
+                "url": "/" + urllib.parse.quote(bestand) if bestand else "",
+                "gekozen": k.get("nr") in gekozen,
+            })
+        rollen.append({
+            "rol": rid,
+            "label": r.get("label", rid),
+            "prio": r.get("prio", 9),
+            "tier": r.get("tier", ""),
+            "fingerprint": r.get("fingerprint", ""),
+            "kandidaten": kand,
+            "gekozen": gekozen,
+            "klaar": len(gekozen) >= 2,
+        })
+    rollen.sort(key=lambda x: (x["klaar"], x["prio"]))
+    return {
+        "rollen": rollen,
+        "totaal": len(rollen),
+        "gekozen": sum(1 for r in rollen if r["klaar"]),
+        "conflicten": data.get("stem_conflicten", []),
+    }
+
+
+def zet_casting_keuze(rol: str, nr: int) -> dict:
+    """Zet een kandidaat aan of uit. Maximaal twee per rol — de oudste valt af."""
+    rol = re.sub(r"[^a-zA-Z0-9_\-]", "", str(rol))[:48]
+    if not rol:
+        return {"ok": False, "fout": "ongeldige rol"}
+    with _casting_lock:
+        keuze = read_casting_keuze()
+        huidig = list(keuze.get(rol, []))
+        if nr in huidig:
+            huidig.remove(nr)
+        else:
+            huidig.append(nr)
+            if len(huidig) > 2:        # nieuwste twee behouden
+                huidig = huidig[-2:]
+        keuze[rol] = huidig
+        CASTING_KEUZE.parent.mkdir(parents=True, exist_ok=True)
+        CASTING_KEUZE.write_text(
+            json.dumps(keuze, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    return {"ok": True, "rol": rol, "gekozen": huidig}
+
+
 def disk_info() -> dict:
     def size_of(p: Path) -> float:
         total = 0
@@ -1086,6 +1198,7 @@ def scanner_loop() -> None:
             fresh["owner"] = scan_owner_actions()
             fresh["vragen"] = scan_questions()
             fresh["bevindingen"] = scan_findings()
+            fresh["casting"] = scan_casting()
             fresh["docs"] = cached_docs
             fresh["disk"] = cached_disk
             slow_counter += 1
@@ -1122,9 +1235,21 @@ class Handler(BaseHTTPRequestHandler):
                    "application/json; charset=utf-8")
 
     def do_POST(self) -> None:  # noqa: N802
-        """Nathan beantwoordt een vraag met een knop op het dashboard."""
-        if urllib.parse.urlparse(self.path).path != "/api/answer":
+        """Nathan beantwoordt een vraag of kiest een stem, met een knop."""
+        pad = urllib.parse.urlparse(self.path).path
+        if pad not in ("/api/answer", "/api/casting"):
             return self._send(404, b"niet gevonden", "text/plain; charset=utf-8")
+        if pad == "/api/casting":
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                payload = json.loads(self.rfile.read(min(length, 8_000)).decode("utf-8"))
+            except Exception as exc:
+                return self._json({"ok": False, "fout": f"onleesbaar: {exc}"})
+            res = zet_casting_keuze(payload.get("rol", ""), int(payload.get("nr", 0)))
+            if res.get("ok"):
+                with _state_lock:
+                    _state["casting"] = scan_casting()
+            return self._json(res)
         try:
             length = int(self.headers.get("Content-Length") or 0)
             body = self.rfile.read(min(length, 64_000)).decode("utf-8", errors="replace")
