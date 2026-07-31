@@ -161,30 +161,58 @@ DoD-basis (14.4): *spec gerefereerd + code + data + tests + EventCatalog/docs bi
 
 **Bar bij het ijken (31-07 avond):** **185/185 tests, 0 gefaald** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog in sync. De rode test van eerder die avond (`Eclipse.Feel.Input.DocumentedConsoleCommandsExist`) is opgelost. En let op bij het lezen van het dashboard: de testteller dáár was **stuk, niet verouderd** — `Tools/update_progress.ps1` las `Saved/Automation/` terwijl elke ronde naar `Saved/TestReport/` schrijft. Ook dat is gerepareerd; de getallen zijn nu te vertrouwen.
 
-### 2a. Nu in flight — zes sporen, bewust file-disjunct
+### 2a. HERIJKT 2026-08-01 ~04:45 — alle zes sporen van 2a zijn GELAND
 
-| # | Spoor | Eigenaar | Bestanden (= ownership zolang het loopt) | De falsificatie die hem afsluit |
-|---|---|---|---|---|
-| **A1** | **Schermlaag bouwstap 1 (boots).** De spelerlaag vóór `IsDebugHudAllowed()` halen, debuglaag erachter — zonder die poort staat de schermlaag *per constructie* op geen enkele opname (§1b). | hud-builder | `Eclipse/Source/Eclipse/UI/` — **de hele map, exclusief** | De opnameronde legt de spelerlaag vast op een frame **én** toont in dezelfde ronde dat de debuglaag afwezig blijft. Twee beweringen, één ronde. |
-| **A2** | **Vitals-feed onder de schermlaag** (`Event.Player.VitalsChanged`). Gemeten gat: er bestaat **geen enkele `Event.Player.*`-tag** (`Core/EclipseGameplayTags.h`); HP/downed lopen via native delegates (`Characters/EclipseCharacter.cpp:1487/1524`) en de munitieregel **polt** `Weapon->GetAmmoInMagazine()` (`UI/EclipseMissionHudWidget.cpp:186`). Zonder feed heeft A1 een poort en niets om te tonen — en zou de bouwer gameplay-logica in een widget moeten schrijven, wat zijn eigen regel verbiedt. | element-builder 1 | `Core/EclipseEventPayloads.h`, `Core/EclipseGameplayTags.{h,cpp}`, **nieuw** `Characters/EclipseVitalsFeed.{h,cpp}`, `Characters/EclipseCharacter.cpp`, `Eclipse/Docs/EventCatalog.md`, **nieuw** `Tests/EclipseVitalsFeedTests.cpp` | 60 ticks zonder verandering = **0** broadcasts · 100→60 HP = **precies 1** met de juiste velden · hurken→staan→sprint = **3** in volgorde · `Eclipse/Tools/check_event_catalog.py` groen. |
-| **A3** | **Inslagspoor: de ene meting die de twee verklaringen scheidt** (dossier 1). `phase0/DEBUG_DISCIPLINE.md` §4.3 concludeert *transform-bug* op grond van een kubus bij het personage — maar `Combat/EclipseHitscanWeaponComponent.cpp:181-195` zegt zélf dat dat blok de controleproef was: **vastgemaakt aan het personage**, neergezet bij BeginPlay. Dat hij daar stond is dus per constructie zo. De logregel op `:220-229` logt `Spot`, maar **nooit `Mark->GetActorLocation()`** — de post-spawn transform is nooit gemeten. | element-builder 2 | `Combat/EclipseHitscanWeaponComponent.cpp` (logregel), **nieuw** `Tests/EclipseImpactMarkTests.cpp` | `Eclipse.Combat.ImpactMarkLandsOnTheHitAndNotOnTheShooter`: 20 treffers, elk **≤1 cm** van de inslagplek én **≥100 cm** van de schutter. Rood = transform-bug bevestigd, vindplaats aangewezen. Groen = §4.3 herschrijven en het dossier gaat terug naar de renderkant. |
-| **A4** | **Trillen: het gewicht per frame, maar headless** (dossier 2). De voorgeschreven Rewind-Debugger-meting kán niet zoals beschreven: de speler draait **geen AnimBP** maar `UEclipseAnimInstance` (`Characters/EclipseCharacter.cpp:1296`), een C++-proxy die gewogen poses optelt — §4.2 oorzaak 1 wijst voor de speler naar een graaf die niet bestaat. Wat er wél staat: `OneShotTime = 0.0f` bij **elk** schot (`Characters/EclipseAnimInstance.cpp:287`) op een envelope `Peak × sin(alpha × PI)` (`:389`), dus per schot 0→piek→0. | element-builder 3 | `Characters/EclipseAnimInstance.{h,cpp}` (gedragsneutrale extractie), **nieuw** `Tests/EclipseAnimOneShotWeightTests.cpp` | Omkeringen lopen **1:1 met het aantal schoten** (10/20/27 → 10/20/27) en veranderen **niet** als de bemonstering van 120 naar 60 Hz gaat. **Niet repareren in dezelfde iteratie** — twee eerdere fixes zijn juist daarom teruggedraaid. |
-| **A5** | **L1 beat-sheets, Act 1 eerst** (spoor A). | story-architect | `phase0/SCRIPT_PRODUCTION_PLAN.md` §4 + de scriptmappen | Raakt de build niet en kan dus altijd doorlopen; sluit op de kalender: werkdeadline generatie **19-08** (credits vervallen 21-08). |
-| **A6** | **Tier 0 casting-kandidaten, 5k credits.** | voice-director | `phase0/VOICE_LEDGER.md`, `19_voice_production.md` §19.2 | Per rol 2-3 kandidaten op **dezelfde signature-regel**, zodat de owner eerlijk vergelijkt. Casting is permanent (de cache-sleutel bevat de stem-ID); de keuze zelf staat in §2e. |
+> **Dit bord stuurde tot vannacht naar werk dat af was — precies waar zijn eigen kop voor
+> waarschuwt.** De vorige ijking is van 31-07 ~19:30; in de uren daarna is alles uit 2a
+> geland. Gecontroleerd tegen de **werkboom**, niet tegen het vorige bord.
+
+| # | Spoor | Bewijs in de werkboom |
+|---|---|---|
+| **A1** | Schermlaag boots + HUD-poort | `a9f6334` — spelerlaag vóór `IsDebugHudAllowed()`, op frames vastgelegd in `Saved/Screenshots/HUD_spelerlaag/`, in beide perspectieven |
+| **A2** | Vitals-feed op de bus | `4747010` — `Characters/EclipseVitalsFeed.{h,cpp}` + `Event_Player_VitalsChanged` in `Core/EclipseGameplayTags.h` + `Tests/EclipseVitalsFeedTests.cpp` |
+| **A3** | Inslagspoor — dossier **gesloten** | `ac09980` (transform-diagnose weerlegd) → `7bffdbc` (zichtbaar op speelafstand: 15 m van 4 naar 105 px; dubbele spawner weg) |
+| **A4** | Trillen — mechanisme **vast**, fix bewust apart | `bc881f4` — `Tests/EclipseAnimOneShotWeightTests.cpp`; de envelope herstart per schot, géén AnimBP |
+| **A5** | Act 1 **geschreven**, niet alleen de beat-sheets | 8 missies + proloog, 1.471 regels, `Eclipse/Content/Script/act1/` — alleen de 12 hub-gesprekken open |
+| **A6** | Casting fase 1 | 104 kandidaten over 19 rollen, **0 credits** — `progress_media/casting/casting_stage1.json` |
 
 **Twee coördinatieregels — disjuncte bestanden zijn niet hetzelfde als disjuncte iteraties:**
 1. **Eén build-slot.** Schrijven mag parallel, **landen is serieel** — en een open owner-editor blokkeert het slot volledig (Live Coding).
-2. **A2 vóór de munitiefeed (N-a).** Beide raken `Eclipse/Docs/EventCatalog.md` én `Core/EclipseGameplayTags.cpp`; parallel is dat een merge-knoop, geen snelheid.
+2. Spoor A raakt de build niet en loopt dus altijd door, ook als het slot bezet is.
+
+### 2a-bis. Wél in flight op 01-08 ~04:45
+
+| Spoor | Eigenaar | Bestanden (= ownership zolang het loopt) | Sluit af met |
+|---|---|---|---|
+| **Vault-shells** | element-builder | `Base/EclipseVaultBuilder.{h,cpp}`, `Base/EclipseBaseSubsystem.{h,cpp}`, **nieuw** `Tests/EclipseVaultRoomTests.cpp` | Een ronde loopt van faciliteit naar faciliteit zonder door geometrie te vallen, en de vier faciliteiten zijn in het frame te onderscheiden. **Let op: de suite is tijdens dit werk 4 rood** — dat is in-flight werk en geen regressie. |
+| **Critic-poort M1.1 / M1.7 / M1.8** | dialogue-critic ×3 | de scriptmappen, alleen-lezen | GO of NO-GO per scène. **M1.1 is de ijkmissie en blokkeert alle generatie**; hij staat terug op `critic: null` doordat vijf van zeven scènes vannacht gerepareerd zijn. |
+| **Hub-gesprekken** | dialogue-writer ×2 | `Eclipse/Content/Script/act1/hub/` — 12 stubs | Act 1 compleet. Budget ~1.200 credits per gesprek (zie `phase0/VOICE_LEDGER.md`). |
+| **Shortlist Petra Voss** | voice-director | `progress_media/casting/petra/`, `casting_stage1.json` | Fragmenten die de owner kan afspelen. Zij ontbrak in alle 19 rollen terwijl O-3 haar wel vroeg. |
 
 ### 2b. Daarna klaarstaand (in deze volgorde)
 
 **N-a — Munitie- en wapenstatus op de bus** *(element-builder; tweede helft van de datalaag onder boots)*
-§1b meet munitie **deels** (alleen kogels in het magazijn) en wapenstatus **nee**. Feit-op-de-bus bij verandering: magazijn, magazijnen over, herlaad-voortgang, leeg-staat, actief wapen, vuurmodus — zodat `UI/EclipseMissionHudWidget.cpp` kan stoppen met pollen.
+**DIT IS NU HET EERSTE OPEN PUNT VAN SPOOR B.** Hermeten 01-08 ~04:45 en nog steeds open:
+`UI/EclipseMissionHudWidget.cpp:198` doet nog altijd `Weapon->GetAmmoInMagazine()` — de HUD
+**polt**. En van de 39 `Event_*`-tags in `Core/EclipseGameplayTags.h` is er geen enkele voor
+wapenstatus: `Event_Combat_ShotFired`, `_ReloadStarted` en `_WeaponSwapped` bestaan, maar
+dragen de **stand** niet. A2 heeft de vitals-helft geleverd (`Event_Player_VitalsChanged`,
+`4747010`); dit is de andere helft en het patroon ligt er dus al.
+Feit-op-de-bus bij verandering: magazijn, magazijnen over, herlaad-voortgang, leeg-staat,
+actief wapen, vuurmodus — zodat de widget kan stoppen met pollen.
 *Falsificatie:* 30 schoten = 30 events met aflopend magazijn · herladen = start + monotone voortgang + eind · wapenwissel = precies 1 event met de nieuwe naam · een frame zonder verandering = **niets**.
 
 **N-b — Eerste kaartstap (map), en hij is kleiner dan hij lijkt** *(element-builder; §1c + `phase0/REFERENTIE_BASE_MAP.md`)*
 Het gat is **geen ontbrekend schema**: `Strategy/EclipseRegionGraphAsset.h` draagt de kanten al (`FEclipseRegionDefinition::ConnectedRegionIds`) mét symmetriecontrole in `Strategy/EclipseStrategyLogic.cpp:84-102`. Het gat zit **tussen twee structuren**: `UI/EclipseStrategyMapWidget.cpp:103` itereert `Campaign->GetState().Regions`, en `FEclipseRegionState` heeft vier velden (`Strategy/EclipseCampaignTypes.h:38-50` — RegionId, Owner, Unrest, GarrisonStrength) en **geen kanten**. De eerste stap is die twee koppelen, niet "bouw een strategische laag".
 *Falsificatie:* de kaartlaag noemt per regio zijn buren, en een asymmetrische kant in de data laat de validator roodlopen vóórdat hij het scherm haalt.
+*Hermeten 01-08 ~04:45 — nog steeds open:* in `UI/EclipseStrategyMapWidget.cpp` komt het woord
+`ConnectedRegionIds` (of lane/buur) **nul keer** voor. De koppeling is dus niet half, hij is er niet.
+Sinds de vorige ijking is de datakant wél gegroeid: er zijn nu **lanes met status en prijs**
+(`FEclipseLaneDefinition`) plus `Event.Strategy.ResponseTierChanged`, dus het scherm heeft meer
+te tonen dan alleen buren — maar de verscheepte `DA_KessaraDistrictGraph` draait nog op de
+PostLoad-migratie, dus alle 14 kanten zijn open lanes tegen eenheidskosten. **Groen maar niet
+geauthord**: de kaartregels zijn pas zichtbaar als daar afstanden, risico en minstens één
+Spire-poort in staan.
 *Let op:* de **visuele** invulling van base en map wacht op de stijlvraag (O-6, §2e) — deze koppeling niet.
 
 **N-c — Fix-iteratie op de winnaar van A3/A4** *(element-builder)*
