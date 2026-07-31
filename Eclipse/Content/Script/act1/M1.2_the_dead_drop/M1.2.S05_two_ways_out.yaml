@@ -15,7 +15,7 @@ turn:         "In the quiet branch the block covers for them unasked; in the lou
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        267
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      VOSS, MARA, one Ember fighter, DEX (radio); loud branch adds Enforcer hunter set
@@ -46,4 +46,304 @@ words:        0
 # writer:    the hunter set is ENFORCERS, not Veil. Veil voices do not appear until M1.7,
 #            after Threx's introduction in M1.3. A Veil bark here breaks AR-6.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# branches:  written as two complete blocks, .010-.190 and .200-.410, sharing nothing.
+#            Condition expression taken from ruling L1-R4 above: run.alarm_raised.
+# ghost:     the turn is a chain. Somebody in this block took a chain off a hasp before the
+#            cell arrived and laid it down where it would not rattle. Nobody thanks anybody,
+#            nobody is thanked, and .070/.080 is the scene refusing to let that happen.
+#            Voss proposes hooking it back (.140) - that is the SECOND time in this mission
+#            he offers something nobody asked for. Mara adopts it as an order (.150) instead
+#            of approving it, which is her S01 move again. The player is being taught a
+#            grammar here, not given a moral.
+# alarm:     no Enforcer speaks. Two reasons, and the second one is the real one:
+#            (a) there is no `enforcer` voice key in 19.3 - Q-5/C-4 - and inventing one
+#                fails the validator's voice-key check;
+#            (b) the branch is stronger with the enemy as engine noise. What the player
+#                hears instead is forty doors closing, and nobody explains that either.
+#            The hunter set is Enforcers per AR-6. No Veil vocabulary anywhere in this file.
+# t5:        .380 IS the tally. Voss memorizes where the man was standing and says nothing
+#            about it; .390/.400 is Dex asking and being told nothing. No counter is named,
+#            no flag is set, nobody grieves on screen. It starts silently or it is not a
+#            tally, it is an announcement.
+# mara:      .300 "He stays." is the hard call and it costs two words. Her justification at
+#            .330 is a real one and she is probably wrong, and .340 tells her so, and she
+#            does not answer it. The scene ends without resolving that - 18.9 D.
+# band:      in-mission-radio (10-25). Ceiling honoured: longest 17 w. Variance 1 to 17
+#            within each branch independently, so the rule holds whichever branch plays.
+# ar-5:      Mara: zero "you", zero "I", across both branches. Three "we".
+# names:     nobody is addressed by name in either branch.
+# triads:    one in the whole file (.110 route). None in the alarm branch.
+
+lines:
+
+  # ============================ GHOST BRANCH ============================
+
+  - id:        M1.2.S05.010
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == false
+    text:      "Both drops are off the block and nobody's said a word about it on any band."
+
+  - id:        M1.2.S05.020
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    text:      "West stair. Slow."
+
+  - id:        M1.2.S05.030
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == false
+    text:      "West stair's chained. Has been since the flood took the pumps."
+
+  - id:        M1.2.S05.040
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == false
+    text:      "It's open."
+    shot:      "The chain is coiled on the step, not hanging. Dry underneath. Somebody lifted it off the hasp and put it down where it would not ring."
+
+  - id:        M1.2.S05.050
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == false
+    tags:      [quietly]
+    text:      "That was chained this morning. I had my hand on it."
+
+  - id:        M1.2.S05.060
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    text:      "Somebody moved it."
+
+  - id:        M1.2.S05.070
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == false
+    text:      "Should I say something? To whoever."
+
+  - id:        M1.2.S05.080
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    tags:      [pause]
+    text:      "No."
+    shot:      "Nobody on the galleries above. Every door shut, every window lit. Not one face."
+    note:      "Beat 3, written as a refusal. The gratitude scene is the one thing that would ruin this."
+
+  - id:        M1.2.S05.090
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == false
+    text:      "Say again? I got half of that."
+
+  - id:        M1.2.S05.100
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    text:      "Nothing. Give the route."
+
+  - id:        M1.2.S05.110
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == false
+    text:      "Out the west stair, along the drainage, up at the transit cut. Twenty minutes if nobody sightsees."
+
+  - id:        M1.2.S05.120
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == false
+    text:      "The chain's dry underneath. It came off before we got here."
+    note:      "18.4 Voss: the mechanism carries the meaning. He does not say what it means."
+
+  - id:        M1.2.S05.130
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    text:      "Then somebody in this block guessed right."
+
+  - id:        M1.2.S05.140
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == false
+    text:      "Hook it back when we're through."
+    note:      "Second of three things Voss offers that nobody asked for: the badge, the chain, the tower."
+
+  - id:        M1.2.S05.150
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    text:      "Hook it back."
+    note:      "She adopts it as an order rather than praising it. Identical move to S01.210 and S99.250."
+
+  - id:        M1.2.S05.160
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == false
+    text:      "Hooking it back."
+
+  - id:        M1.2.S05.170
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == false
+    text:      "Hooking what back?"
+
+  - id:        M1.2.S05.180
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == false
+    text:      "A stair."
+
+  - id:        M1.2.S05.190
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == false
+    text:      "Twenty minutes. Try to make it boring."
+    note:      "Sets Story.Choice.M12_Ghost on exit - systems, not dialogue."
+
+  # ============================ ALARM BRANCH ============================
+
+  - id:        M1.2.S05.200
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == true
+    tags:      [urgent]
+    text:      "Band's lit. Enforcers. Two vans off the ring road and a third behind them."
+
+  - id:        M1.2.S05.210
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    text:      "Off the gallery."
+
+  - id:        M1.2.S05.220
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == true
+    tags:      [shouting]
+    text:      "Contact, third landing, they're already on the--"
+
+  - id:        M1.2.S05.230
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    interrupts: true
+    text:      "Down. Move."
+
+  - id:        M1.2.S05.240
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == true
+    text:      "Doors are shutting from the inside. All the way along the row."
+    shot:      "One after another down the whole gallery, fast, no faces in any of them. Washing left on the lines."
+
+  - id:        M1.2.S05.250
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == true
+    text:      "That's not people hiding. That's people who've done this before."
+
+  - id:        M1.2.S05.260
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == true
+    text:      "Fourth gallery. There's a man out on the rail."
+
+  - id:        M1.2.S05.270
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == true
+    text:      "He's not going in."
+
+  - id:        M1.2.S05.280
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == true
+    text:      "The vans turn at the transformer. That stair is blind for as long as that takes."
+    note:      "He argues with a mechanism, because that is the only way he knows how to argue. 18.4."
+
+  - id:        M1.2.S05.290
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    text:      "Blind going up. Not blind coming down with him."
+
+  - id:        M1.2.S05.300
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    text:      "He stays."
+    note:      "The hard call, two words, no justification offered until she is challenged."
+
+  - id:        M1.2.S05.310
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == true
+    text:      "He's a man on a rail--"
+
+  - id:        M1.2.S05.320
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    interrupts: true
+    text:      "We carry what we came for."
+
+  - id:        M1.2.S05.330
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    text:      "Enforcers do not shoot a man for standing still."
+
+  - id:        M1.2.S05.340
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: run.alarm_raised == true
+    text:      "They did in Twelve."
+
+  - id:        M1.2.S05.350
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    tags:      [pause]
+    text:      "Down the back stair."
+    shot:      "She goes first. She does not look up at the fourth gallery on the way past it."
+    note:      "She does not answer him. The conflict leaves the scene unresolved on purpose - 18.9 D."
+
+  - id:        M1.2.S05.360
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == true
+    text:      "Drainage is out. They have a van sitting on the outfall. Take the transit cut."
+
+  - id:        M1.2.S05.370
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == true
+    text:      "Copy."
+
+  - id:        M1.2.S05.380
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == true
+    tags:      [quietly]
+    text:      "Fourth gallery. Second door from the end."
+    note:      "T5. The tally starts here and it is one man memorizing an address. No counter, no flag, no comment from anybody."
+
+  - id:        M1.2.S05.390
+    speaker:   DEX
+    voice:     dex_callum
+    condition: run.alarm_raised == true
+    text:      "Say again?"
+
+  - id:        M1.2.S05.400
+    speaker:   VOSS
+    voice:     voss
+    condition: run.alarm_raised == true
+    text:      "Nothing."
+
+  - id:        M1.2.S05.410
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: run.alarm_raised == true
+    text:      "Move."

@@ -15,7 +15,7 @@ turn:         "A man on a Veil frequency says a first name, warmly, about somebo
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        159
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      DEX, VOSS, MARA · THREX (voice, radio)
@@ -41,4 +41,178 @@ words:        0
 # writer:    Threx never shouts and never uses rank when a first name will wound more.
 #            He is at his most frightening when he is kind.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+#
+# *** THIS IS WHERE THE MISSION'S CONSEQUENCE IS FELT INSTEAD OF STATED. ***
+# .020-.040: the first thing the cleared air carries is the district's own voice. Shift
+# calls, scrip numbers, a child crying on an open channel. Nobody says "we changed the
+# world"; a man with a scanner says there is no wall in it any more and then lists three
+# ordinary sounds. The prize and the price arrive on the same frequency, in that order,
+# ninety seconds apart, and the second one is Threx. That causal irony is the scene.
+#
+# *** ESCALATION 4 - THE NAME. ***
+# AR-6 rung 2 requires a first name of somebody outside Ember, and canon contains no such
+# person. I did not invent a cell, a faction tie or a surname. The man is a first name and
+# nothing else: TOMAS. What Threx says places him on Kessara (he was taught the hand-signs,
+# 03.3) and in somebody's cell, and stops. No Iron Chorus reference - naming them here
+# would eat M1.5's introduction. IF L1 WANTS A DIFFERENT NAME, it is one edit on .100 and
+# .160 and no other file in the mission changes.
+#
+# threx:    five lines. He never raises his voice, never uses a rank, and asks four
+#           questions in five lines. The compliment at .110 is SINCERE and it is the
+#           cruellest thing in the scene: he is impressed, he says so, and he is telling
+#           a man that four hours of holding out is the most anyone has managed. .150 is
+#           the wound wearing a courtesy - the sister, offered as a choice.
+# name-     18.9 B caps name-address at once per eight turns. Threx says "Tomas" twice in
+# density:  five lines. THAT IS DELIBERATE AND IT IS HIS FINGERPRINT (18.4: first names as
+#           the weapon). Flagged here so the critic scores it as an intended override and
+#           not as drift.
+# mara:     .200/.210 are the mission's Mara plant. "He has time. We don't." is her haste,
+#           in five words, with no explanation attached, and the haste is what kills her in
+#           M1.8. AR-5 clean: "we", never "I", never "you".
+# dex:      the silence. VOSS hands him a straight line at .220 and he answers it with one
+#           syllable and no deflection - the only opening he leaves unused in act 1. His
+#           near-miss at .050 is cut off by Mara before he can finish it, which is the
+#           closest he gets all night to saying a feeling out loud.
+# band:     type is `in-mission-radio` (10-25). Threx sits at 13-20 - no band exception is
+#           needed anywhere in this scene. The short Ember lines are the same ceiling
+#           reading used across the mission.
+# variance: 1 w (.060 "Stop.") to 20 w (.150) = 20x.
+# flag:     Story.Clue.ThrexVoice_1 set on .160.
+
+lines:
+  - id:      M1.3.S06.010
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Band's open. All of it."
+    shot:    "Walking backwards down a service stair with the scanner held up like a lamp. Behind them the checkpoint is still shouting at itself."
+
+  - id:      M1.3.S06.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Two years I've had a wall in this thing. There's no wall."
+
+  - id:      M1.3.S06.030
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Shift calls. Somebody reading scrip numbers. Somebody's kid crying on an open channel."
+    note:    "The world-state change, delivered as three ordinary noises. No character explains what it means and nobody celebrates it."
+
+  - id:      M1.3.S06.040
+    speaker: VOSS
+    voice:   voss
+    text:    "That's just people talking."
+
+  - id:      M1.3.S06.050
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Nobody's talked out loud in this district since I was--"
+
+  - id:         M1.3.S06.060
+    speaker:    MARA
+    voice:      mara_sovann
+    interrupts: true
+    text:       "Stop."
+
+  - id:      M1.3.S06.070
+    speaker: DEX
+    voice:   dex_callum
+    text:    "What?"
+
+  - id:      M1.3.S06.080
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Back one."
+    note:    "She hears it before he does. Five years of listening to nothing has a use."
+
+  - id:      M1.3.S06.090
+    speaker: DEX
+    voice:   dex_callum
+    text:    "That's a Veil carrier."
+    shot:    "The hiss falls away. The air goes clean and close, the way a room sounds with the door shut."
+
+  - id:      M1.3.S06.100
+    speaker: THREX
+    voice:   dahl_threx
+    tags:    [quietly]
+    text:    "Tomas. Sit down. Nobody in this room is going to make you stand."
+    note:    "AR-6 rung 2, line 1 of 5. A first name, warmly, in the first three words. See L2 escalation 4."
+
+  - id:      M1.3.S06.110
+    speaker: THREX
+    voice:   dahl_threx
+    text:    "Four hours. That is real. Most people give me the first name inside twenty minutes."
+    note:    "18.4 Threx: he compliments sincerely while hurting. He means every word of this and it is the worst thing said in act 1 so far."
+
+  - id:      M1.3.S06.120
+    speaker: DEX
+    voice:   dex_callum
+    text:    "He's not talking to a handler."
+
+  - id:      M1.3.S06.130
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [quietly]
+    text:    "Quiet."
+
+  - id:      M1.3.S06.140
+    speaker: THREX
+    voice:   dahl_threx
+    text:    "Somebody taught you the signs. Somebody was patient with you, and I would like to be patient too."
+
+  - id:      M1.3.S06.150
+    speaker: THREX
+    voice:   dahl_threx
+    text:    "Your sister is on the same intake sheet. Do you want to say it, or should I read it out?"
+
+  - id:      M1.3.S06.160
+    speaker: THREX
+    voice:   dahl_threx
+    tags:    [quietly]
+    text:    "There. Breathe. Take as long as you like, Tomas. Nobody is waiting on us tonight."
+    shot:    "The channel drops in the middle of the last word. Mara has stopped walking and she is not looking at anyone."
+    note:    "Line 5 of 5. SETS Story.Clue.ThrexVoice_1. He is unhurried, and being unhurried is the threat."
+
+  - id:      M1.3.S06.170
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Gone."
+
+  - id:      M1.3.S06.180
+    speaker: VOSS
+    voice:   voss
+    text:    "Do we know a Tomas?"
+
+  - id:      M1.3.S06.190
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "No."
+
+  - id:      M1.3.S06.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "He has time."
+
+  - id:      M1.3.S06.210
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "We don't."
+    note:    "Mara's haste, planted here, unexplained, five words total. It is the thing that gets her killed at K-77 and nobody in this scene notices it."
+
+  - id:      M1.3.S06.220
+    speaker: VOSS
+    voice:   voss
+    text:    "Can you get it back?"
+
+  - id:      M1.3.S06.230
+    speaker: DEX
+    voice:   dex_callum
+    text:    "No."
+    shot:    "He does not lower the scanner and he does not say anything else. Nobody fills it."
+    note:    "THE SILENCE. Voss hands him a perfect opening and he takes none of it. The only unused opening he leaves in the act - 18.7, silence is content."
+
+  - id:      M1.3.S06.240
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Walk."

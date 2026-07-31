@@ -2294,8 +2294,11 @@ bool FEclipseEveryRegionReachableTest::RunTest(const FString& Parameters)
 		{
 			continue;
 		}
-		for (const FName& Neighbour : State->ConnectedRegionIds)
+		// Topology only: this walk asks "is the board connected at all", so it
+		// deliberately ignores lane status — a smuggler lane still connects.
+		for (const FEclipseLaneDefinition& Lane : State->Lanes)
 		{
+			const FName Neighbour = Lane.NeighborRegionId;
 			if (!Reached.Contains(Neighbour))
 			{
 				Reached.Add(Neighbour);

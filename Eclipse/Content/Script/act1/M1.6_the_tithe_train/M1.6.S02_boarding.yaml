@@ -15,7 +15,7 @@ turn:         "The guards defend the empty cars, which tells Ember exactly where
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        134
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, BRICK, fighters; Iron Chorus fighters IF the pact holds;
@@ -34,4 +34,147 @@ words:        0
 #            garrison. New variant inside the Dominion vocabulary - flag to voice-director.
 # writer:    callout band under fire. The insight in beat 3 is Voss's line and it is short.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      type is `in-mission-radio` (10-25). Pre-contact lines use it as a ceiling.
+#            From .070 onward everything is CALLOUT (2-6), per the stub and per the
+#            precedent M1.1.S04 set in this same act. Nothing under fire runs past 10 words.
+# variance:  1 w (.060 "Go.") to 12 w (.010) = 12x.
+# ar-5:      no "you" or "your" in any Mara line.
+# causality: the insight at .130 is earned, not announced. The player hears the guards
+#            shout twice about the count (.080, .120), sees them fall back ONTO the ore
+#            (.090), hears that nothing is coming past the third car (.100) - and only then
+#            does Voss say three words. A marker would have said it in one. 11.3.
+# guards:    .070 / .080 / .100 / .120 are the NEW Dominion register the stub asks for:
+#            conscript guards whose fear is the tally, not the rifle. They never shout about
+#            dying. They shout about the count and about the locks. This is a scene-local
+#            sample, not the bark set - the trigger set itself is a BARK.* file and belongs
+#            to whoever writes DOMINION.*; flagged in the report, not invented here.
+# brick:     ZERO lines. BEATS section 8 gives him S01, four words in S03, and one line in
+#            S04, and silence for the rest of the mission. His competence at .190 is a SHOT.
+#            It costs no credits and it says more than a line would.
+# chorus:    the pact image is one line and one shot (.160). No Iron Chorus voice is used -
+#            Q-4 leaves the emissary uncast and a generic Chorus fighter has no casting row.
+#            Escalated in the report rather than invented.
+# fallback:  written so the SPEC-P2-04 fallback (train standing at a switch, clock instead of
+#            motion) needs no rewrite. Nothing here depends on speed - only on horns, locks
+#            and where people are standing.
+
+lines:
+  - id:      M1.6.S02.010
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Nothing goes into a grate car. Not one round, not a ricochet."
+    shot:    "Low along the ballast. The train is a wall of the same car, fourteen times."
+
+  - id:      M1.6.S02.020
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    tags:    [whispering]
+    text:    "They all look the same from down here."
+
+  - id:      M1.6.S02.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Then we go in at the head and walk it back."
+
+  - id:      M1.6.S02.040
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    tags:    [whispering]
+    text:    "Ladder's missing its second rung."
+
+  - id:      M1.6.S02.050
+    speaker: VOSS
+    voice:   voss
+    text:    "Drawbar, not the buffer plate. The plate turns under a boot."
+    note:    "18.4 Voss: technician's vocabulary, names mechanisms, and nobody asked."
+
+  - id:      M1.6.S02.060
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Go."
+
+  - id:      M1.6.S02.070
+    speaker: GUARD_A
+    voice:   dominion_conscript_a
+    tags:    [shouting]
+    text:    "Contact on the drawbars! Ore side!"
+
+  - id:      M1.6.S02.080
+    speaker: GUARD_B
+    voice:   dominion_conscript_b
+    tags:    [shouting]
+    text:    "Hold the ore line! Nobody opens a lock!"
+
+  - id:      M1.6.S02.090
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "They're backing onto the ore cars."
+
+  - id:      M1.6.S02.100
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Nothing's coming past the third car."
+
+  - id:      M1.6.S02.110
+    speaker: GUARD_A
+    voice:   dominion_conscript_a
+    tags:    [shouting]
+    text:    "Off the grates! Get off the grates!"
+
+  - id:      M1.6.S02.120
+    speaker: GUARD_B
+    voice:   dominion_conscript_b
+    tags:    [nervous]
+    text:    "The count is on me! The count is on me!"
+    note:    "18.5 rule 5 and the stub's new Dominion variant: his terror is the tally, not the rifle."
+
+  - id:      M1.6.S02.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Nobody guards ore."
+    note:    "THE TURN, three words. Read out of enemy behaviour, not off a marker."
+
+  - id:      M1.6.S02.140
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Third and ninth. It's third and--"
+
+  - id:         M1.6.S02.150
+    speaker:    MARA
+    voice:      mara_sovann
+    interrupts: true
+    text:       "Both. Now."
+
+  - id:        M1.6.S02.160
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: story.m15_iron_chorus_pact == true
+    text:      "Chorus has the ninth open already."
+    shot:      "ONE IMAGE. Two of them are on the roof of the ninth car with the pins already out. They step back from the door as it goes and neither of them looks at the two guards face down on the gravel between the rails. They do not check whether those two are breathing."
+
+  - id:        M1.6.S02.170
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m15_iron_chorus_pact == true
+    text:      "Let them work."
+    note:      "She does not judge it out loud. Sela will, in S06."
+
+  - id:      M1.6.S02.180
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Take the ones on the gravel alive if they stay down."
+    note:    "Mercy as an order, not as a sentiment. Feeds the twist-5 tally in tone, not in flags."
+
+  - id:      M1.6.S02.190
+    speaker: VOSS
+    voice:   voss
+    text:    "Torch on the lock."
+    shot:    "Brick puts a flat hand on his arm, moves him a pace sideways, and knocks the hinge pins out with two hits. He does not explain and nobody asks."
+    note:    "BRICK SAYS NOTHING (BEATS section 8). He knows how the door comes off. That is the line."
+
+  - id:      M1.6.S02.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Weapons down before that door comes off."
+    shot:    "The door goes over sideways. The light gets in before anybody does."

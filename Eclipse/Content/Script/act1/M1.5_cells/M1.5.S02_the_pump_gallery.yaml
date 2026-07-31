@@ -46,41 +46,55 @@ words:        613
 #            Full Voss variant coverage on both axes.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      type is `hub` (12-35). READ AS A CEILING, not a floor - the same escalation
-#            M1.1 filed. A 12-word floor would delete Brick's one word from the scene that
-#            the whole twist-3 chain hangs on, and would make 18.3's 3x variance rule
-#            unsatisfiable. Ceiling respected: longest line 20 w.
-# variance:  1 w (.190 "Nobody.") to 20 w (.210 / .460) = 20x.
 #
-# EMISSARY FINGERPRINT (proposed - 18.4 has no row for him; see report and C-4/Q-4):
-#   syntax  clipped declaratives; counts instead of adjectives; states a number where
-#           anyone else would state an opinion
-#   tic     repeats the other person's last word back at them, flat (.030 .200 .230 .370)
+# *** ESCALATION 1 - SPEAKER TOKEN. One word, and it is the only one in the mission. ***
+# L1-R6 allows a glossary name or ^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER)_[A-Z]$.
+# The emissary is neither: Q-4 has not given him a name, and its own justification ("AR-1
+# and AR-10 keep Ember's RANK AND FILE nameless") does not describe the second lead of a
+# dialogue mission. I have written `speaker: EMISSARY` because the stub, the beat sheet and
+# the casting key all call him that, and because burying him in FIGHTER_C would make sixty
+# lines unreadable for the critic's strip test.
+# ASK: add EMISSARY to L1-R6's alternation, or answer Q-4. Zero-cost fallback if the ruling
+# goes the other way: EMISSARY -> FIGHTER_C, and shift the two fighters to _D and _E.
+# Generation is NOT at risk either way - `voice: iron_chorus_emissary` resolves today.
+#
+# *** ESCALATION 2 - IRON CHORUS FIGHTER VOICES. ***
+# L1-R5's table has no iron_chorus_fighter_* key, so the two fighters carry
+# eclipse_fighter_c / _d, which resolve. That is the CHEAP answer the beat sheet section 10
+# names and it is a voice-director decision, not mine: two Iron Chorus lines here
+# (.220, .480) and four across the mission are doing faction-differentiation work, and .220
+# in particular is the line that stops the emissary's boast being a boast. Reported, not
+# quietly settled.
+#
+# band:      hub (12-35), ceiling respected (max 20 w). Register reached repeatedly.
+# spread:    1 w (.190 "Nobody.") to 20 w (.210 / .460) = 20x.
+#
+# EMISSARY FINGERPRINT (proposed - 18.4 has no row for him; see report):
+#   syntax  clipped declaratives; counts where anyone else would use an adjective
+#   tic     repeats the other person's last word back at them, flat (.030 .200 .230 .380)
 #   never   NEVER USES A PERSON'S NAME. Not Mara's, not Voss's, not Brick's, not his own,
 #           not his fighters'. "She", "the big one", "your commander". A cell that does not
-#           give its names away does not spend anyone else's either. This is mechanically
-#           checkable and it is what makes Mara's use of "Voss" in S99 land.
-#   right   he is correct at .170, at .300 and at .400, and the player must feel all three.
+#           give its names away does not spend anyone else's either. Mechanically checkable,
+#           and it is what makes Mara's use of "Voss" in S99 land.
+#   right   he is correct at .170, at .300 and at .400. The player must feel all three.
 #
-# P3-b:     lands at .150-.230 and it is the spine of the mission. It is played as a RIVAL
-#           SCORING A POINT OFF THE NEWEST MAN AT THE TABLE. Ember's reaction is offence,
-#           not unease. .220 - his own fighter correcting the count upward - is what stops
-#           it being a boast and makes it a cost. Nothing in the scene marks it as
-#           important. Nobody returns to it.
-# dodge:    .090 asks who tipped Ember on the armoury. .100 answers a question nobody
-#           asked. IT IS NEVER RETURNED TO, here or anywhere in M1.5.
-# ember-hit: .410. Voss works out that this meeting may itself be the small false thing,
-#           and the emissary says yes. It is the only unguarded word he gives Ember, and it
-#           is the moment the negotiation actually starts.
-# options:  .490-.520, four outcomes that are not four flavours of yes. NO PLAYER-CHOICE
-#           CONSTRUCT EXISTS IN SCRIPT_FORMAT (escalated by M1.1's writer; escalated again).
-#           Marked by note only. Downstream state: story.m15_terms =
-#           accepted | conditional | refused | counter. Read by S03.010 and S99.
-#           Every branch still reaches S04 - the emissary walks Ember to the house either
-#           way, and refusing the condition is not refusing the walk.
-# triads:   exactly one (.430), and it is his offer. Nowhere else.
+# P3-b:     .150-.230, and it is the spine of the mission. Played as a RIVAL SCORING A POINT
+#           OFF THE NEWEST MAN AT THE TABLE. Ember's reaction is offence, not unease.
+#           .220 - his own fighter correcting the count upward - is what turns the boast
+#           into a bill. NOTHING IN THE SCENE MARKS IT AS IMPORTANT. Nobody returns to it,
+#           here or in S99.
+# dodge:    .090 asks who tipped Ember on the armoury. .100 answers a question nobody asked.
+#           It is never returned to, in this scene or anywhere in M1.5.
+# ember-hit: .410. Voss works out that this meeting may itself be the small false thing, and
+#           the emissary says yes. The only unguarded word he gives Ember, and the moment
+#           the negotiation actually starts.
+# choice:   .490-.520, group m15_terms, four outcomes that are not four flavours of yes.
+#           story.m15_terms is read at S03.050/.060 and S99.150. EVERY BRANCH STILL REACHES
+#           S04 - he walks Ember to the house either way, and refusing the condition is not
+#           refusing the walk.
+# triads:   exactly one (.430), and it is his offer, so it is allowed to sound rehearsed.
 # em-dash:  two in fifty-four lines (.070 rhetorical, .130 interruption).
-# omitted:  a menacing line. He never threatens once. See report.
+# omitted:  a menacing line. He never threatens once, in any scene. See report.
 
 lines:
   - id:      M1.5.S02.010
@@ -101,7 +115,7 @@ lines:
 
   - id:      M1.5.S02.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "There are crates against the wall."
 
   - id:      M1.5.S02.050
@@ -109,7 +123,7 @@ lines:
     voice:   iron_chorus_emissary
     text:    "We'll stand."
     shot:    "The pumps come up under the floor. Two minutes of noise. He waits them out without moving his eyes."
-    note:    "Pays M1.5.S01.130. Ember chose this room for the two minutes of cover. He has been in rooms like this since before Ember existed and simply waits."
+    note:    "Pays M1.5.S01.130. Ember chose this room for the two minutes of cover; he simply waits."
 
   - id:      M1.5.S02.060
     speaker: EMISSARY
@@ -124,7 +138,7 @@ lines:
 
   - id:      M1.5.S02.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We took what was there."
 
   - id:      M1.5.S02.090
@@ -134,9 +148,9 @@ lines:
 
   - id:      M1.5.S02.100
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "The gallery runs dry at the fourth horn. Nobody should still be in it."
-    note:    "*** THE DODGE. *** She answers a question nobody asked. It is never returned to in this mission by anybody."
+    note:    "*** THE DODGE. *** She answers a question nobody asked. Never returned to by anybody in this mission."
 
   - id:      M1.5.S02.110
     speaker: EMISSARY
@@ -152,7 +166,7 @@ lines:
 
   - id:      M1.5.S02.130
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "He came out of a cell that we--"
 
   - id:         M1.5.S02.140
@@ -203,10 +217,10 @@ lines:
     text:    "We hold a man three months before he carries anything heavier than a message. Three months. We still lost two."
 
   - id:      M1.5.S02.220
-    speaker: IRON_CHORUS_A
-    voice:   iron_chorus_fighter_a
+    speaker: FIGHTER_C
+    voice:   eclipse_fighter_c
     text:    "Three."
-    note:    "His own fighter corrects the count upward. It stops the boast being a boast and turns it into a bill. Written so the player hears what three months of discipline still costs."
+    note:    "His own fighter corrects the count upward. It stops the boast being a boast and turns it into a bill - what three months of discipline still costs. See L2 escalation 2 on the voice key."
 
   - id:      M1.5.S02.230
     speaker: EMISSARY
@@ -226,14 +240,14 @@ lines:
 
   - id:      M1.5.S02.260
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We are not going to feed our own people lies."
 
   - id:      M1.5.S02.270
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "No. You'll do what we did."
-    note:    "The whole Iron Chorus thread in six words: we were you, and this is the road. Act 2-4 fusion/schism/tragedy (2.11) starts here."
+    note:    "The whole Iron Chorus thread in six words: we were you, and this is the road. 2.11's fusion / schism / tragedy starts here."
 
   - id:      M1.5.S02.280
     speaker: EMISSARY
@@ -250,11 +264,11 @@ lines:
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "The district shouted for one night. The Tithe ran the next morning at the usual hour."
-    note:    "He deflates Ember's largest victory with a fact, and the fact is true. This is the scene's obligation: the rival is RIGHT."
+    note:    "He deflates Ember's largest victory with a fact, and the fact is true. The scene's obligation: the rival is RIGHT."
 
   - id:      M1.5.S02.310
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "People stood in the street."
 
   - id:      M1.5.S02.320
@@ -271,7 +285,7 @@ lines:
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "Shift bosses file the sheet. No sheet, no quota. No quota, no transport."
-    note:    "2.7 rule 2 - the doctrine, defensible in one sentence, no rhetoric attached."
+    note:    "2.7 rule 2 - the doctrine, defensible in one sentence, with no rhetoric attached to it."
 
   - id:      M1.5.S02.350
     speaker: VOSS
@@ -296,15 +310,15 @@ lines:
 
   - id:      M1.5.S02.390
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "And the quota?"
 
   - id:      M1.5.S02.400
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "Down a fifth since the winter."
-    shot:    "Mara does not answer. She has nothing to put next to that number and everyone in the gallery watches her not have it."
-    note:    "IT WORKED. The hardest line in the mission to write and the reason act 3 can afford this cell."
+    shot:    "Mara does not answer. She has nothing to set beside that number, and the gallery watches her not have it."
+    note:    "IT WORKED. The hardest line in the mission to write, and the reason act 3 can afford this cell at all."
 
   - id:      M1.5.S02.410
     speaker: VOSS
@@ -315,7 +329,7 @@ lines:
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "Yes."
-    note:    "The one unguarded word he gives Ember. It is also the most respect anybody shows anybody in this scene."
+    note:    "The one unguarded word he gives Ember, and the most respect anybody shows anybody in this scene."
 
   - id:      M1.5.S02.430
     speaker: EMISSARY
@@ -340,7 +354,7 @@ lines:
 
   - id:      M1.5.S02.470
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Watch."
 
   - id:      M1.5.S02.480
@@ -352,8 +366,11 @@ lines:
   - id:      M1.5.S02.490
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m15_terms
+      set:   'story.m15_terms = "accepted"'
+      label: "Accept his terms."
     text:    "We'll be at the door."
-    note:    "PLAYER OPTION 1 of 4 - accept the terms as offered. Sets story.m15_terms = accepted."
     variants:
       pragmatist: "One name against forty rifles' worth of cover. We'll be at the door."
       idealist:   "We'll be at the door. And we'll be looking at what happens on the other side of it."
@@ -363,8 +380,11 @@ lines:
   - id:      M1.5.S02.500
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m15_terms
+      set:   'story.m15_terms = "conditional"'
+      label: "Come, but commit to nothing."
     text:    "We walk with you. What happens at the door, I call there."
-    note:    "PLAYER OPTION 2 of 4 - come, commit to nothing. Sets story.m15_terms = conditional."
     variants:
       pragmatist: "We walk with you. Nothing is agreed until I have seen the house."
       idealist:   "We'll walk with you. Nobody here is promising what he does at the end of it."
@@ -374,8 +394,12 @@ lines:
   - id:      M1.5.S02.510
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m15_terms
+      set:   'story.m15_terms = "refused"'
+      label: "Refuse the condition."
     text:    "Our ground and our guns. Not a name."
-    note:    "PLAYER OPTION 3 of 4 - refuse the condition outright. Sets story.m15_terms = refused. He still walks them out; refusing the condition is not refusing the escort."
+    note:    "He still walks them out. Refusing the condition is not refusing the escort, and the emissary takes Ember to the house anyway (.550)."
     variants:
       pragmatist: "Ground and guns. The list isn't ours to sell."
       idealist:   "Everything we have is on that floor except a man's name."
@@ -385,8 +409,11 @@ lines:
   - id:      M1.5.S02.520
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m15_terms
+      set:   'story.m15_terms = "counter"'
+      label: "Turn the test around."
     text:    "Whose list are we on?"
-    note:    "PLAYER OPTION 4 of 4 - turn the test around. Sets story.m15_terms = counter. Gains information, commits nothing, and costs goodwill."
     variants:
       pragmatist: "Before any of that. Who has us on a sheet?"
       idealist:   "You want a name off us. Say whose list has ours on it first."
@@ -416,7 +443,7 @@ lines:
     voice:     iron_chorus_emissary
     condition: 'story.m15_terms == "counter"'
     text:      "Ember is. Since the mast."
-    note:      "The act's spine, handed over as a jab: every victory made them more visible. He does not explain it and Ember does not ask."
+    note:      "The act's spine handed over as a jab: every victory made them more visible. He does not explain it and Ember does not ask."
 
   - id:        M1.5.S02.570
     speaker:   EMISSARY
@@ -426,5 +453,5 @@ lines:
 
   - id:      M1.5.S02.580
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Second stair. We go up first."

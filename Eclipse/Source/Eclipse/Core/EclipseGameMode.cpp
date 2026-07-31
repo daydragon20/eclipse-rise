@@ -13,6 +13,7 @@
 #include "Core/EclipseEventPayloads.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Core/EclipseGrayboxBuilder.h"
+#include "Core/EclipseRenderProof.h"
 #include "Eclipse.h"
 #include "Engine/DataTable.h"
 #include "Engine/Engine.h"
@@ -307,6 +308,13 @@ void AEclipseGameMode::StartPlay()
 	SetupShotRig();
 	SetupPlayShotRound();
 	SetupSkyChurn();
+	// DE GRONDPROEF (DEBUG_DISCIPLINE 4.3, meting B). Alleen achter
+	// -EclipseGrondProef; zonder die vlag doet dit niets en raakt het geen
+	// spelgedrag. Het is een MEETharnas en repareert niets.
+	if (GetWorld() != nullptr)
+	{
+		EclipseRenderProof::ArmGroundProof(*GetWorld());
+	}
 	StartMissionFromCommandLine();
 #endif
 }
@@ -1183,9 +1191,23 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 					// inslagen blijven liggen waar hij schoot.
 					const FVector NaarSpoor = SpoorIt->GetActorLocation() - CameraLocation;
 					const float Voor = FVector::DotProduct(NaarSpoor.GetSafeNormal(), CameraRotation.Vector());
-					Waar += FString::Printf(TEXT(" [scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f %s]"),
+					// VRIJ ZICHT JA/NEE — meting A uit het dossier. `inbeeld=1` zegt
+					// alleen dat het punt binnen de kijkkegel valt; het zegt niets
+					// over wat er VOOR het vlak staat, en op precies dat gat zijn
+					// twee eerdere uitsluitingen in dit dossier gestrand. Een trace
+					// van de camera naar het spoor maakt er een ja/nee van, met de
+					// naam van de blokkeerder erbij.
+					TArray<const AActor*> Negeer;
+					Negeer.Add(PlayerPawn);
+					FString Blokkeerder;
+					float BlokAfstand = -1.0f;
+					const bool bVrijZicht = EclipseRenderProof::TraceFreeSight(
+						*GetWorld(), CameraLocation, **SpoorIt, Negeer, Blokkeerder, BlokAfstand);
+					Waar += FString::Printf(TEXT(" [scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f %s zicht=%s]"),
 						Scherm.X, Scherm.Y, bInBeeld ? 1 : 0, NaarSpoor.Size(),
-						Voor > 0.0f ? TEXT("VOOR") : TEXT("ACHTER"));
+						Voor > 0.0f ? TEXT("VOOR") : TEXT("ACHTER"),
+						bVrijZicht ? TEXT("VRIJ")
+							: *FString::Printf(TEXT("GEBLOKKEERD-door-%s-op-%.0f"), *Blokkeerder, BlokAfstand));
 				}
 				UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT %d SPOREN] %d levend%s"),
 					ShotIndex, Levend, *Waar);
@@ -1206,10 +1228,19 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 				if (ShotIndex == 1)
 				{
 					int32 Vlakken = 0;
+					int32 VrijeVlakken = 0;
 					FString Waar2;
 					for (TActorIterator<AActor> It2(GetWorld()); It2; ++It2)
 					{
+						// DE TELLER WAS BLIND VOOR EEN DEEL VAN ZIJN EIGEN ONDERWERP.
+						// `Deco_Pool` wordt NERGENS gezet: EclipseGrayboxBuilder tagt de
+						// lichtplekken als `Deco_LampPool` (regel 1139). Deze lijst zag dus
+						// alleen de blobs, en juist de lamp-plekken liggen op OPEN wegdek —
+						// precies de exemplaren waarvan het dossier wil weten of ze renderen.
+						// Beide tags erin; `Deco_Pool` blijft staan voor het geval de bouwer
+						// hem alsnog gaat gebruiken.
 						const bool bGrondvlak = It2->Tags.Contains(TEXT("Deco_Pool"))
+							|| It2->Tags.Contains(TEXT("Deco_LampPool"))
 							|| It2->Tags.Contains(TEXT("Deco_Blob"));
 						if (!bGrondvlak)
 						{
@@ -1221,17 +1252,34 @@ void AEclipseGameMode::MeasurePlayShot(int32 ShotIndex)
 						// niets over wat ervoor staat. Met de hele lijst kan ik er een
 						// kiezen die op ZICHTBAAR wegdek valt en daar de pixels
 						// vergelijken.
-						if (Vlakken > 40)
+						//
+						// 100 en niet 40: met `Deco_LampPool` erbij ligt de telling boven
+						// de oude grens, en dan zou de teller "hoeveel er vrij zicht
+						// hebben" bij de laatste exemplaren stilletjes stoppen met
+						// tellen — een grens die van de LIJSTLENGTE afhangt vervalst het
+						// getal dat eronder staat.
+						if (Vlakken > 100)
 						{
 							continue;
 						}
 						FVector2D Scherm2;
 						const bool bIn = Controller->ProjectWorldLocationToScreen(It2->GetActorLocation(), Scherm2);
-						Waar2 += FString::Printf(TEXT(" [%s scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f]"),
+						// Zelfde ja/nee als bij de sporen: zonder dit blijft "inbeeld=1"
+						// een uitspraak over de kijkkegel en niet over wat je ziet.
+						TArray<const AActor*> Negeer2;
+						Negeer2.Add(PlayerPawn);
+						FString Blok2;
+						float BlokAfstand2 = -1.0f;
+						const bool bVrij2 = EclipseRenderProof::TraceFreeSight(
+							*GetWorld(), CameraLocation, **It2, Negeer2, Blok2, BlokAfstand2);
+						VrijeVlakken += bVrij2 ? 1 : 0;
+						Waar2 += FString::Printf(TEXT(" [%s scherm=(%.0f,%.0f) inbeeld=%d afstand=%.0f zicht=%s]"),
 							*It2->Tags[0].ToString(), Scherm2.X, Scherm2.Y, bIn ? 1 : 0,
-							FVector::Dist(It2->GetActorLocation(), CameraLocation));
+							FVector::Dist(It2->GetActorLocation(), CameraLocation),
+							bVrij2 ? TEXT("VRIJ") : *FString::Printf(TEXT("GEBLOKKEERD-%s"), *Blok2));
 					}
-					UE_LOG(LogEclipse, Display, TEXT("[GRONDVLAKKEN] %d gevonden%s"), Vlakken, *Waar2);
+					UE_LOG(LogEclipse, Display, TEXT("[GRONDVLAKKEN] %d gevonden, %d met vrij zicht%s"),
+						Vlakken, VrijeVlakken, *Waar2);
 				}
 			}
 
@@ -1969,6 +2017,46 @@ void AEclipseGameMode::AdvancePlayShotRound()
 							UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 9] MIDDEN in het herladen — geleende take uit SciFiCharacter"));
 							MeasurePlayShot(9);
 						}), 0.8f, /*bLoop*/ false);
+
+					// EN DE HUD-LAAG MIDDEN IN DE BEURT, want dat is het frame waar
+					// defect 1 op te zien was en waar de reparatie dus op bewezen moet
+					// worden: staan de KOGELS er nog terwijl er "RELOADING" staat? Op
+					// HUD_wapen_E_na_wissel.png stonden ze er niet — één tekstveld
+					// droeg beide feiten en het herladen won.
+					//
+					// HighResShot hierboven kan dit per constructie niet laten zien:
+					// die tekent alleen de 3D-scene. CaptureHudFrame gaat via het
+					// Slate-vensterpad en pakt de UMG-laag wel mee.
+					//
+					// TWEE MOMENTEN, en dat is geen dubbelop: op 0,9 s loopt de beurt
+					// (de balk hoort rond 41 % te staan) en op 1,9 s is hij bijna klaar
+					// (rond 86 %). Eén frame kan niet laten zien DAT de balk loopt, en
+					// een balk die stilstaat is een andere bug dan een balk die er niet is.
+					//
+					// ZETTEN EN OPNEMEN ZIJN TWEE STAPPEN — de les van de wapenframes
+					// van vanavond: ShowMaterialSection legt zijn wijziging in een
+					// render-commando dat pas ná de functie landt, dus wie in hetzelfde
+					// frame fotografeert, legt de vórige toestand vast met het nieuwe
+					// label eronder. Bij UMG geldt hetzelfde voor SetText en
+					// zichtbaarheid. Deze drie opnames vallen daarom op een EIGEN timer,
+					// tientallen frames na de StartReload die ze meten.
+					FTimerHandle HudEarly;
+					GetWorldTimerManager().SetTimer(HudEarly, FTimerDelegate::CreateWeakLambda(this,
+						[this]() { CaptureHudFrame(TEXT("herladen_0900ms")); }), 0.9f, /*bLoop*/ false);
+					FTimerHandle HudLate;
+					GetWorldTimerManager().SetTimer(HudLate, FTimerDelegate::CreateWeakLambda(this,
+						[this]() { CaptureHudFrame(TEXT("herladen_1900ms")); }), 1.9f, /*bLoop*/ false);
+
+					// EN EEN FRAME RUIM NA DE BEURT — de visuele falsificatie van defect
+					// 2. De beurt duurt 2,2 s; op 5,0 s hoort er GEEN "RELOADING" meer
+					// te staan en hoort het magazijn vol te zijn. Dat was tot vandaag
+					// niet zo: de beurt eindigde alleen als je opnieuw de trekker
+					// overhaalde. De harde meting staat in
+					// Tests/EclipseWeaponReloadTests.cpp; dit is dezelfde uitspraak op
+					// het scherm, want de owner leest een scherm en geen suite.
+					FTimerHandle HudAfter;
+					GetWorldTimerManager().SetTimer(HudAfter, FTimerDelegate::CreateWeakLambda(this,
+						[this]() { CaptureHudFrame(TEXT("herladen_klaar_5000ms")); }), 5.0f, /*bLoop*/ false);
 				}
 				else
 				{
@@ -2068,6 +2156,7 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT WISSEL] C geduwd — 1e -> 3e persoon"));
 		break;
 	case 11:
+	{
 		CaptureHudFrame(TEXT("3e_persoon_terug"));
 		if (const AEclipseCharacter* BackCheck = Cast<AEclipseCharacter>(Controller->GetPawn()))
 		{
@@ -2075,7 +2164,105 @@ void AEclipseGameMode::AdvancePlayShotRound()
 				BackCheck->IsFirstPerson() ? 1 : 0);
 		}
 		Controller->ConsoleCommand(TEXT("Eclipse.UI.Report"));
+
+		// DE CONTROLEPROEF VOOR HET RICHTKRUIS, en die is de helft van het bewijs.
+		//
+		// De klacht is dat het kruis "op het gele bord en op het lichaam nauwelijks
+		// te vinden" is. Nagemeten op alle elf frames van 31-07 20:36 en dat KLOPT
+		// NIET met wat die frames laten zien: de luminantie rond het schermmidden
+		// haalt op geen enkel frame boven de 105, dus op geen van die beelden ligt
+		// het kruis op iets lichts. Ze kunnen de klacht dus niet bevestigen én niet
+		// weerleggen — ze gaan er niet over.
+		//
+		// Dat is precies de owner-regel "draai de CONTROLEPROEF eerst": bewijs dat
+		// het daar ooit kán gebeuren, vóór je uitspreekt waarom het niet gebeurt.
+		//
+		// EERSTE POGING WAS EEN BLINDE SWEEP over drie kijkhoeken, en die MISLUKTE:
+		// gemeten ondergrond 48-57 op alle drie de frames, dus alleen grijs asfalt.
+		// Hoeken raden is geen controleproef — het is hopen. Deze versie richt op een
+		// OBJECT waarvan bekend is dat het licht is: de gele waarschuwingsborden die
+		// de grayboxbouwer met de tag `Deco_Sign` neerzet. Waar de speler ook staat,
+		// het kruis komt op geel terecht.
+		{
+			APawn* Eye = Controller->GetPawn();
+			TArray<AActor*> Targets;
+			if (Eye != nullptr)
+			{
+				for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+				{
+					AActor* Candidate = *It;
+					if (Candidate == nullptr)
+					{
+						continue;
+					}
+					// Borden EN wegmarkering: twee soorten lichte ondergrond, en de
+					// klacht noemt ze allebei ("het gele bord", en het asfalt met de
+					// markering waar de teller op wegviel).
+					if (Candidate->Tags.Contains(TEXT("Deco_Sign")) || Candidate->Tags.Contains(TEXT("Deco_Decal")))
+					{
+						Targets.Add(Candidate);
+					}
+				}
+				// Dichtstbij eerst: een bord op 60 m vult te weinig beeld om het kruis
+				// er echt op te leggen.
+				Targets.Sort([Eye](const AActor& A, const AActor& B)
+				{
+					return FVector::DistSquared(A.GetActorLocation(), Eye->GetActorLocation())
+						< FVector::DistSquared(B.GetActorLocation(), Eye->GetActorLocation());
+				});
+			}
+
+			UE_LOG(LogEclipse, Display,
+				TEXT("[KRUIS CONTROLEPROEF] %d lichte doelen gevonden (Deco_Sign/Deco_Decal)."), Targets.Num());
+			if (Targets.IsEmpty())
+			{
+				// Luid, want dan bewijst deze ronde niets over de leesbaarheid en dat
+				// hoort te blijken uit het log en niet uit een frame dat er normaal
+				// uitziet (14.3.5).
+				UE_LOG(LogEclipse, Warning,
+					TEXT("[KRUIS CONTROLEPROEF] GEEN lichte doelen — deze ronde kan de leesbaarheid van het kruis niet toetsen."));
+			}
+
+			const int32 Count = FMath::Min(3, Targets.Num());
+			for (int32 Index = 0; Index < Count; ++Index)
+			{
+				AActor* Target = Targets[Index];
+				const int32 Shot = Index;
+				// ZETTEN EN OPNEMEN ZIJN TWEE STAPPEN. Een camerastand die je in
+				// hetzelfde frame fotografeert, levert het BEELD VAN DE VORIGE STAND
+				// met het label van de nieuwe — dezelfde fout als bij de wapenframes
+				// van vanavond (ShowMaterialSection landt in een render-commando ná de
+				// functie). Bij de derde-persoonscamera komt daar de veerarm bij, die
+				// een blend nodig heeft. Vandaar per doel twee timers, 0,30 s uit
+				// elkaar: ruim twintig getekende frames.
+				FTimerHandle Turn;
+				GetWorldTimerManager().SetTimer(Turn, FTimerDelegate::CreateWeakLambda(this,
+					[this, Controller, Target]()
+					{
+						if (Target == nullptr || Controller->GetPawn() == nullptr)
+						{
+							return;
+						}
+						FVector EyeLocation;
+						FRotator EyeRotation;
+						Controller->GetPlayerViewPoint(EyeLocation, EyeRotation);
+						Controller->SetControlRotation(
+							(Target->GetActorLocation() - EyeLocation).Rotation());
+					}), 0.05f + Index * 0.55f, /*bLoop*/ false);
+
+				FTimerHandle Snap;
+				GetWorldTimerManager().SetTimer(Snap, FTimerDelegate::CreateWeakLambda(this,
+					[this, Shot, Target]()
+					{
+						CaptureHudFrame(FString::Printf(TEXT("kruis_ondergrond_%d"), Shot));
+						UE_LOG(LogEclipse, Display,
+							TEXT("[KRUIS CONTROLEPROEF %d] gericht op '%s' — meet dit frame na op luminantie rond het midden"),
+							Shot, Target != nullptr ? *Target->GetName() : TEXT("(weg)"));
+					}), 0.35f + Index * 0.55f, /*bLoop*/ false);
+			}
+		}
 		break;
+	}
 	case 12:
 		// DE WAPENPROEF (O-5 "volledig", 31-07) — hier en niet in een eigen ronde.
 		//

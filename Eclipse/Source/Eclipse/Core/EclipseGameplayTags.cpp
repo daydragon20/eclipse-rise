@@ -12,6 +12,7 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_RegionControlChanged, "Event.Strategy.RegionControlChanged", "A region changed owner; emitted by CampaignState commit only (SPEC-P1-02/04).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_MissionSelected, "Event.Strategy.MissionSelected", "Player picked a mission offer on the mini-map (SPEC-P1-04).")
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_ResponseTierChanged, "Event.Strategy.ResponseTierChanged", "De Dominion Response Tier is gestegen (GDD 9.4). Draagt de STAP (oud -> nieuw), niet alleen de landing, zodat de diegetische uiting de juiste toon kan kiezen. Alleen omhoog; de transactie weigert een daling.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Strategy_LiberationResolved, "Event.Strategy.LiberationResolved", "Een bevrijdingsrij is gecommit: rijnaam, aantal omgedraaide vakken en de geauthorde zin die uitlegt WAAROM. Vuurt per RIJ, waar RegionControlChanged per VAK vuurt (SPEC-P2-05 bouwvolgorde stap 4).")
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Prep_MissionLaunchRequested, "Event.Prep.MissionLaunchRequested", "Preparation flow requests mission start with squad/loadout/insertion/intel payload (SPEC-P1-08).")

@@ -141,8 +141,24 @@ private:
 	 */
 	void BuildPlayerLayer();
 
-	/** Het richtkruis: het enige element dat altijd staat en nooit ververst wordt. */
+	/**
+	 * Het richtkruis: vier balken rond een gat, geen tekstglyph meer.
+	 *
+	 * GEMETEN op alle elf HUD-frames van 31-07: de oude '+' was 7x9 px met 17 pixels
+	 * inkt (0,0018 % van het beeld) en stond 1 px boven het echte schermmidden — een
+	 * tekstglyph is gecentreerd op zijn regelvak, niet op zijn inkt. Beide zijn met
+	 * geometrie per constructie weg.
+	 */
 	void BuildCrosshair();
+
+	/** Het kruis naar de huidige spreiding en het huidige wapen zetten; per frame, en gratis als er niets veranderde. */
+	void RefreshCrosshair();
+
+	/** SetVisibility alleen bij een echte verandering — het ongeldigt de layout en dit draait per frame (12.4). */
+	static void SetVisibilityIfChanged(class UWidget* Widget, bool bVisible);
+
+	/** De titel-veilige marge voor de huidige viewport (EclipseHudReadout::TitleSafeMarginPx). */
+	FVector2D CurrentTitleSafeMarginPx() const;
 
 	/** Trefferbevestiging in het schermmidden; gedoofd door de teller in NativeTick. */
 	void BuildHitMarker();
@@ -171,7 +187,7 @@ private:
 	 * een donkere muur prima en op een gele wegmarkering niet. Eén functie, zodat
 	 * kruis, trefteken en teller nooit uit elkaar lopen.
 	 */
-	static void ApplyLegibilityOutline(class UTextBlock& Text);
+	static void ApplyLegibilityOutline(class UTextBlock& Text, int32 OutlineSizePx = 1);
 
 	/** In-place refresh of the gauntlet rows; wall-clock throttled, and free when the panel is hidden. */
 	void RefreshGauntletRows(bool bForce);
@@ -212,9 +228,27 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> HitMarker;
 
-	/** Het richtkruis: staat altijd, midden in beeld. Zie BuildPlayerLayer. */
+	/** Volvlaks laag waar de vier kruisbalken en het middenpunt in hangen. */
 	UPROPERTY()
-	TObjectPtr<class UTextBlock> Crosshair;
+	TObjectPtr<class UCanvasPanel> CrosshairRoot;
+
+	/** Boven, onder, links, rechts — in die volgorde. */
+	inline static constexpr int32 CrosshairArmCount = 4;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class UImage>> CrosshairArms;
+
+	/** Donkere onderlaag per balk: dezelfde rol als de font-outline op de teksten, maar dan op geometrie. */
+	UPROPERTY()
+	TArray<TObjectPtr<class UImage>> CrosshairShadows;
+
+	UPROPERTY()
+	TObjectPtr<class UImage> CrosshairCentre;
+
+	/** Laatst gezette maten, zodat een frame zonder verandering geen layout ongeldigt. */
+	float LastCrosshairArmPx = -1.0f;
+	float LastCrosshairGapPx = -1.0f;
+	float LastCrosshairThicknessPx = -1.0f;
 
 	/**
 	 * MUNITIETELLER (26-07 avond). Een magazijn dat je niet ziet is geen mechaniek
@@ -224,6 +258,51 @@ private:
 	 */
 	UPROPERTY(Transient)
 	TObjectPtr<class UTextBlock> AmmoReadout;
+
+	/**
+	 * HET KADER OM DE MUNITIEHOEK, met een VASTE maat.
+	 *
+	 * Niet AutoSize, en dat is de reparatie van defect 4. GEZIEN op
+	 * HUD_wapen_E_na_wissel.png: de wapenregel liep tot beeldkolom 1278 van 1279 en
+	 * de "12 / 12" stond buiten beeld — niet door de offset (die kwam op 1232 uit)
+	 * maar doordat een AutoSize-slot die rechts is uitgelijnd, één frame lang de
+	 * GEWENSTE MAAT VAN DE VORIGE LAYOUT gebruikt. Elke wapenwissel maakte zo'n
+	 * frame. Met een vast kader kan geen enkele tekst zijn eigen rand meer uit.
+	 */
+	UPROPERTY(Transient)
+	TObjectPtr<class UCanvasPanel> AmmoBlock;
+
+	/** De magazijnMAAT ("/ 30"): staat vast, dus kleiner en gedimd naast het getal dat wel beweegt. */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> AmmoCapacity;
+
+	/** De LEESBARE wapennaam uit DT_Weapons.DisplayName (defect 3), niet de rijnaam. */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> WeaponReadout;
+
+	/**
+	 * "RELOADING" op zijn EIGEN regel — de reparatie van defect 1.
+	 *
+	 * Er stond één tekstveld dat tijdens de beurt volledig werd overschreven, dus
+	 * precies wanneer je wilt weten hoeveel er straks in zit, stond het er niet.
+	 * Twee feiten die tegelijk gelden, horen twee velden te zijn.
+	 */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> ReloadReadout;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> ReloadBarTrack;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> ReloadBarFill;
+
+	/** Maten van de munitiehoek. Vast, want de hele reparatie van defect 4 is dat dit blok niet meer meegroeit. */
+	inline static constexpr float AmmoBlockWidthPx = 300.0f;
+	inline static constexpr float AmmoBlockHeightPx = 120.0f;
+	inline static constexpr float ReloadBarWidthPx = 150.0f;
+
+	/** Rijen waarover al geklaagd is dat hun DisplayName ontbreekt — één keer melden, niet per frame. */
+	TSet<FName> ReportedMissingDisplayNames;
 
 	void RefreshAmmoReadout();
 

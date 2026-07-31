@@ -25,6 +25,13 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Strategy_MissionSelected)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Strategy_LiberationResolved)
 
+	/**
+	 * De Dominion Response Tier is gestegen (GDD 9.4). Campagne-breed feit, geen
+	 * vak-feit — daarom een eigen payload naast FEclipseStrategyEventPayload.
+	 * Alleen omhoog: de ladder daalt niet, dus dit feit betekent altijd "erger".
+	 */
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Strategy_ResponseTierChanged)
+
 	// Preparation (SPEC-P1-08)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Prep_MissionLaunchRequested)
 

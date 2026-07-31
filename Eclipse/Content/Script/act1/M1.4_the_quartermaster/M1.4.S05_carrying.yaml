@@ -15,7 +15,7 @@ turn:         "Brick picks up the load that was going to be left, and answers th
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        74
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, MARA, BRICK, fighters
@@ -33,4 +33,107 @@ words:        0
 #
 # writer:    Dex is on the radio and will want to fill this silence. Do not let him.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# 13 lines, 74 words, and the whole mission is in the last two of them.
+# band:      `in-mission-radio` as a ceiling; longest line 10 w. Everything here is short
+#            because nobody in this scene has breath to spare.
+# variance:  1 w (.060 / .070 / .130) to 10 w (.030 / .040 / .090) = 10x.
+# THE LIFT:  Brick carrying is written as a COUNT GOING DOWN and nothing else. .050 says
+#            four crates are being left, .060 says three, .070 says two. No line describes
+#            him, nobody thanks him, nobody says the word heavy. The interruption at .060
+#            is 18.7's required one and it is the count correcting itself mid-sentence.
+# .120/.130: four spoken words, exactly as the stub demands. Voss's first offer in S03 was
+#            a door; this one is a people. That escalation is the entire arc of the offer
+#            and it is three words long.
+# .130:      his yes is his name. He is the man who answers with names, so the one word he
+#            spends on joining is the only name he has not said yet. Mara writes it down
+#            in S99 - the chain from his mouth to her roster is unbroken and unremarked.
+# dex:       ZERO lines, per the stub. He is on the radio and he stays off it.
+# exits:     .080-.110 are the loud/quiet exits. The grate branch leaves on "Then nothing
+#            happened here" - the ghost run, no alarm, no record. The breach branch leaves
+#            with the dock burning. Neither exit comments on the other.
+# choice:    .020 / .030 are the player's leave-behind options (rounds or rifles). Marked
+#            by note only; SCRIPT_FORMAT has no player-choice construct.
+# variants:  none - section 9.7. The repeat offer is deliberately axis-neutral: whatever
+#            Voss said in S03, this is the same three words.
+
+lines:
+  - id:      M1.4.S05.010
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    tags:    [exhausted]
+    text:    "We're not getting all of it through the trench."
+
+  - id:      M1.4.S05.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Rifles out. The round boxes stay where they are."
+    note:    "PLAYER OPTION 1 of 2 (what gets left). Flavor plus small materials variation."
+
+  - id:      M1.4.S05.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Rounds out. An empty rifle is a club either way."
+    note:    "PLAYER OPTION 2 of 2 (what gets left)."
+
+  - id:      M1.4.S05.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Mark what stays. We are not coming back for it."
+
+  - id:      M1.4.S05.050
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "That's four on the floor--"
+
+  - id:      M1.4.S05.060
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    interrupts: true
+    text:    "Three."
+    shot:    "Brick has one of the four on his shoulder and is reaching for the second."
+
+  - id:      M1.4.S05.070
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Two."
+    shot:    "Nobody helps him. Nobody offers."
+
+  - id:      M1.4.S05.080
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    condition: 'story.m14_entry == "breach"'
+    text:    "Whole dock's alight behind us."
+
+  - id:      M1.4.S05.090
+    speaker: MARA
+    voice:   mara_sovann
+    condition: 'story.m14_entry == "breach"'
+    text:    "Then walk into the dark and stop looking at it."
+
+  - id:      M1.4.S05.100
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    condition: 'story.m14_entry == "grate"'
+    tags:    [whispering]
+    text:    "They still haven't sounded anything."
+
+  - id:      M1.4.S05.110
+    speaker: MARA
+    voice:   mara_sovann
+    condition: 'story.m14_entry == "grate"'
+    tags:    [quietly]
+    text:    "Then nothing happened here. Walk."
+
+  - id:      M1.4.S05.120
+    speaker: VOSS
+    voice:   voss
+    text:    "Come with us."
+    shot:    "Alley. Rain. Voss walking backwards for two steps to say it."
+
+  - id:      M1.4.S05.130
+    speaker: BRICK
+    voice:   brick
+    text:    "Bex."
+    shot:    "He says it to the crate on his shoulder, not to Voss, and keeps walking."
+    note:    "His yes. One word, and it is his name. Mara puts it on the roster in S99."

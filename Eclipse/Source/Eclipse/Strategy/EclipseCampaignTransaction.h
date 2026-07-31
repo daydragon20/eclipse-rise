@@ -35,7 +35,9 @@ enum class EEclipseCampaignMutationType : uint8
 	RushConstruction,
 	AssignStaff,
 	// SPEC-P2-04: story beats are facts in campaign state, set-only in Phase 2.
-	SetStoryFlag
+	SetStoryFlag,
+	/** GDD 9.4: the Dominion Response Tier, raise-only (see EEclipseDominionResponseTier). */
+	SetResponseTier
 };
 
 /**
@@ -87,6 +89,15 @@ struct FEclipseCampaignMutation
 	/** SetStoryFlag (SPEC-P2-04): the beat to commit; composers filter already-set beats via EclipseStoryLogic::ShouldCommitBeat. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
 	FGameplayTag StoryFlagTag;
+
+	/**
+	 * SetResponseTier (GDD 9.4): the tier to escalate TO. Must be strictly
+	 * higher than the current tier — a sideways or downward write is rejected,
+	 * not silently dropped, because "the empire calmed down" is a story event
+	 * and would need to arrive as one.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
+	EEclipseDominionResponseTier ResponseTier = EEclipseDominionResponseTier::Indifference;
 
 	/** QueueProduction / CompleteProduction */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Campaign")
@@ -169,6 +180,9 @@ struct FEclipseAppliedMutation
 
 	/** AssignStaff (assign only): true when the site was under construction at apply time - the positional crew role. */
 	bool bAssignedAsCrew = false;
+
+	/** SetResponseTier: the tier the campaign was on before this mutation — the fact needs the step, not just the landing (GDD 9.4). */
+	EEclipseDominionResponseTier OldResponseTier = EEclipseDominionResponseTier::Indifference;
 
 	/** AssignStaff: the facility occupying the slot at apply time (the mutation itself only names the slot). */
 	FName StaffedFacilityId;

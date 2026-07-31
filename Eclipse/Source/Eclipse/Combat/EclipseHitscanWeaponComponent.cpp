@@ -396,7 +396,15 @@ bool UEclipseHitscanWeaponComponent::StartReload(FName Cause)
 	// herladen wordt, en dat is het verschil tussen een speler die vooruitdenkt en
 	// een die droogloopt — precies wat je wilt zien in een log van een speelronde.
 	UWorld* World = GetWorld();
-	if (World == nullptr || bReloading || Weapon.MagazineSize <= 0)
+	if (World == nullptr || Weapon.MagazineSize <= 0)
+	{
+		return false;
+	}
+	// EERST DE VORIGE BEURT AFSLUITEN als de klok er al voorbij is. Zonder deze
+	// regel zou een speler die één beurt lang niet schoot, daarna NOOIT meer kunnen
+	// herladen: `bReloading` stond nog aan en de test hieronder wees hem af.
+	SettleReloadIfElapsed();
+	if (bReloading)
 	{
 		return false;
 	}
@@ -444,6 +452,92 @@ void UEclipseHitscanWeaponComponent::FinishReload()
 	AmmoInMagazine = Weapon.MagazineSize;
 }
 
+bool UEclipseHitscanWeaponComponent::IsReloading() const
+{
+	if (!bReloading)
+	{
+		return false;
+	}
+	const UWorld* World = GetWorld();
+	if (World == nullptr || ReloadEndSeconds < 0.0)
+	{
+		// Geen wereld = geen klok. Dan is de vlag het enige wat er is, en die
+		// zeggen we eerlijk terug in plaats van te gokken dat het wel klaar zal zijn.
+		return true;
+	}
+	return World->GetTimeSeconds() < ReloadEndSeconds;
+}
+
+int32 UEclipseHitscanWeaponComponent::GetAmmoInMagazine() const
+{
+	// Een beurt die op de klok voorbij is, HEEFT het magazijn gevuld — ook als er nog
+	// geen enkel pad langs is gekomen om dat op te schrijven. Zie IsReloading() voor
+	// waarom de waarheid hier uitgerekend wordt in plaats van onthouden.
+	if (bReloading && !IsReloading())
+	{
+		return Weapon.MagazineSize;
+	}
+	return AmmoInMagazine;
+}
+
+float UEclipseHitscanWeaponComponent::GetReloadProgress() const
+{
+	if (!IsReloading() || Weapon.ReloadSeconds <= 0.0f)
+	{
+		return 0.0f;
+	}
+	const UWorld* World = GetWorld();
+	if (World == nullptr || ReloadEndSeconds < 0.0)
+	{
+		return 0.0f;
+	}
+	const double Remaining = ReloadEndSeconds - World->GetTimeSeconds();
+	return static_cast<float>(FMath::Clamp(1.0 - Remaining / Weapon.ReloadSeconds, 0.0, 1.0));
+}
+
+float UEclipseHitscanWeaponComponent::GetCurrentSpreadDegrees() const
+{
+	// EERSTE SCHOT IS ALTIJD ZUIVER, en de reeks BREEKT op de klok.
+	//
+	// Beide regels stonden in Fire() en zijn hierheen verplaatst zodat het kruis
+	// dezelfde waarheid leest als de kogel. De klokregel is de belangrijkste van de
+	// twee voor de schermlaag: `ConsecutiveShots` wordt pas op de VOLGENDE
+	// trekkerbeweging teruggezet, dus wie alleen die teller leest, ziet een wapen
+	// dat eeuwig "midden in een reeks" staat nadat de speler is gestopt. Dat is
+	// exact dezelfde vorm als het herladen dat nooit eindigde — een toestand die
+	// wacht op een handeling die misschien nooit komt.
+	const UWorld* World = GetWorld();
+	const double Now = World != nullptr ? World->GetTimeSeconds() : 0.0;
+	const bool bSeriesBroken = LastFireTimeSeconds < 0.0
+		|| (World != nullptr && Now - LastFireTimeSeconds > Weapon.FireInterval * 3.0);
+	if (ConsecutiveShots <= 0 || bSeriesBroken)
+	{
+		return 0.0f;
+	}
+
+	float SpreadDegrees = ShooterBodyIsAiming() ? Weapon.AimSpreadDegrees : Weapon.HipSpreadDegrees;
+
+	// Bewegen straft, en per wapen anders: de SMG heeft 0,8 graden en de DMR 4,0.
+	// Dat is wat "waardeloos in beweging" in data betekent.
+	if (const APawn* ShooterPawn = Cast<APawn>(GetOwner()))
+	{
+		const float Speed = ShooterPawn->GetVelocity().Size2D();
+		// Op de loopsnelheid geschaald, niet op de sprint: wie wandelt hoort
+		// nauwelijks straf te voelen, wie rent de volle.
+		const float MoveFraction = FMath::Clamp(Speed / 420.0f, 0.0f, 1.0f);
+		SpreadDegrees += Weapon.MovingSpreadDegrees * MoveFraction;
+	}
+	return SpreadDegrees;
+}
+
+void UEclipseHitscanWeaponComponent::SettleReloadIfElapsed()
+{
+	if (bReloading && !IsReloading())
+	{
+		FinishReload();
+	}
+}
+
 bool UEclipseHitscanWeaponComponent::ShooterBodyIsAiming() const
 {
 	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner());
@@ -463,13 +557,15 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	// Herladen loopt af op de klok en niet op een timer: een timer die tijdens een
 	// missiewissel blijft staan zou een wapen voorgoed blokkeren, en dit component
 	// tikt niet uit zichzelf.
+	//
+	// DIT WAS TOT 31-07 DE ENIGE PLEK waar een beurt kon eindigen, en dat was defect
+	// 2: wie na het herladen niet meer schoot, bleef eeuwig herladen. De klokregel
+	// staat nu in SettleReloadIfElapsed en in de getters, zodat elke lezer hem krijgt
+	// en niet alleen de trekker.
+	SettleReloadIfElapsed();
 	if (bReloading)
 	{
-		if (Now < ReloadEndSeconds)
-		{
-			return false; // je handen zitten aan het magazijn
-		}
-		FinishReload();
+		return false; // je handen zitten aan het magazijn
 	}
 
 	if (!IsReady())
@@ -553,23 +649,10 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	// Het geeft er ook een meetbaar systeem van: één schot is deterministisch, dus
 	// het harnas kan de kogel volgen. Zonder dat zou elke gevechtsmeting ruis
 	// bevatten en zou "mist hij of is hij kapot?" niet meer te beantwoorden zijn.
-	const bool bAiming = ShooterBodyIsAiming();
-	float SpreadDegrees = 0.0f;
-	if (ConsecutiveShots > 0)
-	{
-		SpreadDegrees = bAiming ? Weapon.AimSpreadDegrees : Weapon.HipSpreadDegrees;
-
-		// Bewegen straft, en per wapen anders: de SMG heeft 0,8 graden en de DMR
-		// 4,0. Dat is wat "waardeloos in beweging" in data betekent.
-		if (const APawn* ShooterPawn = Cast<APawn>(GetOwner()))
-		{
-			const float Speed = ShooterPawn->GetVelocity().Size2D();
-			// Op de loopsnelheid geschaald, niet op de sprint: wie wandelt hoort
-			// nauwelijks straf te voelen, wie rent de volle.
-			const float MoveFraction = FMath::Clamp(Speed / 420.0f, 0.0f, 1.0f);
-			SpreadDegrees += Weapon.MovingSpreadDegrees * MoveFraction;
-		}
-	}
+	// DE FORMULE STAAT IN GetCurrentSpreadDegrees en nergens anders — zie de header
+	// voor waarom een tweede plek hier een bekende, dure fout van dit project is.
+	// Het richtkruis leest exact deze functie, dus wat je ziet is wat de kogel doet.
+	const float SpreadDegrees = GetCurrentSpreadDegrees();
 	++ConsecutiveShots;
 
 	// Terugslag naar de BESTUURDER, niet naar het wapen: het kruis moet omhoog, en

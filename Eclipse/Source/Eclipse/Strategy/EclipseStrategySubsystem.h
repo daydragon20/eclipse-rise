@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
+#include "Strategy/EclipseStrategyLogic.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UObject/ObjectKey.h"
 #include "EclipseStrategySubsystem.generated.h"
@@ -70,7 +71,30 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Strategy")
 	bool TryGetOffer(FName RegionId, FEclipseMissionOfferView& OutOffer) const;
 
+	/**
+	 * Route across the live board: campaign state for ownership, the graph
+	 * asset for lanes and tuning (GDD 3.1 rules 2 and 4). No graph loaded means
+	 * an invalid route with a reason, never a crash (GDD 14.3.5).
+	 *
+	 * Not a UFUNCTION: FEclipseRoute is a pure C++ struct on purpose — routing
+	 * belongs to the headless core, and wrapping it for Blueprint before a
+	 * screen needs it would put a view shape in the logic layer (GDD 14.3.2).
+	 */
+	EclipseStrategyLogic::FEclipseRoute FindRoute(FName FromRegionId, FName ToRegionId,
+		EclipseStrategyLogic::EEclipseTransitMode Mode = EclipseStrategyLogic::EEclipseTransitMode::Military,
+		int32 MaxAcceptableRisk = MAX_int32) const;
+
+	/** Is this region within supply reach of friendly ground (GDD 3.1 rule 4)? */
+	UFUNCTION(BlueprintCallable, Category = "Eclipse|Strategy")
+	bool IsRegionSupplied(FName RegionId) const;
+
 private:
+	/**
+	 * Re-derive the Dominion Response Tier from campaign facts and commit the
+	 * escalation when it is warranted (GDD 9.4). No-op when nothing changed —
+	 * the ladder never descends, so "nothing to do" is the common case.
+	 */
+	void EscalateResponseTierIfWarranted(UEclipseCampaignSubsystem& Campaign, FName Reason);
 	const UEclipseRegionGraphAsset* ResolveGraph() const;
 	const FEclipseMissionOfferRow* FindOfferForType(const UEclipseRegionGraphAsset& Graph, EEclipseRegionType RegionType) const;
 
@@ -132,4 +156,13 @@ private:
 
 	/** Debug surface for SelectMission (14.5): the fast test route's missing link. */
 	IConsoleObject* SelectMissionCommand = nullptr;
+
+	/**
+	 * The lane layer's debug surface (14.5 step 4, the step before a widget):
+	 * Route prints one route with its legs, Board prints every lane with its
+	 * live status plus the response tier. These are what READ risk and supply
+	 * today — a field nothing reads is not a field (21_quality_mandate.md).
+	 */
+	IConsoleObject* RouteCommand = nullptr;
+	IConsoleObject* BoardCommand = nullptr;
 };

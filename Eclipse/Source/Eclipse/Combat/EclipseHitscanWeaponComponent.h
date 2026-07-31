@@ -50,6 +50,15 @@ public:
 	 */
 	FName GetActiveWeaponName() const { return SlotNames.IsValidIndex(ActiveSlot) ? SlotNames[ActiveSlot] : NAME_None; }
 	/**
+	 * DE NAAM DIE DE SPELER LEEST ("Foundry AR"), uit DT_Weapons.DisplayName.
+	 *
+	 * Naast GetActiveWeaponName en niet in plaats daarvan: de rijnaam blijft de
+	 * SLEUTEL (voor meshes, logregels en de diagnose) en deze is de LEESTEKST. Ze
+	 * door elkaar gebruiken is precies hoe `Sidearm_Scrap` op het scherm van 31-07
+	 * terechtkwam. Leeg mogelijk — de schermlaag hoort dan luid te degraderen.
+	 */
+	const FText& GetActiveWeaponDisplayName() const { return Weapon.DisplayName; }
+	/**
 	 * Het zichtbare mesh van het wapen in je handen (O-5 "volledig", 31-07).
 	 *
 	 * Uit de ACTIEVE rij en niet uit een eigen veld: het wapen dat je vasthoudt is
@@ -111,11 +120,69 @@ public:
 	 * kant op is hij later nog te maken; andersom zou ik hem al genomen hebben.
 	 */
 	bool StartReload(FName Cause);
-	bool IsReloading() const { return bReloading; }
-	int32 GetAmmoInMagazine() const { return AmmoInMagazine; }
+
+	/**
+	 * Ben je NU aan het herladen? Op de KLOK, niet op een vlag.
+	 *
+	 * DIT WAS DEFECT 2, en de vorm ervan is leerzaam. `bReloading` werd gezet in
+	 * StartReload en alleen weer gewist door FinishReload — en FinishReload had
+	 * precies één aanroeper: de tak bovenin Fire(). Wie na een herlaadbeurt niet
+	 * meer schoot, bleef dus voor eeuwig "aan het herladen", met een magazijn dat
+	 * nooit werd bijgevuld. GEMETEN met een tikkende wereld
+	 * (Tests/EclipseWeaponReloadTests.cpp): op t = 2,4 / 3,0 / 6,0 s na een beurt
+	 * van 2,2 s stond herladen=1 en munitie=29/30.
+	 *
+	 * De reparatie is bewust GEEN timer en GEEN tick, want beide zouden het
+	 * architectuurbesluit van dit component omkeren (event-driven, 14.2) en een
+	 * timer die een missiewissel overleeft kan een wapen voorgoed blokkeren. In
+	 * plaats daarvan is de VRAAG eerlijk gemaakt: de beurt heeft een eindtijd, dus
+	 * "ben ik nog bezig" is uit te rekenen in plaats van te onthouden. Er is niets
+	 * meer dat kan vergeten af te lopen.
+	 */
+	bool IsReloading() const;
+
+	/**
+	 * Kogels in het magazijn — met dezelfde klok-correctie als IsReloading().
+	 *
+	 * Zonder deze correctie zou een afgelopen beurt wél "niet meer aan het herladen"
+	 * melden en tóch het oude, lage magazijn tonen. Dat is een tweede leugen in
+	 * plaats van een halve reparatie: de speler leest "klaar" en heeft 3 kogels.
+	 */
+	int32 GetAmmoInMagazine() const;
+
+	/**
+	 * 0..1 door de lopende herlaadbeurt heen; 0 als er niet herladen wordt.
+	 * De schermlaag tekent hier zijn voortgang mee — dat is het verschil tussen
+	 * "er staat iets" en "ik weet wanneer ik weer kan schieten".
+	 */
+	float GetReloadProgress() const;
+
 	int32 GetMagazineSize() const { return Weapon.MagazineSize; }
 	float GetReloadSeconds() const { return Weapon.ReloadSeconds; }
 	int32 GetReloadCount() const { return ReloadCount; }
+
+	/**
+	 * DE SPREIDING DIE HET VOLGENDE SCHOT KRIJGT, in graden.
+	 *
+	 * ÉÉN BRON VOOR DE KOGEL EN VOOR HET KRUIS, en dat is geen netheid maar een
+	 * les uit dit project: DEBUG_DISCIPLINE.md §4.2 beschrijft hoe dezelfde formule
+	 * twee keer stond (in de proxy die de speler ziet en in de spiegel die de test
+	 * uitleest) en hoe een meting aan de ene helft daardoor niets bewees over de
+	 * andere. Een richtkruis dat zijn eigen spreiding uitrekent, belooft iets wat
+	 * de kogel niet doet — en dat is erger dan geen kruis.
+	 *
+	 * Inclusief de "eerste schot is zuiver"-regel én het VERLOPEN daarvan op de
+	 * klok: laat je de trekker drie vuurintervallen los, dan is het volgende schot
+	 * weer zuiver en hoort het kruis dus dicht te trekken. Precies zoals bij het
+	 * herladen wordt dat hier UITGEREKEND en niet onthouden — een teller die pas
+	 * bij de volgende trekkerbeweging wordt bijgewerkt, zou het kruis wijd laten
+	 * staan terwijl het wapen allang weer zuiver is.
+	 */
+	float GetCurrentSpreadDegrees() const;
+
+	float GetHipSpreadDegrees() const { return Weapon.HipSpreadDegrees; }
+	float GetAimSpreadDegrees() const { return Weapon.AimSpreadDegrees; }
+	int32 GetPelletsPerShot() const { return Weapon.PelletsPerShot; }
 
 	float GetFalloffStartCm() const { return Weapon.FalloffStartCm; }
 	float GetFalloffMinFraction() const { return Weapon.FalloffMinFraction; }
@@ -144,6 +211,16 @@ private:
 	int32 ReloadCount = 0;
 
 	void FinishReload();
+
+	/**
+	 * De administratie bijwerken als de klok de beurt al voorbij is.
+	 *
+	 * De getters hierboven rekenen de waarheid uit en zijn const; deze functie legt
+	 * hem vast en staat op elk pad dat de toestand tóch al aanraakt (StartReload,
+	 * Fire). Zo blijven de opgeslagen velden en wat de wereld te horen krijgt nooit
+	 * langer dan één handeling uit elkaar lopen.
+	 */
+	void SettleReloadIfElapsed();
 
 	/** Beide slots, met per slot het magazijn dat erin zit. */
 	TArray<FEclipseWeaponRow> SlotRows;

@@ -22,8 +22,55 @@ namespace EclipseRosterLogic
 	 * Generate one soldier deterministically. Falls back to a numbered recruit
 	 * when pools are empty (missing content = graceful default, GDD 14.3.5) —
 	 * but a name is always produced: nameless soldiers violate Pillar 3.
+	 *
+	 * LET OP: dit is de losse trekking en die weet niets van wie er al bestaat.
+	 * Twee opeenvolgende zaden kunnen dus dezelfde voornaam opleveren — GEMETEN in
+	 * de verscheepte campagne op 31-07: zaad 1 en 2 gaven allebei "Sef" (Sef Voss en
+	 * Sef Chen) in een squad van drie. Wie een ROSTER maakt, hoort GenerateRoster te
+	 * gebruiken; deze functie blijft bestaan voor tests en voor losse aanwas.
 	 */
 	ECLIPSE_API FEclipseSoldierRecord GenerateSoldier(FName OriginId, const FEclipseNameGenerationParams& Params, int32 Seed);
+
+	/**
+	 * Een HELE ploeg, met onderscheidbare mensen erin (Pijler 3: "People, Not Units").
+	 *
+	 * WAAROM DIT BESTAAT. Op het scherm van 31-07 stonden "Sef Voss" en "Sef Chen"
+	 * onder elkaar in een squad van drie. In een bark, in een order en in het
+	 * casualty-bericht heet zo iemand alleen bij zijn voornaam, en dan is één op de
+	 * drie soldaten niet uit een ander te houden. Dat is geen cosmetisch defect: de
+	 * hele pijler leunt erop dat je je mensen herkent.
+	 *
+	 * Het is bovendien geen zeldzaam ongeluk maar het verjaardagsprobleem. Met 16
+	 * voornamen in de pool is de kans op minstens één botsing al 17 % bij drie
+	 * mensen en 65 % bij acht. Wie dit met een grotere pool "oplost", stelt hem
+	 * alleen uit.
+	 *
+	 * DE REGEL: binnen één roster is elke VOORNAAM uniek zolang de pool dat toelaat,
+	 * en is de VOLLEDIGE naam altijd uniek. Raakt de voornamenpool op (meer soldaten
+	 * dan namen), dan mag een voornaam terugkomen — maar dan nooit met dezelfde
+	 * achternaam, en de aanroeper krijgt het te horen via OutFirstNamesExhausted.
+	 * Onbekende data degradeert luid, nooit stil (14.3.5).
+	 *
+	 * Deterministisch: dezelfde FirstSeed en dezelfde pools geven dezelfde ploeg,
+	 * want dat is wat save-fixtures en soak-tests reproduceerbaar houdt.
+	 */
+	ECLIPSE_API TArray<FEclipseSoldierRecord> GenerateRoster(
+		FName OriginId, const FEclipseNameGenerationParams& Params, int32 Count,
+		int32 FirstSeed = 1, bool* OutFirstNamesExhausted = nullptr);
+
+	/** De voornaam uit een volledige naam ("Sef Voss" -> "Sef"). Eén plek, zodat de test en de generator niet uiteen kunnen lopen. */
+	ECLIPSE_API FString FirstNameOf(const FString& FullName);
+
+	/**
+	 * Hoeveel namen in deze lijst met minstens één andere BOTSEN op de voornaam.
+	 *
+	 * Bestaat als losse functie omdat de falsificatie hem nodig heeft: een test die
+	 * "alle namen zijn uniek" zelf uitrekent met andere code dan de generator,
+	 * bewijst niets over de generator. En 0 is hier pas een uitspraak als dezelfde
+	 * functie op een geprepareerde botsing wél een getal > 0 geeft — die
+	 * controleproef staat in EclipseRosterTests.
+	 */
+	ECLIPSE_API int32 CountFirstNameCollisions(const TArray<FEclipseSoldierRecord>& Roster);
 
 	/**
 	 * The death-resolution policy (SPEC-P1-07, extended by SPEC-P2-01):

@@ -10,6 +10,8 @@
 #include "Blueprint/WidgetTree.h"
 #include "Characters/EclipseCommandModeComponent.h"
 #include "Components/HorizontalBox.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/Image.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
@@ -29,6 +31,7 @@
 #include "Quests/EclipseMissionLogic.h"
 #include "Quests/EclipseMissionSubsystem.h"
 #include "Quests/EclipseMissionTypes.h"
+#include "UI/EclipseHudReadoutLogic.h"
 #include "Squad/EclipseSquadSubsystem.h"
 
 namespace
@@ -104,9 +107,12 @@ void UEclipseMissionHudWidget::LogUiReport() const
 		AmmoReadout != nullptr ? *AmmoReadout->GetText().ToString() : TEXT("(bestaat niet)"));
 	UE_LOG(LogEclipse, Display, TEXT("UI:   trefteken zichtbaarheid=%d"),
 		HitMarker != nullptr ? static_cast<int32>(HitMarker->GetVisibility()) : -1);
-	UE_LOG(LogEclipse, Display, TEXT("UI:   richtkruis  zichtbaarheid=%d tekst='%s'"),
-		Crosshair != nullptr ? static_cast<int32>(Crosshair->GetVisibility()) : -1,
-		Crosshair != nullptr ? *Crosshair->GetText().ToString() : TEXT("(bestaat niet)"));
+	// HET KRUIS IN MATEN EN NIET IN TEKST. Het is sinds 31-07 geen glyph meer maar
+	// vier balken, en juist de MAAT was het defect — een regel die "tekst='+'" meldt
+	// zou het probleem niet eens kunnen noemen.
+	UE_LOG(LogEclipse, Display, TEXT("UI:   richtkruis  zichtbaarheid=%d balken=%d arm=%.1f px gat=%.1f px dikte=%.1f px"),
+		CrosshairRoot != nullptr ? static_cast<int32>(CrosshairRoot->GetVisibility()) : -1,
+		CrosshairArms.Num(), LastCrosshairArmPx, LastCrosshairGapPx, LastCrosshairThicknessPx);
 	// Per paneel: staat de vlag aan EN hoeveel regels hangen eronder.
 	// Een open paneel zonder regels ziet er voor de speler net zo leeg
 	// uit als een dicht paneel, en dat zijn twee verschillende bugs.
@@ -141,9 +147,19 @@ void UEclipseMissionHudWidget::LogUiReport() const
 	// richt. Dit is de owner-melding van 27-07 als vaste controle, zodat
 	// hij niet nog eens twee dagen stil kan wegvallen.
 	if (ReportWeapon != nullptr
-		&& (Crosshair == nullptr || Crosshair->GetVisibility() == ESlateVisibility::Hidden))
+		&& (CrosshairRoot == nullptr || CrosshairRoot->GetVisibility() == ESlateVisibility::Collapsed
+			|| CrosshairArms.Num() != CrosshairArmCount))
 	{
 		UE_LOG(LogEclipse, Warning, TEXT("UI: FOUT — er is een wapen, maar er staat geen richtkruis; de speler kan niet zien waar hij richt."));
+	}
+	// EN EEN KRUIS DAT TE KLEIN IS OM TE VINDEN IS OOK KAPOT, en dat is de meting
+	// die 31-07 pas op pixelniveau opviel: 7x9 px, 17 pixels inkt. Een controle die
+	// alleen "staat hij er" vraagt, had daar nooit iets van gezegd.
+	if (ReportWeapon != nullptr && LastCrosshairArmPx > 0.0f && LastCrosshairArmPx < 8.0f)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("UI: FOUT — het richtkruis heeft armen van %.1f px; dat is de maat waarop hij op 31-07 onvindbaar bleek."),
+			LastCrosshairArmPx);
 	}
 	// Open zonder regels is voor de speler niet te onderscheiden van
 	// dicht — en dat is precies waarom het apart gemeld hoort te worden.
@@ -167,37 +183,114 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 	const APawn* Body = GetOwningPlayerPawn();
 	const UEclipseHitscanWeaponComponent* Weapon = Body != nullptr
 		? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
-	if (Weapon == nullptr || Weapon->GetMagazineSize() <= 0)
+
+	// ALLE BESLISSINGEN KOMEN UIT DE PURE KERN (EclipseHudReadoutLogic). Deze functie
+	// mag alleen nog aflezen en tekenen — dat is de laagscheiding waar de drie
+	// defecten van 31-07 doorheen glipten: "toon HERLADEN in plaats van de kogels",
+	// "plak de rijnaam op het scherm" en "zet hem 48 px van de rand" waren alledrie
+	// beslissingen in een opmaakfunctie, en dus per constructie niet te toetsen
+	// zonder de game te starten.
+	EclipseHudReadout::FEclipseWeaponReadoutFacts Facts;
+	if (Weapon != nullptr)
+	{
+		Facts.DisplayName = Weapon->GetActiveWeaponDisplayName();
+		Facts.RowName = Weapon->GetActiveWeaponName();
+		Facts.AmmoInMagazine = Weapon->GetAmmoInMagazine();
+		Facts.MagazineSize = Weapon->GetMagazineSize();
+		Facts.bReloading = Weapon->IsReloading();
+		Facts.ReloadProgress = Weapon->GetReloadProgress();
+		Facts.SlotCount = Weapon->GetSlotCount();
+	}
+
+	const EclipseHudReadout::FEclipseAmmoReadout Readout = EclipseHudReadout::ComposeAmmoReadout(Facts);
+
+	// LUID DEGRADEREN, ÉÉN KEER (14.3.5). Een rij zonder DisplayName levert nu een
+	// opgepoetste rijnaam op het scherm; dat is een noodverband en hoort gemeld te
+	// worden, anders blijft het stil bestaan tot iemand het toevallig op een frame
+	// ziet — precies hoe `Sidearm_Scrap` daar twee dagen kon staan.
+	if (Weapon != nullptr && Facts.SlotCount > 1 && !EclipseHudReadout::DisplayNameCameFromData(Facts)
+		&& !Facts.RowName.IsNone() && !ReportedMissingDisplayNames.Contains(Facts.RowName))
+	{
+		ReportedMissingDisplayNames.Add(Facts.RowName);
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: wapenrij '%s' heeft geen DisplayName — de speler ziet de opgepoetste rijnaam '%s'. Vul DT_Weapons.DisplayName."),
+			*Facts.RowName.ToString(), *EclipseHudReadout::HumaniseRowName(Facts.RowName));
+	}
+
+	if (Readout.bHidden)
 	{
 		// Geen wapen, of een wapen met een oneindig magazijn: dan is er niets te
 		// tellen en hoort er niets te staan. Een teller die "0 / 0" toont liegt.
 		AmmoReadout->SetVisibility(ESlateVisibility::Hidden);
+		SetVisibilityIfChanged(AmmoCapacity, false);
+		SetVisibilityIfChanged(WeaponReadout, false);
+		SetVisibilityIfChanged(ReloadReadout, false);
+		if (ReloadBarFill != nullptr)
+		{
+			SetVisibilityIfChanged(ReloadBarFill, false);
+			SetVisibilityIfChanged(ReloadBarTrack, false);
+		}
 		return;
 	}
 
+	// DRIE VELDEN DIE NAAST ELKAAR BESTAAN — de reparatie van defect 1. Het
+	// magazijngetal wordt hieronder niet meer aangeraakt door de herlaadtak.
 	AmmoReadout->SetVisibility(ESlateVisibility::HitTestInvisible);
-	if (Weapon->IsReloading())
+	AmmoReadout->SetText(FText::FromString(Readout.MagazineText));
+	SetVisibilityIfChanged(AmmoCapacity, true);
+	if (AmmoCapacity != nullptr)
 	{
-		AmmoReadout->SetText(NSLOCTEXT("Eclipse", "Reloading", "HERLADEN"));
-		AmmoReadout->SetColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.65f, 0.15f)));
-		return;
+		AmmoCapacity->SetText(FText::FromString(Readout.CapacityText));
 	}
 
-	const int32 Ammo = Weapon->GetAmmoInMagazine();
-	// De NAAM erbij zodra er meer dan één wapen is. Met een wisselknop op RB is
-	// "hoeveel kogels" niet genoeg — je moet zien welk wapen dat magazijn heeft,
-	// anders wissel je en weet je niet wat je in handen hebt.
-	const FName WeaponName = Weapon->GetActiveWeaponName();
-	AmmoReadout->SetText(FText::FromString(
-		Weapon->GetSlotCount() > 1 && !WeaponName.IsNone()
-			? FString::Printf(TEXT("%s   %d / %d"), *WeaponName.ToString(), Ammo, Weapon->GetMagazineSize())
-			: FString::Printf(TEXT("%d / %d"), Ammo, Weapon->GetMagazineSize())));
-	// Onder een derde kleurt hij. Dat is het punt waarop je moet BESLUITEN of je
-	// herlaadt of doorschiet, en een getal alleen haal je in een vuurgevecht niet
-	// van het scherm — kleur wel.
-	const bool bLow = Ammo * 3 <= Weapon->GetMagazineSize();
-	AmmoReadout->SetColorAndOpacity(FSlateColor(bLow
-		? FLinearColor(1.0f, 0.35f, 0.2f) : FLinearColor(0.9f, 0.9f, 0.9f)));
+	// Leeg is scherper dan laag: bij leeg doet de trekker niets, en dat hoort niet
+	// als "bijna leeg" te lezen.
+	const FLinearColor AmmoColour = Readout.bEmpty
+		? FLinearColor(1.0f, 0.25f, 0.18f)
+		: (Readout.bLow ? FLinearColor(1.0f, 0.55f, 0.15f) : FLinearColor(0.95f, 0.95f, 0.95f));
+	AmmoReadout->SetColorAndOpacity(FSlateColor(AmmoColour));
+
+	SetVisibilityIfChanged(WeaponReadout, !Readout.WeaponText.IsEmpty());
+	if (WeaponReadout != nullptr && !Readout.WeaponText.IsEmpty())
+	{
+		WeaponReadout->SetText(Readout.WeaponText);
+	}
+
+	const bool bReloading = !Readout.ReloadText.IsEmpty();
+	SetVisibilityIfChanged(ReloadReadout, bReloading);
+	SetVisibilityIfChanged(ReloadBarTrack, bReloading);
+	SetVisibilityIfChanged(ReloadBarFill, bReloading);
+	if (bReloading)
+	{
+		if (ReloadReadout != nullptr)
+		{
+			ReloadReadout->SetText(Readout.ReloadText);
+		}
+		// DE VOORTGANG ALS BREEDTE. Het woord alleen zegt DAT je herlaadt; de balk
+		// zegt WANNEER je weer kunt schieten, en dat is de informatie waar je in een
+		// gevecht een besluit op neemt.
+		if (UCanvasPanelSlot* FillSlot = Cast<UCanvasPanelSlot>(ReloadBarFill->Slot))
+		{
+			const FVector2D Size = FillSlot->GetSize();
+			FillSlot->SetSize(FVector2D(ReloadBarWidthPx * Readout.ReloadProgress, Size.Y));
+		}
+	}
+}
+
+void UEclipseMissionHudWidget::SetVisibilityIfChanged(UWidget* Widget, bool bVisible)
+{
+	// SetVisibility ongeldigt de layout, en deze functie draait per frame per
+	// element. Alleen bij een ECHTE verandering aanroepen scheelt vier
+	// layout-invalidaties per frame — 12.4 geldt ook voor de HUD.
+	if (Widget == nullptr)
+	{
+		return;
+	}
+	const ESlateVisibility Desired = bVisible ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed;
+	if (Widget->GetVisibility() != Desired)
+	{
+		Widget->SetVisibility(Desired);
+	}
 }
 
 void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
@@ -216,6 +309,39 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 	if (!bLoggedAmmoState && AmmoReadout != nullptr && GetWorld() != nullptr && GetWorld()->TimeSeconds > 3.0f)
 	{
 		bLoggedAmmoState = true;
+
+		// DE MAAT DIE HET ECHT WORDT, en niet de maat die ik bedoelde.
+		//
+		// Deze regel bestaat omdat ik er twee opnamerondes op ben misgegaan: ik zette
+		// de marge op 36 en mat 25 px op het frame, corrigeerde voor de DPI-schaal en
+		// mat 55. Twee metingen die niet met één schaalfactor te rijmen zijn, dus
+		// mijn model van de keten klopte niet — en dan is doorrekenen zinloos.
+		//
+		// Wat hier staat is de hele keten in één regel: de viewport, de DPI-schaal,
+		// wat ik in het slot zet, en wat Slate er UITEINDELIJK van maakt
+		// (GetCachedGeometry is de geometrie ná de layout, dus na alle schaling).
+		// Daarmee is het verschil tussen "administratie" en "scherm" niet meer een
+		// vermoeden maar een getal — precies waar deze hele laag op vastliep.
+		int32 ViewX = 0;
+		int32 ViewY = 0;
+		if (const APlayerController* Owner = GetOwningPlayer())
+		{
+			Owner->GetViewportSize(ViewX, ViewY);
+		}
+		const float DpiScale = UWidgetLayoutLibrary::GetViewportScale(this);
+		const FVector2D SlotMargin = CurrentTitleSafeMarginPx();
+		const FGeometry& RootGeometry = Root != nullptr ? Root->GetCachedGeometry() : GetCachedGeometry();
+		const FVector2D RootAbsolute = RootGeometry.GetAbsolutePosition();
+		const FVector2D BlockAbsolute = AmmoBlock != nullptr
+			? AmmoBlock->GetCachedGeometry().GetAbsolutePosition() : FVector2D::ZeroVector;
+		const FVector2D BlockSize = AmmoBlock != nullptr
+			? AmmoBlock->GetCachedGeometry().GetAbsoluteSize() : FVector2D::ZeroVector;
+		UE_LOG(LogEclipse, Display,
+			TEXT("HUD MARGE: viewport %dx%d, DPI-schaal %.3f, slotwaarde %.1f -> ECHT linksboven (%.1f, %.1f) px; munitieblok op (%.1f, %.1f) maat %.1fx%.1f -> rechtermarge %.1f px, ondermarge %.1f px"),
+			ViewX, ViewY, DpiScale, SlotMargin.X,
+			RootAbsolute.X, RootAbsolute.Y,
+			BlockAbsolute.X, BlockAbsolute.Y, BlockSize.X, BlockSize.Y,
+			ViewX - (BlockAbsolute.X + BlockSize.X), ViewY - (BlockAbsolute.Y + BlockSize.Y));
 		UE_LOG(LogEclipse, Display,
 			TEXT("HUD: munitieteller zichtbaarheid=%d tekst='%s' inViewport=%d"),
 			static_cast<int32>(AmmoReadout->GetVisibility()),
@@ -228,6 +354,9 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 	// Alleen werk als er iets te doven valt. Deze widget tikt toch al voor Slate;
 	// een timer per treffer zou bij 6,67 schoten per seconde meer kosten dan dit.
 	RefreshAmmoReadout();
+	// Het kruis reageert op de spreiding, dus hij hoort per frame na te kijken —
+	// maar hij doet alleen werk als er iets veranderde (zie RefreshCrosshair).
+	RefreshCrosshair();
 
 	if (HitMarkerSecondsLeft > 0.0f)
 	{
@@ -288,7 +417,14 @@ void UEclipseMissionHudWidget::NativeOnInitialized()
 	{
 		RootSlot->SetAutoSize(true);
 		RootSlot->SetAnchors(FAnchors(0.0f, 0.0f));
-		RootSlot->SetPosition(FVector2D(12.0f, 12.0f));
+		// DEZELFDE MARGE ALS DE REST — defect 4. Hier stond 12 px, rechtsonder stond
+		// 48/32 px, en geen van beide was gekozen: GEMETEN op
+		// HUD_wapen_E_na_wissel.png begon de bovenste regel op beeldkolom 9 (0,7 %
+		// van de breedte) terwijl de wapenregel de laatste kolom raakte. Twee
+		// verschillende ad-hoc getallen in dezelfde HUD. Er is nu één bron, en die
+		// schaalt met de resolutie in plaats van met de toevallige testresolutie.
+		const FVector2D Margin = CurrentTitleSafeMarginPx();
+		RootSlot->SetPosition(Margin);
 	}
 
 	// ---------------------------------------------------------------------------
@@ -751,23 +887,160 @@ void UEclipseMissionHudWidget::BuildHitMarker()
 
 void UEclipseMissionHudWidget::BuildAmmoReadout()
 {
-	// De munitieteller. Rechtsonder verankerd, uitgelijnd op zijn eigen
-	// rechteronderhoek, zodat "30 / 30" en "7 / 30" op dezelfde plek eindigen —
-	// een teller die verspringt terwijl je hem afleest is erger dan geen teller.
-	AmmoReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("AmmoReadout"));
-	if (UCanvasPanelSlot* AmmoSlot = Canvas->AddChildToCanvas(AmmoReadout))
+	// DE MUNITIEHOEK. Vier elementen die samen één blok vormen, en dat is de
+	// reparatie van defect 1 en 4 tegelijk.
+	//
+	// WAT ER STOND: één tekstblok, AutoSize, verankerd rechtsonder en uitgelijnd op
+	// zijn eigen rechteronderhoek, op (-48, -32). Twee dingen mis:
+	//
+	//  1. HET DROEG TWEE FEITEN. Tijdens een herlaadbeurt werd de hele tekst
+	//     vervangen door "HERLADEN", dus precies wanneer je wilt weten hoeveel er
+	//     straks in zit, stond het er niet.
+	//
+	//  2. AUTOSIZE + RECHTSUITGELIJND LOOPT ÉÉN FRAME ACHTER. GEZIEN op
+	//     HUD_wapen_E_na_wissel.png: `Sidearm_Scrap` liep tot beeldkolom 1278 van
+	//     1279 en de "12 / 12" stond helemaal buiten beeld. De oorzaak is niet de
+	//     offset (die zou op 1232 uitkomen) maar dat de slot-geometrie de GEWENSTE
+	//     MAAT VAN DE VORIGE LAYOUT gebruikt: wordt de tekst langer, dan wordt hij
+	//     één frame lang geplaatst alsof hij nog kort was, en groeit hij rechts het
+	//     beeld uit. Elke wapenwissel levert dus zo'n frame op.
+	//
+	// Vandaar een VAST KADER met een eigen breedte in plaats van AutoSize. Wat er
+	// ook in komt te staan, het blok kan zijn eigen rand niet meer uit — een langere
+	// wapennaam kan het probleem niet opnieuw maken.
+	const FVector2D Margin = CurrentTitleSafeMarginPx();
+
+	AmmoBlock = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("AmmoBlock"));
+	if (UCanvasPanelSlot* BlockSlot = Canvas->AddChildToCanvas(AmmoBlock))
 	{
-		AmmoSlot->SetAutoSize(true);
-		AmmoSlot->SetAnchors(FAnchors(1.0f, 1.0f));
-		AmmoSlot->SetAlignment(FVector2D(1.0f, 1.0f));
-		AmmoSlot->SetPosition(FVector2D(-48.0f, -32.0f));
+		BlockSlot->SetAutoSize(false);
+		BlockSlot->SetAnchors(FAnchors(1.0f, 1.0f));
+		BlockSlot->SetAlignment(FVector2D(1.0f, 1.0f));
+		BlockSlot->SetSize(FVector2D(AmmoBlockWidthPx, AmmoBlockHeightPx));
+		BlockSlot->SetPosition(FVector2D(-Margin.X, -Margin.Y));
 	}
+	AmmoBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	// Alles binnen het blok is RECHTS uitgelijnd op dezelfde lijn, zodat "7" en "30"
+	// op dezelfde plek eindigen. Een teller die verspringt terwijl je hem afleest is
+	// erger dan geen teller.
+	auto AddToBlock = [this](UTextBlock* Text, float RightPx, float BottomPx)
+	{
+		if (UCanvasPanelSlot* Slot = AmmoBlock->AddChildToCanvas(Text))
+		{
+			Slot->SetAutoSize(true);
+			Slot->SetAnchors(FAnchors(1.0f, 1.0f));
+			Slot->SetAlignment(FVector2D(1.0f, 1.0f));
+			Slot->SetPosition(FVector2D(-RightPx, -BottomPx));
+		}
+	};
+
+	// HET MAGAZIJNGETAL IS HET GROOTSTE GETAL OP HET SCHERM
+	// (REFERENTIE_HUD_BORDERLANDS.md §1 regel 3). Dat is geen versiering maar de
+	// hiërarchie: één ding is het belangrijkst, de rest wijkt.
+	AmmoReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("AmmoReadout"));
 	FSlateFontInfo AmmoFont = AmmoReadout->GetFont();
-	AmmoFont.Size = 22;
+	AmmoFont.Size = 46;
+	AmmoFont.TypefaceFontName = TEXT("Bold");
 	AmmoReadout->SetFont(AmmoFont);
-	// De teller staat rechtsonder, waar in dit district juist de lichte wegmarkering
-	// ligt — zonder rand is dat de eerste plek waar hij wegvalt.
-	ApplyLegibilityOutline(*AmmoReadout);
+	ApplyLegibilityOutline(*AmmoReadout, 2);
+	AddToBlock(AmmoReadout, /*RightPx*/ 46.0f, /*BottomPx*/ 0.0f);
+
+	// De magazijnMAAT kleiner en gedimd ernaast: hij verandert nooit, dus hij hoort
+	// niet mee te vechten om je blik.
+	AmmoCapacity = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("AmmoCapacity"));
+	FSlateFontInfo CapacityFont = AmmoCapacity->GetFont();
+	CapacityFont.Size = 20;
+	AmmoCapacity->SetFont(CapacityFont);
+	AmmoCapacity->SetColorAndOpacity(FSlateColor(FLinearColor(0.72f, 0.72f, 0.74f)));
+	ApplyLegibilityOutline(*AmmoCapacity);
+	AddToBlock(AmmoCapacity, /*RightPx*/ 0.0f, /*BottomPx*/ 6.0f);
+
+	// De wapennaam erboven — de LEESBARE naam uit de data (defect 3).
+	WeaponReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("WeaponReadout"));
+	FSlateFontInfo WeaponFont = WeaponReadout->GetFont();
+	WeaponFont.Size = 18;
+	WeaponReadout->SetFont(WeaponFont);
+	WeaponReadout->SetColorAndOpacity(FSlateColor(FLinearColor(0.88f, 0.88f, 0.90f)));
+	ApplyLegibilityOutline(*WeaponReadout);
+	AddToBlock(WeaponReadout, /*RightPx*/ 0.0f, /*BottomPx*/ 54.0f);
+
+	// EN DE HERLAADREGEL ERBOVEN, met een eigen plek. Dit is defect 1: hij staat
+	// NAAST de kogels en niet in plaats van de kogels.
+	ReloadReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("ReloadReadout"));
+	FSlateFontInfo ReloadFont = ReloadReadout->GetFont();
+	ReloadFont.Size = 16;
+	ReloadReadout->SetFont(ReloadFont);
+	ReloadReadout->SetColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.72f, 0.20f)));
+	ApplyLegibilityOutline(*ReloadReadout);
+	AddToBlock(ReloadReadout, /*RightPx*/ 0.0f, /*BottomPx*/ 92.0f);
+
+	// De voortgangsbalk: een donkere goot met een oplopende vulling erin. Twee
+	// afbeeldingen met een vlakke kleur — geen textuur, dus er wordt niets getekend
+	// wat er niet ligt.
+	ReloadBarTrack = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("ReloadBarTrack"));
+	ReloadBarTrack->SetColorAndOpacity(FLinearColor(0.05f, 0.05f, 0.06f, 0.85f));
+	if (UCanvasPanelSlot* TrackSlot = AmmoBlock->AddChildToCanvas(ReloadBarTrack))
+	{
+		TrackSlot->SetAutoSize(false);
+		TrackSlot->SetAnchors(FAnchors(1.0f, 1.0f));
+		TrackSlot->SetAlignment(FVector2D(1.0f, 1.0f));
+		TrackSlot->SetSize(FVector2D(ReloadBarWidthPx, 6.0f));
+		TrackSlot->SetPosition(FVector2D(0.0f, -84.0f));
+	}
+
+	ReloadBarFill = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("ReloadBarFill"));
+	ReloadBarFill->SetColorAndOpacity(FLinearColor(1.0f, 0.72f, 0.20f, 1.0f));
+	if (UCanvasPanelSlot* FillSlot = AmmoBlock->AddChildToCanvas(ReloadBarFill))
+	{
+		FillSlot->SetAutoSize(false);
+		// LINKS verankerd binnen de goot, want de vulling groeit naar rechts en moet
+		// dus aan zijn linkerkant vastzitten. Rechts verankeren zou hem laten
+		// krimpen vanaf de verkeerde kant en dat leest als aftellen in plaats van
+		// vollopen.
+		FillSlot->SetAnchors(FAnchors(1.0f, 1.0f));
+		FillSlot->SetAlignment(FVector2D(0.0f, 1.0f));
+		FillSlot->SetSize(FVector2D(0.0f, 6.0f));
+		FillSlot->SetPosition(FVector2D(-ReloadBarWidthPx, -84.0f));
+	}
+
+	SetVisibilityIfChanged(ReloadReadout, false);
+	SetVisibilityIfChanged(ReloadBarTrack, false);
+	SetVisibilityIfChanged(ReloadBarFill, false);
+}
+
+FVector2D UEclipseMissionHudWidget::CurrentTitleSafeMarginPx() const
+{
+	// De schermmaat uit de viewport en niet uit de widget-geometrie: bij
+	// NativeOnInitialized bestaat de Slate-geometrie nog niet, en 0x0 zou de marge
+	// op zijn ondergrens vastzetten zonder dat iets dat meldt.
+	FVector2D Size(1280.0, 720.0);
+	if (const APlayerController* Owner = GetOwningPlayer())
+	{
+		int32 SizeX = 0;
+		int32 SizeY = 0;
+		Owner->GetViewportSize(SizeX, SizeY);
+		if (SizeX > 0 && SizeY > 0)
+		{
+			Size = FVector2D(SizeX, SizeY);
+		}
+	}
+	// GEDEELD DOOR DE DPI-SCHAAL, en dat is een reparatie op mijn eigen eerste
+	// versie — gevonden door na te meten in plaats van aan te nemen.
+	//
+	// GEMETEN op de opnameronde van 31-07 21:41: ik zette de marge op 36 px en op
+	// het frame stond hij op 25. UMG rekent slot-posities in SLATE-EENHEDEN en
+	// vermenigvuldigt die met de DPI-schaal van de viewport; de standaardcurve van
+	// de engine geeft op een korte zijde van 720 een schaal van 0,666, en
+	// 36 x 0,666 = 24. De marge kwam dus stelselmatig te krap uit, en precies op de
+	// kleine vensters waar hij het hardst nodig is.
+	//
+	// Dit is dezelfde kloof als waar deze hele laag op vastliep: een getal in de
+	// administratie is niet hetzelfde als een getal op het scherm. Delen door de
+	// schaal maakt van "36" een belofte in SCHERMPIXELS in plaats van in
+	// Slate-eenheden.
+	const float Scale = FMath::Max(UWidgetLayoutLibrary::GetViewportScale(this), KINDA_SMALL_NUMBER);
+	return EclipseHudReadout::TitleSafeMarginPx(Size) / Scale;
 }
 
 void UEclipseMissionHudWidget::BuildDamageIndicator()
@@ -823,45 +1096,183 @@ void UEclipseMissionHudWidget::BuildCrosshair()
 	// EERST HET KRUIS, DAN DE HITMARKER: de canvas tekent in volgorde van
 	// toevoegen, dus de hitmarker hoort erná zodat een treffer OVER het kruis
 	// oplicht in plaats van eronder te verdwijnen.
-	Crosshair = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Crosshair"));
-	if (UCanvasPanelSlot* CrosshairSlot = Canvas->AddChildToCanvas(Crosshair))
+	// GEEN GLYPH MEER, MAAR GEOMETRIE — en dat is de reparatie van defect 5.
+	//
+	// GEMETEN op alle elf HUD-frames van 31-07 20:36: het kruis was een tekstglyph
+	// van 7x9 px met 17 pixels boven luminantie 200. Dat is 0,0018 % van een beeld
+	// van 1280x720. De donkere rand die hier eerder is aangebracht ZIT ER ECHT (de
+	// donkerste pixel in het middenvak meet 0,0 op elk frame), dus het is geen
+	// contrastprobleem meer — het is een MAAT-probleem, en dat is een ander soort
+	// fout dan waar de vorige ronde op mikte.
+	//
+	// Tweede vondst uit dezelfde meting, en die kon alleen op pixelniveau opvallen:
+	// de inkt van de '+' stond op elk frame op y = -5..+3 ten opzichte van het
+	// schermmidden, dus het kruis hing 1 px TE HOOG. Een tekstglyph is gecentreerd
+	// op zijn regelvak en niet op zijn eigen inkt, en een vizier dat niet op het
+	// richtpunt staat is precies zo fout als een vizier dat je niet ziet.
+	//
+	// Vier balken rond een gat lossen beide op: de maat is een getal in plaats van
+	// een fonteigenschap, en het middelpunt is per constructie het middelpunt.
+	// Dit is ook wat REFERENTIE_HUD_BORDERLANDS.md §2 vraagt (vorm per wapentype).
+	// Tekenen doe ik hiermee niet: het zijn vlakke kleuren, geen textuur.
+	CrosshairRoot = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("CrosshairRoot"));
+	if (UCanvasPanelSlot* RootSlot = Canvas->AddChildToCanvas(CrosshairRoot))
 	{
-		CrosshairSlot->SetAutoSize(true);
-		CrosshairSlot->SetAnchors(FAnchors(0.5f, 0.5f));
-		CrosshairSlot->SetAlignment(FVector2D(0.5f, 0.5f));
-		CrosshairSlot->SetPosition(FVector2D::ZeroVector);
+		RootSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+		RootSlot->SetOffsets(FMargin(0.0f));
 	}
-	FSlateFontInfo CrosshairFont = Crosshair->GetFont();
-	// KLEINER DAN DE HITMARKER (28), en met opzet. Het kruis staat er altijd, dus
-	// het moet het beeld dragen zonder het te vullen; de hitmarker moet er juist
-	// bovenuit springen op het moment dat hij komt.
-	CrosshairFont.Size = 18;
-	Crosshair->SetFont(CrosshairFont);
-	Crosshair->SetText(FText::FromString(TEXT("+")));
-	// Niet wit: tegen de oranje horizon en het lichte asfalt van het district
-	// verdwijnt zuiver wit. Een lichte koele tint met volle dekking blijft op
-	// beide leesbaar.
-	Crosshair->SetColorAndOpacity(FSlateColor(FLinearColor(0.85f, 0.92f, 1.0f, 1.0f)));
-	// EN EEN DONKERE RAND, en dat is de correctie op de regel die hier stond.
-	//
-	// Er stond: "de zwarte contourlijnen van de toon-stijl geven hem vanzelf rand".
-	// Dat klopt niet en kon ook nooit kloppen: de inktlijn is een post-effect op
-	// 3D-GEOMETRIE, en dit kruis is een Slate-glyph die er bovenop wordt getekend —
-	// die krijgt van dat effect nooit één pixel. GEMETEN op het eerste frame waar de
-	// HUD überhaupt zichtbaar was (31-07): een glyph van 9x9 px, lichte tint, zonder
-	// enige donkere pixel eromheen. Op de donkere muur leesbaar, op de gele
-	// wegmarkering ernaast per constructie niet.
-	//
-	// Een schaduw is geen versiering maar de standaardoplossing: één donkere pixel
-	// rondom garandeert contrast tegen élke ondergrond, en dat is precies de eis
-	// "in beide perspectieven écht leesbaar" — die gaat over de ondergrond, niet
-	// over de camera.
-	ApplyLegibilityOutline(*Crosshair);
-	// HitTestInvisible en niet Visible: het kruis mag nooit een klik opvangen.
-	Crosshair->SetVisibility(ESlateVisibility::HitTestInvisible);
+	CrosshairRoot->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+	// Per arm twee lagen: een donkere onderlaag die één pixel aan alle kanten
+	// uitsteekt, en de lichte balk erop. Dat is dezelfde redenering als de
+	// font-outline op de teksten — een teken dat op een lichte ondergrond wegvalt,
+	// wijst nergens naar — maar nu op geometrie, waar een font-outline niet bestaat.
+	CrosshairArms.Reset();
+	CrosshairShadows.Reset();
+	for (int32 Arm = 0; Arm < CrosshairArmCount; ++Arm)
+	{
+		UImage* Shadow = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+		Shadow->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.85f));
+		CrosshairRoot->AddChildToCanvas(Shadow);
+		CrosshairShadows.Add(Shadow);
+	}
+	for (int32 Arm = 0; Arm < CrosshairArmCount; ++Arm)
+	{
+		UImage* Bar = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+		// Niet zuiver wit: tegen de oranje horizon en het lichte asfalt van het
+		// district verdwijnt wit. Een lichte koele tint met volle dekking blijft op
+		// beide leesbaar.
+		Bar->SetColorAndOpacity(FLinearColor(0.90f, 0.95f, 1.0f, 1.0f));
+		CrosshairRoot->AddChildToCanvas(Bar);
+		CrosshairArms.Add(Bar);
+	}
+
+	// EN EEN PUNT IN HET MIDDEN. Klein en gedimd: hij markeert het exacte richtpunt
+	// dat de vier balken juist vrijlaten, zonder het doelwit te bedekken.
+	CrosshairCentre = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("CrosshairCentre"));
+	CrosshairCentre->SetColorAndOpacity(FLinearColor(0.90f, 0.95f, 1.0f, 0.55f));
+	CrosshairRoot->AddChildToCanvas(CrosshairCentre);
+
+	RefreshCrosshair();
 }
 
-void UEclipseMissionHudWidget::ApplyLegibilityOutline(UTextBlock& Text)
+void UEclipseMissionHudWidget::RefreshCrosshair()
+{
+	if (CrosshairRoot == nullptr || CrosshairArms.Num() != CrosshairArmCount)
+	{
+		return;
+	}
+
+	const APawn* Body = GetOwningPlayerPawn();
+	const UEclipseHitscanWeaponComponent* Weapon = Body != nullptr
+		? Body->FindComponentByClass<UEclipseHitscanWeaponComponent>() : nullptr;
+
+	// GEEN WAPEN, GEEN KRUIS. Een vizier boven een lege hand wijst nergens naar.
+	const bool bShow = Weapon != nullptr;
+	if (CrosshairRoot->GetVisibility() != (bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed))
+	{
+		CrosshairRoot->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+	}
+	if (!bShow)
+	{
+		return;
+	}
+
+	int32 ViewportX = 1280;
+	int32 ViewportY = 720;
+	if (const APlayerController* Owner = GetOwningPlayer())
+	{
+		Owner->GetViewportSize(ViewportX, ViewportY);
+	}
+
+	// De spreiding die NU geldt, uit dezelfde bron waar het schot hem vandaan haalt
+	// — anders belooft het kruis iets wat de kogel niet doet.
+	const bool bAiming = Body != nullptr && Body->IsA<AEclipseCharacter>()
+		&& Cast<AEclipseCharacter>(Body)->IsAiming();
+	const float Spread = bAiming ? Weapon->GetAimSpreadDegrees() : Weapon->GetHipSpreadDegrees();
+	const float Fov = bAiming ? 64.0f : 80.0f;
+
+	EclipseHudReadout::FEclipseCrosshairLayout Layout = EclipseHudReadout::ComposeCrosshair(
+		Spread, Weapon->GetPelletsPerShot(), Weapon->GetAimSpreadDegrees(),
+		static_cast<float>(ViewportY), Fov);
+
+	// DEZELFDE DPI-CORRECTIE ALS BIJ DE MARGE, en om dezelfde reden: ComposeCrosshair
+	// rekent in SCHERMPIXELS (de spreidingshoek projecteert op schermpixels), maar een
+	// canvas-slot krijgt SLATE-EENHEDEN. Zonder deze deling werd een balk van 3 px op
+	// 720p als 2 px getekend — GEMETEN op de ronde van 21:41 — en dat is precies de
+	// dunte waar het oude kruis op wegviel. Het gat mag NIET meeschalen op een andere
+	// manier dan de rest, anders belooft het kruis een andere spreiding dan de kogel.
+	const float DpiScale = FMath::Max(UWidgetLayoutLibrary::GetViewportScale(this), KINDA_SMALL_NUMBER);
+	Layout.ArmLengthPx /= DpiScale;
+	Layout.ThicknessPx /= DpiScale;
+	Layout.GapPx /= DpiScale;
+
+	// Niets doen als er niets veranderde: dit draait per frame, en een layout-invalidatie
+	// per frame per balk is precies het soort HUD-kosten dat 12.4 verbiedt.
+	if (FMath::IsNearlyEqual(Layout.ArmLengthPx, LastCrosshairArmPx, 0.05f)
+		&& FMath::IsNearlyEqual(Layout.GapPx, LastCrosshairGapPx, 0.05f)
+		&& FMath::IsNearlyEqual(Layout.ThicknessPx, LastCrosshairThicknessPx, 0.05f))
+	{
+		return;
+	}
+	LastCrosshairArmPx = Layout.ArmLengthPx;
+	LastCrosshairGapPx = Layout.GapPx;
+	LastCrosshairThicknessPx = Layout.ThicknessPx;
+
+	// Volgorde: boven, onder, links, rechts. Haken laten de verticale balken weg —
+	// dat is wat een shotgun-vizier in Borderlands doet en het leest meteen anders.
+	const bool bBrackets = Layout.Shape == EclipseHudReadout::EEclipseCrosshairShape::Brackets;
+	for (int32 Arm = 0; Arm < CrosshairArmCount; ++Arm)
+	{
+		const bool bVertical = Arm < 2;
+		const float Sign = (Arm % 2 == 0) ? -1.0f : 1.0f;
+		const bool bArmVisible = !(bBrackets && bVertical);
+
+		const FVector2D Size = bVertical
+			? FVector2D(Layout.ThicknessPx, Layout.ArmLengthPx)
+			: FVector2D(Layout.ArmLengthPx, Layout.ThicknessPx);
+		// Het midden van de balk ligt op gat + halve armlengte vanaf het schermmidden.
+		const float Offset = Sign * (Layout.GapPx + Layout.ArmLengthPx * 0.5f);
+		const FVector2D Position = bVertical ? FVector2D(0.0f, Offset) : FVector2D(Offset, 0.0f);
+
+		auto Place = [this](UImage* Image, const FVector2D& InSize, const FVector2D& InPosition, bool bIsVisible)
+		{
+			if (Image == nullptr)
+			{
+				return;
+			}
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(Image->Slot))
+			{
+				Slot->SetAutoSize(false);
+				Slot->SetAnchors(FAnchors(0.5f, 0.5f));
+				Slot->SetAlignment(FVector2D(0.5f, 0.5f));
+				Slot->SetSize(InSize);
+				Slot->SetPosition(InPosition);
+			}
+			SetVisibilityIfChanged(Image, bIsVisible);
+		};
+
+		// De schaduw is aan alle kanten één pixel groter; daarmee staat er rondom de
+		// hele balk een donkere lijn in plaats van alleen aan twee zijden.
+		Place(CrosshairShadows[Arm], Size + FVector2D(2.0f, 2.0f), Position, bArmVisible);
+		Place(CrosshairArms[Arm], Size, Position, bArmVisible);
+	}
+
+	if (CrosshairCentre != nullptr)
+	{
+		if (UCanvasPanelSlot* CentreSlot = Cast<UCanvasPanelSlot>(CrosshairCentre->Slot))
+		{
+			CentreSlot->SetAutoSize(false);
+			CentreSlot->SetAnchors(FAnchors(0.5f, 0.5f));
+			CentreSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+			CentreSlot->SetSize(FVector2D(2.0f, 2.0f));
+			CentreSlot->SetPosition(FVector2D::ZeroVector);
+		}
+		SetVisibilityIfChanged(CrosshairCentre, true);
+	}
+}
+
+void UEclipseMissionHudWidget::ApplyLegibilityOutline(UTextBlock& Text, int32 OutlineSizePx)
 {
 	// EEN ECHTE RAND RONDOM, en niet de slagschaduw waar ik mee begon.
 	//
@@ -874,7 +1285,7 @@ void UEclipseMissionHudWidget::ApplyLegibilityOutline(UTextBlock& Text)
 	// zelf. Eén pixel: genoeg om te scheiden, klein genoeg om een kruis van 9 px
 	// niet in een blok te veranderen.
 	FSlateFontInfo Font = Text.GetFont();
-	Font.OutlineSettings.OutlineSize = 1;
+	Font.OutlineSettings.OutlineSize = OutlineSizePx;
 	Font.OutlineSettings.OutlineColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	Text.SetFont(Font);
 }

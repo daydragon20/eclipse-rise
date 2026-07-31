@@ -14,6 +14,7 @@
 #include "Squad/EclipseRosterTypes.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseRegionGraphAsset.h"
+#include "Strategy/EclipseStrategyLogic.h"
 #include "StructUtils/InstancedStruct.h"
 
 namespace
@@ -254,9 +255,6 @@ namespace
 					}
 				}
 			}
-			// Whatever shape came in, the in-memory state is now current.
-			// (Convention: this normalize lives at the LAST tail — v6 moves it.)
-			State.SchemaVersion = 5;
 		}
 		else
 		{
@@ -267,6 +265,40 @@ namespace
 				FName FlagName = Flag.GetTagName();
 				Ar << FlagName;
 			}
+		}
+
+		// Schema v6 (GDD 9.4): the Dominion Response Tier, appended at block end
+		// — the same mechanical tail as v2..v5. A pre-v6 block has no tail and
+		// comes home at Indifference, which is the honest reading: a campaign
+		// that predates the strategic opponent has not been noticed yet.
+		if (Ar.IsLoading())
+		{
+			State.ResponseTier = EEclipseDominionResponseTier::Indifference;
+			if (State.SchemaVersion >= 6)
+			{
+				uint8 Tier = 0;
+				Ar << Tier;
+				if (Tier <= static_cast<uint8>(EEclipseDominionResponseTier::Existential))
+				{
+					State.ResponseTier = static_cast<EEclipseDominionResponseTier>(Tier);
+				}
+				else
+				{
+					// A byte off the ladder is a corrupt or hand-edited file.
+					// Clamping to the top is wrong (it would invent a war);
+					// falling back to 0 is wrong too (it would erase one). Say
+					// so and take the floor — a visible mistake beats a silent one.
+					UE_LOG(LogEclipse, Warning, TEXT("Campaign load: response tier byte %u is off the GDD 9.4 ladder — read as Indifference."), Tier);
+				}
+			}
+			// Whatever shape came in, the in-memory state is now current.
+			// (Convention: this normalize lives at the LAST tail — v7 moves it.)
+			State.SchemaVersion = 6;
+		}
+		else
+		{
+			uint8 Tier = static_cast<uint8>(State.ResponseTier);
+			Ar << Tier;
 		}
 	}
 }
@@ -374,6 +406,24 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 				CampaignBlock->Append(reinterpret_cast<const uint8*>(&EmptyCount), sizeof(int32));
 				return true;
 			}));
+
+		// v5 -> v6 (GDD 9.4): the Campaign block gained the trailing Dominion
+		// Response Tier. NOT an empty count this time — the tier is a single
+		// byte, and the value it migrates to is 0/Indifference on purpose: a
+		// campaign saved before the strategic opponent existed has not been
+		// noticed by the empire yet, which is exactly what tier 0 means.
+		SaveSubsystem->RegisterMigration(5, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
+			[](TMap<FName, TArray<uint8>>& SaveBlocks)
+			{
+				TArray<uint8>* CampaignBlock = SaveBlocks.Find(TEXT("Campaign"));
+				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
+				{
+					return false;
+				}
+				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 6;
+				CampaignBlock->Add(static_cast<uint8>(EEclipseDominionResponseTier::Indifference));
+				return true;
+			}));
 	}
 
 	RegisterConsoleCommands();
@@ -466,17 +516,47 @@ void UEclipseCampaignSubsystem::StartNewCampaign(const UEclipseCampaignSetupAsse
 		UE_LOG(LogEclipse, Warning, TEXT("StartNewCampaign: no class defs table — recruits start classless (GDD 14.3.5)."));
 	}
 
-	for (int32 Index = 0; Index < Setup->StartingRosterSize; ++Index)
+	// DE HELE PLOEG IN ÉÉN KEER, en dat is de reparatie van de dubbele voornaam.
+	//
+	// GEZIEN op HUD_wapen_E_na_wissel.png (31-07): onder "-- squad orders --" stonden
+	// "Sef Voss" en "Sef Chen" in een squad van drie. De losse GenerateSoldier weet
+	// per definitie niet wie er al bestaat, dus deze lus trok drie keer los uit
+	// dezelfde pool van 16 voornamen — het verjaardagsprobleem, met 17 % kans op een
+	// botsing bij drie mensen. GenerateRoster kent de ploeg wel en houdt de
+	// voornamen uit elkaar.
+	bool bFirstNamesExhausted = false;
+	TArray<FEclipseSoldierRecord> Recruits = EclipseRosterLogic::GenerateRoster(
+		OriginId, NameParams, Setup->StartingRosterSize, /*FirstSeed*/ 1, &bFirstNamesExhausted);
+	for (int32 Index = 0; Index < Recruits.Num(); ++Index)
 	{
-		FEclipseSoldierRecord Soldier = EclipseRosterLogic::GenerateSoldier(OriginId, NameParams, Index + 1);
 		if (!StartingClassIds.IsEmpty())
 		{
-			Soldier.ClassId = StartingClassIds[Index % StartingClassIds.Num()];
+			Recruits[Index].ClassId = StartingClassIds[Index % StartingClassIds.Num()];
 		}
-		State.Roster.Add(MoveTemp(Soldier));
+		State.Roster.Add(MoveTemp(Recruits[Index]));
+	}
+	if (bFirstNamesExhausted)
+	{
+		// Luid degraderen (14.3.5): de ploeg past niet in de namenpool, dus er KOMEN
+		// dubbele voornamen en dat is dan een datatekort en geen bug in de generator.
+		UE_LOG(LogEclipse, Warning,
+			TEXT("StartNewCampaign: %d rekruten uit een pool van %d voornamen — voornamen kunnen niet allemaal uniek zijn (DT_NamePools uitbreiden)."),
+			Setup->StartingRosterSize, NameParams.FirstNames.Num());
 	}
 
-	UE_LOG(LogEclipse, Display, TEXT("New campaign: day %d, %d regions, %d soldiers."), State.Day, State.Regions.Num(), State.Roster.Num());
+	// The empire's opening temperature is DERIVED, never assumed zero (GDD 9.4).
+	//
+	// This is a basis, not a switch (owner rule "basis en kader"): the tier is
+	// always at least what the board justifies, from day 0 onward. A setup asset
+	// that starts a district with a region already Contested is a campaign that
+	// starts mid-insurgency, and the Dominion knows it before the player's first
+	// mission — leaving it at Indifference would mean the first completed
+	// mission, of any kind, produced a mysterious jump that the player did not
+	// cause.
+	State.ResponseTier = EclipseStrategyLogic::DeriveResponseTier(State);
+
+	UE_LOG(LogEclipse, Display, TEXT("New campaign: day %d, %d regions, %d soldiers, Dominion Response Tier %s."),
+		State.Day, State.Regions.Num(), State.Roster.Num(), *UEnum::GetValueAsString(State.ResponseTier));
 }
 
 bool UEclipseCampaignSubsystem::CommitTransaction(const FEclipseCampaignTransaction& Transaction, FString& OutError)
@@ -684,6 +764,16 @@ void UEclipseCampaignSubsystem::EmitEventsForApplied(const TArray<FEclipseApplie
 			Payload.BeatTag = Record.Mutation.StoryFlagTag;
 			Payload.Day = Record.DayAfter;
 			Bus->Broadcast(EclipseTags::Event_Story_BeatReached, FInstancedStruct::Make(Payload));
+			break;
+		}
+		case EEclipseCampaignMutationType::SetResponseTier:
+		{
+			FEclipseResponseTierEventPayload Payload;
+			Payload.OldTier = Record.OldResponseTier;
+			Payload.NewTier = Record.Mutation.ResponseTier;
+			Payload.Day = Record.DayAfter;
+			Payload.Reason = Record.Mutation.Reason;
+			Bus->Broadcast(EclipseTags::Event_Strategy_ResponseTierChanged, FInstancedStruct::Make(Payload));
 			break;
 		}
 		case EEclipseCampaignMutationType::StartConstruction:

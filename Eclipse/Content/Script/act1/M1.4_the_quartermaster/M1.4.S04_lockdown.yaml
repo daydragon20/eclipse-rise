@@ -15,7 +15,7 @@ turn:         "The garrison coming down the aisles is nineteen years old, and Em
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        215
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, MARA, BRICK, fighters; Dominion quartermaster (PA); conscript garrison (barks)
@@ -34,4 +34,157 @@ words:        0
 # casting:   needs dominion_officer - see owner question Q-5. Not a villain voice: a
 #            middle-aged administrator reading a checklist.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `in-mission-radio` (10-25) as a ceiling. The PA lines sit at 10-17 because a
+#            man reading a checklist speaks in whole clauses. The floor traffic is
+#            CALLOUT length (2-6) - same waiver as M1.1.S04.
+# variance:  2 w (.210) to 17 w (.220) = 8.5x.
+# THE OFFICER: he is not a villain and he never raises his voice or threatens anybody.
+#            He does four things and only four: he states condition, he counts stock, he
+#            reassigns the work of men who have stopped answering, and he protects his
+#            people with a rule. 02_story_bible 2.2. His most frightening line, .220, is
+#            an accounting instruction, and it is the last thing in the scene.
+#            He is deliberately NOT written like Callis (18.4): no hedging, no passive
+#            evasion, no policy as an excuse. He commits to everything he says. That is
+#            the difference between a coward and a clerk.
+# .030:      "rifles are drawn against a signature" is the procedural detail the whole
+#            garrison then dies inside. It pays immediately at .040 and it is the same
+#            fact the conscript panics about in S02's breach branch.
+# .140:      P5-b. ONE Ember line about how old they are, and it belongs to Brick, and
+#            NOBODY ANSWERS IT. The next line is a man reporting a grating. A debate here
+#            would move the scene from the player to the characters - the stub is right.
+#            Brick is answering a question at .130, so 18.4's "never speaks first" holds.
+# .070:      Voss honours the S03 offer while the building is sealing. It costs him the
+#            worst four seconds of the mission and he never mentions it again.
+# brick:     7 words in this scene. He opens the back route with his hands (.150 reports
+#            it); he does not narrate himself.
+# variants:  none - section 9.7.
+# casting:   QUARTERMASTER needs the `dominion_officer` key, which does not exist in the
+#            19.3 table yet. Owner question Q-5, flagged again in my report. A middle-aged
+#            administrator with a checklist, NOT a villain register.
+
+lines:
+  - id:      M1.4.S04.010
+    speaker: VOSS
+    voice:   voss
+    text:    "Second crate's off the rack."
+    shot:    "The lid comes up. Somewhere three floors of building start closing."
+
+  - id:      M1.4.S04.020
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "Attention. The facility is at condition two. Bay doors are closing on my count from ten."
+    shot:    "A lit office on the bridge. A man at a desk microphone with a clipboard flat in front of him."
+
+  - id:      M1.4.S04.030
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "All personnel to muster points. Rifles are drawn against a signature and not before."
+
+  - id:      M1.4.S04.040
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    tags:    [nervous]
+    text:    "There's nobody at the desk to sign it."
+
+  - id:      M1.4.S04.050
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    tags:    [shouting]
+    text:    "Post six! Sound off, post six!"
+
+  - id:      M1.4.S04.060
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Doors first. Anybody still on the floor when they seat is staying."
+
+  - id:      M1.4.S04.070
+    speaker: VOSS
+    voice:   voss
+    text:    "Pull the bolt on cell three. Now, not after."
+    note:    "The S03 offer, paid at the worst possible moment, without comment."
+
+  - id:      M1.4.S04.080
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "Inventory check. Racks one through eight are sealed and accounted for. Rack nine is open."
+
+  - id:      M1.4.S04.090
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "Rack nine reads open and it did not open itself."
+
+  - id:      M1.4.S04.100
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    tags:    [shouting]
+    text:    "They're in the racks!"
+
+  - id:      M1.4.S04.110
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    text:    "Post four, answer. Post four."
+
+  - id:      M1.4.S04.120
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "Post four does not answer. Post five will take post four's line and continue the count."
+    note:    "He reassigns a dead man's paperwork without changing pace. This is the whole character."
+
+  - id:      M1.4.S04.130
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "How many are down there?"
+
+  - id:      M1.4.S04.140
+    speaker: BRICK
+    voice:   brick
+    text:    "Thirty. Nineteen years old, most of them."
+    shot:    "Nobody answers him. The crate keeps moving."
+    note:    "P5-b. Asked for one number, he gives two. NOBODY REPLIES - see writer note above."
+
+  - id:      M1.4.S04.150
+    speaker: VOSS
+    voice:   voss
+    text:    "Grating at rack nine is up. Two down the trench, then the crate."
+    shot:    "The grating is already leaning against the rack. He did not ask for help with it."
+
+  - id:      M1.4.S04.160
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "Crates six-one-one through six-one-nine are unaccounted. Anyone with eyes on six-one-one, call it to the office."
+
+  - id:      M1.4.S04.170
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    tags:    [shouting]
+    text:    "I can see one of them. I can see one of--"
+
+  - id:      M1.4.S04.180
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Down the trench. Do not stop to look at anybody."
+
+  - id:      M1.4.S04.190
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    text:    "Do not go past the yellow line alone. That is procedure."
+    note:    "The one line where the manual is also care. They go past it anyway."
+
+  - id:      M1.4.S04.200
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "He's still talking."
+
+  - id:      M1.4.S04.210
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Let him."
+
+  - id:      M1.4.S04.220
+    speaker: QUARTERMASTER
+    voice:   dominion_officer
+    tags:    [pause]
+    text:    "Note for the morning shift. The shortfall is written against the district allocation, not against this depot."
+    shot:    "The aisles are full of noise. The voice on the address system has not changed its pace once."

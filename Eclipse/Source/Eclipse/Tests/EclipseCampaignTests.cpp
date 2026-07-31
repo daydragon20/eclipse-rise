@@ -353,7 +353,8 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
 	// Rewrite the header's schema version to 0: the whole chain (0->1 no-op,
-	// 1->2 loadout-unlock append, 2->3 ClassId append, 3->4 base-tail append)
+	// 1->2 loadout-unlock append, 2->3 ClassId append, 3->4 base-tail append,
+	// 4->5 story-tail append, 5->6 response-tier byte)
 	// must run and the load must still succeed (SPEC-P1-02: migration scaffold
 	// proven by CI, not by hope). The tail-appends are harmless on this
 	// current-shaped block: readers stop at the original trailing counts and
@@ -366,7 +367,7 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("Load of v0 file succeeds via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4, 4->5)"), Target.Save->GetLastLoadMigrationStepCount(), 5);
+	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4, 4->5, 5->6)"), Target.Save->GetLastLoadMigrationStepCount(), 6);
 	TestEqual(TEXT("Migrated state matches source"),
 		Target.Campaign->GetState().ComputeStateHash(),
 		Source.Campaign->GetState().ComputeStateHash());
@@ -570,7 +571,7 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
-	// Reconstruct a v3 file from the v4 save: strip the trailing base tail
+	// Reconstruct a v3 file from the v6 save: strip the trailing base tail
 	// (count + per-facility: SlotId/FacilityId as ANSI FStrings, Level,
 	// DaysRemaining, staff count + FGuids) from the Campaign block - the only
 	// registered block, so it ends the file - then rewrite the file header
@@ -583,8 +584,8 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 5);
-	TestEqual(TEXT("Sanity: block leads with state schema v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 5);
+	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
+	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
 
 	int32 BaseTailSize = sizeof(int32);
 	for (const FEclipseFacilityState& Facility : Source.Campaign->GetState().BaseState.Facilities)
@@ -601,6 +602,7 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 	{
 		StripSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1;
 	}
+	StripSize += sizeof(uint8); // the v6 response-tier byte (GDD 9.4) — a v3 file predates it too
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 3;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 3;
@@ -610,7 +612,7 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("v3 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 3->4 and 4->5 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
+	TestEqual(TEXT("Exactly the 3->4, 4->5 and 5->6 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 3);
 
 	const FEclipseBaseState& Base = Target.Campaign->GetState().BaseState;
 	TestEqual(TEXT("Spec start state: exactly one facility"), Base.Facilities.Num(), 1);
@@ -651,8 +653,8 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
-	// Reconstruct a v4 file from the v5 save: the story tail is the last thing
-	// in the Campaign block — for a beat-less campaign exactly one int32 count.
+	// Reconstruct a v4 file from the v6 save: strip the story tail (for a
+	// beat-less campaign exactly one int32 count) AND the v6 tier byte behind it.
 	// Same container math as the v3 reconstruction above.
 	TArray<uint8> FileBytes;
 	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
@@ -660,8 +662,8 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 5);
-	TestEqual(TEXT("Sanity: block leads with state schema v5"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 5);
+	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
+	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
 	TestEqual(TEXT("Sanity: the scripted campaign has no beats yet"), Source.Campaign->GetState().StoryFlags.Num(), 0);
 
 	int32 StoryTailSize = sizeof(int32);
@@ -669,6 +671,7 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 	{
 		StoryTailSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1; // ANSI FName-as-FString
 	}
+	StoryTailSize += sizeof(uint8); // and the v6 tier byte sitting behind it (GDD 9.4)
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 4;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 4;
@@ -678,7 +681,7 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("v4 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 4->5 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("Exactly the 4->5 and 5->6 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
 	TestEqual(TEXT("Pre-story campaign lands on empty flags"), Target.Campaign->GetState().StoryFlags.Num(), 0);
 	TestEqual(TEXT("Migrated state matches source (flags included in hash)"),
 		Target.Campaign->GetState().ComputeStateHash(),
@@ -687,6 +690,146 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 	IFileManager::Get().Delete(*SlotPath, false, true, true);
 	Source.Shutdown();
 	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignResponseTierMigrationTest,
+	"Eclipse.Strategy.Campaign.SaveMigrationV5RecordsWithoutResponseTier",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignResponseTierMigrationTest::RunTest(const FString& Parameters)
+{
+	// GDD 9.4 / 14.3.6, fourth exercise of the same ladder: a byte-faithful v5
+	// file (no tier byte) must land on Indifference — a campaign that predates
+	// the strategic opponent has not been noticed yet — via exactly the 5->6 step.
+	const FString SlotName = TEXT("AutomationTierMigration");
+	const FString SlotPath = UEclipseSaveSubsystem::GetSlotFilePath(SlotName);
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+
+	EclipseCampaignTest::FFixture Source = EclipseCampaignTest::FFixture::Make();
+	FString Error;
+	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
+
+	// Escalate BEFORE saving, so the stripped byte is a non-zero one: a
+	// migration test whose only expected value is 0 cannot tell "migrated to
+	// zero" apart from "never read anything".
+	FEclipseCampaignTransaction Escalate;
+	Escalate.Source = TEXT("Test");
+	{
+		FEclipseCampaignMutation& Tier = Escalate.Mutations.AddDefaulted_GetRef();
+		Tier.Type = EEclipseCampaignMutationType::SetResponseTier;
+		Tier.ResponseTier = EEclipseDominionResponseTier::Insurgency;
+		Tier.Reason = TEXT("Test_Escalation");
+	}
+	TestTrue(TEXT("Escalation commits"), Source.Campaign->CommitTransaction(Escalate, Error));
+	TestEqual(TEXT("Sanity: the source campaign is at Insurgency"),
+		Source.Campaign->GetState().ResponseTier, EEclipseDominionResponseTier::Insurgency);
+	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
+
+	// Reconstruct a v5 file from the v6 save: the tier byte is the last thing
+	// in the Campaign block. Same container math as the v3/v4 reconstructions.
+	TArray<uint8> FileBytes;
+	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
+
+	const int32 HeaderVersionOffset = sizeof(uint32);
+	const int32 BlockSizeOffset = 12 + (4 + 9);
+	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
+	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
+	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
+	TestEqual(TEXT("Sanity: the last byte IS the tier we committed"),
+		static_cast<int32>(FileBytes.Last()), static_cast<int32>(EEclipseDominionResponseTier::Insurgency));
+
+	const int32 TierTailSize = sizeof(uint8);
+	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 5;
+	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 5;
+	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= TierTailSize;
+	FileBytes.SetNum(FileBytes.Num() - TierTailSize);
+	TestTrue(TEXT("v5-shaped file written"), FFileHelper::SaveArrayToFile(FileBytes, *SlotPath));
+
+	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
+	TestTrue(TEXT("v5 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
+	TestEqual(TEXT("Exactly the 5->6 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("A pre-tier campaign comes home unnoticed"),
+		Target.Campaign->GetState().ResponseTier, EEclipseDominionResponseTier::Indifference);
+	TestNotEqual(TEXT("...which is NOT what the source held — the byte really was stripped"),
+		Target.Campaign->GetState().ResponseTier, Source.Campaign->GetState().ResponseTier);
+
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+	Source.Shutdown();
+	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignResponseTierCommitTest,
+	"Eclipse.Strategy.Campaign.ResponseTierEscalatesOnlyUpwardAndEmitsTheStep",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignResponseTierCommitTest::RunTest(const FString& Parameters)
+{
+	// GDD 9.4: the tier is committed state with one writer, it only climbs, and
+	// the fact it emits carries the STEP so a diegetic reaction can pick a tone.
+	EclipseCampaignTest::FFixture Fixture = EclipseCampaignTest::FFixture::Make();
+
+	TArray<FEclipseResponseTierEventPayload> Facts;
+	FEclipseEventSubscriptionHandle Handle = Fixture.Bus->Subscribe(
+		EclipseTags::Event_Strategy_ResponseTierChanged,
+		FEclipseEventNativeDelegate::CreateLambda([&Facts](FGameplayTag, const FInstancedStruct& Payload)
+		{
+			if (const FEclipseResponseTierEventPayload* Fact = Payload.GetPtr<FEclipseResponseTierEventPayload>())
+			{
+				Facts.Add(*Fact);
+			}
+		}));
+
+	FString Error;
+	auto Escalate = [&Fixture, &Error](EEclipseDominionResponseTier To, FName Reason)
+	{
+		FEclipseCampaignTransaction Transaction;
+		Transaction.Source = TEXT("Test");
+		FEclipseCampaignMutation& Tier = Transaction.Mutations.AddDefaulted_GetRef();
+		Tier.Type = EEclipseCampaignMutationType::SetResponseTier;
+		Tier.ResponseTier = To;
+		Tier.Reason = Reason;
+		return Fixture.Campaign->CommitTransaction(Transaction, Error);
+	};
+
+	TestEqual(TEXT("A new campaign starts beneath notice"),
+		Fixture.Campaign->GetState().ResponseTier, EEclipseDominionResponseTier::Indifference);
+
+	TestTrue(TEXT("Escalating to Insurgency commits"), Escalate(EEclipseDominionResponseTier::Insurgency, TEXT("RegionalAttack")));
+	TestEqual(TEXT("Exactly one fact"), Facts.Num(), 1);
+	if (Facts.Num() == 1)
+	{
+		TestEqual(TEXT("The fact carries where it came FROM"), Facts[0].OldTier, EEclipseDominionResponseTier::Indifference);
+		TestEqual(TEXT("...and where it went"), Facts[0].NewTier, EEclipseDominionResponseTier::Insurgency);
+		TestEqual(TEXT("...and why"), Facts[0].Reason, FName(TEXT("RegionalAttack")));
+	}
+
+	// Skipping rungs is legal — an authored beat may jump the ladder.
+	TestTrue(TEXT("Jumping two rungs commits"), Escalate(EEclipseDominionResponseTier::Existential, TEXT("Act4")));
+	TestEqual(TEXT("Two facts"), Facts.Num(), 2);
+	if (Facts.Num() == 2)
+	{
+		TestEqual(TEXT("The step is 2 -> 5, not 4 -> 5"), Facts[1].OldTier, EEclipseDominionResponseTier::Insurgency);
+	}
+
+	// Down and sideways are both refused, and refused LOUDLY: a silent no-op
+	// would let a caller believe the empire calmed down.
+	const uint32 HashBefore = Fixture.Campaign->GetState().ComputeStateHash();
+	TestFalse(TEXT("Lowering the tier is rejected"), Escalate(EEclipseDominionResponseTier::Nuisance, TEXT("Wishful")));
+	TestTrue(TEXT("...with a reason that names the rule"), Error.Contains(TEXT("escalate")));
+	TestFalse(TEXT("Re-committing the same tier is rejected"), Escalate(EEclipseDominionResponseTier::Existential, TEXT("Again")));
+	TestEqual(TEXT("No facts leaked from the rejected commits"), Facts.Num(), 2);
+	TestEqual(TEXT("State untouched"), Fixture.Campaign->GetState().ComputeStateHash(), HashBefore);
+
+	// The tier is part of campaign identity: two campaigns that differ only in
+	// temperature must not hash the same (it is what routing risk reads).
+	FEclipseCampaignState Cool = Fixture.Campaign->GetState();
+	Cool.ResponseTier = EEclipseDominionResponseTier::Indifference;
+	TestNotEqual(TEXT("The tier is inside the state hash"), Cool.ComputeStateHash(), HashBefore);
+
+	Fixture.Bus->Unsubscribe(Handle);
+	Fixture.Shutdown();
 	return true;
 }
 

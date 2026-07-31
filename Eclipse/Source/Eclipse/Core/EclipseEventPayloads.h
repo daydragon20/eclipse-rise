@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Strategy/EclipseCampaignTypes.h" // EEclipseDominionResponseTier (GDD 9.4) — pure data, no engine actors
 #include "EclipseEventPayloads.generated.h"
 
 /**
@@ -106,6 +107,39 @@ struct FEclipseLiberationEventPayload
 	/** De geauthorde zin: WAAROM dit gebied kantelde, in mensentaal. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	FText ContextLine;
+};
+
+/**
+ * Event.Strategy.ResponseTierChanged — the empire's temperature moved (GDD 9.4).
+ *
+ * Its own struct, not a field on FEclipseStrategyEventPayload, for the same
+ * reason LiberationResolved got one: the SCALE differs. RegionControlChanged is
+ * a fact about one square; this is a fact about the whole campaign, and the
+ * region id on that payload would be permanently empty here — a field that is
+ * always None is a lie the compiler cannot catch.
+ *
+ * Carries the STEP, not just the landing: the diegetic broadcast the GDD asks
+ * for ("the player learns the empire's temperature by living in it") needs to
+ * know it went 2 -> 3 to pick the right propaganda line.
+ */
+USTRUCT(BlueprintType)
+struct FEclipseResponseTierEventPayload
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	EEclipseDominionResponseTier OldTier = EEclipseDominionResponseTier::Indifference;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	EEclipseDominionResponseTier NewTier = EEclipseDominionResponseTier::Indifference;
+
+	/** Campaign day the escalation landed on. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 Day = 0;
+
+	/** Ledger reason — same discipline as the wallet: an escalation with no cause is unexplainable to the player (GDD 7.6). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName Reason;
 };
 
 /** Event.Prep.* — the full launch request composed by preparation (SPEC-P1-08). */

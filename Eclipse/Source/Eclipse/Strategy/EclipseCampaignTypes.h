@@ -29,6 +29,36 @@ enum class EEclipseSoldierStatus : uint8
 	Dead
 };
 
+/**
+ * The empire's temperature (GDD 9.4, verbatim ladder). Campaign state, not a
+ * display value: EclipseStrategyLogic adds LaneTuning.RiskPerResponseTier to
+ * every routing leg per tier, so the same road is a different road at tier 4.
+ *
+ * Monotone by rule — the transaction API refuses a decrease. The Dominion does
+ * not forget that you exist; de-escalation would need its own authored fact
+ * (a peace, a decapitation), not an accounting slip.
+ *
+ * Tiers 4 and 5 are reachable only by an authored SetResponseTier: their GDD
+ * triggers are "multi-planet" and "Act 4", and a one-district slice cannot
+ * observe either. DeriveResponseTier says so out loud rather than pretending.
+ */
+UENUM(BlueprintType)
+enum class EEclipseDominionResponseTier : uint8
+{
+	/** Pre-story. Police only. */
+	Indifference = 0,
+	/** Act 1. Veil investigations, checkpoints. */
+	Nuisance = 1,
+	/** Regional attacks. Garrison reinforcement, patrol density, bounties. */
+	Insurgency = 2,
+	/** First liberation. Military occupation, economic blockades, named counter-operations. */
+	Rebellion = 3,
+	/** Multi-planet. Kaine offensives under the player's own supply rules. */
+	War = 4,
+	/** Act 4. Total mobilization, AEGIS protocol, scorched earth. */
+	Existential = 5
+};
+
 /** One region node's mutable state. Static definition (edges, type, yields) lives in the region graph asset (SPEC-P1-04). */
 USTRUCT(BlueprintType)
 struct FEclipseRegionState
@@ -217,9 +247,9 @@ struct FEclipseCampaignState
 {
 	GENERATED_BODY()
 
-	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). v5: +StoryFlags tail (SPEC-P2-04). */
+	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). v5: +StoryFlags tail (SPEC-P2-04). v6: +ResponseTier tail (GDD 9.4). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Campaign")
-	int32 SchemaVersion = 5;
+	int32 SchemaVersion = 6;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 Day = 0;
@@ -256,6 +286,15 @@ struct FEclipseCampaignState
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TArray<FGameplayTag> StoryFlags;
+
+	/**
+	 * The Dominion Response Tier (GDD 9.4). Written only by the SetResponseTier
+	 * mutation, which refuses to lower it. Pre-v6 saves come home at
+	 * Indifference — a campaign that predates the strategic opponent has not
+	 * been noticed yet, which is exactly tier 0.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	EEclipseDominionResponseTier ResponseTier = EEclipseDominionResponseTier::Indifference;
 
 	int32 GetBalance(const FGameplayTag& ResourceType) const
 	{

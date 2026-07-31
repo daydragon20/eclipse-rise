@@ -15,7 +15,7 @@ turn:         "Whichever they take, Dex talks the entire distance, and the cell 
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        213
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      VOSS, MARA, DEX, fighters
@@ -36,4 +36,241 @@ words:        0
 #            fear the deflection speeds up rather than stopping. That is the fingerprint
 #            doing the emotional work, which is how this game does emotion.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# ids:      .010-.170 TUNNEL, .200-.340 PLAZA. The gap at .180/.190 is left open on
+#           purpose so a shared pre-branch beat can be inserted later without renumbering.
+# mara:     the line that notices without naming is .110 "Keep talking." (tunnel) and
+#           .280 "Keep talking. Quieter." (plaza). Same permission, and in the plaza it
+#           costs her something to give, which is the branch difference doing work.
+#           Not "are you all right", not "breathe" - two words that give him the floor.
+# voss:     .120/.130 (tunnel) is the line only he could say and NOBODY ASKS. Dex talks
+#           straight over it, which is how the not-asking gets dramatized instead of
+#           merely observed. Plaza equivalent is .210, a metre of shadow under each crown
+#           - same eye, different system.
+# dex:      the deflection accelerates and then stops dead when Mara asks for quiet
+#           (.160/.170, .330/.340). The stopping is the scene's last beat in both branches
+#           and it is written as two one-word lines and a shot. 18.7: silence is content.
+# plaza:    .290 - Dex clocks a shim somebody else has been using to prop a Dominion gate.
+#           Nobody in the cell put it there. That is the district already cheating, before
+#           Ember touched anything, and it costs one line.
+# band:     type is `walk-and-talk` (10-25). Ceiling respected: longest line 15 w (.230).
+#           Floor read as advisory, same as M1.1 - the one-word lines are the scene.
+# variance: tunnel 1 w to 14 w = 14x. Plaza 1 w to 15 w = 15x.
+# em-dash:  one interrupted line per branch (.060/.070, .250/.260). Rate 1:17 and 1:15.
+
+lines:
+  # ================= TUNNEL BRANCH — story.m13_insertion == "tunnel" =================
+
+  - id:        M1.3.S03.010
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "There's water. Nobody said water."
+    shot:      "Ankle deep and rising toward them. The old geothermal run, tiled a century before the Dominion, warm enough to steam."
+
+  - id:        M1.3.S03.020
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_insertion == "tunnel"
+    text:      "Left wall's the return. Keep a hand off it."
+
+  - id:        M1.3.S03.030
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "Water's fine for the charge. The charge is happier down here than I am."
+
+  - id:        M1.3.S03.040
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "It's the clamps. Clamps rust. Four hours in this air and they're jewellery."
+
+  - id:        M1.3.S03.050
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "Which is fine. Four hours is a career."
+
+  - id:        M1.3.S03.060
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: story.m13_insertion == "tunnel"
+    text:      "Sump ahead. Waist, maybe--"
+
+  - id:         M1.3.S03.070
+    speaker:    VOSS
+    voice:      voss
+    condition:  story.m13_insertion == "tunnel"
+    interrupts: true
+    text:       "Chest."
+
+  - id:        M1.3.S03.080
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "Chest."
+
+  - id:        M1.3.S03.090
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "I'm carrying a shaped charge at chest height through a hundred-year-old sump."
+
+  - id:        M1.3.S03.100
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "Nobody stop me. I'm enjoying the itinerary."
+
+  - id:        M1.3.S03.110
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m13_insertion == "tunnel"
+    text:      "Keep talking."
+    shot:      "She does not turn round. Everybody heard her give him permission and nobody remarks on it."
+    note:      "The required Mara line. She notices the fear by feeding it, not by naming it."
+
+  - id:        M1.3.S03.120
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_insertion == "tunnel"
+    text:      "These hangers are all set two high. The whole run."
+
+  - id:        M1.3.S03.130
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_insertion == "tunnel"
+    text:      "Nobody ever made them do it again."
+    shot:      "He touches one on the way past. Nobody asks."
+    note:      "18.4 Voss: the line only he can say, third generation on this district's plant. Unexplained on purpose (18.8) - and .140 talks straight over it, so the not-asking is played, not just permitted."
+
+  - id:        M1.3.S03.140
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "Two high. Sure. Everything down here is two of something."
+
+  - id:        M1.3.S03.150
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m13_insertion == "tunnel"
+    text:      "Forty metres to the ring. Quiet after that."
+
+  - id:        M1.3.S03.160
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    text:      "Quiet."
+
+  - id:        M1.3.S03.170
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "tunnel"
+    tags:      [pause]
+    text:      "Right."
+    shot:      "He does not say anything else for the rest of the run. Voss keeps checking he is still behind them."
+    note:      "The talking stops on command and the absence is louder than the talking was. Same beat closes the plaza branch at .340."
+
+  # ================= PLAZA BRANCH — story.m13_insertion == "plaza" =================
+
+  - id:        M1.3.S03.200
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "It's very bright. Is anybody else finding it bright."
+    shot:      "Under the crowns. Wet white-gold on wet stone, and four people crossing it with the last of the curfew crowd."
+
+  - id:        M1.3.S03.210
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_insertion == "plaza"
+    text:      "Crowns run hot. There's a metre of shadow under each one."
+    note:      "18.4 Voss: sees the system, hands the squad a route made of lamp physics. Nobody thanks him and he does not wait to be thanked."
+
+  - id:        M1.3.S03.220
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "A metre. I'm wider than a metre with this on my back."
+
+  - id:        M1.3.S03.230
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "The case is rated. The case has been off a gantry and it was fine."
+
+  - id:        M1.3.S03.240
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "The case is the most reliable thing out here and I include myself."
+
+  - id:        M1.3.S03.250
+    speaker:   FIGHTER_B
+    voice:     eclipse_fighter_b
+    condition: story.m13_insertion == "plaza"
+    text:      "Patrol. Coming down the east--"
+
+  - id:         M1.3.S03.260
+    speaker:    MARA
+    voice:      mara_sovann
+    condition:  story.m13_insertion == "plaza"
+    interrupts: true
+    text:       "Stand still."
+    shot:       "Four people stop walking in a square where standing still is the most ordinary thing anybody does. The patrol goes past inside three metres."
+    note:       "The crowd behaviour from S02 becomes the cover. Nobody says that out loud; the staging says it."
+
+  - id:        M1.3.S03.270
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    tags:      [whispering]
+    text:      "Standing still. My best event."
+
+  - id:        M1.3.S03.280
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m13_insertion == "plaza"
+    tags:      [quietly]
+    text:      "Keep talking. Quieter."
+    note:      "The required Mara line, branch variant. In here the permission costs her something, and she gives it anyway."
+
+  - id:        M1.3.S03.290
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "There's a shim in that gate hinge. Somebody props that gate."
+    note:      "Somebody in this district was already cheating the checkpoint before Ember arrived. One line, no comment, no follow-up."
+
+  - id:        M1.3.S03.300
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_insertion == "plaza"
+    text:      "Leave the shim."
+
+  - id:        M1.3.S03.310
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "Leaving the shim."
+
+  - id:        M1.3.S03.320
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m13_insertion == "plaza"
+    text:      "Under the crowns. Quiet from here."
+
+  - id:        M1.3.S03.330
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    text:      "Quiet."
+
+  - id:        M1.3.S03.340
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_insertion == "plaza"
+    tags:      [pause]
+    text:      "Right."
+    shot:      "He does not say anything else all the way to the footing. Voss keeps checking he is still behind them."

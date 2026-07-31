@@ -15,7 +15,7 @@ turn:         "Voss proposes a target that is neither of theirs, and it is the o
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        354
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      MARA, DEX, VOSS, REYES
@@ -35,4 +35,201 @@ words:        0
 #            do not let a character point at it.
 #            Voss variants: how he proposes the tower differs on the strategic/personal axis.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# structure: the mission opens and closes on the same move. Voss gives something nobody
+#            asked for; Mara does not praise it, she writes it down. S01.210, S05.150,
+#            S99.250. Three times, escalating, and no character ever points at it.
+# m1.3:      the tower is NOT an assignment. It is the consequence of what the player found:
+#            Dex's frequency table is worthless while the jammer is up, so Voss proposes the
+#            jammer. The player's loot creates the player's next mission. Set up in S02.260.
+# dex:       his wish list is a repeater - he wants to LISTEN. Voss proposes to make them
+#            DEAF. Two engineers' answers to the same night, and the cell can only afford
+#            one. That is the obstacle made concrete instead of stated.
+#            .200/.210 is the callback to S01.200: scooped twice in one night, and this time
+#            he says it is a good idea, which for Dex is an enormous concession.
+#            He never names a feeling in either place.
+# reyes:     one line, one question, no contractions - the second of her two act-1 questions
+#            and both are about wounded. She is building the only reputation she needs.
+# mara:      "eleven mouths" from the stub's obstacle is played, not counted. I deliberately
+#            do NOT put a number on the cell here: the roster is systemic and M1.1 can take
+#            casualties, so a spoken count would go stale inside one playthrough.
+#            .140 calls back to Reyes counting four units of plasma twice in M1.1.S01.100.
+# branches:  .030-.070 read Story.Choice.M12_Ghost. Two short blocks, not one line with a
+#            condition on it. The alarm block is where the act's spine shows for the first
+#            time: winning made them visible, and nobody in the room treats that as bad news.
+# band:      cutscene (20-60). Same ceiling reading as M1.1.S01 and this mission's S01.
+#            Longest line 20 w. Variance 1 to 20 = 20x.
+# ar-5:      Mara: zero "you", zero "I". Eight of her twelve lines are under seven words.
+# names:     one name-address in 28 turns (.140 "Reyes").
+# triads:    one (.050 "faces, height, the way we move"), in the alarm block.
+# variants:  .190 only - the one axis the scene branches on (how he sells the tower).
+# words:     354 = 278 spoken base + 76 in the four .190 variants. Variants are generated,
+#            so they are counted; M1.1.S01 appears to count base only - flagged upstream.
+
+lines:
+  - id:      M1.2.S99.010
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Two hundred and six names. Warden rosters for four blocks."
+    shot:    "Map table. Two cache tins open, the contents laid out in rows because Dex cannot help himself."
+
+  - id:      M1.2.S99.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "And a frequency table. Handwritten. In a drawer, like a shopping list."
+
+  - id:        M1.2.S99.030
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m12_ghost == true
+    text:      "Nine thousand people in that block and not one of them can describe us."
+
+  - id:        M1.2.S99.040
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m12_ghost == true
+    text:      "Best kind of famous."
+
+  - id:        M1.2.S99.050
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m12_ghost == false
+    text:      "They have us on a gallery in Block Nine. Faces, height, the way we move."
+
+  - id:        M1.2.S99.060
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m12_ghost == false
+    text:      "So we're in a file somewhere."
+
+  - id:        M1.2.S99.070
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m12_ghost == false
+    text:      "We are in a file somewhere."
+    note:      "She repeats it back flat and moves on. The act's engine turning over for the first time, and nobody in the room hears it."
+
+  - id:      M1.2.S99.080
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "What does the table open?"
+
+  - id:      M1.2.S99.090
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Every warden band in the Mid-Works. The maintenance channels under them."
+
+  - id:      M1.2.S99.100
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Which is worth nothing, because we can't hear a word of it from down here."
+
+  - id:      M1.2.S99.110
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Give me a repeater on a housing roof. Four parts and a mast. I've had it drawn for two years."
+    note:    "The wish list. Two years of thinking about something nobody assigned him - and it is a listening post, not a weapon."
+
+  - id:      M1.2.S99.120
+    speaker: DEX
+    voice:   dex_callum
+    text:    "It's on the back of a ration card in my kit. Two years."
+
+  - id:      M1.2.S99.130
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Four parts we buy with names."
+
+  - id:      M1.2.S99.140
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Names buy bread. Names buy the plasma Reyes counts twice."
+    note:    "She weighs intel as food. Callback to M1.1.S01.100 - Reyes counted four units twice."
+
+  - id:      M1.2.S99.150
+    speaker: DEX
+    voice:   dex_callum
+    text:    "So that's a no, that's a--"
+
+  - id:      M1.2.S99.160
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "It is not tonight."
+
+  - id:      M1.2.S99.170
+    speaker: VOSS
+    voice:   voss
+    text:    "The table only works if we can be on the air while we use it."
+
+  - id:      M1.2.S99.180
+    speaker: VOSS
+    voice:   voss
+    text:    "There's a jammer on the mast at the transit checkpoint. It runs off its own line."
+    shot:    "He has not touched anything on the table. He is looking at Dex's frequency sheet from the wrong side, upside down."
+    note:    "Paid off from S02.260, where he noticed the block masts carry their own feed and nobody cared."
+
+  - id:      M1.2.S99.190
+    speaker: VOSS
+    voice:   voss
+    text:    "Take it down and the table starts working. The roof goes up after that, not before."
+    variants:
+      pragmatist: "Take it down and the table starts working. It is the cheapest thing on this list by a long way."
+      idealist:   "Half this district cannot hear itself. Take the mast down and that stops being true for one night."
+      personal:   "He has had it drawn for two years. Take the mast down and he can put the roof up in daylight."
+      strategic:  "Take it down and everything in those tins turns into something we can spend the same night."
+    note:    "THE TURN. The one axis the scene branches on. The personal variant hands the idea to Dex, which is 18.4's Voss trait doing the work."
+
+  - id:      M1.2.S99.200
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Twice in one night. That is twice."
+
+  - id:      M1.2.S99.210
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Fine. It's a good idea. It's a good idea and I'm not saying it again."
+    note:    "Callback to S01.200. He concedes without naming a single feeling, which is the whole of his fingerprint."
+
+  - id:      M1.2.S99.220
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "A mast has a garrison on it. How many of ours come back through my door, and in what condition?"
+    note:    "Her one line. A question instead of an objection, no contractions. Second of two act-1 questions, both about wounded."
+
+  - id:      M1.2.S99.230
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We do not know yet."
+
+  - id:      M1.2.S99.240
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "That is what tomorrow is for."
+
+  - id:      M1.2.S99.250
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Put the mast on the table."
+    shot:    "She takes the grease pencil off Dex without asking and marks the checkpoint on the map herself."
+    note:    "The compliment, third and last time. She never says it was a good idea; she writes it down."
+
+  - id:      M1.2.S99.260
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "And the roof after it. Not before."
+    note:    "She adopts Voss's ordering word for word. That is the payment."
+
+  - id:      M1.2.S99.270
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Half the Mid-Works will see it go."
+    note:    "The mission title of M1.3 without anybody saying it. Restraint, 18.8."
+
+  - id:      M1.2.S99.280
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "Good."
+    shot:    "Reyes is already gone. Dex takes the grease pencil back."
+    note:    "Sets Story.Beat.M12_DeadDrop and Story.Clue.CustodianKey - systems, not dialogue."

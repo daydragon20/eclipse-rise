@@ -15,7 +15,7 @@ turn:         "Voss tells him, and Dex works faster and worse, and it holds anyw
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        184
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      DEX, VOSS, MARA
@@ -32,4 +32,243 @@ words:        0
 # writer:    both branches get their own full line set. The broken joke and the late joke
 #            are different jokes, not the same joke with a cut.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# ids:      .010-.040 shared setup · .050-.150 TELL · .200-.260 HOLD · .300-.310 shared
+#           blast · .320-.330 TELL tail · .340-.360 HOLD tail · .370 shared exit.
+# flag:     I needed a name for the choice and there is none in L1. Written as
+#           story.m13_warned (true = told him). NEW FLAG - ESCALATED, see report. It is
+#           read nowhere outside this file and sets nothing downstream, exactly as the
+#           stub requires.
+# tell:     the joke breaks in half at .060/.070, and VOSS is the one who breaks it. That
+#           is better than Dex correcting himself: the man who gave him the truth then
+#           takes the bit away from him, and Dex works the rest in fragments (.090-.150).
+#           The set is crooked. It holds. Nobody mentions the crooked.
+# hold:     the interruption is at .020/.030 of the branch (.210/.220) and it is VOSS
+#           cutting off the question. That is the lie, played instead of described. Dex
+#           gets his clean set, his best line of the mission (.250), and the bill arrives
+#           after the blast at .340-.360.
+# joke:     the "harder" late joke is .360 "Keep not telling me." - gratitude wearing an
+#           instruction, which is the only shape gratitude is available to him in (18.4:
+#           never finishes a sentimental sentence). Deletion test applied: everything
+#           after it was cut.
+# mara:     radio only. Four words in the whole scene before the blast. AR-5 clean.
+# band:     type is `in-mission-radio` (10-25). Ceiling respected: longest 12 w (.240).
+#           Floor read as advisory, as everywhere in this mission.
+# variance: 1 w (.030 "Ramp.") to 12 w (.240) = 12x.
+# blast:    the loudspeaker address from S02 stops in the middle of a word. That is the
+#           whole point of the mission and it is a `shot`, not a line. Nobody says it.
+
+lines:
+  # ================= SHARED SETUP =================
+
+  - id:      M1.3.S04.010
+    speaker: DEX
+    voice:   dex_callum
+    text:    "On it. Two clamps, then the collar."
+    shot:    "Dex kneeling inside the ring fence with his back to the plaza. He does not look up once in this scene."
+
+  - id:      M1.3.S04.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Don't talk to me during the collar."
+
+  - id:      M1.3.S04.030
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [urgent]
+    text:    "Ramp."
+
+  - id:      M1.3.S04.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Relief's early. Four of them."
+    shot:    "From Mara's overwatch: four figures on the service ramp, walking, not hurrying. Cut to Voss, who can see both of them."
+
+  # ================= TELL BRANCH — story.m13_warned == true =================
+
+  - id:        M1.3.S04.050
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_warned == true
+    text:      "Four on the ramp. Ninety seconds."
+    note:      "PLAYER OPTION 1 of 2. Sets story.m13_warned = true. No systemic consequence; it changes only how the rest of the scene sounds."
+    variants:
+      pragmatist: "Four coming up. Ninety seconds, then we're loud."
+      idealist:   "Four on the ramp. It should come from me."
+      personal:   "Dex. Four of them, ninety seconds."
+      strategic:  "Relief's early. Ninety seconds before it stops being quiet."
+
+  - id:        M1.3.S04.060
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "Ninety. Sure. That's two collars and a sit-down, that's--"
+
+  - id:         M1.3.S04.070
+    speaker:    VOSS
+    voice:      voss
+    condition:  story.m13_warned == true
+    interrupts: true
+    text:       "Dex."
+
+  - id:        M1.3.S04.080
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "No. It's one collar and no sit-down."
+    note:      "The joke breaks in half and he is the one who has to say so. Everything after this is fragments."
+
+  - id:        M1.3.S04.090
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    tags:      [nervous]
+    text:      "Working."
+
+  - id:        M1.3.S04.100
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m13_warned == true
+    text:      "Sixty."
+
+  - id:        M1.3.S04.110
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "I know what sixty is."
+
+  - id:        M1.3.S04.120
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "Clamp. Clamp. Collar."
+
+  - id:        M1.3.S04.130
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_warned == true
+    text:      "Thirty."
+
+  - id:        M1.3.S04.140
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "Don't."
+
+  - id:        M1.3.S04.150
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "Set."
+    shot:      "His hands are not steady and the collar is sitting a few degrees off true. He leaves it. It is set."
+
+  # ================= HOLD BRANCH — story.m13_warned == false =================
+
+  - id:        M1.3.S04.200
+    speaker:   VOSS
+    voice:     voss
+    condition: story.m13_warned == false
+    text:      "Take the time."
+    note:      "PLAYER OPTION 2 of 2. Sets story.m13_warned = false. He is lying by leaving something out, and the scene never says so."
+    variants:
+      pragmatist: "Take the time. Nothing has changed."
+      idealist:   "Nobody is standing over you. Take the time."
+      personal:   "Take the time. I'm right here."
+      strategic:  "Take the time. The ramp is covered."
+
+  - id:        M1.3.S04.210
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    text:      "Generous. Is somebody going to tell me why I get--"
+
+  - id:         M1.3.S04.220
+    speaker:    VOSS
+    voice:      voss
+    condition:  story.m13_warned == false
+    interrupts: true
+    text:       "Clamps."
+    note:       "The cost of holding, played in one word: he takes the question off Dex with work."
+
+  - id:        M1.3.S04.230
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    text:      "Clamps."
+
+  - id:        M1.3.S04.240
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    text:      "This collar's a bad casting. Somebody in a factory hated their week."
+
+  - id:        M1.3.S04.250
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    text:      "Set. Clean set. Prettiest thing I've done all year."
+    shot:      "It is square. He sits back on his heels for one second, which is one second he will pay for."
+
+  - id:        M1.3.S04.260
+    speaker:   MARA
+    voice:     mara_sovann
+    condition: story.m13_warned == false
+    tags:      [urgent]
+    text:      "Move."
+
+  # ================= SHARED BLAST =================
+
+  - id:      M1.3.S04.300
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [shouting]
+    text:    "Down."
+    shot:    "The footing goes. The mast does not topple - it folds inward and comes down inside its own ring, taking the speaker crowns with it. On the last crown still live, the address stops in the middle of a word. Then the district has no sound in it at all."
+
+  - id:      M1.3.S04.310
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Collar held."
+
+  # ================= TELL TAIL =================
+
+  - id:        M1.3.S04.320
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "Worst collar I've ever set."
+
+  - id:        M1.3.S04.330
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == true
+    text:      "Held anyway."
+
+  # ================= HOLD TAIL =================
+
+  - id:        M1.3.S04.340
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    text:      "Four of them on the ramp."
+
+  - id:        M1.3.S04.350
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    text:      "And nobody said a word to me."
+
+  - id:        M1.3.S04.360
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m13_warned == false
+    tags:      [beat]
+    text:      "Keep not telling me."
+    note:      "The late joke. It is an instruction, because thanks is not a sentence he can finish. Nothing follows it - deletion test already applied."
+
+  # ================= SHARED EXIT =================
+
+  - id:      M1.3.S04.370
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Ring gate. Nobody stops."

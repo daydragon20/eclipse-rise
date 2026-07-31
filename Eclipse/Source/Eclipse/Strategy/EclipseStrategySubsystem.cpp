@@ -99,6 +99,104 @@ void UEclipseStrategySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			ECVF_Default);
 	}
 
+	// DE LANE-LAAG OP HET SCHERM DAT ER AL IS (14.5 stap 4: debug-surface vóór
+	// widget). Route beantwoordt de vraag waar deze hele laag voor bestaat —
+	// "hoe kom ik van A naar B en wat kost dat" — en Board legt naast elke lane
+	// zijn LIVE status, zodat "waarom mag ik daar niet heen" een antwoord heeft
+	// dat naar een Spire wijst in plaats van naar niets.
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.Strategy.Route")) == nullptr)
+	{
+		RouteCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.Strategy.Route"),
+			TEXT("Usage: Eclipse.Strategy.Route <From> <To> [smuggler] — cheapest route with its legs, days and risk (GDD 3.1 rules 2/4)."),
+			FConsoleCommandWithArgsDelegate::CreateWeakLambda(this, [this](const TArray<FString>& Args)
+			{
+				if (Args.Num() < 2)
+				{
+					UE_LOG(LogEclipse, Error, TEXT("Usage: Eclipse.Strategy.Route <From> <To> [smuggler]"));
+					return;
+				}
+				const bool bSmuggler = Args.Num() >= 3 && Args[2].Equals(TEXT("smuggler"), ESearchCase::IgnoreCase);
+				const EclipseStrategyLogic::EEclipseTransitMode Mode = bSmuggler
+					? EclipseStrategyLogic::EEclipseTransitMode::Smuggler
+					: EclipseStrategyLogic::EEclipseTransitMode::Military;
+
+				const EclipseStrategyLogic::FEclipseRoute Route = FindRoute(FName(*Args[0]), FName(*Args[1]), Mode);
+				if (!Route.bValid)
+				{
+					// The refusal IS the information here: which wall, not just
+					// "no" (GDD 9.5 applied to geography).
+					UE_LOG(LogEclipse, Display, TEXT("Route %s -> %s (%s): GEEN. %s"),
+						*Args[0], *Args[1], bSmuggler ? TEXT("smokkel") : TEXT("militair"), *Route.FailureReason);
+					return;
+				}
+
+				UE_LOG(LogEclipse, Display, TEXT("Route %s -> %s (%s): %d dag(en), risico %d%s"),
+					*Args[0], *Args[1], bSmuggler ? TEXT("smokkel") : TEXT("militair"),
+					Route.TotalTravelDays, Route.TotalRisk,
+					Route.bUsesSmugglerLeg ? TEXT("  [via smokkelroute]") : TEXT(""));
+				for (const EclipseStrategyLogic::FEclipseRouteStep& Step : Route.Steps)
+				{
+					UE_LOG(LogEclipse, Display, TEXT("  %s -> %s  %dd  risico %d%s"),
+						*Step.FromRegionId.ToString(), *Step.ToRegionId.ToString(),
+						Step.TravelDays, Step.Risk, Step.bSmugglerLeg ? TEXT("  (smokkel)") : TEXT(""));
+				}
+			}),
+			ECVF_Default);
+	}
+
+	if (IConsoleManager::Get().FindConsoleObject(TEXT("Eclipse.Strategy.Board")) == nullptr)
+	{
+		BoardCommand = IConsoleManager::Get().RegisterConsoleCommand(
+			TEXT("Eclipse.Strategy.Board"),
+			TEXT("Eclipse.Strategy.Board — elke regio met eigenaar, bevoorrading en al zijn lanes met LIVE status."),
+			FConsoleCommandWithArgsDelegate::CreateWeakLambda(this, [this](const TArray<FString>&)
+			{
+				const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
+				const UEclipseRegionGraphAsset* Graph = ResolveGraph();
+				if (Campaign == nullptr || Graph == nullptr)
+				{
+					// Same lesson as the save report: name the MISSING LINK
+					// first, or an empty board reads as an empty world.
+					UE_LOG(LogEclipse, Display, TEXT("Board: geen regiograaf geladen — het bord is niet leeg, het is er niet."));
+					return;
+				}
+
+				const FEclipseCampaignState& State = Campaign->GetState();
+				UE_LOG(LogEclipse, Display, TEXT("BOARD — dag %d · Dominion Response Tier %s (+%d risico per lane-leg)"),
+					State.Day, *UEnum::GetValueAsString(State.ResponseTier),
+					static_cast<int32>(State.ResponseTier) * Graph->LaneTuning.RiskPerResponseTier);
+
+				for (const FEclipseRegionDefinition& Definition : Graph->Regions)
+				{
+					const FEclipseRegionState* Region = State.FindRegion(Definition.RegionId);
+					UE_LOG(LogEclipse, Display, TEXT("  %s — %s · %s"),
+						*Definition.RegionId.ToString(),
+						Region != nullptr ? *UEnum::GetValueAsString(Region->Owner) : TEXT("(geen staat)"),
+						IsRegionSupplied(Definition.RegionId) ? TEXT("bevoorraad") : TEXT("AFGESNEDEN"));
+
+					for (const FEclipseLaneDefinition& Lane : Definition.Lanes)
+					{
+						const EclipseStrategyLogic::FEclipseLaneTransit Military = EclipseStrategyLogic::ResolveLaneTransit(
+							State, Lane, EclipseStrategyLogic::EEclipseTransitMode::Military, Graph->LaneTuning);
+						const EclipseStrategyLogic::FEclipseLaneTransit Smuggler = EclipseStrategyLogic::ResolveLaneTransit(
+							State, Lane, EclipseStrategyLogic::EEclipseTransitMode::Smuggler, Graph->LaneTuning);
+
+						UE_LOG(LogEclipse, Display, TEXT("      -> %-18s %-12s militair %s · smokkel %s"),
+							*Lane.NeighborRegionId.ToString(),
+							*UEnum::GetValueAsString(Lane.Status),
+							Military.bPassable
+								? *FString::Printf(TEXT("%dd/r%d"), Military.TravelDays, Military.Risk)
+								: *FString::Printf(TEXT("DICHT (%s)"), *Military.BlockedReason),
+							Smuggler.bPassable
+								? *FString::Printf(TEXT("%dd/r%d"), Smuggler.TravelDays, Smuggler.Risk)
+								: TEXT("DICHT"));
+					}
+				}
+			}),
+			ECVF_Default);
+	}
+
 	// DE LIBERATIE-DUMP (SPEC-P2-05 bouwvolgorde stap 4).
 	//
 	// Dit commando bestond nog niet, en het had de bug van 27-07 in een seconde
@@ -194,6 +292,16 @@ void UEclipseStrategySubsystem::Deinitialize()
 		IConsoleManager::Get().UnregisterConsoleObject(SelectMissionCommand);
 		SelectMissionCommand = nullptr;
 	}
+	if (RouteCommand != nullptr)
+	{
+		IConsoleManager::Get().UnregisterConsoleObject(RouteCommand);
+		RouteCommand = nullptr;
+	}
+	if (BoardCommand != nullptr)
+	{
+		IConsoleManager::Get().UnregisterConsoleObject(BoardCommand);
+		BoardCommand = nullptr;
+	}
 #endif
 
 	Super::Deinitialize();
@@ -204,6 +312,41 @@ const UEclipseRegionGraphAsset* UEclipseStrategySubsystem::ResolveGraph() const
 	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
 	const UEclipseCampaignSetupAsset* Setup = Campaign != nullptr ? Campaign->GetActiveSetup() : nullptr;
 	return Setup != nullptr ? Setup->RegionGraph.LoadSynchronous() : nullptr;
+}
+
+EclipseStrategyLogic::FEclipseRoute UEclipseStrategySubsystem::FindRoute(FName FromRegionId, FName ToRegionId,
+	EclipseStrategyLogic::EEclipseTransitMode Mode, int32 MaxAcceptableRisk) const
+{
+	EclipseStrategyLogic::FEclipseRoute Route;
+
+	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
+	const UEclipseRegionGraphAsset* Graph = ResolveGraph();
+	if (Campaign == nullptr || Graph == nullptr)
+	{
+		// A board with no graph has no geography, and "no route" is the honest
+		// answer — not an empty success (GDD 14.3.5).
+		Route.FailureReason = TEXT("No region graph loaded — the board has no lanes to route over");
+		return Route;
+	}
+
+	EclipseStrategyLogic::FEclipseRouteQuery Query;
+	Query.StartRegionId = FromRegionId;
+	Query.GoalRegionId = ToRegionId;
+	Query.Mode = Mode;
+	Query.MaxAcceptableRisk = MaxAcceptableRisk;
+	Query.Tuning = Graph->LaneTuning;
+	return EclipseStrategyLogic::FindRoute(Campaign->GetState(), Graph->Regions, Query);
+}
+
+bool UEclipseStrategySubsystem::IsRegionSupplied(FName RegionId) const
+{
+	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
+	const UEclipseRegionGraphAsset* Graph = ResolveGraph();
+	if (Campaign == nullptr || Graph == nullptr)
+	{
+		return false;
+	}
+	return EclipseStrategyLogic::IsRegionSupplied(Campaign->GetState(), Graph->Regions, RegionId, Graph->LaneTuning);
 }
 
 const FEclipseMissionOfferRow* UEclipseStrategySubsystem::FindOfferForType(const UEclipseRegionGraphAsset& Graph, EEclipseRegionType RegionType) const
@@ -423,6 +566,43 @@ void UEclipseStrategySubsystem::OnMissionCompleted(FGameplayTag EventTag, const 
 			UE_LOG(LogEclipse, Warning, TEXT("Strategy: no liberation row triggered for completed mission '%s' — no flip (GDD 14.3.5)."), *Mission->MissionId.ToString());
 		}
 	}
+
+	// The empire reacts to what ACTUALLY happened, so this runs last and in its
+	// own commit — after any liberation has landed and its facts have gone out.
+	// Folding it into the liberation transaction would mean deriving the tier
+	// from a board that has not flipped yet, and the first liberation is exactly
+	// the trigger for tier 3 (GDD 9.4).
+	EscalateResponseTierIfWarranted(*Campaign, TEXT("MissionCompleted"));
+}
+
+void UEclipseStrategySubsystem::EscalateResponseTierIfWarranted(UEclipseCampaignSubsystem& Campaign, FName Reason)
+{
+	const EEclipseDominionResponseTier Current = Campaign.GetState().ResponseTier;
+	const EEclipseDominionResponseTier Derived = EclipseStrategyLogic::DeriveResponseTier(Campaign.GetState());
+	if (Derived <= Current)
+	{
+		return; // nothing changed; the ladder never descends (GDD 9.4)
+	}
+
+	FEclipseCampaignTransaction Transaction;
+	Transaction.Source = TEXT("StrategySubsystem");
+	FEclipseCampaignMutation& Mutation = Transaction.Mutations.AddDefaulted_GetRef();
+	Mutation.Type = EEclipseCampaignMutationType::SetResponseTier;
+	Mutation.ResponseTier = Derived;
+	Mutation.Reason = Reason;
+
+	FString Error;
+	if (!Campaign.CommitTransaction(Transaction, Error))
+	{
+		// Derivation already refuses to descend, so a rejection here is a
+		// machinery defect — loud, never thrown (GDD 12.2 rule 4).
+		UE_LOG(LogEclipse, Error, TEXT("Strategy: response-tier escalation to %s rejected: %s"),
+			*UEnum::GetValueAsString(Derived), *Error);
+		return;
+	}
+
+	UE_LOG(LogEclipse, Display, TEXT("Strategy: Dominion Response Tier %s -> %s (%s). Every lane is riskier from here (GDD 9.4)."),
+		*UEnum::GetValueAsString(Current), *UEnum::GetValueAsString(Derived), *Reason.ToString());
 }
 
 bool UEclipseStrategySubsystem::ResolveOfferForRegion(const UEclipseRegionGraphAsset& Graph, FName RegionId, FEclipseMissionOfferView& OutOffer) const

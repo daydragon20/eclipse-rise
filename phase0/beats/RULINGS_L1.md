@@ -190,3 +190,77 @@ Het overleeft ook de strip-test (§18.9 C1) **beter** dan neutraler geschreven d
 > M1.8 — commando, in de **tweede persoon**, aan hem.
 
 Twee verschillende grammaticale bewegingen, oplopend, acht missies uit elkaar. Dat is architectuur die ik niet had bedacht en die ik overneem. **Vastgelegd als AR-5b.**
+
+---
+
+## Ronde 2 — 2026-07-31, Q-3 opgelost + budgetcorrectie
+
+### L1-R9 — Petra Voss krijgt een vingerafdruk
+
+**Q-3's personage-helft is hiermee dicht.** Wat openblijft is de *stem*, en dat is terecht een owner-keuze — maar die volgorde klopt nu: `voice-director` kan pas casten als er een vingerafdruk ligt om tegen te casten, want §19.3 laat elke kandidaat dezelfde signature-regel spreken en die regel volgt uit de vingerafdruk.
+
+Toegevoegd aan `18_writing_standard.md` §18.4 als nieuwe sectie *Recurring non-companion voices* — zij is geen squadlid, dus zij hoort niet in de companion-tabel:
+
+| | |
+|---|---|
+| **Syntax** | Imperatieven met weggelaten voornaamwoord. Huishoudelijke en keukenzelfstandignaamwoorden waar iedereen om haar heen operationele gebruikt. Op één na de kortste regels van het spel. |
+| **Tic** | Beantwoordt een vraag die ze niet wil beantwoorden door een taak uit te delen. |
+| **Nooit** | Zegt nooit "je" of "jouw". Laat zich nooit bedanken. Noemt nooit wat haar is aangedaan. |
+
+**Signature-regel voor §19.3, castklaar:**
+
+> **Petra:** *"Sit. Eat. Then tell me who died."*
+
+Acht woorden, drie imperatieven, geen voornaamwoord, en de derde draait. Hij toont in één regel dat ze instrueert, dat ze eten als gereedschap gebruikt, en dat ze **niet fragiel is** — ze vraagt zelf om de verliezenlijst. Als casting-instrument test hij precies het moeilijke: kan deze stem kortaf zijn zonder koud te klinken. Dat is de hele rol.
+
+**Twee botsingen die ik bewust heb uitgezet, want beide waren echt:**
+
+**1. Petra vs. Brick.** Twee laconieke personages in dezelfde cast is een strip-test-risico (§18.9 C1). Het mechanische verschil: **Brick geeft je een zelfstandig naamwoord, Petra geeft je een werkwoord.** Hij antwoordt met een naam, zij met een klus. Twee korte regels naast elkaar moeten daarop alleen al toe te wijzen zijn.
+
+**2. Petra vs. Mara — en dit was de gevaarlijke.** De waarschuwing was juist. Mara's hele arc hangt aan één voornaamwoord: ze zegt het spel lang "wij" en spendeert "jij" precies één keer, in M1.8.S08, en dát woord ís de commando-overdracht. Petra spreekt vier scènes eerder in diezelfde climax. Als zij ook in de tweede persoon zou werken, stort die ladder in.
+
+Dat doet ze niet, en het is geen toeval: **haar imperatieven laten het voornaamwoord weg.** *"Sit down."* bevat geen "you". Het gevolg is dat het woord schaars is over de hele climax, waardoor Mara's ene gebruik in een vacuüm landt. Het is met een regex te controleren, en dat is het punt — een ontworpen scheiding, geen gelukkige.
+
+**Eén gereserveerde breuk:** precies één keer in de campagne **vraagt Petra in plaats van instrueert**. Niet vóór act 3. Ongebruikt in act 1. (Bewust een ándere soort breuk dan die van Mara — twee personages met hetzelfde apparaat is één te veel.)
+
+---
+
+### L1-R10 — De gedeelde achternaam
+
+**Wat de canon al vastlegt, en dat is meer dan de vraag veronderstelde.** `02_story_bible.md` §2.4: Voss werd grootgebracht door tante **Petra Voss** nadat beide ouders stierven bij de **Foundry Collapse van 484 AE** — een "bedrijfsongeval" dat in AEGIS-dossiers staat als *optimal loss allocation*, ontdekbaar in act 3.
+
+Rekenwerk: heden is 503 AE, Voss is 26 → hij was **zeven**. Petra is ±55 → zij was **36 toen ze een kind van zeven overnam**.
+
+**Wat ik NIET heb gedaan.** De vraag liet drie deuren open: familie, naamgenoot, of iets dat de speler pas laat begrijpt. Twee daarvan zijn dicht en niet door mij: de bijbel zegt *tante*. Van Petra stiekem de moeder maken, of de naam een dekmantel, is een wijziging aan §2.4 en dus een **owner-beslissing**. Ik heb op "tante" doorgebouwd in plaats van eromheen.
+
+**Wat wel van mij was, en wat ik vastleg:**
+
+1. **Ze draagt de naam door bloed, niet door huwelijk.** Wiens zus ze is laat ik open — dat invullen kost canon en levert niets op.
+2. **Zij is de laatste volwassene die de naam draagt.** De Foundry Collapse nam de anderen.
+3. **De achternaam is daarmee de draad tussen de Foundry Collapse en de AEGIS-onthulling.** Act 3 laat zien dat AEGIS die doden boekte als *optimale verliesallocatie*. Dat is niet abstract: het gaat om de mensen wier naam de speler de hele game draagt, en Petra is de enige die er nog is om dat te dragen. Die draad lag ongebruikt in de canon.
+4. **De productie-beperking wordt karakterisering.** §2.4 zet de achternaam vast *"for voiced dialogue"* — de voornaam is speler-gekozen en kan dus nooit ingesproken worden. Iedereen zegt daarom "Voss", en vanaf M1.8 "Cinder". **Petra is de enige levende die hem kende voordat een van beide woorden iets betekende** — en als zij "Voss" zegt, zegt ze ook haar eigen naam en die van haar dode broer of zus.
+5. **Daarom noemt Petra de hoofdpersoon nergens iets.** Geen naam, geen "je". Ze gebruikt taken. Daarmee wordt de hardste VO-beperking van het spel een eigenschap in plaats van een gat — en dat is het soort oplossing waar de andere elf castingregels niets voor hoeven te doen.
+6. **De act-1-beat waar dit alles samenvalt: M1.8.S99.** Op de avond dat Petra terugkomt, ruilen de cellen de familienaam in voor een symbool. **Zij is de enige in de kamer die niet meedoet aan het benoemen** — geen afkeuring, ze gebruikt gewoon geen namen. De vingerafdruk en de naamruling zijn dezelfde beat, en hij kost één shot-noot.
+
+---
+
+### L1-R11 — Het budget van 131.000 en wat er met de hub gebeurt
+
+De hub-laag (was tier 4, ~33k) valt weg. **Drie dingen nagelopen in plaats van aangenomen:**
+
+**1. De dragende plant overleeft, en niet per ongeluk.** `HUB.A1.mara_letters` was de plant voor Mara's opnames in acts 2–4 (canon §2.5). Maar **M1.8.S91 is een missiescène**, dus tier 2, dus wél ingesproken — en ik heb hem expliciet zo gespecificeerd dat hij zonder de hubscène volledig werkt, met de hub als voorwaardelijke verrijking. **AR-9's plant-redundantieregel beschermde tegen een budgetsnede, en daar had ik hem niet voor geschreven.** Hij was bedoeld tegen spelers die optionals overslaan. Dat hij ook dit vangt, is de beste aanwijzing dat de regel klopt.
+
+**2. Twee andere hub-beats hebben een ingesproken achtervang, gecontroleerd:**
+
+| Wat de hub droeg | Ingesproken achtervang |
+|---|---|
+| Brick vraagt om de namen van de doden van vóór zijn komst (`brick_bunk`) → zet M1.8.S90 op | **M1.4.S03** (zijn eerste regel ís drie namen) + **M1.4.S99** (Reyes vraagt naar de namen) — beide tier 2 |
+| Reyes' ex-Dominion-register (`reyes_triage`) | **M1.4.S99** — haar grootste scène staat al in een missie |
+
+De lasbeat in M1.8.S90 houdt dus zijn opzet. Dunner, niet stuk.
+
+**3. De verleiding is hubmateriaal in missiescènes trekken. Niet doen.** Dat zou tier 2 opblazen — die zat volgens bevinding C-6 al ~15% over zijn oude, ruimere plafond — en het zou downtime-schrijfwerk in scènes proppen die ergens heen moeten. **De hub blijft tekst en wacht.** Precies wat §19.2 met de rest van het spel doet.
+
+**Wat wél verandert: de schrijfvolgorde.** De twaalf hubgesprekken concurreren deze maand niet meer om credits, dus ze gaan naar achteren — ná de beat-sheets van acts 2–4. **Met één uitzondering: `HUB.A1.mara_letters` wordt nu geschreven**, want act 2's Mara-opnames worden deze week tegen die scène aan geschreven en ze moeten in dezelfde stem staan.
+
+**Openstaande vraag voor `voice-director`, met het rekenwerk erbij.** Bevinding C-6 stond al open: act 1's verhaaldialoog is ~17.200 te genereren woorden (12.800 script + Voss' gender-verdubbeling + as-varianten) ≈ **~103.000 credits**, tegen een tier 2 dat toen 90.000 was. Bij een totaal van 131.000 kan tier 2 die 103.000 vrijwel zeker niet meer dragen naast tier 1's barks. **De knop is Q-7, het Voss-variantbeleid — niet het aantal scènes.** Varianten zijn de enige post in act 1 die je kunt halveren zonder een beat te verliezen; scènes schrappen kost plant-dragers, en AR-9 zegt dat die verplicht zijn. Ik heb de nieuwe tierverdeling niet gezien, dus dit is een vraag en geen ruling.

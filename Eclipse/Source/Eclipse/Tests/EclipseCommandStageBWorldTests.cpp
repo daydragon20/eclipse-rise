@@ -388,21 +388,54 @@ bool FEclipseStageBRefusalsInWorldTest::RunTest(const FString& Parameters)
 		const bool bToggled = Squad->ToggleSyncStrikeMark(Quarry, bMarked);
 		TestTrue(TEXT("NotConcealed: het stille doelwit is te markeren"), bToggled && bMarked);
 
+		// DE WAKER. Zelfde opzet als AEclipseGameMode zijn vijanden spawnt:
+		// lichaam, dan een losse controller, dan Possess.
 		AEclipseCharacter* WatcherBody = SpawnUnawareHostile(*Harness.World,
 			(MateBody != nullptr ? MateBody->GetActorLocation() : Harness.Location()) + FVector(300.0f, 0.0f, 0.0f));
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		AEclipseEnemyController* Watcher = Harness.World->SpawnActor<AEclipseEnemyController>(
-			AEclipseEnemyController::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		AEclipseEnemyController* Watcher = Harness.World->SpawnActor<AEclipseEnemyController>();
 		if (Watcher != nullptr && WatcherBody != nullptr)
 		{
 			Watcher->Possess(WatcherBody);
+
+			// GEZONDHEID PAS NA HET BEZETTEN, en dat is geen detail.
+			//
+			// De eerste ronde zag deze waker ons nooit, terwijl de meting zei:
+			// pion aanwezig, 244 cm, zichtlijn ja. De oorzaak stond in
+			// AEclipseEnemyController::OnPossess — die roept
+			// InitializeHealth(Archetype.Health) aan en zette mijn 100.000 hp
+			// terug naar de 60 van het standaardarchetype. De squad staat op
+			// Ready en vuurt uit zichzelf (33 schoten per 2 s, 22 schade), dus de
+			// waker lag neer vóór zijn eerste denkbeurt op 0,8 s — en een
+			// neergeschoten vijand wist zijn eigen denkklok.
+			//
+			// Hij hoeft niet onsterfelijk te zijn omdat dat mooier meet; hij moet
+			// de twee seconden halen waarin hij ons kán opmerken. Dat is de
+			// voorwaarde van de meting, niet de meting zelf.
+			WatcherBody->InitializeHealth(100000.0f);
 		}
-		// Zijn denkbeurt loopt op het vuurinterval van het archetype (0,8 s).
-		Harness.Idle(2.0f);
+
+		// Wachten TOT hij ons ziet in plaats van een vast aantal seconden: zijn
+		// denkbeurt loopt op het vuurinterval van het archetype, en een test die
+		// op een gok van twee seconden staat, meet vroeg of laat de klok in plaats
+		// van het gedrag.
+		const double SeeDeadline = FPlatformTime::Seconds() + 6.0;
+		while (FPlatformTime::Seconds() < SeeDeadline && Watcher != nullptr && !Watcher->HasSeenPlayerSide())
+		{
+			Harness.Idle(0.25f);
+		}
 
 		const bool bSeen = MateBody != nullptr && !Squad->IsBodyConcealed(MateBody);
-		AddInfo(FString::Printf(TEXT("GEMETEN  waker heeft ons gezien: %s ; soldaat is %s"),
+
+		// De TUSSENSTAPPEN erbij, want "hij ziet ons niet" heeft vier mogelijke
+		// oorzaken en zonder deze regels is niet te zien welke het was. Dat kostte
+		// de vorige ronde een hele iteratie.
+		AddInfo(FString::Printf(TEXT("GEMETEN  waker: pion=%s, %.0f hp%s, afstand=%.0f cm, zichtlijn=%s, gezien=%s ; soldaat is %s"),
+			Watcher != nullptr ? *GetNameSafe(Watcher->GetPawn()) : TEXT("(geen controller)"),
+			WatcherBody != nullptr ? WatcherBody->GetHealth() : -1.0f,
+			WatcherBody != nullptr && WatcherBody->IsDowned() ? TEXT(" (NEER)") : TEXT(""),
+			(Watcher != nullptr && Watcher->GetPawn() != nullptr && MateBody != nullptr)
+				? FVector::Dist(Watcher->GetPawn()->GetActorLocation(), MateBody->GetActorLocation()) : -1.0f,
+			(Watcher != nullptr && MateBody != nullptr && Watcher->LineOfSightTo(MateBody)) ? TEXT("ja") : TEXT("nee"),
 			Watcher != nullptr && Watcher->HasSeenPlayerSide() ? TEXT("ja") : TEXT("nee"),
 			bSeen ? TEXT("GEZIEN") : TEXT("ongezien")));
 
@@ -537,22 +570,50 @@ bool FEclipseStageBStealthBehaviourTest::RunTest(const FString& Parameters)
 		return After - Before;
 	};
 
-	// --- arm 1 + 2: de basis, en het kader dat hem afknijpt -----------------
-	const int32 ReadyShots = ShotsOverTwoSeconds(EEclipseSquadStance::Ready);
+	// --- arm 1: STEALTH EERST, en dat is geen smaakkwestie -----------------
+	//
+	// De eerste versie van deze test mat Ready eerst en stealth daarna, en kreeg
+	// 19 schoten waar 0 hoorde te staan. De code was niet stuk: het VUREN VAN DE
+	// CONTROLEPROEF ZET HET ALARM AAN. `AEclipseGameMode` alarmeert op elk schot
+	// dat gehoord wordt (Event.Combat.ShotFired -> NotifyAlarmRaised), dus 33
+	// Ready-schoten maakten de wereld luid, en stealth vuurde daarna volkomen
+	// terecht — precies wat zijn tweede poort belooft.
+	//
+	// Dat is de val van "meten ná de gebeurtenis in plaats van tijdens": mijn
+	// eigen meetopstelling vernietigde de voorwaarde die de volgende meting nodig
+	// had. Stille arm dus eerst, en meteen erna nog een keer vragen of het stil
+	// gebleven is — een 0 in een luide wereld zou niets bewijzen.
 	const int32 StealthQuietShots = ShotsOverTwoSeconds(EEclipseSquadStance::Stealth);
-
-	Report(*this, TEXT("schoten in 2 s onder READY"), static_cast<float>(ReadyShots), TEXT(""),
-		TEXT("autonoom vuren is de basis"));
+	const bool bStillQuiet = !Squad->IsEnemyAwareOfSquad();
 	Report(*this, TEXT("schoten in 2 s onder STEALTH, ongezien"), static_cast<float>(StealthQuietShots), TEXT(""),
 		TEXT("hoort 0 te zijn: hij wacht op je order of op ontdekking"));
+	AddInfo(FString::Printf(TEXT("GEMETEN  na de stille arm is de wereld nog steeds %s"),
+		bStillQuiet ? TEXT("stil") : TEXT("LUID — de meting telt niet")));
 
-	// De controleproef zit ingebakken: als READY ook 0 geeft, meet deze test
-	// helemaal niets en is de 0 van stealth waardeloos.
-	TestTrue(TEXT("stealth: de controleproef staat — onder Ready wordt er echt gevuurd"), ReadyShots > 0);
+	TestTrue(TEXT("stealth: de wereld bleef stil tijdens de stille arm (anders meet die 0 niets)"), bStillQuiet);
 	TestEqual(TEXT("stealth: ongezien vuurt hij niet uit zichzelf"), StealthQuietShots, 0);
 
-	// --- arm 3: de tweede poort. Het alarm gaat af -------------------------
-	Mission->NotifyAlarmRaised();
+	// --- arm 2: de controleproef ------------------------------------------
+	// Zonder deze arm is de 0 hierboven waardeloos: een squad die helemaal niet
+	// kán vuren geeft ook 0. Ready moet in dezelfde opstelling, op dezelfde
+	// vijand, in dezelfde twee seconden wél schieten.
+	const int32 ReadyShots = ShotsOverTwoSeconds(EEclipseSquadStance::Ready);
+	Report(*this, TEXT("schoten in 2 s onder READY"), static_cast<float>(ReadyShots), TEXT(""),
+		TEXT("autonoom vuren is de basis — de controleproef"));
+	TestTrue(TEXT("stealth: de controleproef staat — onder Ready wordt er echt gevuurd"), ReadyShots > 0);
+
+	// --- arm 3: de tweede poort. De wereld is nu luid ----------------------
+	// En hij is luid geworden UIT DE FICTIE: de squad heeft zichzelf verraden met
+	// het vuur van de controleproef. Dat is de eerlijkste versie van deze
+	// voorwaarde die er is; de latch erna is alleen een vangnet als de vijanden
+	// buiten gehoorsafstand stonden.
+	const bool bAlarmFromOwnGunfire = Squad->IsEnemyAwareOfSquad();
+	AddInfo(FString::Printf(TEXT("GEMETEN  het alarm kwam %s"),
+		bAlarmFromOwnGunfire ? TEXT("uit het eigen vuur van de squad") : TEXT("er niet vanzelf — latch gezet door de test")));
+	if (!bAlarmFromOwnGunfire)
+	{
+		Mission->NotifyAlarmRaised();
+	}
 	TestTrue(TEXT("stealth: de vijand is nu van ons op de hoogte"), Squad->IsEnemyAwareOfSquad());
 	const int32 StealthLoudShots = ShotsOverTwoSeconds(EEclipseSquadStance::Stealth);
 	Report(*this, TEXT("schoten in 2 s onder STEALTH, na het alarm"), static_cast<float>(StealthLoudShots), TEXT(""),

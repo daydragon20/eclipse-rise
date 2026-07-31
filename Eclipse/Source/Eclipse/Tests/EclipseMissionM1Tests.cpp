@@ -81,12 +81,12 @@ bool FEclipseMissionM11SkeletonTest::RunTest(const FString& Parameters)
 		FEclipseRegionDefinition& Home = Graph->Regions.AddDefaulted_GetRef();
 		Home.RegionId = TEXT("Underworks");
 		Home.StartingOwner = EEclipseRegionOwner::Player;
-		Home.ConnectedRegionIds = { TEXT("AmbushBlock") };
+		Home.Lanes = { TEXT("AmbushBlock") };
 		FEclipseRegionDefinition& Target = Graph->Regions.AddDefaulted_GetRef();
 		Target.RegionId = TEXT("AmbushBlock");
 		Target.RegionType = EEclipseRegionType::Checkpoint;
 		Target.StartingOwner = EEclipseRegionOwner::Dominion;
-		Target.ConnectedRegionIds = { TEXT("Underworks") };
+		Target.Lanes = { TEXT("Underworks") };
 
 		UDataTable* Offers = NewObject<UDataTable>();
 		Offers->RowStruct = FEclipseMissionOfferRow::StaticStruct();

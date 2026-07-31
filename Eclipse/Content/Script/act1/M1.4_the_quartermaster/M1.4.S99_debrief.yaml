@@ -15,7 +15,7 @@ turn:         "She stops asking about his body and asks about the names, and he 
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        301
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
@@ -41,4 +41,216 @@ words:        0
 #            treats a man she would once have been ordered to triage by loyalty score.
 #            The scene knows it. She does not say it.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `cutscene` (20-60) read as a CEILING per the M1.1 precedent; longest base
+#            line 19 w. A 20-word floor and 18.3's variance rule cannot both hold.
+# variance:  1 w (.060 / .080 / .120 / .160) to 19 w (.040) = 19x.
+# beat map:  the haul .010-.040 | THE EXPLANATION .040-.060 | the bill .070-.080 |
+#            Reyes examines Brick .090-.140 | the names .150-.200 | the roster .210-.220 |
+#            Voss hands the night away .230-.240 | P3-a .250-.290
+#
+# *** .040-.060 IS THE ONE THE ACT HANGS ON. ***
+# Dex is halfway through the true explanation - their book was rotten, that is how we got
+# in - and Mara CUTS HIM OFF with the flattering one. She is not reassuring anybody and
+# she is not covering anything up; she believes it, she has earned the right to believe
+# it, and every player in the room believes it with her. That is the requirement: not a
+# comfort that reads as a lie later, but a conviction that reads as a cause of death.
+# The shot on .060 is load-bearing: NOBODY DISAGREES WITH HER. Dex shrugs. If Dex looks
+# doubtful, the twist is flagged sixty hours early and the scene is worthless.
+# NOTE: this deliberately does NOT plant T4. Nobody says the Dominion under-reacted -
+# the armory was fully defended and the beat sheet reserves T4 for elsewhere. What is
+# planted here is Mara's READING of the win, which is a character fact, not an enemy fact.
+#
+# reyes:     her biggest scene of the act and she never says where she learned any of it.
+#            .100 is the whole thing: she knows where the cuff sits in a Dominion holding
+#            block before she has looked. Dex clocks it and says nothing (shot). No line
+#            in this file states or hints that she served. 2.5's "penance to purpose"
+#            arrives as a prescription at .200 and is never named.
+#            18.4: complete clinical sentences, zero contractions, questions instead of
+#            accusations. She is also allowed to be slightly short with him at .130 -
+#            18.9 D says real people are petty.
+# brick:     5 words here (.120 = 1, .160 = 1, .180 = 3). Mission total 27, under the 30.
+#            .180 is the SECOND time the player hears the three names, and this is where
+#            it lands: for three months in the dark, that was the whole of his work.
+#            No explanation follows, here or ever.
+# .210:      the name he gave in S05 goes on the roster. Mara never says it back to him.
+# .220:      the list is getting too long to say out loud - the M1.6 plant the beat sheet
+#            asks for. Deliberately NOT a wall and NOT a plate: the wall is M1.8's and I
+#            am not spending it here.
+# variants:  .240, all four axes. Voss is handed the night's credit and hands it straight
+#            to a man who is sitting in the room. 18.4: never claims credit in front of
+#            the people who did the work.
+# *** P3-a: .250-.290 AND IT IS A JOKE. *** The job exists by the end of .270 and the
+#            last thing anybody says about it is that it comes with a pencil. Nobody
+#            volunteers, nobody is appointed, nobody is looked at. If this beat sounds
+#            weighty the player knows the mole in act 3 before the game tells him.
+# no flags:  no `condition` anywhere in this scene. The casualty state of the run is not
+#            readable from any tag that exists, so every line here is written to be true
+#            on both outcomes. .070 states injuries, never deaths.
+
+lines:
+  - id:      M1.4.S99.010
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Twenty-six crates. Eleven rifles that fire today. Four more when I've had a night with them."
+    shot:    "Bunk row. The haul is laid down the middle of the floor and there is nowhere left to walk."
+
+  - id:      M1.4.S99.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Their book says forty. Their book has said forty for three weeks."
+
+  - id:      M1.4.S99.030
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "So where's the other fourteen?"
+
+  - id:      M1.4.S99.040
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Sold, or written into a column nobody checked. That's how we got in, and it's the only reason we--"
+
+  - id:      M1.4.S99.050
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "We got in because we were better than they are."
+
+  - id:      M1.4.S99.060
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Sure."
+    shot:    "He shrugs and goes back to the crate. Nobody in the room disagrees with her."
+
+  - id:      M1.4.S99.070
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Two crush injuries and a hand that will not close for a week."
+
+  - id:      M1.4.S99.080
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Cheap."
+
+  - id:      M1.4.S99.090
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Sit down and take the left arm out of the sleeve."
+    shot:    "She pulls a crate over and sits on it, which puts her below him."
+
+  - id:      M1.4.S99.100
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "The cuffs sit high in those blocks. Show me above the bone first."
+    shot:    "She knows where to look before she looks. Dex glances up and says nothing."
+    note:    "The whole of her history, and not one word of it is spoken. Do not add one."
+
+  - id:      M1.4.S99.110
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "When did the shoulder go?"
+
+  - id:      M1.4.S99.120
+    speaker: BRICK
+    voice:   brick
+    text:    "Krad-9."
+
+  - id:      M1.4.S99.130
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "That is a place."
+
+  - id:      M1.4.S99.140
+    speaker: REYES
+    voice:   elin_reyes
+    tags:    [pause]
+    text:    "Then it is old, it set on its own, and I cannot open it tonight."
+    note:    "The scene's one permitted triad (18.9 B)."
+
+  - id:      M1.4.S99.150
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Three months in a holding block. What was there to do with the time?"
+
+  - id:      M1.4.S99.160
+    speaker: BRICK
+    voice:   brick
+    text:    "Counted."
+
+  - id:      M1.4.S99.170
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Counted what?"
+
+  - id:      M1.4.S99.180
+    speaker: BRICK
+    voice:   brick
+    text:    "Tam. Oyelaran. Vic."
+    shot:    "He does not look up. Reyes stops writing."
+    note:    "Second pass on the signature line. This is where S03 lands."
+
+  - id:      M1.4.S99.190
+    speaker: REYES
+    voice:   elin_reyes
+    tags:    [pause]
+    text:    "There is nothing in my kit for that."
+
+  - id:      M1.4.S99.200
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Sleeve down. Come back in the morning and say them again."
+    note:    "She prescribes the names. The turn, and she never explains it to anybody."
+
+  - id:      M1.4.S99.210
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Bex goes on the roster."
+
+  - id:      M1.4.S99.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "It used to be a list we could say out loud."
+    note:    "Plant for M1.6. The list outgrows the mouth before it outgrows the room."
+
+  - id:      M1.4.S99.230
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "The trench was not on any plan we had."
+
+  - id:      M1.4.S99.240
+    speaker: VOSS
+    voice:   voss
+    text:    "It wasn't ours. It came out of cell three for nothing."
+    shot:    "He does not look at Brick while he says it. Brick does not look up."
+    variants:
+      pragmatist: "It came out of cell three, for nothing, from a man with no reason to give it."
+      idealist:   "It was his. He gave it away before anybody offered him anything."
+      personal:   "Ask the man who was in the dark with it for three months."
+      strategic:  "One building is mapped now. The next one like it, we won't be guessing."
+
+  - id:      M1.4.S99.250
+    speaker: DEX
+    voice:   dex_callum
+    text:    "One more thing and then I'm going to bed."
+
+  - id:      M1.4.S99.260
+    speaker: DEX
+    voice:   dex_callum
+    text:    "There's twenty-six crates on that floor and no paper on any of it."
+
+  - id:      M1.4.S99.270
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Somebody keeps the book now, or in a month we're stealing our own rounds back."
+    note:    "P3-a. The job exists as of this line and it arrives inside a complaint."
+
+  - id:      M1.4.S99.280
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Not it."
+
+  - id:      M1.4.S99.290
+    speaker: DEX
+    voice:   dex_callum
+    text:    "It comes with a pencil."
+    shot:    "Somebody laughs down the row. Nobody volunteers and nobody is asked. The lamps go down."

@@ -15,7 +15,7 @@ turn:         "Voss recognises a shoulder plate in the response line and keeps m
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        105
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      VOSS, MARA, DEX, fighters; Enforcer response (barks)
@@ -36,4 +36,181 @@ words:        0
 # writer:    lines under fire use the CALLOUT band (2-6 words). The badge line is the
 #            exception and it is still short.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# enforcer: he does not speak, he does not die, and he is never named. He is a three-digit
+#           number in somebody else's mouth for one line. .150/.170 are all he gets.
+#           NOT GATED ON Q-2: Voss knows the plate from standing in the ration line
+#           (02.9 prologue), not from holding the badge. So the beat plays whether or not
+#           the owner approves recap card 3, and Story.Thread.Enforcer_BadgeHeld is read
+#           nowhere in this file. That is deliberate - the thread should not depend on an
+#           open owner question to be touched at all.
+# four:     .170 is exactly four words, as the stub allows, and it is the second half of
+#           a refusal. Mara does not turn round. Nobody asks him again.
+# number:   plate spoken as three digits, matching the convention already in the script -
+#           M1.1.S05's conscript recites "Four six two". NEW DETAIL: the number 917 is
+#           mine. If M1.2's writer or the recap card gives this man a different number,
+#           L1 reconciles and I change .150. Flagged rather than assumed.
+# dominion: .050-.080 are the panic vocabulary the beat sheet asks for - procedure going
+#           short of breath. Calls a sector, calls it again, gets an answer that is not a
+#           procedure, and asks for the procedure back. 18.5 rule 5, in four lines.
+#           No Veil vocabulary anywhere: there are no Veil operatives on this street
+#           until M1.7.
+# under-   this is the mission where the Dominion answers in full, on purpose. The thin
+# reaction: response of M1.2/M1.5/M1.7 only reads as a detail if this night reads as an
+#           avalanche. Two walkers, every gate, every shutter.
+# band:     `in-mission-radio` (10-25) with the stub's callout override. Nothing here is
+#           over 9 words and most are under 6, which is the stub's instruction and the
+#           ceiling-not-floor reading used across this mission.
+# variance: 1 w (.160 "What?") to 9 w (.020) = 9x.
+# em-dash:  one, at .180/.190. Rate 1:27.
+
+lines:
+  - id:      M1.3.S05.010
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    tags:    [urgent]
+    text:    "Gates. All of them at once."
+    shot:    "Alarm tones climb the district in sequence, block by block, a note higher each time. Every checkpoint gate on the row comes down together."
+
+  - id:      M1.3.S05.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "That's not the mast. That's the whole checkpoint."
+
+  - id:      M1.3.S05.030
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "West. The ring is shut."
+
+  - id:      M1.3.S05.040
+    speaker: VOSS
+    voice:   voss
+    text:    "West."
+
+  - id:      M1.3.S05.050
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    text:    "Sector nine. Sector nine, respond."
+
+  - id:      M1.3.S05.060
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    tags:    [nervous]
+    text:    "Anyone on nine. Anyone."
+
+  - id:      M1.3.S05.070
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    text:    "Nine is on the ground."
+
+  - id:      M1.3.S05.080
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    text:    "Say again procedure. Say again."
+    note:    "18.5 rule 5: the Dominion conscript vocabulary breaking down under load. He asks for the words back, not for help."
+
+  - id:      M1.3.S05.090
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    tags:    [shouting]
+    text:    "Walker on the avenue."
+
+  - id:      M1.3.S05.100
+    speaker: DEX
+    voice:   dex_callum
+    text:    "They don't send walkers for us."
+
+  - id:      M1.3.S05.110
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "They did."
+    note:    "The whole price of the mission in two words. Nobody elaborates and nobody is allowed to."
+
+  - id:      M1.3.S05.120
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Shutters. All the way down the row."
+    shot:    "Every shopfront on the row rolling down at once. Somebody hauls a child in by the wrist and the shutter comes down behind them."
+
+  - id:      M1.3.S05.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Leave them shut."
+
+  - id:      M1.3.S05.140
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Second walker. Behind the first."
+
+  - id:      M1.3.S05.150
+    speaker: VOSS
+    voice:   voss
+    text:    "Nine one seven."
+    shot:    "A response line forming across the avenue, sodium light on their backs. Voss is half a step slow for the length of one man's shoulder plate."
+    note:    "THE BADGE. He is not named, he does not speak, and he does not die - 02.11 holds this thread to the end of the campaign."
+
+  - id:      M1.3.S05.160
+    speaker: DEX
+    voice:   dex_callum
+    text:    "What?"
+
+  - id:      M1.3.S05.170
+    speaker: VOSS
+    voice:   voss
+    text:    "Nothing. Left side, go."
+    shot:    "Mara does not turn round. Nobody asks him again tonight."
+    note:    "Exactly four words after the refusal, per the stub. No axis variants here - S01/S04/S99 hold this mission's variant budget (C-6)."
+
+  - id:      M1.3.S05.180
+    speaker: DEX
+    voice:   dex_callum
+    text:    "There's a stair at the--"
+
+  - id:         M1.3.S05.190
+    speaker:    VOSS
+    voice:      voss
+    interrupts: true
+    text:       "Take it."
+
+  - id:      M1.3.S05.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Between the shutters. Single file."
+
+  - id:      M1.3.S05.210
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    tags:    [shouting]
+    text:    "They're in the row. They're in the row."
+
+  - id:      M1.3.S05.220
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [shouting]
+    text:    "Down."
+    shot:    "A walker lamp sweeps the row above their heads, slow, methodical, the way a thing looks when it has all night."
+
+  - id:      M1.3.S05.230
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Count."
+
+  - id:      M1.3.S05.240
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Four."
+
+  - id:      M1.3.S05.250
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Five with the case."
+
+  - id:      M1.3.S05.260
+    speaker: DEX
+    voice:   dex_callum
+    text:    "The case counts."
+
+  - id:      M1.3.S05.270
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Go."

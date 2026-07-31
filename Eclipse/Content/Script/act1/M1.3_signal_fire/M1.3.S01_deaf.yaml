@@ -15,7 +15,7 @@ turn:         "Dex volunteers to set the charge himself, which is the first thin
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        325
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
@@ -33,4 +33,256 @@ words:        0
 #            walks out with you. From M1.4 he stays home again, and the player misses him.
 #            That absence is the point; do not undercut it by making him casual here.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      type is `cutscene` (20-60 per 18.3). MOST LINES SIT FAR BELOW 20, and the
+#            longest is 16. Same reading as M1.1: the band is a CEILING, not a floor -
+#            18.3's own note says the bands "cap the length of one line", and 18.3's
+#            variance rule (>=3x inside a scene) is unsatisfiable against a floor of 20.
+#            No line exceeds the ceiling.
+# variance:  1 w (.110 "Don't.") to 16 w (.370) = 16x.
+# ar-5:      Mara spends ZERO of her "you" allowance here and says "I" never. Checked line
+#            by line. Her only second-person constructions are bare imperatives.
+# reyes:     no contraction anywhere in her four lines. She is stressed and it shows in
+#            grammar, not in adjectives (18.4).
+#
+# *** ESCALATION 1 - Dex's list (beat 2). ***
+# The beat asks him to recite the cells that tried this BY NAME. There are no canon cell
+# names on Kessara except Ember and Iron Chorus, and Iron Chorus is alive and is M1.5's
+# introduction. Inventing three dead cell names is exactly the quiet canon drift the brief
+# forbids, so I did NOT invent them. He recites PLACES from the act-1 location register
+# and COUNTS instead, and the last count carries an age instead of a name (.090). That is
+# Brick's device transposed one step and it costs no canon. If story-architect wants real
+# names, they come from L1 and I will rewrite .080/.090 on the same ids.
+#
+# NOTE FOR M1.5's WRITER: .080 puts a dead cell of six in the Worker Housing pump gallery,
+# two winters before M1.3. M1.5 plays there. That is free weight; it is not a conflict.
+#
+# choice:    .200 / .210 are the player's insertion options, matching the two insertion
+#            points that already exist in data (setup_story_missions.py: Entry_Sewer =
+#            the run, Entry_Roof = the plaza). Both carry full four-axis Voss variants -
+#            this is one of the three scenes the architect budgeted variants to (C-6/Q-7).
+#            S03 reads the result as story.m13_insertion == "tunnel" | "plaza".
+# omitted:   the mission's optional objective. The beat sheet promises "SupplyDepot stores
+#            intact, +60 M", but setup_story_missions.py deliberately ships MT_M13 with NO
+#            optional because that world-fact cannot be evaluated. A briefing line that
+#            promises an objective the runtime never scores is a lying line (14.3.6), so
+#            nobody mentions the depot. ESCALATED - see report.
+# seed:      .370 is the shipped BriefingText for MT_M13, verbatim, hyphen included
+#            (setup_story_missions.py, BriefingSpeaker "Mara").
+
+lines:
+  - id:      M1.3.S01.010
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "This is the mast."
+    shot:    "Map table. She lays one finger on the checkpoint and leaves it there."
+
+  - id:      M1.3.S01.020
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Two winters back we moved this district by runner."
+
+  - id:      M1.3.S01.030
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We buried three of them."
+    note:    "Beat 1. What the jammer does, told only as what it costs. Nobody says the word for it; the HUD objective already carries that."
+
+  - id:      M1.3.S01.040
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "And what comes off it?"
+
+  - id:      M1.3.S01.050
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Nothing."
+
+  - id:      M1.3.S01.060
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We take nothing off that plaza."
+    note:    "The want, stated as a refusal. This is the line that says it is not a robbery, and it never uses the word."
+
+  - id:      M1.3.S01.070
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Somebody tries this every couple of years."
+
+  - id:      M1.3.S01.080
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Pump gallery, six. Foundry Row the winter after, nine."
+
+  - id:      M1.3.S01.090
+    speaker: DEX
+    voice:   dex_callum
+    text:    "The overpass, four, and two of the four were fifteen."
+    note:    "Beat 2, the once-per-act Brick beat, delivered as counts and places. See L2 escalation 1."
+
+  - id:      M1.3.S01.100
+    speaker: DEX
+    voice:   dex_callum
+    text:    "There's more. I can keep going."
+
+  - id:      M1.3.S01.110
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Don't."
+
+  - id:      M1.3.S01.120
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "All of them went for the tower."
+
+  - id:      M1.3.S01.130
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Nobody went for the footing."
+    shot:    "Dex stops. He has been the man with the list for four years and somebody has read past the end of it."
+
+  - id:      M1.3.S01.140
+    speaker: VOSS
+    voice:   voss
+    text:    "It's guyed. Three anchors, a hundred and twenty apart."
+
+  - id:      M1.3.S01.150
+    speaker: VOSS
+    voice:   voss
+    text:    "Cut an anchor and it comes down across the plaza."
+
+  - id:      M1.3.S01.160
+    speaker: VOSS
+    voice:   voss
+    text:    "Cut the footing and it folds where it stands."
+    note:    "18.4 Voss: names the mechanism, nobody asked. The distinction is also why S05 has civilians in doorways and not under the tower."
+
+  - id:      M1.3.S01.170
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "The footing."
+
+  - id:      M1.3.S01.180
+    speaker: VOSS
+    voice:   voss
+    text:    "The old geothermal run surfaces inside the ring fence."
+
+  - id:      M1.3.S01.190
+    speaker: VOSS
+    voice:   voss
+    text:    "Or we cross at the tone with everybody else."
+
+  - id:      M1.3.S01.200
+    speaker: VOSS
+    voice:   voss
+    text:    "The run. Wet feet, and nobody counts us."
+    note:    "PLAYER OPTION 1 of 2. Sets story.m13_insertion = tunnel. Matches insertion point Entry_Sewer in MT_M13."
+    variants:
+      pragmatist: "The run. Nobody counts what they cannot see."
+      idealist:   "The run. There are people standing on that plaza."
+      personal:   "The run. I know what is under this district."
+      strategic:  "The run. We come up inside the fence, not outside it."
+
+  - id:      M1.3.S01.210
+    speaker: VOSS
+    voice:   voss
+    text:    "The plaza. We go in with the people who live there."
+    note:    "PLAYER OPTION 2 of 2. Sets story.m13_insertion = plaza. Matches insertion point Entry_Roof in MT_M13."
+    variants:
+      pragmatist: "The plaza. Four minutes instead of forty."
+      idealist:   "The plaza. We walk in the way they walk in."
+      personal:   "The plaza. I have stood in that crowd."
+      strategic:  "The plaza. A crowd is cover nobody has to build."
+
+  - id:      M1.3.S01.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Set it that way."
+    note:    "Answers either option. No approach flag required in this file."
+
+  - id:      M1.3.S01.230
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "If the extraction is contested, what happens to the ones who cannot walk?"
+    note:    "18.4 Reyes: a question instead of an accusation. No contractions - beat 4 begins."
+
+  - id:      M1.3.S01.240
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We carry who we can carry."
+
+  - id:      M1.3.S01.250
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "And the rest?"
+
+  - id:      M1.3.S01.260
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "They stay where they fall."
+    shot:    "She does not soften it and she does not look away from the table."
+
+  - id:      M1.3.S01.270
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "I would like that said to the room and not only to me."
+
+  - id:      M1.3.S01.280
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "It was."
+    note:    "The honest answer, and the second half of it is that she already gave it in front of everyone. Reyes has no reply, which is the point."
+
+  - id:      M1.3.S01.290
+    speaker: DEX
+    voice:   dex_callum
+    text:    "The footing set is two hands. Clamps, then the collar."
+
+  - id:      M1.3.S01.300
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Nobody here has done a collar."
+
+  - id:      M1.3.S01.310
+    speaker: DEX
+    voice:   dex_callum
+    text:    "So."
+    shot:    "He does not look up. He is squaring the edge of a chart that is already square."
+
+  - id:      M1.3.S01.320
+    speaker: DEX
+    voice:   dex_callum
+    text:    "I'll set it."
+    note:    "Beat 5, the turn. He asks for it as a staffing problem, because asking for it any other way is not available to him."
+
+  - id:      M1.3.S01.330
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "You've never been past the stair."
+
+  - id:      M1.3.S01.340
+    speaker: DEX
+    voice:   dex_callum
+    text:    "I've never had anything out there worth--"
+
+  - id:      M1.3.S01.350
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Dex sets it."
+    note:    "She takes the sentence off him before he has to finish it. AR-5 clean: she says his name to the room, never 'you' to him. Only name-address in the scene."
+
+  - id:      M1.3.S01.360
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Then I want the good gloves. The ones with palm left on them."
+    note:    "18.4 Dex: the hardware joke arrives one line after the frightening thing, every time. Paid off in S99.280."
+
+  - id:      M1.3.S01.370
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "Take the tower and the district goes deaf. It will answer - be gone before it does."
+    shot:    "Nobody moves. Dex is already dragging the case across the table toward himself."
+    note:    "Shipped BriefingText, MT_M13, verbatim including the hyphen."

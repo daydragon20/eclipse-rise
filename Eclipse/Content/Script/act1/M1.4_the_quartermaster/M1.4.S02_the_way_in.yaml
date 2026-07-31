@@ -15,7 +15,7 @@ turn:         "Inside, the place is bigger than the plan, and the plan quietly b
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        231
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, MARA, two Ember fighters, DEX (radio)
@@ -34,4 +34,186 @@ words:        0
 #              what is stacked in here. WRITE IT, do not thesis it.
 # writer:    Mara's plan stops being Mara's plan in this scene, and nobody remarks on it.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `in-mission-radio` (10-25) read as a ceiling; longest line 17 w. The lines
+#            under fire in the breach branch (.130-.180) are CALLOUT length (2-6) on
+#            purpose - same waiver M1.1.S04 took, same reason: nobody speaks in
+#            radio-length sentences while a roller door is coming in.
+# variance:  1 w (.250) to 17 w (.220) = 17x.
+# branches:  .010-.090 grate | .100-.180 breach | .190-.250 shared. Conditions use the
+#            expression the architect put in this stub verbatim; no invented flags
+#            anywhere in this mission.
+# ar-2:      .080 is the seasoning the stub asks for. Voss says a service system is a
+#            place a person can be, and nobody remarks on it. M1.7 plays inside one.
+# shared:    the first look down the hall is .190-.210 and it is THREE lines. .190 prices
+#            it in stamps, .200 prices it in what the cell had two weeks ago, and Mara
+#            refuses to let the sentence finish. No thesis, no awe held for a beat.
+# the turn:  .240-.250. Voss reorders the night and Mara says "Copy." That is the plan
+#            changing hands, and the stub's instruction was that nobody remark on it.
+#            One word, no shot on Voss, scene ends.
+# young:     the breach branch shows the conscripts' age through their own vocabulary
+#            (.160: he is worried about a signature while being shot at). NO Ember
+#            character comments on it here - that line belongs to Brick, once, in S04.
+# variants:  none. Section 9.7 of the beat sheet: axis variants in S03 and S99 only.
+
+lines:
+  # ---------- BRANCH A: the grate ----------
+  - id:      M1.4.S02.010
+    speaker: VOSS
+    voice:   voss
+    condition: 'story.m14_entry == "grate"'
+    tags:    [quietly]
+    text:    "Grate's on a quarter-turn latch and there's no paint left in the slot. Somebody uses this."
+    shot:    "Alley wall, knee height. Warm air coming out of the louvres in the rain."
+
+  - id:      M1.4.S02.020
+    speaker: DEX
+    voice:   dex_callum
+    condition: 'story.m14_entry == "grate"'
+    text:    "Loop's still live. If the return kicks while somebody's inside it, it gets warm very fast."
+
+  - id:      M1.4.S02.030
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    condition: 'story.m14_entry == "grate"'
+    text:    "How long is the crawl?"
+
+  - id:      M1.4.S02.040
+    speaker: VOSS
+    voice:   voss
+    condition: 'story.m14_entry == "grate"'
+    text:    "Eleven metres, then it opens out under the rack floor."
+
+  - id:      M1.4.S02.050
+    speaker: VOSS
+    voice:   voss
+    condition: 'story.m14_entry == "grate"'
+    text:    "Shoulder first, arms ahead. Anybody who stops halfway blocks the other three."
+
+  - id:      M1.4.S02.060
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    condition: 'story.m14_entry == "grate"'
+    text:    "And if a shift comes down the alley?"
+
+  - id:      M1.4.S02.070
+    speaker: MARA
+    voice:   mara_sovann
+    condition: 'story.m14_entry == "grate"'
+    text:    "Then the ones inside start without the rest."
+
+  - id:      M1.4.S02.080
+    speaker: VOSS
+    voice:   voss
+    condition: 'story.m14_entry == "grate"'
+    text:    "Every building on this row has one of these under it. Nobody's ever mapped them."
+    note:    "AR-2 seasoning. Reads as a technician's aside; pays in M1.7."
+
+  - id:      M1.4.S02.090
+    speaker: DEX
+    voice:   dex_callum
+    condition: 'story.m14_entry == "grate"'
+    text:    "Nobody's ever had to. Congratulations, you're the survey."
+
+  # ---------- BRANCH B: the breach ----------
+  - id:      M1.4.S02.100
+    speaker: VOSS
+    voice:   voss
+    condition: 'story.m14_entry == "breach"'
+    text:    "Charge goes on the roller drum, not the plate. The door comes in, not down."
+
+  - id:      M1.4.S02.110
+    speaker: DEX
+    voice:   dex_callum
+    condition: 'story.m14_entry == "breach"'
+    text:    "Stand off eight metres. That drum's going to throw."
+
+  - id:      M1.4.S02.120
+    speaker: MARA
+    voice:   mara_sovann
+    condition: 'story.m14_entry == "breach"'
+    text:    "On the horn. Let the row hear a horn."
+    shot:    "The third horn goes over Foundry Row. The bay door goes in underneath it."
+
+  - id:      M1.4.S02.130
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    condition: 'story.m14_entry == "breach"'
+    tags:    [shouting]
+    text:    "Bay door! Somebody's in the bay!"
+
+  - id:      M1.4.S02.140
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    condition: 'story.m14_entry == "breach"'
+    tags:    [shouting]
+    text:    "Post six, sound off! Post six!"
+
+  - id:      M1.4.S02.150
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    condition: 'story.m14_entry == "breach"'
+    text:    "Two down by the door already."
+
+  - id:      M1.4.S02.160
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    condition: 'story.m14_entry == "breach"'
+    tags:    [nervous]
+    text:    "I'm not signed for a rifle. I'm not signed--"
+    note:    "18.5 rule 5. His age is in the sentence, not in a comment about him."
+
+  - id:      M1.4.S02.170
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    condition: 'story.m14_entry == "breach"'
+    interrupts: true
+    tags:    [shouting]
+    text:    "Stay down! Stay down!"
+
+  - id:      M1.4.S02.180
+    speaker: MARA
+    voice:   mara_sovann
+    condition: 'story.m14_entry == "breach"'
+    text:    "Leave him where he is. Racks, now."
+    shot:    "Nobody looks back to see whether he stayed down."
+
+  # ---------- SHARED: the hall ----------
+  - id:      M1.4.S02.190
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Rack nine's ammunition. Rack ten's ammunition. Every crate stamped for the checkpoints."
+    shot:    "Wide. Stacks four high, running back until the light gives up."
+
+  - id:      M1.4.S02.200
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "We had thirteen rounds on the overpass. Thirteen, between--"
+
+  - id:      M1.4.S02.210
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Then start lifting."
+
+  - id:      M1.4.S02.220
+    speaker: VOSS
+    voice:   voss
+    text:    "Racks run to forty and then the hall turns. There's another floor of it over the office."
+
+  - id:      M1.4.S02.230
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Say that again with a number on it."
+
+  - id:      M1.4.S02.240
+    speaker: VOSS
+    voice:   voss
+    text:    "More than tonight has. Second crate first, and nobody crosses the office bridge."
+
+  - id:      M1.4.S02.250
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Copy."
+    shot:    "She is already moving where he put her. Nobody in the hall marks it."
+    note:    "The turn. The plan is his from here to the end of the mission and it costs one word."

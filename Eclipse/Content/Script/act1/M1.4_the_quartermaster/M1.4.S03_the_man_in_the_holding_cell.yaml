@@ -15,7 +15,7 @@ turn:         "He gives Voss the route in nine words, asks for nothing, and that
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        180
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, BRICK (debut), one Ember fighter; MARA (radio)
@@ -42,4 +42,110 @@ words:        0
 # writer:    he is alone with Voss here, so he may answer - he still never begins.
 #            Under thirty spoken words for Brick in this ENTIRE mission. Count them.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `in-mission-radio` (10-25) as a ceiling; longest base line 16 w, longest
+#            variant 22 w. Brick's lines are 1-9 w and that is the character.
+# variance:  1 w (.050) to 16 w (.120) = 16x.
+# BRICK COUNT (whole mission budget is under 30 spoken words):
+#            S03 = 14  |  S04 = 7  |  S05 = 1  |  S99 = 5  |  TOTAL 27. Counted twice.
+#            This scene: .040 = 3, .090 = 9, .130 = 2.
+# .040:      his entrance is three names and it is the ANSWER to "why are you still in
+#            this one", not to "who are you". Two cells stand open at .010; the three
+#            names are why. Nothing explains it. FIGHTER_A asks "What?" at .050 and gets
+#            nothing back, which is the scene teaching the player that this man does not
+#            elaborate. The second pass is in S99: he counted them for three months.
+# .090:      the route is NINE WORDS, as the stub's turn specifies. Exact, no condition
+#            attached, nothing asked in return. That is what makes .120 happen.
+# .100/.110: 18.7's required interruption. The distrust is real and Voss agrees with it
+#            and goes anyway. Brick never gets to defend himself and never tries.
+# .130:      NOT a yes. Offered an open door, he asks about the work. His yes is one word
+#            and it is in S05.
+# first:     18.4 - never speaks first in a group. He is with Voss and one fighter here,
+#            so he answers; check every Brick line, each one follows a question.
+# variants:  .120 branches on all four axes per section 9.7. What changes is WHY the bolt
+#            comes off; what never changes is that Voss offers rather than asks, and that
+#            the offer is conditional on the work, not on gratitude.
+# escalated: nobody says the callsign "Brick" in this mission, in any scene. Where it
+#            comes from is not in canon and I will not invent it - see report.
+
+lines:
+  - id:      M1.4.S03.010
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Holding block. Three cells, two of them standing open."
+    shot:    "A short corridor behind the racks. Two doors hanging. The third is shut and there is a man standing behind it."
+
+  - id:      M1.4.S03.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Bolt's on the outside and the panel's been torn out."
+
+  - id:      M1.4.S03.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Two cells open, one shut. Why are you still in this one?"
+
+  - id:      M1.4.S03.040
+    speaker: BRICK
+    voice:   brick
+    text:    "Tam. Oyelaran. Vic."
+    shot:    "He does not come to the bars. He has been standing for a long time and it is in how still he is."
+    note:    "19.3 signature line. His whole character, delivered as an answer to a question about cell doors."
+
+  - id:      M1.4.S03.050
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "What?"
+    shot:    "The man looks at him and then away. Nothing follows."
+
+  - id:      M1.4.S03.060
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [urgent]
+    text:    "Voss. The bridge over the floor is covered from both ends."
+
+  - id:      M1.4.S03.070
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "The second crate is on the far side of it. Find another way."
+
+  - id:      M1.4.S03.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Second crate's past the office and the bridge is covered. Is there another way across?"
+
+  - id:      M1.4.S03.090
+    speaker: BRICK
+    voice:   brick
+    text:    "Slag trench, rack nine. It runs under the bridge."
+    note:    "Nine words. The building was a foundry; the man who knows it is a pit miner. No condition, no request."
+
+  - id:      M1.4.S03.100
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Or it's a wall, and we're in a ditch when the alarm--"
+
+  - id:      M1.4.S03.110
+    speaker: VOSS
+    voice:   voss
+    interrupts: true
+    text:    "Could be."
+    shot:    "He is already looking at the bolt."
+
+  - id:      M1.4.S03.120
+    speaker: VOSS
+    voice:   voss
+    text:    "This bolt takes two hands and about four seconds. It comes off when the crate moves."
+    variants:
+      pragmatist: "The man who knows this floor is worth more out here than in there. The bolt comes off when the crate moves."
+      idealist:   "Nothing in this building stays in a cage tonight. That includes the cage."
+      personal:   "A man gave that up for nothing. The bolt comes off when the crate moves."
+      strategic:  "The bolt comes off when the second crate moves. Not before, and not for nothing."
+
+  - id:      M1.4.S03.130
+    speaker: BRICK
+    voice:   brick
+    tags:    [pause]
+    text:    "Which crate?"
+    shot:    "He does not move. He asks it the way a man asks about a shift."
+    note:    "Scene ends here. He has agreed to nothing."

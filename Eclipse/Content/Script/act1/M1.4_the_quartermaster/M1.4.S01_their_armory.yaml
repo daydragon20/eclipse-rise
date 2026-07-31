@@ -32,4 +32,156 @@ words:        247
 # writer:    the carrying problem must be planted here or Brick's entrance in S05 is a
 #            coincidence instead of an answer.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      type is `cutscene` (20-60). Read as a CEILING, per the M1.1 precedent and
+#            21_quality_mandate ("these bands cap the length of one line"). Longest line
+#            here is 19 w. A floor of 20 cannot coexist with 18.3's variance rule.
+# variance:  4 w (.200) to 19 w (.020 / .130) = 4.75x.
+# beat map:  contents-as-weight .020-.030 | insertion .050-.120 | REYES'S QUESTION .130 |
+#            Mara's answer .140-.170 | the carrying arithmetic .180-.210 | closer .220
+# ar-5:      Mara spends ZERO "you" in this scene and never says "I". Her imperatives are
+#            addressed to the room. Checked line by line.
+# the plant: .190 and .210 ARE the mission. Four people, thirty kilos, thirty-six crates
+#            left on the floor. Brick in S05 is the answer to a sum stated here, out loud,
+#            and left hanging - .210 gets no reply.
+# reyes:     her question is the first time anybody in the act asks what happens to
+#            prisoners. She does not get an answer: Mara's is cut off by Dex at .180.
+#            The unanswered question is the point; it hangs over M1.6 and M1.8.
+# dex:       the interruption at .180 is his fingerprint doing work - he defuses the
+#            ugliest moment in the scene with a joke about his own drawing. 18.6: the
+#            best jokes cost something. This one costs Reyes her answer.
+# choice:    .100 / .110 are the player's insertion options (grate / breach), matching
+#            Entry_Sewer / Entry_Vault in setup_story_missions.py. SCRIPT_FORMAT has no
+#            player-choice construct - marked by note only, per the M1.1 precedent.
+# variants:  none. BEATS_M1.4 section 9.7 restricts Voss axis variants to S03 and S99
+#            ("elders neutraal"), which is the budget ruling in ACT1_OVERVIEW C-6/Q-7.
+# seed:      .220 is the shipped BriefingText from setup_story_missions.py (MT_M14),
+#            verbatim.
+
+lines:
+  - id:      M1.4.S01.010
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Foundry Row. The armory in the old casting hall."
+    shot:    "Map table. A floor plan drawn in grease pencil on the back of a ration chart, weighted at the corners with rifle parts."
+
+  - id:      M1.4.S01.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Forty crates on their manifest board. Nobody writes what's in them, so I weighed one off a checkpoint truck."
+    note:    "Beat 1. He gives the armory as mass, not as firepower. That is the only way his head takes it in."
+
+  - id:      M1.4.S01.030
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Twenty-two kilos sealed. The round boxes are worse. Grease-packed, and no handles."
+
+  - id:      M1.4.S01.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "One night. What's left at first light stays theirs."
+
+  - id:      M1.4.S01.050
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Shift changes on the third horn."
+    note:    "The IC-intel prep result, delivered as a fact and not as a briefing."
+
+  - id:      M1.4.S01.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Then the alley's empty for the two minutes it takes them to sign the board."
+
+  - id:      M1.4.S01.070
+    speaker: VOSS
+    voice:   voss
+    text:    "That hall still runs its coolant loop. The foundry's gone. The pumps aren't."
+
+  - id:      M1.4.S01.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Intake grate's on the alley wall at knee height. One person wide."
+
+  - id:      M1.4.S01.090
+    speaker: DEX
+    voice:   dex_callum
+    text:    "One at a time. The fourth one's still outside when it starts."
+
+  - id:      M1.4.S01.100
+    speaker: VOSS
+    voice:   voss
+    text:    "The grate. Inside and counted before anybody's looked up."
+    note:    "PLAYER OPTION 1 of 2 (insertion). Maps to Entry_Sewer. No axis variants - see the variants note above."
+
+  - id:      M1.4.S01.110
+    speaker: VOSS
+    voice:   voss
+    text:    "The bay door. Charge on the roller, and we own the floor before they find a rifle."
+    note:    "PLAYER OPTION 2 of 2 (insertion). Maps to Entry_Vault."
+
+  - id:      M1.4.S01.120
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Then that's the way in."
+    note:    "Answers either option. Written so no approach flag is required at runtime."
+
+  - id:      M1.4.S01.130
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "There are men inside that building who sleep there. What is the instruction if they put their hands up?"
+    shot:    "She has not looked up from the kit she is repacking."
+    note:    "Beat 3. 18.4 Reyes: a question instead of an accusation, and no contractions anywhere in her lines."
+
+  - id:      M1.4.S01.140
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "Eleven bunks. No cell, no rope, and nobody to spare on watching a prisoner."
+    note:    "Beat 4. The scene's one permitted triad (18.9 B). Her answer is logistics, which is what makes it ugly."
+
+  - id:      M1.4.S01.150
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "So nobody comes back with us."
+
+  - id:      M1.4.S01.160
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "That is not an answer I can write in a log."
+
+  - id:      M1.4.S01.170
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Then leave it out of the--"
+
+  - id:      M1.4.S01.180
+    speaker: DEX
+    voice:   dex_callum
+    interrupts: true
+    text:    "Nobody lean on the plan. It's grease pencil and the grease is winning."
+    shot:    "Reyes does not get her answer. Nobody comes back to it."
+
+  - id:      M1.4.S01.190
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Four of us. Thirty kilos each over two kilometres. That's four crates out of forty."
+    note:    "Beat 5. The arithmetic that S05 solves."
+
+  - id:      M1.4.S01.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We get one night."
+
+  - id:      M1.4.S01.210
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Then somebody tell me which thirty-six we're leaving."
+    shot:    "Nobody answers him."
+    note:    "The hole in the plan, said out loud and left open. Brick walks into it in S05."
+
+  - id:      M1.4.S01.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Their armory has been feeding this district for years. Tonight it feeds us."
+    shot:    "She rolls the plan up before anybody can answer Dex."
+    note:    "Shipped BriefingText, MT_M14 in setup_story_missions.py, verbatim."

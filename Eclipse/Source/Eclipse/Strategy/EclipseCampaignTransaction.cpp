@@ -73,6 +73,10 @@ uint32 FEclipseCampaignState::ComputeStateHash() const
 		Hash = HashCombine(Hash, GetTypeHash(StoryFlag.GetTagName()));
 	}
 
+	// v6 (GDD 9.4): two campaigns that differ only in the empire's temperature
+	// are not the same campaign — routing risk reads this.
+	Hash = HashCombine(Hash, GetTypeHash(static_cast<uint8>(ResponseTier)));
+
 	return Hash;
 }
 
@@ -292,6 +296,24 @@ bool ValidateMutation(const FEclipseCampaignState& State, const FEclipseCampaign
 		}
 		return true;
 	}
+	case EEclipseCampaignMutationType::SetResponseTier:
+	{
+		// Raise-only, and strictly: re-committing the tier you are already on is
+		// a caller that did not check, and "the empire relaxed" is a story event
+		// that would have to arrive as one (GDD 9.4 — tiers escalate).
+		if (Mutation.ResponseTier <= State.ResponseTier)
+		{
+			OutError = FString::Printf(TEXT("SetResponseTier: %s does not escalate past the current %s"),
+				*UEnum::GetValueAsString(Mutation.ResponseTier), *UEnum::GetValueAsString(State.ResponseTier));
+			return false;
+		}
+		if (Mutation.ResponseTier > EEclipseDominionResponseTier::Existential)
+		{
+			OutError = TEXT("SetResponseTier: tier is off the GDD 9.4 ladder");
+			return false;
+		}
+		return true;
+	}
 	case EEclipseCampaignMutationType::MarkMissionServed:
 	{
 		const FEclipseSoldierRecord* Soldier = State.FindSoldier(Mutation.SoldierId);
@@ -438,6 +460,12 @@ FEclipseAppliedMutation ApplyMutation(FEclipseCampaignState& State, const FEclip
 	case EEclipseCampaignMutationType::SetStoryFlag:
 	{
 		State.StoryFlags.Add(Mutation.StoryFlagTag);
+		break;
+	}
+	case EEclipseCampaignMutationType::SetResponseTier:
+	{
+		Applied.OldResponseTier = State.ResponseTier;
+		State.ResponseTier = Mutation.ResponseTier;
 		break;
 	}
 	case EEclipseCampaignMutationType::MarkMissionServed:

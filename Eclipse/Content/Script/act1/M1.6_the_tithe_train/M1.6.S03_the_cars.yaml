@@ -15,7 +15,7 @@ turn:         "Sela stops arguing with Voss and starts arguing with them, and wi
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        256
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, BRICK, MARA · SELA VANN (debut) · three conscripts
@@ -40,4 +40,172 @@ words:        0
 #            The conscripts who want to stay have GOOD reasons. Written frightened or stupid,
 #            they make Sela's victory worthless.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `cutscene`, read as a ceiling (M1.1 precedent). Longest line 20 w. Sela is held
+#            to the HUB band (12-35) per AR-7 and the beat sheet; her longest is 19 w. No
+#            oration is spent.
+# variance:  1 w (.050 "No.") to 20 w (.070) = 20x.
+# sela:      FIVE turns - .140, .160, .170, .190, .200. Two of them are questions (.140, .190).
+#            Her tic fires at .140 and .190: a private terror ("my address", "my brother") is
+#            handed back as a collective one. She speaks about herself ZERO times in this
+#            scene, which is inside 18.4's limit of one.
+#            She is IN the car. She has been sitting against the far wall for the whole
+#            argument. Her entrance is standing up, not arriving.
+# signature: .160 is 19.3's signature line, VERBATIM, and it is the first thing the player
+#            ever hears her say to anyone. She does not say it to Voss. Casting stage 2
+#            auditions this line; do not alter one word of it.
+# p1-b:      .170. One reference to the Blight, no gloss, delivered as an activist's opinion
+#            about a bill that keeps arriving. It re-uses S01.040's date, which the player
+#            heard ninety seconds ago as a freight timetable. Twist 1 pays in act 3.
+# voss:      .090 is his attempt and it FAILS on all four axes, because all four argue about
+#            the LIST. The car is not afraid of the list. It is afraid of being the reason.
+#            Note that the strategic variant is the strongest argument in the scene and it
+#            still loses; that is deliberate, and it is why Sela's win is not a trick.
+# refusers:  .070 / .100 are the good reasons, and they are correct. Nobody in the car is
+#            stupid, nobody begs, and nobody is converted by being told they are wrong.
+#            .180 is the room refusing rhetoric, so that Sela cannot win by sounding good.
+# brick:     .220 is three words. It is the whole of AR-11 and there is no line around it.
+#            Two men stay in the car and nobody argues with them - the victory is not clean.
+# water:     .020/.030 pay S01.140 without a syllable of explanation. Somebody asks for water,
+#            and Brick, who told the room where the water was, says nothing at all.
+# omitted:   Voss does not thank her, Mara does not comment, and nobody says what just
+#            happened. The scene ends on a head count.
+
+lines:
+  - id:      M1.6.S03.010
+    speaker: VOSS
+    voice:   voss
+    text:    "Hinge side's clear. Mind the drop, there's no step."
+    shot:    "The door goes over. The car is full end to end and not one of them moves toward the opening. Somebody's hand is up against the light."
+
+  - id:      M1.6.S03.020
+    speaker: DRAFTEE_C
+    voice:   civilian_kessara_c
+    text:    "Is there water?"
+
+  - id:      M1.6.S03.030
+    speaker: VOSS
+    voice:   voss
+    text:    "There's water at the head of the train."
+    shot:    "Brick is in the hatchway behind him and says nothing."
+    note:    "Pays S01.140. No explanation, and the shot is the whole payment."
+
+  - id:      M1.6.S03.040
+    speaker: DRAFTEE_A
+    voice:   civilian_kessara_a
+    text:    "Is this the yard?"
+
+  - id:      M1.6.S03.050
+    speaker: VOSS
+    voice:   voss
+    text:    "No."
+
+  - id:      M1.6.S03.060
+    speaker: DRAFTEE_A
+    voice:   civilian_kessara_a
+    text:    "Then we're staying on."
+
+  - id:      M1.6.S03.070
+    speaker: DRAFTEE_B
+    voice:   civilian_kessara_b
+    text:    "They read the list at the yard. A name that doesn't answer gets a visit at the address beside it."
+    note:    "The obstacle in one line. She is not frightened; she is informed."
+
+  - id:      M1.6.S03.080
+    speaker: DRAFTEE_B
+    voice:   civilian_kessara_b
+    text:    "Mine has two children in it."
+
+  - id:      M1.6.S03.090
+    speaker: VOSS
+    voice:   voss
+    text:    "The list goes up with the car. Nobody reads anything tonight."
+    note:    "VOSS TRIES AND FAILS. All four axes argue about the list. Full four-axis coverage - this is one of the four scenes in M1.6 that earns it (BEATS section 9.8)."
+    variants:
+      pragmatist: "That list is paper in an office. Paper takes a week to catch up with anybody."
+      idealist:   "Then nobody goes back. Not one of you, not tonight, not in the morning."
+      personal:   "The address on my file was my aunt's. They came anyway."
+      strategic:  "Sixty names missing at once stops being a list. It becomes somebody's problem upstairs."
+
+  - id:      M1.6.S03.100
+    speaker: DRAFTEE_A
+    voice:   civilian_kessara_a
+    text:    "I answered so they would stop at my door. If I run, my door goes back on the list."
+    note:    "HIS REASON IS GOOD and Voss has no answer to it."
+
+  - id:      M1.6.S03.110
+    speaker: DRAFTEE_C
+    voice:   civilian_kessara_c
+    text:    "Same."
+    shot:    "A dozen of them sit back down on the floor. It is the quietest thing that has happened all night."
+
+  - id:      M1.6.S03.120
+    speaker: VOSS
+    voice:   voss
+    text:    "There's a spur two kilometres up that nobody watches--"
+
+  - id:         M1.6.S03.130
+    speaker:    DRAFTEE_B
+    voice:      civilian_kessara_b
+    interrupts: true
+    text:       "And in the morning?"
+
+  - id:      M1.6.S03.140
+    speaker: SELA
+    voice:   sela_vann
+    text:    "Who is left at your address that the Tithe has not already taken once?"
+    shot:    "She has been against the far wall the whole time. She stands up inside the car and she does not look at Voss once in this scene."
+    note:    "SELA'S FIRST LINE IN THE GAME. It is a question, it is aimed at the car, and it is her tic: a private address becomes a collective one. Sets Story.Char.SelaMet."
+
+  - id:      M1.6.S03.150
+    speaker: DRAFTEE_C
+    voice:   civilian_kessara_c
+    text:    "They took my brother in the spring. They left the rest of us alone after that."
+
+  - id:      M1.6.S03.160
+    speaker: SELA
+    voice:   sela_vann
+    text:    "They didn't take your brother. We let them."
+    note:    "19.3 SIGNATURE LINE, verbatim. Lands here and nowhere else in the game. Casting stage 2 uses it. Do not edit."
+
+  - id:      M1.6.S03.170
+    speaker: SELA
+    voice:   sela_vann
+    text:    "The Blight was on Meridia. The bill has come here on the ninth of the month ever since."
+    note:    "P1-b. ONE reference, no explanation (18.8). Reads as an activist's opinion; act 3 makes it evidence. Re-uses S01.040's timetable date."
+
+  - id:      M1.6.S03.180
+    speaker: DRAFTEE_B
+    voice:   civilian_kessara_b
+    text:    "That doesn't move an address."
+    note:    "The car refuses rhetoric. Sela does not get to win by sounding good."
+
+  - id:      M1.6.S03.190
+    speaker: SELA
+    voice:   sela_vann
+    text:    "No. So say it out loud if you're staying, and the rest of us can stop counting on you."
+    note:    "The organiser's move: she gives them permission to stay, which is what makes them move. Second question."
+
+  - id:      M1.6.S03.200
+    speaker: SELA
+    voice:   sela_vann
+    text:    "Nobody walks off this train on their own."
+
+  - id:      M1.6.S03.210
+    speaker: DRAFTEE_B
+    voice:   civilian_kessara_b
+    text:    "Two children."
+    shot:    "She goes down the drawbar first and turns to take the next person by the arm. The car empties from the middle outward."
+    note:    "The turn, in two words: the same reason, pointing the other way."
+
+  - id:      M1.6.S03.220
+    speaker: BRICK
+    voice:   brick
+    text:    "Krad-9. Eleven days."
+    shot:    "He holds the hatch open with one hand and does not come down. Two men stay sitting at the back of the car. Nobody argues with them and nobody looks at them twice."
+    note:    "AR-11 lands. Three words, no explanation, no reaction line. The player now knows why he spoke first in S01."
+
+  - id:      M1.6.S03.230
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Head count at the bottom of the ramp. Twice."

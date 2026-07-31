@@ -133,19 +133,19 @@ bool FEclipseStoryOfferPrecedenceTest::RunTest(const FString& Parameters)
 		FEclipseRegionDefinition& Home = Graph->Regions.AddDefaulted_GetRef();
 		Home.RegionId = TEXT("Underworks");
 		Home.StartingOwner = EEclipseRegionOwner::Player;
-		Home.ConnectedRegionIds = { TEXT("AmbushBlock"), TEXT("OldQuarter") };
+		Home.Lanes = { TEXT("AmbushBlock"), TEXT("OldQuarter") };
 		FEclipseRegionDefinition& Target = Graph->Regions.AddDefaulted_GetRef();
 		Target.RegionId = TEXT("AmbushBlock");
 		Target.RegionType = EEclipseRegionType::Checkpoint;
 		Target.StartingOwner = EEclipseRegionOwner::Dominion;
-		Target.ConnectedRegionIds = { TEXT("Underworks") };
+		Target.Lanes = { TEXT("Underworks") };
 		// Industrial has no generic offer row: the asymmetric path — this
 		// region only ever surfaces through its story pin.
 		FEclipseRegionDefinition& PinOnly = Graph->Regions.AddDefaulted_GetRef();
 		PinOnly.RegionId = TEXT("OldQuarter");
 		PinOnly.RegionType = EEclipseRegionType::Industrial;
 		PinOnly.StartingOwner = EEclipseRegionOwner::Dominion;
-		PinOnly.ConnectedRegionIds = { TEXT("Underworks") };
+		PinOnly.Lanes = { TEXT("Underworks") };
 
 		UDataTable* Offers = NewObject<UDataTable>();
 		Offers->RowStruct = FEclipseMissionOfferRow::StaticStruct();

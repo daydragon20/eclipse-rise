@@ -40,4 +40,171 @@ words:        211
 # writer:    Dex is the loudest character in this mission and it is the only mission in
 #            act 1 where that is true. This is where the player learns his voice.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# p2-a:      the three facts land in ONE line (.120) and are never touched again:
+#            custodian / key-token / takes precedence over cell suppression.
+#            Nobody asks what a custodian is. Nobody asks what a key-token is. Nobody is
+#            curious. They are relieved, which is a completely different reaction and it is
+#            the reason the act-2 reveal has anywhere to land.
+# ar-9:      Dex reads it aloud, so the plant is spoken and mandatory. The staging problem
+#            is that Voss is the one at the screen: solved at .100/.110, he pushes the feed
+#            to Dex's set. That is technician vocabulary doing structural work.
+#            SYSTEMS NOTE: AR-9 only holds if the warden's office is on the mandatory path.
+#            The plant table calls the terminal "optional". If level design makes this room
+#            skippable, P2-a loses its mandatory carrier and twist 2 has no plant. Reported.
+# p2-d:      .220-.250, four lines, one beat, then he drops it. Dex does not understand what
+#            he is holding and does not pretend to.
+#            NO CONDITION SET. This should only play if the player searches on, and there is
+#            no registered flag for that (act1 overview section 6 forbids conditions on tags
+#            that do not exist). Marked by note; nothing invented.
+#            CONFLICT: the overview plant table places P2-d at M1.7.S03, while BEATS_M1.2
+#            and this stub place it here. Written here per my stub, escalated upstream.
+# joke:      .160/.170 is Dex's best line of the act per the beat sheet. It is built as a
+#            long sentence and a three-word one so the landing is the short half. It also
+#            does the plant's work: the scale of the search IS the size of what was lost.
+# band:      in-mission-radio (10-25). Ceiling honoured: longest 17 w. Variance 1 to 17.
+# ar-5:      Mara: zero "you", zero "I". She has five lines and four of them are under six
+#            words - she is on watch, and a person on watch does not make speeches.
+# names:     nobody is addressed by name.
+
+lines:
+  - id:      M1.2.S04.010
+    speaker: VOSS
+    voice:   voss
+    tags:    [quietly]
+    text:    "Warden's office. There's an ink pad on the desk and it's still wet."
+    shot:    "One room off the stairhead. A desk, a stamp, a clipboard of absentees with half the column stamped and half not."
+
+  - id:      M1.2.S04.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Wet?"
+
+  - id:      M1.2.S04.030
+    speaker: VOSS
+    voice:   voss
+    text:    "He stamped the absentee list on his way out and did not wait for it to dry."
+
+  - id:      M1.2.S04.040
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Then he's back inside the hour. Terminal."
+
+  - id:      M1.2.S04.050
+    speaker: VOSS
+    voice:   voss
+    text:    "It's a warden box. Two ports, one live. I'm on the service side."
+    note:    "18.4 Voss: sees the system, names the mechanism, explains nothing. 18.8 in one line."
+
+  - id:      M1.2.S04.060
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Good. Anything that asks for a name, walk away from it."
+
+  - id:      M1.2.S04.070
+    speaker: VOSS
+    voice:   voss
+    text:    "Quarterly postings. District orders. All of it just sitting--"
+
+  - id:      M1.2.S04.080
+    speaker: DEX
+    voice:   dex_callum
+    interrupts: true
+    text:    "Don't scroll. Top sheet."
+
+  - id:      M1.2.S04.090
+    speaker: VOSS
+    voice:   voss
+    text:    "The top sheet isn't postings. It's a standing order."
+
+  - id:      M1.2.S04.100
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Push it to my set."
+
+  - id:      M1.2.S04.110
+    speaker: VOSS
+    voice:   voss
+    text:    "Pushing. Line by line."
+
+  - id:      M1.2.S04.120
+    speaker: DEX
+    voice:   dex_callum
+    text:    "District standing order, this quarter. Recovery of the stolen custodian key-token takes precedence over cell suppression."
+    shot:    "Hollow Point. Dex reading off a cracked handset display, flat, the way a man reads a parts list."
+    note:    "P2-a. All three facts, one line, delivered without weight. THE PLANT. Twist 2 pays this back at the end of act 2."
+
+  - id:      M1.2.S04.130
+    speaker: DEX
+    voice:   dex_callum
+    text:    "That's not a footnote. That's line one."
+
+  - id:      M1.2.S04.140
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Again."
+
+  - id:      M1.2.S04.150
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Precedence. Over us."
+
+  - id:      M1.2.S04.160
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Every hand they have on this planet, down on its knees, looking under the furniture."
+
+  - id:      M1.2.S04.170
+    speaker: DEX
+    voice:   dex_callum
+    tags:    [amused]
+    text:    "For a key."
+    note:    "The joke, and it is doing the plant's job: the size of the search is the size of what was lost. Nobody follows up on what the key opens."
+
+  - id:      M1.2.S04.180
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Then they are counting somebody else this quarter."
+
+  - id:      M1.2.S04.190
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We have a quarter, then."
+    note:    "Relief, and it is what makes this plant safe. They hear good news. So does the player."
+
+  - id:      M1.2.S04.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Take the list. Orders change. Lists do not."
+
+  - id:      M1.2.S04.210
+    speaker: VOSS
+    voice:   voss
+    text:    "Taking the quarter. All of it."
+
+  - id:      M1.2.S04.220
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Hang on. There's a personnel sheet stapled to the back of the quarter."
+    note:    "P2-d begins. OPTIONAL: plays only on a deeper search. No condition written - the flag does not exist. See L2 header."
+
+  - id:      M1.2.S04.230
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Household staff. Arbiter's residence. One row, and the name has been lifted out of it."
+
+  - id:      M1.2.S04.240
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Not blacked. Lifted. Somebody went back through the index for that."
+
+  - id:      M1.2.S04.250
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Anyway. Not ours."
+    note:    "P2-d ends. He does not understand it and does not pretend to. One beat, no second beat."
+
+  - id:      M1.2.S04.260
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Down the back stair."

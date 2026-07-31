@@ -36,38 +36,40 @@ words:        226
 #            version of himself that would have liked Ember.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      walk-and-talk (10-25). Read as ceiling per the M1.1 precedent; longest 20 w.
-# variance:  1 w (.010 / .210) to 20 w (.140) = 20x.
-# mara:      one word (.010), then she is gone from the scene. She is forty metres back and
-#            she does not hear any of this. That is the whole point of the staging.
+# format:    L1-R1 / L1-R5 / L1-R6 applied. Speaker EMISSARY is escalated in S02's L2 notes;
+#            the Iron Chorus fighter carries eclipse_fighter_d, same escalation.
+# band:      walk-and-talk (10-25). Ceiling respected (max 20 w), register reached at .030.
+# spread:    1 w (.010 / .210) to 20 w (.140) = 20x.
+# mara:      one word (.010), then gone. She is forty metres back and hears none of this.
+#            That is the whole point of the staging, and it is why the turn can land.
 #
 # *** BRICK'S EIGHT WORDS, .230. ESCALATION - READ THIS. ***
-# The stub asks Brick to NAME somebody the emissary recognises. There is no such name in
-# canon and I am not allowed to invent one, so I have written the beat WITHOUT a proper
-# noun and it loses nothing: Brick names an Iron Chorus man by his cell number and by what
-# he cost. M1.4.S03's stub establishes three cells in the Foundry Row holding block, two of
-# them empty; Brick was in one of them for three months. He is telling the emissary what
-# happened to a man the Iron Chorus never got back. He never lies, so "first" stays in -
-# the man did break, eventually, and Brick will not round it off.
+# The stub asks Brick to NAME somebody the emissary recognises. No such name exists in canon
+# and I may not invent one, so the beat is written WITHOUT a proper noun and loses nothing:
+# Brick names an Iron Chorus man by his cell number and by what he cost. M1.4.S03's stub
+# establishes three cells in the Foundry Row holding block, two of them empty; Brick was in
+# one of them for three months. He is telling the emissary what became of a man the Iron
+# Chorus never got back. He never lies, so "first" stays in - the man did break, eventually,
+# and Brick will not round that off to make it kinder.
 # If Q-4 lands and the Iron Chorus is given names, this line can take one at zero cost.
 # EXACTLY EIGHT WORDS. Counted.
 #
-# lucky:     .240 puts the word "lucky" in the emissary's mouth attached to a man who was
-#            not. He says it again in S05.170 about the Veil sweep (P4-b), and by then the
-#            player knows what he thinks of the word. That rhyme is the whole reason P4-b
-#            is carried by the rival and not by Ember.
-# gift:      .250-.270. He gives back tactically (the yard wall, paid at S05.150) and then
-#            gives Voss a secret about Mara that Mara does not have. That is what makes the
-#            walk a transaction and not a courtesy.
-# voss:      no axis variants in this scene - it does not branch. C-6 option (b).
-#            .080 is 18.4 Voss: he refuses the credit before it is offered.
-# omitted:   a reply to .120. Voss has no answer to what Ember is without Mara and the
-#            scene does not give him one. See report.
+# lucky:     .250 puts "lucky" in the emissary's mouth attached to a man who was not. He
+#            spends the word again at S05.170 about the Veil sweep (P4-b), and by then the
+#            player knows what he thinks of it. That rhyme is the whole reason P4-b is
+#            carried by the rival instead of by Ember.
+# gift:      .260-.270. He gives back tactically (the yard wall, paid at S05.150) and then
+#            gives Voss a piece of Mara that Mara does not know he has. That is what makes
+#            the walk a transaction and not a courtesy.
+# voss:      no axis variants - the scene does not branch (C-6 option b). .080 is 18.4 Voss:
+#            he refuses the credit before it is offered.
+# omitted:   a reply to .120. Voss has no answer to what Ember is without Mara, and the
+#            scene refuses to give him one. See report.
 
 lines:
   - id:      M1.5.S03.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Spacing."
     shot:    "From the rear, to nobody in particular. She stays back there for the whole scene."
 
@@ -107,7 +109,7 @@ lines:
     speaker: VOSS
     voice:   voss
     text:    "They don't. They trust her, and she puts me in front of things."
-    note:    "18.4 Voss: never claims credit in front of the people who did the work. He hands it back before it is given."
+    note:    "18.4 Voss: never claims credit in front of the people who did the work. He hands it back before it is even offered."
 
   - id:      M1.5.S03.090
     speaker: EMISSARY
@@ -120,8 +122,8 @@ lines:
     text:    "Then somebody else stands where I'm standing."
 
   - id:      M1.5.S03.110
-    speaker: IRON_CHORUS_B
-    voice:   iron_chorus_fighter_b
+    speaker: FIGHTER_D
+    voice:   eclipse_fighter_d
     tags:    [quietly]
     text:    "Light on the corner. Wardens."
     shot:    "The whole column steps into a doorway without anybody giving an order. Ember is half a beat slower."
@@ -147,7 +149,7 @@ lines:
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "We told her no. Eleven people is not a cell. It's a list somebody hasn't filed yet."
-    note:    "Rhymes forward into the doctrine of S02 and backward into M1.5.S01.090. Cruel, and true, and he does not soften it."
+    note:    "Rhymes forward into S02's doctrine and backward into M1.5.S01.090. Cruel, true, and he does not soften it."
 
   - id:      M1.5.S03.160
     speaker: VOSS
@@ -158,7 +160,7 @@ lines:
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "She did ask twice. She didn't tell them she stood in the rain for the second one."
-    note:    "THE TURN. True, small, and it makes her larger rather than smaller. Kessaraan rain is canon (03.3, warm grey)."
+    note:    "THE TURN. True, small, and it makes her larger rather than smaller. Kessaraan rain is canon (03.3 - warm and grey)."
 
   - id:      M1.5.S03.180
     speaker: VOSS
@@ -191,7 +193,7 @@ lines:
     voice:   brick
     text:    "Cell two. He gave you eleven days first."
     shot:    "The emissary stops walking. His two fighters go four paces before they notice he is not with them."
-    note:    "*** BRICK'S EIGHT WORDS. *** See the L2 escalation above. He answers a question nobody put to him, with the only currency he has, and it is worth more than everything said in the gallery."
+    note:    "*** BRICK'S EIGHT WORDS. *** See the L2 escalation above. He answers a question nobody put to him, in the only currency he has, and it is worth more than everything said in the gallery."
 
   - id:      M1.5.S03.240
     speaker: EMISSARY
@@ -203,13 +205,13 @@ lines:
     voice:   iron_chorus_emissary
     tags:    [quietly]
     text:    "We came out of that quarter on the twelfth day. We thought we'd been lucky."
-    note:    "*** The word 'lucky' is planted here, on a man who was not. He spends it again at S05.170. ***"
+    note:    "*** 'Lucky' is planted here, on a man who was not. He spends the word again at S05.170. ***"
 
   - id:      M1.5.S03.260
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     text:    "The house tonight. Two doors and a yard wall. Take the wall."
-    note:    "Paid at S05.150. The first thing the Iron Chorus gives Ember without being asked."
+    note:    "Paid at S05.150. The first thing the Iron Chorus gives Ember without being asked for it."
 
   - id:      M1.5.S03.270
     speaker: EMISSARY

@@ -20,6 +20,7 @@ import sys
 import unreal
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from author_region_lanes import apply_lanes  # noqa: E402
 from squad_order_lines import SQUAD_ORDER_ROWS  # noqa: E402
 
 DATA_PATH = "/Game/Data"
@@ -44,7 +45,10 @@ def region(region_id, name, rtype, edges, owner, unrest, garrison, yields):
     d.set_editor_property("region_id", unreal.Name(region_id))
     d.set_editor_property("display_name", unreal.Text(name))
     d.set_editor_property("region_type", rtype)
-    d.set_editor_property("connected_region_ids", [unreal.Name(e) for e in edges])
+    # Topology only. Lane COSTS and STATUS (GDD 3.1 rules 2/4) come from the one
+    # lane table in author_region_lanes.py, applied further down; the edges here
+    # are the fallback shape so a bootstrap is never a disconnected board.
+    d.set_editor_property("lanes", [unreal.EclipseLaneDefinition(neighbor_region_id=unreal.Name(e)) for e in edges])
     d.set_editor_property("starting_owner", owner)
     d.set_editor_property("starting_unrest", unrest)
     d.set_editor_property("starting_garrison", garrison)
@@ -109,6 +113,11 @@ offers_json = json.dumps([
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(offers, offers_json):
     raise RuntimeError("DT_MissionOffers JSON fill failed")
 graph.set_editor_property("mission_offers", offers)
+
+# Lane costs + status, from the single table (GDD 3.1 rules 2/4, GDD 14.2: one
+# home per number). Runs after the regions exist, so it can refuse to author a
+# lane to a region that is not on the board instead of orphaning the far end.
+print("Authored %d lane halves on the district graph." % apply_lanes(graph))
 
 # --- Production items (GDD 6.4.2 rows verbatim).
 items = get_or_create("DT_ProductionItems", unreal.DataTable,

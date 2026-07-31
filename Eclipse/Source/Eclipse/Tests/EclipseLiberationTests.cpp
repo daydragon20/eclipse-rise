@@ -714,7 +714,7 @@ bool FEclipseLiberationDebriefSeamTest::RunTest(const FString& Parameters)
 			Definition.RegionId = Id;
 			Definition.RegionType = EEclipseRegionType::Industrial;
 			Definition.StartingOwner = Owner;
-			Definition.ConnectedRegionIds = Links;
+			Definition.Lanes = EclipseRegionGraph::OpenLanes(Links);
 		};
 		AddRegion(TEXT("Underworks"), EEclipseRegionOwner::Player, { TEXT("SignalSite") });
 		AddRegion(TEXT("SignalSite"), EEclipseRegionOwner::Dominion, { TEXT("Underworks") });

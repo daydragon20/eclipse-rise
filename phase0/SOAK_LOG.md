@@ -161,3 +161,6 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 20:18 | `d8d1bb3` | **GROEN** | 195 tests / 0 gefaald / 0 niet gedraaid | 27 |  [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 4] |
 | 2026-07-31 20:19 | `d8d1bb3` | **ROOD** | 195 tests / 0 gefaald / 0 niet gedraaid | 0 | validatie gaf geen uitslag |
 | 2026-07-31 20:47 | `bfeb073` | **ROOD** | 208 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Command.StageB.NewRefusalsSpeakAndCanBeResolved |
+| 2026-07-31 21:22 | `5fcb6e8` | **ROOD** | 225 tests / 2 gefaald / 0 niet gedraaid | 0 | Eclipse.Strategy.Lanes.SmugglerRouteIsAThirdOutcomeNotASecond; Eclipse.Strategy.Liberation.WiringM11CompletionFlipsNothing |
+| 2026-07-31 21:27 | `73d28d3` | **GROEN** | 225 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-31 21:30 | `73d28d3` | **GROEN** | 225 tests / 0 gefaald / 0 niet gedraaid | 0 | - |

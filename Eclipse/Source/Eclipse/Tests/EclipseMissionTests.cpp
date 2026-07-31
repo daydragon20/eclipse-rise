@@ -76,13 +76,13 @@ namespace EclipseMissionTest
 		Home.RegionId = TEXT("Underworks");
 		Home.RegionType = EEclipseRegionType::Industrial;
 		Home.StartingOwner = EEclipseRegionOwner::Player;
-		Home.ConnectedRegionIds = { FName(RegionId) };
+		Home.Lanes = { FName(RegionId) };
 
 		FEclipseRegionDefinition& Target = Graph->Regions.AddDefaulted_GetRef();
 		Target.RegionId = FName(RegionId);
 		Target.RegionType = EEclipseRegionType::Checkpoint;
 		Target.StartingOwner = EEclipseRegionOwner::Dominion;
-		Target.ConnectedRegionIds = { TEXT("Underworks") };
+		Target.Lanes = { TEXT("Underworks") };
 
 		UDataTable* Offers = NewObject<UDataTable>();
 		Offers->RowStruct = FEclipseMissionOfferRow::StaticStruct();
@@ -221,13 +221,13 @@ bool FEclipseMissionFullLoopTest::RunTest(const FString& Parameters)
 		Home.RegionId = TEXT("Underworks");
 		Home.RegionType = EEclipseRegionType::Industrial;
 		Home.StartingOwner = EEclipseRegionOwner::Player;
-		Home.ConnectedRegionIds = { TEXT("Checkpoint") };
+		Home.Lanes = { TEXT("Checkpoint") };
 
 		FEclipseRegionDefinition& Target = Graph->Regions.AddDefaulted_GetRef();
 		Target.RegionId = TEXT("Checkpoint");
 		Target.RegionType = EEclipseRegionType::Checkpoint;
 		Target.StartingOwner = EEclipseRegionOwner::Dominion;
-		Target.ConnectedRegionIds = { TEXT("Underworks") };
+		Target.Lanes = { TEXT("Underworks") };
 
 		UDataTable* Offers = NewObject<UDataTable>();
 		Offers->RowStruct = FEclipseMissionOfferRow::StaticStruct();
