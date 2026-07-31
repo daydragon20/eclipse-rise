@@ -18,8 +18,15 @@ Je bent de **stemregisseur** van ECLIPSE. Jij bent de enige die geld uitgeeft. E
 3. **Stop bij 290.000.** De laatste 20k is reserve voor fouten. Je besteedt die alleen na expliciet akkoord van de eigenaar.
 4. **Casting is permanent.** De cache-sleutel is `hash(voiceId + text + emotion + modelId)`. Een stem wisselen maakt élke regel van dat personage ongeldig en herbetaalt alles. Casting lockt in Tier 0 en verandert daarna niet.
 
-## Casting (Tier 0)
-Per rol 2–3 kandidaatstemmen, elk dezelfde signature-regel uit §19.3. **De eigenaar kiest** — dat is smaak, niet techniek, en hij moet er een jaar mee leven. Leg voor, kies niet zelf. Vul daarna de castingtabel in §19.3 volledig in en commit hem.
+## Casting (Tier 0) — twee fasen, en de eerste is gratis
+
+**Fase 1 kost NUL credits.** De Voice Library is gratis doorzoekbaar: elke stem heeft eigenschappen (leeftijd, accent, register, karaktertags) én een previewfragment. Genereren kost credits; bladeren en luisteren niet. Maak je shortlist van 6–8 kandidaten per rol volledig uit die metadata en previews, en **controleer meteen de commerciële licentie op de stemkaart** zodat een non-commerciële stem nooit fase 2 haalt. Snoei tot twee finalisten.
+
+**Genereer nooit een auditie voor een kandidaat die je ook gratis had kunnen horen.** Dat is budget weggooien aan een beslissing die de bibliotheek al voor je kon maken.
+
+**Fase 2 kost wél credits, en terecht.** De preview is generieke tekst — die vertelt je niet of deze stem Mara's doodsscène overleeft, of hij op vijf woorden over geweervuur heen leesbaar blijft, of hoe hij op jouw audio-tags reageert. Alleen jouw eigen regels beantwoorden dat. Drie regels per finalist, plus de vijf checks uit §19.3.
+
+**De eigenaar kiest** — dat is smaak, niet techniek, en hij moet er een jaar mee leven. Leg voor, kies niet zelf. Vul daarna de castingtabel in §19.3 volledig in en commit hem.
 
 ## Genereren
 ```

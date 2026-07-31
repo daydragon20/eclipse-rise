@@ -43,10 +43,10 @@ Ordered by *lowest rewrite risk × highest perceived value*. Do not start a tier
 
 | Tier | What | Credits | ≈ Words | Why here |
 |---|---|---|---|---|
-| **0** | **Casting** — two-stage: wide screen then deep test on finalists (§19.3) | 18,000 | 3,000 | Must happen first, and properly. Getting casting wrong after Tier 1 costs 90k+ to fix, so 18k here is the cheapest insurance on the board. |
-| **1** | **Bark & systemic library** — the 16 priority triggers × 6–12 variants × 3 faction vocabularies | 90,000 | 15,000 | Safest spend on the board. The systems already exist, the lines never change, and this is the single biggest "the world is alive" gain per credit. |
-| **2** | **Act 1 story dialogue** — Prologue + M1.1–M1.8 | 88,000 | 14,600 | Beats are locked (SPEC-P2-04 ACCEPTED, no prologue, recap opening). Low rewrite risk. |
-| **3** | **Adaptive music** — main theme, Kessara layers, combat layers, Dominion faction stems | 42,000 | — | Front-loaded once, then near-zero forever (§16.7). Never-silent floor is a §16 requirement. |
+| **0** | **Casting** — stage 1 free (library browsing), stage 2 deep test on finalists only (§19.3) | 12,000 | 2,000 | Must happen first, and properly. Getting casting wrong after Tier 1 costs 90k+ to fix. |
+| **1** | **Bark & systemic library** — the 16 priority triggers × 6–12 variants × 3 faction vocabularies | 93,000 | 15,500 | Safest spend on the board. The systems already exist, the lines never change, and this is the single biggest "the world is alive" gain per credit. |
+| **2** | **Act 1 story dialogue** — Prologue + M1.1–M1.8 | 90,000 | 15,000 | Beats are locked (SPEC-P2-04 ACCEPTED, no prologue, recap opening). Low rewrite risk. |
+| **3** | **Adaptive music** — main theme, Kessara layers, combat layers, Dominion faction stems | 43,000 | — | Front-loaded once, then near-zero forever (§16.7). Never-silent floor is a §16 requirement. |
 | **4** | **Act 1 hub & companion conversations** — Mara, Dex, Brick, Reyes at Hollow Point | 33,000 | 5,500 | Establishes the companion voices the player lives with for 25 hours. |
 | **5** | **Core SFX one-shots** — weapons, impacts, UI, ambient beds | 19,000 | — | Cheap, high polish return. |
 | **—** | **Reserve** — retakes, mistakes, a mis-tagged batch | 20,000 | — | Insurance *during* the sprint — see the rule below. |
@@ -94,10 +94,15 @@ ElevenLabs' free plan gives ~10,000 credits/month, and the owner asked whether t
 
 Owner instruction (2026-07-31): *"doe ook moeite om de juiste voice te gebruiken."* An earlier draft of this section called for two candidates and one line. That was the shortest path, and `21_quality_mandate.md` forbids it. Casting is the one decision that cannot be undone cheaply — a re-cast invalidates every line that character has ever spoken. So it gets the effort it deserves.
 
-**Stage 1 — wide screen (cheap, ~5k credits).**
-Shortlist **6–8 candidates** for every companion and villain, 3–4 for each bark register. Match on age, register, and accent-neutrality. Every candidate speaks **the same short signature line** (below). Cut ruthlessly to **two finalists** per role.
+**Stage 1 — wide screen. COSTS ZERO CREDITS.**
+Owner instruction (2026-07-31): *"om een stem te kiezen moet je niet eerst credits aan spenderen — kijk gewoon naar de eigenschappen van de stem."* Correct, and an earlier draft of this section wasted budget on it.
 
-**Stage 2 — deep test on the finalists only (~11k credits).**
+The Voice Library is browsable for free: every voice carries **metadata** (age, gender, accent, register, descriptive tags, use case) **and a free preview sample**. Generating costs credits; browsing and listening does not.
+
+So: shortlist **6–8 candidates** per companion/villain and 3–4 per bark register **entirely from library metadata and free previews**. Match on age, register, accent-neutrality — and check the **commercial licence on the voice card** while you are there, so a non-commercial voice never reaches stage 2. Cut to **two finalists** per role. **Zero credits spent.**
+
+**Stage 2 — deep test on the finalists only (~12k credits).**
+This is where credits are unavoidable, and why they are worth it: the library preview is *generic content*. It cannot tell you whether this voice survives Mara's death scene, whether it holds up at 5 words over gunfire, or whether it responds to the audio tags this character needs. Only your own lines answer that.
 Each finalist speaks **three** lines, not one:
 
 1. **The signature line** — does the fingerprint (§18.4) survive in this voice?

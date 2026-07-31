@@ -25,16 +25,16 @@
 
 | Tier | Wat | Begroot | Besteed | Klaar |
 |---|---|---|---|---|
-| 0 | Casting — 2 fasen (wide screen + diepe test op finalisten) | 18.000 | 0 | ☐ |
-| 1 | Bark- & systeembibliotheek | 90.000 | 0 | ☐ |
-| 2 | Act 1 story-dialoog | 88.000 | 0 | ☐ |
-| 3 | Adaptieve muziek | 42.000 | 0 | ☐ |
+| 0 | Casting — fase 1 GRATIS (bibliotheek), fase 2 diepe test op finalisten | 12.000 | 0 | ☐ |
+| 1 | Bark- & systeembibliotheek | 93.000 | 0 | ☐ |
+| 2 | Act 1 story-dialoog | 90.000 | 0 | ☐ |
+| 3 | Adaptieve muziek | 43.000 | 0 | ☐ |
 | 4 | Act 1 hub & companions | 33.000 | 0 | ☐ |
 | 5 | Kern-SFX | 19.000 | 0 | ☐ |
 | — | Reserve (niet toewijzen; 17/08 vrijgeven) | 20.000 | 0 | — |
 | | **Totaal** | **310.000** | **0** | |
 
-*Tier 0 ging van 5.000 naar 18.000 op owner-instructie "doe moeite om de juiste voice te vinden". Gedekt uit tiers 1–5. Casting fout hebben na tier 1 kost 90k+ om te herstellen, dus dit is de goedkoopste verzekering op het bord.*
+*Tier 0 is twee keer bijgesteld. Eerst 5.000 → 18.000 op owner-instructie "doe moeite om de juiste voice te vinden". Daarna 18.000 → **12.000**, want de owner wees erop dat de brede screening **niets hoeft te kosten**: de Voice Library is gratis doorzoekbaar, met eigenschappen én previewfragmenten per stem. Alleen de diepe test op de twee finalisten kost credits, omdat een generieke preview niet vertelt of een stem Mara's doodsscène overleeft of over geweervuur heen leesbaar blijft. De 6.000 die vrijkwam is terug naar tiers 1–3.*
 
 ## Aantekeningen
 
