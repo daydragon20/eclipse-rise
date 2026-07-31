@@ -142,7 +142,7 @@ Negen agents, waarvan vijf nieuw. Precieze systeemprompts staan in `.claude/agen
 | # | Actie | Blokkeert | Wanneer |
 |---|---|---|---|
 | ~~O-1~~ | ~~Verloopdatum credits bevestigen~~ — **✓ gedaan 31-07: 21 augustus 2026.** §4 staat nu op echte datums, met 19/08 als werkdeadline. | — | Afgerond |
-| **O-2** | **Bevestig commerciële gebruiksrechten** op het huidige abonnement — en of de gekozen stemmen uit de Voice Library eigen voorwaarden dragen. Dit is een ship-blocker, geen detail. | L3 bulk-generatie | Vóór D3 |
+| ~~**O-2**~~ | ~~Bevestig commerciële gebruiksrechten~~ — **✓ BEANTWOORD 31-07.** Het abonnement draagt ze, en per stem is in de Voice Library zichtbaar of die rechten heeft. Beleid dat eruit volgt staat in `19_voice_production.md` §19.3: `voice-director` weigert elke bibliotheekstem zonder commerciële licentie in fase 1, vóór hij een betaalde fase 2 kan bereiken. **Let op:** die licentie is *niet* uit de API te lezen (dat veld bestaat niet), dus het blijft één owner-klik per finalist. | — | gedaan |
 | **O-3** | **Kies de stemmen** uit de kandidaten die `voice-director` voorlegt (§19.3). Smaak, niet techniek — dit is jouw beslissing. | L3, en dus alles | D2 |
 | **O-4** | **Luister naar de ijkmissie** en geef akkoord of afkeuring. | L0-gate → massaproductie | D7–D8 |
 | **O-5** | **Wapenbron** — er bestaat nergens een los wapenmesh (staande actie uit `JOUW_TAKEN.md`). | Spoor B wapenwerk | Staand |

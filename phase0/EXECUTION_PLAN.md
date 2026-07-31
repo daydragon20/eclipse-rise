@@ -2,7 +2,7 @@
 *Werkdocument game-planner | aangemaakt 2026-07-23 | **laatst bijgewerkt 2026-07-31 ~19:30**: §2 volledig geijkt tegen de werkboom (de vijf "in flight"-sporen van 24-07 waren alle vijf geland), §1b/§1c HUD-nulmetingen erbij, T-9 rechtgezet op `19_voice_production.md` §19.1 | risk-first per 13.1*
 *Bronnen: 13_roadmap.md, SPEC-P2-00, 14_ai_dev_instructions.md (14.4/14.5), 12_technical_design.md, HANDOFF.md "LAATSTE STAND".*
 
-**Status:** Phase 2 — Vertical Slice "Thirteen Bullets" is per expliciete owner-instructie (2026-07-23) de **actieve milestone**. De 13.2-gatevraag van Phase 1 ("speelt een tester vrijwillig een tweede loop?") blijft open als **staande owner-actie** (§4, T-1) — het antwoord kan de fidelity-investering nog bijsturen, maar blokkeert de Phase-2-systemenbouw niet.
+**Status:** Phase 2 — Vertical Slice "Thirteen Bullets" is per expliciete owner-instructie (2026-07-23) de **actieve milestone**. De 13.2-gatevraag van Phase 1 ("speelt een tester vrijwillig een tweede loop?") is **31-07 gesloten**: de owner antwoordde *"nog niet"* mét de mededeling dat **fase 0 en 1 hiermee zijn afgesloten** en dat er niet langer op zijn playtest gewacht moet worden. Die vraag stuurt de fidelity-investering dus niet meer, en er hoort niets meer achter gepland te worden (§4, T-1).
 
 **Leesregels:** bouwvolgorde per spec volgt altijd 14.5 (dataschema → pure-logic core + unit tests → subsystem-wrapper + events → debug-UI → echte UI/content laatst). Elke taak eindigt build-groen. Bouwer: **main** = hoofdagent (architectuur/systemen/specs, seams per 14.6), **eb** = element-builder(s), parallel spawnbaar, één element per agent.
 
@@ -261,7 +261,7 @@ Pas plannen als de meting er ligt. Geen fix zonder benoemde oorzaak plús meting
 
 | T | Actie | Waarvoor / blokkeert | Wanneer |
 |---|---|---|---|
-| T-1 | **Playtest 13.2**: loop in PIE spelen (Xbox-controller, squad-barks) en de gate-vraag beantwoorden. | Eerlijk Phase-1-verdict; stuurt R1 en de fidelity-prioriteit. | **Nu — staande actie**, ~30 min |
+| ~~T-1~~ | ~~Playtest 13.2~~ — **✓ BEANTWOORD 31-07: "nog niet", en dat sluit de poort.** Verbatim: *"Ik speel nog NIET. Eerst laat ik alle basisdingen bouwen waar je nu mee bezig bent. **Fase 0 en 1 zijn hiermee afgesloten — wacht niet meer op mijn playtest, die staat niet langer in de weg.**"* De 13.2-gatevraag stuurt dus niets meer; R1 en de fidelity-prioriteit hangen er niet langer aan. **Plan hier niets meer achter.** | — | gedaan |
 | T-2 | **Fab-kliks (rest)**: login ✓ en de character-packs zijn binnen; resterend zijn de env-pack-pulls (Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci-Fi Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash) + **1 gestileerd civilian/worker-pack** (4–6 bodies, Mannequin-rig — het enige character-gat: Hollow Point-crew/idlers en Kessara-burgers close-up). | Kit-pass backlog #10 + SPEC-P2-03-bevolking; monitor vuurt daarna autonoom. | Gauw, ~10 min (R5-timebox loopt op de env-packs) |
 | T-3 | ~~ElevenLabs-scopes~~ — **✓ gedaan 2026-07-23** (Music/SFX aangezet, zie `jijGedaan`). | — | Afgerond |
 | T-4 | ~~Blender-install~~ — **✓ gedaan 2026-07-23** (zie `jijGedaan`). | — | Afgerond |
