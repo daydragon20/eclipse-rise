@@ -52,7 +52,7 @@ TRANSCRIPT_DIRS = [
     Path.home() / ".claude" / "projects" / "C--Dev-ECLIPSE-GDD",
 ]
 SHOTS_DIR = REPO / "Eclipse" / "Saved" / "Screenshots" / "WindowsEditor"
-VOICE_BUDGET = 310_000
+VOICE_BUDGET = 131_000
 
 _state_lock = threading.Lock()
 _state: dict = {"booting": True}

@@ -50,7 +50,7 @@ Elke laag is **compleet en gelockt** voordat de volgende begint. Een laag is gel
 | **L0** | **IJkmissie** — M1.1 door álle lagen heen (§3) | allen | De eigenaar heeft de missie gehoord en gezegd: "zo moet het klinken" |
 | **L1** | **Verhaalfundering** — beat-sheets voor alle 42 authored missies, 4 acts | story-architect | Continuïteitsaudit: elke twist geplant én betaald, geen weesdraad, geen tegenstrijdigheid met `02_story_bible.md` |
 | **L2** | **Dialoog** — elke regel van elke scène, `SCRIPT_FORMAT`-conform | dialogue-writer ×N → dialogue-critic | 100% van de scènes op `critic: GO`. Steekproef van 10 scènes doorstaat de strip-test (§18.9 C1) |
-| **L3** | **Stem** — generatie in credit-tier-volgorde | voice-director | `VOICE_LEDGER.md` sluit; **310k besteed, 0 over** op 19/08; alles importeert en speelt af |
+| **L3** | **Stem** — generatie in credit-tier-volgorde | voice-director | `VOICE_LEDGER.md` sluit; **131k besteed, 0 over** op 19/08; alles importeert en speelt af |
 | **L4** | **Wereldbeschrijving** — per locatie: wat staat er, hoe ziet het eruit, wat moet bestaan | story-architect + art-reviewer | Elke missielocatie heeft een objectlijst die een element-builder zonder vragen kan bouwen |
 | **L5** | **Assets & implementatie** — meshes, materialen, missies bedraad, scènes gespeeld | element-builder ×N + main | Groene bar + speelbaar + art-review GO |
 
@@ -120,7 +120,7 @@ M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
 | **31/07** | **L1 act 1 GELAND** — P0 + M1.1–M1.8 beat-sheets, 69 scène-stubs, plant/payoff-tabel. `phase0/beats/ACT1_OVERVIEW.md`. | |
 | **01/08 – 11/08** | **L1: beat-sheets acts 2–4** — de 34 resterende van de 42 (26 verhaalmissies M2.1–M4.7 + 8 loyaliteitsmissies). story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
 | **vanaf gate L0** | **L2: dialoog, act 1 eerst.** dialogue-writer ×4–6 parallel, één missie per agent. Critic-gate per scène. **Niet geblokkeerd door L1 acts 2–4** — act 1's beats liggen er al sinds 31/07. | reguliere backlog `EXECUTION_PLAN.md` |
-| **10/08 – 19/08** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Reserve niet toewijzen tot **17/08**, dan vrijgeven. Doel: **310k besteed, 0 over.** | audio-import, bark-bedrading |
+| **10/08 – 19/08** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Reserve niet toewijzen tot **17/08**, dan vrijgeven. Doel: **131k besteed, 0 over.** | audio-import, bark-bedrading |
 | **19/08** | **HARDE STOP generatie.** Ledger sluiten. | |
 | **20/08 – 21/08** | Acts 2–4 script-compleet afmaken (kost geen credits) | L4-wereldbeschrijving start |
 
@@ -152,7 +152,7 @@ Negen agents, waarvan vijf nieuw. Precieze systeemprompts staan in `.claude/agen
 
 ## 6. Wat dit plan bewust NIET doet
 
-- **Niet de hele campagne inspreken.** Dat kost ~790k credits; er zijn er 310k. Alles wordt geschreven, ~40% wordt gesproken, de rest wacht als tekst op credits. Zie `19_voice_production.md` §19.2.
+- **Niet de hele campagne inspreken.** Dat kost ~790k credits; er zijn er 131k. Alles wordt geschreven, ~40% wordt gesproken, de rest wacht als tekst op credits. Zie `19_voice_production.md` §19.2.
 - **Niet de EXECUTION_PLAN vervangen.** De risk-first backlog, de falsificatietests (R1–R11) en de owner-wachtrij blijven leidend voor spoor B. Dit document is spoor A plus de koppeling.
 - **Niet stoppen met bouwen tijdens het schrijven.** Zie §1.
 - **Niet genereren zonder critic-GO.** Ook niet op D29. Zie `SCRIPT_FORMAT.md` §7.

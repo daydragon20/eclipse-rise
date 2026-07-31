@@ -24,18 +24,20 @@ Three consequences follow, and all three are load-bearing:
 
 ---
 
-## 19.2 The Budget — 310,000 credits, one month, no rollover
+## 19.2 The Budget — 131,000 credits, one month, no rollover
 
-**The situation.** The account holds **310,000 credits**. They **expire on 21 August 2026** (owner-confirmed 2026-07-31) and they do not roll over. A €11 top-up month is possible but the owner would rather not. So: spend it all, spend it on the right things, and spend nothing twice.
+**The situation.** The account holds **131,000 credits**. They **expire on 21 August 2026** (owner-confirmed 2026-07-31) and they do not roll over. A €11 top-up month is possible but the owner would rather not. So: spend it all, spend it on the right things, and spend nothing twice.
 
 **That is 21 days.** The working deadline is **19 August**, not the 21st — two days of buffer, because a failed batch on the last evening cannot be re-run.
 
 **The arithmetic.** ≈1 credit = 1 character. ~6 characters per word including spaces.
 
-- 310,000 credits ≈ **~51,000 spoken words**
+- 131,000 credits ≈ **~21,800 spoken words**
 - The full spoken script is **~132,000 words** (§18.1) ≈ ~790,000 credits
 
-**So roughly 40% of the game's speech fits in this month.** That is not a failure — it is the correct amount, because the other 60% is dialogue for acts whose beats are not yet locked, and generating those now would mean paying for lines that change.
+> **Corrected 2026-07-31 (late).** This section said 310,000 for most of the day; the owner had misremembered his balance. The real figure is **131,000** — 42% of what every plan on this page was built on. Every tier below has been re-cut, not just re-labelled.
+
+**So roughly 17% of the game's speech fits in this month**, not the 40% the earlier draft claimed. That is not a failure — it is the correct amount, because the other 60% is dialogue for acts whose beats are not yet locked, and generating those now would mean paying for lines that change.
 
 ### The credit ladder — spend in this order
 
@@ -43,24 +45,25 @@ Ordered by *lowest rewrite risk × highest perceived value*. Do not start a tier
 
 | Tier | What | Credits | ≈ Words | Why here |
 |---|---|---|---|---|
-| **0** | **Casting** — stage 1 free (library browsing), stage 2 deep test on finalists only (§19.3) | 12,000 | 2,000 | Must happen first, and properly. Getting casting wrong after Tier 1 costs 90k+ to fix. |
-| **1** | **Bark & systemic library** — the 16 priority triggers × 6–12 variants × 3 faction vocabularies | 93,000 | 15,500 | Safest spend on the board. The systems already exist, the lines never change, and this is the single biggest "the world is alive" gain per credit. |
-| **2** | **Act 1 story dialogue** — Prologue + M1.1–M1.8 | 90,000 | 15,000 | Beats are locked (SPEC-P2-04 ACCEPTED, no prologue, recap opening). Low rewrite risk. |
-| **3** | **Adaptive music** — main theme, Kessara layers, combat layers, Dominion faction stems | 43,000 | — | Front-loaded once, then near-zero forever (§16.7). Never-silent floor is a §16 requirement. |
-| **4** | **Act 1 hub & companion conversations** — Mara, Dex, Brick, Reyes at Hollow Point | 33,000 | 5,500 | Establishes the companion voices the player lives with for 25 hours. |
-| **5** | **Core SFX one-shots** — weapons, impacts, UI, ambient beds | 19,000 | — | Cheap, high polish return. |
-| **—** | **Reserve** — retakes, mistakes, a mis-tagged batch | 20,000 | — | Insurance *during* the sprint — see the rule below. |
-| | **Total** | **310,000** | | |
+| **0** | **Casting** — stage 1 free (library browsing), stage 2 deep test on the Act-1-critical roles only | 6,000 | 1,000 | Must happen first. Getting casting wrong later re-costs every line that character has. Villains (Vex, Kaine, Threx) appear in Act 3–4 and are cast later. |
+| **1** | **Bark & systemic library** — the 16 priority triggers × 3 faction vocabularies | 48,000 | 8,000 | Still the safest spend on the board. The systems already exist, the lines never change, and this is the biggest "the world is alive" gain per credit. |
+| **2** | **Act 1 story dialogue** — Prologue + M1.1–M1.8 | 45,000 | 7,500 | Beats are locked. Low rewrite risk. Includes the calibration mission. |
+| **3** | **Adaptive music** — main theme + the never-silent floor only | 15,000 | — | Cut from the full stem library to the theme and one layer set. Front-loaded once, then near-zero forever. |
+| **4** | **Core SFX one-shots** — weapons, impacts, UI | 7,000 | — | Cheap, high polish return. |
+| **—** | **Reserve** — retakes, mistakes, a mis-tagged batch | 10,000 | — | Insurance *during* the sprint — see the rule below. |
+| | **Total** | **131,000** | | |
+
+> **What fell off the ladder at 131k:** the Act 1 hub & companion conversations (was Tier 4, 33k). Those are the Hollow Point scenes with Mara, Dex, Brick and Reyes — the voices the player lives with between missions. They stay *written*; they wait for next month's credits. If that is the wrong cut, the owner says so — see **O-10**.
 
 ### The reserve rule — owner-corrected 2026-07-31
 
-The owner is right: **all 310,000 get spent.** Credits that are unused on 21 August are simply thrown away — expiring credits have no value at expiry, so "stop at 290,000" would mean burning 20,000 for nothing.
+The owner is right: **all 131,000 get spent.** Credits that are unused on 21 August are simply thrown away — expiring credits have no value at expiry, so "stop at 290,000" would mean burning 20,000 for nothing.
 
-But the reserve is not savings, it is **insurance during the sprint**. If the full 310k is allocated to tiers on day one and a batch turns out wrong on day twelve, there is nothing left to fix it with. So:
+But the reserve is not savings, it is **insurance during the sprint**. If the full 131k is allocated to tiers on day one and a batch turns out wrong on day twelve, there is nothing left to fix it with. So:
 
 1. **Keep 20,000 unallocated** — do not plan it into a tier.
 2. **On 17 August**, release whatever is left of it into the next tier in the ladder.
-3. **Target on 19 August: 310,000 spent, 0 remaining.**
+3. **Target on 19 August: 131,000 spent, 0 remaining.**
 
 That gives insurance for the risky middle of the sprint *and* zero waste at the end. Strictly better than both alternatives.
 
@@ -69,7 +72,7 @@ That gives insurance for the risky middle of the sprint *and* zero waste at the 
 - **Nothing is generated that has not passed `dialogue-critic` with GO.** No exceptions, no "we'll check it after". A failed line that gets generated is money burned permanently.
 - **Batch, never drip.** Generate per scene or per trigger-set, never line by line — batching is where mistakes get caught before they multiply.
 - **Log every batch.** `voice-director` appends actual credit spend to `phase0/VOICE_LEDGER.md` after each run. The ladder above is a plan; the ledger is the truth.
-- **Do not allocate the last 20,000 to a tier before 17 August** — it is insurance, not savings. On 17 August, release whatever remains of it into the next tier. Target on 19 August is **310,000 spent, 0 remaining** (see the reserve rule above). An earlier draft of this line said "stop at 290,000", which contradicted that rule and would have thrown away 20,000 credits at expiry.
+- **Do not allocate the last 20,000 to a tier before 17 August** — it is insurance, not savings. On 17 August, release whatever remains of it into the next tier. Target on 19 August is **131,000 spent, 0 remaining** (see the reserve rule above). An earlier draft of this line said "stop at 290,000", which contradicted that rule and would have thrown away 20,000 credits at expiry.
 
 **What happens to Acts 2–4?** They get *written* this month (writing costs nothing) and sit as text with complete script files. The moment credits exist again, they generate with one command and zero further authoring. That is the whole point of the layer discipline: the expensive-to-change work is done, and the cheap-to-defer work is deferred.
 
@@ -268,7 +271,7 @@ Before Tier 1 bulk generation, `voice-director` runs the **full pipeline on a si
 - [ ] Bark library live: 16 triggers × 3 faction vocabularies, playing in-game
 - [ ] Act 1 fully voiced: prologue + M1.1–M1.8
 - [ ] Adaptive music never-silent floor running (§16.7)
-- [ ] `phase0/VOICE_LEDGER.md` reconciles to within 5% of **310,000** spent
+- [ ] `phase0/VOICE_LEDGER.md` reconciles to within 5% of **131,000** spent
 - [ ] The 20,000 reserve stayed unallocated until 17 August, then went into the next tier — **0 credits left unused at expiry**
 - [ ] Every generated line traceable to a script file that passed `dialogue-critic`
 - [ ] Acts 2–4 written and script-complete, awaiting credits only

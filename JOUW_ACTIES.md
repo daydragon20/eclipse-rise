@@ -26,7 +26,7 @@ zonder die komt er geen enkele regel audio uit, ook niet als je vanavond stemmen
 **Wat er aan de hand is, en het is erger dan het klinkt.** De ingebouwde creditmeter was
 stuk **en zei dat niet**. `generate_audio_assets.py` vroeg bij ElevenLabs op wat een batch
 kost, kreeg daar een `401` op, **slikte die fout** en schreef stil geen verbruik weg. De
-ledger las dus als waarheid terwijl er niets gemeten was — en die 310.000 was daarmee een
+ledger las dus als waarheid terwijl er niets gemeten was — en die 131.000 was daarmee een
 mededeling van jou, geen meting.
 
 Dat is nu omgedraaid: generatie **weigert** te draaien zonder gemeten spend (exit-code 3),
@@ -44,7 +44,7 @@ en die weigering hangt als poort in `verify.ps1` zodat hij niet stilletjes terug
 
 **Stap 3.** Zeg het als het staat. Dan meet ik het echte saldo na en zet dat in de ledger.
 
-> **Goed nieuws:** je saldo staat nog op de volle **310.000**. Er is deze maand geen enkele
+> **Goed nieuws:** je saldo staat nog op de volle **131.000**. Er is deze maand geen enkele
 > credit uitgegeven — ook casting fase 1 niet.
 
 ---

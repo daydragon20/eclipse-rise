@@ -22,10 +22,40 @@
   ],
   "vragen": [
     {
+      "id": "O-10",
+      "prio": "nu",
+      "vraag": "131.000 in plaats van 310.000 — wat mag er sneuvelen?",
+      "waarom": "Je corrigeerde je saldo naar 131.000. Dat is 42% van waar de hele begroting op stond, en dus past nog maar ~17% van de gesproken tekst in deze maand in plaats van 40%. Ik heb alle tiers opnieuw gesneden en er viel er een af: de hub- en companiongesprekken in Hollow Point — de stemmen die je TUSSEN de missies door hoort, Mara, Dex, Brick, Reyes. Die blijven geschreven maar worden niet ingesproken. Ik wil weten of dat de juiste snede is, want het is jouw game.",
+      "stappen": [
+        "Lees de drie opties hieronder",
+        "Kies er een, of typ zelf wat je belangrijker vindt"
+      ],
+      "meer_info": "**De nieuwe verdeling van 131.000:**\n\n| Tier | Wat | Credits |\n|---|---|---|\n| 0 | Casting, alleen Act-1-rollen | 6.000 |\n| 1 | Barks - de systeemstemmen | 48.000 |\n| 2 | Act 1 story-dialoog | 45.000 |\n| 3 | Muziek: thema + vloer | 15.000 |\n| 4 | Kern-SFX | 7.000 |\n| - | Reserve | 10.000 |\n\n**Waarom barks zo duur zijn en toch blijven:** het zijn de zinnen die je HONDERD keer hoort - contact, herladen, iemand neer, order bevestigd. Ze veranderen bijna nooit, de systemen bestaan al, en ze bepalen of de wereld leeft. Per credit is dit het meeste rendement.\n\n**Waarom Act 1 blijft:** daar zit de ijkmissie in. Zonder die kun je niet beoordelen of de schrijfstandaard klopt, en dan schrijven we 42 missies op goed geluk.\n\n**Wat eraf viel:** de hub-gesprekken. Je hoort in Act 1 dus wel je squad in het veld en de verhaalscenes, maar in de basis blijven Mara en Dex stil.\n\n**Goed nieuws voor daarna:** vanaf 22 augustus kost een Starter-abonnement ~5 euro/maand voor 30.000 credits met commerciele rechten. De hub-gesprekken staan dan klaar als tekst en zijn met een commando in te spreken.",
+      "opties": [
+        {
+          "label": "Akkoord — hub sneuvelt",
+          "waarde": "hub-later",
+          "gevolg": "Barks + Act 1 + muziek + SFX worden ingesproken. De hub-gesprekken blijven tekst en volgen volgende maand."
+        },
+        {
+          "label": "Nee — hub is belangrijker dan de barks",
+          "waarde": "hub-boven-barks",
+          "gevolg": "De barkbibliotheek wordt gehalveerd om de hub-gesprekken erin te houden. De wereld klinkt leger tijdens gevecht."
+        },
+        {
+          "label": "Alleen Act 1 + casting, de rest later",
+          "waarde": "alleen-act1",
+          "gevolg": "Maximale zekerheid over de schrijfstandaard, maar de barks blijven de placeholders die er nu zijn en de muziek wacht."
+        }
+      ],
+      "advies": "Akkoord met de hub-snede. De barks hoor je honderd keer per missie, een hubgesprek een keer. En met ~5 euro per maand haal je de hub daarna alsnog binnen.",
+      "vrijtekst": true
+    },
+    {
       "id": "T-12",
       "prio": "nu",
       "vraag": "Drie API-scopes aanzetten — hier staat alle generatie op stil",
-      "waarom": "Dit is op dit moment de ENIGE echte rem in het project. De ingebouwde creditmeter was stuk en zei dat niet: generate_audio_assets.py vroeg bij ElevenLabs op wat een batch kost, kreeg daar een 401 op, slikte die fout en schreef stil geen verbruik weg. De ledger las dus als waarheid terwijl er niets gemeten was — en die 310.000 was daarmee jouw mededeling, geen meting. Dat is nu omgedraaid: generatie WEIGERT te draaien zonder gemeten spend (exit-code 3), en die weigering hangt als poort in verify.ps1 zodat hij niet stilletjes terug kan komen. Gevolg: zolang user_read ontbreekt komt er geen enkele regel audio uit, ook niet nadat je stemmen hebt gekozen. Goed nieuws: je saldo staat nog op de volle 310.000 — er is deze maand geen credit uitgegeven, ook casting fase 1 niet.",
+      "waarom": "Dit is op dit moment de ENIGE echte rem in het project. De ingebouwde creditmeter was stuk en zei dat niet: generate_audio_assets.py vroeg bij ElevenLabs op wat een batch kost, kreeg daar een 401 op, slikte die fout en schreef stil geen verbruik weg. De ledger las dus als waarheid terwijl er niets gemeten was — en die 131.000 was daarmee jouw mededeling, geen meting. Dat is nu omgedraaid: generatie WEIGERT te draaien zonder gemeten spend (exit-code 3), en die weigering hangt als poort in verify.ps1 zodat hij niet stilletjes terug kan komen. Gevolg: zolang user_read ontbreekt komt er geen enkele regel audio uit, ook niet nadat je stemmen hebt gekozen. Goed nieuws: je saldo staat nog op de volle 131.000 — er is deze maand geen credit uitgegeven, ook casting fase 1 niet.",
       "stappen": [
         "Ga naar elevenlabs.io → je avatar rechtsboven → API Keys",
         "Zet op de sleutel van dit project user_read aan — DIT is de blokkade: saldo lezen voor en na elke batch",
