@@ -14,7 +14,7 @@ turn:         "Voss re-solves the ambush out loud, and Mara follows his call ins
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        150
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
@@ -167,66 +167,78 @@ lines:
   - id:      M1.1.S04.200
     speaker: VOSS
     voice:   voss
+    band:    callout
     text:    "Now."
 
   - id:      M1.1.S04.210
     speaker: FIGHTER_A
     voice:   eclipse_fighter_a
     tags:    [shouting]
+    band:    callout
     text:    "Contact, left rail!"
 
   - id:      M1.1.S04.220
     speaker: CONSCRIPT_B
     voice:   dominion_conscript_b
     tags:    [shouting]
+    band:    callout
     text:    "Above us! Above the--"
 
   - id:      M1.1.S04.230
     speaker: MARA
     voice:   mara
     interrupts: true
+    band:    callout
     text:    "Two down."
     shot:    "The interruption is the volley. Nine seconds of dark, four muzzle flashes, no lamps."
 
   - id:      M1.1.S04.240
     speaker: FIGHTER_B
     voice:   eclipse_fighter_b
+    band:    callout
     text:    "Leader's on the deck."
 
   - id:      M1.1.S04.250
     speaker: CONSCRIPT_A
     voice:   dominion_conscript_a
     tags:    [shouting]
+    band:    callout
     text:    "Man down at the hoist!"
 
   - id:      M1.1.S04.260
     speaker: FIGHTER_A
     voice:   eclipse_fighter_a
+    band:    callout
     text:    "That's me dry."
 
   - id:      M1.1.S04.270
     speaker: MARA
     voice:   mara
+    band:    callout
     text:    "Count."
 
   - id:      M1.1.S04.280
     speaker: FIGHTER_B
     voice:   eclipse_fighter_b
+    band:    callout
     text:    "Two."
 
   - id:      M1.1.S04.290
     speaker: VOSS
     voice:   voss
+    band:    callout
     text:    "Three."
 
   - id:      M1.1.S04.300
     speaker: MARA
     voice:   mara
+    band:    callout
     text:    "Five between us."
     note:    "The mission's arithmetic, audible: thirteen became five and bought a patrol."
 
   - id:      M1.1.S04.310
     speaker: FIGHTER_A
     voice:   eclipse_fighter_a
+    band:    callout
     text:    "One's still moving."
     shot:    "Nobody moves toward the sound. The lamps come back up the row, one span at a time."

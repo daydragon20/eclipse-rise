@@ -14,7 +14,7 @@ turn:         "Whatever Voss decides, the cell watches him decide it, and that i
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .080 'eleven minutes' valt onder L1-R14 en de missie is nu open; plus .150 label is een herinterpunctie van text"
 words:        239
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
@@ -108,7 +108,8 @@ lines:
   - id:      M1.1.S05.080
     speaker: FIGHTER_B
     voice:   eclipse_fighter_b
-    text:    "Relief cycles on the hour. We're eleven minutes inside that."
+    text:    "Relief cycles on the hour. We're eighteen minutes inside that."
+    note:    "WAS 'eleven minutes' - geweken onder L1-R14 op 01-08, toen deze missie open lag. Elf meet de omvang van Ember Cell en niets anders; dit was het enige gesproken elf in de ijkmissie en het mat minuten, dus de mal leerde veertig schrijvers precies het omgekeerde van de ruling. ACHTTIEN is gekozen omdat het nergens in act 1 gesproken wordt (sixteen en eighteen waren de enige twee vrije getallen onder de twintig; seventeen ging naar M1.6.S03). Twaalf viel af: dat is in vijf van zijn zeven gebruiken een PLAATS (Block Twelve), en dat is dezelfde verzadiging in een ander jasje."
 
   - id:      M1.1.S05.090
     speaker: CONSCRIPT_A

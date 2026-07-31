@@ -14,7 +14,7 @@ turn:         "She tells him what she actually expects to lose tonight, and it i
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        167
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----

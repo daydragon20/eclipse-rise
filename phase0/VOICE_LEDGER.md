@@ -123,7 +123,45 @@ Ik heb de scriptbestanden geteld in plaats van aangenomen: elke `text:` plus elk
 | overige sprekers | — | — | ~9.610 | |
 | | | | **65.015** | **tier 2 is begroot op 45.000** |
 
-### ✅ ACT 1 IS GESCHREVEN OP DE HUB NA — de eindstand van de nacht (01-08 ~03:50)
+### ✅ ACT 1 IS COMPLEET — gemeten eindstand (01-08 ~05:40)
+
+Nul stubs: acht missies, de proloog en de twaalf hub-gesprekken. **71 bestanden,
+1.623 regels (varianten meegeteld), 97.275 credits.**
+
+| Missie | Regels | Credits |
+|---|---|---|
+| M1.1 Thirteen Bullets | 182 | 9.332 |
+| M1.2 The Dead Drop | 181 | 11.333 |
+| M1.3 Signal Fire | 211 | 8.793 |
+| M1.4 The Quartermaster | 132 | 8.655 |
+| M1.5 Cells | 221 | 13.279 |
+| M1.6 The Tithe Train | 187 | 12.997 |
+| M1.7 Under the Ice | 154 | 10.206 |
+| M1.8 Blacksite K-77 | 187 | 10.450 |
+| Hub (12 gesprekken) | 152 | 10.780 |
+| Proloog | 16 | 1.450 |
+| **TOTAAL** | **1.623** | **97.275** |
+
+**Saldo 125.612. Act 1 is dus 77% van alles wat er nog is** — en daarna komen barks,
+muziek, SFX en de acts 2 t/m 4. Dat is de vraag die op O-14 ligt.
+
+**De extrapolatie zat er 3% naast.** Vannacht om 02:20 schatte ik ~100.000 op basis van
+1.641 credits/scène over zes geschreven missies; het werd 97.275. Dat is precies waarom
+het getal **geëxtrapoleerd héétte** in plaats van gemeld te worden als meting.
+
+**Twee handtellingen die 5% te hoog uitkwamen.** Beide hub-schrijvers rekenden met de
+hand (5,3 tekens per woord) en kwamen samen op ~11.290 tegen de gemeten 10.780. Ze
+meldden allebei uit zichzelf dat ze de tools **niet konden draaien** — die agents hebben
+geen shell — en vroegen om een echte meting voor iemand het als groen boekt. Dat is de
+juiste vorm: een handtelling die zichzelf een handtelling noemt.
+
+> **Correctie op commit `43c493f`:** het bericht daar zegt "78 scenes". Het zijn er **71**.
+> Dat getal heb ik uit een agentrapport overgenomen zonder te tellen; regels (1.623) en
+> credits (97.275) kloppen wel.
+
+---
+
+### ✅ ACT 1 IS GESCHREVEN OP DE HUB NA — tussenstand (01-08 ~03:50)
 
 Alle acht missies plus de proloog staan er. Gemeten met
 `Eclipse/Tools/count_generation_cost.py`:

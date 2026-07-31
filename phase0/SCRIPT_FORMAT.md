@@ -271,7 +271,7 @@ Forty-two missions of branching had no way to say "these lines are the player's 
     choice:
       group: m11_conscript                              # options sharing a group are one prompt
       set:   'story.m11_conscript_choice = "bound"'     # same grammar as condition
-      label: "Dress it."                                # optional wheel text — NOT the spoken line
+      label: "Dress the wound, then leave him."                                # optional wheel text — NOT the spoken line
     text:    "Dressing. Above the hip."
 ```
 
@@ -324,7 +324,7 @@ variants:
 
 ## 6. Validation
 
-`Tools/validate_script.py` (to be built — small, one afternoon) runs in the green bar alongside `EclipseValidateData`:
+`Tools/`validate_script.py` (bestaat en draait in de bar sinds 01-08) — small, one afternoon) runs in the green bar alongside `EclipseValidateData`:
 
 | Check | Fails on |
 |---|---|
