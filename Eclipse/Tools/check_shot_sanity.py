@@ -34,11 +34,20 @@ from __future__ import print_function
 import os
 import sys
 
+import warnings
+
 try:
     from PIL import Image
 except ImportError:
     sys.exit("Pillow ontbreekt -- deze controle kan niet draaien. "
              "Dat is iets anders dan schoon; meld het als NIET GEDRAAID.")
+
+# Pillow waarschuwt per aanroep over getdata(). Op 25 frames zijn dat 25 regels
+# ruis in de bar, en ruis is hoe een echte melding wordt gemist. Alleen DEZE
+# waarschuwing wordt gedempt -- een blanket filter zou de volgende echte
+# deprecation ook verbergen.
+warnings.filterwarnings("ignore", category=DeprecationWarning,
+                        message=r".*getdata.*")
 
 ONDERBAND = 0.25      # onderste kwart van het beeld
 VLAK_MELD = 0.60      # boven dit percentage: melden, niet zakken
