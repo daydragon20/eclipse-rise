@@ -88,6 +88,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Eclipse|Strategy")
 	bool IsRegionSupplied(FName RegionId) const;
 
+	/**
+	 * The live region graph — lanes, their costs, and the board-wide tuning — or
+	 * null when no campaign setup is loaded (GDD 14.3.5: absent is a state, not a
+	 * crash).
+	 *
+	 * Public since N-b, and for one reason: the map screen composes its view over
+	 * the SAME asset that routing reads. The board drew a list of
+	 * FEclipseRegionState because that was the only structure it could reach, and
+	 * that structure has no edges — a screen with its own second source of truth
+	 * is exactly how a board and its rules drift apart. Not a UFUNCTION: the
+	 * asset type is C++-side data, and Blueprint has no business editing it.
+	 */
+	const UEclipseRegionGraphAsset* GetRegionGraph() const { return ResolveGraph(); }
+
 private:
 	/**
 	 * Re-derive the Dominion Response Tier from campaign facts and commit the

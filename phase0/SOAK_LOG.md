@@ -209,3 +209,7 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 > *Voor backlog #12 telt deze nacht dus niet als groen.* Dat is geen formaliteit: de bar
 > meet met opzet meer dan build-plus-tests, en zolang er acht dialoogregels zijn die als
 > **stilte** zouden genereren, is de slice niet groen — hoe groen de suite ook staat.
+| 2026-08-01 00:48 | `4df8f15` | **ROOD** | 237 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen [beeld: 3 beeld(en) VERANDERD -> stap 1, stap 4, stap 7] |
+| 2026-08-01 00:54 | `be0a7af` | **ROOD** | 237 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 01:29 | `9b87943` | **ROOD** | 244 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 01:34 | `f90c4c8` | **ROOD** | 244 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |

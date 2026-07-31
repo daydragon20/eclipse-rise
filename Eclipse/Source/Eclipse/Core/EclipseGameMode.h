@@ -30,6 +30,25 @@ public:
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	/**
+	 * Eén frame MET de UI-laag erop, via het Slate-vensterpad.
+	 *
+	 * De drie bestaande opnamewegen tekenen alleen de 3D-scene of leveren niets op
+	 * (zie de meting in de implementatie). Zonder deze functie is er per
+	 * constructie geen beeldbewijs mogelijk van welk UI-element dan ook, en dan is
+	 * de owner-eis "controleer het op een screenshot voordat je het af noemt" voor
+	 * de hele schermlaag onvervulbaar.
+	 *
+	 * Schrijft naar Saved/Screenshots/HUD/HUD_<Label>.png en zegt in het log of het
+	 * lukte — een opnamemethode die stil faalt is hoe deze laag onzichtbaar bleef.
+	 *
+	 * PUBLIEK sinds N-b, en niet uit netheid. Elke bestaande opnameronde SPEELT
+	 * een missie, dus van de twee andere schermhoogtes — de basis en de kaart —
+	 * bestond per constructie geen enkel frame. De hubronde zit in de
+	 * PlayerController (`-EclipseShotHub`) en die kon deze weg niet bereiken.
+	 */
+	bool CaptureHudFrame(const FString& Label);
+
 private:
 	/** Route mission lifecycle facts: Started -> spawn, Completed/Failed -> despawn. */
 	void OnMissionLifecycle(FGameplayTag EventTag, const FInstancedStruct& Payload);
@@ -110,20 +129,6 @@ private:
 	int32 SkyChurnFrames = 0;
 	int32 SkyChurnRebuilds = 0;
 	uint32 SkyChurnLastFrame = 0;
-
-	/**
-	 * Eén frame MET de UI-laag erop, via het Slate-vensterpad.
-	 *
-	 * De drie bestaande opnamewegen tekenen alleen de 3D-scene of leveren niets op
-	 * (zie de meting in de implementatie). Zonder deze functie is er per
-	 * constructie geen beeldbewijs mogelijk van welk UI-element dan ook, en dan is
-	 * de owner-eis "controleer het op een screenshot voordat je het af noemt" voor
-	 * de hele schermlaag onvervulbaar.
-	 *
-	 * Schrijft naar Saved/Screenshots/HUD/HUD_<Label>.png en zegt in het log of het
-	 * lukte — een opnamemethode die stil faalt is hoe deze laag onzichtbaar bleef.
-	 */
-	bool CaptureHudFrame(const FString& Label);
 
 	FTimerHandle PlayShotTimer;
 	FTimerHandle PlayShotDriveTimer;

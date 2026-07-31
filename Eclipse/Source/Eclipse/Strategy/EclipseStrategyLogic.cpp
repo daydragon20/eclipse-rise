@@ -353,13 +353,29 @@ bool ValidateGraph(const TArray<FEclipseRegionDefinition>& Definitions, TArray<F
 					*Definition.RegionId.ToString(), *NeighborId.ToString(),
 					*Lane.GateRegionId.ToString(), *Reverse->GateRegionId.ToString()));
 			}
-			if (Reverse->TravelDays != Lane.TravelDays || Reverse->Risk != Lane.Risk
-				|| Reverse->SmugglerDelayDays != Lane.SmugglerDelayDays
-				|| Reverse->SmugglerRiskPenalty != Lane.SmugglerRiskPenalty)
+			// DE FOUT MOET HET VELD NOEMEN. Hier stond één regel die altijd
+			// alleen dagen en risico afdrukte, ook als juist een SMOKKELveld
+			// verschilde — dan las de melding "costs 1d/0r but the reverse costs
+			// 1d/0r": rood, met twee identieke getallen en geen aanwijzing. Een
+			// melding die twee verklaringen niet scheidt, is geen meting.
+			TArray<FString> Disagreements;
+			auto Compare = [&Disagreements](const TCHAR* Field, int32 Mine, int32 Theirs)
 			{
-				OutErrors.Add(FString::Printf(TEXT("Asymmetric lane cost: '%s' -> '%s' costs %dd/%dr but the reverse costs %dd/%dr"),
+				if (Mine != Theirs)
+				{
+					Disagreements.Add(FString::Printf(TEXT("%s %d vs %d"), Field, Mine, Theirs));
+				}
+			};
+			Compare(TEXT("TravelDays"), Lane.TravelDays, Reverse->TravelDays);
+			Compare(TEXT("Risk"), Lane.Risk, Reverse->Risk);
+			Compare(TEXT("SmugglerDelayDays"), Lane.SmugglerDelayDays, Reverse->SmugglerDelayDays);
+			Compare(TEXT("SmugglerRiskPenalty"), Lane.SmugglerRiskPenalty, Reverse->SmugglerRiskPenalty);
+
+			if (!Disagreements.IsEmpty())
+			{
+				OutErrors.Add(FString::Printf(TEXT("Asymmetric lane cost: '%s' -> '%s' disagrees with its reverse on %s"),
 					*Definition.RegionId.ToString(), *NeighborId.ToString(),
-					Lane.TravelDays, Lane.Risk, Reverse->TravelDays, Reverse->Risk));
+					*FString::Join(Disagreements, TEXT(", "))));
 			}
 		}
 	}

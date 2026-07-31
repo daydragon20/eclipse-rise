@@ -7,6 +7,7 @@
 #include "CommonInputSubsystem.h"
 #include "CommonInputTypeEnum.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "Core/EclipseGameMode.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
 #include "GameFramework/InputDeviceSubsystem.h"
@@ -202,6 +203,39 @@ void AEclipsePlayerController::BeginPlay()
 
 	// The loop starts at the menu base (SPEC-P1-08); launching drops into the mission.
 	EnterBaseMode();
+
+#if !UE_BUILD_SHIPPING
+	// DE HUBRONDE (-EclipseShotHub), en hij bestond nog niet.
+	//
+	// GEMETEN 01-08: elke opnameronde in dit project SPEELT een missie
+	// (-EclipseShot, -EclipseShotPlay, -EclipseShotFixtures), dus van de twee
+	// andere schermhoogtes — de basis en de strategiekaart — is nooit één frame
+	// gemaakt. Ze werden beoordeeld op de broncode. Dat is precies de vorm van
+	// falen die `verify.ps1` in zijn kop beschrijft: twee vondsten die op geen
+	// enkele meter stonden en alleen op een frame.
+	//
+	// Zes seconden, en dat is geen willekeurig getal: de kaart hertekent bij elk
+	// Event.Strategy-feit, en de campagne commit zijn openingsfeiten tijdens
+	// BeginPlay. Een opname op frame 1 fotografeert een bord dat nog niet weet
+	// welke regio's er zijn.
+	if (FParse::Param(FCommandLine::Get(), TEXT("EclipseShotHub")))
+	{
+		FTimerHandle HubShotTimer;
+		GetWorldTimerManager().SetTimer(HubShotTimer, FTimerDelegate::CreateWeakLambda(this, [this]()
+		{
+			AEclipseGameMode* Mode = GetWorld() != nullptr ? GetWorld()->GetAuthGameMode<AEclipseGameMode>() : nullptr;
+			if (Mode == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning, TEXT("[HUBSHOT] geen EclipseGameMode — geen opname van de basislaag."));
+			}
+			else
+			{
+				Mode->CaptureHudFrame(TEXT("hub_kaart"));
+			}
+			ConsoleCommand(TEXT("quit"));
+		}), 6.0f, /*bLoop*/ false);
+	}
+#endif
 }
 
 void AEclipsePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
