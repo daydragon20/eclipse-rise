@@ -15,7 +15,9 @@ turn:         "They get out, and afterwards nobody can say why it was that easy.
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        134
+words_heard:  114
+words_generated: 151
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      VOSS, MARA, BRICK, DEX (if present); Veil operatives (barks)
@@ -39,4 +41,180 @@ words:        0
 #            consequences: the player must later be able to recall that nobody ever called
 #            for help. This belongs as an explicit instruction in the tier-1 Veil bark set.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      in-mission-radio (10-25) for the six lines after the fight; `band: callout`
+#            (2-6) for the fourteen under fire, per L1-R1's override field. Every override
+#            counted against the ceiling of six; the longest is exactly six.
+# register:  reached at .150 (12), .160 (14), .190 (11), .200 (10) - none band-overridden.
+# spread:    2 w (.120 "Ladder. Now.") to 14 w (.160) = 7x.
+# flag-in:   story.m17_dex_along (S02.030/.040) read at .100/.110 and .170-.200.
+#
+# *** THE VEIL UNDER PRESSURE - THE MISSION'S NEW VOCABULARY, AND IT IS A STORY DEVICE. ***
+# Eight Veil lines and the audit is short: no volume, no profanity, no pronoun for anybody
+# they are shooting at, no question, and NOT ONE CALL FOR HELP. .060 is the line that should
+# frighten the player - they log their own man going down in three words and keep working.
+# .140 is the second: they do not pursue. They secure and they write down the hour.
+# Contrast with M1.4's conscripts is meant to land inside ten seconds.
+# *** BARK-SET INSTRUCTION FOR TIER 1, CARRIED FROM THE BEAT SHEET SECTION 9: the Veil bark
+# library must contain NO reinforcement call, in any trigger, anywhere. That is a story
+# constraint disguised as a bark rule - the player has to be able to recall in act 4 that
+# nobody ever shouted for help. Escalated in the report; it is not a scene file's to fix.
+#
+# *** P4-d SET-UP, .150-.160. THE SECOND TAP, AND IT IS FLAT BY REUSE. ***
+# L1-R17 forbids a fourth polished maxim. .160 is therefore NOT A NEW LINE: it is Mara's own
+# M1.2.S03.130-.150 arithmetic, said again, worn, with "We've had this." on the end of it.
+# A woman repeating an old explanation and closing the subject is the exact opposite of an
+# epigram, and the degradation is the characterisation - her explanations are running out and
+# M1.8.S03 is where they stop. The player remembers the first time; that is the whole point
+# of using the same words.
+# Voss does not push back a second time. He said it once (.150) and the scene moves on -
+# pressing it here would make act 1 a mystery, and the thread is registered as waved away
+# until M1.8.S09 (ACT1_OVERVIEW section 5).
+#
+# dex:       the stub gives him the line closest to the truth, as a joke. It exists in BOTH
+#            branches and it is BETTER in the one where he stayed on the stair, because there
+#            he was on the Veil's own channel for the whole fight - AR-9 redundancy without a
+#            duplicated plant. The joke is about being ignored, not about the Dominion: an
+#            epigram about the enemy here would be the fourth aphorism L1-R17 bans, and
+#            "we're worth a shout" is a gag about Dex's pride that happens to be the truth.
+#            18.6: the best jokes cost something, and this one costs him the last thing in
+#            the mission he could still feel good about.
+# mara:      AR-5 - zero "you", zero "I".
+# omitted:   a hero beat on the way out, a Brick line, and any reaction to .060. See report.
+
+lines:
+  - id:      M1.7.S06.010
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Flange head is open. Two ranks."
+    shot:    "No alarm sounds anywhere in the hall. The lights do not change. A door opens somewhere behind the condenser banks and that is the entire warning they get."
+
+  - id:      M1.7.S06.020
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "Moving to the aisle. Slow."
+
+  - id:      M1.7.S06.030
+    speaker: MARA
+    voice:   mara
+    band:    callout
+    text:    "Ranks. Go wide."
+
+  - id:      M1.7.S06.040
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Vapour on three. Wait for it."
+    shot:    "The banks dump. The aisle fills white to head height and both sides stop shooting at the same moment."
+
+  - id:      M1.7.S06.050
+    speaker: BRICK
+    voice:   brick
+    band:    callout
+    text:    "Left rank. Two."
+
+  - id:      M1.7.S06.060
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "One down. Continue."
+    note:    "*** THE COLDEST LINE IN THE MISSION. *** They lose a man and log it in three words. No name, no reaction, no change of tone. That is the whole faction in one bark."
+
+  - id:      M1.7.S06.070
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Brick, the aisle!"
+
+  - id:      M1.7.S06.080
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Don't chase into the vapour."
+
+  - id:      M1.7.S06.090
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Seal the head. Work the ranks."
+
+  - id:        M1.7.S06.100
+    speaker:   DEX
+    voice:     dex
+    band:      callout
+    condition: 'story.m17_dex_along == true'
+    text:      "So far from that ladder."
+
+  - id:        M1.7.S06.110
+    speaker:   DEX
+    voice:     dex
+    band:      callout
+    condition: 'story.m17_dex_along == false'
+    text:      "Band's quiet. Still quiet."
+    note:      "Seeded here so his .190 in this branch is a report and not a punchline arriving from nowhere."
+
+  - id:      M1.7.S06.120
+    speaker: MARA
+    voice:   mara
+    band:    callout
+    text:    "Ladder. Now."
+
+  - id:      M1.7.S06.130
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "Two on the ladder run."
+
+  - id:      M1.7.S06.140
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Log the hour. Hold the head."
+    note:    "They do not pursue. They secure the post and write down the time - procedure, not permission, and nobody in Ember hears it as anything else tonight."
+
+  - id:      M1.7.S06.150
+    speaker: VOSS
+    voice:   voss
+    text:    "Six people in that post and not one of them called anybody. Nobody even--"
+    shot:    "Rain again at the top of the shaft, warm on the back of the neck. Nothing behind them on the ladder."
+    note:    "The fact lands whole before she cuts him off; only the second thought is lost, and losing it is the point."
+
+  - id:         M1.7.S06.160
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "They mark everything. They come back for what's worth the night. We've had this."
+    note:    "*** P4-d SET-UP. SECOND TAP. *** Her own M1.2.S03 arithmetic, repeated word for word, with the subject closed on the end of it. Not a new line and deliberately not a new idea - L1-R17. Act 4 takes it apart; M1.8.S03 is the third tap."
+
+  - id:        M1.7.S06.170
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == true'
+    text:      "Nobody yelled for anybody in there. Not one shout."
+
+  - id:        M1.7.S06.180
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == true'
+    text:      "Bit insulting, that. We're worth a shout."
+
+  - id:        M1.7.S06.190
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == false'
+    text:      "I had their whole band. Forty minutes, and nobody called anybody."
+
+  - id:        M1.7.S06.200
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == false'
+    text:      "Not one. I checked it twice in case it was me."
+    note:      "18.4 Dex: he suspects his own hardware before he suspects the world. The joke is on him and it is the closest anybody comes to the truth in act 1."
+
+  - id:      M1.7.S06.210
+    speaker: MARA
+    voice:   mara
+    text:    "Up the ladder. Nobody stops at the top."
+    shot:    "Last frame of the hall from above: four condenser banks still breathing white into an empty aisle. Nothing is burning, no alarm is running, and nobody is following them."

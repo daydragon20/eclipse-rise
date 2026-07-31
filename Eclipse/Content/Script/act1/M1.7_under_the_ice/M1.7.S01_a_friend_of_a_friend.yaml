@@ -15,7 +15,9 @@ turn:         "Voss asks where the tip came from, and Mara ends the conversation
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        268
+words_heard:  268
+words_generated: 290
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      MARA, VOSS, DEX, BRICK, REYES, SELA
@@ -36,4 +38,158 @@ words:        0
 # not have anyone come back to it. Whisper does not exist until act 2; only his shadow is
 # here, and a shadow that gets pointed at is a spotlight.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 24 w at .170). Register reached at
+#            .010 (23), .100 (21) and .170 (24).
+# spread:    3 w (.180 "There isn't one.") to 24 w = 8x.
+# humour:    18.6 - this is downtime, so it pays. Three beats, all of them costing something:
+#            .020 (a warden sat down on the dead drop), .050 (Dex correcting himself out
+#            loud), .110 (Dex answering Sela's question honestly, which is the frightened
+#            answer). None of them is authorial and none is a joke about the mission.
+# stumble:   .050 is a genuine self-correction and .080 is cut off mid-sentence. The act's
+#            script had zero false starts across 160 lines before this; Dex is the character
+#            18.4 gives fragments to, so the repairs live with him.
+# P2-c:      .130 / .140. TWO LINES. The question is operational, the answer is eight words,
+#            and the very next line is Reyes on a completely different subject. Dex's look is
+#            in the SHOT, not in a line, so nothing in the audio marks it. Nobody returns to
+#            it in this scene, and the repeat in S99 is one line with the same treatment.
+#            I have not defended it, softened it, or given anybody a reaction beat.
+# sela:      .100 is her first line at this table and it changes what the room can say - the
+#            question nobody who lives here would ask out loud. Second person plural, and it
+#            gets answered by the one man honest enough to lower the room's confidence.
+# reyes:     .150 / .170 / .200. No contractions anywhere: she is stressed from the moment
+#            she hears "one route in". .170 is her tic - the accusation arrives as anatomy.
+# mara:      .180 is the stub's beat 5. She does not have an answer and the line does not
+#            pretend she does; .190 is what she offers instead, and it is worse than nothing.
+#            AR-5: zero "you" in this scene. Zero "I".
+# brick:     .210, four words, and it answers Reyes's question with a dead man's name - his
+#            18.4 tic aimed at the only question in the room nobody wants. Nobody replies.
+# omitted:   Voss has no line after .140. He asked, he was answered, and he lets it go. That
+#            silence is the plant; a follow-up would be a spotlight. See report.
+
+lines:
+  - id:      M1.7.S01.010
+    speaker: MARA
+    voice:   mara
+    text:    "Two weeks ago the wardens took the long way round Block Nine. Since the train they take the short one, at the fourth horn."
+    shot:    "Map table, low lamp. Six people standing. The Foundry District chalked on oilcloth, and somebody has drawn the new patrol line over the old one without rubbing the old one out."
+
+  - id:      M1.7.S01.020
+    speaker: MARA
+    voice:   mara
+    text:    "The drop under the weighbridge moved twice this month. The second time it moved because a warden sat down on it."
+    note:    "18.6 - the joke is a fact, not a gag, and it belongs to the scene's fear. Weighbridge is canon (M1.1.S01, M1.2.S03)."
+
+  - id:      M1.7.S01.030
+    speaker: VOSS
+    voice:   voss
+    text:    "That isn't a patrol pattern. Somebody redrew it."
+
+  - id:      M1.7.S01.040
+    speaker: DEX
+    voice:   dex
+    text:    "Not the wardens. The draw."
+
+  - id:      M1.7.S01.050
+    speaker: DEX
+    voice:   dex
+    text:    "Forget the wardens for a second. No — don't forget the wardens, but look at this."
+    shot:    "He turns a scavenged meter panel round on the table so it faces the wrong way for everyone including himself."
+    note:    "Self-correction, out loud, uncleaned. 18.9 B articulacy: somebody in this game has to stumble, and 18.4 gives Dex the fragments."
+
+  - id:      M1.7.S01.060
+    speaker: DEX
+    voice:   dex
+    text:    "The coolant sublevel under the relay is pulling four times what a bank of condensers needs. Eight months of it."
+
+  - id:      M1.7.S01.070
+    speaker: DEX
+    voice:   dex
+    text:    "Nobody's chilling water down there. Nothing's down there. It's a slab and some pipe."
+
+  - id:      M1.7.S01.080
+    speaker: DEX
+    voice:   dex
+    text:    "Warmer going out than coming in, every hour, and it's been like that since--"
+
+  - id:         M1.7.S01.090
+    speaker:    VOSS
+    voice:      voss
+    interrupts: true
+    text:       "Then it isn't a coolant hall. It's a jacket."
+    note:       "18.8: he uses the trade word and nobody asks. He is a third-generation foundry technician and this is literally his subject. Paid in S02."
+
+  - id:      M1.7.S01.100
+    speaker: SELA
+    voice:   sela
+    text:    "Before anybody names a night — how many of you have been inside a Veil room and come back out of it?"
+    shot:    "She is at the end of the table and she has not touched the map. This is the first briefing she has ever stood at."
+    note:    "SELA'S FIRST LINE IN THIS ROOM. Second person plural, question, collective reframe (18.4). Her presence is what makes the question askable; nobody who has been here two years would say it."
+
+  - id:      M1.7.S01.110
+    speaker: DEX
+    voice:   dex
+    text:    "Near one. Once. Off a laundry roof."
+    note:    "18.6: the best jokes cost something. This one costs the room its confidence, and he is the only person who answers her."
+
+  - id:      M1.7.S01.120
+    speaker: MARA
+    voice:   mara
+    text:    "Then we go in knowing that."
+
+  - id:      M1.7.S01.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Who gave us the sublevel?"
+
+  - id:      M1.7.S01.140
+    speaker: MARA
+    voice:   mara
+    text:    "A friend of a friend on the lanes."
+    shot:    "Dex looks up from the panel. Nobody else does. She has already turned the map a quarter turn towards Reyes."
+    note:    "*** P2-c. TWIST 2 PLANT. *** Eight words. No defence, no emphasis, no reaction line - the look is in the shot and is never voiced. The next line is about something else entirely and nobody comes back to it. Repeated once in S99, same treatment."
+
+  - id:      M1.7.S01.150
+    speaker: REYES
+    voice:   reyes
+    text:    "How far is the nearest surface access from that hall?"
+
+  - id:      M1.7.S01.160
+    speaker: DEX
+    voice:   dex
+    text:    "Two hundred metres of gallery, then a ladder."
+
+  - id:      M1.7.S01.170
+    speaker: REYES
+    voice:   reyes
+    text:    "Then a man with a leg wound does not come out of there under his own power, and neither does the person carrying him."
+    note:    "18.4 Reyes: no contractions under stress, and the accusation arrives as anatomy instead of as an objection."
+
+  - id:      M1.7.S01.180
+    speaker: MARA
+    voice:   mara
+    text:    "There isn't one."
+
+  - id:      M1.7.S01.190
+    speaker: MARA
+    voice:   mara
+    text:    "We take four. Anybody who goes down in that hall stays in that hall until the watch turns over."
+    note:    "The stub's beat 5. She has no good answer and says so, then says the thing that is worse than no answer. Nobody argues with it because it is correct."
+
+  - id:      M1.7.S01.200
+    speaker: REYES
+    voice:   reyes
+    text:    "I will pack for the watch turning over, then."
+
+  - id:      M1.7.S01.210
+    speaker: BRICK
+    voice:   brick
+    text:    "Somebody stayed with Tam."
+    shot:    "He does not say who. Nobody asks, and Reyes goes back to the crate she is filling."
+    note:    "18.4 Brick: the hardest question in the room answered with a dead man's name. Tam is canon (M1.4.S03 signature line). Four words and no reply."
+
+  - id:      M1.7.S01.220
+    speaker: MARA
+    voice:   mara
+    text:    "We are in the hall before the second horn and out before the third."
+    shot:    "She puts a weight on the corner of the oilcloth. The lamp goes down. The new patrol line and the old one are still both on the map."

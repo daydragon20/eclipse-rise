@@ -15,7 +15,7 @@ turn:         "She gives the night's credit to Voss in front of everyone, and he
 # ---- state ----
 status:       draft
 critic:       null
-words:        279
+words:        273
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
@@ -40,13 +40,17 @@ words:        279
 #            personal/strategic axis).
 
 # ---- dialogue-writer notes (L2) ----
-# ESCALATION: this scene needs a run-quality flag that does not exist. The stub promises
-# "one extra Reyes line" on the zero-casualty optional and "Dex's third joke only in the
-# clean-run variant". I have written those against story.m11_zero_casualty (bool). Same
-# class of systems ask as Story.Choice.M11_ConscriptSpared. Named, not invented around.
+# ESCALATION, RULED. This scene needed a run-quality flag that did not exist, and it was
+# written against story.m11_zero_casualty (bool) pending a decision. RULING L1-R4 answers
+# it: that flag should not exist at all. "Did anybody go down tonight" is a RUN fact, not
+# campaign state, and persisting it for 42 missions would grow the save with transient
+# data. CORRECTED 2026-07-31: .090 / .100 / .130 read `run.zero_casualty`, which reads the
+# existing downed-soldier latch from the SPEC-P2-04 amendment and needs no new state, only
+# access. .190 read the boolean story.m11_conscript_spared, WITHDRAWN by L1-R3 - it now
+# reads the leaf `story.m11_conscript_choice == "bound"` that M1.1.S05 actually sets.
 #
 # aftermath: 18.6 says ZERO comic beats in aftermath. Dex's third joke therefore exists
-#            ONLY on story.m11_zero_casualty == true. If anybody is hurt, .130 does not
+#            ONLY on run.zero_casualty == true. If anybody is hurt, .130 does not
 #            play and the scene has no laugh in it at all. That is the point.
 # credit:    .170 is the first time 18.4's "never claims credit in front of the people who
 #            did the work" is visible. Mara refuses the refusal at .180 - she writes it
@@ -107,14 +111,14 @@ lines:
   - id:        M1.1.S99.090
     speaker:   REYES
     voice:     reyes
-    condition: story.m11_zero_casualty == false
+    condition: 'run.zero_casualty == false'
     text:      "One through the meat above the knee. He keeps the leg. He does not keep the week."
     note:      "Her first complete clinical sentence in the game. No contractions."
 
   - id:        M1.1.S99.100
     speaker:   REYES
     voice:     reyes
-    condition: story.m11_zero_casualty == true
+    condition: 'run.zero_casualty == true'
     text:      "I opened nothing tonight. Four units of plasma. Still four."
     note:      "Pays off S01.100 exactly. The optional objective is rewarded with an inventory line, not a compliment."
 
@@ -131,7 +135,7 @@ lines:
   - id:        M1.1.S99.130
     speaker:   DEX
     voice:     dex
-    condition: story.m11_zero_casualty == true
+    condition: 'run.zero_casualty == true'
     tags:      [amused]
     text:      "Four hundred rounds in that crate and the wire is the part I'll dream about."
     note:      "Dex joke 3 of 3. Clean run only - 18.6 allows zero comic beats in aftermath."
@@ -172,7 +176,7 @@ lines:
   - id:        M1.1.S99.190
     speaker:   REYES
     voice:     reyes
-    condition: story.m11_conscript_spared == true
+    condition: 'story.m11_conscript_choice == "bound"'
     text:      "Somebody used a pressure dressing tonight. It is not in the bag and it is not on anyone in this room."
     shot:      "Nobody answers her. She writes something down and does not ask twice."
     note:      "P5-a echo, spared branch. A fact about the inventory. No verdict, and she does not guess out loud."
@@ -209,7 +213,8 @@ lines:
   - id:      M1.1.S99.250
     speaker: MARA
     voice:   mara
-    text:    "Nobody down there has said our name yet. That's worth more than the wire."
+    text:    "Nobody down there has said our name yet."
+    note:    "'That's worth more than the wire.' is cut (2026-07-31). .230 already set it up; the second sentence had Mara adding the score up for the player."
 
   - id:      M1.1.S99.260
     speaker: MARA

@@ -15,7 +15,9 @@ turn:         "Voss reads the building the way he was trained to read a foundry,
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        157
+words_heard:  135
+words_generated: 235
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      VOSS, MARA, BRICK; DEX (present or on radio - player choice in S01)
@@ -40,4 +42,144 @@ words:        0
 # writer:    this is the scene where Voss's 2.4 background stops being a biography line and
 #            becomes a capability. Do not let anyone praise him for it.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      walk-and-talk (10-25). Ceiling respected (longest 15 w at .120). Register
+#            reached at .010 (14), .090 (14), .120 (15), .160 (14).
+# spread:    1 w (.170 "In.") to 15 w = 15x.
+#
+# THE IMAGE (21_quality_mandate 21.2). The graphic point is one frame and it is written into
+# the shots, not into anybody's mouth: amber rain still falling down the shaft BEHIND them,
+# frost ferns on the flanges AHEAD of them, and their own breath in between. Nobody in the
+# scene remarks on it. Kessara's only cold room, held in the same shot as Kessara's warm rain.
+#
+# choice:    .030 / .040, group `m17_dex`. This is the stub's small choice with real
+#            consequences and it is deliberately NOT an axis choice - no Voss variants are
+#            spent here (C-6 option b, and the beat sheet says S02 is neutral).
+#            story.m17_dex_along is READ in S03 (.020/.030, .200/.210) and in S06
+#            (.230/.240). Both readers are inside this mission; nothing dangles.
+#            The trade is honest either way: Dex at the terminal is faster and is a body in
+#            the hall when it goes wrong; Dex on the stair is slower and is the only person
+#            listening to the Veil's own band, which is how the player hears in S06 that
+#            nobody ever called for help.
+# voss:      .090 / .100 / .120 / .140 are the turn. He reads the hall the way a foundry
+#            technician reads a floor - which rank is doing work, what a wet flange means,
+#            why a seized bolt is not seized - and NOT ONE LINE EXPLAINS ANY OF IT (18.8).
+#            He also gives no reasons and no orders that sound like orders; he simply starts
+#            walking at .100 and the squad follows. NOBODY PRAISES HIM. Not here, not in S99.
+# mara:      .110. Two words, to Brick, in the THIRD PERSON, and she steps out of Voss's lane
+#            while she says it. That is AR-5b's ladder deliberately re-struck - tactical
+#            authority handed over without the second person and without a comment. She does
+#            not remark on it afterwards and neither does anybody else.
+# brick:     .080. Three words about the cold that are not about the cold, and the shot is
+#            the other half: he takes his gloves OFF. Unexplained on purpose.
+# em-dash:   one in seventeen lines (.130 interruption).
+# omitted:   a line where somebody says this place is beautiful, and a line where somebody
+#            asks Voss how he knew. See report.
+
+lines:
+  - id:      M1.7.S02.010
+    speaker: VOSS
+    voice:   voss
+    text:    "Hold at the mouth. Let it run a cycle before we're standing in it."
+    shot:    "*** THE ACT'S IMAGE. *** The stair opens into a hall the size of a chapel. Condenser banks in four ranks, breathing white. Frost in fern shapes up the flanges. Behind the squad, warm amber rain is still falling down the shaft they came out of. Ahead of them, their own breath."
+
+  - id:      M1.7.S02.020
+    speaker: DEX
+    voice:   dex
+    text:    "It never stops. That's not cover, that's both of us deaf."
+
+  - id:      M1.7.S02.030
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m17_dex
+      set:   'story.m17_dex_along = true'
+      label: "Take Dex to the terminal."
+    text:    "You're at the terminal with me. Brick carries your bag."
+    note:    "Read at S03.020/.200 and S06.230. Faster on the screen, and a body in the hall when it turns."
+
+  - id:      M1.7.S02.040
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m17_dex
+      set:   'story.m17_dex_along = false'
+      label: "Leave Dex on the stair."
+    text:    "Stay on the stair and keep the band. I'll read it out."
+    note:    "Read at S03.030/.210 and S06.240. Slower on the screen, and he is the only one listening to the Veil's own channel - which is where S06's no-reinforcement fact comes from in this branch."
+
+  - id:        M1.7.S02.050
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == true'
+    text:      "Cold, dark, and a hundred metres from a ladder. Wonderful."
+
+  - id:        M1.7.S02.060
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == false'
+    text:      "Stair it is. If the band goes quiet I'll say so twice."
+
+  - id:      M1.7.S02.070
+    speaker: MARA
+    voice:   mara
+    text:    "Wide on the ranks. Nobody walks the centre aisle."
+
+  - id:      M1.7.S02.080
+    speaker: BRICK
+    voice:   brick
+    text:    "Hands go first."
+    shot:    "He takes his gloves off and puts them inside his coat."
+    note:    "His first line in the mission. About the cold and not about the cold, and the shot carries the half he does not say."
+
+  - id:      M1.7.S02.090
+    speaker: VOSS
+    voice:   voss
+    text:    "Rank three's running warm. The flanges are wet and the other three are furred."
+    note:    "18.8. Trade language, correct, and nobody asks what it means. 02.4's biography becomes a capability in one line."
+
+  - id:      M1.7.S02.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Follow the wet flange."
+    shot:    "He is already walking. He did not wait to be told to."
+    note:    "THE TURN, and it is four words with no reason attached. The deletion test took the explanation off the end of .090 and the scene got better."
+
+  - id:      M1.7.S02.110
+    speaker: MARA
+    voice:   mara
+    text:    "Behind him."
+    shot:    "She says it to Brick, not to Voss, and steps out of the lane he is walking in."
+    note:    "AR-5b. Tactical authority in the third person, to the squad, two words - the same grammatical move as M1.1's 'His mark.' and eight missions short of the second person. She never remarks on it and nobody thanks her."
+
+  - id:      M1.7.S02.120
+    speaker: VOSS
+    voice:   voss
+    text:    "Service head at the end of the rank. It's a coupling flange, not a door."
+
+  - id:      M1.7.S02.130
+    speaker: DEX
+    voice:   dex
+    text:    "Bolts'll be seized. Eight months of condensate on a flange like--"
+
+  - id:         M1.7.S02.140
+    speaker:    VOSS
+    voice:      voss
+    interrupts: true
+    text:       "They're not seized. Somebody comes through here every week."
+
+  - id:      M1.7.S02.150
+    speaker: MARA
+    voice:   mara
+    text:    "Then somebody is in there now."
+
+  - id:      M1.7.S02.160
+    speaker: VOSS
+    voice:   voss
+    text:    "Brick, take the top two. I want it off in one piece, not two."
+
+  - id:      M1.7.S02.170
+    speaker: MARA
+    voice:   mara
+    text:    "In."
+    shot:    "The flange comes away whole. Behind it the air is dry and still and twenty degrees warmer, and there is a hum in it that is not water."

@@ -50,10 +50,10 @@ words:        239
 # 1) FLAG SHAPE. The stub asks for ONE boolean, Story.Choice.M11_ConscriptSpared, but the
 #    scene has THREE outcomes and the T5 tally needs to tell "bound and left alive" apart
 #    from "left to bleed". A boolean cannot carry that. I have written conditions against
-#    story.m11_conscript_choice with values "finished" / "left" / "bound", and systems
-#    should ALSO set Story.Choice.M11_ConscriptSpared true on "bound". If the architect
-#    prefers one boolean, the "left" branch reactions collapse into "finished" and that
-#    is a story loss, not a formatting one.
+#    story.m11_conscript_choice with values "finished" / "left" / "bound".
+#    *** RULED, L1-R3: escalation upheld. Three mutually exclusive leaves under one parent,
+#    no schema change. Story.Choice.M11_ConscriptSpared is WITHDRAWN and systems must NOT
+#    set it - a derived boolean would be a second home for the same truth. ***
 # 2) NO PLAYER-CHOICE CONSTRUCT. phase0/SCRIPT_FORMAT.md has no way to say "these three
 #    lines are the player's options". .140 / .150 / .160 are marked by note only. Forty-two
 #    missions of choices need a real field. Escalated.
@@ -164,7 +164,7 @@ lines:
     speaker: VOSS
     voice:   voss
     text:    "Dressing. Above the hip."
-    note:    "PLAYER OPTION 3 of 3 - bind and leave. Sets story.m11_conscript_choice = bound AND Story.Choice.M11_ConscriptSpared = true. P5-a, first entry in the twist-5 tally."
+    note:    "PLAYER OPTION 3 of 3 - bind and leave. Sets story.m11_conscript_choice = bound, leaf Story.Choice.M11_Conscript.Bound. CORRECTED 2026-07-31: this note used to ask systems to ALSO set Story.Choice.M11_ConscriptSpared. That tag is WITHDRAWN by ruling L1-R3 and no derived boolean replaces it - two homes for one truth is a divergence bug. Readers use the leaf; M1.1.S99.190 is the only one in this mission. P5-a, first entry in the twist-5 tally."
     variants:
       pragmatist: "Dress it. Their relief spends an hour on him instead of us."
       idealist:   "He came up here pushing a crate."

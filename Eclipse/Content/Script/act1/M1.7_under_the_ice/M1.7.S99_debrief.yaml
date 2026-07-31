@@ -15,7 +15,9 @@ turn:         "She overrules all of them, and the terrible thing is that she is 
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        405
+words_heard:  295
+words_generated: 541
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      MARA, VOSS, DEX, REYES, SELA, BRICK
@@ -49,4 +51,242 @@ words:        0
 #            as punishment instead of as loss.
 #            Full Voss variant coverage on both axes.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 27 w at .080). Register reached at
+#            .080 (27), .120 (20), .240 (21).
+# spread:    1 w (.170 "Thirty-one." / .190 "Voss.") to 27 w = 27x.
+#
+# *** FIVE PEOPLE ARE RIGHT AND THE AUDIT IS THE POINT OF THE SCENE. ***
+# Each objection is a FACT the speaker owns professionally, and not one of them is answered:
+#   DEX    .030-.060  one shaft, and the stair is inside it. He is the only person in the
+#                     room who has looked at the building. He offers to get them IN and says
+#                     plainly he has nothing for getting them out. Nobody contradicts him.
+#   REYES  .070-.100  four beds, one of which is furniture. She does not say "too dangerous";
+#                     she describes the floor of the vault by lamplight, and then asks a
+#                     question about ladders that hands Sela the argument. No contractions
+#                     anywhere - she is stressed from her first word (18.4).
+#   SELA   .110-.130  the forty-one from M1.6.S06 are the cost of Ember dying, not a
+#                     sentiment. Second person plural, rhetorical structure, and she speaks
+#                     about herself zero times. She is cut off before she finishes.
+#   BRICK  .170       ONE WORD, and it is the strongest argument in the room because it is
+#                     the only one about people rather than logistics. It also pays S05: he
+#                     read that list and named nobody, and the number is what he kept.
+#   MARA   .140 / .240-.260  three days, and the first time this cell has ever known where a
+#                     person actually is. Both true. Her closing argument does not overstate
+#                     what Ember has done - it UNDERSTATES it, which is what makes it land.
+# Nobody is written as an obstacle. If any one of these were weak, her decision becomes a
+# mistake and her death becomes punishment.
+#
+# .180 IS THE HINGE OF THE ENSEMBLE. Reyes - who argued against thirty seconds earlier -
+# answers Brick's number with two words that concede it. Everyone in the room knows both
+# things are true at once, and that is why the player wants to go.
+#
+# humour:    ZERO comic beats (18.6). Dex is grim here and that is the whole return on his
+#            three jokes in S01, his two in S02 and his flat one in S03. The act earns this
+#            scene by having been funny four scenes ago.
+# voss:      FULL FOUR-AXIS COVERAGE on both options - the beat sheet names this scene and
+#            S05.120 as the only two that get it. This is the first time the player can take
+#            a strategic position AGAINST Mara, and both branches are arguable:
+#            the FOR variants are not enthusiasm and the AGAINST variants are not cowardice.
+#            AGAINST/personal says his aunt is on the page and still refuses - that is the
+#            hardest line in the mission and the branch is worthless without it.
+#            AGAINST/strategic deliberately does NOT name the thin-response anomaly. Voss
+#            noticing it is canon (M1.2.S03.180) but putting it in a K-77 argument would turn
+#            act 1 into a mystery and hand the player twist 4 four acts early. He asks for a
+#            week of watching instead, which costs the raid the only thing it cannot spend.
+# flags:     story.m17_voss_position is set at .200/.210 and READ at .220/.230 in this file,
+#            so it can never be a dangling `set` (SCRIPT_FORMAT section 6). It is ALSO the
+#            tone input M1.8 needs - beat sheet section 4 beat 6: Mara goes either way, and
+#            the difference is whether Voss goes because she goes or because he wants to.
+#            *** FLAGGED FOR THE ARCHITECT AND THE M1.8 WRITER: this flag needs a "gelezen
+#            door" row in ACT1_OVERVIEW section 6 pointing at M1.8, or L1-R12 happens again
+#            in the other direction. Reported. ***
+# P2-c:      .150 / .160. The repeat the plant table asks for. Sela asks because she has been
+#            in this room twice and does not know yet that nobody asks; the answer is the
+#            same eight words; the next line is Brick on a different subject. Not defended,
+#            not emphasised, no reaction beat, nobody returns to it.
+# mara:      AR-5 - zero "you", zero "I" in twenty-seven lines. She spends his NAME at .190
+#            to give him the floor, which is the same formality M1.5.S99 used and eight
+#            missions short of the second person (AR-5b).
+# names:     one vocative in the scene (.190).
+# em-dash:   one in twenty-seven lines (.130 interruption), and it is Mara cutting off the
+#            argument she has no answer to. That is the haste from M1.3.S99, full grown.
+# omitted:   a vote, a speech, a line where anybody says the word "trap", and any reaction to
+#            Petra's name from anybody other than Voss. See report.
+
+lines:
+  - id:      M1.7.S99.010
+    speaker: MARA
+    voice:   mara
+    text:    "That is eight months of us, in their handwriting, with the hours written next to it."
+    shot:    "The printout and the paper manifest weighted flat over the map. Everyone standing. Nobody has taken a coat off."
+
+  - id:      M1.7.S99.020
+    speaker: VOSS
+    voice:   voss
+    text:    "It starts at the mast. Everything after the mast is on the page with a time beside it."
+
+  - id:      M1.7.S99.030
+    speaker: DEX
+    voice:   dex
+    text:    "K-77 is a service lift and a stair, and the stair runs inside the lift shaft."
+
+  - id:      M1.7.S99.040
+    speaker: DEX
+    voice:   dex
+    text:    "One shaft. Way down and way up, and they are the same hole."
+
+  - id:      M1.7.S99.050
+    speaker: DEX
+    voice:   dex
+    text:    "It's a box with one door."
+    note:    "The scene's title, and it is the flattest possible statement of the only structural fact anybody in this room actually knows."
+
+  - id:      M1.7.S99.060
+    speaker: DEX
+    voice:   dex
+    text:    "I can put us through the door. I've got nothing for the other side of it."
+    shot:    "He has drawn the shaft on the back of a ration slip. He does not look up from it for the rest of the scene."
+    note:    "18.4 Dex: he does not argue, he specifies. His arc turns here - he is right about the machine and it changes nothing."
+
+  - id:      M1.7.S99.070
+    speaker: REYES
+    voice:   reyes
+    text:    "We have four beds and one of them is a door laid across two crates."
+
+  - id:      M1.7.S99.080
+    speaker: REYES
+    voice:   reyes
+    text:    "If thirty of us go into a building with one exit, I will be treating the ones who come out on the floor of the vault by lamplight."
+    note:    "No contractions. She does not say the raid is dangerous; she describes the room it ends in."
+
+  - id:      M1.7.S99.090
+    speaker: REYES
+    voice:   reyes
+    text:    "I will lose people I could have kept."
+
+  - id:      M1.7.S99.100
+    speaker: REYES
+    voice:   reyes
+    text:    "How many of the forty-one have ever carried a wounded person up a ladder?"
+    note:    "18.4 Reyes: asks a question instead of accusing - and the question hands the floor to Sela, who owns the answer."
+
+  - id:      M1.7.S99.110
+    speaker: SELA
+    voice:   sela
+    text:    "None of them."
+
+  - id:      M1.7.S99.120
+    speaker: SELA
+    voice:   sela
+    text:    "You brought forty-one people out of a car nine days ago and told them this was somewhere they could stand."
+    note:    "Second person plural, rhetorical structure, and zero lines about herself (18.4). Pays M1.6.S03 and M1.6.S06 directly."
+
+  - id:      M1.7.S99.130
+    speaker: SELA
+    voice:   sela
+    text:    "If the ones who opened that car don't come back, ask what the next car hea--"
+
+  - id:         M1.7.S99.140
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "Three days. On the fourth that list is on a transport and none of it is ours to reach."
+    note:       "She cuts off the only argument she cannot answer. The haste planted in M1.3.S99, full grown, and it is not written as rudeness - it is written as a clock."
+
+  - id:      M1.7.S99.150
+    speaker: SELA
+    voice:   sela
+    text:    "Who told you the hall was worth going into?"
+
+  - id:      M1.7.S99.160
+    speaker: MARA
+    voice:   mara
+    text:    "A friend of a friend on the lanes."
+    note:    "*** P2-c, SECOND AND LAST TIME. *** Same eight words as S01.140. Nobody follows up, the next line is about something else, and no shot marks it. Twist 2 pays in act 2."
+
+  - id:      M1.7.S99.170
+    speaker: BRICK
+    voice:   brick
+    text:    "Thirty-one."
+    shot:    "He has had the paper copy since the coolant hall. He has not put it down and he has not read a name off it out loud, here or anywhere."
+    note:    "*** HIS ONE SENTENCE, AND HE IS THE ONLY ONE IN FAVOUR. *** One word. It is the strongest argument in the room because it is the only one about people, and it pays S05.150: the number is what he kept from a list he would not read aloud."
+
+  - id:      M1.7.S99.180
+    speaker: REYES
+    voice:   reyes
+    text:    "I know."
+    shot:    "Nobody says anything after that for long enough that Dex stops drawing."
+    note:    "*** THE HINGE. *** The person who argued hardest against concedes the number without withdrawing a word of her own case. Both things are true and everybody in the room knows it."
+
+  - id:      M1.7.S99.190
+    speaker: MARA
+    voice:   mara
+    text:    "Voss."
+    note:    "She spends his name to give him the floor. AR-5b: formality instead of the second person, eight missions short of M1.8.S08."
+
+  - id:      M1.7.S99.200
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m17_position
+      set:   'story.m17_voss_position = "for"'
+      label: "Back the raid."
+    text:    "Then we go before the transport does."
+    note:    "Read at .220 in this file and by M1.8 for tone. In this branch he goes to K-77 because he wants to, and the aftermath is his."
+    variants:
+      pragmatist: "We'll never have a better list than this one. We go."
+      idealist:   "There are thirty-one people in it that nobody else is coming for. We go."
+      personal:   "I'm going. The rest of it is somebody else's argument."
+      strategic:  "Three days is a date. A date is the only thing this cell has ever been able to use."
+
+  - id:      M1.7.S99.210
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m17_position
+      set:   'story.m17_voss_position = "against"'
+      label: "Argue against the raid."
+    text:    "Not that building. Not with what we have."
+    note:    "Read at .230 in this file and by M1.8 for tone. In this branch he goes to K-77 because Mara goes, and the aftermath is hers."
+    variants:
+      pragmatist: "One door and four beds. That arithmetic doesn't change because we want it to."
+      idealist:   "We took forty-one people in and promised them a floor. That first."
+      personal:   "My aunt is on that page and I am still saying no to that building."
+      strategic:  "Not until somebody has stood outside that door for a week and counted what goes in."
+
+  - id:        M1.7.S99.220
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m17_voss_position == "for"'
+    text:      "Then we can spend tonight on the how instead of the whether."
+
+  - id:        M1.7.S99.230
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m17_voss_position == "against"'
+    text:      "He is right about that building. We are going into it."
+    note:      "SHE AGREES WITH HIM AND OVERRULES HIM IN THE SAME BREATH. That sentence is the difference between tragedy and plot."
+
+  - id:      M1.7.S99.240
+    speaker: MARA
+    voice:   mara
+    text:    "We have opened a car because it was in front of us, and we have taken a mast because it was tall."
+    note:    "She understates her own victories. Nobody in the room corrects her, because on the evidence she is not wrong."
+
+  - id:      M1.7.S99.250
+    speaker: MARA
+    voice:   mara
+    text:    "This is the first time we have known where a person is."
+
+  - id:      M1.7.S99.260
+    speaker: MARA
+    voice:   mara
+    text:    "Three days."
+    note:    "Second time she says it (.140). It is a clock, not a phrase, and the repetition is the pressure."
+
+  - id:      M1.7.S99.270
+    speaker: MARA
+    voice:   mara
+    text:    "Put it on the map."
+    shot:    "K-77 goes on the oilcloth high up, in the clean part of the board where nothing has ever been written. The Spire Levels. The lamp comes down over it and nobody moves it away again."

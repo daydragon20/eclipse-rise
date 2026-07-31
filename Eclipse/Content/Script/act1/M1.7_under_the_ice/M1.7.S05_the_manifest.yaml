@@ -15,7 +15,9 @@ turn:         "Voss stops being a technician reading a system and becomes a man 
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        137
+words_heard:  110
+words_generated: 222
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      VOSS, MARA, BRICK
@@ -33,4 +35,145 @@ words:        0
 #            act climax. It needs no music cue in the writing - one name on a list.
 #            Full Voss variant coverage.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      in-mission-radio (10-25). Ceiling respected (longest 13 w at .080). Register
+#            reached at .020 (11), .080 (13), .090 (11).
+# spread:    1 w (.100 "Voss.") to 13 w = 13x.
+#
+# THE TWO-STEP ON THE NAME, and it is the whole scene:
+#   .100  he reads the SURNAME - his own - and stops. The player hears the protagonist say
+#         the one word everybody in the game calls him by, off a Veil transfer list.
+#   .110  Mara asks him to say it again. Three words, and it is the only thing she says
+#         between the manifest and the reversal.
+#   .120  he says the FIRST name. That is the person arriving where the file was.
+# Nothing marks any of it. No music note is written, no adjective is spent, and nobody in
+# the room says what it means (18.9 A).
+#
+# *** BRICK'S SILENCE - THE BEAT IS THE ABSENCE, SO HERE IS HOW IT IS BUILT. ***
+# He is written into two shots (.080 and .150) reading the screen the whole time, and he is
+# given exactly one line - .150 - which is a THING and not a name. That inversion is the
+# beat: the man whose entire tic is handing you a dead person's name looks at a list of
+# thirty-one of them and hands over a piece of paper instead.
+# He is not lying and he is not ignorant (18.4: he never lies). He knows nobody on that
+# screen - he has been on Kessara six weeks - and that is precisely why it is not his list
+# to read out loud. Restraint, not absence of material. It only works because the player has
+# heard "Tam. Oyelaran. Vic." (M1.4.S03), "Cell two." (M1.5.S03) and "Somebody stayed with
+# Tam." (M1.7.S01.210) first, which is why S01 gives him one.
+#
+# mara:      she opens the scene wanting the log and nothing else (.010, .030, .090) and she
+#            is RIGHT every time she says it. Then .130: three words, and she reverses
+#            completely without a syllable of transition. That is her seeing his face. The
+#            stub's beat 6 is a shot, not a speech, and .140 is her going further than he
+#            asked for - which is the haste that carries her into K-77.
+#            AR-5: zero "you", zero "I".
+# voss:      FULL FOUR-AXIS COVERAGE at .120, per the beat sheet. This is one of only two
+#            scenes in the mission that gets it (the other is S99) - Q-7 discipline: the
+#            other five scenes carry none.
+#            The base line is the stub's preferred read ("says her name"), and none of the
+#            four variants repeats it. Pragmatist takes the useful fact off the screen;
+#            idealist is angry at the column, not the cell; personal claims the relation out
+#            loud, which is the only place in act 1 anybody does; strategic has already
+#            started planning and the player should notice that about himself.
+# em-dash:   one in sixteen lines (.020 interruption).
+# canon:     Petra Voss, aunt, 02.4 / L1-R10. The shared surname is doing the work at .100
+#            and nobody explains it. K-77 is glossary canon.
+# omitted:   a line where anybody says the word "rescue", a line where Mara asks whether he
+#            is all right, and any reference to the prologue. See report.
+
+lines:
+  - id:      M1.7.S05.010
+    speaker: MARA
+    voice:   mara
+    text:    "We have what we came for. Bag it and go."
+
+  - id:      M1.7.S05.020
+    speaker: VOSS
+    voice:   voss
+    text:    "There's a second file open under the log. Transfer manifest, sequen--"
+
+  - id:         M1.7.S05.030
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "That's not ours to carry."
+
+  - id:      M1.7.S05.040
+    speaker: VOSS
+    voice:   voss
+    text:    "It's people. Numbers first, then names, then a date."
+
+  - id:      M1.7.S05.050
+    speaker: VOSS
+    voice:   voss
+    text:    "Intake, Blacksite K-77. Thirty-one of them."
+
+  - id:      M1.7.S05.060
+    speaker: MARA
+    voice:   mara
+    text:    "Detained where?"
+
+  - id:      M1.7.S05.070
+    speaker: VOSS
+    voice:   voss
+    text:    "Everywhere. Second column's the pickup date. Ninth. Ninth. Ninth."
+    note:    "Repetition off a screen, not rhetoric - so it is not the scene's triad (18.9 B). The ninth is the Tithe date and nobody glosses it (18.8)."
+
+  - id:      M1.7.S05.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Some of these are two years old. They've been holding people two years."
+    shot:    "Brick has come round behind the chair. He is reading down the screen with his lips moving and he does not say one of them out loud."
+    note:    "*** BRICK'S BEAT, PART ONE. *** Written as staging, because the beat is a man not speaking."
+
+  - id:      M1.7.S05.090
+    speaker: MARA
+    voice:   mara
+    text:    "That's a reason to go, not a reason to stand here."
+    note:    "She is right, and she stays right until .130."
+
+  - id:      M1.7.S05.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Voss."
+    shot:    "He has stopped scrolling. The entry is four lines from the bottom of the page and the surname on it is his own."
+
+  - id:      M1.7.S05.110
+    speaker: MARA
+    voice:   mara
+    text:    "Say that again."
+
+  - id:      M1.7.S05.120
+    speaker: VOSS
+    voice:   voss
+    text:    "Petra."
+    shot:    "Brick reads it over his shoulder and says nothing at all."
+    note:    "*** THE PAYOFF OF THE PROLOGUE AND THE SETUP FOR THE ACT CLIMAX, AND IT IS ONE WORD. *** Sets Story.Char.PetraLocated and Story.Intel.K77Manifest. FULL AXIS COVERAGE - the beat sheet names this line and S99 as the only two that get it."
+    variants:
+      pragmatist: "Live intake number. Somebody had her alive nine days ago."
+      idealist:   "They gave my aunt a number and put it in a column."
+      personal:   "That's my aunt."
+      strategic:  "Thirty-one people and a date they move on. That's a window."
+
+  - id:      M1.7.S05.130
+    speaker: MARA
+    voice:   mara
+    text:    "Take the manifest."
+    note:    "Beat 6. She wanted the log and nothing else eleven lines ago and she reverses in three words with no transition. The scene does not comment on it."
+
+  - id:      M1.7.S05.140
+    speaker: MARA
+    voice:   mara
+    text:    "All of it. Take the desk apart."
+
+  - id:      M1.7.S05.150
+    speaker: BRICK
+    voice:   brick
+    text:    "Paper copy. Under the tray."
+    shot:    "He has read the whole screen twice and there is not one name in anything he says."
+    note:    "*** BRICK'S BEAT, PART TWO. *** His one line is an OBJECT. 18.4 gives him a noun where Petra would give a verb, and here the noun is deliberately not a person. This list is not his to read out."
+
+  - id:      M1.7.S05.160
+    speaker: MARA
+    voice:   mara
+    text:    "Then we go up with it."
+    shot:    "Voss has not moved. She puts the paper copy into his hands instead of into the bag, and goes to the stair without waiting to see whether he follows."

@@ -15,7 +15,9 @@ turn:         "Ember's own operations are in the log by date — and so is a que
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        225
+words_heard:  199
+words_generated: 309
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      VOSS, MARA, DEX (present or radio)
@@ -66,4 +68,210 @@ words:        0
 #            findings 2 and 3 are texture that the player will remember and the characters
 #            will not.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      in-mission-radio (10-25). Ceiling respected (longest 15 w at .210). Register
+#            reached at .030 (12), .130 (12), .160 (12), .210 (15).
+# spread:    2 w (.240 "That's room.") to 15 w = 7.5x.
+# flag-in:   story.m17_dex_along (set S02.030/.040) is read at .020/.030 and .250.
+#
+# *** P4-c, .160-.240. THE MOST IMPORTANT DOCUMENT IN ACT 1, AND IT IS FLAT. ***
+# L1-R17 read and applied. Here is exactly how it is kept off a poster, so the critic can
+# check it mechanically instead of by taste:
+#   1. NO APHORISM ANYWHERE IN THE BEAT. Not one line is a general truth about the Dominion,
+#      the Veil, or war. Every line is about THIS form: a stamp, a signature, a line item.
+#      Read .160-.240 aloud out of context and none of it means anything.
+#   2. THE FINDING ARRIVES AS SOMEBODY BEING WRONG. Dex assumes at .170 that the package is
+#      coming - of course it is - and .180 corrects him. A beat that begins with an expert's
+#      wrong guess cannot be screenshotted as wisdom, and it is the false start 18.9 B says
+#      this script has none of.
+#   3. NO CLOSING BEAT AND NO RHYTHM. .210 ends on "a line item", which is the dullest
+#      available noun. .230 restates the document in eight words and adds nothing.
+#      No triad, no symmetry, no antithesis, no sentence that turns at the end.
+#   4. THE JOKE IS NOT THE EXPLANATION. .220 is Dex's stub-mandated budget joke and it is
+#      deliberately limp - a small deflated realisation, not a witticism. The explanation
+#      (.230) is Mara's and it is boring on purpose.
+#   5. NOBODY LOOKS TWICE. .240 is two words, nobody agrees with it, nobody follows up, and
+#      the next line is about a completely different document.
+# Poster test applied to every line in the beat. .210 and .230 were both rewritten once for
+# failing it: "Somebody in accounts said no" and "he's working with what he's got, same as
+# everybody" were the earlier versions and both had a snap to them.
+#
+# *** AR-9 DEVIATION, DELIBERATE, AND IT MAKES THE PLANT STRONGER - see report. ***
+# The stub says DEX reads the refusal aloud. In the branch where the player left him on the
+# stair (S02.040) Dex cannot read a screen at all, so a Dex-reads-it version of this beat
+# would need a conditioned twin - eight lines, and one of the two would be the load-bearing
+# plant of the whole game living behind a player choice. Instead VOSS reads the form fields
+# in BOTH branches and Dex supplies the one thing Voss cannot know: what an allocation stamp
+# means on a Veil requisition. Zero conditioned lines, identical in every playthrough, and
+# it is the same division of expertise the two of them have had since M1.2.S03. AR-9's
+# requirement - mandatory, spoken, never document-only - is met harder, not softer.
+#
+# finding 1: .040-.110, and it is the only beat in the scene with any emotional content.
+#            The player reads his own campaign back to himself with timestamps on it. The
+#            reaction is a SHOT (.100), not a line - nobody says what it feels like, and
+#            Mara's answer to it is a filing instruction. That is 18.9 A observed at the one
+#            place in the mission where it would have been easiest to break.
+#            The count at .100 is the scene's single Kessaran counting beat (rulings ronde 1,
+#            limit of one per scene). Fourteen and five - not eleven (L1-R14).
+# finding 2: .120-.150. TWO LINES OF DEX AND NO THEORY. Nobody speculates about whose query
+#            it is, nobody says "second hunter", nobody frowns. Mara's five-word answer is
+#            the whole reaction the scene permits. Whisper does not exist yet; a shadow that
+#            gets pointed at is a spotlight.
+# finding 4: .250, one line, conditioned. He does not understand it and he does not stop.
+#            SYSTEMS: run.m17_record is set by the optional record objective, not by script.
+#            If that objective is cut, delete this line - nothing else reads the fact.
+# names:     nobody is addressed by name in twenty-six lines.
+# mara:      zero "you", zero "I" (AR-5).
+# omitted:   Voss has no reaction line to finding 1 beyond the count, and there is no line
+#            anywhere connecting the three findings to each other. See report.
+
+lines:
+  - id:      M1.7.S03.010
+    speaker: VOSS
+    voice:   voss
+    text:    "It's a log. Eight months of it, and it's sorted by sector."
+    shot:    "Four screens on a plywood desk in what used to be a valve gallery. Somebody's tea has gone cold beside the keyboard. Two coats on a hook."
+
+  - id:        M1.7.S03.020
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == true'
+    text:      "Off. My chair."
+
+  - id:        M1.7.S03.030
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m17_dex_along == false'
+    text:      "Top right. There's always a sector index and it's always top right."
+
+  - id:      M1.7.S03.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Relay mast. Nineteenth of last month, twenty-one forty."
+
+  - id:      M1.7.S03.050
+    speaker: VOSS
+    voice:   voss
+    text:    "Foundry Row armoury. The pump gallery. The tithe line. The yard."
+    note:    "Four items, not three - 18.9 B's triad check. All four are canon act-1 locations."
+
+  - id:      M1.7.S03.060
+    speaker: DEX
+    voice:   dex
+    text:    "That's not an alert log. That's a case file."
+    note:    "18.4 Dex: the technical noun does the work and no feeling is stated anywhere near it."
+
+  - id:      M1.7.S03.070
+    speaker: VOSS
+    voice:   voss
+    text:    "The overpass isn't in it. Block Twelve isn't in it."
+
+  - id:      M1.7.S03.080
+    speaker: VOSS
+    voice:   voss
+    text:    "It starts at the mast."
+
+  - id:      M1.7.S03.090
+    speaker: MARA
+    voice:   mara
+    text:    "Then they saw the mast and not the two before it."
+
+  - id:      M1.7.S03.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Fourteen entries. Five of them are us."
+    shot:    "Nobody answers him. The cursor goes on down the list by itself."
+    note:    "*** ACT 1'S ENGINE ON A SCREEN. *** Every victory made them more visible, in the player's own chronology, with timestamps. The reaction is the shot. Nobody says one word about how it feels (18.9 A)."
+
+  - id:      M1.7.S03.110
+    speaker: MARA
+    voice:   mara
+    text:    "Copy the sub-file. All of it, not the summary."
+
+  - id:      M1.7.S03.120
+    speaker: VOSS
+    voice:   voss
+    text:    "There's a query chain sitting under ours."
+
+  - id:      M1.7.S03.130
+    speaker: DEX
+    voice:   dex
+    text:    "That's not theirs. Different authorisation, and it's older than everything above it."
+    note:    "P2-b, line 1 of 2. He says what it is NOT."
+
+  - id:      M1.7.S03.140
+    speaker: DEX
+    voice:   dex
+    text:    "Nothing was ever filed after it."
+    note:    "P2-b, line 2 of 2. Sets Story.Clue.OutsideQuery. NO THEORY FOLLOWS. Nobody guesses, nobody frowns, nobody says the word hunter."
+
+  - id:      M1.7.S03.150
+    speaker: MARA
+    voice:   mara
+    text:    "Take it with the rest."
+
+  - id:      M1.7.S03.160
+    speaker: VOSS
+    voice:   voss
+    text:    "Requisition, same sector. Interdiction package. Four standing teams and a permanent--"
+    note:    "P4-c OPENS. Bureaucratic listing, not rhetoric - no 'and the whole hammer', no triad, no flourish. He does not get to finish it."
+
+  - id:         M1.7.S03.170
+    speaker:    DEX
+    voice:      dex
+    interrupts: true
+    text:       "Right. So that's what's coming. When does it start?"
+    note:       "The expert assumes, fast, over the top of the man still reading. He is about to be wrong, and that is what stops this beat from ever being quotable."
+
+  - id:      M1.7.S03.180
+    speaker: VOSS
+    voice:   voss
+    text:    "It doesn't. There's a stamp across it."
+
+  - id:      M1.7.S03.190
+    speaker: DEX
+    voice:   dex
+    text:    "Across it how? Read me the stamp."
+
+  - id:      M1.7.S03.200
+    speaker: VOSS
+    voice:   voss
+    text:    "Allocation. Not a command signature."
+
+  - id:      M1.7.S03.210
+    speaker: DEX
+    voice:   dex
+    text:    "Then it wasn't his chain that said no to him. It was a line item."
+    note:    "*** THE LINE TWIST 4 RESTS ON. *** Ends on the dullest available noun. No rhythm, no turn, nothing that survives being taken out of this room. Sets Story.Clue.AegisDenial."
+
+  - id:      M1.7.S03.220
+    speaker: DEX
+    voice:   dex
+    text:    "They get told no. I didn't know they got told no."
+    note:    "The stub's budget joke, kept limp on purpose (L1-R17). It is a deflated realisation, not a witticism, and 18.4 Dex deflects the beat rather than sitting in it."
+
+  - id:      M1.7.S03.230
+    speaker: MARA
+    voice:   mara
+    text:    "Then he asked for more and didn't get it."
+    note:    "The act-1 explanation, and it is eight boring words that restate the document. She adds nothing. Act 4 takes it apart."
+
+  - id:      M1.7.S03.240
+    speaker: MARA
+    voice:   mara
+    text:    "That's room."
+    shot:    "She is already looking at the next screen. Nobody agrees with her and nobody argues."
+    note:    "She sees room in it. Two words, no follow-up, and the next line is about an unrelated document. Nobody in this room looks at any of it twice."
+
+  - id:        M1.7.S03.250
+    speaker:   DEX
+    voice:     dex
+    condition: 'run.m17_record == true'
+    text:      "Personnel record, Arbiter's household. Name's lacquered out and so's the post. Taking it anyway."
+    note:      "P2-d, fully optional. ONE line, no second beat, no reaction from anybody. SYSTEMS: run.m17_record is set by the optional-record objective; if that objective is cut, delete this line."
+
+  - id:      M1.7.S03.260
+    speaker: MARA
+    voice:   mara
+    text:    "We have the log. Everybody off that desk."
+    shot:    "Nobody moves off the desk. On the fourth screen a channel indicator has been lit the whole scene."

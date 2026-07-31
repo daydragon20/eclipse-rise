@@ -34,15 +34,22 @@ words:        256
 #
 # plants:    P1-b - Sela's rhetoric names the Blight as the wound all of this came out of.
 #            ONE reference, no explanation (18.8). Twist 1 pays in act 3.
-# *** CHANGE BRICK'S NUMBER - RULING L1-R14. His line reads "Krad-9. Eleven days." ***
+# *** DONE - RULING L1-R14. Brick's line was "Krad-9. Eleven days."; it is now SEVENTEEN. ***
 # Three scenes earlier, in M1.5.S03, "eleven days" means HOW LONG A MAN HELD OUT UNDER
-# QUESTIONING before he broke. The player learns that meaning first, so Brick's line lands
+# QUESTIONING before he broke. The player learns that meaning first, so Brick's line landed
 # as interrogation instead of transit - which inverts AR-11's payoff at the exact moment it
 # pays. Neither writer could see this; it only exists between two missions.
 #
-# AR-11 needs the BEAT ("he was in a car like this one"), not the number. Any duration that
-# feels too long in a box does the same work at zero cost. Nine, six, sixteen - the writer
-# picks. The ensemble around it does not change.
+# AR-11 needs the BEAT ("he was in a car like this one"), not the number, so the ruling left
+# the replacement to the writer. The ruling's own suggestions were "nine, six, sixteen" -
+# and TWO OF THOSE THREE ARE THE SAME MISTAKE AGAIN. Counted across every spoken line in
+# act 1 (Tools/count_generation_cost.py's sibling sweep): nine is spoken 30x in 6 missions,
+# six 29x in 6. Both are as saturated as eleven was; picking one would have moved the
+# collision instead of removing it.
+#
+# SEVENTEEN is spoken nowhere in act 1 - it and sixteen and eighteen were the only free
+# numbers under twenty. Seventeen days in a box is long enough to do AR-11's work, and it
+# measures nothing else in this act.
 #
 # M1.5 is GO and is not being reopened over a number; this is the cheaper repair and it
 # produces the same result.
@@ -222,7 +229,7 @@ lines:
   - id:      M1.6.S03.220
     speaker: BRICK
     voice:   brick
-    text:    "Krad-9. Eleven days."
+    text:    "Krad-9. Seventeen days."
     shot:    "He holds the hatch open with one hand and does not come down. Two men stay sitting at the back of the car. Nobody argues with them and nobody looks at them twice."
     note:    "AR-11 lands. Three words, no explanation, no reaction line. The player now knows why he spoke first in S01."
 

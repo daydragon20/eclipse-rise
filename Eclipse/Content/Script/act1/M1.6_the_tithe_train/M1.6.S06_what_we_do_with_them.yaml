@@ -15,7 +15,7 @@ turn:         "She admits out loud that they cannot vet anybody, decides to take
 # ---- state ----
 status:       draft
 critic:       null
-words:        428
+words:        456
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      MARA, VOSS, SELA, REYES, DEX, BRICK, dozens of newcomers (unnamed)
@@ -86,8 +86,8 @@ words:        428
 #            act 3, the scene failed; he must think "I would have done the same".
 
 # ---- dialogue-writer notes (L2) ----
-# band:      `hub`. Ceiling 35, respected (longest 24 w at .250). Register reached everywhere.
-#            Spread 1 w (.150 "No.") to 24 w = 24x.
+# band:      `hub`. Ceiling 35, respected (longest 28 w at .270). Register reached everywhere.
+#            Spread 1 w (.150 "No.") to 28 w = 28x.
 # THE TRAP:  checked line by line, and here is the audit so the critic does not have to
 #            reconstruct it.
 #            - No newcomer is named anywhere in this scene. Not once, by anybody.
@@ -121,10 +121,16 @@ words:        428
 #            as presence-only, false means "tag absent". Story.Thread.ConscriptLetters_Open
 #            is set by the scene commit, not by the choice - it opens either way, because
 #            Sela does not stop asking.
-# shiftboss: .250 / .260, one line each, and the scene does not come back to it. Spared: a
-#            compliment shaped like a piece of district gossip, and she never says the word
-#            mercy. Killed: a flat fact that the lists came out anyway, which is worse than
-#            a reproach and is the closing of the sub-thread (ACT1_OVERVIEW section 5).
+# shiftboss: .250 / .260 / .270, one line each, and the scene does not come back to any of
+#            them. CORRECTED 2026-07-31 (L1-R12): the conditions read the three leaves
+#            `story.m15_shiftboss` = prevented | killed | warned that M1.5.S04 actually
+#            sets. The boolean they used to read, story.choice_m15_shiftbossspared, is set
+#            by nothing and cannot express three outcomes. .270 IS NEW - the warned branch
+#            had no reader in the mission that closes the thread, and M1.8 may not reopen
+#            it. Prevented: a compliment shaped like district gossip, and she never says
+#            the word mercy. Killed: a flat fact that the lists came out anyway, which is
+#            worse than a reproach. Warned: a ledger she does not total, which is the one
+#            place in the act where her certainty runs out (ACT1_OVERVIEW section 5).
 # brick:     no lines (BEATS section 8). He is in the room.
 
 lines:
@@ -287,15 +293,23 @@ lines:
   - id:        M1.6.S06.250
     speaker:   SELA
     voice:     sela
-    condition: 'story.choice_m15_shiftbossspared == true'
+    condition: 'story.m15_shiftboss == "prevented"'
     text:      "The shift boss was at his gate on Tuesday. That is the only thing I have heard about this cell that I believed."
     shot:      "She says it on her way past with an armful of blankets and does not stop walking."
-    note:      "SHIFT BOSS PAYOFF, spared branch. A compliment that arrives as district gossip. She never says mercy and nobody thanks her for it. Sub-thread closed (ACT1_OVERVIEW section 5)."
+    note:      "SHIFT BOSS PAYOFF, prevented branch. A compliment that arrives as district gossip. She never says mercy and nobody thanks her for it. Sub-thread closed (ACT1_OVERVIEW section 5)."
 
   - id:        M1.6.S06.260
     speaker:   SELA
     voice:     sela
-    condition: 'story.choice_m15_shiftbossspared == false'
+    condition: 'story.m15_shiftboss == "killed"'
     text:      "The absentee lists went out on time this week. Somebody else fills them in now."
     shot:      "She says it to the table, not to anybody at it, and goes back to the blankets. Nobody in the room answers and the conversation does not come back to it."
     note:      "SHIFT BOSS PAYOFF, killed branch. No reproach - a flat fact that the thing he did got done anyway. Worse than a reproach, and she will remember it. Sub-thread closed."
+
+  - id:        M1.6.S06.270
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m15_shiftboss == "warned"'
+    text:      "One Tuesday went unfiled. Nobody on this row tells it the same way twice, and every version has him walking out with a good look at both cells."
+    shot:      "She says it on her way past with the last of the blankets and does not stop walking. Nobody in the room answers, and she never raises it again."
+    note:      "SHIFT BOSS PAYOFF, warned branch. NEW 2026-07-31 per ruling L1-R12; the branch existed in M1.5.S04 and had no reader here. Four things in one line: the sheet stopped exactly once, he is alive, he is gone, and he is a witness to two cells. It closes - it is a statement, nobody answers it, and nothing in act 1 returns to it. No verdict is offered, and that is the architect's requirement: this is the branch where Sela is least certain, because it is the branch where Voss was clever instead of principled. She shows it by reporting that her own district cannot settle on one story and by declining to pick one - the woman who prices everything (S04.070) leaves this one untotalled. The word mercy does not appear and nobody is blamed. It sits with M1.5.S05.260 without repeating it: the emissary wonders who the man is running TO, she reports what he took WITH him. Sets up M1.8.S99's P3-d, where in this branch only, 'the man we let run' replaces one of the three explanations - three, never four."

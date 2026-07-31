@@ -15,7 +15,7 @@ turn:         "Dex talks them down a route he has never walked, is right, and ca
 # ---- state ----
 status:       draft
 critic:       null
-words:        185
+words:        184
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, two Ember fighters, DEX (radio)
@@ -97,7 +97,8 @@ lines:
   - id:      M1.1.S06.100
     speaker: FIGHTER_A
     voice:   eclipse_fighter_a
-    text:    "Two vehicles. That's all of it. Two."
+    text:    "Two vehicles. That's all of it."
+    note:    "The closing 'Two.' is cut (2026-07-31). 'That's all of it' already carries it, and .110 opens on the same word from another mouth with no `interrupts` - in audio that is a double take, not a beat."
 
   - id:      M1.1.S06.110
     speaker: FIGHTER_B

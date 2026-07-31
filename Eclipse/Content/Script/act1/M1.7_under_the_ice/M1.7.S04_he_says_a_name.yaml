@@ -15,7 +15,9 @@ turn:         "He says an Ember name, kindly, and pronounces it correctly."
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        152
+words_heard:  152
+words_generated: 179
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      VOSS, MARA · THREX (live Veil traffic)
@@ -42,4 +44,132 @@ words:        0
 # writer:    Threx never shouts and never uses rank when a first name will wound more.
 #            He compliments you sincerely while hurting you. That is the whole character.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 25 w at .090). Register reached at
+#            .060 (24) and .090 (25).
+# spread:    1 w (.050, the bare {name} slot) to 25 w = 25x.
+#
+# *** AR-6 RUNG 3 - THE COMPLIANCE AUDIT, so the critic does not have to reconstruct it. ***
+#   - Voss's name: NOT SAID. Not by Threx, not by the operative, not obliquely. Checked.
+#   - K-77: NOT SAID. The word blacksite does not appear. Checked.
+#   - the trap: no allusion of any kind. Threx does not know Ember is in the room, does not
+#     hint at one, and gives no instruction that only makes sense on a second playthrough.
+#   - Threx has five turns (.030 .050 .060 .070 .090) plus one coda (.100). Warm,
+#     question-heavy, never raised.
+#
+# {name} AND L1-R8's TWO CONSTRAINTS, both checked word by word:
+#   - .050 / .060 / .070 are PRONOUN-FREE around the slot. No he, she, his, her, him. The
+#     roster decides gender at runtime and none of these lines cares. .060 says "a frightened
+#     person"; .070 says "somebody in that cell"; .090 says "somebody who shares a ration".
+#     Every one of those was a pronoun in the first draft.
+#   - the slot is a rostered fighter the player has met, and AR-10 makes it the same fighter
+#     who goes on the wall first in M1.8.S07.
+#
+# THE PRONUNCIATION BEAT (stub beat 3) IS A SHOT, NOT A LINE. A mispronunciation cannot be
+# authored against a runtime name-clip, so the beat is staged instead: the operative reaches
+# for the procedural designation, Threx cuts him off with the name itself, and the shot on
+# .050 carries the stress pattern for the cinematic and VO pass. That is also the AR-6
+# characterisation - he overrides his own service's radio discipline to say a first name.
+#
+# .090:      he refuses a pickup, and the reason he gives is KINDNESS. That is the whole
+#            character (18.4: compliments you sincerely while hurting you) and it is the most
+#            frightening line in act 1 precisely because nothing in it is a threat. It also
+#            quietly declines to be about resources - P4-c is one scene old and a second
+#            AEGIS-shaped hint here would turn a plant into a mystery.
+# .100:      he says something warm to a man standing in the room Ember is standing in. The
+#            player works that out; nobody says it.
+# mara:      .110 is the ONLY frightened line she has in the game. The tell is grammatical,
+#            not emotional: she asks a question she cannot answer, which is the one thing she
+#            has never done - in M1.2.S03 she met an anomaly and did arithmetic at it. Zero
+#            "you", zero "I", no stated feeling anywhere near it (18.9 A). One line, and
+#            nobody answers her.
+# voss:      .120/.130 are the stub's beat 6 and they point the opposite way from Mara. She
+#            is at the stair; he wants the desk. That is S05's obstacle set up one scene early
+#            and it is the first time in the game he overrules her about anything.
+#            No axis variants - the scene does not branch (C-6 option b, Q-7 discipline).
+# names:     Threx uses the slot three times in five turns. That is his fingerprint, not a
+#            density failure (18.9 B counts characters ADDRESSING each other; nobody in this
+#            scene addresses anybody).
+# omitted:   a Threx line about Mara, a Threx line about the cell's size, and any reaction
+#            line from Voss to .060. See report.
+
+lines:
+  - id:      M1.7.S04.010
+    speaker: VOSS
+    voice:   voss
+    text:    "The channel's live."
+    shot:    "A handset off its cradle on the fourth screen. The indicator has been lit since they walked in and nobody looked at it."
+
+  - id:      M1.7.S04.020
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    text:    "Sector file, subject four. No movement since the yard."
+    note:    "18.5 rule 5. Two seconds of Veil vocabulary: a human being is a subject and a number, and the tone is a man reading a stock level."
+
+  - id:      M1.7.S04.030
+    speaker: THREX
+    voice:   threx
+    text:    "There's a name in that file. Use the name."
+
+  - id:      M1.7.S04.040
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    text:    "Designation is preferred on an open chann--"
+
+  - id:         M1.7.S04.050
+    speaker:    THREX
+    voice:      threx
+    interrupts: true
+    text:       "{name}."
+    shot:       "*** He says it the way the Foundry District says it, stress on the front, and he is right. *** VO note: this is the correct local pronunciation and it is the point of the scene. Mara has stopped with a hand flat on the desk."
+    note:       "AR-6 RUNG 3 LANDS HERE. He overrides his own service's radio procedure to say a first name out loud. 18.4: never uses rank when a first name will wound more."
+
+  - id:      M1.7.S04.060
+    speaker: THREX
+    voice:   threx
+    text:    "{name} gives half a ration away on the ninth. Every ninth, for a year now. That is not a thing a frightened person does."
+    note:    "Sincere, accurate, and unbearable. Pronoun-free (L1-R8). The ninth is the Tithe date established in M1.6.S03.170 and nobody glosses it (18.8)."
+
+  - id:      M1.7.S04.070
+    speaker: THREX
+    voice:   threx
+    text:    "Who is feeding {name} now? Somebody in that cell must be, and I would like to know which one."
+    note:    "Question-heavy, warm, and it is a targeting query wearing concern. Pronoun-free."
+
+  - id:      M1.7.S04.080
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    text:    "Do you want a pickup order against the file?"
+
+  - id:      M1.7.S04.090
+    speaker: THREX
+    voice:   threx
+    text:    "No. Nobody is going to knock on a door at four in the morning and make a martyr out of somebody who shares a ration."
+    note:    "He declines, and the reason is kindness. 18.4 Threx entire. No threat anywhere in the scene - that is what makes it work."
+
+  - id:      M1.7.S04.100
+    speaker: THREX
+    voice:   threx
+    text:    "And keep the coat on. That hall was never meant to have people standing in it."
+    shot:    "Two coats on the hook by the desk. Neither of them has been touched."
+    note:    "He says something kind to a man who is standing where Ember is standing. Nobody in the scene points at it."
+
+  - id:      M1.7.S04.110
+    speaker: MARA
+    voice:   mara
+    tags:    [quietly]
+    text:    "How long has that man been saying that name?"
+    shot:    "She has not moved since .050. Nobody answers her, and nobody ever does."
+    note:    "*** THE ONLY TIME MARA SOUNDS FRIGHTENED IN THE GAME. *** One line. The tell is that she ASKS - in M1.2.S03 an anomaly got arithmetic, not a question. No feeling is named and no adjective is spent."
+
+  - id:      M1.7.S04.120
+    speaker: VOSS
+    voice:   voss
+    text:    "That channel's open, so the watch hasn't turned over yet."
+
+  - id:      M1.7.S04.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Everything on that desk comes with us. We're not coming back down here."
+    shot:    "Mara is already at the stair mouth. She stops there and does not come back."
+    note:    "Beat 6, and it is not what she wants. First time in the game he overrules her, and it is about staying longer in the worst room on Kessara."

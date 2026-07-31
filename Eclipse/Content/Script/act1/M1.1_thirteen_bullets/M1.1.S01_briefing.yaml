@@ -15,7 +15,7 @@ turn:         "She stops arguing the odds and hands them the count as an inherit
 # ---- state ----
 status:       draft
 critic:       null
-words:        264
+words:        328
 
 # ---- RULING L1-R18, 2026-07-31: THE APPROACH CHOICE IS WITHDRAWN. Option (b). ----
 #
@@ -82,13 +82,25 @@ words:        264
 #            band as a CEILING - 21_quality_mandate and 18.3's own note say "these bands
 #            cap the length of one line". Ceiling respected everywhere: longest line 20 w.
 # variance:  2 w ("He counts.") to 20 w (.010) = 10x.
+# interjection:
+#            .210 after L1-R18. One line, four axes, one outcome. The player's input in this
+#            scene is the register of Voss's reasoning, not a fork - and the reasoning is
+#            what S04 spends. Each axis keeps the span AND keeps a use for the height:
+#            pragmatist hedges against being wrong about the order, idealist wants to tell a
+#            guard from a man pushing a crate (which is the man he will find alive in S05),
+#            personal will not listen to it happen above him, strategic takes the height as
+#            the thing that decides the order of the fight. Nothing downstream branches, so
+#            nothing downstream had to be written twice.
 # ar-5:      Mara spends ZERO of her "you" allowance in this whole mission, and says "I"
 #            never. Checked line by line.
 # jokes:     Dex joke 1 of 3 is .060 - the frightened one. See S02 (2) and S99 (3).
-# choice:    .210 / .220 are the player's two planning options (overpass / underpass).
-#            SCRIPT_FORMAT HAS NO PLAYER-CHOICE CONSTRUCT - see report. Marked by note
-#            only. Downstream variation in S02/S04 needs a tag that does not exist;
-#            NOT written, rather than invented.
+# choice:    RESOLVED 2026-07-31. .210 / .220 were the player's two planning options and
+#            they needed a tag that did not exist; the tag was escalated instead of
+#            invented. RULING L1-R18 withdrew the choice outright - option (b) - because
+#            SPEC-P2-04 gives M1.1 one site and no drain, so option (a) would have paid for
+#            dialogue on a route the mission asset cannot instantiate. The two lines are
+#            now one (.210) with full axis coverage. M1.1 keeps exactly ONE real choice,
+#            S05, with a flag, a reader and three branches. That is the mould.
 # omitted:   the Enforcer plant (Q-2 still open) - omitted silently per the stub.
 
 lines:
@@ -203,20 +215,19 @@ lines:
   - id:      M1.1.S01.210
     speaker: VOSS
     voice:   voss
-    text:    "The span. I want the height."
-    note:    "PLAYER OPTION 1 of 2 (approach). No axis variants - architect budget ruling, BEATS section 10.8."
-
-  - id:      M1.1.S01.220
-    speaker: VOSS
-    voice:   voss
-    text:    "The drain. Let them walk over us."
-    note:    "PLAYER OPTION 2 of 2 (approach)."
+    text:    "The span. Height means we can still change the plan after the first man is in the lane."
+    note:    "RULING L1-R18: the approach choice is withdrawn and .220 with it. This is beat 4's technical line nobody asked for, and it is now a PLANT: S04 cashes it when the patrol walks in the wrong order and the height is what lets Voss re-solve the ambush in front of the squad. No flag, no `choice:` block, no conditional variants in S02 or S04. 18.7's participation beat is served as an INTERJECTION - all four axes pick the span, so the player chooses HOW he says it, never WHAT is decided. .220 is deleted, not renumbered; the ID is retired and never reused."
+    variants:
+      pragmatist: "The span. Nobody has to be right about the order from up there."
+      idealist:   "The span. From up there we can tell a guard from a man pushing a crate."
+      personal:   "The span. I'd rather see the whole thing than hear it happen over my head."
+      strategic:  "The span. From above we pick the order of it. From the drain they do."
 
   - id:      M1.1.S01.230
     speaker: MARA
     voice:   mara
     text:    "Mark it on the table. That's the plan now."
-    note:    "Answers either option. Written so no approach flag is required."
+    note:    "Answers the line above on any axis. No approach flag is required, and after L1-R18 none exists."
 
   - id:      M1.1.S01.240
     speaker: FIGHTER_A
