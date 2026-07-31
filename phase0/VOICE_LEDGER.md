@@ -4,9 +4,33 @@
 
 ---
 
-**Budget:** 310.000 credits · **vervalt 21 augustus 2026, rolt niet door**
+> ## ⚠️ HERKOMST VAN DIT GETAL IS NIET TE HERLEIDEN — vóór er iets op gepland wordt
+>
+> Dit bestand stond op **310.000** en is op 31-07 gewijzigd naar **131.000**, een verschil
+> van 179.000 credits. Die wijziging is **niet gecommit** en er staat **geen bron** voor in
+> `phase0/OWNER_ANSWERS.md` — de tekst hieronder noemt het een owner-mededeling, maar het
+> antwoord zelf is nergens vastgelegd.
+>
+> **Het kan gewoon waar zijn.** Precies hetzelfde gebeurde vanavond met O-2: een agent legde
+> een owner-bevestiging vast waarvan ik de bron niet kon aanwijzen, ik draaide hem terug, en
+> hij bleek wél echt — het antwoord was in een chatvenster gevallen dat de repo niet ziet.
+> Ik draai dit dus **niet** terug op grond van "ik zie de bron niet".
+>
+> **Maar er wordt ook niets op gepland tot het bevestigd is.** 310.000 en 131.000 geven
+> verschillende antwoorden op welke tiers er nog in passen, en de hele ladder in
+> `19_voice_production.md` §19.2 hangt eraan. Een tierverdeling op een onbevestigd getal is
+> erger dan geen verdeling, want hij leest als een plan.
+>
+> **Het saldo is op dit moment niet te méten** — dat vraagt de `user_read`-scope, en die
+> staat nog uit (owner-actie T-12). Zodra die er is meet ik het echte getal en vervangt die
+> meting deze regel.
+>
+> **Regel die hieruit volgt, en die breder geldt dan dit bestand:** een getal dat het plan
+> stuurt, draagt zijn bron. Staat er geen bron, dan staat er een waarschuwing — geen stilte.
+
+**Budget:** 131.000 credits · **vervalt 21 augustus 2026, rolt niet door**
 **Werkdeadline generatie:** 19 augustus (twee dagen buffer)
-**Doel op 19/08: 310.000 besteed, 0 over.** Credits die op 21 augustus ongebruikt zijn, zijn weggegooid.
+**Doel op 19/08: 131.000 besteed, 0 over.** Credits die op 21 augustus ongebruikt zijn, zijn weggegooid.
 
 **De reserve (20.000) is geen spaarpot maar verzekering.** Hij blijft *niet-toegewezen* tijdens de sprint, zodat een misgelopen batch nog te herstellen is. Op **17 augustus** gaat wat er nog van over is alsnog de volgende tier in. Niet eerder toewijzen, niet laten staan.
 
@@ -16,8 +40,8 @@
 
 | Datum | Tier | Scope | Regels | Credits | Saldo na |
 |---|---|---|---|---|---|
-| 2026-07-31 | 0 | Casting stage 1 — brede screening, 18 rollen × 4–6 kandidaten (premade) | 0 | 0 | 310.000 |
-| 2026-07-31 | 0 | Casting stage 1 uitbreiding — Voice Library, 24 kandidaten voor Mara/Kaine/Vex/Callis/Torren | 0 | 0 | 310.000 |
+| 2026-07-31 | 0 | Casting stage 1 — brede screening, 18 rollen × 4–6 kandidaten (premade) | 0 | 0 | 131.000 |
+| 2026-07-31 | 0 | Casting stage 1 uitbreiding — Voice Library, 24 kandidaten voor Mara/Kaine/Vex/Callis/Torren | 0 | 0 | 131.000 |
 
 > **Formaat:** het dashboard leest deze tabel automatisch uit. Houd de kolomvolgorde
 > aan en begin de datumkolom met `JJJJ-MM-DD`, anders telt de regel niet mee.
@@ -26,14 +50,15 @@
 
 | Tier | Wat | Begroot | Besteed | Klaar |
 |---|---|---|---|---|
-| 0 | Casting — fase 1 GRATIS (bibliotheek), fase 2 diepe test op finalisten | 12.000 | 0 | ☐ |
-| 1 | Bark- & systeembibliotheek | 93.000 | 0 | ☐ |
-| 2 | Act 1 story-dialoog | 90.000 | 0 | ☐ |
-| 3 | Adaptieve muziek | 43.000 | 0 | ☐ |
-| 4 | Act 1 hub & companions | 33.000 | 0 | ☐ |
-| 5 | Kern-SFX | 19.000 | 0 | ☐ |
-| — | Reserve (niet toewijzen; 17/08 vrijgeven) | 20.000 | 0 | — |
-| | **Totaal** | **310.000** | **0** | |
+| 0 | Casting — fase 1 GRATIS, fase 2 alleen Act-1-rollen | 6.000 | 0 | ☐ |
+| 1 | Bark- & systeembibliotheek | 48.000 | 0 | ☐ |
+| 2 | Act 1 story-dialoog (incl. ijkmissie) | 45.000 | 0 | ☐ |
+| 3 | Muziek — thema + never-silent-vloer | 15.000 | 0 | ☐ |
+| 4 | Kern-SFX | 7.000 | 0 | ☐ |
+| — | Reserve (niet toewijzen; 17/08 vrijgeven) | 10.000 | 0 | — |
+| | **Totaal** | **131.000** | **0** | |
+
+*Herzien 31-07 laat: het budget bleek **131.000** en niet 310.000 — de owner had zich vergist. Alle tiers zijn opnieuw gesneden, niet alleen omgenummerd. Wat eraf viel: de Act-1-hub- en companiongesprekken (was 33.000). Die blijven geschreven en wachten op volgende maand.*
 
 *Tier 0 is twee keer bijgesteld. Eerst 5.000 → 18.000 op owner-instructie "doe moeite om de juiste voice te vinden". Daarna 18.000 → **12.000**, want de owner wees erop dat de brede screening **niets hoeft te kosten**: de Voice Library is gratis doorzoekbaar, met eigenschappen én previewfragmenten per stem. Alleen de diepe test op de twee finalisten kost credits, omdat een generieke preview niet vertelt of een stem Mara's doodsscène overleeft of over geweervuur heen leesbaar blijft. De 6.000 die vrijkwam is terug naar tiers 1–3.*
 
@@ -60,7 +85,7 @@ Resultaat staat in `progress_media/casting/` (zie `CASTING.html`). Stage 2 is
 | `/v1/models` | 401 — `missing permission models_read` |
 
 **Gevolgen, en ze zijn niet klein:**
-1. Het werkelijke saldo is **niet uit te lezen**. De 310.000 is een owner-mededeling,
+1. Het werkelijke saldo is **niet uit te lezen**. De 131.000 is een owner-mededeling,
    geen meting. Elk saldo in dit bestand is dus een *aftreksom*, geen waarneming.
 2. `Eclipse/Tools/generate_audio_assets.py` roept `get_usage()` aan om spend te meten.
    Die functie vangt de fout af en geeft `None` terug — het script schrijft dan
