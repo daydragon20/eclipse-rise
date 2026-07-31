@@ -2,6 +2,7 @@
 
 #include "Components/ActorComponent.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Combat/EclipseWeaponStatusFeed.h"
 #include "CoreMinimal.h"
 #include "EclipseHitscanWeaponComponent.generated.h"
 
@@ -189,7 +190,63 @@ public:
 	float GetRecoilPitchDegrees() const { return Weapon.RecoilPitchDegrees; }
 	float GetRecoilRecoveryDegreesPerSecond() const { return Weapon.RecoilRecoveryDegreesPerSecond; }
 
+	/** Zie EEclipseWeaponFireMode: vandaag voor elke DT_Weapons-rij `Unspecified`. */
+	EEclipseWeaponFireMode GetFireMode() const { return Weapon.FireMode; }
+
+	/**
+	 * Hoeveel Event.Player.WeaponStatusChanged dit wapen werkelijk heeft uitgezonden.
+	 *
+	 * Bestaat om dezelfde reden als GetVitalsBroadcastCount op het lichaam: bij een
+	 * meting van 0 feiten op de bus moet de keten te bisecteren zijn. Zonder dit
+	 * getal kan "er kwam niets aan" evengoed betekenen dat de poort het wapen
+	 * afwees, dat de feed het geen verandering vond, of dat de bus niet afleverde —
+	 * en een kale teller scheidt die drie niet.
+	 */
+	int32 GetWeaponStatusBroadcastCount() const { return StatusTracker.GetBroadcastCount(); }
+
+	/**
+	 * De huidige stand als feit op de bus zetten, als er iets veranderd is.
+	 *
+	 * Publiek en niet privé: de bedrading hangt aan de plekken waar de stand
+	 * WERKELIJK verschuift (vuren, herladen, wisselen, uitrusten), en een test moet
+	 * kunnen bewijzen dat een extra aanroep zonder verandering niets oplevert. De
+	 * rem zit in EclipseWeaponStatusFeed, niet hier: deze functie mag rustig vaker
+	 * aangeroepen worden dan er iets gebeurt.
+	 */
+	void PublishWeaponStatus();
+
+	/**
+	 * TIKT ALLEEN TIJDENS EEN HERLAADBEURT, en alleen voor het wapen van een lokale
+	 * speler.
+	 *
+	 * Het component was en blijft event-gedreven (GDD 14.2) — de constructor zet de
+	 * tick uit en StartReload zet hem aan, TickComponent zet hem zelf weer uit. De
+	 * uitzondering is er omdat herlaadVOORTGANG als enige van de zes feiten geen
+	 * gebeurtenis is maar een KLOK: tussen "beurt begonnen" en "beurt klaar" gebeurt
+	 * er niets waar een balk aan kan hangen. Zonder deze tick zou de HUD daarvoor
+	 * alsnog moeten pollen, en dan is precies het ene stuk overgebleven waar dit
+	 * werk voor bestond.
+	 */
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
+	/**
+	 * Kijkt er een LOKALE SPELER door dit wapen heen?
+	 *
+	 * Zonder deze poort zou elke vijand op de kaart zijn magazijn over de
+	 * spelersbus sturen. Bewust dezelfde vraag en dezelfde formulering als
+	 * `AEclipseCharacter::PublishVitals`, inclusief de daar gemeten les: NIET
+	 * `APawn::IsPlayerControlled()`, want die leest `GetPlayerState() && !IsABot()`
+	 * en hangt dus aan een object dat pas bestaat als een GameMode het spawnt.
+	 */
+	bool HasLocalPlayerConsumer() const;
+
+	/** De rauwe waarneming voor de feed; alle conclusies staan in EclipseWeaponStatusFeed. */
+	EclipseWeaponStatusFeed::FEclipseWeaponSnapshot MakeStatusSnapshot() const;
+
+	/** Het geheugen achter Event.Player.WeaponStatusChanged: wat er het laatst uit ging. */
+	EclipseWeaponStatusFeed::FEclipseWeaponStatusTracker StatusTracker;
+
 	/** Het zichtbare wapen bijwerken naar de actieve rij. Zie de toelichting in de .cpp. */
 	void NotifyActiveWeaponChanged();
 

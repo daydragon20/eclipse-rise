@@ -43,6 +43,8 @@ namespace EclipseTags
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Player_VitalsChanged, "Event.Player.VitalsChanged", "De toestand van het SPELERSLICHAAM veranderde: gezondheid (huidig + max), houding (staand/hurken/sprint/dekking) of neer. Vuurt alleen als er echt iets veranderde — de HUD hoeft niet te pollen (GDD 12.2 regel 2, bouwvolgorde 14.5).")
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Player_WeaponStatusChanged, "Event.Player.WeaponStatusChanged", "De STAND van het wapen van de SPELER veranderde: magazijn (+ vorige), magazijnen over, herlaadvoortgang, leeg-staat, actief wapen en vuurmodus. ShotFired/ReloadStarted/WeaponSwapped dragen de GEBEURTENIS en niet de stand; dit feit bestaat zodat de HUD kan stoppen met per frame GetAmmoInMagazine() te pollen (GDD 12.2 regel 2, bouwvolgorde 14.5).")
+
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeEntered, "Event.Command.ModeEntered", "Command Mode hold began; payload carries the applied dilation (SPEC-P2-02). Audio ducks/filters on this (SPEC-P2-09); UI is a consumer, never the emitter.")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Event_Command_ModeExited, "Event.Command.ModeExited", "Command Mode ended (release or fail-safe); payload carries HeldSeconds + OrdersIssuedWhileHeld — the R3 feel-gauntlet telemetry (SPEC-P2-02).")
 

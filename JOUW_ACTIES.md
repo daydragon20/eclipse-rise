@@ -1,6 +1,6 @@
 # JOUW ACTIES — wat Nathan moet doen, wanneer, en hoe
 
-*Laatst bijgewerkt: 2026-07-31 laat · Dit is de uitvoerbare versie van de owner-tabel in `STATUS.md`.*
+*Laatst bijgewerkt: 2026-08-01 vroeg · Dit is de uitvoerbare versie van de owner-tabel in `STATUS.md`.*
 *Agents: werk dit bij zodra een punt afgehandeld is, en verplaats het naar "Afgerond" onderaan.*
 
 ---
@@ -9,43 +9,29 @@
 
 | Wanneer | Wat | Hoe lang | Blokkeert |
 |---|---|---|---|
-| **Nu — dit houdt wél iets tegen** | **API-scopes** aanzetten bij ElevenLabs | 3 min | **alle generatie staat stil** |
-| **Nu, het staat klaar** | **O-3** Stemmen kiezen — 104 kandidaten | 30–45 min | alles wat gesproken wordt |
-| **Als je zin hebt** | **O-8** Hoe Borderlands mag de HUD worden | 5 min | de vormgeving van de schermlaag |
-| **Rond 6–7 augustus** | **O-4** IJkmissie beluisteren | 20 min | de massaproductie |
-| **Wanneer de HUD af is** | Eén sessie spelen | 30 min | niets |
+| **Nu — dit houdt de bar rood** | **O-3** Twee stemmen voor `eclipse_fighter` C en D, plus Petra | 15 min | acht regels die anders als **stilte** gegenereerd worden |
+| **Nu — het gaat over geld** | **O-14** Act 1 kost ~97.000 van je 125.612 credits | 10 min | hoe act 1 klinkt |
+| **Nu** | **O-12** 2.475 credits gingen naar het verkeerde model — opnieuw of niet? | 5 min | niets, maar het loopt op |
+| **Nu** | **O-13** Drie stemmen zijn twee keer gekozen | 10 min | niets |
+| **Als je zin hebt** | **O-15** Kijk naar de vier vault-kamers: is dit Hollow Point? | 5 min | niets |
+| **Wacht op mij** | **O-4** IJkmissie beluisteren | — | — |
 
-**Op één na houdt niets hiervan het werk tegen.** De agents bouwen door aan het wapen, de
-schermlaag, Command Mode en de verkeersborden terwijl jij dit doet. Maar **de scopes wél**:
-zonder die komt er geen enkele regel audio uit, ook niet als je vanavond stemmen kiest.
+**Niets hiervan houdt het bouwen tegen** — de agents werken door aan de schermlaag, de
+kaartlaag en het schrijfwerk terwijl jij dit doet. Maar **O-3 wél voor audio**: zolang twee
+`eclipse_fighter`-slots leeg zijn, verdwijnen acht regels zonder foutmelding.
 
----
+## ~~API-scopes~~ · *afgehandeld — dit was de rem, en hij is weg*
 
-## API-scopes · *dit is de enige echte rem (nu, 3 minuten)*
+Je hebt de drie scopes (`user_read`, `speech_history_read`, `models_read`) aangezet. Gemeten:
+alle drie geven HTTP 200, het saldo is leesbaar (**125.612 van 131.000 over**) en `eleven_v3`
+blijkt op dit abonnement te bestaan — dat sluit de open vraag of §19.4's audiotags kunnen
+werken.
 
-**Wat er aan de hand is, en het is erger dan het klinkt.** De ingebouwde creditmeter was
-stuk **en zei dat niet**. `generate_audio_assets.py` vroeg bij ElevenLabs op wat een batch
-kost, kreeg daar een `401` op, **slikte die fout** en schreef stil geen verbruik weg. De
-ledger las dus als waarheid terwijl er niets gemeten was — en die 131.000 was daarmee een
-mededeling van jou, geen meting.
-
-Dat is nu omgedraaid: generatie **weigert** te draaien zonder gemeten spend (exit-code 3),
-en die weigering hangt als poort in `verify.ps1` zodat hij niet stilletjes terug kan komen.
-
-**Stap 1.** Ga naar elevenlabs.io → je avatar rechtsboven → **API Keys**.
-
-**Stap 2.** Zet op de sleutel van dit project drie scopes aan:
-
-| Scope | Waarvoor | Zonder |
-|---|---|---|
-| `user_read` | saldo lezen vóór en ná elke batch | **dit is de blokkade — er komt niets uit** |
-| `speech_history_read` | achteraf per regel controleren wat het kostte | een uitschieter is niet te herleiden |
-| `models_read` | checkt of `eleven_v3` beschikbaar is | de audio-tags uit §19.4 hangen eraan, en `modelId` zit in de cache-sleutel — een verkeerde gok herbetaalt alles |
-
-**Stap 3.** Zeg het als het staat. Dan meet ik het echte saldo na en zet dat in de ledger.
-
-> **Goed nieuws:** je saldo staat nog op de volle **131.000**. Er is deze maand geen enkele
-> credit uitgegeven — ook casting fase 1 niet.
+Wat er meteen uitkwam en wat je moet weten: **de ingebouwde kostenmeting was dood en meldde
+dat nergens.** Daardoor zijn er 2.475 credits naar het verkeerde model gegaan zonder dat
+iets alarm sloeg. De meter is gerepareerd en weigert nu te genereren zolang de uitgave niet
+meetbaar is; de vraag wat er met die 51 clips moet gebeuren staat als **O-12** op je
+dashboard.
 
 ---
 
@@ -92,29 +78,21 @@ kaart: **één klik per finalist, niet per kandidaat.**
 
 ---
 
-## O-8 · Hoe Borderlands mag de HUD worden *(5 minuten)*
-
-Je hebt met **O-6 = A** de gestileerde lock bevestigd. De vervolgvraag is hoe ver dat in de
-schermlaag mag doorwerken: dikke inktlijnen en comic-panelen, of een strakke leesbare laag
-die alleen de kleurtaal deelt. Dat bepaalt hoeveel werk het is én hoe leesbaar het blijft
-tijdens een gevecht.
-
-De vraag staat als kaart met knoppen op je dashboard.
-
----
-
-## O-4 · IJkmissie beluisteren *(rond 6–7 augustus, 20 minuten)*
+## O-4 · IJkmissie beluisteren *(wacht op mij, niet op jou)*
 
 **Wat dit is.** Missie M1.1 *Thirteen Bullets* gaat als eerste helemaal door de pijplijn:
 beats → dialoog → kwaliteitspoort → stem → in de game. Eén missie volledig af vóór er 41
-andere gemaakt worden. De beats liggen er al.
+andere gemaakt worden. Als de schrijfstandaard fout is, wil je dat weten bij missie 1 en
+niet bij missie 34.
 
-**Waarom het zo werkt.** Als de schrijfstandaard fout is, wil je dat weten bij missie 1 —
-niet bij missie 34. Je giet ook eerst één proefstuk voor je er 42 giet.
+**Stand 01-08: er is nog geen seconde audio, en dat kan ook niet.** De kwaliteitspoort heeft
+M1.1 op **NO-GO** gezet — drie van de zeven scènes zijn door, vier gaan terug. Eén voorbeeld
+van wat hij vond: in de debrief zegt Mara *"They'll count six men missing"*, terwijl er in
+twee van de drie takken vijf doden zijn en één man leeft. Dat is niet te repareren nadat het
+ingesproken is.
 
-**Wat jij doet:** de missie spelen of beluisteren en één ding zeggen: **"zo moet het
-klinken" of "nee, want…"**. Bij "nee" wordt de standaard bijgesteld en gaat M1.1 er nog één
-keer doorheen. **Pas na jouw akkoord** start de massaproductie.
+Die vier reparaties lopen nu. **Je hoeft niets te doen**; de kaart springt vanzelf terug
+zodra er iets te horen is.
 
 ---
 

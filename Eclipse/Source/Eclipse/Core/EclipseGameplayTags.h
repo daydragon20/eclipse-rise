@@ -93,6 +93,16 @@ namespace EclipseTags
 	 */
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Player_VitalsChanged)
 
+	/**
+	 * De andere helft van hetzelfde dashboard: de STAND van het wapen in de handen
+	 * van de speler.
+	 *
+	 * Hier en niet bij Event.Combat.*, want die familie beschrijft de wereld (elk
+	 * lichaam mag erin voorkomen, de AI en de audiolaag luisteren mee) en dit
+	 * beschrijft één scherm. Zie de toelichting bij FEclipseWeaponStatusPayload.
+	 */
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Player_WeaponStatusChanged)
+
 	// Command Mode lifecycle (SPEC-P2-02)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeEntered)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Command_ModeExited)

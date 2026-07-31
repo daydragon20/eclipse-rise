@@ -20,7 +20,103 @@
 
 UEclipseHitscanWeaponComponent::UEclipseHitscanWeaponComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false; // event-driven (GDD 14.2)
+	// EVENT-GEDREVEN (GDD 14.2), MET ÉÉN VENSTER WAARIN HIJ TIKT.
+	//
+	// `bCanEverTick` stond hier op false en dat klopte zolang alles aan dit wapen
+	// een gebeurtenis was. Herlaad-VOORTGANG is dat niet: tussen het begin en het
+	// eind van een beurt gebeurt er niets, er verstrijkt alleen tijd, en een balk
+	// die daaraan hangt heeft iets nodig dat kijkt. `bStartWithTickEnabled = false`
+	// houdt de kosten waar ze horen — StartReload zet hem aan, TickComponent zet
+	// hem zelf weer uit, en voor een wapen zonder lokale speler gaat hij nooit aan.
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
+}
+
+bool UEclipseHitscanWeaponComponent::HasLocalPlayerConsumer() const
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner());
+	if (Body == nullptr)
+	{
+		return false;
+	}
+	const AController* Driver = Body->GetController();
+	return Driver != nullptr && Driver->IsPlayerController() && Driver->IsLocalController();
+}
+
+EclipseWeaponStatusFeed::FEclipseWeaponSnapshot UEclipseHitscanWeaponComponent::MakeStatusSnapshot() const
+{
+	EclipseWeaponStatusFeed::FEclipseWeaponSnapshot Snapshot;
+	// DE GETTERS EN NIET DE VELDEN, en dat is geen netheid. `AmmoInMagazine` en
+	// `bReloading` zijn opgeslagen waarden die tot een handeling langskomt achter de
+	// klok aan kunnen lopen; GetAmmoInMagazine() en IsReloading() REKENEN de
+	// waarheid uit (zie de toelichting bij IsReloading — dat was defect 2). Het feit
+	// op de bus moet zeggen wat het wapen werkelijk is, niet wat er het laatst is
+	// opgeschreven.
+	Snapshot.AmmoInMagazine = GetAmmoInMagazine();
+	Snapshot.MagazineSize = Weapon.MagazineSize;
+	// -1: de voorraad is met opzet oneindig; zie de toelichting bij StartReload in
+	// deze header. Als er ooit een echte voorraad komt, is dit het enige veld dat
+	// verandert — schema, catalogus en HUD blijven zoals ze zijn.
+	Snapshot.SpareMagazines = -1;
+	Snapshot.bReloading = IsReloading();
+	Snapshot.ReloadProgress = GetReloadProgress();
+	Snapshot.ReloadSecondsTotal = Weapon.ReloadSeconds;
+
+	const UWorld* World = GetWorld();
+	Snapshot.ReloadSecondsRemaining = Snapshot.bReloading && World != nullptr && ReloadEndSeconds >= 0.0
+		? static_cast<float>(FMath::Max(0.0, ReloadEndSeconds - World->GetTimeSeconds()))
+		: 0.0f;
+
+	Snapshot.WeaponRowName = GetActiveWeaponName();
+	Snapshot.WeaponDisplayName = Weapon.DisplayName;
+	Snapshot.ActiveSlot = ActiveSlot;
+	Snapshot.SlotCount = SlotRows.Num();
+	Snapshot.FireMode = Weapon.FireMode;
+	return Snapshot;
+}
+
+void UEclipseHitscanWeaponComponent::PublishWeaponStatus()
+{
+	if (!HasLocalPlayerConsumer())
+	{
+		return;
+	}
+
+	const EclipseWeaponStatusFeed::FEclipseWeaponStatusDecision Decision =
+		StatusTracker.Submit(MakeStatusSnapshot());
+	if (!Decision.bShouldBroadcast)
+	{
+		return;
+	}
+
+	// Geen bus (een test zonder GameInstance, of een component dat buiten een wereld
+	// leeft): het feit is dan al door de tracker geteld en er gebeurt verder niets.
+	// Stil degraderen, nooit crashen (GDD 14.3.5).
+	const UWorld* World = GetWorld();
+	UGameInstance* GameInstance = World != nullptr ? World->GetGameInstance() : nullptr;
+	if (UEclipseEventBusSubsystem* Bus = GameInstance != nullptr ? GameInstance->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
+	{
+		Bus->Broadcast(EclipseTags::Event_Player_WeaponStatusChanged, FInstancedStruct::Make(Decision.Payload));
+	}
+}
+
+void UEclipseHitscanWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// De beurt kan op de klok voorbij zijn; SettleReloadIfElapsed sluit hem dan af
+	// én zendt dat eind uit. Daarna is dit een gewone voortgangsstap — en die levert
+	// alleen iets op als hij de drempel uit EclipseWeaponStatusFeed haalt.
+	SettleReloadIfElapsed();
+	PublishWeaponStatus();
+
+	if (!bReloading)
+	{
+		// Het venster sluit zichzelf. Een tick die aan blijft staan omdat niemand
+		// hem uitzet, is exact de vorm van defect 2 (een toestand die wacht op een
+		// handeling die misschien nooit komt) — alleen dan met framekosten erbij.
+		SetComponentTickEnabled(false);
+	}
 }
 
 void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitResult& Hit)
@@ -128,6 +224,11 @@ void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row
 	ActiveSlot = 0;
 	ReadyAtSeconds = -1.0;
 	NotifyActiveWeaponChanged();
+	// De EERSTE foto van dit wapen, zodat de teller niet op nul staat tot het eerste
+	// schot. Via ApplyLoadout komt hier een tweede feit achteraan (dat pad vult de
+	// rijnamen en het tweede slot pas ná deze regel); dat is één frame en het tweede
+	// feit is degene die de HUD echt tekent.
+	PublishWeaponStatus();
 }
 
 void UEclipseHitscanWeaponComponent::NotifyActiveWeaponChanged()
@@ -157,6 +258,7 @@ void UEclipseHitscanWeaponComponent::ApplyLoadout(const FEclipseWeaponRow& Prima
 	// NAME_None — en zonder rijnaam is er geen mesh te vinden. Opnieuw, nu de
 	// namen er zijn.
 	NotifyActiveWeaponChanged();
+	PublishWeaponStatus();
 }
 
 bool UEclipseHitscanWeaponComponent::IsReady() const
@@ -220,6 +322,13 @@ bool UEclipseHitscanWeaponComponent::SwapWeapon()
 			Bus->Broadcast(EclipseTags::Event_Combat_WeaponSwapped, FInstancedStruct::Make(Swap));
 		}
 	}
+
+	// EN DE STAND ERACHTERAAN, want WeaponSwapped hierboven zegt WELKE FAMILIE er
+	// nu in de handen ligt en hoe lang het optillen duurt — niet hoeveel er in zit.
+	// Dat is precies het gat waar dit werk over gaat: er waren drie combat-feiten en
+	// geen daarvan droeg de stand. Eén feit, want de tracker ziet één verandering:
+	// ander slot, andere rijnaam, ander magazijn.
+	PublishWeaponStatus();
 	return true;
 }
 
@@ -274,6 +383,15 @@ bool UEclipseHitscanWeaponComponent::StartReload(FName Cause)
 	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner()))
 	{
 		Body->PlayReloadPose(Weapon.ReloadSeconds);
+	}
+
+	// DE START VAN DE BEURT ALS STAND-FEIT, en het venster waarin de voortgang
+	// gemeten wordt. De tick gaat alleen aan als er ook echt iemand naar kijkt: voor
+	// een vijand die herlaadt is er geen consument en dus geen reden om te tikken.
+	PublishWeaponStatus();
+	if (HasLocalPlayerConsumer())
+	{
+		SetComponentTickEnabled(true);
 	}
 	return true;
 }
@@ -368,6 +486,13 @@ void UEclipseHitscanWeaponComponent::SettleReloadIfElapsed()
 	if (bReloading && !IsReloading())
 	{
 		FinishReload();
+		// HET EIND VAN DE BEURT HANGT HIER EN NIET AAN DE TICK, om dezelfde reden
+		// dat het zichtbare wapen aan NotifyActiveWeaponChanged hangt en niet aan de
+		// RB-binding ("hang gedrag aan het feit"): élk pad dat een beurt afsluit
+		// meldt hem nu. De tick is er één van, Fire() en StartReload() zijn de
+		// andere twee, en er komt er vanzelf een bij zonder dat iemand deze regel
+		// hoeft te onthouden.
+		PublishWeaponStatus();
 	}
 }
 
@@ -435,6 +560,15 @@ bool UEclipseHitscanWeaponComponent::Fire(const FVector& ViewLocation, const FVe
 	{
 		--AmmoInMagazine;
 	}
+
+	// EEN SCHOT IS EEN KOGEL MINDER, ONGEACHT WAT HIJ RAAKT.
+	//
+	// Hier en niet onderaan Fire(), om precies dezelfde reden als het ShotFired-feit
+	// hieronder: onder de trace staan drie `return false`-takken (niets geraakt, de
+	// wereld geraakt, en de personage-tak eronder), en in twee daarvan zou de teller
+	// dus nooit vertrekken. Dan zou de HUD alleen aftellen bij RAKE schoten — en
+	// missen doe je het vaakst.
+	PublishWeaponStatus();
 
 	// HET SCHOT VERRAADT JE (owner-opdracht 26-07, punt 1).
 	//

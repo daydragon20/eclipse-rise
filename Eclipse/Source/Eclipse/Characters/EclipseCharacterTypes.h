@@ -884,11 +884,46 @@ struct FEclipseEnemyArchetypeRow : public FTableRowBase
 	float MeleeRange = 200.0f;
 };
 
+/**
+ * Hoe dit wapen op één trekkerbeweging reageert — het woord dat rechtsonder naast
+ * het magazijn hoort te staan (SINGLE / BURST / AUTO).
+ *
+ * NIET GEAUTHORD OP 01-08, en dat staat hier expliciet in plaats van dat het veld
+ * er stil bij komt te staan. GEMETEN: `FireMode`, `SemiAuto`, `bAutomatic` en
+ * `BurstCount` komen samen NUL keer voor in `Source/` en `Tools/`; DT_Weapons
+ * draagt de kolom dus niet en de vier rijen uit `create_phase1_content.py` vullen
+ * hem niet. Elke rij leest daarom vandaag `Unspecified`.
+ *
+ * Waarom hij er tóch staat, en waarom `Unspecified` een echte waarde is en geen
+ * gaatje: de schermlaag hoort het verschil te kunnen zien tussen "dit wapen is
+ * enkelschot" en "niemand heeft dit ooit ingevuld". Een enum die bij afwezigheid
+ * stilletjes `Single` zou zeggen, laat het scherm iets beweren wat niemand heeft
+ * besloten — precies de klasse fout waar `Sidearm_Scrap` uit voortkwam. Bij
+ * `Unspecified` toont de HUD niets en degradeert luid.
+ *
+ * WELK wapen welke modus krijgt is een balansbeslissing over DT_Weapons en dus
+ * van de owner; de bedrading eronder (rij -> feed -> bus -> payload) is compleet,
+ * zodat het invullen van die kolom geen regel code meer kost.
+ */
+UENUM(BlueprintType)
+enum class EEclipseWeaponFireMode : uint8
+{
+	/** DT_Weapons zegt er niets over. De schermlaag hoort dan te ZWIJGEN, niet te gokken. */
+	Unspecified,
+	Single,
+	Burst,
+	Automatic
+};
+
 /** One weapon platform (DT_Weapons row; Phase 1: one AR, one sidearm per feel targets). */
 USTRUCT(BlueprintType)
 struct FEclipseWeaponRow : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	/** Zie EEclipseWeaponFireMode: vandaag voor elke rij `Unspecified`, bewust. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
+	EEclipseWeaponFireMode FireMode = EEclipseWeaponFireMode::Unspecified;
 
 	/** Damage per shot. Feel target: well-aimed player TTK vs. basic enemy ~0.6 s. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 0))

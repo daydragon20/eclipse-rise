@@ -466,6 +466,17 @@ void AEclipseCharacter::NotifyControllerChanged()
 	// beginwaarden opnieuw als bInitial verstuurt in plaats van als "genezing".
 	VitalsTracker.Reset();
 	PublishVitals();
+
+	// EN DE WAPENHELFT VAN DEZELFDE FOTO. Nodig omdat de volgorde niet vastligt: de
+	// game mode kan het wapen uitrusten vóór de bezetting (dan wees de poort in
+	// PublishWeaponStatus het feit af — er was nog geen speler) of erna (dan heeft
+	// ApplyLoadout het al gedaan). Alleen het tweede geval dekken zou betekenen dat
+	// de teller op sommige startpaden leeg blijft tot het eerste schot, en welk pad
+	// dat is, is niet aan dit lichaam om te weten.
+	if (UEclipseHitscanWeaponComponent* Weapon = FindComponentByClass<UEclipseHitscanWeaponComponent>())
+	{
+		Weapon->PublishWeaponStatus();
+	}
 }
 
 void AEclipseCharacter::SetCameraRelativeOrientation(bool bEnabled)

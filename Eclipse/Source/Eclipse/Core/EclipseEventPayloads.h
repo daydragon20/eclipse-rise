@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Characters/EclipseCharacterTypes.h" // EEclipseWeaponFireMode — pure data, no engine actors
 #include "Strategy/EclipseCampaignTypes.h" // EEclipseDominionResponseTier (GDD 9.4) — pure data, no engine actors
 #include "EclipseEventPayloads.generated.h"
 
@@ -457,6 +458,164 @@ struct FEclipsePlayerVitalsPayload
 	 * pawn is er niets veranderd, er was alleen nog niets bekend. Alle drie de
 	 * vlaggen hierboven staan dan op false — anders zou "vol leven" bij spawn als
 	 * een treffer op het scherm landen.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bInitial = false;
+};
+
+/**
+ * Event.Player.WeaponStatusChanged — de STAND van het wapen in de handen van de
+ * speler is veranderd. De tweede helft van dezelfde laag als VitalsChanged.
+ *
+ * WAAROM ER AL DRIE COMBAT-TAGS ZIJN EN DEZE ER TOCH BIJ MOET. `ShotFired`,
+ * `ReloadStarted` en `WeaponSwapped` dragen alle drie een GEBEURTENIS: er knalde
+ * iets, er begon iets, er wisselde iets. Geen van drieën draagt de STAND — er
+ * staat nergens in hoeveel kogels er nu nog in zitten. Een luisteraar die de
+ * teller wil tekenen zou dus zelf moeten meetellen (en dan heeft élke widget zijn
+ * eigen kopie van het magazijn) of alsnog de pawn moeten pollen, wat
+ * `UI/EclipseMissionHudWidget.cpp` tot 01-08 letterlijk elk frame deed
+ * (`Weapon->GetAmmoInMagazine()`). Dat breekt GDD 12.2 regel 2 precies zoals de
+ * gezondheidshelft hem brak.
+ *
+ * HET IS EEN Event.Player.*-FEIT EN GEEN Event.Combat.*-FEIT, en dat is geen
+ * naamgevingssmaak. De Combat-familie beschrijft wat er in de WERELD gebeurde en
+ * heeft luisteraars die dat nodig hebben: de AI hoort schoten, de audiolaag hangt
+ * er foley aan, en elk lichaam op de kaart mag daarin voorkomen. Dit feit gaat
+ * over het ENE lichaam waar een lokale speler doorheen kijkt, en over niets
+ * anders. Zet je het in Combat, dan moet elke bestaande luisteraar leren
+ * negeren; zo naast VitalsChanged kan de schermlaag zich op `Event.Player.*`
+ * abonneren en heeft hij het hele dashboard.
+ */
+USTRUCT(BlueprintType)
+struct FEclipseWeaponStatusPayload
+{
+	GENERATED_BODY()
+
+	/** Kogels in het magazijn NA de verandering. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 AmmoInMagazine = 0;
+
+	/** Waar dat getal tegen afgezet hoort te worden ("23 / 30"). 0 = dit wapen telt niet. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 MagazineSize = 0;
+
+	/**
+	 * Het magazijn ERVOOR — zelfde reden als PreviousHealth bij de vitals: het
+	 * TEKEN van het verschil scheidt een schot (aflopend) van een herlaadbeurt die
+	 * landt (omhoog springend), en zonder dat zou elke widget zijn eigen vorige
+	 * waarde moeten bewaren. Precies de verborgen staat die een event-gedreven HUD
+	 * moet vermijden.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 PreviousAmmoInMagazine = 0;
+
+	/**
+	 * MAGAZIJNEN OVER. -1 = ONBEPERKT, en dat is een gemeten feit en geen
+	 * plaatshouder: `Combat/EclipseHitscanWeaponComponent.h` legt expliciet vast
+	 * dat de voorraad oneindig is ("je magazijn raakt leeg, je munitie niet") omdat
+	 * eindige munitie loadouts, economie en missiebalans tegelijk raakt en dus een
+	 * owner-beslissing is. GEMETEN: `ReserveAmmo`, `SpareMag` en `ReserveMag` komen
+	 * nul keer voor in `Source/`.
+	 *
+	 * Als -1 en niet als 0 of als weggelaten veld: 0 betekent "op", en dat is een
+	 * andere uitspraak dan "hier wordt niet geteld". De HUD hoort bij -1 níets te
+	 * tonen; een teller die "0" toont zou de speler laten denken dat hij droogstaat.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 SpareMagazines = -1;
+
+	/** Zijn de handen NU aan het magazijn? */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bReloading = false;
+
+	/** 0..1 door de lopende beurt heen; 0 zodra er niet herladen wordt. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float ReloadProgress = 0.0f;
+
+	/**
+	 * Seconden die de beurt nog te gaan heeft, en de volle duur ernaast.
+	 *
+	 * Bestaan omdat voortgang een KLOK is en geen gebeurtenis. De feed zendt
+	 * voortgang in gekwantiseerde stappen uit (zie EclipseWeaponStatusFeed:
+	 * ReloadProgressEpsilon) — genoeg om een balk te laten lopen, weinig genoeg om
+	 * de bus niet in per-frame verkeer te veranderen. Wie het tussen twee feiten
+	 * door vloeiend wil, heeft aan deze twee getallen genoeg en hoeft daarvoor niet
+	 * alsnog het wapen te pollen.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float ReloadSecondsRemaining = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	float ReloadSecondsTotal = 0.0f;
+
+	/**
+	 * LEEG. Als eigen vlag en niet als "reken AmmoInMagazine == 0 zelf uit": leeg is
+	 * de enige toestand waarin de trekker niets doet, en dat is de scherpste
+	 * mededeling die de teller heeft. Wie hem laat afleiden, laat elke widget de
+	 * regel opnieuw bedenken — en een wapen zónder magazijn (MagazineSize 0, de
+	 * oneindige varianten) staat dan ten onrechte permanent op "leeg".
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bEmpty = false;
+
+	/** De rijnaam uit DT_Weapons — de SLEUTEL, voor logregels en diagnose. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FName WeaponRowName;
+
+	/**
+	 * DE NAAM DIE DE SPELER LEEST (DT_Weapons.DisplayName). Naast de rijnaam en
+	 * niet in plaats daarvan: op 31-07 stond `Sidearm_Scrap` op het scherm omdat
+	 * die twee door elkaar gebruikt werden. Leeg mogelijk — de schermlaag hoort dan
+	 * luid te degraderen via `EclipseHudReadout::HumaniseRowName`, niet stil.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	FText WeaponDisplayName;
+
+	/** Welk slot er in de handen ligt, en hoeveel er te wisselen valt (1 = geen wisselknop). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 ActiveSlot = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	int32 SlotCount = 1;
+
+	/** Zie EEclipseWeaponFireMode — vandaag altijd Unspecified, en dat is gemeten, niet vergeten. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	EEclipseWeaponFireMode FireMode = EEclipseWeaponFireMode::Unspecified;
+
+	/**
+	 * WELK deel er veranderde. Zonder deze vlaggen zou de schermlaag elk feit als
+	 * "teken alles opnieuw" moeten lezen, en zou een herlaadstap net zo goed een
+	 * schot-flits geven als een schot.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bAmmoChanged = false;
+
+	/** Het wapen zelf wisselde (ander slot of een andere rij). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bWeaponChanged = false;
+
+	/**
+	 * De herlaadbeurt BEGON of EINDIGDE. De twee zijn uit elkaar te houden aan
+	 * bReloading in ditzelfde feit; een aparte "start"- en "eind"-vlag zou twee
+	 * velden zijn voor één omslag, en dan kunnen ze in theorie tegenspreken.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bReloadStateChanged = false;
+
+	/** Alléén de voortgang schoof op — dit is het feit waar de balk aan hangt. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bReloadProgressed = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bEmptyChanged = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
+	bool bFireModeChanged = false;
+
+	/**
+	 * De EERSTE foto van dit wapen, niet een verandering eraan — zelfde afspraak als
+	 * bij de vitals. Alle vlaggen hierboven staan dan uit, zodat een vol magazijn bij
+	 * het oppakken niet als een herlaadbeurt over het scherm rolt.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eclipse|Events")
 	bool bInitial = false;
