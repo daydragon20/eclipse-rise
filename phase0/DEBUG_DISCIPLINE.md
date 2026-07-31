@@ -158,6 +158,33 @@ en **ga aan iets anders werken.** Een geblokkeerde bug die netjes gedocumenteerd
 
 **Bronnen:** [Layered Blend Per Bone Jitter — Epic forums](https://forums.unrealengine.com/t/layered-blend-per-bone-jitter-4-26/1999131) · [aiming animation shaking with Layered blend per bone](https://forums.unrealengine.com/t/aiming-animation-is-shaking-with-layered-blend-per-bone/1804108) · [layer blend per bone making animations jittery](https://forums.unrealengine.com/t/animation-bug-layer-blend-per-bone-making-animations-jittery/410566) · [Using Layered Animations — UE-documentatie](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-layered-animations-in-unreal-engine)
 
+### 4.4 "The map specified on the commandline could not be found" — **GEEN GAMEBUG**
+
+**Symptoom (31-07, 19:11):** de game start niet en toont een dialoog:
+
+> The map specified on the commandline `C:/Users/natha/AppData/Local/Programs/Git/Game/Maps/GrayboxDistrict` could not be found. Would you like to load the default map instead?
+
+**Oorzaak: Git Bash (MSYS2) verminkt het argument.** Unreal-mapnamen zijn *virtuele* paden en beginnen met `/Game/…`. MSYS ziet elk argument dat op een Unix-absoluut pad lijkt en vertaalt het naar Windows door de Git-installatiemap ervoor te plakken. Git staat hier in `C:\Users\natha\AppData\Local\Programs\Git`, en dat is exact het voorvoegsel in de melding.
+
+**Bewijs (één commando, geen redenering):**
+```bash
+$ cmd //c echo /Game/Maps/GrayboxDistrict
+C:/Users/natha/AppData/Local/Programs/Git/Game/Maps/GrayboxDistrict
+```
+
+**Er is dus niets mis met `SPEEL_ECLIPSE.bat`** — daar staat gewoon `set MAP=/Game/Maps/GrayboxDistrict`. De fout ontstaat alleen wanneer de game via de **Bash-tool** wordt gestart.
+
+**Oplossing, in volgorde van voorkeur:**
+
+1. **Start de game via PowerShell of cmd, niet via Bash.** `SPEEL_ECLIPSE.bat` is een batchbestand; dat hoort in de PowerShell-tool. Dit is de echte fix.
+2. Moet het toch via Bash: zet de padvertaling uit voor dat commando —
+   `MSYS_NO_PATHCONV=1 ./SPEEL_ECLIPSE.bat` of `MSYS2_ARG_CONV_EXCL='*' …`
+3. Of ontsnap het pad met een dubbele slash: `//Game/Maps/GrayboxDistrict`.
+
+**Algemene regel voor dit project:** elk argument dat met `/Game/`, `/Script/`, `/Engine/` of `-ExecCmds=` begint, gaat **nooit** door de Bash-tool. Dat geldt ook voor commandlets en `-EclipseStartMission=…`.
+
+**Waarom dit hier staat:** dit is precies een §1-stap-0-geval. Het is bekend gedrag van het gereedschap, niet van de game, en het kost tien seconden om te herkennen zodra je het één keer hebt opgeschreven.
+
 ### 4.3 Inslagspoor rendert niet — **OPEN, maar verkeerd benaderd**
 
 **Stand:** twaalf oorzaken "uitgesloten" door redenering, drie conclusies teruggenomen. Het enige dat ooit verscheen was een kubus **bij het personage**, niets op de inslagplek.
