@@ -150,8 +150,47 @@ en **ga aan iets anders werken.** Een geblokkeerde bug die netjes gedocumenteerd
 
 **Diagnose:** 27 richtingsomkeringen is geen animatiefout — dat is een **oscillerend blendgewicht**. Dit is het bekende *Layered Blend Per Bone*-jittersymptoom, breed gemeld op de Epic-forums, vaak in combinatie met een aim-offset.
 
+> ## ⚠️ OORZAAK 1 IS GEMETEN — 31-07. De diagnose klopt, het mechanisme níét.
+>
+> **Wat bevestigd is:** het gewicht oscilleert echt, en 1:1 met het aantal schoten.
+> Gemeten pieken bij 10 / 20 / 27 schoten: **10 / 20 / 27**, identiek bij 120 Hz,
+> 60 Hz **en 77 Hz**. Dat derde raster is er met opzet: 120 en 60 zijn allebei een
+> geheel veelvoud van het vuurinterval van 0,15 s, dus die twee kunnen het samen eens
+> zijn over een rasterartefact. 77 Hz valt nergens op een schot en geeft hetzelfde.
+>
+> **Controleproef vóór de meting**, want een teller die altijd "het aantal schoten"
+> zegt meet niets: één doorlopende pose over hetzelfde venster geeft **1 piek**, een
+> vlak signaal **0**. De teller kan dus wél iets anders zeggen.
+>
+> **Wat NIET klopt aan de tekst hieronder — en dat is de les.** De speler draait
+> **geen AnimBP**: `EclipseCharacter.cpp` zet `UEclipseAnimInstance` als
+> anim-instance-class, een C++-proxy die gewogen poses optelt. Er is dus geen
+> *Layered Blend Per Bone*-node en geen aim-offset die om bones vecht, en de
+> **Rewind Debugger heeft niets om terug te spoelen**. Die aanbeveling stuurde naar
+> gereedschap dat hier niet bestaat.
+>
+> **Het echte mechanisme:** `PlayOneShot` zet `OneShotTime = 0.0f` — de envelope
+> **herstart bij elk schot**, en loopt dus per schot 0 → piek → 0.
+>
+> **Twee dingen die de voor de hand liggende verklaring uitsluiten.** De geleverde
+> config is niet het zaagtandregime: posetijd 0,12 s < vuurinterval 0,15 s, dus elke
+> puls loopt áf (104 stille frames tussen de schoten) — er wordt niets afgekapt. En
+> dat maakt niet uit: bij snelvuur (interval 0,08 s < posetijd) zijn er 0 stille
+> frames en zijn het **exact dezelfde** 27 pieken. Het afkappen maakt de omkeringen
+> dus niet; de herstart doet dat, in beide regimes.
+>
+> **Vondst onderweg:** de formule stond **twee keer** — in de proxy die de speler ziet
+> én in de game-thread-spiegel die de testlaag uitleest. Beide roepen nu
+> `EclipseLocomotion::OneShotEnvelope()` aan. Zonder die samenvoeging bewees een
+> meting aan de ene helft niets over de andere.
+>
+> **Fixrichting (aparte iteratie, bewust nog niet gedaan):** een doorlopende envelope
+> die bij een nieuw schot vanaf het *huidige* gewicht verder loopt in plaats van vanaf
+> 0. De falsificatie ligt klaar — dezelfde test moet dan pieken ≪ N geven bij
+> ongewijzigde bemonstering. Test: `Tests/EclipseAnimOneShotWeightTests.cpp`.
+
 **Bekende oorzaken, in volgorde van waarschijnlijkheid:**
-1. **Blendgewicht oscilleert** — twee nodes (bovenlichaamslaag en aim-offset) vechten om dezelfde bones. Kijk met de **Rewind Debugger** naar het gewicht per frame; je ziet het heen en weer springen in plaats van te speculeren.
+1. ~~**Blendgewicht oscilleert** — twee nodes (bovenlichaamslaag en aim-offset) vechten om dezelfde bones. Kijk met de **Rewind Debugger** naar het gewicht per frame.~~ **Gemeten en gecorrigeerd, zie het kader hierboven:** het gewicht oscilleert wél, maar er zijn geen vechtende nodes en geen Rewind Debugger — het is de herstart per schot in de C++-proxy.
 2. **Animatiecompressie** — geïmporteerde animaties gaan trillen door compressie. Zet de compressie op **Default Anim Bone Compression** en meet opnieuw. Goedkope test, veelvoorkomende oorzaak.
 3. **Bone-uitlijning / retargeting** — verschillen tussen skeletons. Gebruik **Show Retargeting Debug** om de trillende bone aan te wijzen.
 4. **Blend-in/blend-out per schot te kort** — bij hoge vuursnelheid herstart de montage voor hij is uitgeblend. Een additieve terugslag-take lost dit structureel op (staat al als voorstel in de repo).
@@ -185,12 +224,27 @@ C:/Users/natha/AppData/Local/Programs/Git/Game/Maps/GrayboxDistrict
 
 **Waarom dit hier staat:** dit is precies een §1-stap-0-geval. Het is bekend gedrag van het gereedschap, niet van de game, en het kost tien seconden om te herkennen zodra je het één keer hebt opgeschreven.
 
-### 4.3 Inslagspoor rendert niet — **OPEN, maar verkeerd benaderd**
+### 4.3 Inslagspoor rendert niet — **OPEN, maar de transform is nu met een meting UITGESLOTEN**
 
-**Stand:** twaalf oorzaken "uitgesloten" door redenering, drie conclusies teruggenomen. Het enige dat ooit verscheen was een kubus **bij het personage**, niets op de inslagplek.
+*Stand 31-07. Deze regel vervangt de vorige conclusie ("transform-bug, geen rendering-bug"); die is weerlegd.*
 
-**Wat dat ene feit betekent — en het is het enige harde feit in het dossier:** als het gespawnde object bij het personage verschijnt in plaats van op de inslagplek, dan rendert het systeem prima en is de **transform fout**. Dat is geen rendering-bug, dat is een locatie-bug. Twaalf uitgesloten rendering-oorzaken waren dus twaalf tests in de verkeerde helft van de zoekruimte.
+**Wat hier stond, en waarom het weg moest.** De conclusie luidde: het enige zichtbare object stond *bij het personage* in plaats van op de inslagplek, dus de transform is fout en het renderen werkt prima. Dat feit kwam uit een controleproef die het niet kan dragen — het was een magenta blok dat **vastgemaakt was aan het personage** en bij BeginPlay was neergezet. Een object dat per constructie bij het personage staat, zegt niets over waar een *gespawnd* spoor terechtkomt; het kón nergens anders staan. Dezelfde aantekening meldde bovendien dat de echte sporen gemeten op **8,4–8,5 m vóór de camera** stonden, wat de tegenovergestelde kant op wijst. En de logregel die het had kunnen beslissen, logde wel `Spot` (waar het spoor *naartoe* ging) maar nooit `Mark->GetActorLocation()` (waar het *staat*). Dit is anti-patroon 1 uit §2 in zuivere vorm: een conclusie zonder observatie die hem aantoont.
 
-**Volgende stap volgens dit protocol:** log de hit-locatie uit de trace en de uiteindelijke spawn-transform naast elkaar, 20 schoten lang. Wijken ze af, dan zit het in de trace of de transform-berekening (waarschijnlijk lokale versus wereldruimte, of een relatieve attach die niet los is gemaakt). Zijn ze gelijk, dán pas is het een rendering-vraag en gaat RenderDoc open.
+**De meting die nu wel is gedaan.** `Eclipse.Combat.ImpactMarkLandsOnTheHitAndNotOnTheShooter` (`Eclipse/Source/Eclipse/Tests/EclipseImpactMarkTests.cpp`), volledig headless, 20 schoten gevarieerd over afstand (250–3955 cm), hoek (360° yaw, pitch −35…+35), oppervlaknormaal (vloer / muur / schuin) en schutterpositie — die laatste staat nooit op de oorsprong, want daar zijn wereld- en lokale ruimte identiek en is juist de vermoede fout onzichtbaar. Twee eisen per schot **tegelijk**, want elk van de twee alleen laat de andere verklaring in leven.
 
-*Geen dertiende hypothese. Eén meting.*
+| Gemeten | Uitkomst |
+|---|---|
+| spoor ≤ 1 cm van de inslagplek uit de trace | **20/20** — slechtste afwijking 1,000 cm, en dat is exact de bewuste lift van 1 cm langs de normaal; van de *bedoelde* plek 0,000 cm bij alle twintig |
+| spoor ≥ 100 cm van de schutter | **20/20** — dichtstbijzijnde 249,4 cm |
+| staan ze er ná alle twintig spawns nog steeds | 20/20, slechtste afwijking onveranderd 1,000 cm |
+| **controleproef**: een spoor met de hand OP de schutter gezet, langs hetzelfde zoek- en meetpad | 250,0 cm van de inslag, 0,0 cm van de schutter — **beide eisen keuren het af**, dus deze meting kán rood worden |
+
+**Weerlegd:** de transform-diagnose. `SpawnImpactMark` zet het spoor in wereldruimte precies waar de `FHitResult` het wil hebben, op elke afstand en elke hoek, met een schutter ver van de oorsprong. Geen lokale-ruimte-fout, geen niet-losgemaakte attach, geen vergeten offset.
+
+**Niet bewezen, en dus geen nieuwe aanname:** dit meet de keten *ná* de `FHitResult`. Of de trace in het spel een goed inslagpunt oplevert, meet deze test niet — dat doet sinds 31-07 de uitgebreide logregel in `SpawnImpactMark`, die naast `bedoeld` ook de **werkelijke actor-locatie na spawnen**, de **schutterspositie** en `Hit.GetActor()` afdrukt. En de testwereld tickt nooit, dus over frame-tijd zegt hij niets.
+
+**Het dossier gaat terug naar de renderkant**, met een kleinere zoekruimte dan in juli: er staan inmiddels **twee onafhankelijke spawners** van hetzelfde spoor in de code — `UEclipseHitscanWeaponComponent::SpawnImpactMark` (M_EclipseToonDecal + masker, rotatie uit de normaal) en `AEclipseGameMode::OnWorldImpact` (M_EclipseToon, geen rotatie) — en ze zijn allebei onzichtbaar. Dat sluit "het ligt aan wie hem neerzet" én "het ligt aan dit ene materiaal" in één klap uit.
+
+**De volgende meting, niet de volgende hypothese.** De zwakke plek staat al in het dossier: *"inbeeld=1 zegt niets over wat er vóór het vlak staat"*, en geen enkele rig-stand kijkt naar onbelemmerd wegdek. De goedkoopste test die dat halveert is een **zichtlijn-trace van de camera naar elk levend spoor** in de `[PLAYSHOT n SPOREN]`-regel: die maakt van "inbeeld" een "vrij zicht ja/nee". Is het zicht vrij en staat er niets, dán is het een render-vraag en gaat RenderDoc open. Is het zicht nooit vrij, dan meet dit harnas de vraag helemaal niet en is een rig-stand die wél naar de grond kijkt de eerste stap. Exact dezelfde vraag staat open voor de 38 grondvlakken van de bouwer, waarvan nooit is vastgesteld dát ze renderen.
+
+*Geen dertiende hypothese. Eén meting — en die is nu gedaan.*

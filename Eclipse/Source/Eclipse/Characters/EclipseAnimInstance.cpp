@@ -219,6 +219,24 @@ float EclipseLocomotion::ComputeStrideRate(float GroundSpeed, const FEclipseLoco
 	return ComputeStrideRate(GroundSpeed, Set.WalkSpeed, Set.RunSpeed, Set.SprintSpeed, Blend);
 }
 
+float EclipseLocomotion::OneShotEnvelope(float Elapsed, float Duration, float PeakWeight)
+{
+	// Snel erin, langzamer eruit: een klap moet meteen zichtbaar zijn en dan
+	// wegebben. De klem op PeakWeight is hier een no-op voor allebei de aanroepers
+	// — PlayOneShot en PlayOneShotPose klemmen hem al bij het zetten — maar hij
+	// maakt de functie totaal, zodat de testlaag hem met elke waarde mag voeren.
+	if (Duration <= 0.0f)
+	{
+		return 0.0f;
+	}
+	const float Alpha = Elapsed / Duration;
+	if (Alpha >= 1.0f)
+	{
+		return 0.0f;
+	}
+	return FMath::Clamp(PeakWeight, 0.0f, 1.0f) * FMath::Sin(FMath::Clamp(Alpha, 0.0f, 1.0f) * PI);
+}
+
 EEclipseLocomotionTier FEclipseLocomotionSet::GetTier() const
 {
 	return EclipseLocomotion::ClassifyTier(Idle != nullptr, Walk != nullptr, Run != nullptr);
@@ -384,9 +402,9 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 	if (OneShot != nullptr && OneShotDuration > 0.0f)
 	{
 		const float Alpha = FMath::Clamp(OneShotTime / OneShotDuration, 0.0f, 1.0f);
-		// Snel erin, langzamer eruit: een klap moet meteen zichtbaar zijn en dan
-		// wegebben. Sin-envelope met de piek op een derde van de duur.
-		OneShotWeight = OneShotPeakWeight * FMath::Sin(FMath::Clamp(Alpha, 0.0f, 1.0f) * PI);
+		// De curve zelf staat in EclipseLocomotion::OneShotEnvelope; hier blijft
+		// alleen het OPRUIMEN staan, want dat is proxy-toestand en geen wiskunde.
+		OneShotWeight = EclipseLocomotion::OneShotEnvelope(OneShotTime, OneShotDuration, OneShotPeakWeight);
 		if (Alpha >= 1.0f)
 		{
 			OneShot = nullptr;
@@ -937,7 +955,7 @@ void UEclipseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		OneShotElapsed += GetDeltaSeconds();
 		const float Alpha = OneShotDurationLeft > 0.0f ? OneShotElapsed / OneShotDurationLeft : 1.0f;
-		OneShotWeight = Alpha >= 1.0f ? 0.0f : OneShotPeak * FMath::Sin(FMath::Clamp(Alpha, 0.0f, 1.0f) * PI);
+		OneShotWeight = EclipseLocomotion::OneShotEnvelope(OneShotElapsed, OneShotDurationLeft, OneShotPeak);
 		bOneShotActive = Alpha < 1.0f;
 	}
 

@@ -206,4 +206,27 @@ namespace EclipseLocomotion
 	/** Set-shaped convenience wrappers — the runtime call sites use these. */
 	ECLIPSE_API FEclipseLocomotionBlend ComputeBlend(float GroundSpeed, const FEclipseLocomotionSet& Set);
 	ECLIPSE_API float ComputeStrideRate(float GroundSpeed, const FEclipseLocomotionSet& Set, const FEclipseLocomotionBlend& Blend);
+
+	/**
+	 * Het gewichtsverloop van ÉÉN eenmalige pose (schot, klap, herladen, draaien):
+	 * verstreken tijd -> hoeveel die pose nu meetelt. Sin-envelope, dus 0 aan het
+	 * begin, de piek halverwege, en 0 zodra de duur om is.
+	 *
+	 * WAAROM DIT HIER STAAT EN NIET TWEE KEER IN DE .CPP. Deze formule stond
+	 * letterlijk twee keer: één keer in FEclipseLocomotionProxy::Evaluate (de pose
+	 * die de speler ziet) en één keer in UEclipseAnimInstance::NativeUpdateAnimation
+	 * (de spiegel die de testlaag uitleest, omdat de proxy op de werkthread leeft en
+	 * daar uitlezen een datarace is). Twee kopieën van dezelfde curve betekent dat
+	 * een meting aan de ene niets bewijst over de andere.
+	 *
+	 * En meten is precies waarvoor dit hier ligt: het dossier "trillen bij het
+	 * schieten" vraagt om het gewicht PER FRAME, en de voorgeschreven route daarvoor
+	 * (Rewind Debugger op de AnimBP, DEBUG_DISCIPLINE §4.2 oorzaak 1) bestaat voor de
+	 * speler niet — er is geen AnimBP, er is deze proxy. Als functie van zijn
+	 * argumenten is de curve wél headless te bemonsteren, zonder editor en zonder
+	 * skelet (EclipseAnimOneShotWeightTests.cpp).
+	 *
+	 * Duur <= 0 of Alpha >= 1 geeft 0: een pose die niet loopt, weegt niets.
+	 */
+	ECLIPSE_API float OneShotEnvelope(float Elapsed, float Duration, float PeakWeight);
 }
