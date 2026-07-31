@@ -180,14 +180,28 @@ DoD-basis (14.4): *spec gerefereerd + code + data + tests + EventCatalog/docs bi
 1. **Eén build-slot.** Schrijven mag parallel, **landen is serieel** — en een open owner-editor blokkeert het slot volledig (Live Coding).
 2. Spoor A raakt de build niet en loopt dus altijd door, ook als het slot bezet is.
 
-### 2a-bis. Wél in flight op 01-08 ~04:45
+### 2a-bis. HERIJKT 01-08 ~09:30
+
+**Geland sinds 04:45** — elk met een hash, per de regel van dit bord:
+
+| Spoor | Bewijs |
+|---|---|
+| **Vault-shells** | `f3e5c0b` — vier beloopbare kamers, en de vondst dat de vault **nooit getekend werd** (verborgen anker → 175 onzichtbare blokken, terwijl collision, tags en tests groen waren) |
+| **N-a wapenstatus op de bus** | `0dec68f` — `Event.Player.WeaponStatusChanged` + `Combat/EclipseWeaponStatusFeed.{h,cpp}` + 6 tests |
+| **HUD stopt met pollen** | `057b2e7` — `RefreshAmmoReadout` leest uit de bus; controleproef bewees dat pollen en luisteren **optelden** (20 → 200 op 180 frames) |
+| **Act 1 compleet + M1.1 door de poort** | `43c493f` · `057b2e7` — 71 bestanden, 1.623 regels, 97.275 credits; M1.1 op **GO** na drie critic-rondes |
+| **Negen L1-rulings** | `be0a7af` — L1-R21 t/m L1-R29, waarvan twee correcties op eerdere rulings |
+
+### 2a-ter. In flight op 01-08 ~09:30
 
 | Spoor | Eigenaar | Bestanden (= ownership zolang het loopt) | Sluit af met |
 |---|---|---|---|
-| **Vault-shells** | element-builder | `Base/EclipseVaultBuilder.{h,cpp}`, `Base/EclipseBaseSubsystem.{h,cpp}`, **nieuw** `Tests/EclipseVaultRoomTests.cpp` | Een ronde loopt van faciliteit naar faciliteit zonder door geometrie te vallen, en de vier faciliteiten zijn in het frame te onderscheiden. **Let op: de suite is tijdens dit werk 4 rood** — dat is in-flight werk en geen regressie. |
-| **Critic-poort M1.1 / M1.7 / M1.8** | dialogue-critic ×3 | de scriptmappen, alleen-lezen | GO of NO-GO per scène. **M1.1 is de ijkmissie en blokkeert alle generatie**; hij staat terug op `critic: null` doordat vijf van zeven scènes vannacht gerepareerd zijn. |
-| **Hub-gesprekken** | dialogue-writer ×2 | `Eclipse/Content/Script/act1/hub/` — 12 stubs | Act 1 compleet. Budget ~1.200 credits per gesprek (zie `phase0/VOICE_LEDGER.md`). |
-| **Shortlist Petra Voss** | voice-director | `progress_media/casting/petra/`, `casting_stage1.json` | Fragmenten die de owner kan afspelen. Zij ontbrak in alle 19 rollen terwijl O-3 haar wel vroeg. |
+| **N-b eerste kaartstap** | element-builder | `UI/EclipseStrategyMapWidget.*`, `Strategy/` | De kaartlaag noemt per regio zijn buren, en een asymmetrische kant laat de validator roodlopen **vóór** hij het scherm haalt. |
+| **Ijkmissie inspreken** | voice-director | `Content/Audio/`, `phase0/VOICE_LEDGER.md` | M1.1 hoorbaar op het dashboard. ~9.332 credits, met een stop bij >25% afwijking van de schatting. |
+| **De twee laatste takken** | dialogue-writer | `M1.6.S05`, `M1.8.S99` | `BRANCH` schoon — dit is de categorie die *"Unfixable after generation"* heet. |
+| **Screenshotronde** | screenshot-inspector | `phase0/SHOT_FINDINGS.md` | 141 frames die niemand bekeken had, tegen §20.2 en de HUD-eis. |
+
+**Eén build-slot.** Schrijven mag parallel, **landen is serieel**. Spoor A raakt de build niet en loopt dus altijd door.
 
 ### 2b. Daarna klaarstaand (in deze volgorde)
 
