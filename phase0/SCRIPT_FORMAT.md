@@ -251,6 +251,43 @@ condition: 'run.zero_casualty == true'                # this mission run only
 
 **Run facts are not story flags.** A debrief scene asking "did anybody go down" is asking about the run, and persisting that as campaign state would grow the save with transient data for every mission in the game. `run.zero_casualty` reads the existing downed-soldier latch (SPEC-P2-04 amendment); it needs no new state at all.
 
+#### The declared run facts, and what each one reads — RULING L1-R26
+
+There are two kinds, and the second kind is **a category, not a list**:
+
+| Fact | Reads | Kind |
+|---|---|---|
+| `run.zero_casualty` | `FEclipseMissionOutcome::DownedSoldierIds` is empty | latch |
+| `run.alarm_raised` | `FEclipseMissionOutcome::bAlarmRaised` | latch |
+| `run.ghost` | never went loud and was never seen | latch |
+| **`run.m17_record`** | **`CompletedObjectiveIds` contains M1.7's optional record objective** | **objective** |
+
+**`CompletedObjectiveIds` already exists** (`EclipseMissionTypes.h:165`) and it is generic. So **any `run.` fact of the form "did the player complete this optional objective" needs no new state — only access**, exactly as L1-R4 said of `run.zero_casualty`. Every mission in the game has optionals, so a debrief line about one is always free of persisted state. **A `story.` flag for an optional objective is always wrong.**
+
+`run.m17_record` gates `M1.7.S03.250` (P2-d, twist 2 — a Dominion personnel record with the name *and* the post lacquered out: Whisper as an absence, read as clerical noise). One line, 96 credits, and AR-9 is satisfied without it because P2-b is the mandatory carrier in the same scene.
+
+> **Declaring it silences `CONDITION` — so the outstanding work must stay visible somewhere the validator cannot cover.** It does: the optional-objective row in M1.7's mission definition plus the `script_to_seed.py` mapping is tracked in `phase0/VOICE_LEDGER.md`. If that row is still missing at act-2 planning, the line is cut — a cheap decision then, instead of a surprise after generation. **This is the one place a declaration is allowed to outrun the implementation, and only because a second ledger is watching it.**
+
+#### Scene-level gate — the header field `condition:` — RULING L1-R28
+
+**SPECIFIED, NOT YET ENABLED. Do not use it in a scene file until `validate_script.py` accepts it.**
+
+`BEATS_HUB_A1.md` §2 requires every hub scene to be gated, and there was no header field — so twelve writers all wrote the gate as a **comment** (`# condition: story.beat_m14_quartermaster == true`). That validates clean and means nothing: no tool reads it, and the gate that "ungated hub dialogue is the fastest way to make a game sound stupid" was meant to enforce exists nowhere in machine form.
+
+It does **not** need a second `HEADER_MAPS` entry. `silence:` is a mapping (value → reason); a scene gate is one expression, so it is a plain scalar and `parse_scene_file` already handles it on the existing indent-0 path:
+
+```yaml
+type:         hub
+credit_tier:  4
+condition:    'story.beat_m14_quartermaster == true'   # the scene is not offered until then
+```
+
+Same name and same grammar as the line-level field on purpose — one grammar, not two (the L1-R2 argument). The scope difference (is the scene *offered* vs. does the line *play*) is a level difference, and the parser separates them by indentation.
+
+**It must count as a reader in the fact table**, or it is decoration: then `CONDITION resolves` and the flag register's *gelezen door* column cover the gates too, and a hub scene hanging on a dead flag falls over. Checked: all twelve gates in `BEATS_HUB_A1.md` §5 have a row in `ACT1_OVERVIEW` §6 or exist in `EclipseGameplayTags.cpp` — with one exception, and that exception is L1-R29.
+
+**Tool change first, adoption second:** add `condition` to `SCENE_OPTIONAL`, check it with `COND_GRAMMAR`, feed it to the fact table. Until then the comment stays.
+
 **Multi-value story flags use gameplay-tag leaves.** `StoryFlags` is a `TArray<FGameplayTag>` with no values, so a three-way choice is three mutually exclusive leaf tags under one parent:
 
 ```
@@ -259,6 +296,34 @@ story.brick_recruited      == true      ⇄   Story.Beat.BrickRecruited   (prese
 ```
 
 Zero schema change, and the parent tag stays queryable as "has this choice been made at all". `script_to_seed.py` performs the mapping; writers only ever use the lowercase form. **Any choice with more than two outcomes uses this shape** — collapsing three outcomes into a boolean is story loss disguised as simplification.
+
+### The three word counts, measured against the files — 01-08
+
+`words`, `words_heard` and `words_generated` are marked **auto** in the table above. **Nothing
+fills them.** Every value in the corpus is hand-counted, and two writers said so unprompted
+when they could not run the tools. Counted across all 71 scenes:
+
+| | |
+|---|---|
+| `words` — median error | **0** — hand-counting mostly works |
+| `words` — worst error | **M1.5.S02, −32** (declares 613, measures 645; 5%) |
+| scenes off by more than 3 | 9 of 71, most of them in M1.5 |
+| **`words_generated` present** | **26 of 71** — absent in M1.1–M1.6 and the prologue |
+
+**The second row is the one that matters.** `words_generated` is described above as *"the
+credit figure"* and *"the input to the Q-7 variant-policy decision"* — and it does not exist
+in 63% of the corpus, including every scene written before 31-07.
+
+> **The act-1 budget does not rest on it, and that is deliberate.** The 97.275 on
+> `phase0/VOICE_LEDGER.md` is measured directly from the text by
+> `Eclipse/Tools/count_generation_cost.py`, which counts every `text:` and every variant and
+> doubles Voss. A tool that reads the lines cannot drift; a field a writer maintains by hand
+> can, and M1.5.S02 shows by how much.
+>
+> **So the open question is a design one, not a bookkeeping one:** should
+> `words_generated` be generated into the files, or dropped in favour of the tool that
+> already computes it exactly? Two homes for one truth is the divergence bug this format
+> argues against everywhere else. **Not decided here** — it is L1's call.
 
 ### The band floors are not too high — measured 01-08
 
