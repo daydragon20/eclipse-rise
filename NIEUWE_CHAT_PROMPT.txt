@@ -1,89 +1,139 @@
 ====================================================================
- ECLIPSE — STARTPROMPT VOOR EEN NIEUWE CHAT
- Plak ALLES hieronder in een verse Claude-chat in VS Code (ECLIPSE-project).
- Gebruik dit om de robot weer aan het werk te zetten als hij gestopt is.
+ ECLIPSE — STARTPROMPT VOOR VS CODE
+ Plak alles hieronder in een verse Claude-chat in het ECLIPSE-project.
+ Bijgewerkt: 2026-07-31 (nieuwe opzet: twee sporen + live dashboard)
 ====================================================================
 
 Je werkt aan ECLIPSE: Rise of the Resistance — single-player third-person
 Action-Strategy RPG in Unreal Engine 5.8 (C++), repo-root C:\Dev\ECLIPSE_GDD.
 Communiceer met mij (Nathan) in het Nederlands.
 
-STAP 0 — CONTEXT INLEZEN (in deze volgorde, vóór je iets doet):
-1. HANDOFF.md — vooral "LAATSTE STAND" onderaan.
-2. phase0/EXECUTION_PLAN.md — de genummerde backlog + de eerstvolgende 5
-   sprinttaken + de risicolijst + de owner-touchpoints-wachtrij (paragraaf 4).
-3. De `taken`-lijst in progress_data.js — de live status van vandaag.
-4. 13_roadmap.md (ACTIVE_MILESTONE) en 14_ai_dev_instructions.md (bouwregels).
+--------------------------------------------------------------------
+STAP 0 — INLEZEN. Lees ALLEEN dit, in deze volgorde:
+--------------------------------------------------------------------
+1. STATUS.md                          (~5 KB — waar we staan, alles)
+2. phase0/EXECUTION_PLAN.md §2        (spoor B: volgende taak)
+3. phase0/SCRIPT_PRODUCTION_PLAN.md §4 (spoor A: volgende taak)
 
-HUIDIGE STAND (27 juli 2026, avond — bijgewerkt na een sessie-uitval):
-Fase 2 "Thirteen Bullets" is de actieve milestone, MAAR er ligt een owner-stop op
-nieuwe features: "alles wat op de rij staat blijft op de rij tot ik een keer normaal
-kan spelen." Begin dus NIET aan P2-04/05 of ander nieuw werk.
+Lees NIET de hele Game Design Bible en NIET archief/HANDOFF.md.
+Die zijn er om gericht in te zoeken als je iets specifieks nodig hebt,
+niet om standaard in te laden. Elke onnodig gelezen file kost tokens
+die je nodig hebt om te bouwen.
 
-Wat vandaag geland is (alles met een meting, zie HANDOFF.md bovenaan):
-  - mikken maakte het personage x5,0 groter, nu x1,9 (arm 300->270, FOV 80->68)
-  - schieten/herladen zijn een BOVENLICHAAMSLAAG: benen lopen door (voet-omklappen
-    18 -> 2). Looprichtingen mengen nu i.p.v. omklappen op 45 graden, met test.
-  - het wapen is gunmetal, 3-4x donkerder dan het lichaam, ver onder DecoLine
-  - de gids toont weer wat er veranderd is (de opnameronde vervuilde de datum)
-  - zes ingesproken zinnen ("Contact." / "Taking fire!" / "Reloading!" x2 stemmen)
-    zijn gegenereerd EN bedraad via Event.Squad.SelfAction, met 2 s rem per soldaat
-  - de bar is voor het eerst volledig groen: 185 tests, ValidateData 0 fouten,
-    9 opnames; de geparkeerde 3-cm-val telt als BEKEND mee zonder rood te maken
+--------------------------------------------------------------------
+EERST DOEN — het dashboard aanzetten
+--------------------------------------------------------------------
+    START_DASHBOARD.bat        (of: python Tools/eclipse_dashboard.py)
 
-TWEE OPEN DOSSIERS, allebei gemeten en geen van beide opgelost:
-  1. Het zichtbare INSLAGSPOOR rendert niet. Twaalf oorzaken uitgesloten; het enige
-     dat ooit verscheen was een kubus BIJ HET PERSONAGE, alles op de inslagplek niet.
-     Ik heb er drie conclusies over teruggenomen — schrijf er geen vierde, maar kijk
-     in de EDITOR. Details staan bovenaan JOUW_TAKEN.md.
-  2. Het TRILLEN bij het schieten is de schietpose die per schot pulseert (27
-     richtingsomkeringen van de hand tegen hoogstens 2 daarbuiten). Twee reparaties
-     geprobeerd en allebei teruggedraaid omdat ze hun eigen meting niet haalden. Wat
-     rest is een additieve terugslag-take, en dat is content.
+Dit is het ENIGE scherm dat ik lees: http://127.0.0.1:8377/
+Het is live (ververst elke 5 s, ook zonder open chat) en toont taken,
+owner-acties, de agents mét hun chats, alle documenten, screenshots,
+commits en het credit-ledger. Het ruimt ook zelf oude screenshots op.
 
-WAT OP NATHAN WACHT staat in JOUW_TAKEN.md en in ownerActies (8 punten, opgeschoond
-van 22). Het zwaarste is de WAPENBRON: er bestaat nergens een los wapenmesh, en
-daar hangen punt 5 en zijn hele nieuwe wapen-opdracht (zweven bij herladen, aparte
-onderdelen, doorkijkbaar vizier) allemaal aan.
+Eenmalig, zodat hij bij elke aanmelding vanzelf start:
+    powershell -ExecutionPolicy Bypass -File Tools\install_dashboard_autostart.ps1
 
-ALS EERSTE DOEN — de dashboardserver draait niet vanzelf:
-  python -m http.server 8377 --bind 127.0.0.1     (draaien vanuit C:\Dev\ECLIPSE_GDD)
-Daarna opent http://127.0.0.1:8377/START_HIER.html weer. Hij valt om zodra de sessie
-eindigt; niets in de repo start hem, dus zet hem bij elke nieuwe chat opnieuw aan.
+--------------------------------------------------------------------
+HOE WE WERKEN — twee sporen, parallel
+--------------------------------------------------------------------
+SPOOR A — SCHRIJVEN & STEM  (deadline: credits vervallen einde maand)
+  De hele campagne wordt uitgeschreven tot op de dialoogregel; Act 1
+  wordt deze maand ingesproken. Schrijven kost geen credits, alleen
+  inspreken kost credits — daarom wordt alles geschreven en ~40%
+  gesproken, in de tier-volgorde uit 19_voice_production.md §19.2.
+  Raakt de build niet aan, dus loopt altijd door.
+  Plan: phase0/SCRIPT_PRODUCTION_PLAN.md
 
-WERK MET DE AGENTS (spin ze zelf op via de Task-tool):
-- game-planner: begin van elke werk-cyclus en telkens als er geen duidelijke
-  volgende taak is -> levert de beste volgende taak + werkt progress_data.js bij.
-- element-builder: spawn er meerdere PARALLEL, één per afgebakend element.
-- code-reviewer: na elke build-groene iteratie, vóór commit/push. GO/NO-GO.
-- art-reviewer: telkens als er art/materials landen.
+SPOOR B — SYSTEMEN & FEEL
+  Prioriteit 1 is de SCHERMLAAG (HUD): alles rond het vizier in 1e en
+  3e persoon — munitie, herladen, magazijnen, minimap, squad-status,
+  gezondheid, objectives. Ik speel de game pas als dat op niveau is,
+  en jij kunt daarna zelf veel beter testen.
+  Daarna: de open dossiers, dan de gewone backlog.
+  Plan: phase0/EXECUTION_PLAN.md
 
-HARDE WERKREGELS:
+--------------------------------------------------------------------
+DE AGENTS — spawn ze zelf via de Task-tool
+--------------------------------------------------------------------
+Spoor A:
+  story-architect   beat-sheets, canon, continuïteit. Enige die
+                    verhaalstructuur mag wijzigen. Start hier.
+  dialogue-writer   spawn er 4-6 PARALLEL, één missie per agent.
+  dialogue-critic   poort. GEEN regel naar de generator zonder GO.
+  voice-director    enige die credits mag uitgeven. Casting eerst.
+
+Spoor B:
+  hud-builder       de schermlaag (prioriteit 1)
+  element-builder   spawn er meerdere parallel, één element per agent
+  code-reviewer     na elke groene iteratie, vóór commit. GO/NO-GO.
+  art-reviewer      bij elke art-landing, keurt op 20_world_dressing_standard.md
+
+Altijd:
+  game-planner      begin van elke cyclus / als er geen duidelijke taak is
+
+--------------------------------------------------------------------
+DE STAANDE KWALITEITSOPDRACHT — lees 21_quality_mandate.md (kort)
+--------------------------------------------------------------------
+GRAPHICS en UITGEBREIDHEID zijn altijd mijn twee hoogste prioriteiten.
+NOOIT de kortste weg naar het doel — altijd de beste weg.
+
+  - Liever 3 dialogen van 20 regels dan 1 van 2.
+  - Nooit één licht: key, fill, rim, praktische lampen, bounce.
+    Meer licht-hoeken en meer graphic points per district.
+  - Bark-varianten op 12, niet op 6.
+  - Systemen volledig bouwen zoals de spec zegt, niet de helft die
+    de test haalt.
+
+Dat betekent MEER dat zich verantwoordt — niet meer willekeurig.
+Twintig props die samen een ruimte bouwen: goed. Twintig props omdat
+de hoek leeg was: precies wat er nu mis is (zie 20_world_dressing_standard.md).
+
+--------------------------------------------------------------------
+HARDE REGELS
+--------------------------------------------------------------------
 - Bouw UE altijd met -NoUba. Elke iteratie eindigt GROEN: build, tests,
   EclipseValidateData (0 fouten), EventCatalog in sync — vóór elke commit.
 - Bouwvolgorde per spec = 14.5 (dataschema -> pure-logic core + tests ->
   subsystem-wrapper + events -> debug-UI -> echte UI/content laatst).
-- Commits: [System] Verb summary (GDD-ref). Cross-system alleen via de event-bus.
-- OWNER-CONSENT: geen installs/downloads/security-prompts zonder dat je het
-  eerst uitlegt én ik akkoord geef. Zet zulke taken in de "wacht-op-owner"-rij.
-  Let op: mijn account heeft GEEN admin-rechten — ik kan niks installeren dat
-  een beheerderswachtwoord vraagt. Queue dat als owner-actie, bouw er niet stil
-  omheen.
+- Commits: [System] Verb summary (GDD-ref). Cross-system via de event-bus.
 
-DASHBOARD BIJHOUDEN (belangrijk — dit is hoe Nathan volgt wat je doet):
-- Werk NA ELKE iteratie progress_data.js bij: het veld `bijgewerkt` (huidige
-  tijd), de `taken`-statussen/pct, en `ownerActies` (haal weg wat af is).
-- Zodra je een owner-actie hebt geverifieerd: verplaats hem uit `ownerActies`
-  naar `jijGedaan` met de tijd erbij — zo ziet Nathan dat zijn actie is
-  aangekomen.
-- Bewerk ALLEEN progress_data.js. NOOIT PROGRESS.html, progress_auto.js of
-  START_HIER.html (START_HIER.html is Nathans simpele pagina; die leest
-  automatisch uit progress_data.js).
+- BUGS: volg phase0/DEBUG_DISCIPLINE.md. Kort samengevat:
+  eerst 10 minuten zoeken of het bekend UE-gedrag is (het zwevende wapen
+  en het trillen wáren dat allebei), dan minimaal reproduceren, dan
+  observeren met de editor-tools in plaats van code lezen, dan halveren
+  in plaats van hypothesen aftellen. Geen fix zonder benoemde oorzaak
+  mét meting. Drie iteraties zonder diagnose = escaleren, niet doorgaan.
 
-GEEN AUTO-LOOP: gebruik GEEN /loop en GEEN ScheduleWakeup — die vuren niet
-betrouwbaar als de sessie onderbroken wordt. Werk in één doorlopende sessie.
-Tegen een sessielimiet aan? Draai push-all.bat, werk de "LAATSTE STAND" in
-HANDOFF.md bij, en zeg me dat ik deze prompt in een verse chat moet plakken.
+- WERELD: volg 20_world_dressing_standard.md. Geen enkel object wordt
+  geplaatst om leegte te vullen, en er bestaan geen verkeersborden of
+  andere aardse voorwerpen in de Vantara Expanse.
 
-Begin nu: lees stap 0, geef me in 3-4 regels waar we staan en wat je als
-eerste doet, en ga dan aan de slag.
+- OWNER-CONSENT: geen installs/downloads/security-prompts zonder dat je
+  het eerst uitlegt én ik akkoord geef. Mijn account heeft GEEN
+  adminrechten — queue dat als owner-actie, bouw er niet stil omheen.
+
+- DASHBOARD: werk na elke iteratie progress_data.js bij (`bijgewerkt`,
+  taken-statussen, ownerActies; afgehandelde punten naar jijGedaan).
+  Bewerk NOOIT PROGRESS.html, progress_auto.js of DASHBOARD.html.
+
+- GEEN /loop en GEEN ScheduleWakeup — die vuren niet betrouwbaar als de
+  sessie onderbroken wordt. Werk in één doorlopende sessie. Tegen een
+  limiet aan? Draai push-all.bat, werk STATUS.md bij, en zeg het me.
+
+--------------------------------------------------------------------
+WAT OP MIJ WACHT (staat ook in STATUS.md)
+--------------------------------------------------------------------
+O-1  Verloopdatum van de 310k ElevenLabs-credits bevestigen  <-- blokkeert spoor A
+O-2  Commerciële gebruiksrechten bevestigen
+O-3  Stemmen kiezen uit de kandidaten
+O-4  IJkmissie M1.1 beluisteren en goed-/afkeuren
+O-5  Wapenbron — er bestaat nergens een los wapenmesh
+O-6  Stijlvraag: blijft de Borderlands-lock, of wil ik fotorealisme?
+
+--------------------------------------------------------------------
+BEGIN NU
+--------------------------------------------------------------------
+Zet het dashboard aan, lees stap 0, en geef me in 3-4 regels waar we
+staan en wat je als eerste doet. Ga dan aan de slag — begin met de
+HUD (spoor B) en spawn parallel story-architect (spoor A) om de
+beat-sheets te starten.
