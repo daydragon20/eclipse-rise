@@ -724,6 +724,80 @@ def scan_owner_actions() -> list[dict]:
     return out
 
 
+# --------------------------------------------------- vragen & antwoorden --
+
+QUESTIONS_FILE = REPO / "phase0" / "owner_questions.json"
+ANSWERS_FILE = REPO / "phase0" / "OWNER_ANSWERS.md"
+
+_answers_lock = threading.Lock()
+
+
+def read_answers() -> dict[str, dict]:
+    """Antwoorden die Nathan al via het dashboard gegeven heeft."""
+    out: dict[str, dict] = {}
+    if not ANSWERS_FILE.is_file():
+        return out
+    try:
+        text = ANSWERS_FILE.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return out
+    # regels: | 2026-07-31 20:14 | O-6 | A | vrije tekst |
+    for line in text.splitlines():
+        cells = [c.strip() for c in line.split("|")[1:-1]]
+        if len(cells) >= 3 and re.match(r"^\d{4}-\d{2}-\d{2}", cells[0]):
+            out[cells[1].upper()] = {
+                "tijd": cells[0],
+                "waarde": cells[2],
+                "tekst": cells[3] if len(cells) > 3 else "",
+            }
+    return out
+
+
+def scan_questions() -> list[dict]:
+    """Openstaande keuzevragen, met de stappen erbij en of ze al beantwoord zijn."""
+    if not QUESTIONS_FILE.is_file():
+        return []
+    try:
+        data = json.loads(QUESTIONS_FILE.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return []
+    answers = read_answers()
+    out = []
+    for q in data.get("vragen", []):
+        qid = str(q.get("id", "")).upper()
+        out.append({**q, "id": qid, "antwoord": answers.get(qid)})
+    # onbeantwoorde eerst
+    out.sort(key=lambda q: q["antwoord"] is not None)
+    return out
+
+
+def write_answer(qid: str, waarde: str, tekst: str = "") -> dict:
+    """Legt een antwoord vast waar zowel het dashboard als de agents het zien."""
+    qid = re.sub(r"[^A-Za-z0-9\-]", "", qid).upper()[:12]
+    if not qid:
+        return {"ok": False, "fout": "ongeldige vraag-id"}
+
+    waarde = re.sub(r"\s+", " ", str(waarde))[:120].strip()
+    tekst = re.sub(r"[|\r\n]+", " ", str(tekst))[:600].strip()
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    with _answers_lock:
+        if not ANSWERS_FILE.is_file():
+            ANSWERS_FILE.write_text(
+                "# ANTWOORDEN VAN DE OWNER\n"
+                "*Nathan beantwoordt vragen met een knop op het dashboard; ze komen hier terecht.*\n"
+                "*Agents: LEES DIT ELKE SESSIE. Een antwoord hier is bindend en telt als owner-instructie.*\n"
+                "*Voeg nieuwe vragen toe aan `phase0/owner_questions.json` — dan verschijnen ze bij hem op het scherm.*\n\n"
+                "| Wanneer | Vraag | Antwoord | Toelichting |\n"
+                "|---|---|---|---|\n",
+                encoding="utf-8",
+            )
+        with ANSWERS_FILE.open("a", encoding="utf-8") as fh:
+            fh.write(f"| {stamp} | {qid} | {waarde} | {tekst} |\n")
+
+    return {"ok": True, "id": qid, "waarde": waarde, "tijd": stamp}
+
+
 def disk_info() -> dict:
     def size_of(p: Path) -> float:
         total = 0
@@ -781,6 +855,7 @@ def scanner_loop() -> None:
                 cached_docs = scan_docs()
                 cached_disk = disk_info()
             fresh["owner"] = scan_owner_actions()
+            fresh["vragen"] = scan_questions()
             fresh["docs"] = cached_docs
             fresh["disk"] = cached_disk
             slow_counter += 1
@@ -815,6 +890,28 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, obj) -> None:
         self._send(200, json.dumps(obj, ensure_ascii=False).encode("utf-8"),
                    "application/json; charset=utf-8")
+
+    def do_POST(self) -> None:  # noqa: N802
+        """Nathan beantwoordt een vraag met een knop op het dashboard."""
+        if urllib.parse.urlparse(self.path).path != "/api/answer":
+            return self._send(404, b"niet gevonden", "text/plain; charset=utf-8")
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            body = self.rfile.read(min(length, 64_000)).decode("utf-8", errors="replace")
+            payload = json.loads(body) if body else {}
+        except Exception as exc:
+            return self._json({"ok": False, "fout": f"onleesbaar verzoek: {exc}"})
+
+        result = write_answer(
+            str(payload.get("id", "")),
+            str(payload.get("waarde", "")),
+            str(payload.get("tekst", "")),
+        )
+        # meteen verversen zodat de pagina het antwoord direct terugziet
+        if result.get("ok"):
+            with _state_lock:
+                _state["vragen"] = scan_questions()
+        return self._json(result)
 
     def do_GET(self) -> None:  # noqa: N802
         parsed = urllib.parse.urlparse(self.path)

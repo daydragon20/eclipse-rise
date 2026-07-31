@@ -84,6 +84,12 @@ gelezen te worden.
 de opnameronde hem kan zien. Teruggedraaid; zie §1b voor waarom die poort de eerste
 bouwstap is.
 
+## Hoe je Nathan iets vraagt
+
+**Niet in de chat — met een knop.** Zet je vraag in `phase0/owner_questions.json` (id, vraag, waarom, stappen, opties met label/waarde/gevolg, advies, vrijtekst). Hij ziet hem dan als kaart mét knoppen op het dashboard en beantwoordt hem met één klik.
+
+Zijn antwoord komt in **`phase0/OWNER_ANSWERS.md`** — **lees dat elke sessie**, het is bindend. Verwerk het daarna in de tabel hieronder mét citaat.
+
 ## Wacht op Nathan
 
 | # | Actie | Blokkeert |

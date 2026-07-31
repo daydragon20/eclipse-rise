@@ -133,6 +133,32 @@ h3{font-size:17px;margin:0 0 8px}
 .msg.assistant .who{color:var(--acc)}
 .msg .tx{font-size:13.5px;white-space:pre-wrap;word-break:break-word}
 
+/* beslissingen met knoppen */
+.vraag{border-left:3px solid var(--bad)}
+.vraag h3{font-size:16px;line-height:1.35}
+.vraag .waarom{font-size:13.5px;color:var(--dim);margin:10px 0 0}
+.vraag .stappen{margin:12px 0 0;font-size:13px;color:var(--dim)}
+.vraag .stappen b{color:var(--tx)}
+.vraag .stappen ol{margin:6px 0 0 20px}
+.vraag .stappen li{margin:4px 0}
+.knoppen{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 0}
+.kb{
+  background:var(--acc);color:#0b0e14;border:0;border-radius:9px;
+  padding:11px 20px;font:600 14px/1 inherit;cursor:pointer;transition:transform .1s,filter .15s;
+}
+.kb:hover{filter:brightness(1.12)}
+.kb:active{transform:scale(.97)}
+.kb.bezig{opacity:.5;cursor:wait}
+.kb.gelukt{background:var(--ok)}
+.gevolgen{margin:13px 0 0;font-size:12.5px;color:var(--dim2);display:grid;gap:5px}
+.gevolgen b{color:var(--dim)}
+.advies{margin:12px 0 0;font-size:13px;color:var(--acc2)}
+.vt{
+  width:100%;margin:12px 0 0;background:var(--panel2);border:1px solid var(--line);
+  color:var(--tx);border-radius:8px;padding:10px 12px;font:13.5px inherit;
+}
+.vt:focus{outline:0;border-color:var(--acc)}
+
 /* owner-blokkades */
 .ow{padding:11px 0;border-bottom:1px solid var(--line)}
 .ow:last-child{border:0;padding-bottom:0}
@@ -234,6 +260,37 @@ function vNu(){
     <div class="stat"><div class="n">${(g.commits||[]).length?esc(g.commits[0].date):"—"}</div><div class="l">Laatste commit</div><div class="s">${g.dirty?g.dirty+" bestanden open":"werkboom schoon"}</div></div>
     <div class="stat"><div class="n" style="color:${acties.length?"var(--bad)":"var(--ok)"}">${acties.length}</div><div class="l">Wacht op jou</div><div class="s">${acties.length?"actie nodig":"niets te doen"}</div></div>
   </div>
+
+  ${(()=>{
+    const vr=(S.vragen||[]);
+    const open=vr.filter(q=>!q.antwoord), klaar=vr.filter(q=>q.antwoord);
+    if(!vr.length)return "";
+    return `
+    <h2>Beslissingen — druk op een knop${open.length?` · ${open.length} open`:""}</h2>
+    ${open.map(q=>`
+      <div class="card vraag" id="q-${esc(q.id)}">
+        <div class="ow-h"><span class="tag bad">${esc(q.id)}</span>
+          <h3 style="margin:0">${esc(q.vraag)}</h3></div>
+        ${q.waarom?`<p class="waarom">${esc(q.waarom)}</p>`:""}
+        ${(q.stappen&&q.stappen.length)?`
+          <div class="stappen"><b>Wat je doet:</b><ol>${q.stappen.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>`:""}
+        <div class="knoppen">
+          ${(q.opties||[]).map(o=>`
+            <button class="kb" onclick="antwoord('${esc(q.id)}','${esc(o.waarde)}',this)"
+                    title="${esc(o.gevolg||"")}">${esc(o.label)}</button>`).join("")}
+        </div>
+        ${(q.opties||[]).some(o=>o.gevolg)?`<div class="gevolgen">
+          ${(q.opties||[]).filter(o=>o.gevolg).map(o=>`<div><b>${esc(o.label)}</b> — ${esc(o.gevolg)}</div>`).join("")}
+        </div>`:""}
+        ${q.advies?`<div class="advies"><b>Mijn advies:</b> ${esc(q.advies)}</div>`:""}
+        ${q.vrijtekst?`<input class="vt" id="vt-${esc(q.id)}" placeholder="Iets toe te voegen? (optioneel)">`:""}
+      </div>`).join("")}
+    ${klaar.length?`<div class="card"><h3>Beantwoord <span class="tag ok">${klaar.length}</span></h3>
+      ${klaar.map(q=>`<div class="row"><span class="t"><span class="tag ok">${esc(q.id)}</span> ${esc(q.vraag)}</span>
+        <span class="m"><strong style="color:var(--ok)">${esc(q.antwoord.waarde)}</strong> · ${esc(q.antwoord.tijd)}</span></div>`).join("")}
+      <div class="note">Deze antwoorden staan in <code>phase0/OWNER_ANSWERS.md</code> — de agents lezen dat elke sessie.</div>
+    </div>`:""}`;
+  })()}
 
   ${(()=>{
     const ow=(S.owner||[]).filter(r=>!r.klaar);
@@ -556,6 +613,37 @@ function openImg(u,n){
   document.getElementById("ov-t").textContent=n;
   document.getElementById("ov-b").innerHTML='<img src="'+u+'">';
   ov.classList.add("on");
+}
+
+/* ---------- antwoord doorgeven ---------- */
+async function antwoord(id,waarde,btn){
+  const veld=document.getElementById("vt-"+id);
+  const tekst=veld?veld.value.trim():"";
+  const rij=btn.parentElement;
+  [...rij.querySelectorAll(".kb")].forEach(b=>b.classList.add("bezig"));
+  btn.textContent="bezig…";
+  try{
+    const r=await fetch("/api/answer",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id,waarde,tekst})
+    });
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.fout||"onbekende fout");
+    btn.classList.remove("bezig");btn.classList.add("gelukt");
+    btn.textContent="✓ doorgegeven";
+    const kaart=document.getElementById("q-"+id);
+    if(kaart){
+      const m=document.createElement("div");
+      m.className="advies";
+      m.innerHTML="<b>Doorgegeven.</b> De agents lezen dit uit phase0/OWNER_ANSWERS.md.";
+      kaart.appendChild(m);
+    }
+    setTimeout(poll,900);
+  }catch(e){
+    [...rij.querySelectorAll(".kb")].forEach(b=>b.classList.remove("bezig"));
+    btn.textContent="mislukt — probeer opnieuw";
+  }
 }
 
 /* ---------- nav ---------- */

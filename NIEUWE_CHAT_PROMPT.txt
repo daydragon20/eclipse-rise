@@ -12,8 +12,33 @@ Communiceer met mij (Nathan) in het Nederlands.
 STAP 0 — INLEZEN. Lees ALLEEN dit, in deze volgorde:
 --------------------------------------------------------------------
 1. STATUS.md                          (~5 KB — waar we staan, alles)
-2. phase0/EXECUTION_PLAN.md §2        (spoor B: volgende taak)
-3. phase0/SCRIPT_PRODUCTION_PLAN.md §4 (spoor A: volgende taak)
+2. phase0/OWNER_ANSWERS.md            (mijn beslissingen — BINDEND)
+3. phase0/EXECUTION_PLAN.md §2        (spoor B: volgende taak)
+4. phase0/SCRIPT_PRODUCTION_PLAN.md §4 (spoor A: volgende taak)
+
+--------------------------------------------------------------------
+HOE JE MIJ IETS VRAAGT — niet in de chat, maar met een knop
+--------------------------------------------------------------------
+Ik lees geen lange berichten en ik typ niet graag antwoorden over.
+Wil je iets van me weten of moet ik iets kiezen, zet het dan in:
+
+    phase0/owner_questions.json
+
+Dan verschijnt het op mijn dashboard als een kaart MET knoppen, en
+beantwoord ik het met één klik. Per vraag geef je:
+
+    id        O-8, T-12, ... (loop door op de bestaande nummers)
+    vraag     in gewone taal, geen jargon
+    waarom    waarom je het vraagt en wat ervan afhangt
+    stappen   wat ik CONCREET moet doen om te kunnen antwoorden
+    opties    de knoppen: label + waarde + gevolg per keuze
+    advies    jouw aanbeveling (of null als je die echt niet hebt)
+    vrijtekst true als ik ook iets mag typen
+
+Mijn antwoord komt in phase0/OWNER_ANSWERS.md. LEES DAT ELKE SESSIE -
+een antwoord daar is bindend en telt als owner-instructie. Verwerk het
+daarna in STATUS.md met het antwoord erbij geciteerd, want een antwoord
+dat alleen in een chat viel bestaat voor de volgende sessie niet.
 
 Lees NIET de hele Game Design Bible en NIET archief/HANDOFF.md.
 Die zijn er om gericht in te zoeken als je iets specifieks nodig hebt,

@@ -1,0 +1,132 @@
+{
+  "_uitleg": [
+    "Dit bestand voedt de knoppen op het dashboard onder 'Wacht op jou'.",
+    "Agents: zet hier elke vraag neer die je aan Nathan wilt stellen. Hij ziet",
+    "hem dan op zijn scherm MET de stappen erbij, en beantwoordt hem met een klik.",
+    "Zijn antwoord komt in phase0/OWNER_ANSWERS.md — lees dat elke sessie.",
+    "",
+    "Velden per vraag:",
+    "  id        O-6, T-11, ... (moet matchen met de owner-tabellen)",
+    "  vraag     de vraag in gewone taal, geen jargon",
+    "  waarom    waarom je het vraagt, en wat er van afhangt",
+    "  stappen   wat hij CONCREET moet doen om te kunnen antwoorden (mag leeg)",
+    "  opties    de knoppen. label = op de knop, gevolg = wat er dan gebeurt",
+    "  advies    jouw aanbeveling, of null",
+    "  vrijtekst true = hij mag ook zelf iets typen"
+  ],
+
+  "vragen": [
+    {
+      "id": "O-7",
+      "vraag": "GPU-crash: naar SM6 tillen, of de zware paden uitzetten?",
+      "waarom": "De game crashte met 'GPU Crashed / D3D Device Removed'. Gemeten uit de log: je GTX 1080 Ti draait op Feature Level SM5, terwijl het project wél Lumen- en Nanite-instellingen aanzet. Op SM5 bestaat Nanite niet en valt Lumen terug op software-raytracing — dat is de zwaarste variant. Samen met TSR op 200% duurt één GPU-opdracht dan langer dan de 2 seconden die Windows toestaat, en dan reset Windows de driver. Dat IS deze crash. De huidige mengvorm is het slechtste van twee werelden: de kosten van de zware paden zonder de voordelen.",
+      "stappen": [
+        "Je hoeft hier niets voor te testen — de agent doet eerst een falsificatietest met Lumen uit",
+        "Kies alleen welke richting het structureel op moet"
+      ],
+      "opties": [
+        { "label": "Naar SM6 — Nanite echt aan", "waarde": "SM6", "gevolg": "Je kaart ondersteunt shader model 6.7, dus dit kan. Nanite gaat écht werken en de zware instellingen krijgen betekenis. Wel: een 1080 Ti is Pascal, dus hardware-raytracing blijft uit en er moet opnieuw geprofileerd worden." },
+        { "label": "Op SM5 blijven — zware paden uit", "waarde": "SM5", "gevolg": "Lumen en Nanite-cvars uit, TSR terug naar 100. Stabiel en snel, maar de fidelity-doelen uit doc 15 schuiven naar een sterkere machine." },
+        { "label": "Weet ik niet — kies jij", "waarde": "agent-kiest", "gevolg": "De agent meet eerst beide varianten en komt met een aanbeveling plus cijfers terug." }
+      ],
+      "advies": "Eerst de falsificatietest laten draaien. Daarna beslissen met echte framecijfers in plaats van op gevoel.",
+      "vrijtekst": true
+    },
+    {
+      "id": "O-6",
+      "vraag": "Blijft de gestileerde look, of wil je echt fotorealisme?",
+      "waarom": "Je zei dat de wereld 'realistisch geloofwaardig' moet zijn. Dat kan twee dingen betekenen en het verschil is weken werk. Je klacht ging over verkeersborden en random opvulling — dat zijn compositieproblemen die in élke stijl bestaan.",
+      "stappen": [
+        "Kijk naar de laatste screenshots op het tabblad Beeld",
+        "Vraag jezelf af: stoort de STIJL me, of stoort het dat er dingen willekeurig staan?",
+        "Is het dat tweede, dan is A het antwoord"
+      ],
+      "opties": [
+        { "label": "A — gestileerd blijft", "waarde": "A", "gevolg": "Geen herwerk. De Borderlands-lock blijft; de compositie- en fictieregels uit doc 20 lossen je klacht op." },
+        { "label": "B — echt fotorealisme", "waarde": "B", "gevolg": "De art-lock uit 15.5 vervalt, elk materiaal moet opnieuw, de toon-master vervalt, en alle gestileerde assets die binnen zijn moeten opnieuw beoordeeld. Weken werk." }
+      ],
+      "advies": "A — je klacht ging over willekeurige opvulling, niet over de stijl zelf.",
+      "vrijtekst": true
+    },
+    {
+      "id": "O-5",
+      "vraag": "Het wapen: goedkope zichtbaarheidsfix nu, of het volledig uit de mesh halen?",
+      "waarom": "Er hángt wel een wapen, maar het zit ín de karaktermesh in plaats van als los object. Daarom is er geen attachment, doet de wapenwissel visueel niets, en valt het weg in het silhouet — het heeft dezelfde factietint als het lichaam ernaast.",
+      "stappen": [
+        "Je hoeft hier niets voor te doen of te bekijken",
+        "Kies alleen of je nu snel wilt zien wat je vasthoudt, of meteen de goede oplossing"
+      ],
+      "opties": [
+        { "label": "Goedkoop — eigen tint", "waarde": "goedkoop", "gevolg": "Uren werk. Je ziet je wapen. De zichtbare wapenwissel werkt nog steeds niet." },
+        { "label": "Volledig — uit de mesh halen", "waarde": "volledig", "gevolg": "Dagen werk: wapen isoleren, los mesh-asset per wapenfamilie, socket op hand_r, wisselogica eraan. Lost alles op." }
+      ],
+      "advies": "Goedkoop. Of die zichtbare wapenwissel je stoort weet je pas ná je eerste speelronde — dan pas is de dure variant het waard.",
+      "vrijtekst": true
+    },
+    {
+      "id": "T-11",
+      "vraag": "Command Mode: voelt het goed genoeg om erop door te bouwen?",
+      "waarom": "Command Mode staat er als testversie in (hold-to-enter, tijd naar 30%, camera stijgt). Pas als jij zegt dat het goed voelt, wordt de volledige ordertabel gebouwd. Zegt de test niks, dan passen we eerst het ontwerp aan in plaats van er polish op te stapelen.",
+      "stappen": [
+        "Start de game via de knop '1 - SPEEL ECLIPSE' op je bureaublad",
+        "Houd Q ingedrukt (of LB op de controller) — de tijd zakt naar 30%",
+        "Geef een paar orders met 1-4 of het D-pad, en wissel van soldaat met Tab of RB",
+        "Let op: kun je in die vertraagde tijd RUSTIG nadenken, of wordt het chaos?"
+      ],
+      "opties": [
+        { "label": "Voelt goed — bouw door", "waarde": "true", "gevolg": "Stage B start: de volledige 8.4-ordertabel, vijf nieuwe orders, stealth-stance." },
+        { "label": "Voelt niet goed", "waarde": "false", "gevolg": "Geen polish. Eerst het ontwerp aanpassen volgens de terugvalopties in de spec." }
+      ],
+      "advies": null,
+      "vrijtekst": true
+    },
+    {
+      "id": "T-10",
+      "vraag": "Overbodige downloads annuleren in de Epic Launcher?",
+      "waarom": "Er staan downloads in de wachtrij die dit project niet gebruikt. Ze kosten ongeveer 30 GB schijfruimte.",
+      "stappen": [
+        "Open de Epic Games Launcher → Downloads",
+        "ANNULEER: alle Paragon-helden (Kwang, Narbash, Wukong, Riktor, Sevarog...), Old West VOL 4/6, Path of Adventure JRPG-muziek, NWIRO AI Pro",
+        "LAAT STAAN: Photogrammetry Snow, Plant Models Vol 60, Perfect Fire VFX"
+      ],
+      "opties": [
+        { "label": "Gedaan", "waarde": "gedaan", "gevolg": "Punt gaat van de lijst; ~30 GB vrij." },
+        { "label": "Doe ik later", "waarde": "later", "gevolg": "Blijft staan, blokkeert niets." }
+      ],
+      "advies": "Twee minuten werk voor 30 GB. Even doen.",
+      "vrijtekst": false
+    },
+    {
+      "id": "T-8",
+      "vraag": "MetaHuman-downloads afronden?",
+      "waarom": "De basis staat er (SentinelC + Common, 908 MB). Voor de resterende MetaHuman-onderdelen is per stuk één Download-klik nodig. Daarna kan de curatie van de named-character-slots verder.",
+      "stappen": [
+        "Open de Unreal Editor → Window → Fab → My Library",
+        "Klik bij elk resterend MetaHuman-item op Download",
+        "Klaar? Druk hieronder op de knop"
+      ],
+      "opties": [
+        { "label": "Staan erin", "waarde": "gedaan", "gevolg": "De agent pikt ze op en gaat verder met de curatie." },
+        { "label": "Doe ik later", "waarde": "later", "gevolg": "De curatie loopt intussen door op wat al binnen is." }
+      ],
+      "advies": "Ongeveer 5 minuten.",
+      "vrijtekst": false
+    },
+    {
+      "id": "T-2",
+      "vraag": "De environment-packs uit Fab halen?",
+      "waarom": "De character-packs zijn binnen, de environment-packs nog niet. Die blokkeren het aankleden van het district (de kit-pass) en het bevolken van de basis.",
+      "stappen": [
+        "Ga naar fab.com, ingelogd met je Epic-account",
+        "Zoek en klik 'Add to My Library' bij: Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci-Fi Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash",
+        "Plus één gestileerd civilian/worker-pack (4-6 bodies, Mannequin-rig) — dat is het enige gat in de personages"
+      ],
+      "opties": [
+        { "label": "Staan erin", "waarde": "gedaan", "gevolg": "De monitor pikt ze automatisch op en de kit-pass kan starten." },
+        { "label": "Doe ik later", "waarde": "later", "gevolg": "De kit-pass blijft wachten; de agent werkt ondertussen aan andere dingen." }
+      ],
+      "advies": "Ongeveer 10 minuten.",
+      "vrijtekst": false
+    }
+  ]
+}
