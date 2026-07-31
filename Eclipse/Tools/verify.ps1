@@ -148,6 +148,13 @@ if ($LASTEXITCODE -ne 0) { $Failures += "event-catalogus klopt niet" }
 python "$Root\Tools\test_credit_meter.py"
 if ($LASTEXITCODE -ne 0) { $Failures += "creditmeter kan blind genereren" }
 
+# Elke `voice:` in Content/Script moet ergens op uitkomen. Een spreker die
+# nergens op uitkomt crasht NIET en valt ook niet terug op een standaardstem:
+# de commandlet slaat hem over op Display-niveau en de samenvatting ziet er
+# gezond uit. Dat merk je pas na de sprint, als de credits op zijn.
+python "$Root\Tools\check_voice_resolves.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "scriptstem komt nergens op uit" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"
