@@ -220,7 +220,25 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Choice.M11_Conscript.{Finished,Left,Bound}` | M1.1.S05 | T5-telling — **`.Bound` telt als genade** |
 | `Story.Choice.M12_Ghost` | M1.2 debrief | Veil-alertheid act 1 |
 | `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` | M1.5.S04 | **M1.6.S06 (.250/.260/.270 — drie takken, verplicht)** · M1.8.S99 (alleen `.Warned`: P3-d-verwisseling) · Sela-reputatie |
-| `Story.Choice.M15_IronChorusPact` | M1.5.S99 | M1.8.S99 stemming, act 2 |
+| `Story.Choice.M15_Pact.{Full,Limited,None}` | M1.5.S99 | M1.5.S99 (4) · M1.8.S99 (3) · M1.6.S02 (2) · M1.6.S04 (2) — act 2 |
+
+> **`M15_Pact` heette hier tot 01-08 `M15_IronChorusPact`, en dat is één waarheid met vier
+> spellingen geweest.** De scripts zetten en lezen `story.m15_pact` (20 keer, in productie);
+> dit register zei `Story.Choice.M15_IronChorusPact` (12); en er liepen nog
+> `story.choice_m15_ironchoruspact` (3, gezet door niets) en `story.m15_ironchoruspact ==
+> "pact"` (1 — een spelling én een wáárde die geen van beide bestaan) rond in levende
+> instructies aan schrijvers. De tag bestaat nog niet in code, dus de goedkoopste kant om te
+> wijken was deze. **De verklarende naam is daarmee weg en dat is verlies** — wie hem terug
+> wil, hernoemt deze rij én de twintig scriptregels in dezelfde stap, want de koppeling is
+> genormaliseerd op letters en cijfers en breekt zodra er één kant beweegt.
+> Controleer met `python Eclipse/Tools/validate_script.py --explain`.
+| `Story.Choice.M15_Terms.{Accepted,Conditional,Counter,Refused}` | M1.5.S02 | M1.5.S02 (5) · M1.5.S03 (2) · M1.5.S99 (1) |
+| `Story.Choice.M13_Insertion.{Tunnel,Plaza}` | M1.3.S01 | M1.3.S03 (32) — **en verder niemand** |
+| `Story.Choice.M13_Warned` | M1.3.S04 | M1.3.S04 (21) — **en verder niemand** |
+| `Story.Choice.M14_Entry.{Grate,Breach}` | M1.4.S01 | M1.4.S02 (18) · M1.4.S05 (4) — **en verder niemand** |
+| `Story.Choice.M16_SelaInvited` | M1.6.S99 | M1.6.S99 (2) — **en verder niemand** |
+| `Story.Choice.M17_DexAlong` | M1.7.S02 | M1.7.S06 (6) · M1.7.S02 (2) · M1.7.S03 (2) |
+| `Story.Choice.M17_VossPosition.{For,Against}` | M1.7.S99 | M1.7.S99 (2) — **en verder niemand**, maar M1.8 leest hem als toon |
 | `Story.Choice.M16_Train.{Run,Emptied,Split}` | M1.6.S04 | wervingsinstroom, onrust |
 | `Story.Choice.M16_LettersAllowed` | M1.6.S06 | draad *Conscript Letters* → act 4 |
 | `Story.Flag.IntakeUnvetted` | M1.6.S06, stil | **act 3, twist 3** |
@@ -234,6 +252,18 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Thread.Enforcer_BadgeHeld` | proloog (Q-2) | M1.2.S01 |
 | `Story.Thread.MaraLetters_Open` | HUB.A1.mara_letters | act 2–4 |
 | `Story.Thread.WallOpen` | M1.8.S90 | act 2–4 |
+
+> **VIJF VAN DEZE VLAGGEN WORDEN ALLEEN GELEZEN IN DE MISSIE DIE ZE ZET** (01-08, geteld,
+> niet aangenomen): `M13_Insertion`, `M13_Warned`, `M14_Entry`, `M16_SelaInvited` en
+> `M17_VossPosition`. Volgens de redenering die de M1.8-schrijver zelf toepaste op
+> `run.m18_threx_probe` — *"`run.` omdat een gesprekstak de missie niet hoort te overleven"* —
+> zijn dat kandidaten voor `run.` in plaats van `story.`. Twee kanttekeningen die het geen
+> automatisme maken: `M13_Insertion` en `M14_Entry` kiezen een echt insertiepunt in de
+> missietabel (`Entry_Sewer` / `Entry_Roof` / `Entry_Vault`), dus daar hangt gameplay aan; en
+> `M17_VossPosition` heeft volgens zijn schrijver M1.8 als echte lezer, alleen als *toon* en
+> niet als conditie — precies het soort lezer dat deze kolom niet kan zien.
+> **Dit is een architect-vraag en hij is hier bewust niet beslist.** Wel geteld, zodat hij
+> niet nog een keer onzichtbaar is.
 
 **Regel:** een `Story.Clue.*` verandert nooit gameplay in act 1. Hij bestaat om act 3 en 4 te laten weten wat de speler heeft gezien, zodat de betaling zich naar hem voegt. Dat is de mechanische kant van "geen wending zonder plant".
 

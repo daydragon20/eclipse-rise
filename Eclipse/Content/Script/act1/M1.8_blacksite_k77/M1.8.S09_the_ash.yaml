@@ -13,9 +13,11 @@ obstacle:     "Nobody wants to give him one."
 turn:         "Petra gives it, out loud, with the numbers, because somebody has to and she has done it before."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           118
+words_heard:     118
+words_generated: 139
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, PETRA, REYES, DEX, BRICK, survivors
@@ -25,19 +27,145 @@ words:        0
 #            2) silence
 #            3) Voss asks for the count
 #            4) nobody answers
-#            5) PETRA COUNTS. Names and numbers, flat, no comfort. Her fingerprint does all
-#               the work here
+#            5) PETRA COUNTS. Names and numbers, flat, no comfort
 #            6) Reyes starts working
-#            7) P4-d FINAL TAP: somebody - Dex, or Brick - notes that nobody came after
-#               them. Nobody has an answer. THIS QUESTION LEAVES ACT 1 UNANSWERED, on
-#               purpose, with a payoff address in act 4 (twist 4)
+#            7) P4-d FINAL TAP: somebody notes that nobody came after them. Nobody has an
+#               answer. THIS QUESTION LEAVES ACT 1 UNANSWERED, on purpose
 #
-# NO LINE MAY STATE A CASUALTY NUMBER (see S07). Petra counts as an ACTION; the camera does
-# not read the total over her shoulder.
+# NO LINE MAY STATE A CASUALTY NUMBER. Petra counts as an ACTION.
 #
-# direct_beat: this scene OR S90 may spend the act's single rationed direct_beat line
-#              (18.9 A - roughly thirty in the whole game). Writer picks one, with a note:
-#              justification. In the scene where everyone would name a feeling, nobody
-#              does; in the quiet one afterwards, one person may say it flat, once.
+# direct_beat: this scene OR S90 may spend the act's single rationed direct_beat.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      in-mission-radio (10-25). Ceiling respected (longest 23 w at .100).
+#            Register reached at .070, .090, .100, .120, .150.
+#            Spread 1 w (.040 / .110 / .140) to 23 w = 23x.
+#
+# *** DIRECT_BEAT: SPENT IN S90, NOT HERE. AR-12. ***
+# The architect gave the act one rationed line and the choice of two scenes. I have spent it
+# on Brick in S90 and the reasoning is in that file. The short form: S09 is still an
+# operation. People are being triaged, water is being found, a route is being chosen, and
+# Petra's fingerprint is already carrying the scene's whole emotional load by refusing to
+# offer comfort. A named feeling in this scene would have to compete with a woman counting,
+# and it would lose. S90 has nothing else in it.
+#
+# *** PETRA COUNTS, AND THERE IS NO TOTAL. ***
+# .050-.080 are four lines of arithmetic and not one of them adds up. She counts by GROUP
+# and by WHAT IS NEEDED - west stair, not walking, for the doctor, still in the lift house -
+# and the camera never reads a sum over her shoulder. That is the design constraint from the
+# stub honoured as characterisation rather than as an omission: nobody in this mission ever
+# says how many died, because the only person willing to count is counting the living.
+# She closes the count with a task (.080) and the task is water, which hands the scene to
+# Reyes without either of them addressing the other.
+# Pronoun audit: zero "you", zero "your", zero "I", zero "we", zero names. Four consecutive
+# lines and no person in any of them is identified by anything except where they are.
+# Shape audit against Mara: Mara would have said "Everyone off the ramp, we go in two
+# groups" - a place and a group. Petra says "Two for the doctor now, not later" - a pair of
+# hands and the next thing they do. Neither line survives being swapped.
+#
+# voss:      .020 is a false start he cannot finish, and what he cannot finish is a casualty
+#            question. He asks two more times and gets silence. He does not get his count
+#            from anybody who was in that corridor - he gets it from a woman who came out of
+#            a cell forty minutes ago, and nobody says anything about that either.
+#            NO VARIANTS. There is no judgement in this scene, only a request and a route.
+# .150:      his first operational instruction after Mara, and it is a route. He does not
+#            take command, nobody hands it to him, and nobody notices. That is S99's job.
+# brick:     two lines, two words total. .110 is a single noun and it does two things at
+#            once: it is an instruction (these people have no coats) and it is the answer to
+#            S02.090, spoken by the one man who said nothing when the lift doors opened on a
+#            corridor of people carrying theirs home. Nothing anywhere connects them.
+#            .140 is one syllable answering a question that act 4 answers.
+# reyes:     back to work inside two lines, zero contractions, and .100 is a clinical fact
+#            that reads as care because of what it is being used for.
+# P4-d:      .120/.130, from Dex, on the radio, reading a net that has nothing on it. It is
+#            NOT an aphorism - it is a negative inventory and then four flat words (L1-R17).
+#            Nobody answers it. Brick's "No." at .140 confirms the fact and explains nothing.
+#            The conversation does not come back to it and act 1 ends without an answer.
+# eleven:    L1-R14 checked. Not used.
+
+lines:
+  - id:      M1.8.S09.010
+    speaker: DEX
+    voice:   dex
+    text:    "Say again. Somebody say something."
+    shot:    "Foundry Row loading deck at the top of the shaft. Warm grey rain. Forty people standing in a yard in cell clothes with nowhere to be. Nobody is talking."
+
+  - id:      M1.8.S09.020
+    speaker: VOSS
+    voice:   voss
+    text:    "How many did we--"
+    note:    "He cannot finish the question and what he cannot finish is the casualty count. Nobody in this mission ever completes that sentence."
+
+  - id:      M1.8.S09.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Somebody give me a count."
+    shot:    "Reyes is looking at a man's pupils. Brick is holding somebody up. Nobody looks over."
+
+  - id:      M1.8.S09.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Anybody."
+
+  - id:      M1.8.S09.050
+    speaker: PETRA
+    voice:   petra
+    text:    "Six out of the west stair. Four not walking."
+    shot:    "She is sitting on a pallet with a blanket over her shoulders and she has not stopped looking at the yard since she came up."
+    note:    "*** SHE COUNTS. *** Flat, immediate, no comfort, and no total anywhere in the four lines. She has done this before and no line says when."
+
+  - id:      M1.8.S09.060
+    speaker: PETRA
+    voice:   petra
+    text:    "Two for the doctor now, not later."
+
+  - id:      M1.8.S09.070
+    speaker: PETRA
+    voice:   petra
+    text:    "Three still in the lift house with the ones that can't stand."
+
+  - id:      M1.8.S09.080
+    speaker: PETRA
+    voice:   petra
+    text:    "And somebody boil water."
+    note:    "The count ends in a task, which is the tic, and the task is kitchen work in a rescue yard. It hands the scene to Reyes without either woman speaking to the other."
+
+  - id:      M1.8.S09.090
+    speaker: REYES
+    voice:   reyes
+    text:    "Not from the standpipe. There is a tap on the north side of the platform and it runs clean."
+
+  - id:      M1.8.S09.100
+    speaker: REYES
+    voice:   reyes
+    text:    "Everyone who is still standing sits down now. People who have been in a cell for months faint after the danger, not during it."
+    note:    "Zero contractions. She is working within ninety seconds and nobody thanks her for it."
+
+  - id:      M1.8.S09.110
+    speaker: BRICK
+    voice:   brick
+    text:    "Coats."
+    note:    "One noun, two jobs. It is an instruction, and it is the answer to S02.090 from the only man in that lift who did not look away and did not speak. Nothing anywhere connects the two lines."
+
+  - id:      M1.8.S09.120
+    speaker: DEX
+    voice:   dex
+    text:    "There's nothing on the district net. No sweep, no cordon, nothing at the Row."
+
+  - id:      M1.8.S09.130
+    speaker: DEX
+    voice:   dex
+    text:    "Nobody came after you."
+    note:    "*** P4-d, FINAL TAP - L1-R17. *** A negative inventory and four flat words. No maxim, no rhythm, no closing beat. It is the last time act 1 mentions it and nobody answers."
+
+  - id:      M1.8.S09.140
+    speaker: BRICK
+    voice:   brick
+    text:    "No."
+    shot:    "Nobody follows it up. Somebody starts moving pallets to make a place for people to sit."
+
+  - id:      M1.8.S09.150
+    speaker: VOSS
+    voice:   voss
+    text:    "Down to the Row on foot. Nobody stops on the ramp."
+    note:    "His first instruction after Mara, and it is a route. Nobody hands him anything, nobody defers, and nobody in the yard notices what just happened. S99 is where the room notices."

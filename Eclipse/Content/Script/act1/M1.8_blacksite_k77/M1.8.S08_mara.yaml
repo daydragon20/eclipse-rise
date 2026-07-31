@@ -13,46 +13,154 @@ obstacle:     "It only holds from this side."
 turn:         "She says \"you\" for the first time in the game, and Voss understands the whole sentence before she has finished it."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           117
+words_heard:     79
+words_generated: 184
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      MARA, VOSS · THREX (offscreen)
 # flags-in:  none
-# flags-out: Story.Char.MaraDead ✚  (NEW TAG)
+# flags-out: Story.Char.MaraDead ✚  (NEW TAG, set by the scene commit)
 #            *** AFTER THIS FLAG, NO LIVE MARA LINE EVER PLAYS AGAIN. Recordings only. ***
 #
-# FIXED POINT. 02_story_bible 2.5 and 2.9: Mara dies at the end of act 1, executed
-# personally by Threx (2.6) while covering the escape. This does not move.
-#
-# beats:     1) the last door. The mechanism - DEX EXPLAINED IT IN S01 AND NOBODY LISTENED.
-#               The player already knows
-#            2) there is no argument. She does not say "go". She does something practical
-#               and by the time it reads it is too late to undo
-#            3) *** AR-5 - THE ONLY "YOU" IN THE GAME ***
-#               Mara says "we" for the entire game where anyone else would say "I" (18.4).
-#               Here she says one sentence with "you" in it, and that sentence IS the
-#               transfer of command. She does not say he is the leader. She uses a word she
-#               never uses, and that is enough
-#            4) Voss's answer. FULL VARIANTS ON BOTH AXES - the most expensive and most
-#               important variant set in the act
-#            5) the door closes
-#            6) THE EXECUTION. Threx does it personally (2.6). Player sees it through glass,
-#               or does not see it and hears it over a radio nobody switched off.
-#               RECOMMENDATION: the second. It is worse, it is cheaper, and it respects
-#               18.9 - you do not show feeling, you leave a channel open
-#            7) NO LAST WORDS AFTER THE SHOTS. No deathbed monologue
+# FIXED POINT. Mara dies at the end of act 1, executed personally by Threx while covering
+# the escape. This does not move.
 #
 # HARD RULES:
 #   - Mara names no emotion. ZERO direct_beat lines (18.9 A)
 #   - She does not say "I'm proud of you", "lead them", or "this is yours now"
-#   - THE ENTIRE HANDOVER IS ONE PRONOUN. If the writer does not trust that, the scene is
-#     already broken
-#   - Voss gets no farewell line that lands. He is interrupted, or the door is already shut
+#   - THE ENTIRE HANDOVER IS ONE PRONOUN
+#   - Voss gets no farewell line that lands
 #   - FOURTEEN LINES MAXIMUM IN THE WHOLE SCENE
-#
-# writer:    every banned construction in 18.9 A was invented for this exact scene.
-#            Not one of them appears in it.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# lines:     NINE. The ceiling is fourteen and the scene did not need them.
+# band:      cutscene (20-60). Ceiling respected (longest 27 w at .080).
+#            Register reached at .080. Spread 2 w (.070 "Open it.") to 27 w = 13.5x.
+# direct_beat: ZERO, as instructed. The act's single rationed beat is spent in S90 (AR-12).
+#
+# *** .040 - AR-5 / AR-5b. THE ONLY "YOU" IN THE GAME. ***
+# "You take them up. We'll hold the stair."
+# Eight words, and everything in the design is inside them:
+#   - the "you" is the FIRST word. Voss understands at word one and she keeps talking for
+#     seven more, which is the stub's "before she has finished it" made literal;
+#   - the ladder completes. M1.1: tactical authority, third person, to the squad - "His
+#     mark." M1.8: command, second person, to him. Two different grammatical moves, eight
+#     missions apart, and this is the top rung;
+#   - the second sentence is her LAST "we", and it contains one person. A woman alone on a
+#     bar calling herself a plural. That is her entire 18.4 fingerprint collapsing into its
+#     literal meaning and NOT ONE LINE ANYWHERE POINTS AT IT;
+#   - she does not say he is the leader, does not say "lead them", does not say goodbye,
+#     does not name a feeling, and never says "I".
+# WHAT IS ACTUALLY GUARANTEED ABOUT THE WORD, stated precisely so the critic can check it
+# rather than take a claim on trust:
+#   - MARA says "you"/"your" exactly once in this mission, and it is .040. Verified across
+#     all twelve files, base text and variants.
+#   - PETRA never says it, here or anywhere in the campaign (18.4).
+#   - S04 - her whole debut - has ZERO occurrences from ANYBODY, including Mara and Voss.
+#     That is a text:-field regex; the inherited L1 comment block in that file contains the
+#     word in prose and is not voiced.
+#   - Voss's five answers at .050 were written without it on purpose, so that nobody echoes
+#     it back four seconds after she spends it.
+#   - THREX has zero occurrences in S05 and four in S06, and that shape is deliberate: on
+#     the public address he talks ABOUT people, and face to face he talks TO one. The enemy's
+#     intimacy is free and he spends it the moment he is in a room; hers costs her life.
+# Sela, Dex and Reyes use the word normally elsewhere in the mission and should - banning it
+# from the whole cast would be one tic shared by everybody, which is 18.9 D. The scarcity
+# that makes .040 land is Petra's silence and S04's vacuum, not a global blackout.
+#
+# .010:      VOSS HAS NOT REMEMBERED THE RULE. Dex explained the gate in S01.020 and was
+#            talked over; the player kept it and Voss did not. So he offers a wedge, and .020
+#            corrects him in six words from the wrong side of the door. The scene never
+#            re-explains the mechanism, because re-explaining it is what would kill it.
+# .050:      FULL FOUR-AXIS COVERAGE. The most important variant set in the act and the only
+#            place in this mission that gets the full form. All five readings are a REFUSAL,
+#            all five fail, and none of them is a farewell:
+#              pragmatist - argues the arithmetic of the bar
+#              idealist   - argues the principle and calls it ours
+#              personal   - stops arguing and repeats himself
+#              strategic  - argues that she is worth more up the shaft, and pays S01.130's
+#                           "rated for six" without mentioning that anybody said it
+#            None of them contains "you" or "your".
+# .060:      her last instruction, and it is a count. "Count them at the top." In S09 Voss
+#            asks for exactly that count and nobody in the world will give him one. Nothing
+#            in either scene connects them out loud.
+# .070:      the non-landing farewell. Two words, the same two he used at .050, said to a
+#            door that is already shut, on a channel where nobody is left to answer. He does
+#            not get a sentence and he does not get to finish being anybody's second.
+# .080:      THREX IS NOT TALKING TO VOSS. He is speaking in the room, to his own people,
+#            about a chair, and the open channel carries it. Voss is not being addressed - he
+#            is overhearing his mentor's last minutes being managed politely. No threat, no
+#            gloat, no acknowledgement that anybody is listening. This is also the scene's
+#            register line, which is fitting: the longest sentence in Mara's death scene
+#            belongs to the man who is about to end it and it is about furniture.
+# .090:      her last words are a routine status call, in the plural, to nobody. Then the
+#            channel stays open. NO LINE AFTER THE SHOTS, from anybody, ever.
+# omitted:   an argument, an embrace, a last look, a farewell that lands, any statement of
+#            what she meant to him, and any line at all after the sound. See report.
+
+lines:
+  - id:      M1.8.S08.010
+    speaker: VOSS
+    voice:   voss
+    text:    "That's everyone. Come through and we'll wedge it."
+    shot:    "The last of the crowd going up past camera. The gate is a slab with a lift-bar across it, exactly as Dex drew it on a table nobody was looking at."
+
+  - id:      M1.8.S08.020
+    speaker: MARA
+    voice:   mara
+    text:    "It only closes from in here."
+    shot:    "She is already on the other side of it, with both hands on the bar. She did not walk back; she never came through. Play it so the audience realises one beat before Voss does."
+    note:    "There is no argument, no announcement and no decision on screen. She did something practical while he was counting heads, and by the time it reads it cannot be undone."
+
+  - id:      M1.8.S08.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Then we put somebody on it and rotate--"
+
+  - id:         M1.8.S08.040
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "You take them up. We'll hold the stair."
+    shot:       "She is not looking at him. She is looking down the corridor behind her, the way she looks at every corridor."
+    note:       "*** AR-5 / AR-5b. THE ONLY 'YOU' IN THE GAME, AND IT IS THE TRANSFER OF COMMAND. *** First word of the line. The second sentence is her last 'we' and there is one person in it. Nothing in the scene remarks on either."
+
+  - id:      M1.8.S08.050
+    speaker: VOSS
+    voice:   voss
+    text:    "No. Open it."
+    note:    "FULL FOUR-AXIS COVERAGE - the act's most expensive and most important variant set. Every reading is a refusal, every one fails, none is a farewell, and none of the five contains 'you' or 'your'."
+    variants:
+      pragmatist: "Two of us and one bar. Open it and we do this properly."
+      idealist:   "Nobody holds a door alone. That is not a thing we do."
+      personal:   "Open the door. Mara. Open the door."
+      strategic:  "Forty people up a shaft rated for six. That needs the person who counted them."
+
+  - id:      M1.8.S08.060
+    speaker: MARA
+    voice:   mara
+    text:    "Count them at the top."
+    note:    "Her last instruction is a count, and it is the count Voss asks for in S09 and does not get. Neither scene connects them out loud."
+
+  - id:      M1.8.S08.070
+    speaker: VOSS
+    voice:   voss
+    text:    "Open it."
+    shot:    "The bar is already down. He is saying it to a closed slab through a grille, and the two words are the same two words he used a moment ago."
+    note:    "The farewell that does not land. He is not interrupted - he is simply too late, and he has no sentence left except the one that already failed."
+
+  - id:      M1.8.S08.080
+    speaker: THREX
+    voice:   threx
+    tags:    [quietly]
+    text:    "There's a chair in the office if she wants it. Nobody down here is in a hurry and it has been a very long night for everybody."
+    shot:    "Voice off, thin, carried on the channel Mara never closed. He is not talking to Voss. He does not know or care that anybody is listening."
+
+  - id:      M1.8.S08.090
+    speaker: MARA
+    voice:   mara
+    text:    "We've got the door."
+    shot:    "A status call, in the plural, from one person, to nobody. The channel stays open afterwards. Hold on Voss and the open channel. There is no line after this in the scene."

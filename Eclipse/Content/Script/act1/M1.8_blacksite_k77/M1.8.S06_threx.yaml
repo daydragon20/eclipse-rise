@@ -13,9 +13,11 @@ obstacle:     "He is not going to, he would like to talk first, and he is in no 
 turn:         "He tells Voss something true about Petra, kindly, and it works — Voss loses ten seconds, and ten seconds is what the containment needed."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           177
+words_heard:     117
+words_generated: 224
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, THREX (in person, behind glass)
@@ -27,9 +29,7 @@ words:        0
 #            3) THE 19.3 SIGNATURE LINE LANDS HERE - "You have your aunt's hands. Did
 #               anyone ever tell you that?" This is its canonical placement
 #            4) he asks three questions and answers none
-#            5) VOSS GETS DIALOGUE OPTIONS AND NONE OF THEM WIN. Essential: this is an
-#               unwinnable dialogue confrontation ten hours before the game gives one you
-#               CAN win (Vex, act 4). The shape rhymes; the outcome does not
+#            5) VOSS GETS DIALOGUE OPTIONS AND NONE OF THEM WIN
 #            6) Threx leaves because he has to be somewhere else. THAT is the insult
 #
 # NO THREATS. NO MONOLOGUE. NO IDEOLOGY. He hurts with warmth.
@@ -37,4 +37,178 @@ words:        0
 # writer:    full Voss variant coverage on both axes. This and S08 are where the act's
 #            variant budget goes.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 28 w at .010).
+#            Register reached at .010 (28 w), .120 (20 w), .130 (23 w).
+#            Spread 3 w (.030 "How is she?") to 28 w = 9.3x.
+#
+# *** THE VARIANT DECISION, AND IT IS A BUDGET DECISION - C-6 OPTION (b) / Q-7. ***
+# The stub asks for full coverage on both axes. Written as four axis-variants on each of
+# three spoken options that would have been 12-24 Voss generations in ONE scene of an act
+# that is already 15% over tier 2 and in which Voss is 71% of the spend.
+# What is here instead is FOUR CHOICE OPTIONS, one per quadrant, at four generations:
+#   .050 pragmatist  - he opens a trade
+#   .060 idealist    - he refuses the intimacy
+#   .070 personal    - he answers the question about his aunt
+#   .080 strategic   - he goes looking for the mechanism
+# That is full coverage on both axes by construction, it costs a third of the variant form,
+# and it is better drama: the axis is something the player DOES, in a conversation whose
+# whole subject is that doing does not work. The four failures are also four different
+# failures - see below - which a variant set cannot give you, because variants share a reply.
+# ESCALATED in the report so the architect can overrule cheaply if the ledger allows it.
+#
+# THREX ANSWERS EACH ONE SEPARATELY (.090-.120), keyed on the same flag. Four Threx
+# generations, ungendered, and they are the cheapest lines in the scene.
+# NAMESPACE: run.m18_threx_probe, not story. This is a conversational branch that must not
+# outlive the mission, which is exactly the distinction L1-R4 drew. It is set by the choice
+# and read four lines later in this same file; nothing else reads it and nothing should.
+#
+# *** WHY NONE OF THE FOUR WINS, AND WHY THEY LOSE DIFFERENTLY. ***
+#   trade     -> he does not refuse the offer. He identifies who taught Voss to open with a
+#                number, and he is right, and her name is the answer.
+#   refuse    -> he asks permission to keep talking. There is no purchase on a man who wants
+#                nothing from you.
+#   personal  -> he receives the detail warmly and gives one back that is worse, because it
+#                proves he was there on the first morning.
+#   strategic -> HE ANSWERS. Honestly, completely, with a compliment attached, and the
+#                answer is worthless. The most tactically minded player gets the truth and
+#                it costs Threx nothing - which is the single most frightening line he has.
+# This is the unwinnable confrontation that rhymes with Vex in act 4. The shape is the same;
+# the outcome is not.
+#
+# signature: .040 is 19.3's signature line, VERBATIM, in its canonical placement. Do not edit
+#            one word. It arrives as the answer to HIS OWN question at .030, which nobody has
+#            answered - "How is she?" ... "You have your aunt's hands."
+# questions: exactly three, and he answers none of them: .030, .040, .130.
+# no threats: audited. Nothing in his eight lines states a consequence, raises volume, uses
+#            rank, or describes what will happen to anybody. He compliments (.010, .120),
+#            asks after a prisoner's health (.030), requests permission to continue (.100),
+#            shares a memory (.110), wonders aloud about kindness (.130) and excuses himself
+#            because somebody else is waiting (.150). If a delivery makes any of these sound
+#            like gloating it is miscast, not miswritten - flagged for voice-director.
+# the cost:  the ten seconds are not spoken anywhere. They are in the shot on .160: the bolt
+#            sequence Voss could hear when he arrived has stopped, and it stopped during the
+#            conversation. Nobody says so, in this scene or in S07.
+# the insult: .150. He does not win the argument and he does not end it. He has an
+#            appointment on another floor and somebody up there has been patient with him.
+# omitted:   ideology, a mission statement, any account of what the Dominion is for, and any
+#            line in which Voss lands a hit. See report.
+
+lines:
+  - id:      M1.8.S06.010
+    speaker: THREX
+    voice:   threx
+    text:    "Eight people, a service lift and a manifest that was never supposed to leave a desk. I have written four pages about it and I am not finished."
+    shot:    "A pressure door with a glass panel and a speaking grille. He is alone on the other side, unarmed, holding a folder against his hip like a man waiting for a bus."
+    note:    "The compliment is deserved and he means it. He opens on admiration and never leaves that register."
+
+  - id:      M1.8.S06.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Open the corridor doors."
+
+  - id:      M1.8.S06.030
+    speaker: THREX
+    voice:   threx
+    text:    "How is she?"
+    note:    "QUESTION ONE. Nobody answers it, and .040 arrives as though somebody had."
+
+  - id:      M1.8.S06.040
+    speaker: THREX
+    voice:   threx
+    tags:    [quietly]
+    text:    "You have your aunt's hands. Did anyone ever tell you that?"
+    shot:    "He is looking at the hand Voss has flat against the glass. He says it the way you would say it at a table."
+    note:    "*** 19.3 SIGNATURE LINE, VERBATIM, CANONICAL PLACEMENT. DO NOT EDIT A WORD. *** Casting stage 2 auditions this line. QUESTION TWO."
+
+  - id:      M1.8.S06.050
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m18_threx
+      set:   'run.m18_threx_probe = "trade"'
+      label: "Offer him something."
+    text:    "Ninety people in that corridor. Say a number."
+    note:    "PRAGMATIST QUADRANT. Four options replace four-axis variants on three lines - see the budget note above."
+
+  - id:      M1.8.S06.060
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m18_threx
+      set:   'run.m18_threx_probe = "refuse"'
+      label: "Refuse the conversation."
+    text:    "Open the doors or stop talking."
+    note:    "IDEALIST QUADRANT."
+
+  - id:      M1.8.S06.070
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m18_threx
+      set:   'run.m18_threx_probe = "petra"'
+      label: "Answer him about Petra."
+    text:    "She was folding a blanket when we found her."
+    note:    "PERSONAL QUADRANT. The most human thing Voss can do here and the most expensive."
+
+  - id:      M1.8.S06.080
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m18_threx
+      set:   'run.m18_threx_probe = "board"'
+      label: "Find the board."
+    text:    "Somebody's holding those doors by hand. Which floor?"
+    note:    "STRATEGIC QUADRANT."
+
+  - id:        M1.8.S06.090
+    speaker:   THREX
+    voice:     threx
+    condition: 'run.m18_threx_probe == "trade"'
+    text:      "Somebody taught you to open with the count. That was Mara."
+    note:      "He does not decline the offer. He identifies the teacher, correctly, and the reply is her name."
+
+  - id:        M1.8.S06.100
+    speaker:   THREX
+    voice:     threx
+    condition: 'run.m18_threx_probe == "refuse"'
+    text:      "I would rather talk, if that is all right."
+
+  - id:        M1.8.S06.110
+    speaker:   THREX
+    voice:     threx
+    condition: 'run.m18_threx_probe == "petra"'
+    text:      "She did that on the first morning as well."
+    note:      "The kindest sentence in the scene and the worst. He was here on the first morning, and he remembers what she did with her hands."
+
+  - id:        M1.8.S06.120
+    speaker:   THREX
+    voice:     threx
+    condition: 'run.m18_threx_probe == "board"'
+    text:      "Third floor, at the end. It will not help, but that was a good guess and I want it said."
+    note:      "*** HE ANSWERS. *** Truthfully, fully, with a compliment attached, and it is worth nothing. The strategic player gets exactly what he asked for and it changes not one thing in S07."
+
+  - id:      M1.8.S06.130
+    speaker: THREX
+    voice:   threx
+    text:    "Do the people in the corridor know what they were held for? I have never been sure whether it is kinder to say."
+    note:    "QUESTION THREE. He answers none of the three and this one he clearly finds genuinely difficult."
+
+  - id:      M1.8.S06.140
+    speaker: VOSS
+    voice:   voss
+    text:    "Nobody in that corridor asked to be--"
+
+  - id:         M1.8.S06.150
+    speaker:    THREX
+    voice:      threx
+    interrupts: true
+    text:       "I have to be on the fourth level. Somebody there has been very patient with me."
+    shot:       "He picks the folder off his hip and goes. He does not look back at the glass and he is not walking quickly."
+    note:       "*** THE INSULT. *** He does not win the argument or end it. He has an appointment, and the appointment is with somebody else."
+
+  - id:      M1.8.S06.160
+    speaker: VOSS
+    voice:   voss
+    text:    "He's gone up. Fourth level."
+    shot:    "The bolt sequence that was still running behind the wall when Voss arrived has stopped. It stopped some time during the conversation and no line anywhere says so."

@@ -13,14 +13,16 @@ obstacle:     "There is nowhere in a geothermal vault that is meant for that."
 turn:         "He welds a bunk plate to the wall and etches the name, nobody asked him to, and by morning there are three more."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           39
+words_heard:     39
+words_generated: 39
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      BRICK, VOSS, others arriving
 # flags-in:  Story.Char.MaraDead
-# flags-out: Story.Thread.WallOpen ✚  (NEW TAG)
+# flags-out: Story.Thread.WallOpen ✚  (NEW TAG, set by the scene commit)
 # beats:     1) the sound of welding, at night, in a base that is not sleeping
 #            2) Brick, alone
 #            3) Voss comes to look and says nothing
@@ -31,8 +33,94 @@ words:        0
 # (05_base_building 5.3: "Grief is never a purchase" - the facility costs zero).
 #
 # writer:    Brick uses fewer words here than anywhere else in the act, which means one or
-#            two. His entire 2.5 arc - "he remembers every name on the wall" - becomes
-#            literally true starting with this weld, and nobody comments on that either.
-#            This scene OR S09 may spend the act's one rationed direct_beat.
+#            two. This scene OR S09 may spend the act's one rationed direct_beat.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected. Register reached at .010, exactly on the
+#            lower number (20 w). Spread 1 w (.020 / .040 / .070) to 20 w = 20x.
+# VOSS HAS NO LINES IN THIS SCENE. Not one. The stub says he comes to look and says
+#            nothing, and the cheapest way to write that is to write it. It also costs zero
+#            credits in the most expensive mission of the act, which is not the reason but
+#            is worth stating in a file the voice-director reads.
+# length:    seven lines, thirty-nine words, and that is the scene rather than a shortcut.
+#            The generosity 21_quality_mandate asks for is spent in S91 and S99; here the
+#            content is a man with a welder and nobody talking to him.
+# brick:     he does not speak first (18.4). Reyes opens, and she opens by noticing a theft
+#            and announcing that nobody will mention it.
+#            .070 is one noun and it is the founding of a facility. He is not asking for
+#            plates; he is telling the room what the wall is going to be.
+#
+# *** AR-12 - THE ACT'S SINGLE RATIONED direct_beat IS .050, AND HERE IS WHY. ***
+# The architect allowed one in act 1, in S09 or S90, never in S08. I have spent it here.
+#   - S09 is still an operation. Petra is counting, Reyes is triaging, a route is being
+#     chosen, and the scene's whole emotional load is already carried by a woman refusing to
+#     offer comfort. A named feeling there would have to compete with that and would lose.
+#   - S90 has nothing else in it. One man, one welder, and a wall that did not exist an hour
+#     ago. There is no operation for the line to sit behind.
+#   - It belongs to BRICK, and that is the whole argument. His 18.4 tic is that he answers
+#     difficult questions by naming a dead soldier - he has spent seven missions putting a
+#     name where a feeling should go. Tonight the name is already on the plate in front of
+#     him and the deflection is used up. The one man in the cast who has never stated a
+#     feeling states one, in four words, because he has run out of names to hide behind.
+#   - And it converts a feeling into the reason a SYSTEM exists. 02_story_bible 2.5 says
+#     "he remembers every name on the wall"; this line is why there is a wall to remember.
+#     05_base_building 5.3's "grief is never a purchase" gets its origin story for the price
+#     of one rationed line and one stolen bunk plate.
+# Nobody answers it. Nobody comments on it, here or ever again.
+#
+# the plate: .010 is the whole cost of the memorial and no character ever adds it up: the
+#            wall is made out of a bunk, so somebody sleeps on a frame tonight, and the
+#            medic's decision is to say nothing about it out loud while saying it out loud.
+# {name}:    .020 only, pronoun-free per L1-R8, same roster member Threx named in M1.7.S04
+#            and in S05.060 and who died in S07. .030 avoids every pronoun as well, so the
+#            roster can decide gender at runtime without touching this scene.
+# omitted:   a eulogy, a speech, a hand on a shoulder, and Mara's name. Nobody says Mara in
+#            this scene. Her plate is one of the three that are there by morning and no line
+#            points at it. See report.
+
+lines:
+  - id:      M1.8.S90.010
+    speaker: REYES
+    voice:   reyes
+    text:    "There is a bunk plate missing off the third frame and nobody is going to say anything about that either."
+    shot:    "Bunk Row at some hour that is not a time. A welder going in short bursts, throwing the whole vault white and then dark. Voss is standing four metres back with a cup he has not drunk. Reyes says this to him, not to Brick."
+    note:    "The memorial costs a bed, and the only person who notices says so and covers it in the same sentence. 05_base_building 5.3 - grief is never a purchase - given a price nobody itemises."
+
+  - id:      M1.8.S90.020
+    speaker: BRICK
+    voice:   brick
+    text:    "{name}."
+    shot:    "He has scratched it into the plate with a punch before welding, so the letters are wrong and deep. He says it once, checking it against nothing."
+    note:    "AR-10. The first name on the wall, and it is the name Threx spoke in M1.7.S04 and again in M1.8.S05.060. Pronoun-free per L1-R8. He does not speak first in the scene (18.4)."
+
+  - id:      M1.8.S90.030
+    speaker: REYES
+    voice:   reyes
+    text:    "Is that the whole name?"
+    note:    "Her tic - a question where anybody else would offer condolence. Deliberately pronoun-free so the roster decides gender at runtime."
+
+  - id:      M1.8.S90.040
+    speaker: BRICK
+    voice:   brick
+    text:    "No."
+
+  - id:          M1.8.S90.050
+    speaker:     BRICK
+    voice:       brick
+    direct_beat: true
+    text:        "I'm scared of forgetting."
+    shot:        "He does not stop working while he says it. Nobody answers him. Voss does not move."
+    note:        "*** AR-12 - THE ACT'S ONE RATIONED direct_beat. *** Justification: the man whose entire tic is answering hard questions by naming a dead soldier has the name in front of him already, so the deflection is spent - and the feeling he names is the reason the Memorial Hall exists (02_story_bible 2.5). Four words, in the quietest scene in the act, from the character who has never stated one. Nobody responds to it."
+
+  - id:      M1.8.S90.060
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "There's more bunk plate in the workshop."
+    shot:    "Two people have come down the row and stopped. One of them is carrying a plate already. Nobody asked anybody for anything."
+
+  - id:      M1.8.S90.070
+    speaker: BRICK
+    voice:   brick
+    text:    "Plates."
+    shot:    "By the time the shift horns go there are four plates on the wall and no ceremony has happened. One of them has three letters on it. The camera does not go close enough to read any of them."
+    note:    "One noun, and it founds a facility. He is not asking for plates; he is telling the room what this wall is now. Story.Thread.WallOpen commits here."

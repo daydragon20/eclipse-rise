@@ -13,9 +13,11 @@ obstacle:     "The route is already closed, and the man closing it says so polit
 turn:         "Threx uses Voss's first name, and Ember learns in one word how long he has been watching."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           167
+words_heard:     167
+words_generated: 190
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, MARA, DEX (radio), squad · THREX (public address)
@@ -28,10 +30,147 @@ words:        0
 #            4) AR-6 RUNG 4 - the ladder completes here
 #            5) containment begins
 #
-# HE DOES NOT GLOAT. He congratulates them, and he means it. Threx is at his worst when he
-# is warm; a single threat turns him into a stock villain and act 3 loses its catharsis.
+# HE DOES NOT GLOAT. He congratulates them, and he means it.
 #
 # writer:    18.4 - never shouts, never uses rank when a first name will wound more.
 #            The horror is that he pronounces everything correctly.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 23 w at .020).
+#            Register reached at .030 (20 w) and .090 (22 w).
+#            Spread 2 w (.070 "And Voss.") to 23 w = 11.5x.
+#
+# *** ESCALATION TO STORY-ARCHITECT - THE FIRST NAME. NOT SOLVED SILENTLY. ***
+# This stub's turn says "Threx uses Voss's FIRST name". Ruling L1-R10 (same night, same
+# document set - BEATS_M1.8.md section 2b, point 4) says the protagonist's first name is
+# player-chosen and therefore CAN NEVER BE VOICED: "everyone says 'Voss', and from M1.8
+# 'Cinder'". The two cannot both be executed.
+# I have written the newer and more specific ruling: Threx says "Voss", and AR-6 rung 4 is
+# carried by the REGISTER rather than by the name form - he says it in exactly the warm,
+# given-name cadence he used for the other two, and follows it with a detail from before
+# Ember existed (.080). "How long he has been watching" arrives as a trade and an
+# apprenticeship note, not as a syllable. That is stronger than a first name would have
+# been, because a first name only proves he read a file; .080 proves he read it and liked it.
+# If the architect wants the literal reading instead, the fix is one line and no restructure.
+#
+# *** THE THREE NAMES, AND WHY NONE OF THEM IS INVENTED. ***
+# The stub asks for one prisoner, one Ember fighter and Voss.
+#   PRISONER  = PETRA (.050). She is a prisoner in this building and she is canon. Naming a
+#               new prisoner would have cost an invented name for one line; naming Petra
+#               costs nothing and is worse, which is the correct direction. It also loads
+#               S06 instead of competing with it: he spends the NAME publicly here and the
+#               RELATION privately there ("your aunt's hands"), which is a descent.
+#   FIGHTER   = {name} (.060), AR-10, the roster slot, the same fighter Threx spoke in
+#               M1.7.S04 and the one who dies in S07 and goes on the wall in S90. Line is
+#               pronoun-free per L1-R8.
+#   VOSS      = .070, two words.
+# "Thursday" at .050 is deliberate: the player learned what Thursday means ninety seconds
+# earlier from PRISONER_B in S03.090, and Threx now uses it about Petra, helpfully.
+#
+# no threats: checked line by line. Threx congratulates (.030), offers to help (.040),
+#            passes on a scheduling change (.050), admires a supervisor's note (.080) and
+#            advises against wasting effort (.090). There is no consequence stated anywhere
+#            in his seven lines and no adjective about Ember that is not a compliment.
+#            He does not raise his voice, he does not use rank, and he pronounces everything
+#            correctly. If any of these lines can be delivered as a sneer, it is miscast,
+#            not miswritten - flagged for voice-director.
+# dex:       .020 is his fingerprint at maximum: fragments, a technical fact turned into a
+#            person, and the sentence gets bigger and worse as it goes. HE IS INTERRUPTED BY
+#            THE PA, which is the only interruption in the scene and the best one available.
+#            .110 is four words and he is the only person who says out loud that the street
+#            was named.
+# mara:      .120 refuses the whole broadcast in three words and one of them is "we". She
+#            does not react to a single name, including Petra's, at any point in this scene.
+# pronoun:   Threx says "you" and "your" ZERO times in this scene and four times in S06.
+#            On a public address he talks ABOUT people - "Petra is", "she will want", "there
+#            is a note" - and he only speaks TO somebody when he is in a room with them. It
+#            costs nothing, it keeps the word scarce for two more scenes, and it means the
+#            first thing he ever says directly to Voss is "You have your aunt's hands."
+# voss:      no variants. Both his lines are technician's observations, not judgements -
+#            there is nothing here for an axis to disagree about, and the act's variant
+#            budget belongs to S06 and S08 (C-6 option b).
+# eleven:    L1-R14 checked. Not used.
+
+lines:
+  - id:      M1.8.S05.010
+    speaker: VOSS
+    voice:   voss
+    text:    "Panel's dead. It's not jammed, it's been keyed out."
+    shot:    "The corridor door. No alarm, no lights, no sound at all. Forty people backed up behind him in a hall the colour of paper."
+
+  - id:      M1.8.S05.020
+    speaker: DEX
+    voice:   dex
+    text:    "Keyed out means somebody keyed it. That's a person. That's a person sitting at a desk with the plan of this building open--"
+    note:    "18.4 Dex: fragments, and the sentence gets worse as it builds. He understands it before anybody else and the PA cuts him off before he can finish being right."
+
+  - id:         M1.8.S05.030
+    speaker:    THREX
+    voice:      threx
+    interrupts: true
+    tags:       [quietly]
+    text:       "That was well done. Nobody has opened a door on that block in four years, and it took twenty-two minutes."
+    shot:       "A ceiling speaker in a clean corridor. Nothing else changes. The prisoners look up before Ember does, because they know that voice."
+    note:       "*** AR-6, RUNG 4 BEGINS. *** He opens with a compliment and it is deserved. No threat appears anywhere in his seven lines."
+
+  - id:      M1.8.S05.040
+    speaker: THREX
+    voice:   threx
+    text:    "I would like the people in the corridor to hear their names, because I think it will help."
+
+  - id:      M1.8.S05.050
+    speaker: THREX
+    voice:   threx
+    text:    "Petra is on the list for Thursday and Thursday has been moved. She will want to know that."
+    note:    "THE PRISONER. Canon name, zero invention, and the worst sentence in the mission. 'Thursday' is PRISONER_B's word from S03.090 - the player learned to dread it ninety seconds ago and Threx uses it as a courtesy."
+
+  - id:      M1.8.S05.060
+    speaker: THREX
+    voice:   threx
+    text:    "{name}, still on Foundry Row."
+    note:    "THE EMBER FIGHTER. AR-10 / L1-R8 roster slot - the same fighter Threx named in M1.7.S04, who dies in S07 and whose plate is welded in S90. Line is pronoun-free as the slot requires."
+
+  - id:      M1.8.S05.070
+    speaker: THREX
+    voice:   threx
+    text:    "And Voss."
+    shot:    "Two words, in exactly the register he used for the other two. Nobody in the corridor moves."
+
+  - id:      M1.8.S05.080
+    speaker: THREX
+    voice:   threx
+    text:    "Circuits. There is a supervisor's note in that file that anybody would be pleased with."
+    note:    "*** THE ONE WORD BECOMES A LENGTH OF TIME. *** He is not quoting an Ember dossier. He is quoting an apprenticeship record from before there was a cell, and he liked it. That is how long he has been watching, and it is a compliment."
+
+  - id:      M1.8.S05.090
+    speaker: THREX
+    voice:   threx
+    text:    "Doors on this level are going to stay as they are for a while. There is no reason to run at them."
+    shot:    "The speaker clicks off. Somewhere behind the walls, bolts start dropping in sequence, unhurried, one corridor at a time."
+
+  - id:      M1.8.S05.100
+    speaker: MARA
+    voice:   mara
+    text:    "Everyone back through the block. We go the long way."
+
+  - id:      M1.8.S05.110
+    speaker: DEX
+    voice:   dex
+    text:    "He said the street."
+
+  - id:      M1.8.S05.120
+    speaker: MARA
+    voice:   mara
+    text:    "We heard it."
+    note:    "Three words, one of them 'we', and she does not react to Petra's name or to Voss's. The refusal is the character."
+
+  - id:      M1.8.S05.130
+    speaker: VOSS
+    voice:   voss
+    text:    "He's holding the doors, not locking them. Somebody's sitting on a board."
+    note:    "Technician's read, and it is what puts him at the glass in S06. He does not say who; he says what kind of machine it is."
+
+  - id:      M1.8.S05.140
+    speaker: MARA
+    voice:   mara
+    text:    "Then find the board."

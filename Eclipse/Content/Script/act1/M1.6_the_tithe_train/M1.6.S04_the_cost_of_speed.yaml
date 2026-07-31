@@ -24,7 +24,9 @@ words:        318
 #            THREE outcomes, three mutually exclusive leaf tags under one parent - ruling
 #            L1-R3. Write them with the `choice:` field (SCRIPT_FORMAT 4, L1-R2),
 #            group: m16_train. The .Split option only exists with the Iron Chorus pact, so
-#            it also carries condition: story.choice_m15_ironchoruspact == true.
+#            it also carries condition: story.m15_pact == "full". (The spelling in this
+#            line used to be story.choice_m15_ironchoruspact == true, which nothing sets.
+#            Corrected 01-08: the shipped condition on .120 is the authority, not this note.)
 #
 # THE CHOICE (2.7 archetype "The Cost of Speed"):
 #   run    - drive on to the Underworks spur. Slower, everybody comes, the train is a
@@ -35,7 +37,10 @@ words:        318
 # *** RULING L1-R13 - SPLIT IS GATED ON THE PACT, AND THE LIMITED BRANCH GETS NO
 #     REPLACEMENT THIRD OPTION. Escalated by the writer of M1.5.S99; ruled here. ***
 #
-# condition on .120:  story.m15_ironchoruspact == "pact"
+# condition on .120:  story.m15_pact == "full"   (VERIFIED against line 199 on 01-08.
+#                     This note used to say story.m15_ironchoruspact == "pact" -- a flag
+#                     spelling that does not exist AND a value that does not exist; the
+#                     setter only ever writes full|limited|none.)
 #
 # THREE REASONS, IN ORDER OF WEIGHT:
 # 1. FICTION. You cannot hand custody of a car of people to a cell you have no operating

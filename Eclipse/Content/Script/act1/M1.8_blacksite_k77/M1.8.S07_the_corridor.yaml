@@ -13,9 +13,11 @@ obstacle:     "Ember is a squad, this is a crowd, and the one person who can mov
 turn:         "Somebody from Ember's original eleven dies holding a door, and the crowd moves because they saw it."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           147
+words_heard:     147
+words_generated: 160
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, MARA, BRICK, REYES, fighters, prisoners; Veil (barks)
@@ -23,20 +25,215 @@ words:        0
 # flags-out: none
 # beats:     1) the fight, in short callouts
 #            2) prisoners who cannot run. Reyes under pressure - HER CONTRACTIONS
-#               DISAPPEAR (18.4: training reasserts). Clearest fingerprint moment in the
-#               act. NOBODY REMARKS ON IT
+#               DISAPPEAR (18.4). Clearest fingerprint moment in the act. NOBODY REMARKS ON IT
 #            3) Brick carries
-#            4) THE FIRST NAME ON THE WALL: one of the eight dies, and it is the same name
-#               Threx spoke in M1.7.S04 (AR-10). Systemic recruit deaths may happen on top
-#               of this via the {name} slot, but THIS death is authored and guaranteed
+#            4) THE FIRST NAME ON THE WALL: one of the eight dies, same name Threx spoke in
+#               M1.7.S04 (AR-10). THIS death is authored and guaranteed
 #            5) onward
 #
-# DESIGN CONSTRAINT - read this before writing any line:
-# 01_game_vision 1.7 moment 3 says a recruited soldier LIKELY dies. Likely, not certainly.
-# NO LINE ANYWHERE IN THIS MISSION MAY ASSUME A CASUALTY COUNT. Never "we lost four".
-# The authored death above is the only one the script may name.
+# DESIGN CONSTRAINT: NO LINE ANYWHERE IN THIS MISSION MAY ASSUME A CASUALTY COUNT.
 #
 # writer:    callout band throughout except Reyes, who is doing medicine and therefore
 #            speaks in complete sentences even here. That contrast IS the scene.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      scene type is in-mission-radio (10-25); twenty-one of the twenty-five lines
+#            carry `band: callout` (L1-R1 override, ceiling 6, all checked).
+#            .045 / .105 / .195 use the insertion slots the tens scheme exists for
+#            (SCRIPT_FORMAT section 2) and are monotonic; nothing was renumbered.
+#            The four that do not are Reyes's, and that is the scene: everything in this
+#            corridor is three words long except the doctor, who is incapable of shortening
+#            a sentence and gets slower and more grammatical as it gets worse.
+#            Register reached at .070 (19 w), .110 (22 w), .180 (22 w), .220 (20 w) - all
+#            non-overridden. Spread 1 w (.040 / .170 / .210) to 22 w = 22x.
+# reyes:     ZERO contractions in all four of her lines, against "can't", "won't", "Where's",
+#            "Got her" everywhere around her. 18.4: training reasserts under stress. NOBODY
+#            REMARKS ON IT and no shot points at it. This is the clearest fingerprint moment
+#            in the act and it is invisible if you are not listening, which is correct.
+#            .180 is deliberately a three-stage instruction in the middle of a firefight.
+#
+# *** THE AUTHORED DEATH, AND THE ONE DECISION IN IT. ***
+# {name} does not speak. Not one line, not a last word, not an acknowledgement.
+# Two reasons and the second is the load-bearing one:
+#   1. the roster name is procedural (L1-R8) while the voice pool is fixed, so a spoken line
+#      would risk a voice that does not match the name the player is hearing;
+#   2. the beat is that OTHER PEOPLE say the name. .130 puts them on the bar, .140/.150 are
+#      Voss ordering them off twice and being ignored, .200 is somebody asking where they
+#      are, and .210 is Brick answering with a noun. The player is never told what happened.
+#      They are told where.
+# All four {name} lines are pronoun-free as L1-R8 requires - checked, including "Where's
+# {name}?" which uses no gendered word at all.
+# brick:     .210 is the whole character in one syllable. He answers a difficult question by
+#            naming a dead soldier; tonight the question is where somebody is, and the answer
+#            is a piece of architecture. 18.4 "he hands you a noun" - never more so.
+# crowd:     .160 is the turn and it comes from a PRISONER, not from Ember. The crowd moves
+#            because it saw somebody hold a door, and the person who says so is one of the
+#            people being saved. No principal is allowed to narrate that.
+# veil:      three lines, calm, no volume, no reinforcement calls (the M1.7 rule holds and
+#            pays here). They MARK and they HOLD A LIP. They do not pursue. Nobody in Ember
+#            notices; the player has now watched the Veil decline to chase twice in two acts.
+# counting:  .220 is the casualty-count constraint turned into character - Reyes REFUSES to
+#            count in the corridor, out loud, as a medical decision. No line in this mission
+#            states a number of dead, and this is the line that makes that a choice instead
+#            of an omission. It also holds her 18.4 never: she does not guess out loud.
+# eleven:    L1-R14 checked. Not used.
+
+lines:
+  - id:      M1.8.S07.010
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Both ends closing."
+    shot:    "A white corridor sixty metres long with people in it who have not walked that far in months."
+
+  - id:      M1.8.S07.020
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Hold the north lip."
+
+  - id:      M1.8.S07.030
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "Counting through."
+
+  - id:      M1.8.S07.040
+    speaker: BRICK
+    voice:   brick
+    band:    callout
+    text:    "Here."
+
+  - id:      M1.8.S07.045
+    speaker: MARA
+    voice:   mara
+    band:    callout
+    text:    "Two lines. Hands on shoulders."
+    note:    "The last ordinary order she gives in the game, and it is a place and a group, which is her shape. Nothing marks it."
+
+  - id:      M1.8.S07.050
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    band:    callout
+    text:    "{name}, hinge side!"
+
+  - id:      M1.8.S07.060
+    speaker: PRISONER_B
+    voice:   civilian_kessara_b
+    band:    callout
+    text:    "I can't--"
+
+  - id:      M1.8.S07.070
+    speaker: REYES
+    voice:   reyes
+    text:    "She cannot run and she is not going to be able to. Somebody take the other side of her."
+    note:    "First of four. Zero contractions, complete sentences, and she is the slowest speaker in a corridor where everybody else has three words."
+
+  - id:      M1.8.S07.080
+    speaker: BRICK
+    voice:   brick
+    band:    callout
+    text:    "Got her."
+
+  - id:      M1.8.S07.090
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Middle of the hall!"
+
+  - id:      M1.8.S07.100
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Mark and hold the lip."
+    note:    "The Veil contains and does not pursue. Same doctrine, same vocabulary as M1.5.S05.030. No reinforcement call anywhere in this scene."
+
+  - id:      M1.8.S07.105
+    speaker: PRISONER_A
+    voice:   civilian_kessara_a
+    band:    callout
+    text:    "Which way is up?"
+    note:    "Four words from a man who has lost the concept. Nobody answers him and the line is never referred to again."
+
+  - id:      M1.8.S07.110
+    speaker: REYES
+    voice:   reyes
+    text:    "There are people at the back who have not eaten in two days. They will fall and they will not get up."
+
+  - id:      M1.8.S07.120
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    band:    callout
+    text:    "Door won't hold!"
+
+  - id:      M1.8.S07.130
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    band:    callout
+    text:    "{name} has the bar."
+    shot:    "Seen once, at distance, through moving bodies. The camera does not go closer and does not come back."
+    note:    "*** THE AUTHORED DEATH BEGINS. AR-10. *** {name} never speaks in this scene. Other people say the name; the player is never shown the moment."
+
+  - id:      M1.8.S07.140
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Off the bar!"
+
+  - id:      M1.8.S07.150
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Get off it!"
+
+  - id:      M1.8.S07.160
+    speaker: PRISONER_A
+    voice:   civilian_kessara_a
+    band:    callout
+    text:    "Go. Go, go."
+    shot:    "The crowd had stopped. It starts again from the middle, where people can see the door, and it is a prisoner who starts it."
+    note:    "*** THE TURN, AND IT BELONGS TO ONE OF THE PEOPLE BEING RESCUED. *** No principal narrates why the crowd moved."
+
+  - id:      M1.8.S07.170
+    speaker: BRICK
+    voice:   brick
+    band:    callout
+    text:    "Walk."
+
+  - id:      M1.8.S07.180
+    speaker: REYES
+    voice:   reyes
+    text:    "Take his weight on the right. We are going to do this in three stages and the first one is standing up."
+
+  - id:      M1.8.S07.190
+    speaker: MARA
+    voice:   mara
+    band:    callout
+    text:    "Last door. Everyone through."
+
+  - id:      M1.8.S07.195
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "Log the hour. Both ends."
+    shot:    "Nobody follows Ember through the last door. The corridor behind them is being written up."
+    note:    "Same doctrine and nearly the same words as M1.5.S05.230. The Veil closes a night as paperwork, twice in two acts, and Ember never notices either time. P4 texture, delivered as procedure."
+
+  - id:      M1.8.S07.200
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    band:    callout
+    text:    "Where's {name}?"
+
+  - id:      M1.8.S07.210
+    speaker: BRICK
+    voice:   brick
+    band:    callout
+    text:    "Door."
+    note:    "One syllable, and it is how the player finds out. He answers a question about a person with a piece of architecture, which is the same move as naming a dead soldier and it is the only answer he has."
+
+  - id:      M1.8.S07.220
+    speaker: REYES
+    voice:   reyes
+    text:    "The last of them is through. I am not going to count anybody in this corridor until we are up."
+    note:    "The no-casualty-number constraint, written as a medical decision made out loud. She does not guess and she does not count where the counting would be wrong (18.4). No line in this mission states a number of dead."

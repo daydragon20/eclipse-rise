@@ -13,18 +13,16 @@ obstacle:     "She is not the person the prologue remembers, and she starts by g
 turn:         "He stops trying to comfort her and does what she says, and she lets him take her arm."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           135
+words_heard:     85
+words_generated: 215
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, PETRA VOSS (debut), MARA
 # flags-in:  Story.Char.PetraLocated
 # flags-out: none (Story.Char.PetraRescued commits at S99)
-#
-# UNBLOCKED 2026-07-31 - ruling L1-R9. Petra's fingerprint is now in 18_writing_standard.md
-# 18.4 ("Recurring non-companion voices") and her signature line is in 19.3. WRITEABLE NOW.
-# Still open: the CASTING (owner picks the voice) - so write, do not generate.
 #
 #   syntax : imperatives WITH THE PRONOUN ELIDED. Household and kitchen nouns where
 #            everyone around her uses operational ones. Second-shortest lines in the game
@@ -33,29 +31,143 @@ words:        0
 #            to her
 #
 # *** THE PRONOUN RULE IS LOAD-BEARING, NOT A STYLE NOTE. ***
-# Mara spends the game's only "you" four scenes later in S08, and that word IS the command
-# transfer (AR-5/AR-5b). Petra's elided imperatives keep the word scarce across the whole
-# climax so Mara's single use lands in a vacuum. A regex over this scene must return zero
-# hits for "you"/"your". If you need her to address him, she assigns a task instead.
-#
-# SHE ALSO NEVER NAMES HIM (ruling L1-R10). No "Voss", no callsign, nothing. She is the
-# only living person who knew him before either word meant anything, and the protagonist's
-# first name is player-chosen and therefore unvoiced. Everyone else says "Voss" then
-# "Cinder"; she says "sit down". That turns the hardest VO constraint in the game into
-# characterisation - do not spend it by having her use a name here or anywhere.
-#
-# Distinguish from Brick: HE HANDS YOU A NOUN, SHE HANDS YOU A VERB (18.9 C1 strip test).
-#
-# beats:     1) the cell. She is sitting. She stands before he says anything
-#            2) HER FIRST LINE IS A TASK. She does not thank him and she does not cry
-#            3) Voss tries the emotional register. It does not work
-#            4) she points at somebody else who needs help
-#            5) ONLY WHEN HE DOES WHAT SHE SAYS does she let him hold her up
-#            6) one line that touches the prologue without quoting it
+# A regex over this scene must return zero hits for "you"/"your".
+# SHE ALSO NEVER NAMES HIM (ruling L1-R10).
+# Distinguish from Brick: HE HANDS YOU A NOUN, SHE HANDS YOU A VERB.
 #
 # THIS IS THE PAYOFF OF THE ENTIRE PROLOGUE AND IT LASTS NINETY SECONDS.
 # No line names what happened to her. Not one.
 #
 # writer:    half Voss variant set (personal/strategic axis reads differently here).
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 27 w, a variant of .040).
+#            Register reached at .040 (24 w base). Spread 1 w (.020 "Petra.") to 24 w = 24x.
+#
+# *** THE REGEX, AND ITS SCOPE. ***
+# Zero occurrences of "you" or "your" in every text: field in this file, including variants,
+# including Mara's line and Voss's. The stub asks for the scene, not just for Petra, and the
+# scene is where the value is: the word is absent from Petra's entire debut, so that when
+# Mara spends it four scenes later it lands in a vacuum. Checked by hand, base and variant.
+# SCOPE: text: fields only. The inherited L1 comment block above uses the word in prose, as
+# does this note, and none of it is voiced. A whole-file grep will report false hits.
+# Petra additionally uses no first person either - no "I", no "we", nowhere. Mara's whole
+# fingerprint is "we"; Petra has no pronouns at all. That is a second regex and it is the
+# cleanest available separation between the two women.
+#
+# *** MARA vs PETRA - THE MECHANICAL DIFFERENCE, DEMONSTRATED AT .080/.090. ***
+# The two lines are adjacent on purpose, so the strip test (18.9 C1) can be run on them
+# alone:
+#   MARA  names a PLACE and a GROUP.  "Everyone in the corridor."   She moves a room.
+#   PETRA names a THING and a VERB.   "Cups. Both of them."         She moves two hands.
+# Mara's unit is the room; Petra's unit is the next thing a pair of hands does. Mara says
+# "we" constantly and never "you"; Petra says neither. Two laconic women, four scenes apart,
+# and no line of either is deliverable by the other.
+# Against Brick the published rule holds unchanged: he hands you a noun ("Carpet.",
+# "Plates."), she hands you a verb ("Roll it.", "Go and stand.").
+#
+# the tic:   fires three times and never once as a refusal. .030 answers his use of her name
+#            with a bowl. .050 answers his account of the search with somebody else's cell.
+#            .110 answers the fact that she cannot walk by telling him which arm to take -
+#            she does not accept help, she assigns it. That is the same move as the other
+#            two and it is why the scene turns without anybody softening.
+# names:     Voss says "Petra" exactly once, at .020. She never says anything back that is a
+#            name, a callsign or a pronoun, here or in S09 or in S99. The asymmetry IS the
+#            scene: he still has a word for her and she has none for him, and the reason is
+#            that the only word she ever used is the one the game cannot voice (L1-R10).
+#            One name use in twelve turns - inside 18.9 B's density limit.
+# .040:      his longest line in the mission, and it fails. He offers the months, the vigil,
+#            the arithmetic - and gets a cell number back. He claims nothing for himself in
+#            any version of it ("somebody in our vault", "nobody in that vault") which is his
+#            18.4 fixed trait doing quiet work in the one scene where he could have cashed it.
+# variants:  personal / strategic only - HALF SET, per the stub and per C-6 option (b).
+#            The idealist/pragmatist axis genuinely does not read here: there is no decision
+#            in this scene, only a register, and the register that varies is how much of
+#            himself he puts in the sentence. personal = the vigil. strategic = the paperwork
+#            that found her. Both fail identically, and that is the point of writing two.
+# kettle:    .070 pays the kettle in S03.010's shot. Nobody remarks on the fact that the room
+#            that held her for months has a rota and a kettle in it.
+# .120:      the prologue, touched and not quoted. Five words about footwear from a woman who
+#            raised a seven-year-old, said while leaning on him. No emotion is named, nothing
+#            that was done to her is named, and it is the last line in the scene.
+# omitted:   thanks, tears, an embrace, and any line acknowledging where she has been. Voss
+#            never gets to finish being her nephew. See report.
+
+lines:
+  - id:      M1.8.S04.010
+    speaker: PETRA
+    voice:   petra
+    text:    "Blanket first. Roll it from the foot end."
+    shot:    "The cell door is still swinging. She is already on her feet with her back to it, squaring the bedding. She has not looked at the doorway."
+    note:    "HER FIRST LINE IS A TASK. Two imperatives, pronoun elided, household nouns, and she is tidying a room she is about to leave forever."
+
+  - id:      M1.8.S04.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Petra."
+    note:    "The only name spoken in the scene, and it is his. She has none for him and never will."
+
+  - id:      M1.8.S04.030
+    speaker: PETRA
+    voice:   petra
+    text:    "Bowl on the shelf. It goes back on the shelf."
+    note:    "THE TIC. She answers her own name with crockery. She is putting the cell in order because that is what hands are for, and nothing in the scene explains it."
+
+  - id:      M1.8.S04.040
+    speaker: VOSS
+    voice:   voss
+    text:    "We've had people on the Row since the spring. Every list that came out of this place, somebody in our vault read it twice."
+    shot:    "He is standing in the doorway with the rifle still across him because nobody has told him to put it down."
+    note:    "HALF VARIANT SET - personal/strategic (C-6 option b). His longest line in the mission and it does not work on any axis. He claims nothing for himself in any version."
+    variants:
+      personal:  "Nobody in that vault stopped reading the lists. Not one week, not since the spring, and there were weeks when it was the only thing anybody did."
+      strategic: "There are ninety names on the manifest that got us in here. One of them is the reason anybody knew where to come."
+
+  - id:      M1.8.S04.050
+    speaker: PETRA
+    voice:   petra
+    text:    "Four's been shouting since the alarm. Go and stand where she can see the door."
+    note:    "THE TIC AGAIN, and this time it is the turn: she redirects him at somebody else's cell. She does not acknowledge one word of .040."
+
+  - id:      M1.8.S04.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Four. Where's four?"
+    note:    "He stops. This is the first thing he says that is not about her, and it is the moment the scene turns - he has joined her register instead of asking her into his."
+
+  - id:      M1.8.S04.070
+    speaker: PETRA
+    voice:   petra
+    text:    "Left. Past the kettle."
+    shot:    "He goes. She finishes the blanket while he is gone and does not watch the door."
+
+  - id:      M1.8.S04.080
+    speaker: MARA
+    voice:   mara
+    text:    "We move on the hour. Everyone in the corridor."
+    shot:    "Mara in the doorway for two seconds, counting heads down the block. The two women do not speak to each other at any point in this mission."
+
+  - id:      M1.8.S04.090
+    speaker: PETRA
+    voice:   petra
+    text:    "Cups. Both of them."
+    note:    "*** THE STRIP TEST, DELIBERATELY ADJACENT TO .080. *** Mara names a place and a group; Petra names a thing and a verb. Neither line is deliverable by the other woman."
+
+  - id:      M1.8.S04.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Got them."
+
+  - id:      M1.8.S04.110
+    speaker: PETRA
+    voice:   petra
+    text:    "Left arm."
+    shot:    "She puts her weight on him without being asked and without asking. He takes it. Neither of them says anything about it and the camera does not hold."
+    note:    "She does not accept help; she assigns it. Two words, and they are the turn the stub asks for. What is wrong with the other arm is never said, here or in any later act."
+
+  - id:      M1.8.S04.120
+    speaker: PETRA
+    voice:   petra
+    text:    "Shoes are wrong. Always were."
+    shot:    "Said to the floor, moving, leaning on him. Last line of the scene. Do not cut to his face."
+    note:    "THE PROLOGUE, TOUCHED AND NOT QUOTED. Five words about footwear from the woman who raised him from seven. No emotion named, no name, no pronoun, nothing that was done to her. This is the payoff of the entire prologue and it is a complaint about his boots."

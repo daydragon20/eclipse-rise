@@ -13,9 +13,11 @@ obstacle:     "There are eleven recordings on it, dated, addressed to \"the next
 turn:         "He plays the first one, because he is the only person in the vault who could not stand to leave it unheard — and it is not addressed to Voss."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           137
+words_heard:     137
+words_generated: 158
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      DEX, VOSS · MARA (recording only - Story.Char.MaraDead is already set)
@@ -27,16 +29,143 @@ words:        0
 #
 # beats:     1) the console. Dex alone, then Voss
 #            2) the list of recordings. ELEVEN - as many as the cell used to be
-#            3) Dex's joke, and he does not land it (second time in the act he leaves an
-#               opening unused; the first was M1.3.S06, and now the player knows what it means)
-#            4) THE FIRST RECORDING PLAYS. Mara: short, practical, no pathos - AND IT IS
-#               ADDRESSED TO SOMEBODY OTHER THAN VOSS, which makes it infinitely better
+#            3) Dex's joke, and he does not land it
+#            4) THE FIRST RECORDING PLAYS - ADDRESSED TO SOMEBODY OTHER THAN VOSS
 #            5) Voss lets it play
-#
-# condition:  add a conditional line pair on story.thread_mara_letters_open == true (the
-#             player saw her recording one in HUB.A1.mara_letters). Landing this ten times
-#             harder for that player is exactly what condition: exists for.
 #
 # writer:    the recorded Mara still says "we". She never got to spend the "you" twice.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 21 w at .100).
+#            Register reached at .100. Spread 2 w (.030 / .080) to 21 w = 10.5x.
+# ELEVEN:    L1-R14. This is the one blessed use in the mission and the only "eleven" in the
+#            whole file set. Eleven recordings, eleven people in the cell, and no character
+#            says the second half of that sentence.
+#
+# *** THE RECORDING - THREE DESIGN DECISIONS, ALL OF THEM PAYING SOMETHING. ***
+# 1. IT IS ADDRESSED TO REYES. The stub only requires "somebody other than Voss"; using
+#    Elin costs no canon (02_story_bible / 18.4 give the name) and buys the most, because
+#    Reyes is the one person in the cell whose job is keeping people alive in a building.
+# 2. IT IS ABOUT THE WATER ROTA. No pathos, no farewell, no legacy - a housekeeping note
+#    about which system fails first. That is 18.4 Mara exactly, and it is the reason the
+#    scene is unbearable rather than sentimental.
+# 3. IT PREDATES THE PLAYER. .120 dates it "before the overpass" - M1.1, the night Voss
+#    joined. The cell existed without him, planned for its own continuation without him, and
+#    would have carried on without him. That is the anti-chosen-one beat of the whole act
+#    and it costs eight flat words from an engineer reading a timestamp.
+# PRONOUN AUDIT: the recording contains no "you" and no "your". She says "we" twice. AR-5
+# holds even posthumously: the word was spent once, in S08, and she never got to spend it
+# again. All her later recordings in acts 2-4 must obey this - flagged for those writers.
+#
+# dex:       .010 is his want stated as a task, .020-.040 is the list, and .050 IS THE JOKE
+#            HE DOES NOT LAND. He starts a hardware comparison and abandons it inside the
+#            sentence. 18.6 forbids comic beats in aftermath - so this is the absence of one,
+#            written out loud, and it is the second time in the act he leaves an opening
+#            unused (M1.3.S06 was the first). The player knows what that means now.
+#            .070 is four words and he says it to protect Voss from what is coming, and it
+#            does not work.
+# voss:      four short lines and a conditional. He asks twice, he does not argue, and his
+#            only instruction is to leave it running. No axis variants: there is no judgement
+#            here, only a man deciding not to switch something off.
+# condition: .140/.150 read story.thread_mara_letters_open, set by HUB.A1.mara_letters, where
+#            the player watched her record one. For that player Voss already knows what the
+#            files are and says so - quietly, three lines after Dex explained them to him -
+#            and Dex's three-word fragment is the whole reaction. AR-9 holds: the scene is
+#            complete without the hub, and the hub makes it worse. That is what condition: is
+#            for and it is why the plant survived the hub-layer budget cut (L1-R11).
+# omitted:   a line addressed to Voss, a message from Mara to Voss, any acknowledgement that
+#            she is dead, and any statement of what the recordings mean. Nobody says her name
+#            in this scene either. See report.
+
+lines:
+  - id:      M1.8.S91.010
+    speaker: DEX
+    voice:   dex
+    text:    "I'm taking her console off the net before somebody opens it and starts reading things out loud."
+    shot:    "Map table. One lamp. The chalk from S01 is still on the table under the manifest and nobody has wiped it."
+
+  - id:      M1.8.S91.020
+    speaker: DEX
+    voice:   dex
+    text:    "Eleven files on it. Dated. Every one of them addressed to the same four words."
+    note:    "L1-R14: the blessed use. Eleven recordings for eleven people, and nobody in the scene says the second half of that."
+
+  - id:      M1.8.S91.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Which words?"
+
+  - id:      M1.8.S91.040
+    speaker: DEX
+    voice:   dex
+    text:    "The next of us."
+
+  - id:      M1.8.S91.050
+    speaker: DEX
+    voice:   dex
+    text:    "Board holds nine hundred hours. She used about forty minutes of it, which for her is practically a--"
+    shot:    "He stops on his own. Nobody interrupted him and nobody was going to."
+    note:    "*** THE JOKE HE DOES NOT LAND. *** 18.6 allows zero comic beats in aftermath, so this is the absence of one, written. Second time in the act he leaves an opening unused - the first was M1.3.S06, and the player now knows what it means."
+
+  - id:      M1.8.S91.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Play the first one."
+
+  - id:      M1.8.S91.070
+    speaker: DEX
+    voice:   dex
+    text:    "It isn't for you."
+
+  - id:      M1.8.S91.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Play it."
+
+  - id:      M1.8.S91.090
+    speaker: MARA
+    voice:   mara
+    text:    "Elin. If this is playing, the water rota is the first thing that falls over, not the guns."
+    shot:    "RECORDING. Compressed, close, a chair creaking somewhere behind her. Play it through the console speaker, not as clean VO. Voss does not sit down."
+    note:    "*** THE FIRST LETTER, AND IT IS ADDRESSED TO REYES. *** No pathos, no farewell, no legacy - a housekeeping note about which system fails first. That is why it lands."
+
+  - id:      M1.8.S91.100
+    speaker: MARA
+    voice:   mara
+    text:    "We keep the rota on paper and we keep it where everybody can see it. That's all this one is about."
+    note:    "Two 'we's and no 'you' anywhere in the recording. AR-5 holds posthumously: she spent the word once, in S08, and never got to spend it again. Every later Mara recording in acts 2-4 inherits this rule."
+
+  - id:      M1.8.S91.110
+    speaker: MARA
+    voice:   mara
+    text:    "There'll be a longer one when there's time."
+
+  - id:      M1.8.S91.120
+    speaker: DEX
+    voice:   dex
+    text:    "Dated the spring before last. Before the overpass."
+    note:    "*** IT PREDATES THE PLAYER. *** M1.1 is the overpass. The cell planned for its own continuation before Voss existed to it, and it would have carried on without him. Eight flat words, read off a timestamp, and nobody says another thing about it."
+
+  - id:      M1.8.S91.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Leave it running."
+
+  - id:        M1.8.S91.140
+    speaker:   VOSS
+    voice:     voss
+    condition: 'story.thread_mara_letters_open == true'
+    text:      "She did them at this table. With the lamp off."
+    note:      "Only for the player who watched her record one in HUB.A1.mara_letters. AR-9: the scene is complete without the hub and ten times worse with it. This is exactly what condition: exists for (L1-R11)."
+
+  - id:        M1.8.S91.150
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.thread_mara_letters_open == true'
+    text:      "And nobody said."
+
+  - id:      M1.8.S91.160
+    speaker: DEX
+    voice:   dex
+    text:    "Second file's up."
+    shot:    "He does not press anything. The console rolls into the next recording on its own and the date on it is more recent. Fade with it still playing. Story.Thread.MaraLetters_Open commits here."

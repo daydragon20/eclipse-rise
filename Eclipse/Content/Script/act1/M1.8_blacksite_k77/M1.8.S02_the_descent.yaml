@@ -13,9 +13,11 @@ obstacle:     "Nobody in this squad has ever been above the Mid-Works, and the l
 turn:         "The lift stops at an administrative floor by accident, the doors open on a corridor of people going home from work, and nobody looks up."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           102
+words_heard:     102
+words_generated: 131
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, MARA, DEX, REYES, BRICK, fighters
@@ -36,4 +38,98 @@ words:        0
 #            AR-3: K-77 sits beneath the Spire Levels, reached by service lift from
 #            Foundry Row. The clean light sits on top of the cells.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      walk-and-talk (10-25). Ceiling respected (longest 20 w at .060).
+#            Register reached at .020 (19 w) and .060 (20 w).
+#            Spread 1 w (.040 "Warm." / .100 "Down.") to 20 w = 20x.
+# the one line:
+#            .090, and it goes to a NAMELESS FIGHTER, not to a principal. Three flat words
+#            about strangers' evening, said by somebody carrying a rifle into a prison, and
+#            nobody answers it. Brick - the man the Tithe shipped off Krad-9 in a box - says
+#            NOTHING here, and that is written into the shot. Giving him the line would have
+#            been the scene explaining itself.
+#            The temptation the stub names is a second line. There is no second line. The
+#            next thing anybody says is a lift instruction.
+# shapes:    deliberate variety of sentence FORM, not just subject (18.9 D, and the critic's
+#            note that 37 of M1.1's 160 lines share one clipped shape):
+#            .010 question · .020 two full clinical sentences · .030 flat declarative ·
+#            .040 bare noun · .050 two imperatives · .060 order with a justifying clause ·
+#            .070 run-on that abandons itself · .080 count plus judgement · .090 statement ·
+#            .100 single word · .110 imperative plus reason.
+# reyes:     .060 is a hydration order WITH A CLINICAL CLAUSE ATTACHED, and that clause is
+#            the whole difference between Reyes caring for people and Petra doing it two
+#            scenes later. Petra would say "Drink." and stop. Reyes cannot stop; she
+#            explains, because explaining is the training. Establishing that contrast here,
+#            before Petra exists, is cheap and it protects S04.
+# hapering:  .070 is a false start that abandons itself mid-sentence. Nobody in M1.1 stumbles
+#            once in 160 lines; this squad is about to walk into the worst night of its life
+#            and somebody should not be able to finish a sentence.
+# count:     .080 is the scene's telbeat (RULINGS_L1 ronde 1, max one carrying beat per
+#            scene): Voss counts a lift the way a technician counts a circuit, and the number
+#            is an accusation about who this building was built for. Reyes's .020 deliberately
+#            carries NO number so this one stands alone.
+# eleven:    L1-R14 checked. Not used in this mission outside S91.
+
+lines:
+  - id:      M1.8.S02.010
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Is that daylight?"
+    shot:    "The car is a freight cage. The light coming through the mesh has gone from amber to something almost white, and it is getting whiter."
+
+  - id:      M1.8.S02.020
+    speaker: REYES
+    voice:   reyes
+    text:    "It is not. There is a lamp field behind those panels and it does not go off at night."
+    note:    "18.4 Reyes: complete, clinical, zero contractions. She is already stressed and nobody has fired a shot."
+
+  - id:      M1.8.S02.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Somebody pays for that all night."
+
+  - id:      M1.8.S02.040
+    speaker: BRICK
+    voice:   brick
+    text:    "Warm."
+    note:    "18.4 Brick: a single noun, and it is a man from a pit mine noticing that the air up here has been made comfortable on purpose. He speaks fourth. He never speaks first."
+
+  - id:      M1.8.S02.050
+    speaker: MARA
+    voice:   mara
+    text:    "Nothing on the net past this floor. Hands off the rail."
+    note:    "Mara's imperatives name a PLACE and a GROUP. Petra's, two scenes later, name a thing and a verb. That separation starts here and is checkable line by line."
+
+  - id:      M1.8.S02.060
+    speaker: REYES
+    voice:   reyes
+    text:    "Everyone drinks before we are out of this car. There is no water on that level that I would use."
+
+  - id:      M1.8.S02.070
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "My mother cleaned a floor like this one, she used to say the polish was — never mind."
+
+  - id:      M1.8.S02.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Fourteen seconds a floor. Whoever set that was not in any hurry."
+
+  - id:      M1.8.S02.090
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "They're going home."
+    shot:    "The car stops where nobody asked it to. The doors open on a white corridor at the end of a working day: coats over arms, a woman shifting a folder to her other hip, a man with a lunch tin swinging off two fingers. Eight armed people stand in a freight cage four metres away. Not one person in the corridor looks up. Hold it long enough to be uncomfortable. Brick does not look away and does not say anything."
+    note:    "*** THE ONE LINE. *** Nameless fighter, flat, and nobody answers it. 21_quality_mandate 21.2 graphic point: the entire Dominion, in ten seconds, argued by silence."
+
+  - id:      M1.8.S02.100
+    speaker: MARA
+    voice:   mara
+    text:    "Down."
+    shot:    "She reaches past somebody's shoulder and presses it herself. The doors close on the corridor and nothing in the corridor changes."
+
+  - id:      M1.8.S02.110
+    speaker: VOSS
+    voice:   voss
+    text:    "Nobody touch the left rail. It's live and it's not ours."
+    note:    "The squad refuses the subject. That refusal is the discipline of people who cannot afford to think about what they just saw, and no line anywhere says so."

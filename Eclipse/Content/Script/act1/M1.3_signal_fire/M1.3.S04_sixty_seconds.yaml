@@ -91,7 +91,10 @@ lines:
   - id:        M1.3.S04.050
     speaker:   VOSS
     voice:     voss
-    condition: story.m13_warned == true
+    choice:
+      group: m13_warned
+      set:   'story.m13_warned = true'
+      label: "Tell them what is coming."
     text:      "Four on the ramp. Ninety seconds."
     note:      "PLAYER OPTION 1 of 2. Sets story.m13_warned = true. No systemic consequence; it changes only how the rest of the scene sounds."
     variants:
@@ -169,7 +172,10 @@ lines:
   - id:        M1.3.S04.200
     speaker:   VOSS
     voice:     voss
-    condition: story.m13_warned == false
+    choice:
+      group: m13_warned
+      set:   'story.m13_warned = false'
+      label: "Say nothing and let them work."
     text:      "Take the time."
     note:      "PLAYER OPTION 2 of 2. Sets story.m13_warned = false. He is lying by leaving something out, and the scene never says so."
     variants:

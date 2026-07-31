@@ -13,9 +13,11 @@ obstacle:     "Some of the people inside have been there long enough that an ope
 turn:         "Voss counts the guards, the number is too small, he says so — and Mara tells him to keep opening doors."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           141
+words_heard:     141
+words_generated: 173
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, MARA, BRICK, REYES; prisoners (3-4 speaking bit parts)
@@ -32,19 +34,147 @@ words:        0
 #               explanation, and this time it sounds thin
 #
 # THIRD TAP OF TWIST 4, and the last reminder before act 4 pays it.
-#   M1.2.S03 worldbuilding -> M1.7.S06 pattern -> HERE a question -> act 4 the answer
-#
-# writer:    Mara's explanation must be visibly weaker than it was in M1.2 without her
-#            noticing that it is. That is the whole tragedy in one line delivery.
 #
 # *** P4-d MUST BE FLAT, NOT QUOTABLE - RULING L1-R17. ***
-# The two earlier thin-response explanations are both aphorisms: "Police always come
-# afterwards." (M1.2.S03) and "Freight yards get freight guards." (M1.5.S05). Both good.
-# That is the danger: a neat maxim is what a player remembers and re-examines, so a fourth
-# one makes THE FORM the tell, and twist 4 gets solved by noticing a prose habit instead of
-# by act 4 earning it.
 # Mara's line here is the WEAKEST of the four by design - she is repeating herself under
 # pressure. A polished epigram is the opposite of a woman running out of explanations.
 # Flat. Tired. Slightly too fast. Nothing you would put on a poster.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      in-mission-radio (10-25). Ceiling respected (longest 22 w at .080).
+#            Register reached at .030, .080, .120, .130, .150.
+#            Spread 1 w (.020 "Carpet.") to 22 w = 22x.
+#
+# *** P4-d, AND WHY IT IS BUILT THIS WAY - RULING L1-R17. ***
+# The two shipped explanations are epigrams: "Police always come afterwards." (M1.5.S05.200)
+# and "Freight yards get freight guards." A third neat one and the FORM becomes the tell.
+# So .130 is built out of everything an aphorism is not:
+#   - it offers TWO explanations, which is one more than a confident person needs
+#   - neither of them is finished. The first is four words. The second dies on "every--"
+#   - it has no rhythm, no symmetry, no closing beat, and no image
+#   - it reaches for the Tithe, which is the most ordinary thing in Kessaran life, the way
+#     a tired person reaches for the nearest available reason
+#   - and .140 is not an argument. It is a task, issued to end the conversation, and it is
+#     the only part of the exchange she delivers with any weight
+# Nothing here would survive being printed on anything. That is the specification.
+# She does not notice that it is thin. Nobody in the scene tells her. Voss does not push a
+# second time. That silence is the tragedy and there is no line about it.
+#
+# arithmetic:
+#            .110 is not a new fact - Dex said "Nineteen" in S01.040 as ordinary logistics.
+#            The player already owns the numerator. Voss supplies the denominator and says
+#            "five" twice, because a man who cannot let go of a number repeats it.
+#            IMPORTANT: Voss does NOT say Threx knew. He cannot - S05 is where the trap
+#            reveals, and pre-empting it would cost the act its best beat. His observation is
+#            about STAFFING, which is exactly the shape twist 4 needs: an anomaly with a
+#            human explanation available, taken.
+# prisoner:  .050 sounds like a question about the war. .070 says what it was about, and it
+#            is much smaller and much worse. Voss answers the wrong question first and has
+#            nothing for the right one. NOBODY COMFORTS HIM. Reyes arrives with a procedure
+#            instead, which is the only kindness available in the scene.
+# cast:      the stub asks for 3-4 speaking prisoners. The casting registry (SCRIPT_FORMAT
+#            section 4) has two civilian rows, still owner-question Q-5, so this scene uses
+#            TWO: PRISONER_A (the questions) and PRISONER_B (Thursday). Splitting a third out
+#            later is two field edits and no rewrite. Same call the M1.6 writer made; noted
+#            again in the report so it stays visible.
+# reyes:     zero contractions throughout, and .080 is the scene's register line. She gives a
+#            hydration-style order with a clause attached - the same shape as S02.060 - which
+#            is the deliberate contrast against Petra's bare verbs one scene from now.
+# brick:     one word, and it is the worst detail in the building.
+# mara:      .160 keeps Voss out of a door for the second time in fifteen minutes. Two words.
+#            The player has now seen it happen twice and has not been told anything.
+# eleven:    L1-R14 checked. Not used.
+
+lines:
+  - id:      M1.8.S03.010
+    speaker: VOSS
+    voice:   voss
+    text:    "It's an office."
+    shot:    "Bright, low ceiling, a desk with a kettle on it and a rota pinned above the kettle. The cell doors are the same colour as the walls. No noise anywhere."
+
+  - id:      M1.8.S03.020
+    speaker: BRICK
+    voice:   brick
+    text:    "Carpet."
+    note:    "18.4 Brick: one noun, and it is the most frightening thing in the building. Nobody expands on it."
+
+  - id:      M1.8.S03.030
+    speaker: REYES
+    voice:   reyes
+    text:    "There are observation charts on the doors. Somebody has been writing these up twice a day."
+
+  - id:      M1.8.S03.040
+    speaker: MARA
+    voice:   mara
+    text:    "Open them. Left side first."
+
+  - id:      M1.8.S03.050
+    speaker: PRISONER_A
+    voice:   civilian_kessara_a
+    text:    "Is it over?"
+    shot:    "The door has been open for six seconds. He has not stood up."
+
+  - id:      M1.8.S03.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Block's ours. Nobody's coming down."
+
+  - id:      M1.8.S03.070
+    speaker: PRISONER_A
+    voice:   civilian_kessara_a
+    text:    "No. The questions. Is that part over."
+    shot:    "It is not a question the second time. Voss has nothing. Hold on him for a beat too long."
+    note:    "The stub's 'it means something other than it sounds like'. He is not asking about the war. Nobody comforts him and no line in the scene acknowledges what he just told the room."
+
+  - id:      M1.8.S03.080
+    speaker: REYES
+    voice:   reyes
+    text:    "Sit on the step. I am going to look at your feet, and then we are going to walk to the lift."
+    note:    "The only kindness available is a procedure. Zero contractions - and the clause attached to the order is the mechanical difference from Petra, who will give the same care in three bare words one scene from now."
+
+  - id:      M1.8.S03.090
+    speaker: PRISONER_B
+    voice:   civilian_kessara_b
+    text:    "I'm on the list for Thursday."
+    shot:    "She is sitting with her back against the bunk frame and her shoes lined up beside her. She does not move when the door opens."
+
+  - id:      M1.8.S03.100
+    speaker: MARA
+    voice:   mara
+    text:    "Everyone out to the corridor. Move to the light."
+
+  - id:      M1.8.S03.110
+    speaker: VOSS
+    voice:   voss
+    text:    "Nineteen doors on this level. Five people watching them."
+    note:    "*** P4-d, PART ONE. *** The numerator is S01.040, spoken by Dex as logistics. The player did the arithmetic before Voss said it out loud."
+
+  - id:      M1.8.S03.120
+    speaker: VOSS
+    voice:   voss
+    text:    "This is the building they put people in so nobody finds them, and it's got five."
+
+  - id:      M1.8.S03.130
+    speaker: MARA
+    voice:   mara
+    tags:    [exhausted]
+    text:    "It's a shift change. Or the Tithe's got half of them standing on a platform somewhere, that happens every--"
+    note:    "*** P4-d, THE EXPLANATION. FLAT BY SPECIFICATION - L1-R17. *** Two reasons instead of one, neither finished, no image, no rhythm, nothing quotable. She reaches for the Tithe because it is the nearest ordinary thing in Kessaran life. She does not hear how thin it is."
+
+  - id:      M1.8.S03.140
+    speaker: MARA
+    voice:   mara
+    text:    "Keep opening doors."
+    note:    "Not a rebuttal. A task, used to close the subject - the only part of the exchange she puts any weight behind. Voss does not push a second time and nobody else says anything."
+
+  - id:      M1.8.S03.150
+    speaker: REYES
+    voice:   reyes
+    text:    "Two of them cannot walk unaided. I need somebody at each elbow and I need it now."
+
+  - id:      M1.8.S03.160
+    speaker: MARA
+    voice:   mara
+    text:    "Voss. Route."
+    shot:    "She is already at the far end of the block. She does not wait to see whether he goes."
+    note:    "Second time in fifteen minutes she has kept him out of a door. Two words, no reason, and the player has now seen the pattern without being told there is one."

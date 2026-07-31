@@ -13,57 +13,242 @@ obstacle:     "Nobody in the room wants the job, and the only person who ever wa
 turn:         "Somebody uses a name that was not a name an hour ago, it goes around the room, and by the end of it Voss answers to it."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           224
+words_heard:     182
+words_generated: 252
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, SELA, BRICK, DEX, REYES, PETRA, the Iron Chorus emissary (pact only),
 #            the crowd
-# flags-in:  Story.Choice.M15_IronChorusPact · Story.Flag.IntakeUnvetted · Story.Char.MaraDead
+# flags-in:  story.m15_pact · story.m15_shiftboss · Story.Flag.IntakeUnvetted ·
+#            Story.Char.MaraDead
 # flags-out: Story.Beat.M18_BlacksiteK77 ✚ · Story.Char.CinderNamed ✚ ·
 #            Story.Char.PetraRescued ✚ · Story.Beat.Act1Complete ✚   (NEW TAGS)
 #
-# beats:     1) the vault, full. Ember, the Iron Chorus (pact), the freed, the forty
-#            2) SELA SPEAKS. Short - NO ORATION (AR-7: only four in the game, all reserved
-#               for acts 3-4). She asks the question nobody dares: and now?
-#            3) the argument. Iron Chorus wants its own line; some want to walk away; some
-#               want revenge
-#            4) P3-d: somebody asks how Threx knew. THREE ANSWERS COME AND NO CONCLUSION -
-#               the intake, the Veil's informant networks, or bad luck. The conversation
-#               moves on. NOBODY RESOLVES IT. This is the plant for twist 3 AND twist 4,
-#               and the player must be left holding anger with no address
-#
-#               CONDITIONAL VARIANT - L1-R12. On story.m15_shiftboss == "warned" ONLY, one
-#               of the three becomes "the man we let run" IN PLACE OF one of the others.
-#               STILL THREE. NEVER FOUR - the cap in BEATS_M1.8.md section 4 stands.
-#               Reason: a warned shift boss who fled knows the faces of two cells, and any
-#               player who chose that branch will think of him here. If the game never
-#               says it, that player is ahead of the writers; if the game adds it as a
-#               fourth, P3-d turns into a list and stops being a wound. Swap, do not add.
-#            5) THE NAME. Somebody in the crowd - not a principal - uses the word "Cinder".
-#               It comes from how he looked coming up, or from something Mara once said.
-#               VOSS NEVER CALLS HIMSELF THAT
-#            6) BRICK REPEATS IT. That is what makes it stick: the man with the fewest
-#               words spends one, and it is the heaviest word in the room
-#            7) the vote - explicit, hands or voices. Canon 2.9: "the surviving cells vote
-#               to follow 'Cinder'"
-#            8) THE SIGIL. Somebody has painted it on the wall. Nobody knows who. The
-#               movement has a name. Last image
+# beats:     1) the vault, full
+#            2) SELA SPEAKS. Short - NO ORATION (AR-7)
+#            3) the argument
+#            4) P3-d: THREE ANSWERS, NO CONCLUSION. Warned branch SWAPS one, never adds
+#            5) THE NAME, from the crowd, not a principal. VOSS NEVER CALLS HIMSELF THAT
+#            6) BRICK REPEATS IT
+#            7) the vote - explicit, hands or voices
+#            8) THE SIGIL. Last image
 #
 # PETRA'S BEAT HERE - ruling L1-R10, and it costs one shot: note, no line.
-# On the night she comes back, the cells trade the family name for a symbol. SHE IS THE
-# ONLY PERSON IN THE ROOM WHO DOES NOT JOIN THE NAMING. Not disapproval - she simply does
-# not use names (18.4). The fingerprint and the surname ruling are the same beat.
-# She is the last adult carrying the name Voss; the Foundry Collapse took the others, and
-# act 3 reveals AEGIS filed those deaths as optimal loss allocation. That thread runs
-# through her and nobody else. Do not have anyone point at it.
-#
-# ACT 1 ENDS HERE. Canon end state (2.9): one upgraded hideout, ~15 soldiers, the loyalty
-# of three fused cells, the Eclipse sigil on a wall.
 #
 # writer:    ANYONE WHO LETS ONE EXPLANATION WIN IN BEAT 4 DESTROYS TWIST 3.
-#            Half Voss variant set. He should speak less in this scene than in any other
-#            debrief in the act - being made leader is something that happens TO him.
+#            Half Voss variant set. He should speak less here than in any other debrief.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 23 w at .010).
+#            Register reached at .010. Spread 1 w (.150 / .160) to 23 w = 23x.
+# voss:      ONE LINE in the whole scene, and it is an answer to somebody else's question.
+#            Being made leader is something that happens to him; he does not speak until he
+#            is spoken to by a name he has never heard before.
+#            HALF VARIANT SET - idealist/pragmatist, per the stub and C-6 option (b). That is
+#            the axis that reads here: what the first order of a command is FOR. The
+#            personal/strategic axis has nothing to disagree about in a line about beds.
+#
+# *** P3-d, AND WHY NOTHING WINS. ***
+# Three explanations reach the room and none of them is answered:
+#   .080  the intake        - Dex, who ran the ledger, cut off mid-sentence
+#   .090  the Veil's nets   - a fighter, eight flat words           [default branch]
+#   .100  the man we let run - same slot, WARNED BRANCH ONLY         [swap, not addition]
+#   .110  luck              - a freed conscript, and it deflates the room
+# .120 is Reyes asking which one they act on, and NOBODY ANSWERS HER. The shot moves the
+# scene on to a completely different question. The player is left holding anger with no
+# address, which is the specification for twist 3 and twist 4 both.
+# THE SWAP IS A SWAP. In the warned branch the room still hears exactly three explanations;
+# .090 does not play. Four would make P3-d a list and stop it being a wound (BEATS_M1.8
+# section 4, L1-R12). The M1.6.S06 thread stays closed - nothing here reopens it, nobody
+# asks what happened to him, and no line invites a follow-up.
+# .080 is the one that matters (Story.Flag.IntakeUnvetted, act 3), and it is deliberately
+# the one that gets INTERRUPTED. The true answer is the least finished sentence in the room.
+#
+# *** THE NAME, AND HOW IT ARRIVES. ***
+# .130  Sela asks the practical question - who does the district send to - which pays
+#       M1.5.S99.180, where Mara routed the Iron Chorus to Voss and Dex said "That's new".
+#       The room does not choose a leader; it needs an ADDRESS.
+# .140  a freed conscript answers with a DESCRIPTION instead of a name, because she does not
+#       know his name. "Grey to the eyes, both hands full" - what he looked like coming up
+#       the shaft. The word falls out of the description.
+# .150  a fighter turns the description into one word.
+# .160  BRICK REPEATS IT. The man with the fewest words in the game spends one, and that is
+#       what makes it stick. He has said "Carpet", "Coats", "Door" and "Plates" tonight; this
+#       is the fifth noun and it is a person.
+# .200  somebody uses it as an address, as a question. .210 is Voss answering the question
+#       and not the name. HE NEVER SAYS THE WORD, here or anywhere in the game.
+#
+# emissary:  .040, .180 and .190, all gated on story.m15_pact (set by M1.5.S99, three leaves
+#            - see the M1.5 writer's escalation; ACT1_OVERVIEW section 6 still lists this
+#            flag as a single tag and that ledger row needs updating, flagged in the report).
+#            .180/.190 are the payoff of his 18.4 "never": HE CANNOT VOTE FOR A NAME, because
+#            he does not use them. So he votes with a count. Full pact and limited pact
+#            differ in one word - up or down - which is exactly the distinction M1.5's writer
+#            asked M1.8.S99 to preserve, and it costs thirteen words to honour.
+# petra:     NO LINES. Ruling L1-R10, one shot note at .160. She is the only person in the
+#            room who does not join the naming, and it is not disapproval - she does not use
+#            names, and the only name she ever had for him is the one the game cannot voice.
+#            She is also the last adult carrying the surname that the room is trading for a
+#            symbol tonight. NOBODY POINTS AT ANY OF THAT.
+# sela:      three turns, no oration (AR-7), longest 23 w - inside the hub band the beat
+#            sheet holds her to. She asks twice and answers nothing; her tic fires at .060,
+#            where a decision at a table is handed back to the room as a whole.
+# vote:      .170, explicit, hands, and she runs it in eight words without a speech. Canon
+#            2.9 satisfied: the surviving cells vote to follow "Cinder".
+# sigil:     .220/.230. Two short lines and nobody knows who painted it. Last image, no
+#            comment, no swell.
+# eleven:    L1-R14 checked. Not used.
+# omitted:   a speech, a toast, a moment where somebody tells Voss he has earned it, any
+#            line acknowledging Mara by name, and any resolution to P3-d. See report.
+
+lines:
+  - id:      M1.8.S99.010
+    speaker: SELA
+    voice:   sela
+    text:    "This vault was cut for a pump crew and there are three cells standing in it. Somebody say what happens in the morning."
+    shot:    "Hollow Point, full to the walls. Ember, the freed, the ones off the train, and a knot of Iron Chorus by the ramp who have not sat down. Somebody's kettle going in the middle of it."
+
+  - id:      M1.8.S99.020
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "We go back up."
+
+  - id:      M1.8.S99.030
+    speaker: CIVILIAN_A
+    voice:   civilian_kessara_a
+    text:    "Some of us are going home. There's people here who never signed anything."
+
+  - id:        M1.8.S99.040
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_pact != "none"'
+    text:      "Three cells and one door out. The Chorus sleeps somewhere else."
+    note:      "18.4: counts where anyone else would reach for an adjective, and his objection is arithmetic about an exit."
+
+  - id:      M1.8.S99.050
+    speaker: REYES
+    voice:   reyes
+    text:    "Nobody in this room has slept and half of it should not be standing."
+
+  - id:      M1.8.S99.060
+    speaker: SELA
+    voice:   sela
+    text:    "Say it to the room, not to the table."
+    note:    "Her tic: a decision being made by four people at a map is handed back to three hundred as a collective one."
+
+  - id:      M1.8.S99.070
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "How did he have the names?"
+    note:    "*** P3-d OPENS. *** The question that act 1 does not answer."
+
+  - id:      M1.8.S99.080
+    speaker: DEX
+    voice:   dex
+    text:    "Forty-one people walked in here in one night and nobody asked any of them a single--"
+    note:    "EXPLANATION ONE, and it is the true one (Story.Flag.IntakeUnvetted, M1.6.S06, twist 3). It is also the only one that gets interrupted. The correct answer is the least finished sentence in the room."
+
+  - id:         M1.8.S99.090
+    speaker:    FIGHTER_A
+    voice:      eclipse_fighter_a
+    condition:  'story.m15_shiftboss != "warned"'
+    interrupts: true
+    text:       "The Veil buys people. That's the whole job."
+    note:       "EXPLANATION TWO, default branch. Replaced - not joined - by .100 in the warned branch."
+
+  - id:         M1.8.S99.100
+    speaker:    FIGHTER_A
+    voice:      eclipse_fighter_a
+    condition:  'story.m15_shiftboss == "warned"'
+    interrupts: true
+    text:       "There's a shift boss out there who saw both cells in one kitchen."
+    note:       "*** THE WARNED SWAP - L1-R12. *** Occupies .090's slot, never sits beside it. Still three explanations. It does not reopen M1.6.S06's closed thread: nobody asks after him, nobody answers this, and the conversation moves on two lines later like the others."
+
+  - id:      M1.8.S99.110
+    speaker: CIVILIAN_B
+    voice:   civilian_kessara_b
+    text:    "Or he guessed. People guess and then they're right."
+    note:    "EXPLANATION THREE, and it is the one that deflates the room. Kept in both branches because a wound needs somewhere for the anger to fail to go."
+
+  - id:      M1.8.S99.120
+    speaker: REYES
+    voice:   reyes
+    text:    "Which one of those do we act on?"
+    shot:    "Nobody answers her. Somebody at the back starts moving crates and the noise takes the room somewhere else."
+    note:    "*** NOBODY RESOLVES IT. *** Anyone who lets an explanation win here destroys twist 3. The scene does not return to this."
+
+  - id:      M1.8.S99.130
+    speaker: SELA
+    voice:   sela
+    text:    "So who does the district send to?"
+    note:    "Pays M1.5.S99.180, where Mara routed the Iron Chorus to Voss and Dex said 'That's new'. The room is not choosing a leader. It needs an address."
+
+  - id:      M1.8.S99.140
+    speaker: CIVILIAN_B
+    voice:   civilian_kessara_b
+    text:    "The one that came up the shaft last. Grey to the eyes, both hands full."
+    note:    "*** THE NAME ARRIVES AS A DESCRIPTION. *** She does not know his name and is not trying to give him one. It is what he looked like coming out of the ground."
+
+  - id:      M1.8.S99.150
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Cinder."
+    note:    "From the crowd, not a principal. One word, out of somebody else's sentence."
+
+  - id:      M1.8.S99.160
+    speaker: BRICK
+    voice:   brick
+    text:    "Cinder."
+    shot:    "It goes along the ramp and comes back. Petra is sitting on a crate at the edge of the light with a cup in both hands and does not say it, and does not look up, and nobody notices either. She is the last adult carrying the name they are trading in."
+    note:    "*** WHY IT STICKS. *** The man with the fewest words in the game spends one. Fifth noun he has handed anybody tonight - Carpet, Coats, Door, Plates - and this one is a person. PETRA: ruling L1-R10, one shot, no line, and nobody points at any of it."
+
+  - id:      M1.8.S99.170
+    speaker: SELA
+    voice:   sela
+    text:    "Hands. Now, so everybody sees who's in it."
+    shot:    "Hands go up in ones and then in blocks. It is not unanimous and nobody counts it out loud."
+    note:    "The vote, explicit, eight words, no speech. AR-7: act 1 spends no oration and she does not get one until act 3."
+
+  - id:        M1.8.S99.180
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_pact == "full"'
+    text:      "Ours are up. Count them."
+    note:      "*** HIS 'NEVER' PAYING OFF. *** He cannot vote for a name because he does not use names, so he votes with a number and makes somebody else do the counting."
+
+  - id:        M1.8.S99.190
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_pact == "limited"'
+    text:      "Ours stay down. We fight the same streets."
+    note:      "The limited branch tells itself apart from the full one in one word - down instead of up - which is exactly the distinction the M1.5 writer asked this scene to preserve for act 2's merger/schism."
+
+  - id:      M1.8.S99.200
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Cinder. What do we do first?"
+    note:    "The first time it is used as an address. It is a question about work, which is the only reason it gets answered."
+
+  - id:      M1.8.S99.210
+    speaker: VOSS
+    voice:   voss
+    text:    "Beds, then the door. In that order."
+    shot:    "He answers it. He does not repeat the word, does not accept it, does not decline it, and does not look at anybody while he says it."
+    note:    "HIS ONLY LINE IN THE SCENE. He answers to the name by answering the question - that is the whole beat, and he never says the word here or anywhere in the game. HALF VARIANT SET (idealist/pragmatist): the axis is what a first order is for."
+    variants:
+      idealist:   "Beds. Every one of them, before anybody stands a watch."
+      pragmatist: "Watch on the ramp first. Then beds, and everybody gets one."
+
+  - id:      M1.8.S99.220
+    speaker: DEX
+    voice:   dex
+    text:    "Who did the wall?"
+
+  - id:      M1.8.S99.230
+    speaker: REYES
+    voice:   reyes
+    text:    "It was there when we came down."
+    shot:    "The sigil, painted large and badly on the pump-gallery wall above three hundred people, in whatever was to hand. Nobody knows who. Hold it. End of act 1."

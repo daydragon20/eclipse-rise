@@ -13,9 +13,11 @@ obstacle:     "The fewest people is still more than Ember can afford to lose, an
 turn:         "She assigns Voss the extraction route instead of the entry — the first time she has ever kept him out of a door."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           168
+words_heard:     168
+words_generated: 181
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      MARA, VOSS, DEX, REYES, BRICK, SELA
@@ -35,4 +37,123 @@ words:        0
 # writer:    NOBODY SAYS GOODBYE. 18.7 - enter late, leave early. A farewell scene before
 #            a death is the cheapest trick available and it makes S08 worthless.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      cutscene (20-60). Ceiling respected (longest 25 w at .020).
+#            Register reached at .010 (22 w), .050 (21 w), .070 (21 w).
+#            Spread 1 w (.040 "Nineteen.") to 25 w = 25x.
+# burial:    .020 IS THE S08 MECHANISM and it is buried by .030 - Mara asks a different
+#            question over the top of it and Dex answers hers instead. The player hears the
+#            whole rule ("holds it from in there") and then watches the room walk past it.
+#            No shot lingers, nobody repeats it, and nothing in S08 explains it again.
+# nineteen:  .040 plants the door count that Voss uses in S03 to carry P4-d. The number is
+#            established here as ordinary logistics, so that when he counts guards against
+#            it two scenes later, the arithmetic is already the player's.
+#            L1-R14 checked: no use of "eleven" anywhere in this mission except S91.
+# mara:      she keeps him out of a door for the first time in the game and does not give a
+#            reason at .090, does not give one when pushed at .110, and never gives one.
+#            AR-5 holds: she says his NAME because the pronoun is not hers to spend yet.
+#            Her imperatives name a PLACE and a GROUP - "on the floor", "at the second
+#            horn", "everyone". Petra's, four scenes later, name a THING AND A VERB. That
+#            is the mechanical separation and it is visible from this scene onward.
+# sela:      one turn, second person plural, and she never says that she is staying -
+#            she describes the room and lets Mara say it. 18.4: never speaks about herself
+#            for more than one line, and here she manages zero.
+# reyes:     .070 is one clinical sentence and it is the reason she has never come before.
+#            .140 takes Dex's joke literally, which is the only funny thing in the scene
+#            and it is funny because she is not joking.
+# dex:       .130 is the act's last permitted comic beat (18.6: zero in aftermath). It is a
+#            weight rating, it is true, and it costs him something to say out loud.
+# brick:     two words, one of them a dead man's name (19.3 "Tam. Oyelaran. Vic."). He does
+#            not say why and nobody asks. He speaks after Voss, never first (18.4).
+# omitted:   every goodbye. Nobody wishes anybody luck, nobody touches anybody, and the
+#            scene ends on a kit check. See report.
+
+lines:
+  - id:      M1.8.S01.010
+    speaker: DEX
+    voice:   dex
+    text:    "Four levels, and I've got walls for two of them. The manifest gives me doors and door numbers, not what's between them."
+    shot:    "Map table. The K-77 manifest is pinned flat with a wrench and a cup. Half the plan is drawn in chalk on the table itself."
+
+  - id:      M1.8.S01.020
+    speaker: DEX
+    voice:   dex
+    text:    "Cell block to the lift is one gate. Bar drops on the inside, lifts on the inside. Whoever holds it, holds it from in there."
+    note:    "*** THE S08 MECHANISM. *** Delivered flat, in the middle of a logistics complaint, and buried by .030 before anybody can react to it. The player is told the rule eight scenes before it kills somebody."
+
+  - id:      M1.8.S01.030
+    speaker: MARA
+    voice:   mara
+    text:    "How many doors on the manifest?"
+    shot:    "She asks it across the end of his sentence, already moving chalk. Nobody in the room looks back at the gate."
+
+  - id:      M1.8.S01.040
+    speaker: DEX
+    voice:   dex
+    text:    "Nineteen."
+    note:    "Plants the count Voss uses for P4-d in S03. Ordinary logistics now; arithmetic later."
+
+  - id:      M1.8.S01.050
+    speaker: SELA
+    voice:   sela
+    text:    "The ones off the train know four faces in this vault. Two of you are about to walk into a building."
+    note:    "18.4 Sela: second person plural, rhetorical structure, and she does not say she is staying. She describes the room and lets Mara draw the conclusion."
+
+  - id:      M1.8.S01.060
+    speaker: MARA
+    voice:   mara
+    text:    "Sela's on the floor with them. Nobody argues that."
+
+  - id:      M1.8.S01.070
+    speaker: REYES
+    voice:   reyes
+    text:    "I am going because a room that has held people for months produces conditions that do not wait for a debrief."
+    note:    "18.4 Reyes: complete clinical sentence, zero contractions. Her first field deployment in the act and she gives a medical reason, not a moral one."
+
+  - id:      M1.8.S01.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Then I want the entry team."
+
+  - id:      M1.8.S01.090
+    speaker: MARA
+    voice:   mara
+    text:    "Voss takes the lift and the route out. Both ways."
+    shot:    "She does not look up and she does not pause on it. Dex keeps drawing. Nobody in the room registers that anything has changed."
+    note:    "*** THE TURN. *** First time she has ever kept him out of a door. No reason given, here or ever. AR-5: she uses his name because the pronoun is spent once, in S08."
+
+  - id:      M1.8.S01.100
+    speaker: VOSS
+    voice:   voss
+    text:    "That's the door I know how to open--"
+
+  - id:         M1.8.S01.110
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "Both ways."
+    note:       "She repeats herself instead of explaining. That is the whole exchange and there is no third beat on it."
+
+  - id:      M1.8.S01.120
+    speaker: BRICK
+    voice:   brick
+    text:    "Vic. Me."
+    shot:    "He is standing behind Reyes with his hands at his sides. He has been in the room the entire scene."
+    note:    "18.4 Brick: fewest words, answers a difficult question by naming a dead soldier (19.3 'Tam. Oyelaran. Vic.'). Nobody asks who Vic was. He never speaks first in a group and he does not here."
+
+  - id:      M1.8.S01.130
+    speaker: DEX
+    voice:   dex
+    text:    "The lift's rated for six and there are eight of you. I'll write that down as fine."
+    note:    "18.6: the best jokes cost something, and this is the last comic beat in the mission. Everything after S02 is aftermath."
+
+  - id:      M1.8.S01.140
+    speaker: REYES
+    voice:   reyes
+    text:    "Write down that it is rated for six."
+
+  - id:      M1.8.S01.150
+    speaker: MARA
+    voice:   mara
+    text:    "Lift at the second horn. Kit checked on the floor first."
+    shot:    "The table breaks up. Nobody shakes hands, nobody says anything to anybody on the way out, and the chalk stays on the table."

@@ -141,6 +141,10 @@ lines:
   - id:      M1.1.S05.140
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m11_conscript
+      set:   'story.m11_conscript_choice = "finished"'
+      label: "Finish him."
     text:    "One round. Then we go."
     note:    "PLAYER OPTION 1 of 3 - finish him. Sets story.m11_conscript_choice = finished."
     variants:
@@ -152,6 +156,10 @@ lines:
   - id:      M1.1.S05.150
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m11_conscript
+      set:   'story.m11_conscript_choice = "left"'
+      label: "Leave him and move."
     text:    "Leave him. Move."
     note:    "PLAYER OPTION 2 of 3 - walk on. Sets story.m11_conscript_choice = left."
     variants:
@@ -163,6 +171,10 @@ lines:
   - id:      M1.1.S05.160
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m11_conscript
+      set:   'story.m11_conscript_choice = "bound"'
+      label: "Dress the wound, then leave him."
     text:    "Dressing. Above the hip."
     note:    "PLAYER OPTION 3 of 3 - bind and leave. Sets story.m11_conscript_choice = bound, leaf Story.Choice.M11_Conscript.Bound. CORRECTED 2026-07-31: this note used to ask systems to ALSO set Story.Choice.M11_ConscriptSpared. That tag is WITHDRAWN by ruling L1-R3 and no derived boolean replaces it - two homes for one truth is a divergence bug. Readers use the leaf; M1.1.S99.190 is the only one in this mission. P5-a, first entry in the twist-5 tally."
     variants:

@@ -175,6 +175,10 @@ lines:
   - id:      M1.3.S01.200
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m13_insertion
+      set:   'story.m13_insertion = "tunnel"'
+      label: "Take the run under the plaza."
     text:    "The run. Wet feet, and nobody counts us."
     note:    "PLAYER OPTION 1 of 2. Sets story.m13_insertion = tunnel. Matches insertion point Entry_Sewer in MT_M13."
     variants:
@@ -186,6 +190,10 @@ lines:
   - id:      M1.3.S01.210
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m13_insertion
+      set:   'story.m13_insertion = "plaza"'
+      label: "Cross the plaza with the crowd."
     text:    "The plaza. We go in with the people who live there."
     note:    "PLAYER OPTION 2 of 2. Sets story.m13_insertion = plaza. Matches insertion point Entry_Roof in MT_M13."
     variants:

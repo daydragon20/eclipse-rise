@@ -110,12 +110,20 @@ lines:
   - id:      M1.4.S01.100
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m14_entry
+      set:   'story.m14_entry = "grate"'
+      label: "Go in through the intake grate."
     text:    "The grate. Inside and counted before anybody's looked up."
     note:    "PLAYER OPTION 1 of 2 (insertion). Maps to Entry_Sewer. No axis variants - see the variants note above."
 
   - id:      M1.4.S01.110
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m14_entry
+      set:   'story.m14_entry = "breach"'
+      label: "Blow the bay door and go in loud."
     text:    "The bay door. Charge on the roller, and we own the floor before they find a rifle."
     note:    "PLAYER OPTION 2 of 2 (insertion). Maps to Entry_Vault."
 
