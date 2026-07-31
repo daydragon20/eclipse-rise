@@ -22,57 +22,6 @@
   ],
   "vragen": [
     {
-      "id": "O-6",
-      "prio": "nu",
-      "vraag": "Blijft de gestileerde look, of wil je echt fotorealisme?",
-      "waarom": "Je zei dat de wereld 'realistisch geloofwaardig' moet zijn. Dat kan twee dingen betekenen en het verschil is weken werk. Je klacht ging over verkeersborden en random opvulling — dat zijn compositieproblemen die in elke stijl bestaan.",
-      "stappen": [
-        "Ga naar het tabblad Beeld en kijk naar de laatste screenshots",
-        "Vraag jezelf af: stoort de STIJL me, of stoort het dat er dingen willekeurig staan?",
-        "Is het dat tweede, dan is A het antwoord"
-      ],
-      "meer_info": "**Wat er al vastligt, ongeacht je keuze** (doc 20):\n\n- Geen verkeersborden of andere aardse voorwerpen — de mensheid verliet de Aarde 600 jaar geleden\n- Geen enkel object wordt geplaatst om leegte te vullen; elk object verantwoordt zich in een zin\n- Nooit een licht: key, fill, rim, praktische lampen, bounce\n- Elk district krijgt meerdere graphic points\n\n**Wat B betekent:** de art-lock uit 15.5 vervalt, elk materiaal opnieuw, de toon-master vervalt, en alle gestileerde assets die binnen zijn moeten opnieuw beoordeeld. Reken op weken.\n\n**Waarom ik A adviseer:** Borderlands is gestileerd en volstrekt geloofwaardig. Geloofwaardigheid komt van compositie, slijtage en schaal — niet van fotorealisme.",
-      "opties": [
-        {
-          "label": "A — gestileerd blijft",
-          "waarde": "A",
-          "gevolg": "Geen herwerk. De regels uit doc 20 lossen je klacht op."
-        },
-        {
-          "label": "B — echt fotorealisme",
-          "waarde": "B",
-          "gevolg": "Art-lock vervalt, elk materiaal opnieuw. Weken werk."
-        }
-      ],
-      "advies": "A — je klacht ging over willekeurige opvulling, niet over de stijl zelf.",
-      "vrijtekst": true
-    },
-    {
-      "id": "O-5",
-      "prio": "nu",
-      "vraag": "Het wapen: goedkope zichtbaarheidsfix nu, of volledig uit de mesh halen?",
-      "waarom": "Er hangt wel een wapen, maar het zit in de karaktermesh in plaats van als los object. Daarom is er geen attachment, doet de wapenwissel visueel niets, en valt het weg in het silhouet.",
-      "stappen": [
-        "Je hoeft hier niets voor te bekijken",
-        "Kies of je nu snel wilt zien wat je vasthoudt, of meteen de goede oplossing"
-      ],
-      "meer_info": "**Wat volledig inhoudt** — vier toetsbare stappen:\n\n1. Het wapen isoleren uit de skeletal mesh\n2. Een los mesh-asset per wapenfamilie\n3. Een socket op hand_r\n4. De bestaande wisselogica eraan koppelen — die code bestaat al, er was alleen nooit iets om te wisselen\n\n**Bij de goedkope stap:** een eigen tint lost 'ik zie mijn wapen niet' op, maar de wapenwissel blijft visueel niets doen. Dat is een bewuste volgorde: eerst zien, dan pas beslissen of de wissel je stoort.",
-      "opties": [
-        {
-          "label": "Goedkoop — eigen tint",
-          "waarde": "goedkoop",
-          "gevolg": "Uren werk. Je ziet je wapen. De wapenwissel werkt nog niet."
-        },
-        {
-          "label": "Volledig — uit de mesh halen",
-          "waarde": "volledig",
-          "gevolg": "Dagen werk. Lost zichtbaarheid en wapenwissel op."
-        }
-      ],
-      "advies": "Goedkoop. Of die wapenwissel je stoort weet je pas na je eerste speelronde.",
-      "vrijtekst": true
-    },
-    {
       "id": "O-8",
       "prio": "nu",
       "vraag": "HUD-uiterlijk: hoe Borderlands mag het worden?",
@@ -104,86 +53,6 @@
       "vrijtekst": true
     },
     {
-      "id": "O-7",
-      "vraag": "GPU-crash: naar SM6 tillen, of de zware paden uitzetten?",
-      "waarom": "BIJGEWERKT 31-07 NA METING — de eerste diagnose (TDR-timeout) klopt NIET, en dat verandert de fix. Er ligt een NVIDIA Aftermath-dump van de crash, en die decodeert hem als 'Status: PageFault, Type: AddressTranslationError, Access: Read' op GPU-adres 0x00007fff00000000, in een compute-shader. Dat is geen timeout maar een ONGELDIGE GEHEUGENLEZING: de GPU wachtte niet te lang, hij las een adres dat er niet was. In het hele log staan NUL timeout- of hang-duurmeldingen; de regel 'TDR Delay: 2' die de eerste diagnose aanhaalde is de engine die zijn INSTELLINGEN rapporteert bij het opstarten, niet een gebeurtenis. Ook 'Adapter Reset: False' past niet bij een driver-reset door tijdsoverschrijding. TWEE ONDERDELEN VAN DE EERSTE DIAGNOSE BESTAAN HIER NIET: dit project zet nergens een Nanite-cvar, en r.TSR.History.ScreenPercentage staat nergens op 200 — niet in Config, niet in de startbat, niet in de code. Die naar 100 zetten doet dus niets. WAT ER WEL AAN STAAT (Eclipse/Config/DefaultEngine.ini): Lumen GI (r.DynamicGlobalIlluminationMethod=1), Lumen-reflecties (r.ReflectionMethod=1), Virtual Shadow Maps (r.Shadow.Virtual.Enable=1) en mesh distance fields — op Feature Level SM5, waar Lumen terugvalt op software-raytracing. Dat blijft de hoofdverdachte, maar dan als de bron van de foute lezing, niet als traagheid. Uit het log bevestigd: GTX 1080 Ti, D3D12, draait op SM5, kaart kan Feature Level 12_1. DE CRASH IS BOVENDIEN GRILLIG: 1 crash op 9 automatische opnamerondes vanavond. Een enkele proefrun 'zonder Lumen' die niet crasht bewijst daarom NIETS — bij 11% crashkans gaat een run in 89% van de gevallen vanzelf goed. De structurele keuze hieronder staat los van dat meetprobleem en is nog steeds aan jou. ▸ DOORGEMETEN, EN DE PASS IS GEVONDEN: de GPU-breadcrumbs stonden al in hetzelfde log, twintig regels onder de crashmelding. Actief toen de kaart viel waren de SkyAtmosphere-LUT's (DistantSkyLightLut, SkyViewLut, CameraVolumeLut) plus de eerste BasePass-tekenopdracht. Die LUT's zijn compute-passes, en Aftermath meldde exact twee actieve compute-shaders — dat sluit op elkaar aan. BELANGRIJK: dit weerlegt OOK de Lumen-verdenking, ook die van mij. Lumen (DiffuseIndirectAndAO), TSR en screen-space reflecties staan alle drie op 'Niet gestart' — de GPU is die frame nooit bij Lumen aangekomen. Lumen uitzetten had de crash dus niet weggenomen, en was de proefrun toevallig schoon geweest (89% kans), dan had Lumen ten onrechte de eer gekregen. De crash zit in SkyAtmosphere, niet in de zware belichtingspaden.",
-      "stappen": [
-        "Je hoeft hier niets voor te testen — kies alleen welke richting het structureel op moet",
-        "Weet je het niet: kies de derde optie, dan meet ik eerst door met de Aftermath-dump die er al ligt"
-      ],
-      "opties": [
-        {
-          "label": "Naar SM6 — Nanite echt aan",
-          "waarde": "SM6",
-          "gevolg": "Je kaart ondersteunt shader model 6.7, dus dit kan. Nanite gaat echt werken en de zware instellingen krijgen betekenis. Wel: een 1080 Ti is Pascal, dus hardware-raytracing blijft uit en er moet opnieuw geprofileerd worden. LET OP: dit is geen gegarandeerde fix voor de crash — die is een page fault, geen traagheid, en kan op SM6 blijven bestaan."
-        },
-        {
-          "label": "Op SM5 blijven — zware paden uit",
-          "waarde": "SM5",
-          "gevolg": "Lumen en VSM uit. Stabiel en snel, en het haalt de meest waarschijnlijke bron van de foute lezing weg. Maar de fidelity-doelen uit doc 15 schuiven daarmee naar een sterkere machine. (TSR terug naar 100 staat hier niet meer bij: die stond nooit op 200.)"
-        },
-        {
-          "label": "Weet ik niet — kies jij",
-          "waarde": "agent-kiest",
-          "gevolg": "Ik ga eerst door op de Aftermath-dump die al op schijf staat — die noemt de shader die faalt. Dat is sneller en zekerder dan een grillige crash 26 keer proberen te reproduceren."
-        }
-      ],
-      "advies": "Kies gerust 'kies jij'. De crash is nu herleid tot de SkyAtmosphere-LUT-pass en dat spoor loopt door zonder jou. Jouw keuze hieronder gaat over de STRUCTUUR — SM5 met zware paden aan is nog steeds het slechtste van twee werelden — maar hij is niet langer de fix voor deze crash.",
-      "vrijtekst": true,
-      "prio": "gauw"
-    },
-    {
-      "id": "T-11",
-      "vraag": "Command Mode: voelt het goed genoeg om erop door te bouwen?",
-      "waarom": "Command Mode staat er als testversie in (hold-to-enter, tijd naar 30%, camera stijgt). Pas als jij zegt dat het goed voelt, wordt de volledige ordertabel gebouwd. Zegt de test niks, dan passen we eerst het ontwerp aan in plaats van er polish op te stapelen.",
-      "stappen": [
-        "Start de game via de knop '1 - SPEEL ECLIPSE' op je bureaublad",
-        "Houd Q ingedrukt (of LB op de controller) — de tijd zakt naar 30%",
-        "Geef een paar orders met 1-4 of het D-pad, en wissel van soldaat met Tab of RB",
-        "Let op: kun je in die vertraagde tijd RUSTIG nadenken, of wordt het chaos?"
-      ],
-      "opties": [
-        {
-          "label": "Voelt goed — bouw door",
-          "waarde": "true",
-          "gevolg": "Stage B start: de volledige 8.4-ordertabel, vijf nieuwe orders, stealth-stance."
-        },
-        {
-          "label": "Voelt niet goed",
-          "waarde": "false",
-          "gevolg": "Geen polish. Eerst het ontwerp aanpassen volgens de terugvalopties in de spec."
-        }
-      ],
-      "advies": null,
-      "vrijtekst": true,
-      "prio": "gauw"
-    },
-    {
-      "id": "T-10",
-      "vraag": "Overbodige downloads annuleren in de Epic Launcher?",
-      "waarom": "Er staan downloads in de wachtrij die dit project niet gebruikt. Ze kosten ongeveer 30 GB schijfruimte.",
-      "stappen": [
-        "Open de Epic Games Launcher → Downloads",
-        "ANNULEER: alle Paragon-helden (Kwang, Narbash, Wukong, Riktor, Sevarog...), Old West VOL 4/6, Path of Adventure JRPG-muziek, NWIRO AI Pro",
-        "LAAT STAAN: Photogrammetry Snow, Plant Models Vol 60, Perfect Fire VFX"
-      ],
-      "opties": [
-        {
-          "label": "Gedaan",
-          "waarde": "gedaan",
-          "gevolg": "Punt gaat van de lijst; ~30 GB vrij."
-        },
-        {
-          "label": "Doe ik later",
-          "waarde": "later",
-          "gevolg": "Blijft staan, blokkeert niets."
-        }
-      ],
-      "advies": "Twee minuten werk voor 30 GB. Even doen.",
-      "vrijtekst": false,
-      "prio": "gauw"
-    },
-    {
       "id": "T-8",
       "vraag": "MetaHuman-downloads afronden?",
       "waarom": "De basis staat er (SentinelC + Common, 908 MB). Voor de resterende MetaHuman-onderdelen is per stuk één Download-klik nodig. Daarna kan de curatie van de named-character-slots verder.",
@@ -205,31 +74,6 @@
         }
       ],
       "advies": "Ongeveer 5 minuten.",
-      "vrijtekst": false,
-      "prio": "gauw"
-    },
-    {
-      "id": "T-2",
-      "vraag": "De environment-packs uit Fab halen?",
-      "waarom": "De character-packs zijn binnen, de environment-packs nog niet. Die blokkeren het aankleden van het district (de kit-pass) en het bevolken van de basis.",
-      "stappen": [
-        "Ga naar fab.com, ingelogd met je Epic-account",
-        "Zoek en klik 'Add to My Library' bij: Factory Pack Vol.1, Industrial Building 49 PBR, UNIBLOCKS, Sci-Fi Hallway, Sci-Fi Light Pack, Auto Footsteps Utility, Niagara Footstep VFX, FPS Weapon Bundle, Free Muzzle Flash",
-        "Plus één gestileerd civilian/worker-pack (4-6 bodies, Mannequin-rig) — dat is het enige gat in de personages"
-      ],
-      "opties": [
-        {
-          "label": "Staan erin",
-          "waarde": "gedaan",
-          "gevolg": "De monitor pikt ze automatisch op en de kit-pass kan starten."
-        },
-        {
-          "label": "Doe ik later",
-          "waarde": "later",
-          "gevolg": "De kit-pass blijft wachten; de agent werkt ondertussen aan andere dingen."
-        }
-      ],
-      "advies": "Ongeveer 10 minuten.",
       "vrijtekst": false,
       "prio": "gauw"
     },
