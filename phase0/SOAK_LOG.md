@@ -160,3 +160,4 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 20:07 | `f2b82e5` | **ROOD** | 194 tests / 1 gefaald / 0 niet gedraaid | 27 | Eclipse.Squad.Orders.OrderLinesNameThePerson [beeld: 3 beeld(en) VERANDERD -> stap 1, stap 4, stap 7] |
 | 2026-07-31 20:18 | `d8d1bb3` | **GROEN** | 195 tests / 0 gefaald / 0 niet gedraaid | 27 |  [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 4] |
 | 2026-07-31 20:19 | `d8d1bb3` | **ROOD** | 195 tests / 0 gefaald / 0 niet gedraaid | 0 | validatie gaf geen uitslag |
+| 2026-07-31 20:47 | `bfeb073` | **ROOD** | 208 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Command.StageB.NewRefusalsSpeakAndCanBeResolved |
