@@ -178,6 +178,7 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 22:20 | `9928a7d` | **ROOD** | 226 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit |
 | 2026-07-31 22:49 | `bdad112` | **ROOD** | 228 tests / 4 gefaald / 0 niet gedraaid | 0 | Eclipse.Base.VaultBuildDeterminism; Eclipse.Base.VaultRoomsAreTellable; Eclipse.Base.VaultStateParity; Eclipse.Base.VaultWalkingRound; scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
 | 2026-08-01 04:55 | `9a3425b` | **ROOD** | build NIET GEDRAAID (slot bezet) | 0 | scriptstem komt nergens op uit + scriptvalidatie meldt bevindingen |
+| 2026-08-01 07:20 | `0dec68f` | **ROOD** | 235 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit + scriptvalidatie meldt bevindingen |
 
 > **De regel van 01-08 04:55 is bewust onvolledig, en dat staat er dus bij.** De build
 > en de suite zijn **niet gedraaid**: het build-slot was bezet door in-flight vault-werk
@@ -189,3 +190,22 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 > *Niet gedraaid is niet hetzelfde als groen*, en daarom staat er ROOD en geen streepje.
 > Deze regel telt **niet** mee voor de "drie nachten achtereen" van backlog #12 — die eist
 > een volledige bar, en een nacht met een niet-gedraaide build is geen nacht.
+| 2026-07-31 23:35 | `f5ad6f5` | **ROOD** | 229 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 4] |
+| 2026-07-31 23:45 | `54fc292` | **ROOD** | 229 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 00:18 | `58dd5de` | **ROOD** | 235 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 00:22 | `27ecf25` | **ROOD** | 235 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+
+> **De regel van 01-08 07:20 is de eerste van de nacht met een VOLLEDIG gedraaide
+> build.** Het slot was vrij, dus dit is een echte meting en geen halve: build groen
+> `-NoUba`, **235 tests / 0 gefaald / 0 niet gedraaid** (was 226 aan het begin van de
+> nacht), `EclipseValidateData` 7 validators / 9 assets / 0 fouten, EventCatalog 40/40,
+> creditmeter groen, owner-kaarten groen.
+>
+> Hij staat **toch op ROOD**, en op precies twee punten die allebei buiten de build
+> liggen: `check_voice_resolves` (twee `eclipse_fighter`-slots zonder stem — owner-actie
+> O-3) en `validate_script` (negen schrijversbevindingen, waarvan zes REGISTER-uitschieters
+> en twee takken die na generatie niet meer te repareren zijn).
+>
+> *Voor backlog #12 telt deze nacht dus niet als groen.* Dat is geen formaliteit: de bar
+> meet met opzet meer dan build-plus-tests, en zolang er acht dialoogregels zijn die als
+> **stilte** zouden genereren, is de slice niet groen — hoe groen de suite ook staat.
