@@ -614,9 +614,24 @@ tegen hoogstens 2 in elk ander interval.
   vervangen te worden: ze moeten op het BOVENLICHAAM gelegd worden in plaats van
   op het hele lijf. Dat is een per-bot-blend in de bestaande blender, geen nieuw
   systeem en geen nieuwe asset.
-- **Punt 2 vraagt wél content:** een additieve terugslagtake bestaat niet in dit
-  project. Zolang die er niet is, is een korte bovenlichaamspose de beste
-  benadering.
+- ~~**Punt 2 vraagt wél content:** een additieve terugslagtake bestaat niet in dit
+  project.~~
+  > **ONJUIST, WEERLEGD 27-07 AVOND — hij lag er al.** `Primary_Fire_Med_MSA` staat
+  > in hetzelfde Belica-pack als de volledige `Primary_Fire_Med` die we speelden, en
+  > is aantoonbaar additief (1,00 s). MSA is de Paragon-conventie voor *mesh space
+  > additive*, en het pack levert die variant voor élke vuurtake. Ik schreef
+  > "bestaat niet" op grond van "wij gebruiken hem niet" — dezelfde fout als
+  > vanochtend bij het wapenmesh.
+  >
+  > **Aangesloten, en het kostte niets.** Wat het wél kostte was een verkeerde
+  > eerste poging: ik maskeerde de BRON (bijdrage onder de ruggengraat op
+  > identiteit) en mat 21 voet-omklappen tegen 2. Een mesh-space-additief wordt ná
+  > de blend in meshruimte opgeteld, dus daar betekent een lege lokale transform
+  > niet "geen bijdrage". De werkende vorm is het additief op een KOPIE toepassen en
+  > die er per bot in mengen: gemeten 2–3 voet-omklappen, gelijk aan wat er stond.
+  >
+  > **Niet aangetoond:** dat het BETER is. Op de benen gelijk; het verschil zit in de
+  > armen en dat ziet de omklap-teller niet.
 - **Punt 3 is er al** — de acht richtingen bestaan als slots; vijf lichamen missen
   hun zijcycli, en dat staat al als assetwerk op de owner-lijst.
 - **Punt 4 ontbreekt volledig.** Wij draaien het HELE lichaam naar de camera bij
