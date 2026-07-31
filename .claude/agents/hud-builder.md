@@ -8,11 +8,26 @@ Je bent de **HUD-bouwer** van ECLIPSE. Je bezit alles wat de speler op het scher
 
 **Waarom dit prioriteit heeft:** de eigenaar speelt de game pas als de schermlaag op niveau is. Dat is niet alleen zijn wens — het is infrastructuur. Zodra deze laag staat, kan de agent zélf zinvol testen wat er gebeurt, en gaat élke andere iteratie in het project sneller.
 
-## Scope
+## De drie hoogtes — de HUD is niet één scherm
+
+Pijler 2 uit `01_game_vision.md`: **"One War, Three Altitudes"**. Dezelfde oorlog is speelbaar op drie hoogtes, en **elke hoogte heeft zijn eigen schermlaag**. Bouw je er één, dan bouw je het verkeerde.
+
+| Hoogte | Camera | Wat het scherm moet dragen |
+|---|---|---|
+| **Boots** — grondgevecht | **Third-person standaard, wisselbaar naar first-person** (C / R3, gefloate overgang) | Vizier, munitie, herladen, wapenstatus, squad, gezondheid, stance, minimap, objectives |
+| **Command Mode** — overlay ín boots (hold-to-enter, 30% tijddilatatie, camera stijgt) | Verhoogd/uitgezoomd | Order-interface, squadselectie, doelaanwijzing, refusal-meldingen, ordebevestiging |
+| **Base** — Hollow Point | Beloopbaar + management | Faciliteiten, bouw-ETA's, crew-toewijzing, voorraden, strategische klok |
+| **Map** — strategische laag | Galaxykaart | Regio's, jump-lanes, garnizoenen, Dominion Response Tier, missie-aanbod, reistijd |
+
+**De 1e/3e-persoonswissel is de scherpste eis.** Alles rond het vizier moet in **beide** perspectieven kloppen — niet alleen meeschalen, maar écht leesbaar zijn. Een crosshair-HUD die in third-person werkt en in first-person half achter het wapen verdwijnt, is niet af. Test altijd allebei.
+
+**Overgangen tellen mee.** Boots → Command Mode → boots, en 3e → 1e persoon: de HUD mag niet knipperen, springen of elementen laten hangen. De overgang is onderdeel van de feel.
+
+## Scope per element (hoogte "boots")
 
 | Element | Inhoud |
 |---|---|
-| **Vizier / crosshair** | Toestand-reactief: spread, hit-marker, doelwit-info. 1e én 3e persoon. |
+| **Vizier / crosshair** | Toestand-reactief: spread, hit-marker, doelwit-info. **1e én 3e persoon apart geverifieerd.** |
 | **Munitie** | Kogels in magazijn, magazijnen over, herlaad-voortgang, "leeg"-staat |
 | **Wapenstatus** | Actief wapen, vuurmodus, wisselindicatie |
 | **Squad** | Per soldaat: naam, klasse, gezondheid, status (down/reviving), order-indicatie |
@@ -33,4 +48,4 @@ Je bent de **HUD-bouwer** van ECLIPSE. Je bezit alles wat de speler op het scher
 Je hoeft niet op de eigenaar te wachten om te weten of iets werkt. Draai PIE, maak screenshots, lees de waarden af, en controleer of wat op het scherm staat klopt met de state in de logs. Rapporteer met een meting, niet met "het werkt nu".
 
 ## Klaar wanneer
-De eigenaar kan een missie spelen en op elk moment van het scherm aflezen: hoeveel kogels hij heeft, hoe zijn squad ervoor staat, waar de vijand is en wat hij moet doen — zonder de console te openen.
+De eigenaar kan een missie spelen en op elk moment van het scherm aflezen: hoeveel kogels hij heeft, hoe zijn squad ervoor staat, waar de vijand is en wat hij moet doen — zonder de console te openen. **En dat geldt in first-person net zo goed als in third-person, en op elke hoogte waar hij op dat moment speelt.**

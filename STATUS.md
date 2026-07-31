@@ -7,11 +7,13 @@
 ## Waar we staan
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
-Bar: build groen · **185/185 tests** · validatie 0 fouten · EventCatalog in sync · werkboom schoon (31-07 18:08).
+Bar: build groen · **184/185 tests — één rood, zie hieronder** · validatie 0 fouten · EventCatalog in sync.
 
 > Let op: `progress_auto.js` is van 26-07 en meldt nog 110 tests. Dat cijfer is verouderd — het dashboard toont er eerlijk "5 dagen geleden" bij. Draai `Tools/update_progress.ps1` om het te verversen.
 
 De owner-stop op nieuwe features is **opgeheven** (31-07). Er geldt nog één voorwaarde: Nathan speelt pas als de **schermlaag (HUD)** op niveau is — dat is nu spoor-B-prioriteit 1.
+
+> **De HUD is niet één scherm.** Pijler 2 (`01_game_vision.md`): *One War, Three Altitudes* — **boots** (third-person, **wisselbaar naar first-person** met C/R3), **base** (management) en **map** (strategie), met **Command Mode** als overlay binnen boots. Elke hoogte heeft zijn eigen schermlaag, en alles rond het vizier moet in **beide** perspectieven leesbaar zijn. Volledige scope in `.claude/agents/hud-builder.md`.
 
 ## Twee sporen lopen nu parallel
 

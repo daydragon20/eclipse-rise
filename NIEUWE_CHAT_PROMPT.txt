@@ -49,12 +49,34 @@ SPOOR A — SCHRIJVEN & STEM  (deadline: credits vervallen einde maand)
   Plan: phase0/SCRIPT_PRODUCTION_PLAN.md
 
 SPOOR B — SYSTEMEN & FEEL
-  Prioriteit 1 is de SCHERMLAAG (HUD): alles rond het vizier in 1e en
-  3e persoon — munitie, herladen, magazijnen, minimap, squad-status,
-  gezondheid, objectives. Ik speel de game pas als dat op niveau is,
-  en jij kunt daarna zelf veel beter testen.
+  Prioriteit 1 is de SCHERMLAAG (HUD). Ik speel de game pas als dat op
+  niveau is, en jij kunt daarna zelf veel beter testen.
+
+  LET OP - de HUD is NIET één scherm. Pijler 2 uit 01_game_vision.md is
+  "One War, Three Altitudes": dezelfde oorlog is speelbaar op drie
+  hoogtes, en elke hoogte heeft zijn eigen schermlaag.
+
+    BOOTS  grondgevecht. THIRD-PERSON standaard, WISSELBAAR NAAR
+           FIRST-PERSON (C / R3, gefloate overgang). Vizier, munitie,
+           herladen, magazijnen, wapenstatus, squad, gezondheid,
+           stance, minimap, objectives.
+    COMMAND MODE  overlay binnen boots: hold-to-enter, 30% tijd-
+           dilatatie, camera stijgt. Order-interface, squadselectie,
+           doelaanwijzing, refusals.
+    BASE   Hollow Point: faciliteiten, bouw-ETA's, crew, voorraden,
+           strategische klok.
+    MAP    strategische laag: regio's, jump-lanes, garnizoenen,
+           Dominion Response Tier, missie-aanbod.
+
+  De scherpste eis: alles rond het vizier moet in BEIDE perspectieven
+  kloppen. Niet alleen meeschalen - echt leesbaar. Een crosshair-HUD
+  die in third-person werkt maar in first-person half achter het wapen
+  verdwijnt, is niet af. Verifieer allebei apart, en let ook op de
+  overgangen (3e<->1e, boots<->command): geen geknipper of hangende
+  elementen.
+
   Daarna: de open dossiers, dan de gewone backlog.
-  Plan: phase0/EXECUTION_PLAN.md
+  Plan: phase0/EXECUTION_PLAN.md · agent: hud-builder
 
 --------------------------------------------------------------------
 DE AGENTS — spawn ze zelf via de Task-tool
