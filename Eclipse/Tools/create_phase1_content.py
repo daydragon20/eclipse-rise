@@ -14,8 +14,13 @@ Creates (idempotent — existing assets are updated in place):
 All numbers here are GDD-sourced data (14.2); code never hardcodes them.
 """
 import json
+import os
+import sys
 
 import unreal
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from squad_order_lines import SQUAD_ORDER_ROWS  # noqa: E402
 
 DATA_PATH = "/Game/Data"
 
@@ -216,95 +221,12 @@ setup.set_editor_property("prep_tuning", prep_tuning)
 # --- Squad data (SPEC-P1-06): bark pools + tuning.
 order_defs = get_or_create("DT_SquadOrderDefs", unreal.DataTable,
                            make_table_factory(unreal.EclipseSquadOrderDefRow.static_struct()))
-order_defs_json = json.dumps([
-    {"Name": "MoveTo",
-     "AcknowledgeLines": ["On it.", "Moving.", "Copy - relocating."],
-     "RefusalLines": ["No route, boss.", "Can't get there from here.", "That path's blocked."]},
-    {"Name": "FocusTarget",
-     "AcknowledgeLines": ["Target marked.", "On your mark.", "Engaging."],
-     "RefusalLines": ["Can't see the target.", "No shot from here.", "Target's gone."]},
-    {"Name": "Hold",
-     "AcknowledgeLines": ["Holding.", "Anchored.", "Not moving."],
-     "RefusalLines": ["Can't hold here."]},
-    {"Name": "Regroup",
-     "AcknowledgeLines": ["Falling back to you.", "Coming in.", "Regrouping."],
-     "RefusalLines": ["No way back to you.", "Route's cut."]},
-    # Een RIJ en geen veld (owner-beslissing 26-07, optie 1). Een neergeschoten
-    # soldaat weigerde tot vandaag met de zin van het ORDERTYPE: vroeg je hem te
-    # verplaatsen, dan zei hij "No route, boss." en wees hij je op een
-    # routeprobleem dat er niet was. De reden Downed geldt identiek voor alle vier
-    # de orders, dus een gedeelde pool is genoeg — en een extra rij vraagt geen
-    # schemawijziging, wat na een nacht dode velden opruimen de bedoeling is.
-    # AcknowledgeLines blijft leeg: wie neer ligt bevestigt niets.
-    {"Name": "Downed",
-     "AcknowledgeLines": [],
-     "RefusalLines": ["I'm hit - can't move.", "I'm down, boss.", "Need a medic, not an order."]},
-
-    # --- SPEC-P2-02 Stage B: de rest van de 8.4-tabel -----------------------
-    # Vijf orderrijen, drie redenrijen, en de regels voor wat er KLAARSTAAT.
-    #
-    # Waarom de redenen eigen rijen krijgen: dezelfde reden als bij Downed. Een
-    # breach zonder deur die "No route, boss." zegt, stuurt de speler een
-    # routeprobleem zoeken dat niet bestaat. De code kiest de rij op REDEN als de
-    # reden iets anders betekent dan zijn ordertype (EclipseSquadOrderLogic::
-    # RefusalPoolRowName); ontbreekt de rij, dan valt hij luid terug op de
-    # orderzin - dus deze rijen zijn geen decoratie.
-    {"Name": "Suppress",
-     "AcknowledgeLines": ["Suppressing.", "Putting rounds on it.", "Heads down - firing."],
-     "RefusalLines": ["No angle on that spot.", "Can't see it from here.", "Something's in the way."]},
-    {"Name": "Flank",
-     "AcknowledgeLines": ["Route's up - say go.", "I've got a way around. Your call.", "Line's plotted, boss."],
-     "RefusalLines": ["No way around them.", "That flank's closed.", "Nothing but open ground that side."]},
-    {"Name": "Breach",
-     "AcknowledgeLines": ["Stacking up.", "On the door.", "Moving to breach."],
-     "RefusalLines": ["Can't reach the stack.", "No path to that door."]},
-    {"Name": "UseAbility",
-     "AcknowledgeLines": ["Working it.", "On it.", "Doing what I'm good at."],
-     "RefusalLines": ["Nothing for me to do here.", "Wrong moment for that."]},
-    {"Name": "SyncStrike",
-     "AcknowledgeLines": ["Taking mine.", "Going quiet.", "Mine's down."],
-     "RefusalLines": ["Can't make that work."]},
-
-    # De drie nieuwe REDENEN. Elk zegt WELK probleem het is, niet dat er een is.
-    {"Name": "NoBreachPoint",
-     "AcknowledgeLines": [],
-     "RefusalLines": ["Nothing to breach here.", "There's no door, boss.", "Show me a way in and I'll take it."]},
-    {"Name": "NoTargetsMarked",
-     "AcknowledgeLines": [],
-     "RefusalLines": ["Nothing marked.", "Mark them first, boss.", "I've got no targets."]},
-    {"Name": "NotConcealed",
-     "AcknowledgeLines": [],
-     "RefusalLines": ["They're looking right at me.", "Too late for quiet.", "I'm made - can't do it silent."]},
-
-    # Wat er KLAARSTAAT (Event.Squad.OrderQueued). Deze spreken uit de ACK-pool:
-    # er is niets geweigerd, er wacht iets. Ook de negatieve overgangen krijgen
-    # een regel - een voorstel dat stil verdampt is precies de stilte die 9.5
-    # verbiedt, ook al is jouw nietsdoen geen weigering.
-    {"Name": "FlankProposed",
-     "AcknowledgeLines": ["Route's up. Say go.", "Ready when you are.", "Waiting on your word."],
-     "RefusalLines": []},
-    {"Name": "FlankApproved",
-     "AcknowledgeLines": ["Moving.", "Going wide.", "On my way around."],
-     "RefusalLines": []},
-    {"Name": "FlankExpired",
-     "AcknowledgeLines": ["Window's gone.", "Too slow - they moved.", "That line's closed now."],
-     "RefusalLines": []},
-    {"Name": "SyncStrikeMark",
-     "AcknowledgeLines": ["Marked.", "Got him.", "That one's mine."],
-     "RefusalLines": []},
-    {"Name": "SyncStrikeFull",
-     "AcknowledgeLines": ["That's four already.", "Hands are full, boss.", "No room for another."],
-     "RefusalLines": []},
-    {"Name": "SyncStrikePruned",
-     "AcknowledgeLines": ["Lost one.", "He's moved off.", "Mark's gone."],
-     "RefusalLines": []},
-    {"Name": "BreachEntry",
-     "AcknowledgeLines": ["Going in.", "Through.", "Now."],
-     "RefusalLines": []},
-    {"Name": "BreachAborted",
-     "AcknowledgeLines": ["Can't get to the door.", "I'm cut off.", "Not making the stack."],
-     "RefusalLines": []},
-])
+# DE REGELS KOMEN UIT EEN GEDEELDE BRON (squad_order_lines.py), en dat is geen
+# opruiming maar een reparatie: ze stonden hier inline terwijl
+# author_squad_order_lines.py dezelfde tabel schrijft zonder de rest van deze
+# dataset aan te raken. Twee kopieen van dezelfde barks lopen precies een keer
+# uiteen, en dan hangt het van WELK script je draaide af wat je squad zegt.
+order_defs_json = json.dumps(SQUAD_ORDER_ROWS)
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(order_defs, order_defs_json):
     raise RuntimeError("DT_SquadOrderDefs JSON fill failed")
 
@@ -380,6 +302,7 @@ weapons_json = json.dumps([
      "RecoilPitchDegrees": 0.5, "RecoilYawDegrees": 0.15, "RecoilRecoveryDegreesPerSecond": 6.0,
      "ReadySeconds": 0.5, "PelletsPerShot": 1, "SoundFamily": "AssaultRifle", "bSuppressed": False,
      "Mesh": "/Game/Art/Weapons/SM_Weapon_AR_Foundry.SM_Weapon_AR_Foundry",
+     "DisplayName": "Foundry AR",
      "RoleSummary": "Allrounder: nergens de beste, overal bruikbaar. Je standaardwapen."},
     {"Name": "SMG_Patch", "Damage": 11, "RangeCm": 2000, "FireInterval": 0.075, "HeadshotMultiplier": 1.8,
      "GunshotAlertRadiusCm": 3500, "MagazineSize": 40, "ReloadSeconds": 2.0,
@@ -388,6 +311,7 @@ weapons_json = json.dumps([
      "RecoilPitchDegrees": 0.35, "RecoilYawDegrees": 0.3, "RecoilRecoveryDegreesPerSecond": 9.0,
      "ReadySeconds": 0.35, "PelletsPerShot": 1, "SoundFamily": "AssaultRifle", "bSuppressed": False,
      "Mesh": "/Game/Art/Weapons/SM_Weapon_SMG_Patch.SM_Weapon_SMG_Patch",
+     "DisplayName": "Patch SMG",
      "RoleSummary": "Dichtbij: hoogste vuursnelheid en het minste last van bewegen, maar valt na 8 m snel af."},
     {"Name": "DMR_Longsight", "Damage": 55, "RangeCm": 9000, "FireInterval": 0.55, "HeadshotMultiplier": 3.0,
      "GunshotAlertRadiusCm": 8000, "MagazineSize": 10, "ReloadSeconds": 2.8,
@@ -396,6 +320,7 @@ weapons_json = json.dumps([
      "RecoilPitchDegrees": 1.8, "RecoilYawDegrees": 0.1, "RecoilRecoveryDegreesPerSecond": 3.0,
      "ReadySeconds": 0.8, "PelletsPerShot": 1, "SoundFamily": "AssaultRifle", "bSuppressed": False,
      "Mesh": "/Game/Art/Weapons/SM_Weapon_DMR_Longsight.SM_Weapon_DMR_Longsight",
+     "DisplayName": "Longsight DMR",
      "RoleSummary": "Afstand: hardste kogel en hoogste kopschot, maar traag, luid en waardeloos in beweging."},
     {"Name": "Sidearm_Scrap", "Damage": 16, "RangeCm": 2500, "FireInterval": 0.12, "HeadshotMultiplier": 2.5,
      "GunshotAlertRadiusCm": 1200, "MagazineSize": 12, "ReloadSeconds": 1.4,
@@ -404,6 +329,7 @@ weapons_json = json.dumps([
      "RecoilPitchDegrees": 0.7, "RecoilYawDegrees": 0.25, "RecoilRecoveryDegreesPerSecond": 8.0,
      "ReadySeconds": 0.25, "PelletsPerShot": 1, "SoundFamily": "Handgun", "bSuppressed": True,
      "Mesh": "/Game/Art/Weapons/SM_Weapon_Sidearm_Scrap.SM_Weapon_Sidearm_Scrap",
+     "DisplayName": "Scrap Sidearm",
      "RoleSummary": "Sluipwerk: gedempt, dus je verraadt jezelf pas op 12 m. Het snelst in de hand, het kleinste magazijn."},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(weapons, weapons_json):

@@ -491,19 +491,70 @@ staan; elke regel hieronder draagt zijn meting of zijn frame.*
 
 | stap | uitkomst | bewijs |
 |---|---|---|
-| 1 · sectie isoleren | slot 4 `M_Belica_Guns`, **14.606 van 70.403 driehoeken (20,7%)**, aan/uit per LOD | log `[WAPEN * STAP1]` + frames A/D |
-| 2 · los asset per familie | 4 meshes, **94,9 / 64,1 / 122,9 / 33,9 cm**, langste as telkens X | `Eclipse.Combat.WapenMeshPerFamilie` |
+| 1 · sectie isoleren | slot 4 `M_Belica_Guns`, **14.606 van 70.403 driehoeken (20,7%)**, aan/uit per LOD | log `[WAPEN * STAP1]` + frames A/C/B |
+| 2 · los asset per familie | 4 meshes, **97,0 / 64,1 / 122,9 / 24,4 cm**, langste as telkens X | `Eclipse.Combat.WapenMeshPerFamilie` |
 | 3 · socket op `hand_r` | bot bestaat, aangehecht, afstand **constant 4,47 cm** | log `[WAPEN * STAP3]` |
-| 4 · wisselogica eraan | `AR_Foundry`→`Sidearm_Scrap`, mesh **94,9 → 33,9 cm** | **[GEZIEN — `HUD_wapen_E_na_wissel.png`]** |
+| 4 · wisselogica eraan | `AR_Foundry`→`Sidearm_Scrap`, mesh **97,0 → 24,4 cm** | **[GEZIEN — `HUD_wapen_D` naast `HUD_wapen_E`]** |
+
+> **DE EERSTE PROEFRONDE WAS ONGELDIG, EN DE FOUT ZAT IN MIJN MEETOPSTELLING.**
+> Aangewezen door de screenshot-inspecteur; de oorzaak bleek een andere dan hij
+> vermoedde, en dat is precies waarom hij het moest melden.
+>
+> **Wat er misging:** ik zette de toestand en maakte de opname in DEZELFDE stap.
+> `ShowMaterialSection` zet niets direct — het legt de nieuwe `HiddenMaterials` in
+> een render-commando en roept `MarkRenderStateDirty()` aan, en allebei landen pas
+> ná die functie. Elk frame droeg dus het label van een toestand die nog niet
+> getekend was. **Gemeten**: `wapen_B` (lichaam zónder wapen) toonde géén lichaam en
+> twee zwevende voorwerpen — dat is de toestand van label C.
+>
+> Die les stond al in dezelfde file, bij PLAYSHOT stap 8: *"een meetmoment dat
+> samenvalt met de gebeurtenis die het meet, meet de overgang in plaats van de
+> toestand."* Ik heb hem overtreden mét een comment erboven waarom hij hier niet
+> gold. **Na de reparatie** (zetten en opnemen zijn twee stappen) klopt het:
+> C houdt 1,2% huid over en B 6,1% — de labels en de toestanden vallen samen.
+>
+> **Wat NIET waar bleek van de melding:** "de camera staat in de karaktermesh en
+> een roodbruin vlak vult 60-95% van het beeld". Nagemeten met
+> `Tools/measure_weapon_frames.py`: geen enkel frame komt boven **6,7% huid**, de
+> grootste huidvlek raakt **één** beeldrand. Een lichaam vóór de lens raakt er vier.
+> De frames waren fout gelabeld, niet fout gecomponeerd.
 
 - **DE WAPENWISSEL DOET NU ZICHTBAAR IETS.** [GEZIEN — `HUD_wapen_D_los_aan_hand.png`
   naast `HUD_wapen_E_na_wissel.png`, zelfde camera en zelfde pose]: op D een lang
   geweer met zichtbaar magazijn, op E een kort compact wapen, en de HUD wisselt
   mee van `HERLADEN` naar `Sidearm_Scrap`. Dat was het hele gat van owner-punt 5.
-- **ER BESTOND GEEN LOS WAPENASSET** — alle tien packs nagelopen; Belica's geweer
-  zit in `Belica.uasset`. De vier meshes zijn dus zelf geauthord
-  (`Tools/blender/gen_weapons.py`) en niet uit de skeletal mesh gesneden. Dat is
-  bewust: extractie levert **één** vorm op, en dan doet de wissel nog steeds niets.
+- **DE WAPENS KOMEN UIT LYRA, NIET MEER UIT BLENDER** (owner-instructie OBS-3:
+  *"bouw geen wapens meer met de hand als er een goed asset ligt"*).
+  `LyraStarterGame/Content/Weapons/` levert productieassets van Epic zelf.
+  Geëxporteerd naar FBX met een commandlet tegen het Lyra-project en geïmporteerd
+  in ECLIPSE — **geen owner-klik**, want de editor hoefde niet open.
+
+  | familie | mesh | lengte | driehoeken | herkomst |
+  |---|---|---|---|---|
+  | `AR_Foundry` | Lyra `SM_Rifle` | 97,0 cm | **4.485** (was 1.884) | ingekocht |
+  | `Sidearm_Scrap` | Lyra `SM_Pistol` | 24,4 cm | **2.933** (was 1.292) | ingekocht |
+  | `SMG_Patch` | Blender | 64,1 cm | 1.636 | **terugval** — Lyra heeft geen SMG |
+  | `DMR_Longsight` | Blender | 122,9 cm | 2.328 | **terugval** — geen scherpschutter |
+
+  **Waarom niet migreren maar exporteren:** ECLIPSE gooit de materialen tóch weg —
+  `AttachWeaponMesh` vervangt elk slot door een toon-MID (15.5). Van een ingekocht
+  wapen overleeft alleen de GEOMETRIE, dus de FBX-weg is geen omweg maar de rechte
+  lijn: geen afhankelijkheidsboom, geen redirectors, geen owner-klik.
+- **DE FICTIEWET (20.2) WORDT HIER DOOR CONSTRUCTIE GEHAALD, niet door curatie.**
+  Aardse semiotiek in zo'n pack zit in de diffuse (`T_Rifle_D`, `T_Rifle_Masks`);
+  de weapon-MID zet **geen `AlbedoTex`**. Wat er op het scherm komt is silhouet
+  plus gunmetal-waarde. *Wat dat NIET afvangt is de VORM* — dat oordeel hoort bij
+  een frame, en `HUD_wapen_D_los_aan_hand.png` toont een near-future militair
+  geweer zonder merktekens of schrift.
+- **ELK INGEKOCHT ASSET BRENGT ZIJN EIGEN AS-CONVENTIE MEE.** Lyra legt zijn wapens
+  langs **+Y**, ECLIPSE langs +X. Rechtgezet **één keer bij de import**
+  (`import_rotation` yaw −90) en niet per wapen in de data — anders draagt elk
+  wapen zijn eigen uitzondering en voegt de volgende inkoop er weer een toe.
+  `Eclipse.Combat.WapenMeshPerFamilie` eist dat de langste as X is, en is daarmee
+  de poort waar élk toekomstig wapen doorheen moet.
+- **`SM_Shotgun` (72,3 cm) ligt binnen maar hangt aan geen familie**: er is geen
+  hagelwapen in `DT_Weapons`. `PelletsPerShot` staat daar al als ongelezen veld, dus
+  de dag dat die familie komt, ligt de mesh er.
 - **NAIJLEN BESTAAT HIER NIET** (`DEBUG_DISCIPLINE.md` §4.1). Gemeten over **1.255
   frames**: afstand wapen→handbot 4,47–4,47 cm, **spreiding 0,00**, terwijl het
   handbot in diezelfde reeks **1.009,9 cm** aflegde. Die tweede helft is de

@@ -1041,6 +1041,29 @@ struct FEclipseWeaponRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
 	FText RoleSummary;
 
+	/**
+	 * DE NAAM DIE DE SPELER LEEST. "Foundry AR", niet `AR_Foundry`.
+	 *
+	 * Gemeld 31-07 door de screenshot-inspecteur: op `HUD_wapen_E_na_wissel.png`
+	 * staat letterlijk **`Sidearm_Scrap`** op het scherm — mét underscore. Dat is
+	 * de ruwe RIJNAAM uit deze tabel, en een rijnaam is een sleutel: hij is
+	 * hoofdlettergevoelig, hij mag geen spaties dragen, en hij verandert nooit
+	 * meer zodra er data aan hangt. Precies de eigenschappen die hem ongeschikt
+	 * maken als leestekst.
+	 *
+	 * Zelfde klasse fout als de `45434C53` die dezelfde avond op het scherm stond:
+	 * een interne sleutel die als mensentaal wordt gebruikt. De reparatie is niet
+	 * "vervang de underscore" maar "geef het ding een naam" — een sleutel opsmukken
+	 * blijft een sleutel tonen.
+	 *
+	 * HIER EN NIET IN DE HUD, en dat is de laagscheiding: welk wapen dit IS, is
+	 * data; hoe het op het scherm past, is de schermlaag. De HUD leest dit veld en
+	 * valt terug op de rijnaam als het leeg is — luid degraderen (14.3.5), want een
+	 * lege naam mag geen leeg vakje opleveren.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon|Profiel")
+	FText DisplayName;
+
 	/** Locational damage stub (GDD 8.2): headshot multiplier. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 1))
 	float HeadshotMultiplier = 2.5f;
