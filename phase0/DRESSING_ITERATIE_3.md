@@ -183,10 +183,23 @@ uitkomen"*. Negen entries staan erboven:
 | `BldgA` | 0,2396 | 1,32× |
 | `KitRow` | 0,1928 | 1,06× |
 
-**Zo gelezen is stap 7 niet doorgeschoten maar NAUWELIJKS BEGONNEN.** Hij is op één entry
-toegepast — de barrière — en daar 2,9× te ver; de andere negen zijn onaangeroerd. `Wall_`
-is de uitzondering die het bevestigt: die stond volgens §1e op 4,1–4,8× de vloer en staat
-nu op 1,49×, dus die correctie is wél netjes geland.
+**CORRECTIE OP MIJN EIGEN EERSTE LEZING.** Ik schreef hier eerst *"stap 7 is nauwelijks
+begonnen"*, en dat is sterker dan het bewijs. Nagelezen wat de stap zélf als doelwit
+**noemt**: `Prop_Barrier`, tread-pad en hazardpad — en §1e voegde `Wall_` toe. Meer niet.
+Van die genoemde doelen is `Wall_` **netjes geland** (stond op 4,1–4,8× de vloer, nu 1,49×,
+en dat is 98% van het plafond — dus bewust er net onder gezet) en `Prop_Barrier`
+**doorgeschoten** (§1g).
+
+**Het verschil zit tussen de REGEL en het WERKPLAN.** De regel zoals hij geschreven staat —
+*"niets dat geen lichtbron is"* — dekt die negen andere entries gewoon mee. Het werkplan
+noemt ze nooit. Eén van tweeën klopt niet, en welke is een architect-vraag:
+
+- ofwel de regel is te breed geformuleerd en bedoelt alleen grote oppervlakken (`Wall_`
+  staat er niet voor niets bij met *"grootste oppervlak in élk frame"*),
+- ofwel het werkplan is onvolledig en er staan negen entries open.
+
+**Zolang dat niet vastligt, kan stap 7 niet als afgerond worden verklaard** — en hij staat
+in de tabel al op *"GROTENDEELS GELAND"*.
 
 > **Wat ik hier NIET van maak.** Ik weet niet welke van deze negen de regel bedoeld was te
 > dekken. `LitColor` en `ShadeColor` klinken als palet-primitieven en niet als objecten, en
