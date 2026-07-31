@@ -13,9 +13,11 @@ obstacle:     "Unarmed people do not move like a squad and cannot be ordered."
 turn:         "Sela moves them, using her voice where Ember would have used cover."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        216
+status:          draft
+critic:          null
+words:           264
+words_heard:     172
+words_generated: 297
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, BRICK, SELA, fighters, freed conscripts; Dominion response
@@ -49,6 +51,51 @@ words:        216
 #            NOT ONE LETTER OF TEXT CHANGED. Register carried by .010 (11 w), .020 (14 w),
 #            .140 (14 w). Spread 1 w (.420) to 14 w (.140) = 14x.
 # branches:  branch conditions read `story.m16_train_choice` from S04 (L1-R3 leaf-tag form).
+#            ALL THREE LEAVES ARE HANDLED HERE as of 01-08: run .200-.250, emptied .300-.340,
+#            split .350-.390. Before that, the player who took the darkest option got the
+#            beats of a choice he did not make or nothing at all - the L1-R12 shape, on the
+#            branch with the fewest players and the most to lose.
+#
+# *** THE SPLIT BLOCK - RULING L1-R25, WRITTEN 01-08. ***
+# split:     five lines, .350-.390, monotonic after .340 and before the shared tail at .400.
+#            Nothing renumbered, no existing line touched.
+#            WHY NOT `silence:` - the ruling's reasoning, and it is worth keeping in the file:
+#            this scene is about ONE thing, counting people while you move them across a rail
+#            yard, and in this branch THE NUMBER CHANGED. Silence in the only counting scene,
+#            on the branch where the count moved, is a hole with an explanation around it.
+#            THE CRUELTY IS THAT THE SUM COMES OUT. In `run` and `emptied` Sela loses people
+#            in front of her and the count is short. Here it is exact: forty-one on the
+#            drawbar, forty-one at the wall. Nothing in the block says that is wrong, because
+#            nobody in the yard thinks it is. The second car is not short a single person -
+#            it is not in the column at all.
+#            FORTY-ONE IS NOT A NEW NUMBER. It is the intake figure the mission already
+#            ships: S06.010 (Dex counts it twice), S06.040, S06.110/.120, S06.190/.200, and
+#            M1.8.S99.080. Sela reckoning in it is her doing arithmetic in the only unit this
+#            mission has. L1-R14 checked: eleven is Ember and appears nowhere in this scene.
+#            Nine and six are saturated (30x / 29x in act 1) and are not used here either -
+#            .140's "nine in ten" is AEGIS's existing line and was not touched.
+#            NO DOMINION RESPONSE. Ruling point 4: the shared tail .400/.410 carries T4 for
+#            all three branches and this block does not go near it. Nothing in .350-.390
+#            mentions towers, squads, guards or what did or did not come down the Spire road.
+#            NO IRON CHORUS VOICE. Ruling point 5, and Q-4 leaves the emissary uncast. The
+#            Chorus is not in this block at all - not a line, not a shot. They left at the
+#            switch in S04.180 and the yard never sees them.
+# counts:    HAND-COUNTED, NOT MEASURED. I had no shell in this session, so
+#            `Eclipse/Tools/count_generation_cost.py` was not run and these three figures are
+#            counted by hand against the tool's own definition (whitespace tokens; every
+#            `text:` plus every variant; Voss doubled). Reported as a hand count, not as a
+#            measurement. words 264 = 217 existing + 47 new. THE OLD FIGURE OF 216 WAS ONE
+#            LOW - recounted line by line, the pre-existing text is 217. words_heard 172 =
+#            head 106 + branch 47 + tail 19, which is both the `emptied` and the `split`
+#            playthrough; `run` hears 170. words_generated 297 = 264 + 33 Voss words doubled
+#            (.040 .220 .340 .400, no variants anywhere in this scene). The split block adds
+#            NO Voss line, so it costs nothing at all on the gender axis - 47 words of new
+#            text and 47 words of new generation.
+# reread:    .390 was first written "Everyone who got on with you is standing with you." and
+#            changed before delivery: "got on with" is also the idiom for getting along with
+#            somebody, and a TTS model has no context to disambiguate it. "came off that car"
+#            cannot be misread, and it is better besides - it points at the other car without
+#            her knowing she is doing it.
 # sela:      audibly the same person as S03, doing a different job. Same structure - a
 #            grouping, then an instruction, then who goes first - compressed into four to
 #            six words because there is a searchlight on her. She never asks a question here;
@@ -62,8 +109,21 @@ words:        216
 #            known for an hour. If the architect wants civilian names, .090 / .230 / .320 are
 #            the three drop-in points and it is a three-line edit. Reported, not invented.
 # faces:     the loss has a face and no name - "the woman in the yard coat". She is the same
-#            person in both branches: shot on the embankment under `run`, on her knees at the
-#            weighbridge under `emptied`. Same coat, two endings, and neither is clean.
+#            person in all three branches: shot on the embankment under `run`, on her knees at
+#            the weighbridge under `emptied`, and under `split` she was in the second car and
+#            NOBODY KNOWS. Same coat, three endings, and none of them is clean.
+#            THE THIRD ONE IS THE ONLY ONE NOBODY SEES. Under run and emptied a fighter points
+#            at her and Sela answers. Under split .380 is a man asking which car she got on and
+#            there is no answer in the yard, in the mission, or in the act. That is the exact
+#            payment of S04.190 - "Somebody should be able to say afterwards who got into that
+#            car" - and it pays by nobody being able to.
+#            NOT ONE LINE NAMES A FEELING ABOUT IT (ruling point 2). .350 writes her off
+#            without noticing, .390 answers a question about one person with a fact about
+#            forty-one, and .390's shot is a man going back to his place. Nobody is sad on
+#            camera and nobody says anything true about what happened.
+#            AND THE PLAYER MEETS HER AS AN ABSENCE. .230 and .320 are branch-exclusive, so
+#            this player has never had her pointed out. In this branch alone she is introduced
+#            and lost inside the same line. That is the branch, in one production fact.
 # aegis:     .020 / .140. ACT1_OVERVIEW section 2 puts AEGIS in M1.6 as a public announcement.
 #            Present tense, no self-reference, states a figure where a person would state an
 #            opinion, and it never addresses the player (AR-8). It is the yard's weather.
@@ -232,6 +292,45 @@ lines:
     voice:     voss
     condition: 'story.m16_train_choice == "emptied"'
     text:      "Wall, then the culvert. Nobody stops at the wall."
+
+  - id:        M1.6.S05.350
+    speaker:   FIGHTER_B
+    voice:     eclipse_fighter_b
+    condition: 'story.m16_train_choice == "split"'
+    text:      "First car's all at the wall. That's everybody we've got."
+    note:      "SPLIT BLOCK OPENS, ruling L1-R25. He writes off the second car in four words and does not hear himself do it. The other two branches open on a fighter reading the fight; this one opens on a fighter reading a total."
+
+  - id:        M1.6.S05.360
+    speaker:   SELA
+    voice:     sela
+    band:      callout
+    tags:      [shouting]
+    condition: 'story.m16_train_choice == "split"'
+    text:      "Count off. Front to back."
+
+  - id:        M1.6.S05.370
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_train_choice == "split"'
+    text:      "Forty-one at the drawbar. Forty-one at this wall."
+    shot:      "She goes down the line with a hand on each shoulder and comes off the end of it with the number she started with. Nobody writes anything down."
+    note:      "*** THE COUNT COMES OUT, AND THAT IS THE CRUELTY. *** She is short in run and short in emptied; here she is exact. Forty-one is the mission's own intake figure (S06.010, S06.110, M1.8.S99.080) - no new number, and L1-R14's eleven is untouched. She reckons in it because it is the only unit she has."
+
+  - id:        M1.6.S05.380
+    speaker:   FIGHTER_A
+    voice:     eclipse_fighter_a
+    condition: 'story.m16_train_choice == "split"'
+    text:      "The woman in the yard coat. Which one did she get on?"
+    shot:      "He looks back down the line for a coat that is not in it. The line keeps moving past him."
+    note:      "Her third ending, and the only one nobody sees. He does not know which car she took and neither does anybody else. This is S04.190 - 'Somebody should be able to say afterwards who got into that car' - being paid by nobody being able to."
+
+  - id:        M1.6.S05.390
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_train_choice == "split"'
+    text:      "Everyone who came off that car with you is standing with you."
+    shot:      "The fighter goes back to his place on the line and does not ask anybody else."
+    note:      "18.4 SELA: rhetorical parallelism, second person plural twice, and her tic - a question about one person handed back as a fact about the whole column. It is true, it does not answer him, and it is the habit that makes the woman disappear. She asks nothing here; S03 was two questions and this scene is none."
 
   - id:      M1.6.S05.400
     speaker: VOSS

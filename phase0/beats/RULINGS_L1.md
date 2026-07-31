@@ -561,6 +561,31 @@ De criticus vraagt terecht wat de `none`-tak telt, en de vraag is groter dan hij
 
 ---
 
+> ### ⚠ L1-R24 — NAGEMETEN OP 01-08, EN DE PREMISSE HOUDT NIET
+>
+> De ruling wijst `silence:` af met *"de branch plays, de camera was wrong"*. **De
+> shot-clausule is verplaatst en de bevinding staat er nog**, woordelijk hetzelfde:
+> `M1.8.S99` vertakt op `story.m15_pact` en handelt `full` en `limited` af van drie.
+> Gemeten met `validate_script.py --no-voice` ná de verhuizing.
+>
+> Dat is te verwachten zodra je naleest wat de check doet: hij vergelijkt `positive`
+> (`{full, limited}`) met `universe` en de uitsluiting op `.040` (`!= "none"`) dekt `none`
+> niet af. Hij kijkt naar **regels**, niet naar `shot:`. De camera was inderdaad fout en het
+> verplaatsen was juist — maar het was een ánder defect.
+>
+> **De schrijver heeft dit gezien en het veld NIET toegevoegd**, omdat hij niet stil over een
+> benoemde ruling heen wilde gaan. Dat is het goede gedrag en het is de reden dat dit hier
+> staat in plaats van dat het stilletjes opgelost is.
+>
+> **Waarom `silence:` waarschijnlijk tóch het juiste instrument is** — en dit is een
+> voorstel, geen wijziging: de ruling zegt zelf in de `emissary:`-noot dat de emissaris niet
+> in de kamer staat en dat **de afwezigheid ís de beat**. Dat is precies de vorm van een
+> verklaarde stilte: de `none`-speler krijgt 20 van de 24 regels, en de pact-tak zwijgt omdat
+> hij geen pact sloot. Een plakklare blok mét reden staat in het bestand.
+>
+> **Tot L1 dit herziet blijft de bar hier rood, en dat is de bedoeling.** Eén eerlijke rode
+> regel is goedkoper dan een agent die een ruling overschrijft omdat een tool zeurt.
+
 ### L1-R25 — `M1.6.S05` krijgt een `split`-blok, geen verklaarde stilte
 
 De scène vertakt op `story.m16_train_choice` en handelt `run` (`.200`–`.250`) en `emptied` (`.300`–`.340`) af. `split` krijgt niets. **De speler die de donkerste optie koos, krijgt in de scène die hem zijn prijs moet tonen ofwel de beats van een keuze die hij niet maakte, ofwel stilte.** Dat is de vorm van L1-R12, op de tak die het minst aantal spelers heeft en het meest te verliezen.

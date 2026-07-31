@@ -14,7 +14,7 @@ turn:         "Somebody uses a name that was not a name an hour ago, it goes aro
 
 # ---- state ----
 status:          draft
-critic:          "NO-GO: .010 zet de Iron Chorus onvoorwaardelijk in de kamer en telt onvoorwaardelijk drie cellen, terwijl de regels op pact gated zijn"
+critic:          null
 words:           224
 words_heard:     182
 words_generated: 252
@@ -65,6 +65,13 @@ words_generated: 252
 # free, and the cinematic pass then reads it exactly where it is true. No second spoken line,
 # no condition on .010, no variant. NOT a `silence:` - the branch does play; the camera was
 # wrong, and dressing a camera problem as a declared silence is the stale-silence failure.
+#
+# *** APPLIED 01-08 BY dialogue-writer. *** The clause is out of .010 and into .040's new
+# shot. Zero credits: no text: field in this file changed, so words / words_heard /
+# words_generated are unmoved at 224 / 182 / 252 and nothing needs regenerating. A side
+# effect worth having: .010's shot now finds exactly the three groups .010's line counts.
+# The `none` branch is written up in full in the L2 `emissary:` note below, including one
+# escalation the ruling could not see because the validator was not run when it was written.
 #
 # NO CONFLICT with M1.5.S99.030's idealist variant ("Two cells..."): at that moment the forty
 # and the freed do not exist yet. Checked.
@@ -119,6 +126,56 @@ words_generated: 252
 #            he does not use them. So he votes with a count. Full pact and limited pact
 #            differ in one word - up or down - which is exactly the distinction M1.5's writer
 #            asked M1.8.S99 to preserve, and it costs thirteen words to honour.
+#
+#            *** AND `none`, WHICH THIS NOTE USED TO SKIP. Added 01-08. ***
+#            The note above described full and limited to the word and said nothing at all
+#            about the third leaf - which made the only branch without an explanation look
+#            like the only branch nobody had thought about. It was thought about; it was just
+#            never written down, and an undocumented branch is indistinguishable from a
+#            forgotten one.
+#            IN `none` THE EMISSARY IS NOT IN THE ROOM. No line, no shot, no reaction - Voss
+#            said "We're not in. They can have the water and the street." in M1.5.S99, and a
+#            cell that took the water and the street does not come down to Hollow Point to
+#            watch somebody else be named. His three lines are gated on the pact and all three
+#            correctly go quiet together.
+#            THAT PLAYER LOSES NOTHING FROM THE SCENE'S SPINE. .010's three cells are Ember,
+#            the forty and the freed - unconditional, ruling L1-R24 - so the count is true
+#            with him and true without him. He never voted for the name in any branch; .180 /
+#            .190 are him refusing to, in a number. What the `none` player gets instead is a
+#            room with nobody standing by the ramp, and that is the branch's whole statement:
+#            he declined an ally in M1.5 and the ally is not at the end of act 1. The absence
+#            IS the beat, and it needs no line to carry it.
+#            NO REPLACEMENT LINE, and this is deliberate rather than cheap. Giving `none` a
+#            substitute speaker would sand the difference between the three pact branches flat
+#            at the exact moment act 2 has to tell them apart (L1-R13). Silence here costs the
+#            player nothing and buys act 2 its evidence.
+#
+#            *** ESCALATION TO L1 - THE VALIDATOR WILL STILL REPORT THIS SCENE. ***
+#            I could not run validate_script.py (no shell), so I read it instead. Its per-scene
+#            branch check is `if len(positive) >= 2 and echt_gemist` at line 990. For
+#            story.m15_pact in this file positive = {full, limited} (.180 / .190), excluded =
+#            {none} (.040), universe = {full, limited, none}, so `none` lands in `gemist` and
+#            BRANCH fires. THE SHOT MOVE DOES NOT CLEAR IT, and it was never going to - the
+#            finding is about the flag's branch content, not about the camera.
+#            L1-R24 rejects `silence:` here, and its stated reason is that "the branch does
+#            play; only the camera was wrong". That answers a different question than the one
+#            the tool asks. The tool is not asking whether the SCENE plays in `none` - it does,
+#            in full, and that is not in doubt. It is asking whether the FLAG contributes
+#            anything spoken in `none`, and the honest answer is no, on purpose, for the
+#            reasons written above. That is exactly the "nothing belongs here" case the field
+#            was added for (SCRIPT_FORMAT section 4, 01-08).
+#            I HAVE NOT ADDED IT, because a writer quietly overriding a named ruling is worse
+#            than a red bar. If L1 rules for it, it is one paste into the header and it passes
+#            the field's four checks (reason over 40 chars, branch really is silent, value
+#            exists, this scene reads the flag):
+#
+#              silence:
+#                none: "The emissary is not in Hollow Point at all in this branch - Voss
+#                       declined the pact and the Chorus kept the water and the street. The
+#                       scene's three cells are Ember, the forty and the freed and are
+#                       unconditional (L1-R24), so nothing is withheld from this player: he
+#                       gets the same count and an empty ramp, which is what refusing an ally
+#                       looks like at the end of act 1."
 # petra:     NO LINES. Ruling L1-R10, one shot note at .160. She is the only person in the
 #            room who does not join the naming, and it is not disapproval - she does not use
 #            names, and the only name she ever had for him is the one the game cannot voice.
@@ -140,7 +197,8 @@ lines:
     speaker: SELA
     voice:   sela
     text:    "This vault was cut for a pump crew and there are three cells standing in it. Somebody say what happens in the morning."
-    shot:    "Hollow Point, full to the walls. Ember, the freed, the ones off the train, and a knot of Iron Chorus by the ramp who have not sat down. Somebody's kettle going in the middle of it."
+    shot:    "Hollow Point, full to the walls. Ember, the freed, and the ones off the train. Somebody's kettle going in the middle of it."
+    note:    "CHORUS CLAUSE MOVED OUT 01-08 (ruling L1-R24). The three groups the camera finds are now exactly the three cells the line counts, in every branch. Not one word of text changed."
 
   - id:      M1.8.S99.020
     speaker: FIGHTER_A
@@ -157,7 +215,8 @@ lines:
     voice:     iron_chorus_emissary
     condition: 'story.m15_pact != "none"'
     text:      "Three cells and one door out. The Chorus sleeps somewhere else."
-    note:      "18.4: counts where anyone else would reach for an adjective, and his objection is arithmetic about an exit."
+    shot:      "A knot of Iron Chorus by the ramp who have not sat down. He says it from where he is standing and does not come further in."
+    note:      "18.4: counts where anyone else would reach for an adjective, and his objection is arithmetic about an exit. THE CHORUS CLAUSE LIVES HERE NOW (L1-R24, 01-08): it arrived from .010's shot, which put them in the room unconditionally - and in the `none` branch Voss said 'We're not in. They can have the water and the street.' This line already carries the pact condition, so the camera now finds them exactly where they are true. `shot:` is never voiced: nil credits, no second spoken line, no condition on .010, no variant."
 
   - id:      M1.8.S99.050
     speaker: REYES
