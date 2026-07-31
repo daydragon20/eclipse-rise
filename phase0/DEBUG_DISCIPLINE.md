@@ -326,10 +326,50 @@ dat een wijziging de crash wegneemt, heb je grofweg **26 achtereenvolgende schon
 nodig (0,89²⁶ ≈ 0,05). Een test die niet kan onderscheiden tussen "gerepareerd" en "geluk
 gehad", is geen test.
 
-**De goedkopere weg is er, en hij ligt al op schijf:** de Aftermath-dump
-(`Saved/Logs/D3D12.*.nv-gpudmp`) noemt de falende pass. Dat is één observatie tegenover
-tientallen runs statistiek. Volgende stap is dus die dump uitlezen, niet de crash
-wegtesten.
+#### DE PASS IS GEVONDEN — en het is niet Lumen
+
+**De GPU-breadcrumbs stonden al in hetzelfde log**, twintig regels onder de crashmelding.
+Ze noemen precies wat er liep toen de kaart viel:
+
+```
+Frame 1257 / SceneRender / RenderGraphExecute / Scene
+    HZB                          [ Finished ]
+    ComputeLightGrid             [ Finished ]
+    LightFunctionAtlasGeneration [ Finished ]
+    SkyAtmosphereLUTs            [ ACTIEF ]
+        SkyAtmosphere::DistantSkyLightLut  [ ACTIEF ]
+        SkyAtmosphere::SkyViewLut          [ ACTIEF ]
+        SkyAtmosphere::CameraVolumeLut     [ ACTIEF ]
+    BasePass                     [ ACTIEF ]
+        ParallelDraw (0 van 3)   [ ACTIEF ]
+        ParallelDraw (1 van 3)   [ Niet gestart ]
+    ... alles hierna               [ Niet gestart ]
+```
+
+**Dat wijst één ding aan.** De SkyAtmosphere-LUT's zijn **compute**-passes, en de
+Aftermath-dump meldde exact **twee actieve compute-shaders**. `BasePass/ParallelDraw` is
+graphics, geen compute. De enige actieve compute in de hele boom is SkyAtmosphere.
+
+**En het weerlegt de Lumen-hypothese — inclusief mijn eigen.** Kijk naar wat er *niet*
+gelopen heeft:
+
+| Verdachte | Breadcrumb-status |
+|---|---|
+| Lumen GI / reflecties | `DiffuseIndirectAndAO`, `RenderDeferredLighting` — **Niet gestart** |
+| TSR | `TemporalSuperResolution` — **Niet gestart** |
+| Screen-space reflecties | `ScreenSpaceReflections(Quality=2)` — **Niet gestart** |
+| Nanite | bestaat niet in dit project |
+
+De GPU is die frame **nooit bij Lumen aangekomen**. Lumen uitzetten had de crash dus niet
+weggenomen — en was de proefrun toevallig schoon geweest (89% kans, zie hierboven), dan had
+Lumen ten onrechte de schuld gekregen én de eer van de "fix". Dat is precies de val die
+deze twee metingen samen dichttimmeren.
+
+**Stand van de diagnose:** een page fault bij het lezen, in een SkyAtmosphere-LUT
+compute-pass, gelijktijdig met de eerste BasePass-ParallelDraw. Volgende stap is dáár
+halveren — `r.SkyAtmosphere 0` als eerste falsificatie, met de kanttekening dat de
+grilligheid (1 op 9) ook die test veel runs kost, tenzij er eerst een deterministische
+reproductie komt.
 
 **Waarom dit hier staat:** dit is §2 en §5 in één geval. De diagnose klonk sluitend, noemde
 een echt getal (Delay: 2) en wees een echte zwaarte aan (Lumen op SM5) — en was toch fout,
