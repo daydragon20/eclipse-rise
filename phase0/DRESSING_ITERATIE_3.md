@@ -153,6 +153,47 @@ een ander object.
 > niet gevonden heb. **Wie dit oppakt: zoek eerst die meting.** Is er geen, dan is
 > `(0.135, 0.140, 0.155)` de waarde die het document zelf voorschrijft.
 
+## 1h. De hele palettabel geteld — en het beeld is anders dan §1g suggereert (01-08)
+
+*Eén doorschieter gevonden betekent: de klas controleren. Alle 18 palet-entries uit
+`EclipseGrayboxBuilder.cpp` nagerekend tegen de vloer (0,1205) en de pool-kern (0,1820).*
+
+**Het is GEEN systematische doorschieter.** Vier entries zitten onder 0,6× de vloer, en
+drie daarvan horen dat te zijn:
+
+| onder de vloer | × vloer | hoort dat? |
+|---|---|---|
+| `Outland` | 0,36× | **ja** — achtergrondterrein, donker geeft diepte |
+| `Skyline` | 0,38× | **ja** — silhouetten in de verte |
+| **`Prop_Barrier`** | **0,40×** | **nee** — de enige VOORGROND-prop die onder zijn eigen ondergrond duikt (§1g) |
+| `DecoStain` | 0,54× | **ja** — een vlek is donkerder dan waar hij op ligt |
+
+**Maar de tegenovergestelde kant is veel groter, en dat is de echte bevinding.** De
+plafondregel van stap 7 luidt *"niets dat geen lichtbron is mag boven de pool-kernwaarde
+uitkomen"*. Negen entries staan erboven:
+
+| | lum | × pool-kern |
+|---|---|---|
+| `Cover` | 0,4418 | **2,43×** |
+| `BldgB` | 0,4155 | **2,28×** |
+| `DecoLine` | 0,3429 | 1,88× |
+| `DecoPlaza` / `LitColor` | 0,3234 | 1,78× |
+| `CoverB` | 0,3179 | 1,75× |
+| `Prop_Crate` | 0,2490 | 1,37× |
+| `BldgA` | 0,2396 | 1,32× |
+| `KitRow` | 0,1928 | 1,06× |
+
+**Zo gelezen is stap 7 niet doorgeschoten maar NAUWELIJKS BEGONNEN.** Hij is op één entry
+toegepast — de barrière — en daar 2,9× te ver; de andere negen zijn onaangeroerd. `Wall_`
+is de uitzondering die het bevestigt: die stond volgens §1e op 4,1–4,8× de vloer en staat
+nu op 1,49×, dus die correctie is wél netjes geland.
+
+> **Wat ik hier NIET van maak.** Ik weet niet welke van deze negen de regel bedoeld was te
+> dekken. `LitColor` en `ShadeColor` klinken als palet-primitieven en niet als objecten, en
+> `Cover`/`CoverB` zijn dekking — misschien mag dekking juist opvallen. **De lijst is een
+> meting, geen aanklacht.** Wie stap 7 afmaakt moet eerst per entry zeggen of de regel voor
+> hem geldt; dat staat nergens.
+
 ## 1f. De vault is op dezelfde as GEBOUWD, en hij staat er slechter voor (01-08)
 
 *Gemeten op de vier vault-frames van vannacht met een luminantie-histogram (Rec.709,
