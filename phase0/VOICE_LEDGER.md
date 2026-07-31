@@ -4,29 +4,23 @@
 
 ---
 
-> ## ⚠️ HERKOMST VAN DIT GETAL IS NIET TE HERLEIDEN — vóór er iets op gepland wordt
+> ## ✅ BRON GEVONDEN — 31-07, en de vraag is dicht
 >
-> Dit bestand stond op **310.000** en is op 31-07 gewijzigd naar **131.000**, een verschil
-> van 179.000 credits. Die wijziging is **niet gecommit** en er staat **geen bron** voor in
-> `phase0/OWNER_ANSWERS.md` — de tekst hieronder noemt het een owner-mededeling, maar het
-> antwoord zelf is nergens vastgelegd.
+> Hier stond een waarschuwing dat dit getal geen herleidbare bron had. **Die bron is er
+> wel**, verbatim van de owner: *"het waren geen 310000 credits maar 131000, fout
+> onthouden."* Vastgelegd in commit `ebc764e`, waar ook alle tiers opnieuw gesneden zijn —
+> niet omgenummerd, want een vlakke zoek-vervang liet de tiers optellen tot 310k.
 >
-> **Het kan gewoon waar zijn.** Precies hetzelfde gebeurde vanavond met O-2: een agent legde
-> een owner-bevestiging vast waarvan ik de bron niet kon aanwijzen, ik draaide hem terug, en
-> hij bleek wél echt — het antwoord was in een chatvenster gevallen dat de repo niet ziet.
-> Ik draai dit dus **niet** terug op grond van "ik zie de bron niet".
+> **Waarom dit hier blijft staan in plaats van weggepoetst te worden:** ik heb dit getal
+> bijna teruggedraaid omdat ik de bron niet kon vinden. Eerder op dezelfde avond deed ik dat
+> wél met O-2 — en dat bleek fout, want dat antwoord was in een chatvenster gevallen dat de
+> repo niet ziet. **De les is niet "vertrouw agents" en ook niet "wantrouw ze", maar: een
+> getal dat het plan stuurt hoort zijn bron in de repo te dragen, niet in een gesprek.**
+> Daarom staat het citaat nu in het commitbericht én hier.
 >
-> **Maar er wordt ook niets op gepland tot het bevestigd is.** 310.000 en 131.000 geven
-> verschillende antwoorden op welke tiers er nog in passen, en de hele ladder in
-> `19_voice_production.md` §19.2 hangt eraan. Een tierverdeling op een onbevestigd getal is
-> erger dan geen verdeling, want hij leest als een plan.
->
-> **Het saldo is op dit moment niet te méten** — dat vraagt de `user_read`-scope, en die
-> staat nog uit (owner-actie T-12). Zodra die er is meet ik het echte getal en vervangt die
-> meting deze regel.
->
-> **Regel die hieruit volgt, en die breder geldt dan dit bestand:** een getal dat het plan
-> stuurt, draagt zijn bron. Staat er geen bron, dan staat er een waarschuwing — geen stilte.
+> Gevolg van de correctie, eerlijk: **~17% van de gesproken tekst past deze maand, niet 40%.**
+> De Act-1-hub- en companiongesprekken (was 33.000) zijn eraf gevallen — dat zijn de stemmen
+> die je *tussen* de missies hoort in Hollow Point.
 
 **Budget:** 131.000 credits · **vervalt 21 augustus 2026, rolt niet door**
 **Werkdeadline generatie:** 19 augustus (twee dagen buffer)
