@@ -1276,6 +1276,16 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/", "/index.html", "/START_HIER.html", "/PROGRESS.html"):
             return self._serve_file(REPO / "DASHBOARD.html", "text/html; charset=utf-8")
 
+        # De losse castingpagina is vervangen door het tabblad Casting: daar
+        # kan hij ook KIEZEN, en twee implementaties lopen gegarandeerd uit
+        # elkaar. Oude link blijft werken, hij komt alleen op de goede plek uit.
+        if path.lower().endswith("/casting.html"):
+            self.send_response(302)
+            self.send_header("Location", "/#casting")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+
         if path == "/api/state":
             with _state_lock:
                 return self._json(_state)

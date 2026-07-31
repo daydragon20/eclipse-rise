@@ -902,6 +902,15 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.getElementById("v-"+cur).classList.add("on");render();
 });
 
+/* ---------- diep linken: /#casting opent meteen dat tabblad ---------- */
+function openVanuitHash(){
+  const h=(location.hash||"").replace("#","").trim();
+  if(!h||!VIEWS[h])return;
+  const knop=document.querySelector(`nav button[data-v="${h}"]`);
+  if(knop)knop.click();
+}
+window.addEventListener("hashchange",openVanuitHash);
+
 /* ---------- live poll ---------- */
 async function poll(){
   try{
@@ -914,7 +923,8 @@ async function poll(){
     ? "live · "+new Date().toLocaleTimeString("nl")
     : "GEEN VERBINDING — start START_DASHBOARD.bat";
 }
-poll();setInterval(poll,5000);
+poll().then(openVanuitHash);
+setInterval(poll,5000);
 setInterval(()=>{const l=Date.now()-lastOk<12000;document.getElementById("dot").className="dot"+(l?" live":"")},2000);
 </script>
 </body>
