@@ -177,3 +177,15 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 22:11 | `381aa35` | **ROOD** | 226 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit [beeld: 6 beeld(en) VERANDERD -> stap 1, stap 2, stap 4, stap 5, stap 6, stap 7] |
 | 2026-07-31 22:20 | `9928a7d` | **ROOD** | 226 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit |
 | 2026-07-31 22:49 | `bdad112` | **ROOD** | 228 tests / 4 gefaald / 0 niet gedraaid | 0 | Eclipse.Base.VaultBuildDeterminism; Eclipse.Base.VaultRoomsAreTellable; Eclipse.Base.VaultStateParity; Eclipse.Base.VaultWalkingRound; scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 04:55 | `9a3425b` | **ROOD** | build NIET GEDRAAID (slot bezet) | 0 | scriptstem komt nergens op uit + scriptvalidatie meldt bevindingen |
+
+> **De regel van 01-08 04:55 is bewust onvolledig, en dat staat er dus bij.** De build
+> en de suite zijn **niet gedraaid**: het build-slot was bezet door in-flight vault-werk
+> in `Base/EclipseVaultBuilder.cpp`, en een build daaroverheen meet de halve wijziging
+> van iemand anders. Wat wél gedraaid is: event-catalogus groen, creditmeter groen,
+> owner-kaarten groen, **stemresolutie rood** (`eclipse_fighter_c/_d` onbezet — owner-actie
+> O-3) en **scriptvalidatie rood** (13 bevindingen, alle schrijvers- of architect-besluiten).
+>
+> *Niet gedraaid is niet hetzelfde als groen*, en daarom staat er ROOD en geen streepje.
+> Deze regel telt **niet** mee voor de "drie nachten achtereen" van backlog #12 — die eist
+> een volledige bar, en een nacht met een niet-gedraaide build is geen nacht.
