@@ -23,7 +23,7 @@ gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · Ev
 >    op Display gelogd en overgeslagen. **Owner-actie (O-3), bewust géén fallback** —
 >    terugvallen op stem A maakt de bar groen terwijl die acht regels nog steeds geen
 >    gekozen stem hebben.
-> 2. **`validate_script.py`** (nieuw, 01-08) — 31 bevindingen, waarvan twee de hele
+> 2. **`validate_script.py`** (nieuw, 01-08) — **13** bevindingen, waarvan twee de hele
 >    tool waard zijn: `M1.1.S99` vertakt op drie uitkomsten en handelt er **twee** af
 >    (`left` ontbreekt), `M1.6.S05` mist `split`. Plus vijf condities die door niemand
 >    gezet worden. Die bevindingen bestonden allemaal al; er kon alleen niets naar
@@ -38,15 +38,19 @@ nul kosten leest als gratis. `Tools/count_generation_cost.py` maakt de telling
 herhaalbaar en **drukt altijd zijn eigen dekking af**. Saldo 125.612 — act 1 alleen is
 dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 
-> **Spoor A staat verder dan spoor B.** Act 1 is **geschreven**: 40 scènes, ~9.400 woorden,
-> M1.1 t/m M1.6 plus de proloog. De critic-poort is voor 13 van de 20 beoordeelde scènes
-> door; de rest wacht op kleine reparaties (conditienamen, één woord, zes bandvelden — geen
-> scène hoeft herschreven). M1.7 en M1.8 wachten bewust op M1.5/M1.6-GO, want ze betalen
-> plant-ketens uit die daar gelegd zijn.
+> **Spoor A staat verder dan spoor B.** **Act 1 is geschreven op de hub na**: acht missies
+> plus de proloog, **1.471 regels**, `Eclipse/Content/Script/act1/`. Alleen de **12
+> hub-gesprekken** zijn nog stubs; twee schrijvers zijn ermee bezig.
 >
-> **Generatie is technisch open** (Nathan zette de scopes aan) maar staat stil op **O-12**:
-> er zijn 2.475 credits op het verkéérde model gegaan en de vraag is of die 51 clips
-> opnieuw moeten. Saldo **gemeten** op 125.612 — de ledger klopt tot op de credit.
+> **De critic-poort is de rem, en dat hoort zo.** M1.1, M1.7 en M1.8 staan alle drie op
+> `critic: null` en er loopt een ronde op alle drie. **M1.1 is de ijkmissie** en blokkeert
+> alle generatie — hij ging terug naar draft doordat vijf van zijn zeven scènes vannacht
+> gerepareerd zijn. Geen regel gaat naar de generator zonder GO.
+>
+> **Act 1 kost ~100.000 credits van de 125.612 die er nog is** — zie de barnoot hierboven.
+> Generatie staat verder stil op **O-12** (2.475 credits op het verkeerde model; opnieuw of
+> niet). Meet met `python Eclipse/Tools/count_generation_cost.py`; die telt `text:` plus elke
+> variant, verdubbelt Voss, en drukt **altijd zijn eigen dekking af**.
 
 Spoor-B-prioriteit 1 is de **schermlaag**. Nathan speelt pas als die op niveau is.
 
@@ -68,9 +72,10 @@ alleen in normaal spel. Daarmee is de blokkade uit §1b weg.
 | **A — Schrijven & stem** | Hele campagne uitschrijven; Act 1 ingesproken vóór de credits vervallen (**21-08**, werkdeadline **19-08**) | `phase0/SCRIPT_PRODUCTION_PLAN.md` |
 | **B — Systemen & feel** | HUD eerst, dan de open dossiers, dan de backlog | `phase0/EXECUTION_PLAN.md` §2 |
 
-Spoor A raakt de build niet aan en loopt dus altijd door. Act 1 heeft beats: 9
-beat-sheets + 71 scène-stubs in `phase0/beats/` en `Eclipse/Content/Script/act1/`.
-Casting fase 1 klaar: **104 kandidaten, 0 credits**.
+Spoor A raakt de build niet aan en loopt dus altijd door — dat is de reden dat hij
+vooruit is gekomen terwijl het build-slot bezet was. De 71 scène-stubs uit
+`phase0/beats/` zijn **geschreven**, op de 12 hub-gesprekken na. Casting fase 1 klaar:
+**104 kandidaten over 19 rollen, 0 credits** — Petra ontbrak daar en wordt nu toegevoegd.
 
 ## Open dossiers — alle drie met een gemeten stand
 
@@ -109,10 +114,21 @@ alle drie zijn eerder de verkeerde kant op gestuurd door een plausibele redeneri
    **open editor** tijdens een ronde — en die kost het build-slot, dus dat is een
    owner-afweging, geen agent-besluit.
 
-**Twee dingen die alleen een frame liet zien:** er staat een **STOP-verkeersbord** in het
-district (`EclipseGrayboxBuilder.cpp:1432`) terwijl `20_world_dressing_standard.md` §20.2
-dat verbiedt — doc geschreven, code nooit aangepast. En de squad-lijst toont `45434C53`
-in plaats van namen: de ASCII-kop "ECLS" van de GUID uit `EclipseRosterLogic.cpp:15`.
+**Twee dingen die alleen een frame liet zien — allebei GEREPAREERD, hier bewaard omdat de
+manier waarop ze binnenkwamen niet gerepareerd is.** Het STOP-verkeersbord, de
+ISO-361-stralingstrefoil en het doodshoofd-boven-TOXIC zijn weg uit
+`EclipseGrayboxBuilder.cpp` (`4102aa0`); wat er staat zijn nu commentaren die uitleggen wat
+er wás. De squadlijst toont geen `45434C53` meer — die GUID (`Strategy/EclipseRosterLogic.cpp`)
+is nog steeds de deterministische id en hoort dat te blijven, hij werd alleen als naam
+getoond.
+
+> **Waarom ze hier blijven staan.** Alle drie de borden kwamen door drie curatie-ingangen
+> heen die alleen op **techniek** en **toon** oordeelden — een foto van een aards bord haalt
+> een toonfilter moeiteloos. Daarom staat er sinds 31-07 een **criterium 0 (PAST DE FICTIE?)**
+> vóór de vijf technische criteria in `phase0/CURATIE_ENVPACKS_2026-07-25.md`, met twee
+> afgeleide regels: *beoordeel het asset, niet zijn naam* (juist de drie die onschuldig
+> héétten — `labor`, `route`, `reactor` — waren letterlijke verkeersborden) en *een pack faalt
+> per FAMILIE, niet per asset*.
 
 ## Fouten uit screenshots halen — autonoom
 
