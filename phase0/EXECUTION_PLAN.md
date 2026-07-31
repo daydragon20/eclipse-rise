@@ -81,15 +81,36 @@ de schermlaag; dit is het vertrekpunt zodat de bouwer met feiten begint.*
 | Minimap | **nee** | Bestaat niet. |
 | Objective-marker | **deels** | Objectives staan als tekstregels, niet als richtingaanwijzer in de wereld. |
 
-**DE BELANGRIJKSTE BEVINDING, en die bepaalt de eerste bouwstap:** alles behalve het
-richtkruis zit achter `IsDebugHudAllowed()`. In de opnameronde is de widget bewust
-inert — "no rows, no subscriptions, no console command" — met het kruis als enige
-uitzondering. Dat is verdedigbaar voor reviewbeelden, maar het betekent ook dat de
-schermlaag die de owner wil zien **per constructie niet op een opname staat**, en dus
-niet door het harnas te controleren is.
-
-Wie hier begint, begint dus met die poort: een echte HUD-laag hoort zichtbaar te zijn
-in het spel én meetbaar in de ronde, en die twee sluiten elkaar nu uit.
+> ## ⚠️ DE HOOFDCONCLUSIE HIERONDER WAS FOUT — weerlegd 31-07, en dat is winst
+>
+> Hier stond: *"alles behalve het richtkruis zit achter `IsDebugHudAllowed()`, dus de
+> schermlaag staat per constructie niet op een opname."* Daar is de hele eerste bouwstap
+> op gebaseerd. **Het klopt niet, op twee niveaus, en allebei zijn gemeten.**
+>
+> **1. De poort stond helemaal niet dicht.** `FParse::Param` eist een woordgrens, dus
+> `-EclipseShotPlay` — de vlag die de opnameronde gebruikt — matcht `EclipseShot` **niet**.
+> `IsDebugHudAllowed()` gaf in de ronde gewoon `true`. De poort was nooit de blokkade.
+>
+> **2. De widgets werden nooit één keer getekend.** Gemeten in de engine-bron
+> (`UserWidget.cpp:1190`): `UUserWidget::RebuildWidget()` bouwt de Slate-boom uit
+> `WidgetTree->RootWidget` en draait **vóór** `NativeConstruct`. Alle drie de
+> Eclipse-widgets zetten hun wortel *in* `NativeConstruct` — altijd één stap te laat, dus
+> de Slate-kant bleef een lege `SSpacer`. De missie-HUD, de basis-hub én de strategiekaart
+> zijn dus **nooit getekend**.
+>
+> Dat verklaart in één klap drie klachten die los van elkaar leken: "ik kan niet zien waar
+> ik richt", "F3 doet niets", en "de HUD is niet te fotograferen".
+>
+> **Waarom niemand het zag, en dat is de les.** Het log meldde
+> `zichtbaarheid=3 tekst='AR_Foundry 19 / 30' inViewport=1` terwijl er niets op het frame
+> stond. `IsInViewport()` en `GetVisibility()` lezen de **UMG-administratie**, niet het
+> scherm. Het instrument beantwoordde een andere vraag dan werd gesteld — en gaf daarbij
+> het geruststellende antwoord. De tabel hierboven blijft dus geldig als inventaris van
+> *wat er geconstrueerd wordt*, maar niet als antwoord op *wat je ziet*.
+>
+> Gerepareerd via `NativeOnInitialized` in alle drie de widgets. De poort op de
+> montageplek (`EnterMissionMode` sloeg de hele widget over) is eruit: die hoort ín de
+> widget, waar het verschil tussen een richtkruis en een debugregel bekend is.
 
 ## 1c. NULMETING VAN DE ANDERE TWEE HOOGTES — base en map
 
