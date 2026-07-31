@@ -419,6 +419,7 @@ def parse_scene_file(path: Path) -> tuple[Node, list[Node]]:
     header = Node()
     items: list[Node] = []
     seq_key: str | None = None
+    map_key: str | None = None
     cur: Node | None = None
     nested: Node | None = None
     nested_indent = -1
@@ -439,13 +440,33 @@ def parse_scene_file(path: Path) -> tuple[Node, list[Node]]:
             cur = nested = None
             nested_indent = -1
             if val is None:
+                # Bewust een KLEINE lijst. De kop kende alleen sequenties
+                # (`lines:`), en een blok `key: value` eronder viel om met
+                # "field before any `- ` item". `silence:` heeft een mapping
+                # nodig; alles wat NIET in HEADER_MAPS staat gedraagt zich
+                # exact zoals eerst, zodat lines/variants niets merken.
+                if key in HEADER_MAPS:
+                    seq_key = None
+                    map_key = key
+                    header.data.setdefault(key, {"__line__": n})
+                    header.where[key] = n
+                    continue
                 seq_key = key            # `lines:` / `variants:` block sequence
+                map_key = None
                 header.data.setdefault(key, [])
                 header.where[key] = n
             else:
                 seq_key = None
+                map_key = None
                 header.data[key] = _scalar(val)
                 header.where[key] = n
+            continue
+
+        if map_key is not None:
+            m = SCALAR_KEY.match(body)
+            if not m or m.group("val") is None:
+                raise ParseError(f"{path}:{n}: `{map_key}:` verwacht `waarde: reden`: {body!r}")
+            header.data[map_key][m.group("key")] = _scalar(m.group("val"))
             continue
 
         if seq_key is None:
@@ -515,6 +536,7 @@ CHECKS = {
     "TRIGGER": "Bark trigger not in Docs/EventCatalog.md",
     "LOCATION": "location not in the act's location registry (section 7, finding C-1)",
     "GUARD": "status: generated on a scene whose critic is not GO -- the money-saver",
+    "SILENCE": "A declared silent branch that is empty, stale, or unknown (L1 must state WHY)",
 }
 
 
@@ -528,9 +550,13 @@ class Finding:
         return f"  {self.where:<52} {self.message}"
 
 
+# Kopvelden die een MAPPING zijn in plaats van een sequentie. Klein houden:
+# elke naam hier verandert hoe de parser een blok leest.
+HEADER_MAPS = ("silence",)
+
 SCENE_REQUIRED = ("scene", "mission", "title", "act", "location", "type",
                   "credit_tier", "want", "obstacle", "turn", "status", "critic", "lines")
-SCENE_OPTIONAL = ("words", "words_heard", "words_generated")
+SCENE_OPTIONAL = ("words", "words_heard", "words_generated", "silence")
 BARK_REQUIRED = ("bark_set", "trigger", "faction", "type", "credit_tier",
                  "status", "critic", "variants")
 BARK_OPTIONAL = ("words", "words_heard", "words_generated")
@@ -571,6 +597,9 @@ class Validator:
         self.stubs = 0
         self.barks = 0
         self.lines = 0
+        # scene -> {vlagwaarde: reden}. Een BEWUST stille tak, opgeschreven.
+        self.silences: dict[str, dict] = {}
+        self.silence_used: set = set()
 
     def add(self, code: str, where: str, msg: str) -> None:
         self.findings.append(Finding(code, where, msg))
@@ -624,6 +653,37 @@ class Validator:
             self.add("LOCATION", f"{rel}:{header.line('location')}",
                      f"`{loc}` is not in the act-1 location registry "
                      f"(ACT1_OVERVIEW section 7)")
+
+        # ---- `silence:` -- een tak die BEWUST leeg is -----------------------
+        # Zonder dit veld is er geen verschil tussen "vergeten" en "hier hoort
+        # niets te staan", en dan blijft BRANCH voor altijd rood op een scene
+        # die de criticus expliciet heeft goedgekeurd. Een bar die altijd rood
+        # staat verbergt evenveel als een test die nooit rood wordt.
+        #
+        # De prijs is met opzet een ZIN: je mag een tak stil laten, maar je moet
+        # opschrijven waarom, en dat staat dan in het bestand in plaats van in
+        # een chatvenster. Een stilte zonder reden is nog steeds een bevinding.
+        sil = header.get("silence")
+        if sil is not None:
+            if not isinstance(sil, dict) or not sil:
+                self.add("SCHEMA", f"{rel}:{header.line('silence')}",
+                         "`silence:` moet een blok van waarde -> reden zijn, en niet leeg")
+            else:
+                clean = {}
+                for val, reason in sil.items():
+                    if val == "__line__":
+                        continue
+                    txt = str(reason or "").strip()
+                    if len(txt) < 40:
+                        self.add("SILENCE", f"{rel}:{header.line('silence')}",
+                                 f"`silence: {val}` heeft geen reden van betekenis "
+                                 f"({len(txt)} tekens). Een stilte die je niet kunt "
+                                 "uitleggen is een vergissing die zich voordoet als "
+                                 "een keuze -- schrijf op waarom die speler niets hoort.")
+                    else:
+                        clean[str(val)] = txt
+                if clean:
+                    self.silences[rel] = clean
 
         if header.get("status") == "generated":
             critic = str(header.get("critic") or "")
@@ -885,7 +945,16 @@ class Validator:
         # tool had just accused. A check you have not tried to disprove is a
         # rumour.
         covered_somewhere = read_eq | {v for v in universe if any(v != w for w in read_ne)}
-        for v in sorted(set_vals - covered_somewhere - {"true", "false"}):
+        # Een BEWUST stille tak telt hier ook, maar alleen als hij gedeclareerd
+        # is in een scene die deze vlag daadwerkelijk LEEST. Anders zou een
+        # stilte in het ene verhaal een gat in het andere afdekken.
+        stil_hier = set()
+        for sc in f.scene_reads:
+            for val in self.silences.get(sc, {}):
+                stil_hier.add(val)
+                if val in set_vals - covered_somewhere:
+                    self.silence_used.add((sc, name, val))
+        for v in sorted(set_vals - covered_somewhere - stil_hier - {"true", "false"}):
             self.add("BRANCH", f.setters[0][0],
                      f"`{name}` can be set to \"{v}\" and not one line anywhere in the "
                      "corpus plays for it. The branch is reachable and empty.")
@@ -901,13 +970,32 @@ class Validator:
             positive = {v for v in vals if not isinstance(v, tuple)}
             excluded = {v for kind, v in (x for x in vals if isinstance(x, tuple))}
             covered = positive | (universe - excluded if excluded else set())
-            if len(positive) >= 2 and covered < universe:
+            gemist = universe - covered
+            verklaard = self.silences.get(scene, {})
+
+            # Een stilte die je declareert voor een tak die WEL bespeeld wordt,
+            # is verouderd -- en dat is gevaarlijker dan geen stilte, want hij
+            # dekt straks een echte omissie af.
+            for val in sorted(set(verklaard) & covered):
+                self.add("SILENCE", scene,
+                         f"`silence: {val}` staat in de kop maar die tak WORDT bespeeld "
+                         f"in deze scene. Een verouderde stilte dekt de volgende echte "
+                         "omissie af; haal hem weg.")
+            for val in sorted(set(verklaard) - universe):
+                self.add("SILENCE", scene,
+                         f"`silence: {val}` staat in de kop maar `{name}` kent die waarde "
+                         f"niet. Bekend: {sorted(universe)}.")
+
+            echt_gemist = gemist - set(verklaard)
+            if len(positive) >= 2 and echt_gemist:
                 where = next(r[0] for r in f.readers if r[0].startswith(scene))
                 self.add("BRANCH", where,
                          f"this scene branches on `{name}` and handles "
                          f"{sorted(positive)} of {sorted(universe)} -- the player who took "
-                         f"{sorted(universe - covered)} gets the beat of a choice he did not "
+                         f"{sorted(echt_gemist)} gets the beat of a choice he did not "
                          "make, or none at all. Unfixable after generation.")
+            for val in sorted(gemist & set(verklaard)):
+                self.silence_used.add((scene, name, val))
 
     def check_groups(self) -> None:
         groups: dict[str, list] = defaultdict(list)
@@ -1026,12 +1114,34 @@ def main(argv=None) -> int:
           f"({v.written} written, {v.stubs} still stubs), {v.barks} bark set(s), "
           f"{v.lines} lines, {len(v.facts)} distinct story/run facts.")
 
+    def _print_silences(v, blank_before=False):
+        """Een doorgelaten stilte moet ZICHTBAAR blijven, ook op een schone bar.
+
+        Dit stond eerst alleen op het bevindingenpad, en dan verdwijnt een
+        stille tak precies wanneer alles verder groen is -- op het moment dat
+        niemand meer kijkt. Anders koopt `silence:` groen met onzichtbaarheid,
+        en dat is exact het gedrag dat deze tool bestaat om te vangen.
+
+        Gevonden door de test die eist dat hij zichtbaar blijft, niet door de
+        code te herlezen.
+        """
+        if not v.silence_used:
+            return
+        if blank_before:
+            print()
+        print(f"{len(v.silence_used)} BEWUST STILLE TAK(KEN) -- doorgelaten, niet verdwenen:")
+        for scene, name, val in sorted(v.silence_used):
+            print(f"  {scene}: `{name} == \"{val}\"` speelt niets af, met opgeschreven reden")
+        if not blank_before:
+            print()
+
     by_code: dict[str, list[Finding]] = defaultdict(list)
     for f in v.findings:
         by_code[f.code].append(f)
 
     if not v.findings:
         print("\nOK: every check that ran is clean.")
+        _print_silences(v, blank_before=True)
         for code in CHECKS:
             mark = "SKIPPED" if code in skipped else "clean  "
             print(f"  {mark}  {code:<10} {CHECKS[code]}")
@@ -1051,6 +1161,8 @@ def main(argv=None) -> int:
         print("--- check_voice_resolves.py ---")
         print(voice_out.rstrip())
         print()
+
+    _print_silences(v)
 
     print(f"{len(v.findings)} finding(s) over {len(by_code)} check(s):")
     for code in CHECKS:

@@ -1,0 +1,37 @@
+# SILENCE-fixture (lezer, ANDERE missie -- dat is het hele punt).
+scene:        M1.6.S06
+mission:      M1.5
+title:        "T"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+silence:
+  vanished: "Het grootboek noteert alleen wat is uitgegeven, en deze tak geeft niets uit. De hardste echo van die tak staat al eerder in de missie."
+
+lines:
+  - id:      M1.6.S06.250
+    speaker: SELA
+    voice:   sela
+    condition: 'story.m15_shiftboss == "killed"'
+    text:    "A line that is long enough to sit inside the band comfortably here."
+
+  - id:      M1.6.S06.260
+    speaker: SELA
+    voice:   sela
+    condition: 'story.m15_shiftboss == "prevented"'
+    text:    "A line that is long enough to sit inside the band comfortably here."
+
+  - id:      M1.6.S06.270
+    speaker: SELA
+    voice:   sela
+    condition: 'story.m15_shiftboss == "warned"'
+    text:    "A line that is long enough to sit inside the band comfortably here."
+

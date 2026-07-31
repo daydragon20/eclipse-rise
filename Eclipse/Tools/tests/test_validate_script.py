@@ -152,6 +152,21 @@ class EveryCheckCanGoRed(unittest.TestCase):
     def test_trigger_bark_pointing_at_an_invented_event(self):
         self.assertOnly("trigger", "TRIGGER")
 
+    def test_silence_without_a_reason_of_substance(self):
+        """`silence:` koopt geen groen -- het kost een zin."""
+        self.assertOnly("silence_short", "SILENCE")
+
+    def test_silence_declared_for_a_branch_that_is_played(self):
+        """Een verouderde stilte is gevaarlijker dan geen stilte.
+
+        Hij dekt de VOLGENDE echte omissie af, en dan is de check erger dan
+        waardeloos: hij produceert vertrouwen waar geen grond voor is.
+        """
+        self.assertOnly("silence_stale", "SILENCE")
+
+    def test_silence_for_a_value_the_flag_does_not_have(self):
+        self.assertOnly("silence_unknown", "SILENCE")
+
     def test_every_check_has_a_fixture(self):
         """No check may be shipped without a proof that it can fail.
 
@@ -161,12 +176,27 @@ class EveryCheckCanGoRed(unittest.TestCase):
         """
         proven = {"PARSE", "SCHEMA", "ID", "SPEAKER", "CEILING", "REGISTER", "SPREAD",
                   "TAG", "CHOICE", "CONDITION", "BRANCH", "FLAGREG", "NAMESLOT",
-                  "LOCATION", "GUARD", "TRIGGER"}
+                  "LOCATION", "GUARD", "TRIGGER", "SILENCE"}
         self.assertEqual(set(vs.CHECKS) - proven, {"VOICE"})
 
 
 class TheControl(unittest.TestCase):
     """The other half of the proof: correct input must stay silent."""
+
+    def test_a_declared_silence_rescues_the_branch(self):
+        """De andere helft van het bewijs, en de reden dat SILENCE bestaat.
+
+        Zonder dit is BRANCH voor altijd rood op een scene die de criticus
+        expliciet heeft goedgekeurd -- en een bar die altijd rood staat
+        verbergt evenveel als een test die nooit rood wordt. `silence_ok`
+        is `branch` met EEN regel minder en EEN opgeschreven reden erbij.
+        """
+        rc, out = run("silence_ok")
+        self.assertEqual(codes(out), set(),
+                         "een verklaarde stilte moet groen zijn:\n" + out)
+        self.assertEqual(rc, 0)
+        self.assertIn("BEWUST STILLE TAK", out,
+                      "een doorgelaten stilte moet zichtbaar blijven, niet verdwijnen")
 
     def test_clean_fixture_produces_nothing(self):
         rc, out = run("clean")

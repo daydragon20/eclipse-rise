@@ -260,6 +260,40 @@ story.brick_recruited      == true      ⇄   Story.Beat.BrickRecruited   (prese
 
 Zero schema change, and the parent tag stays queryable as "has this choice been made at all". `script_to_seed.py` performs the mapping; writers only ever use the lowercase form. **Any choice with more than two outcomes uses this shape** — collapsing three outcomes into a boolean is story loss disguised as simplification.
 
+### `silence` — a branch that deliberately plays nothing (01-08)
+
+`BRANCH` asks: N leaves set, N leaves handled. That is the right question, and it caught
+three real defects. But it has no way to hear **"nothing belongs here"** — so a scene the
+critic has explicitly cleared stays red forever, and **a bar that is always red hides as
+much as a test that never goes red.**
+
+Optional scene-header field. Keys are flag *values*, values are the reason:
+
+```yaml
+silence:
+  left: "Both existing echoes are ledger facts, and the left branch spends nothing, so the
+         ledger has nothing to report. That player already gets the hardest echo of the
+         three and it is on the right beat."
+```
+
+**It buys nothing for free.** Four things are enforced, each with a fixture that proves the
+check can go red (`Eclipse/Tools/tests/script_fixtures/silence_*`):
+
+| | |
+|---|---|
+| A reason under 40 characters | `SILENCE` — a silence you cannot explain is an oversight wearing the costume of a choice |
+| Declared for a branch that **is** played | `SILENCE` — a stale silence covers the *next* real omission, which is worse than no silence at all |
+| Declared for a value the flag does not have | `SILENCE` |
+| Declared in a scene that does not read the flag | ignored — a silence in one story may never cover a hole in another |
+
+**And it never becomes invisible.** Every accepted silence is printed above the findings —
+*and on a completely clean run too*, which is where it would otherwise vanish exactly when
+nobody is looking. That behaviour is pinned by a test, and the test found the bug: the first
+version only printed on the findings path.
+
+The scene header is otherwise flat, so `silence` is the one mapping the parser accepts there
+(`HEADER_MAPS`). Keep that list short — every name in it changes how a block is read.
+
 ### `choice` — player options — RULING L1-R2
 
 Forty-two missions of branching had no way to say "these lines are the player's options". It has one now:

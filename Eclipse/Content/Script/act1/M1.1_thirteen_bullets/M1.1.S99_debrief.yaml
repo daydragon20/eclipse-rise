@@ -17,6 +17,13 @@ status:       draft
 critic:       "NO-GO: .230 is onwaar in de takken left en bound; .090 schrijft voornaamwoorden tegen een runtime-roster (L1-R8)"
 words:        273
 
+# Een tak die BEWUST niets afspeelt. De criticus heeft deze stilte op 01-08
+# uitdrukkelijk goedgekeurd; zonder dit veld bleef BRANCH voor altijd rood op een
+# scene die de poort al door is, en een bar die altijd rood staat verbergt
+# evenveel als een test die nooit rood wordt.
+silence:
+  left: "Beide bestaande echo's zijn INVENTARISFEITEN: .190 een verband dat weg is, .200 een patroon dat weg is. De left-tak geeft niets uit, dus het grootboek heeft niets te melden - de stilte volgt uit het apparaat en niet uit nalatigheid. Bovendien krijgt die speler al de hardste echo van de drie en die staat op de goede plek: M1.1.S05.190 'Four six two. Four six two.', met shot 'It is still going when the camera leaves.' Een debriefregel erbij verdunt de beste beat van die tak, en elke left-regel nodigt uit tot het oordeel dat het beat-sheet juist verbiedt."
+
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
 # flags-in:  story.m11_conscript_choice ("finished" | "left" | "bound")  - L1-R3

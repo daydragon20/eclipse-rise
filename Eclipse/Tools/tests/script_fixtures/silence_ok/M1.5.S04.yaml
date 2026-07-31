@@ -1,0 +1,39 @@
+# SILENCE-fixture (zetter). Drie bladeren onder een ouder.
+scene:        M1.5.S04
+mission:      M1.5
+title:        "T"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.5.S04.010
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_shiftboss
+      set:   'story.m15_shiftboss = "killed"'
+    text:    "He does not walk out of this gallery and tell anyone what he saw."
+
+  - id:      M1.5.S04.020
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_shiftboss
+      set:   'story.m15_shiftboss = "prevented"'
+    text:    "Take his key and shut the gate behind him."
+
+  - id:      M1.5.S04.030
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_shiftboss
+      set:   'story.m15_shiftboss = "warned"'
+    text:    "Be gone by the second horn."
