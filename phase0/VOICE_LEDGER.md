@@ -4,8 +4,13 @@
 
 ---
 
-**Budget:** 310.000 credits · **vervalt einde maand, rolt niet door**
-**Harde stop:** 290.000 (de laatste 20.000 is reserve voor fouten en retakes)
+**Budget:** 310.000 credits · **vervalt 21 augustus 2026, rolt niet door**
+**Werkdeadline generatie:** 19 augustus (twee dagen buffer)
+**Doel op 19/08: 310.000 besteed, 0 over.** Credits die op 21 augustus ongebruikt zijn, zijn weggegooid.
+
+**De reserve (20.000) is geen spaarpot maar verzekering.** Hij blijft *niet-toegewezen* tijdens de sprint, zodat een misgelopen batch nog te herstellen is. Op **17 augustus** gaat wat er nog van over is alsnog de volgende tier in. Niet eerder toewijzen, niet laten staan.
+
+**Let op — de gratis 10.000/maand tellen NIET mee.** Het gratis niveau geeft geen commerciële rechten en vereist naamsvermelding; die audio mag niet in een verkochte game. Na 21 augustus is de route: **Starter, ~€5/maand voor 30.000 credits mét commerciële rechten** (zie `19_voice_production.md` §19.2).
 
 ## Ledger
 

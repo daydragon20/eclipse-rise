@@ -49,8 +49,20 @@ Ordered by *lowest rewrite risk × highest perceived value*. Do not start a tier
 | **3** | **Adaptive music** — main theme, Kessara layers, combat layers, Dominion faction stems | 45,000 | — | Front-loaded once, then near-zero forever (§16.7). Never-silent floor is a §16 requirement. |
 | **4** | **Act 1 hub & companion conversations** — Mara, Dex, Brick, Reyes at Hollow Point | 35,000 | 5,800 | Establishes the companion voices the player lives with for 25 hours. |
 | **5** | **Core SFX one-shots** — weapons, impacts, UI, ambient beds | 20,000 | — | Cheap, high polish return. |
-| **—** | **Reserve** — retakes, mistakes, a mis-tagged batch | 20,000 | — | **Do not plan this away.** A single bad batch without reserve means a €11 top-up. |
+| **—** | **Reserve** — retakes, mistakes, a mis-tagged batch | 20,000 | — | Insurance *during* the sprint — see the rule below. |
 | | **Total** | **310,000** | | |
+
+### The reserve rule — owner-corrected 2026-07-31
+
+The owner is right: **all 310,000 get spent.** Credits that are unused on 21 August are simply thrown away — expiring credits have no value at expiry, so "stop at 290,000" would mean burning 20,000 for nothing.
+
+But the reserve is not savings, it is **insurance during the sprint**. If the full 310k is allocated to tiers on day one and a batch turns out wrong on day twelve, there is nothing left to fix it with. So:
+
+1. **Keep 20,000 unallocated** — do not plan it into a tier.
+2. **On 17 August**, release whatever is left of it into the next tier in the ladder.
+3. **Target on 19 August: 310,000 spent, 0 remaining.**
+
+That gives insurance for the risky middle of the sprint *and* zero waste at the end. Strictly better than both alternatives.
 
 **Hard rules for the sprint:**
 
@@ -60,6 +72,17 @@ Ordered by *lowest rewrite risk × highest perceived value*. Do not start a tier
 - **Stop at 290,000.** The last 20,000 is reserve. If a tier is not reached, it is not reached — it waits for next month's writing, which will be better anyway.
 
 **What happens to Acts 2–4?** They get *written* this month (writing costs nothing) and sit as text with complete script files. The moment credits exist again, they generate with one command and zero further authoring. That is the whole point of the layer discipline: the expensive-to-change work is done, and the cheap-to-defer work is deferred.
+
+### The free tier cannot be used for this game
+
+ElevenLabs' free plan gives ~10,000 credits/month, and the owner asked whether those can be added to the pool. **They cannot, for two reasons that both matter:**
+
+1. **No commercial rights.** The free plan grants no commercial usage and requires attributing ElevenLabs in public content. Audio shipped inside a game that is sold would violate that.
+2. **API access is not a production path** on the free tier — and this whole pipeline is API-driven and cached.
+
+**The cheap fix, and it is genuinely cheap:** commercial rights start at the **Starter** plan, roughly **€5/month for 30,000 credits**. So after 21 August, Acts 2–4 can be generated at ~30k credits/month for the price of a sandwich, indefinitely, with the cache making sure nothing is ever paid for twice. That is the plan of record for the remaining ~60% of the script — not a €11 top-up, and certainly not the free tier.
+
+*Verify against the current pricing page before committing; plan names and quotas change.*
 
 ---
 
