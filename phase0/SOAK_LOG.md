@@ -155,3 +155,8 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 18:27 | `23d2915` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Feel.Input.DocumentedConsoleCommandsExist |
 | 2026-07-31 18:29 | `23d2915` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Feel.Input.DocumentedConsoleCommandsExist |
 | 2026-07-31 19:17 | `bc881f4` | **ROOD** | 193 tests / 2 gefaald / 0 niet gedraaid | 12 | Eclipse.Characters.VitalsFeed.ThresholdAccumulates; Eclipse.Characters.VitalsFeed.WiredToBus [beeld: 7 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 6, stap 7, stap 8] |
+| 2026-07-31 19:37 | `72cdc83` | **GROEN** | 193 tests / 0 gefaald / 0 niet gedraaid | 12 |  [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 7] |
+| 2026-07-31 19:44 | `ec3dcd9` | **GROEN** | 193 tests / 0 gefaald / 0 niet gedraaid | 12 |  [beeld: 3 beeld(en) VERANDERD -> stap 1, stap 4, stap 7] |
+| 2026-07-31 20:07 | `f2b82e5` | **ROOD** | 194 tests / 1 gefaald / 0 niet gedraaid | 27 | Eclipse.Squad.Orders.OrderLinesNameThePerson [beeld: 3 beeld(en) VERANDERD -> stap 1, stap 4, stap 7] |
+| 2026-07-31 20:18 | `d8d1bb3` | **GROEN** | 195 tests / 0 gefaald / 0 niet gedraaid | 27 |  [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 4] |
+| 2026-07-31 20:19 | `d8d1bb3` | **ROOD** | 195 tests / 0 gefaald / 0 niet gedraaid | 0 | validatie gaf geen uitslag |

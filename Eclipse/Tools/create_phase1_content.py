@@ -239,6 +239,71 @@ order_defs_json = json.dumps([
     {"Name": "Downed",
      "AcknowledgeLines": [],
      "RefusalLines": ["I'm hit - can't move.", "I'm down, boss.", "Need a medic, not an order."]},
+
+    # --- SPEC-P2-02 Stage B: de rest van de 8.4-tabel -----------------------
+    # Vijf orderrijen, drie redenrijen, en de regels voor wat er KLAARSTAAT.
+    #
+    # Waarom de redenen eigen rijen krijgen: dezelfde reden als bij Downed. Een
+    # breach zonder deur die "No route, boss." zegt, stuurt de speler een
+    # routeprobleem zoeken dat niet bestaat. De code kiest de rij op REDEN als de
+    # reden iets anders betekent dan zijn ordertype (EclipseSquadOrderLogic::
+    # RefusalPoolRowName); ontbreekt de rij, dan valt hij luid terug op de
+    # orderzin - dus deze rijen zijn geen decoratie.
+    {"Name": "Suppress",
+     "AcknowledgeLines": ["Suppressing.", "Putting rounds on it.", "Heads down - firing."],
+     "RefusalLines": ["No angle on that spot.", "Can't see it from here.", "Something's in the way."]},
+    {"Name": "Flank",
+     "AcknowledgeLines": ["Route's up - say go.", "I've got a way around. Your call.", "Line's plotted, boss."],
+     "RefusalLines": ["No way around them.", "That flank's closed.", "Nothing but open ground that side."]},
+    {"Name": "Breach",
+     "AcknowledgeLines": ["Stacking up.", "On the door.", "Moving to breach."],
+     "RefusalLines": ["Can't reach the stack.", "No path to that door."]},
+    {"Name": "UseAbility",
+     "AcknowledgeLines": ["Working it.", "On it.", "Doing what I'm good at."],
+     "RefusalLines": ["Nothing for me to do here.", "Wrong moment for that."]},
+    {"Name": "SyncStrike",
+     "AcknowledgeLines": ["Taking mine.", "Going quiet.", "Mine's down."],
+     "RefusalLines": ["Can't make that work."]},
+
+    # De drie nieuwe REDENEN. Elk zegt WELK probleem het is, niet dat er een is.
+    {"Name": "NoBreachPoint",
+     "AcknowledgeLines": [],
+     "RefusalLines": ["Nothing to breach here.", "There's no door, boss.", "Show me a way in and I'll take it."]},
+    {"Name": "NoTargetsMarked",
+     "AcknowledgeLines": [],
+     "RefusalLines": ["Nothing marked.", "Mark them first, boss.", "I've got no targets."]},
+    {"Name": "NotConcealed",
+     "AcknowledgeLines": [],
+     "RefusalLines": ["They're looking right at me.", "Too late for quiet.", "I'm made - can't do it silent."]},
+
+    # Wat er KLAARSTAAT (Event.Squad.OrderQueued). Deze spreken uit de ACK-pool:
+    # er is niets geweigerd, er wacht iets. Ook de negatieve overgangen krijgen
+    # een regel - een voorstel dat stil verdampt is precies de stilte die 9.5
+    # verbiedt, ook al is jouw nietsdoen geen weigering.
+    {"Name": "FlankProposed",
+     "AcknowledgeLines": ["Route's up. Say go.", "Ready when you are.", "Waiting on your word."],
+     "RefusalLines": []},
+    {"Name": "FlankApproved",
+     "AcknowledgeLines": ["Moving.", "Going wide.", "On my way around."],
+     "RefusalLines": []},
+    {"Name": "FlankExpired",
+     "AcknowledgeLines": ["Window's gone.", "Too slow - they moved.", "That line's closed now."],
+     "RefusalLines": []},
+    {"Name": "SyncStrikeMark",
+     "AcknowledgeLines": ["Marked.", "Got him.", "That one's mine."],
+     "RefusalLines": []},
+    {"Name": "SyncStrikeFull",
+     "AcknowledgeLines": ["That's four already.", "Hands are full, boss.", "No room for another."],
+     "RefusalLines": []},
+    {"Name": "SyncStrikePruned",
+     "AcknowledgeLines": ["Lost one.", "He's moved off.", "Mark's gone."],
+     "RefusalLines": []},
+    {"Name": "BreachEntry",
+     "AcknowledgeLines": ["Going in.", "Through.", "Now."],
+     "RefusalLines": []},
+    {"Name": "BreachAborted",
+     "AcknowledgeLines": ["Can't get to the door.", "I'm cut off.", "Not making the stack."],
+     "RefusalLines": []},
 ])
 if not unreal.DataTableFunctionLibrary.fill_data_table_from_json_string(order_defs, order_defs_json):
     raise RuntimeError("DT_SquadOrderDefs JSON fill failed")

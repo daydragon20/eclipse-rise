@@ -81,7 +81,19 @@ click remains. The `Grungy_Surface_slnnecvc` directory was physically removed
 The 5 `LevelPrototyping` meshes are UE-template primitives (the graybox already owns that job) — rejected, as are the mannequin materials (162 of 167 assets are template filler). The pack's actual payload — `/Game/Screen_Damage_Indicator/UI/WBP_DamageIndicator` + `/Game/Screen_Damage_Indicator/Texture/T_BloodOverlay` — is combat-feedback HUD (GDD 08), flagged for the HUD/gameplay agent; not district dressing, no toon restyle.
 **Template filler (`UE/`, `L_DemoMap/`, `BluePrint/`) removed from disk 2026-07-23** (cleanup pass, `ASSET_CLEANUP.md` D3); the payload `UI/` + `Texture/` is kept for the HUD lane.
 
-## 8. /Game/FD_WarningSigns_V1 (rest) — 60 sign albedos → **7 in the pipeline (4 new this pass), 53 rejected**
+## 8. /Game/FD_WarningSigns_V1 (rest) — 60 sign albedos → **ALL 60 REJECTED (2026-07-31 fiction pass)**
+
+> ### ⛔ RETIRED 2026-07-31 — all seven survivors failed `20_world_dressing_standard.md` §20.2
+>
+> **Nothing from this pack is in the build.** The seven placards below were dressed by the builder until the §20.2 fiction pass, and every one of them was Earth signage: STOP in Latin capitals, the ISO-361 radiation trefoil, skull-and-crossbones over the word TOXIC, a European mandatory-direction arrow, the men-at-work roadworks pictogram, a cartoon dynamite stick, and a second trefoil. Three were confirmed in frame on the 31-07 recording round.
+>
+> **Why this pass missed them.** The rejections below were judged on **tone** — "joke/meme", "reads suburban, not industrial oppression". They were never judged on **fiction**. §20.2 says curation is both: *"Curatie betekent niet alleen 'past de stijl' maar ook 'past de fictie'."* A photographed Earth sign passes a tone filter perfectly and still breaks the world.
+>
+> **Replacement:** an authored Dominion signage system, `Eclipse/Tools/generate_dominion_signs.py` → `Saved/GeneratedDecals` → `Tools/import_generated_decals.py`, as `T_sign_dom_*_diff`. Replaced, not removed — same seven placements, same scales, same red/amber split. The grammar is documented in the generator.
+>
+> `prepare_warning_signs.py`, `import_warning_signs.py` and `export_sign_albedos.py` are now **dead paths**; `Saved/WarningSignStaging` is a dead source. Do not derive new placards from this pack — it cannot produce an in-fiction sign.
+
+*Historical record of the 2026-07-23 pass, kept so the failure mode is readable:*
 
 All 60 albedos exported and judged on a contact sheet (`Tools/export_sign_albedos.py` → `Saved/WarningSignStaging/raw`). The pack's own decal MIs stay rejected (green-screen backing renders green cards — 2026-07-23 audit); accepted signs travel as derived placards via `prepare_warning_signs.py` (crop + dark-steel plate) into `/Game/Art/Decals`.
 **Pack removed from disk 2026-07-23** (cleanup pass, `ASSET_CLEANUP.md` D2): the placard source is now `Saved/WarningSignStaging/raw` (all 60 albedos exported) — re-derivation runs without the pack.
@@ -90,15 +102,17 @@ All 60 albedos exported and judged on a contact sheet (`Tools/export_sign_albedo
 
 | Placard (`/Game/Art/Decals/…`) | Pack index | norm scale | mean-lin | gain | Use |
 |---|---|---|---|---|---|
-| `T_sign_stop_diff` | 09 | 1.00 | 0.113 | 8.9 | gate portal (in use) |
-| `T_sign_radiation_diff` | 17 | 1.03 | 0.098 | 10.2 | crossing lamp (in use) |
-| `T_sign_toxic_diff` | 30 | 1.05 | 0.168 | 5.9 | west wall, Entry_Main (in use) |
-| `T_sign_route_diff` | 36 | 1.00 | 0.079 | **12.7** | **PLACED**: routing arrow on the second crossing lamp at the artery choke, red family (pairs with the radiation placard, review cam 6) |
-| `T_sign_labor_diff` | 50 | 1.15 | 0.157 | **6.4** | **PLACED**: beside the warehouse yard's east gate gap on BldgB_E (labor stories, art bible §2.2), amber |
-| `T_sign_blast_diff` | 51 | 1.24 | 0.143 | **7.0** | **PLACED**: Dominion post west face — munitions warning on the checkpoint approach, amber (pops on oxide red) |
-| `T_sign_reactor_diff` | 53 | 1.09 | 0.068 | **14.8** | **PLACED**: west perimeter wall north of the gate, red — exclusion zone stacked over the rebel stencil story |
+| Placard (retired) | Pack index | What it actually was | §20.2 verdict |
+|---|---|---|---|
+| `T_sign_stop_diff` | 09 | red triangle, **"STOP"** in Latin capitals | Earth traffic sign — bullets 1 + 4 |
+| `T_sign_radiation_diff` | 17 | the **ISO-361 trefoil** (UC Berkeley, 1946) | datable Earth institution — bullet 5 |
+| `T_sign_toxic_diff` | 30 | skull-and-crossbones over **"TOXIC"** | Earth semiotics + Latin text — bullets 4 + 5 |
+| `T_sign_route_diff` | 36 | **white arrow in a circle** on a triangle | European mandatory-direction road sign — bullet 1 |
+| `T_sign_labor_diff` | 50 | the **men-at-work roadworks pictogram** | a literal road sign — bullet 1 (the "probably fine" that was not) |
+| `T_sign_blast_diff` | 51 | burst + **cartoon dynamite stick with a fuse** | Western cartoon semiotics — bullet 5 |
+| `T_sign_reactor_diff` | 53 | the trefoil again, in a triangle | Earth ISO **and** a repeat read (§20.7 check 7) |
 
-All seven placards are now dressed by the builder (2026-07-23 placement round; sign-plane pattern, `Deco_Sign`). **Rejected (53):** joke/meme signs (`NO LIFE` 06/07, `STOP RUN` 08, camera 57/60, `LOVE` 27/28, `BAD DOG` 18–21, food 58/59 — off the grounded Expanse/Andor tone), civic-traffic family (22–26, 44–48 — reads suburban, not industrial oppression), skull/poison variants 14–16, 54–56 (duplicative of toxic/reactor), remaining rust-triangle variants (weaker reads of the accepted seven).
+Replaced 1:1 by `T_sign_dom_seal / flare / scrubber / lane / shift / charge / core` at the same seven placements. **Rejected (53):** joke/meme signs (`NO LIFE` 06/07, `STOP RUN` 08, camera 57/60, `LOVE` 27/28, `BAD DOG` 18–21, food 58/59 — off the grounded Expanse/Andor tone), civic-traffic family (22–26, 44–48 — reads suburban, not industrial oppression), skull/poison variants 14–16, 54–56 (duplicative of toxic/reactor), remaining rust-triangle variants (weaker reads of the accepted seven).
 
 ## 9. ambientCG CC0 imports — **5 accepted, 2 parked**
 

@@ -484,6 +484,64 @@ speelde hij oude code en kán het kruis er niet zijn.
   silhouet zonder dat er iets uit de mesh hoeft. Dat lost "ik zie mijn wapen niet"
   op, maar niet "de wissel doet niets".
 
+### UITGEVOERD 31-07 — O-5 "VOLLEDIG", DE VIER STAPPEN GEMETEN
+
+*Owner koos "volledig" boven de goedkope tint-tussenstap. Alle vier de stappen
+staan; elke regel hieronder draagt zijn meting of zijn frame.*
+
+| stap | uitkomst | bewijs |
+|---|---|---|
+| 1 · sectie isoleren | slot 4 `M_Belica_Guns`, **14.606 van 70.403 driehoeken (20,7%)**, aan/uit per LOD | log `[WAPEN * STAP1]` + frames A/D |
+| 2 · los asset per familie | 4 meshes, **94,9 / 64,1 / 122,9 / 33,9 cm**, langste as telkens X | `Eclipse.Combat.WapenMeshPerFamilie` |
+| 3 · socket op `hand_r` | bot bestaat, aangehecht, afstand **constant 4,47 cm** | log `[WAPEN * STAP3]` |
+| 4 · wisselogica eraan | `AR_Foundry`→`Sidearm_Scrap`, mesh **94,9 → 33,9 cm** | **[GEZIEN — `HUD_wapen_E_na_wissel.png`]** |
+
+- **DE WAPENWISSEL DOET NU ZICHTBAAR IETS.** [GEZIEN — `HUD_wapen_D_los_aan_hand.png`
+  naast `HUD_wapen_E_na_wissel.png`, zelfde camera en zelfde pose]: op D een lang
+  geweer met zichtbaar magazijn, op E een kort compact wapen, en de HUD wisselt
+  mee van `HERLADEN` naar `Sidearm_Scrap`. Dat was het hele gat van owner-punt 5.
+- **ER BESTOND GEEN LOS WAPENASSET** — alle tien packs nagelopen; Belica's geweer
+  zit in `Belica.uasset`. De vier meshes zijn dus zelf geauthord
+  (`Tools/blender/gen_weapons.py`) en niet uit de skeletal mesh gesneden. Dat is
+  bewust: extractie levert **één** vorm op, en dan doet de wissel nog steeds niets.
+- **NAIJLEN BESTAAT HIER NIET** (`DEBUG_DISCIPLINE.md` §4.1). Gemeten over **1.255
+  frames**: afstand wapen→handbot 4,47–4,47 cm, **spreiding 0,00**, terwijl het
+  handbot in diezelfde reeks **1.009,9 cm** aflegde. Die tweede helft is de
+  controle — zonder een bewegende hand kan deze meting niet rood worden. De
+  oorzaak dat het niet optreedt is constructie en geen geluk: het wapen is een
+  kind van de mesh en tickt zelf niet.
+- **"OMGEKEERD VASTGEHOUDEN" — DE JUISTE VAN TWEE OORZAKEN, met de meting die de
+  andere uitsloot.** De owner zag het; er zijn twee kandidaten die er identiek
+  uitzien. De mesh-as is UITGESLOTEN door de importmeting (langste as X, doos van
+  X=−24,3 kolf tot X=+70,6 loop — precies de UE-conventie). Wat overbleef was de
+  greeprotatie, en die was óók gemeten: **yaw −158° tot −180°**, een halve slag.
+  Vandaar `WeaponGripRotation` = yaw 180 in de data, niet een gedraaide mesh —
+  dat laatste zou de conventie voor élk volgend wapen breken.
+
+### NOG OPEN, MET DE MEETSTAND ERBIJ
+
+- **EERSTE PERSOON IS NOG STEEDS LEEG** [GEZIEN — `HUD_wapen_F_eerste_persoon.png`],
+  maar de oorzaak is nu **benoemd in plaats van vermoed**: het wapen projecteert op
+  **(−2054, 3130) in een beeld van 1280×720** en staat 7,5 cm vóór een near-clip van
+  10. Het hangt dus zowel binnen het clipvlak als ver buiten de kijkkegel. Geen
+  zichtbaarheidsvlag repareert dat; eerste persoon heeft een EIGEN wapentransform
+  nodig. **Wat er dan te zien moet zijn is een smaakvraag en staat als `O-9` in
+  `owner_questions.json`** — wapen alleen, wapen plus armen, of voorlopig niets.
+- **DE "BEIDE"-TEGENPROEF IS NOG NIET SLUITEND.** Frame G zet de ingebouwde sectie
+  én het losse wapen tegelijk aan en hoort er dus TWEE te tonen; hij toont er
+  zichtbaar minder dan frame D. De vlag klopt wél (`IsMaterialSectionShown` meldt
+  `zichtbaar`), dus beeld en vlag spreken elkaar tegen. **Leidende kandidaat, niet
+  bewezen:** `ShowMaterialSection` legt `HiddenMaterials` per aanroep in een
+  render-commando én roept `MarkRenderStateDirty()` aan; 56 aanroepen binnen enkele
+  frames kunnen elkaars hersteltoestand overschrijven. **Volgende meting:** één
+  aanroep per LOD in plaats van per sectie, en `IsMaterialSectionShown` een frame
+  LATER teruglezen in plaats van meteen. Niet gerepareerd — er ligt geen diagnose,
+  en dit dossier heeft al twee reparaties zonder diagnose teruggedraaid.
+- **De linkerhand staat niet op de voorgreep.** Dat is hand-IK (§4.1 noemt het als
+  de standaardoplossing voor tweehandige wapens) en een eigen klus. Het hoort hier
+  genoemd omdat een frame waarop die hand los hangt anders als "de greeprotatie
+  klopt niet" gelezen wordt — en dat is een andere reparatie.
+
 ---
 
 ## 5. KOGELS EN TREFFERS

@@ -108,17 +108,33 @@ if ($BudgetWarnings) {
 # exacte fout die dit script moest wegnemen. Een controle die je moet onthouden,
 # is geen controle.
 Write-Step "VALIDATIE"
+#
+# EIGEN LOGBESTAND, en dat is geen netheid maar een reparatie.
+#
+# Hier stond geen -abslog, dus de commandlet schreef naar het GEDEELDE
+# Saved\Logs\Eclipse.log en we lazen zijn uitslag daar weer uit. Zodra een
+# tweede agent gelijktijdig een commandlet draait, overschrijft die het log en
+# is de validatieregel weg -- waarna dit script "validatie gaf geen uitslag"
+# meldt en de bar ONTERECHT rood kleurt. Dat is 31-07 gemeten: een run die
+# 20:19:42 zijn regel schreef, was om 20:20:05 gewist door een andere agent.
+#
+# Een valse rode bar is duurder dan geen bar. Hij kost een zoektocht naar een
+# fout die er niet is, en erger: hij went, en dan wordt een echte rode bar ook
+# weggewuifd. Elke run leest nu zijn eigen bestand en kan dus niet meer door
+# iemand anders worden gewist.
+$ValidationLog = "$Root\Saved\Logs\verify_validate.log"
 $p = Start-Process -FilePath $exe -PassThru -NoNewWindow -ArgumentList `
-    "`"$Project`"", '-run=EclipseValidateData', '-unattended', '-nullrhi', '-NoLiveCoding'
+    "`"$Project`"", '-run=EclipseValidateData', '-unattended', '-nullrhi', '-NoLiveCoding', `
+    "-abslog=`"$ValidationLog`""
 if (-not $p.WaitForExit(600000)) { $p.Kill(); throw "validatie liep vast" }
-$Validation = Select-String -Path "$Root\Saved\Logs\Eclipse.log" -Pattern "ValidateData: .* errors\." |
+$Validation = Select-String -Path $ValidationLog -Pattern "ValidateData: .* errors\." -ErrorAction SilentlyContinue |
     Select-Object -Last 1
 if ($Validation) {
     Write-Host ($Validation.Line -replace '^.*Display: ', '')
     if ($Validation.Line -notmatch ', 0 errors\.') { $Failures += "validatie meldt fouten" }
     $script:ValidationLine = ($Validation.Line -replace '^.*Display: ', '')
 } else {
-    Write-Host "GEEN VALIDATIEREGEL gevonden - draaide de commandlet wel?"
+    Write-Host "GEEN VALIDATIEREGEL in $ValidationLog - draaide de commandlet wel?"
     $Failures += "validatie gaf geen uitslag"
 }
 

@@ -246,6 +246,42 @@
       ],
       "advies": "Later. Het lokale draaien is nu niet het knelpunt.",
       "vrijtekst": false
+    },
+    {
+      "id": "O-9",
+      "prio": "gauw",
+      "vraag": "Eerste persoon: wat wil je van jezelf zien?",
+      "waarom": "Het wapen is nu een LOS object aan je rechterhand, dus in derde persoon zie je het en verandert het zichtbaar als je wisselt. In EERSTE persoon zie je nog steeds niets — en dat is gemeten, niet gegokt: de camera zit in je hoofd, en je wapen hangt op 7,5 cm daarvoor en ver buiten je kijkkegel (het projecteert op (-2054, 3130) in een beeld van 1280x720). Geen zichtbaarheidsvlag repareert dat; het wapen moet in eerste persoon een EIGEN plek krijgen. Welke, is een smaakvraag met echte gevolgen voor de scope, en dus van jou.",
+      "stappen": [
+        "Open in het dashboard de opname HUD_wapen_D_los_aan_hand.png (derde persoon, wapen in de hand).",
+        "Open daarnaast HUD_wapen_F_eerste_persoon.png (eerste persoon, leeg beeld).",
+        "Kies welke van de drie hieronder je wilt."
+      ],
+      "opties": [
+        {
+          "label": "A — alleen het wapen",
+          "gevolg": "Het wapen krijgt in eerste persoon een eigen positie voor de camera. Geen armen, geen handen. Goedkoopst: geen nieuwe assets, een dag werk.",
+          "waarde": "A"
+        },
+        {
+          "label": "B — wapen plus armen",
+          "gevolg": "Zoals Call of Duty en Battlefield: een aparte armenmesh die alleen jij ziet. Het mooist, en het is een eigen asset-klus — reken op meerdere dagen.",
+          "waarde": "B"
+        },
+        {
+          "label": "C — laat eerste persoon voorlopig leeg",
+          "gevolg": "We doen niets tot je de derde persoon af vindt. Eerste persoon blijft dan een kale kijkstand zonder wapen.",
+          "waarde": "C"
+        }
+      ],
+      "advies": "A. Je ziet dan meteen wat je vasthoudt en welk wapen je koos, en dat is precies waar de klacht over ging. Armen zijn mooier, maar dat is een asset-klus die pas loont als je eerste persoon ook echt gaat spelen — en dat weet je pas na een ronde met A.",
+      "vrijtekst": true,
+      "meer_info": [
+        "De frames staan in Eclipse/Saved/Screenshots/HUD_volledig/.",
+        "Waarom eerste persoon leeg is, staat gemeten in het log als [1EPERSOON ... SCHERM].",
+        "Dit blokkeert niets: derde persoon werkt en de wapenwissel is er zichtbaar."
+      ],
+      "audio_map": null
     }
   ]
 }
