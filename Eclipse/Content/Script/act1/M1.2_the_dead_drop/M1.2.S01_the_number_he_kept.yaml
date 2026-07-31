@@ -57,6 +57,19 @@ words:        393
 #            escalation as M1.1.S01: 18.3's variance rule (>=3x) and a 20-word FLOOR cannot
 #            both hold. Read the band as a CEILING, per 18.3's own note and 21_quality_mandate.
 #            Ceiling respected: longest line 19 w. Variance 1 w to 19 w = 19x.
+#
+# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
+# Two measured reasons, and the second one is the interesting one.
+# 1. The 19-word line is .120 - the line VOSS CUTS OFF at .130. Its length is set by where
+#    the interrupter comes in, not by me. Padding it means Voss talks over one more word.
+# 2. THE SCENE DOES REACH THE REGISTER IN PERFORMANCE. Counted: three of the four .110
+#    variants run 20 / 22 / 24 words (pragmatist / personal / idealist), and every player
+#    on an axis hears one of them at the scene's turn. The check reads base `text:` only,
+#    which is a deliberate tool decision (validate_script.py: variants are checked against
+#    the CEILING and excluded from register/spread, because those two measure the scene's
+#    written shape and not its heard one). So the finding is true of the file and false of
+#    the playthrough. NOT an argument for changing the tool - it is the argument for
+#    leaving these 28 lines exactly as they are.
 # ar-5:      Mara says "you" ZERO times in this scene, and "I" never. Checked line by line.
 #            Her imperatives address without the word - that is the mechanism.
 # triads:    exactly one, and it is the shipped canon string at .280. Mine were removed.

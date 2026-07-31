@@ -39,7 +39,26 @@ words:        325
 #            18.3's own note says the bands "cap the length of one line", and 18.3's
 #            variance rule (>=3x inside a scene) is unsatisfiable against a floor of 20.
 #            No line exceeds the ceiling.
-# variance:  1 w (.110 "Don't.") to 16 w (.370) = 16x.
+# variance:  1 w (.110 "Don't.") to 16 w (.370) = 16x. (The validator reports 17 for .370
+#            because the bare hyphen in the shipped string splits as a token. Sixteen real
+#            words. Same line either way; noted so nobody hunts for a 17-word line.)
+#
+# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. ***
+# 37 lines and the longest is .370 - which is the shipped BriefingText for MT_M13, quoted
+# verbatim, hyphen included. THE LONGEST LINE IN THIS SCENE IS NOT MINE TO LENGTHEN. It is
+# in data. So reaching 20 means inventing a long line somewhere else in a room where all
+# four speakers are constitutionally short: Mara under AR-5 (bare imperatives, no "you",
+# no "I"), Dex in fragments, Reyes in clinical questions, Voss naming mechanism. Every
+# beat that could take room is one L1 instructed shorter - Dex's list is counts because
+# it is a list, Mara's answer at .260 is five words because softening it is the failure,
+# and the turn at .310-.320 works BECAUSE he cannot say why.
+# THERE IS ONE REAL HOLE AND IT IS ALREADY L1'S: escalation 1 above. Beat 2 asks Dex to
+# recite the dead cells BY NAME and there are no canon cell names, so he recites places
+# and counts instead. Names carry length. If L1 grants three names, .080/.090 get
+# rewritten on the same ids and THIS FINDING SHOULD BE RE-ASKED THEN - it may answer
+# itself. Until then the scene is short because of who is in the room, which is not a
+# defect, and I am not writing a twentieth word to close a gap that belongs to a different
+# ticket.
 # ar-5:      Mara spends ZERO of her "you" allowance here and says "I" never. Checked line
 #            by line. Her only second-person constructions are bare imperatives.
 # reyes:     no contraction anywhere in her four lines. She is stressed and it shows in

@@ -15,7 +15,7 @@ turn:         "She stops asking about his body and asks about the names, and he 
 # ---- state ----
 status:       draft
 critic:       null
-words:        302
+words:        299
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
@@ -84,6 +84,16 @@ words:        302
 # band:      `cutscene` (20-60) read as a CEILING per the M1.1 precedent; longest base
 #            line 19 w. A 20-word floor and 18.3's variance rule cannot both hold.
 # variance:  1 w (.060 / .080 / .120 / .160) to 19 w (.040) = 19x.
+#
+# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
+# The scene misses the cutscene floor by one word, and the 19-word line is .040 - the line
+# MARA CUTS IN HALF at .050. Its length is not mine to set; it is set by where the
+# interrupter comes in, and one more word before the cut is one more word she has to talk
+# over. Everything else in the room is short because of who is in it: Dex in fragments,
+# Brick on a 30-word mission budget, Reyes clinical, Mara terse. There is no beat here
+# asking for room - the two that could take it (.100, the P3-a joke at .250-.290) are
+# explicitly instructed SHORTER by L1: her history must stay unspoken and the job must
+# land as a complaint. A twentieth word would buy a green bar and cost the scene.
 # beat map:  the haul .010-.040 | THE EXPLANATION .040-.060 | the bill .070-.080 |
 #            Reyes examines Brick .090-.140 | the names .150-.200 | the roster .210-.220 |
 #            Voss hands the night away .230-.240 | P3-a .250-.290
@@ -105,9 +115,12 @@ words:        302
 #            block before she has looked. Dex clocks it and says nothing (shot). No line
 #            in this file states or hints that she served. 2.5's "penance to purpose"
 #            arrives as a prescription at .200 and is never named.
-#            18.4: complete clinical sentences, zero contractions, questions instead of
-#            accusations. She is also allowed to be slightly short with him at .130 -
-#            18.9 D says real people are petty.
+#            18.4: complete clinical sentences, questions instead of accusations. NOT
+#            "zero contractions" - that sentence stood here while L1-R22 sat six lines
+#            above it saying the opposite, and the lines followed this note, not the
+#            ruling. She contracts at .070 .130 .140 and stops at .190. She is also
+#            allowed to be slightly short with him at .130 - 18.9 D says real people
+#            are petty.
 # brick:     5 words here (.120 = 1, .160 = 1, .180 = 3). Mission total 27, under the 30.
 #            .180 is the SECOND time the player hears the three names, and this is where
 #            it lands: for three months in the dark, that was the whole of his work.
@@ -165,7 +178,8 @@ lines:
   - id:      M1.4.S99.070
     speaker: REYES
     voice:   reyes
-    text:    "Two crush injuries and a hand that will not close for a week."
+    text:    "Two crush injuries and a hand that won't close for a week."
+    note:    "L1-R22 EXECUTED 01-08. She contracts here. This is the baseline the M1.6/M1.8 tell fires against; the header ruling named this line and the text had never been changed."
 
   - id:      M1.4.S99.080
     speaker: MARA
@@ -198,14 +212,15 @@ lines:
   - id:      M1.4.S99.130
     speaker: REYES
     voice:   reyes
-    text:    "That is a place."
+    text:    "That's a place."
+    note:    "L1-R22. Contracts. A dry correction to a man she is not worried about yet."
 
   - id:      M1.4.S99.140
     speaker: REYES
     voice:   reyes
     tags:    [pause]
-    text:    "Then it is old, it set on its own, and I cannot open it tonight."
-    note:    "The scene's one permitted triad (18.9 B)."
+    text:    "Then it's old, it set on its own, and I can't open it tonight."
+    note:    "The scene's one permitted triad (18.9 B). L1-R22: contracts. Last contraction she uses in act 1 - .190 and .200 come after the three names and they do not."
 
   - id:      M1.4.S99.150
     speaker: REYES

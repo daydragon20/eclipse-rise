@@ -15,7 +15,7 @@ turn:         "She marks it anyway, and asks Voss where the next one goes."
 # ---- state ----
 status:       draft
 critic:       null
-words:        204
+words:        233
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
@@ -75,9 +75,27 @@ words:        204
 #           the one who is cut off for keeping it (.140/.150).
 # dex:      his joke comes back at .280 and it is a callback to S01.360 - the gloves. Half
 #           strength, which is the right strength, because he lost the other half in S06.
-# band:     `cutscene` (20-60) read as a ceiling. Longest line 15 w. Same ruling as S01.
-# variance: 1 w (.100 "Nine.") to 15 w (.130) = 15x.
-# em-dash:  two interrupted lines in 28 (.070/.080, .140/.150). Rate 1:14.
+# band:     `cutscene` (20-60) read as a ceiling. Longest line 29 w (.055). Same ruling as
+#           S01: no line is over the ceiling.
+# variance: 1 w (.100 "Nine.") to 29 w (.055) = 29x.
+# em-dash:  two interrupted lines in 29 (.070/.080, .140/.150). Rate 1:14.
+# words:    233 = 186 spoken base + 47 in the four .230 variants. Hand-counted, no shell.
+#           The 204 this field carried before matched my count of the old file exactly,
+#           which is why I trust the 233.
+#
+# *** .055 ADDED 01-08. BEAT 2 WAS BEING CLIPPED, AND THAT IS WHY THIS SCENE WAS RED. ***
+# The beat sheet asks for a man who CANNOT STOP TALKING about the mast and is pushing
+# something else away with it. What was here was three staccato lines and then an
+# interruption - that is a man who says three things, not a man who cannot stop. The flood
+# is the beat. It is also the only place in this room where anybody HAS room: everyone
+# else is counting bunks, counting weeks, or holding a pencil.
+# Written so it ENDS IN METAL. He puts his own hands over his head in passing, as evidence
+# of how big the thing was, and runs straight back into the footing. 18.4 Dex reports his
+# own fear as instrumentation and never lands on it, so the line may not close on his body.
+# It restates .050 in more detail on purpose (18.9 D - people repeat while they can still
+# hear it), and it lands his own work: the collar he set in S04 took the whole load.
+# REGISTER was the finding, not the reason. If L1 ever cuts this line the scene goes red
+# again, and it should, because the beat would be clipped again.
 
 lines:
   - id:      M1.3.S99.010
@@ -106,6 +124,12 @@ lines:
     speaker: DEX
     voice:   dex
     text:    "It didn't fall. It folded. Like it sat down."
+
+  - id:      M1.3.S99.055
+    speaker: DEX
+    voice:   dex
+    text:    "I was flat on the stones with my hands over my head and I felt the whole load go into the footing and the legs come in on themselves."
+    note:    "Beat 2, the flood. He gives his own hands over his head as a measuring instrument and then runs back into the metal, which is the only direction 18.4 lets him go. Nobody stops him yet."
 
   - id:      M1.3.S99.060
     speaker: DEX

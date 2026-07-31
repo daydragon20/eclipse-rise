@@ -15,7 +15,7 @@ turn:         "Voss recognises a shoulder plate in the response line and keeps m
 # ---- state ----
 status:       draft
 critic:       null
-words:        110
+words:        130
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      VOSS, MARA, DEX, fighters; Enforcer response (barks)
@@ -50,19 +50,42 @@ words:        110
 #           M1.1.S05's conscript recites "Four six two". NEW DETAIL: the number 917 is
 #           mine. If M1.2's writer or the recap card gives this man a different number,
 #           L1 reconciles and I change .150. Flagged rather than assumed.
-# dominion: .050-.080 are the panic vocabulary the beat sheet asks for - procedure going
-#           short of breath. Calls a sector, calls it again, gets an answer that is not a
-#           procedure, and asks for the procedure back. 18.5 rule 5, in four lines.
-#           No Veil vocabulary anywhere: there are no Veil operatives on this street
-#           until M1.7.
+# dominion: .045-.080 are the panic vocabulary the beat sheet asks for - procedure going
+#           short of breath. Reads the formula, calls a sector, calls it again, gets an
+#           answer that is not a procedure, and asks for the procedure back. 18.5 rule 5,
+#           in five lines. No Veil vocabulary anywhere: there are no Veil operatives on
+#           this street until M1.7.
+#
+# *** .045 ADDED 01-08. THE PROCEDURE HAD NO BASELINE, WHICH IS WHY THIS SCENE WAS RED. ***
+# .080 "Say again procedure" asks for words the player has never heard. The net was
+# breaking against nothing, so 18.5 rule 5 fired silently - the same failure L1-R22 found
+# in Reyes's contractions, and the same fix: voice the un-broken version once, in the same
+# mouth, minutes before it breaks. CONSCRIPT_A now runs the whole arc alone: formula
+# (.045) -> calls nine (.050) -> "Anyone" (.060) -> asks for the words back (.080).
+# It also puts the gates on the record as DELIBERATE - "down by order" - one line after
+# Ember reads them as a reflex, and "starting at one" says he had counted to nine before
+# anybody failed to answer. The district answering is the enemy being GOOD at this for
+# ten seconds, which is the beat this scene is named after and the contrast T4 needs.
+# NOT an officer: `dominion_officer` is uncast (Q-3/Q-4/Q-5) and would fail VOICE. One
+# conscript doing procedure and then losing it is the better scene anyway.
+# type:     NOT escalated, and I looked. BEATS_M1.3 section 4 types this scene
+#           `in-mission-radio + callout`; `type:` holds one value, so the radio half owns
+#           the header and the street half sits well under its ceiling. Re-typing to
+#           `callout` (2-6) would put .020 (8 w) and .120 (7 w) RED on CEILING, which is
+#           the header type telling the truth about the scene.
+# no band:  the street lines carry no `band:` override on purpose. They are all inside the
+#           25-word ceiling already, so an override would buy nothing and hide them from a
+#           check they pass. The register belongs to the radio half, and .045 is it.
 # under-   this is the mission where the Dominion answers in full, on purpose. The thin
 # reaction: response of M1.2/M1.5/M1.7 only reads as a detail if this night reads as an
 #           avalanche. Two walkers, every gate, every shutter.
-# band:     `in-mission-radio` (10-25) with the stub's callout override. Nothing here is
-#           over 9 words and most are under 6, which is the stub's instruction and the
-#           ceiling-not-floor reading used across this mission.
-# variance: 1 w (.160 "What?") to 9 w (.020) = 9x.
-# em-dash:  one, at .180/.190. Rate 1:27.
+# band:     `in-mission-radio` (10-25). The street is at the stub's callout length and the
+#           radio is at the band's own, which is what a mixed scene sounds like. Ceiling
+#           respected everywhere; .045 is the one line that uses the register.
+# variance: 1 w (.160 "What?") to 21 w (.045) = 21x.
+# em-dash:  one, at .180/.190. Rate 1:28.
+# recount:  the old note claimed 9 w for .020 and the old `words` said 110. Both were one
+#           over: .020 is 8, the file was 109. Now 130, hand-counted (no shell here).
 
 lines:
   - id:      M1.3.S05.010
@@ -86,6 +109,13 @@ lines:
     speaker: VOSS
     voice:   voss
     text:    "West."
+
+  - id:      M1.3.S05.045
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    text:    "All stations, Foundry District. The gates are down by order. Hold where you stand and report by sector, starting at one."
+    shot:    "Picked up on the squad set, flat and unhurried, over four people moving west along a wall."
+    note:    "The formula, correct and complete, from the mouth that loses it at .060 and asks for it back at .080. Not exposition: it is the only ten seconds in the mission where the Dominion is good at this."
 
   - id:      M1.3.S05.050
     speaker: CONSCRIPT_A

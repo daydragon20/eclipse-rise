@@ -37,6 +37,18 @@ words:        247
 #            21_quality_mandate ("these bands cap the length of one line"). Longest line
 #            here is 19 w. A floor of 20 cannot coexist with 18.3's variance rule.
 # variance:  4 w (.200) to 19 w (.020 / .130) = 4.75x.
+#
+# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
+# The scene misses the cutscene floor by one, and the two 19-word lines are already the
+# two the scene exists for: Dex weighing the armory (.020, beat 1) and REYES'S QUESTION
+# (.130, beat 3, the question that hangs over the rest of the act). They are the longest
+# things anybody says because they are the heaviest things anybody says - that is the
+# register working, one word short of a number.
+# Nothing here is clipped. Reyes goes unanswered because Dex cuts Mara off at .180, and
+# that is the beat. Mara's answer must stay logistics or it stops being ugly. .190 is
+# arithmetic and arithmetic is short. The only line that could absorb twenty words is
+# .020, and a fourth clause on a man who thinks in kilos is padding with a hardware noun
+# stapled to it.
 # beat map:  contents-as-weight .020-.030 | insertion .050-.120 | REYES'S QUESTION .130 |
 #            Mara's answer .140-.170 | the carrying arithmetic .180-.210 | closer .220
 # ar-5:      Mara spends ZERO "you" in this scene and never says "I". Her imperatives are
