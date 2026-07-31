@@ -1,0 +1,47 @@
+# ID: a duplicate id, and ids out of order inside one scene.
+#
+# NOT "off the tens grid". An early draft of this check failed any id that was
+# not a multiple of ten and lit up on three shipped lines -- while
+# SCRIPT_FORMAT section 2 exists to BLESS exactly that: "a line can be
+# inserted at 015 six weeks later without renumbering the scene, without
+# breaking the cache, and without invalidating a single generated asset."
+# Section 6 asks for uniqueness and monotonicity. That is what is checked.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.030
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.030
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.045
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."

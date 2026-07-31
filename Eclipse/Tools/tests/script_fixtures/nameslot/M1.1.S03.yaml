@@ -1,0 +1,28 @@
+# NAMESLOT: a {name} slot and a pronoun in the same line. The roster
+# decides gender at runtime, so the surrounding line must be pronoun-free
+# (L1-R8). The second line is the shipped M1.1.S99.170 and must stay
+# silent.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "{name} took the low rail first and nobody asked her to do it."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    text:    "{name} took the low rail first. Nobody asked for that."

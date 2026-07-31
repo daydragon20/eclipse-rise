@@ -1,0 +1,36 @@
+# CONDITION: a condition on a WITHDRAWN flag.
+# Story.Choice.M11_ConscriptSpared was retired by RULING L1-R3 -- one
+# truth, one storage place. A line conditioned on it never plays, and it
+# is still generated and still paid for. Found by hand on 2026-07-31;
+# found here in milliseconds.
+# 
+# This fixture also guards the tool against ITSELF. The first version of
+# the register loader swept every backticked tag in ACT1_OVERVIEW section
+# 6 -- including the sentence that RETIRES this one -- and so reported
+# this file clean.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    condition: 'story.m11_conscript_spared == true'
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    condition: 'story.m99_invented_by_nobody == true'
+    text:    "A perfectly ordinary line of dialogue here."

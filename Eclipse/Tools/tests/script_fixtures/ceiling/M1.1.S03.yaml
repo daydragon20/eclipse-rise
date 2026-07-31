@@ -1,0 +1,33 @@
+# CEILING: a line over the band's upper number.
+# The check fires ABOVE the ceiling and never below it -- the one-word line
+# here must stay silent, because bands are ceilings (L1-R1).
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "Thirteen."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    text:    "It is thirty one words long and it says the same thing four times over because nobody edited it, and by the end of it the player has already walked away from the radio entirely now"
+
+  - id:      M1.1.S03.030
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    band:    callout
+    text:    "Contact left, contact left, moving up the ramp now"

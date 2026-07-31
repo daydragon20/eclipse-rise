@@ -1,0 +1,26 @@
+# PARSE: a line this tool cannot read must never be skipped.
+#
+# The parser is a stdlib YAML SUBSET (PyYAML is not installed and cannot be --
+# no admin rights). A hand parser that quietly ignores what it does not
+# understand is the fastest way to build a green bar that means nothing, so
+# anything unrecognised is a hard failure with a file:line.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Parse"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    this line is not a key/value pair at all
+    text:    "Thirteen."

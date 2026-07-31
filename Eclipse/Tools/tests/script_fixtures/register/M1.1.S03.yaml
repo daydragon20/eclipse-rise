@@ -1,0 +1,51 @@
+# REGISTER: a scene of six or more lines that never reaches its band's
+# lower number. This is the check that REPLACED the illegal per-line
+# minimum (L1-R1): the scene never uses the room its delivery context
+# gives it. The longest line here is NINE words against a floor of ten,
+# which also keeps the spread at 9x so this fixture isolates REGISTER and
+# does not trip SPREAD as well. A fixture that fires two checks proves
+# neither of them.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "Move."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    text:    "Now."
+
+  - id:      M1.1.S03.030
+    speaker: MARA
+    voice:   mara
+    text:    "Go left and hold the corner till they clear"
+
+  - id:      M1.1.S03.040
+    speaker: MARA
+    voice:   mara
+    text:    "Down."
+
+  - id:      M1.1.S03.050
+    speaker: MARA
+    voice:   mara
+    text:    "Clear."
+
+  - id:      M1.1.S03.060
+    speaker: MARA
+    voice:   mara
+    text:    "Out."

@@ -1,0 +1,22 @@
+# SCHEMA: a missing required header field, an unknown header field, and a
+# line carrying a field nobody defined. want/obstacle/turn are not
+# decoration: SCRIPT_FORMAT says a scene without all three is not written.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Schema"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+status:       draft
+critic:       null
+mood:         "invented header field"
+
+lines:
+  - id:       M1.1.S03.010
+    speaker:  MARA
+    voice:    mara
+    emotion:  "not a field in SCRIPT_FORMAT section 4"
+    text:     "Thirteen."

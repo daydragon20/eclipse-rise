@@ -176,3 +176,4 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 22:04 | `eade7e1` | **GROEN** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
 | 2026-07-31 22:11 | `381aa35` | **ROOD** | 226 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit [beeld: 6 beeld(en) VERANDERD -> stap 1, stap 2, stap 4, stap 5, stap 6, stap 7] |
 | 2026-07-31 22:20 | `9928a7d` | **ROOD** | 226 tests / 0 gefaald / 0 niet gedraaid | 25 | scriptstem komt nergens op uit |
+| 2026-07-31 22:49 | `bdad112` | **ROOD** | 228 tests / 4 gefaald / 0 niet gedraaid | 0 | Eclipse.Base.VaultBuildDeterminism; Eclipse.Base.VaultRoomsAreTellable; Eclipse.Base.VaultStateParity; Eclipse.Base.VaultWalkingRound; scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |

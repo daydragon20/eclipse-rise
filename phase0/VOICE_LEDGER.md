@@ -123,8 +123,55 @@ Ik heb de scriptbestanden geteld in plaats van aangenomen: elke `text:` plus elk
 | overige sprekers | — | — | ~9.610 | |
 | | | | **65.015** | **tier 2 is begroot op 45.000** |
 
-**Tekort: 20.015 credits.** Er is 125.612 over, dus het is oplosbaar — maar niet
-zonder een keuze, en de keuze is niet van mij.
+### ⚠⚠ EN DIE 65.015 GAAT OVER ZES VAN DE ACHT MISSIES (01-08)
+
+De telling hierboven klopt op wat ze telde. **Maar ze telde niet heel act 1**, en dat
+stond er niet bij — het bedrag las als "act 1 kost dit" terwijl het "de scenes die
+op 31-07 al geschreven waren kosten dit" betekende.
+
+Gemeten met `Eclipse/Tools/count_generation_cost.py` (nieuw, herhaalbaar): **31 van
+de 71 scriptbestanden hebben geen enkele tekstregel.** Dat zijn M1.7 (6 van 7), heel
+**M1.8 (12 scenes — de climax van de act)** en de **hele hub (12 scenes)**.
+
+| | scenes | credits |
+|---|---|---|
+| Gemeten — M1.1 t/m M1.6 + proloog + de eerste M1.7-scene | 40 | **67.341** |
+| Geëxtrapoleerd — rest van M1.7, heel M1.8, hele hub | 30 | ~49.230 |
+| **Act 1 compleet** | **70** | **~116.571** |
+
+De extrapolatie is 1.641 credits/scene, het gemeten gemiddelde over de zes
+geschreven missies (spreiding 1.256 bij M1.3 tot 2.213 bij M1.5). **Het is een schatting
+en heet hier ook zo.** Twee bekende scheeftrekkingen die elkaar deels opheffen: de hub
+bestaat uit korte gesprekken en zit er waarschijnlijk te hoog in, M1.8 is de climax met
+twaalf scenes en zit er waarschijnlijk te laag in.
+
+**Dat verandert de vraag.** Niet 20.015 tekort op een pot van 45.000, maar: **act 1
+alleen kost ~93% van de 125.612 die er nog is.** Barks, muziek, SFX en de acts 2 t/m 4
+komen daar nog bij. De opties hieronder zijn doorgerekend op 65.015 en dus op een te
+klein probleem.
+
+**Waarom de handtelling dit niet kon zien.** Ze telde wat er stond, en wat er stond was
+zes missies. Een teller die zwijgt over zijn eigen dekking meldt een stub als nul kosten,
+en nul kosten leest als "gratis" in plaats van als "nog niet geschreven". De nieuwe tool
+drukt daarom **altijd** de stub-lijst af, ook als die leeg is.
+
+**Kruisproef op de tool, want twee tellingen die verschillen moeten uitgezocht worden.**
+Tegen het corpus zoals het op 31-07 stond geeft de tool 65.125 tegen 65.015 met de hand
+— 0,17% verschil. Dex (9.459), mara (8.261) en reyes (2.387) reproduceren **tot op het
+teken**. De tool meet dus hetzelfde; het restverschil zit in hoe regels met varianten
+geteld werden. En de zelftest (`--zelftest`, 5 controles) bewijst eerst dát hij kan
+bewegen: varianten meetellen, de Voss-verdubbeling, een onbekende YAML-vorm melden in
+plaats van stil overslaan, een regel zonder `voice:` signaleren, en een lege scene als
+stub melden in plaats van als nul.
+
+**`words_generated` bestaat in nul van de 71 bestanden.** L1-R15 en `SCRIPT_FORMAT` §4
+schrijven het allebei voor als *het* credit-veld. Zolang het nergens staat, is deze tool
+de enige bron voor dat getal.
+
+---
+
+**Tekort op de oude telling: 20.015 credits.** Er is 125.612 over, dus het is oplosbaar
+— maar niet zonder een keuze, en de keuze is niet van mij.
 
 **Waarom Voss zo duur is.** Twee dingen stapelen. `SCRIPT_FORMAT` §4 regel 196 zegt
 dat `voss` een *logische* sleutel is die "resolved to `voss_m` / `voss_f` per player

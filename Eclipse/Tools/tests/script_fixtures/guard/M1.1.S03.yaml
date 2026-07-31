@@ -1,0 +1,23 @@
+# GUARD: status 'generated' on a scene the critic never passed. This is
+# the money-saver: the mechanical reason a bad line cannot reach the API.
+# No scene is generated on a NO-GO, ever, for any reason, including
+# deadline pressure.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       generated
+critic:       "NO-GO 2026-08-03: the turn does not land"
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."

@@ -1,0 +1,29 @@
+# CHOICE: a prompt with a single answer is not a choice.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    choice:
+      group: fx_lone
+      set:   'story.m12_ghost = true'
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    condition: 'story.m12_ghost == true'
+    text:    "A perfectly ordinary line of dialogue here."

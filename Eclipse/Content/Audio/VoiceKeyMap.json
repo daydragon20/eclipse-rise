@@ -48,6 +48,13 @@
   "dahl_threx": {
    "role": "threx"
   },
+  "threx": {
+   "role": "threx",
+   "alias_of": "dahl_threx"
+  },
+  "petra": {
+   "role": "petra"
+  },
   "malachar_vex": {
    "role": "vex"
   },

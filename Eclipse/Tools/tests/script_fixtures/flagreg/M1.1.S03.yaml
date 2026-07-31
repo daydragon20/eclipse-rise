@@ -1,0 +1,46 @@
+# FLAGREG: a flag set and read in production with no row in the section 6
+# register -- so it has no gameplay tag, and nothing is watching its
+# 'gelezen door' column. Section 6's own rule: no scene uses a flag in a
+# condition before the tag exists.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    choice:
+      group: fx_unreg
+      set:   'story.m99_unregistered = true'
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    choice:
+      group: fx_unreg
+      set:   'story.m99_unregistered = false'
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.030
+    speaker: MARA
+    voice:   mara
+    condition: 'story.m99_unregistered == true'
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.040
+    speaker: MARA
+    voice:   mara
+    condition: 'story.m99_unregistered == false'
+    text:    "A perfectly ordinary line of dialogue here."

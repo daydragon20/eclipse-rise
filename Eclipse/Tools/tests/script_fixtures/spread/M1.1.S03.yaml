@@ -1,0 +1,47 @@
+# SPREAD: every turn the same length -- the loudest tell that a machine
+# wrote it (18.9 D). Six lines, all eleven words, ratio 1.0x against a
+# floor of 3x.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "The patrol comes back around the corner in about nine minutes flat"
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    text:    "The patrol comes back around the corner in about nine minutes flat"
+
+  - id:      M1.1.S03.030
+    speaker: MARA
+    voice:   mara
+    text:    "The patrol comes back around the corner in about nine minutes flat"
+
+  - id:      M1.1.S03.040
+    speaker: MARA
+    voice:   mara
+    text:    "The patrol comes back around the corner in about nine minutes flat"
+
+  - id:      M1.1.S03.050
+    speaker: MARA
+    voice:   mara
+    text:    "The patrol comes back around the corner in about nine minutes flat"
+
+  - id:      M1.1.S03.060
+    speaker: MARA
+    voice:   mara
+    text:    "The patrol comes back around the corner in about nine minutes flat"

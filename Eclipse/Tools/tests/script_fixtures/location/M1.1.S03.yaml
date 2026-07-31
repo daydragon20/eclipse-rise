@@ -1,0 +1,22 @@
+# LOCATION: a location string that is not in the act-1 registry
+# (ACT1_OVERVIEW section 7 -- NOT 03_world_design.md, which has no
+# district names; see finding C-1).
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / The Duiker"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    text:    "A perfectly ordinary line of dialogue here."

@@ -1,0 +1,76 @@
+# THE CONTROL. Zero findings, and that is the half of the proof people forget.
+#
+# Every other fixture here proves a check can go RED. This one proves they do
+# not go red on correct input. A validator that fires on everything is exactly
+# as useless as one that fires on nothing, and it fails in the more expensive
+# direction: people learn to wave it away, and then the real red goes past too.
+#
+# It deliberately exercises the shapes that are easiest to get wrong:
+#   - a one-word line inside a 10-25 band  (SCRIPT_FORMAT: "a validator that
+#     fails this line is a broken validator" -- bands are ceilings, L1-R1)
+#   - a `band:` override, excluded from register, still counted for spread
+#   - a two-option choice on a REGISTERED flag, read by both branches
+#   - a multi-line folded `note:` scalar, which real scenes contain
+scene:        M1.1.S03
+mission:      M1.1
+title:        "The Control"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "The validator must stay quiet when the file is right."
+obstacle:     "Every check it owns has an opinion about this file."
+turn:         "It has nothing to say, and that is the result."
+status:       draft
+critic:       null
+words:        64
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    tags:    [quietly]
+    text:    "Thirteen."
+    note:    "One word inside a 10-25 band. Legal, and the canonical example
+              of why the floor was lifted."
+
+  - id:      M1.1.S03.020
+    speaker: VOSS
+    voice:   voss
+    text:    "That is not enough for four of them and the pair on the low route as well."
+
+  - id:      M1.1.S03.030
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    band:    callout
+    text:    "Contact."
+
+  - id:      M1.1.S03.040
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: fx_ghost
+      set:   'story.m12_ghost = true'
+      label: "Quiet."
+    text:    "Nobody saw us come up and nobody sees us leave. That is the whole job."
+
+  - id:      M1.1.S03.050
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: fx_ghost
+      set:   'story.m12_ghost = false'
+      label: "Loud."
+    text:    "Let them count the holes afterwards."
+
+  - id:        M1.1.S03.060
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m12_ghost == true'
+    text:      "Off the deck."
+
+  - id:        M1.1.S03.070
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m12_ghost == false'
+    text:      "Then we walk out through it."

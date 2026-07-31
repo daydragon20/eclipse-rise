@@ -1,0 +1,37 @@
+# BRANCH, the reader half -- ANOTHER MISSION, ANOTHER WRITER, which is the
+# whole point. This is RULING L1-R12 reproduced exactly: the flag grew
+# three leaves at the setter and this closing scene handles two of them.
+# One player in three would get the wrong closing beat of a story thread,
+# on the closing beat, unfixable after generation.
+# 
+# The architect's own words: 'my SCRIPT_FORMAT section 6 check "condition
+# resolves" would have caught this. I specified it and it does not exist
+# in code. That is the argument for building validate_script.py BEFORE act
+# 2 and not after -- it catches the architect's errors as well as the
+# writers'.'
+scene:        M1.6.S06
+mission:      M1.6
+title:        "What We Do With Them"
+act:          1
+location:     "Kessara / Mid-Works / Supply Depot Yard"
+type:         hub
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.6.S06.250
+    speaker: SELA
+    voice:   sela
+    condition: 'story.m15_shiftboss == "prevented"'
+    text:    "He is still at his gate, and he is still telling everyone who passes about it."
+
+  - id:      M1.6.S06.260
+    speaker: SELA
+    voice:   sela
+    condition: 'story.m15_shiftboss == "killed"'
+    text:    "Nobody has opened that gallery gate since, and nobody has asked me to either."

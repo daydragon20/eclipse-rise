@@ -1,202 +1,204 @@
 {
-  "_uitleg": [
-    "Dit bestand voedt de knoppen op het dashboard onder 'Wacht op jou'.",
-    "Agents: zet hier elke vraag neer die je aan Nathan wilt stellen. Hij ziet",
-    "hem dan op zijn scherm MET de stappen erbij, en beantwoordt hem met een klik.",
-    "Zijn antwoord komt in phase0/OWNER_ANSWERS.md — lees dat elke sessie.",
-    "",
-    "Velden per vraag:",
-    "  id        O-6, T-11, ... (moet matchen met de owner-tabellen)",
-    "  vraag     de vraag in gewone taal, geen jargon",
-    "  waarom    waarom je het vraagt, en wat er van afhangt",
-    "  stappen   wat hij CONCREET moet doen om te kunnen antwoorden (mag leeg)",
-    "  opties    de knoppen. label = op de knop, gevolg = wat er dan gebeurt",
-    "  advies    jouw aanbeveling, of null",
-    "  vrijtekst true = hij mag ook zelf iets typen",
-    "  meer_info  uitklapbare uitleg: WAAR staat het, HOE open je het, waar let je op",
-    "  audio_map  repo-relatieve map met audio - speelt hij af IN het dashboard",
-    "  prio       nu | gauw | later",
-    "VOEG NOOIT EEN ONBEANTWOORDE VRAAG WEG. Op 31-07 vielen O-5 en O-6 stil weg",
-    "bij een herformattering. Beantwoorde vragen zakken vanzelf naar de sectie",
-    "Beantwoord zodra ze in OWNER_ANSWERS.md staan."
-  ],
-  "vragen": [
+ "_uitleg": [
+  "Dit bestand voedt de knoppen op het dashboard onder 'Wacht op jou'.",
+  "Agents: zet hier elke vraag neer die je aan Nathan wilt stellen. Hij ziet",
+  "hem dan op zijn scherm MET de stappen erbij, en beantwoordt hem met een klik.",
+  "Zijn antwoord komt in phase0/OWNER_ANSWERS.md — lees dat elke sessie.",
+  "",
+  "Velden per vraag:",
+  "  id        O-6, T-11, ... (moet matchen met de owner-tabellen)",
+  "  vraag     de vraag in gewone taal, geen jargon",
+  "  waarom    waarom je het vraagt, en wat er van afhangt",
+  "  stappen   wat hij CONCREET moet doen om te kunnen antwoorden (mag leeg)",
+  "  opties    de knoppen. label = op de knop, gevolg = wat er dan gebeurt",
+  "  advies    jouw aanbeveling, of null",
+  "  vrijtekst true = hij mag ook zelf iets typen",
+  "  meer_info  uitklapbare uitleg: WAAR staat het, HOE open je het, waar let je op",
+  "  audio_map  repo-relatieve map met audio - speelt hij af IN het dashboard",
+  "  prio       nu | gauw | later",
+  "VOEG NOOIT EEN ONBEANTWOORDE VRAAG WEG. Op 31-07 vielen O-5 en O-6 stil weg",
+  "bij een herformattering. Beantwoorde vragen zakken vanzelf naar de sectie",
+  "Beantwoord zodra ze in OWNER_ANSWERS.md staan."
+ ],
+ "vragen": [
+  {
+   "id": "O-13",
+   "prio": "nu",
+   "vraag": "Drie stemmen zijn twee keer gekozen — welke verhuist?",
+   "waarom": "Een stem kan geen twee rollen spelen: de cache-sleutel bevat de stem-ID, dus twee personages met dezelfde stem klinken letterlijk identiek. Je eerste keuze botst op drie plekken, en een ervan is pijnlijk: LAURA staat bij Voss (vrouwelijk) en bij Kaya. ALICE staat bij Reyes en bij Kaine — je companion-medic en de Grand Marshal van de Dominion, die elkaar in akte 3 tegenkomen. DANIEL staat bij Torren en bij AEGIS, dus een mens en een machine. Je hebt per rol een reserve gekozen, dus voor elke botsing hoeft er maar EEN te verhuizen naar nummer twee. Zeg per botsing welke van de twee rollen de reserve krijgt; heb je geen voorkeur, dan kies ik en leg ik uit waarom.",
+   "stappen": [
+    "Open de castingpagina; de botsende rollen staan gemarkeerd",
+    "Zeg per botsing wie de reservestem krijgt",
+    "Of laat het aan mij — dan verhuist de rol met de minste regels, want daar is omcasten later het goedkoopst"
+   ],
+   "opties": [
     {
-      "id": "O-13",
-      "prio": "nu",
-      "vraag": "Drie stemmen zijn twee keer gekozen — welke verhuist?",
-      "waarom": "Een stem kan geen twee rollen spelen: de cache-sleutel bevat de stem-ID, dus twee personages met dezelfde stem klinken letterlijk identiek. Je eerste keuze botst op drie plekken, en een ervan is pijnlijk: LAURA staat bij Voss (vrouwelijk) en bij Kaya. ALICE staat bij Reyes en bij Kaine — je companion-medic en de Grand Marshal van de Dominion, die elkaar in akte 3 tegenkomen. DANIEL staat bij Torren en bij AEGIS, dus een mens en een machine. Je hebt per rol een reserve gekozen, dus voor elke botsing hoeft er maar EEN te verhuizen naar nummer twee. Zeg per botsing welke van de twee rollen de reserve krijgt; heb je geen voorkeur, dan kies ik en leg ik uit waarom.",
-      "stappen": [
-        "Open de castingpagina; de botsende rollen staan gemarkeerd",
-        "Zeg per botsing wie de reservestem krijgt",
-        "Of laat het aan mij — dan verhuist de rol met de minste regels, want daar is omcasten later het goedkoopst"
-      ],
-      "opties": [
-        {
-          "label": "Ik kies zelf — ik zeg het erbij",
-          "waarde": "zelf",
-          "gevolg": "Noem per botsing welke rol naar de reserve gaat. Dan lock ik de tabel en is casting definitief voor die zes rollen."
-        },
-        {
-          "label": "Kies jij, met uitleg",
-          "waarde": "agent",
-          "gevolg": "Ik verhuis per botsing de rol met de minste regels naar zijn reserve en schrijf op waarom. Je kunt het altijd terugdraaien zolang er niet gegenereerd is."
-        },
-        {
-          "label": "Laat maar even — ik kies eerst de rest af",
-          "waarde": "later",
-          "gevolg": "Prima, maar dan blijft casting open en kan Tier 1 niet starten. De botsingen moeten voor generatie weg."
-        }
-      ],
-      "advies": "Alice bij Reyes houden en Kaine de reserve geven ligt voor de hand — een medic die je 25 uur hoort weegt zwaarder dan een schurk in akte 3. Maar het is jouw oor.",
-      "vrijtekst": true
+     "label": "Ik kies zelf — ik zeg het erbij",
+     "waarde": "zelf",
+     "gevolg": "Noem per botsing welke rol naar de reserve gaat. Dan lock ik de tabel en is casting definitief voor die zes rollen."
     },
     {
-      "id": "O-14",
-      "prio": "nu",
-      "vraag": "Act 1 past niet in het budget: Voss alleen is 71% van de dialoogpot",
-      "waarom": "Nu er echt geteld is in plaats van geschat, klopt de begroting niet. Act 1 kost 65.015 credits tegen een Tier 2-pot van 45.000 — 20.015 te kort. En de oorzaak zit op een plek: VOSS ALLEEN KOST 32.014, oftewel 71% van die pot. Dat komt door twee vermenigvuldigingen die op elkaar stapelen. Ten eerste spreekt Voss in twee stemmen (mannelijk en vrouwelijk, want de speler kiest), dus elke regel wordt twee keer gegenereerd. Ten tweede heeft hij 126 persoonlijkheidsvarianten — vier assen waarop hij anders reageert — en die verdubbelen ook. 201 regels worden zo ruim 650 generaties. Je saldo van 125.612 kan het dragen, maar dan gaat het ergens anders vanaf: dit is een keuze over WAT DE SPELER HOORT, geen boekhoudkundige. Er staan vier doorgerekende opties in de ledger.",
-      "stappen": [
-        "Lees de vier opties in phase0/VOICE_LEDGER.md (kort, met bedragen)",
-        "Of kies hieronder de richting en laat mij het uitwerken"
-      ],
-      "opties": [
-        {
-          "label": "Varianten halveren",
-          "waarde": "varianten",
-          "gevolg": "De vier persoonlijkheidsassen terugbrengen naar twee op de scenes waar het minst verschil hoorbaar is. Bespaart het meest per verloren beat, en de scenes zelf blijven allemaal bestaan. Dit is de hefboom die story-architect aanwijst."
-        },
-        {
-          "label": "Een Voss-stem deze maand",
-          "waarde": "een-stem",
-          "gevolg": "Alleen mannelijk of alleen vrouwelijk genereren nu, de andere na 21 augustus via de Starter-route. Halveert Voss in een klap, maar tot die tijd hoort de helft van de spelers zichzelf niet."
-        },
-        {
-          "label": "Meer uit de reserve halen",
-          "waarde": "reserve",
-          "gevolg": "Tier 2 ophogen ten koste van muziek en SFX. Het saldo kan het, maar dan is de never-silent-vloer uit doc 16 dit jaar niet te halen."
-        },
-        {
-          "label": "Kies jij, met cijfers erbij",
-          "waarde": "agent",
-          "gevolg": "Ik kies de combinatie met de minste hoorbare schade en leg per beat uit wat er sneuvelt. Niets wordt gegenereerd tot jij het gezien hebt."
-        }
-      ],
-      "advies": "Varianten halveren. Een variant is een andere KLEUR van dezelfde beat; een geschrapte scene is een gat. En het is de enige post die je kunt halveren zonder een verplichte plant-drager te verliezen.",
-      "vrijtekst": true
+     "label": "Kies jij, met uitleg",
+     "waarde": "agent",
+     "gevolg": "Ik verhuis per botsing de rol met de minste regels naar zijn reserve en schrijf op waarom. Je kunt het altijd terugdraaien zolang er niet gegenereerd is."
     },
     {
-      "id": "O-12",
-      "prio": "nu",
-      "vraag": "2.475 credits zijn op het verkeerde model gegaan — opnieuw doen, en hoeveel?",
-      "waarom": "Je hebt de API-scopes aangezet terwijl een agent aan het werk was. Goed nieuws: de generatie is daarmee open, eleven_v3 is bevestigd beschikbaar, en het saldo is nu ECHT te meten. Slecht nieuws: precies daardoor ging de rem eraf midden in een run, en die run draaide op het verkeerde model. 51 auditieclips zijn gegenereerd op multilingual_v2 in plaats van eleven_v3, en 21 daarvan dragen audio-tags die v2 niet kan. De agent had die controle als WAARSCHUWING geschreven in plaats van als poort, en zag hem niet omdat de uitvoer werd weggegooid. Dat is nu een harde poort (exit 6) en geverifieerd weigerend; het standaardmodel is eleven_v3. DE SCHADE IS GEMETEN EN NIET GESCHAT: zelfde stem, zelfde regel, tag weg — 4,44 s met tag tegen 2,14 s zonder. Een uitschieter van 2,30 s op een basis van 2,14 s is veel meer dan een woord uitspreken, dus v2 doet iets groots en onbedoelds met die haakjes. Wat precies — de tag voorlezen of de voordracht veranderen — scheidt die meting NIET, en dat wordt ook niet geclaimd. Wat wel vaststaat: die 21 clips zijn geen eerlijke basis voor een permanente castingbeslissing. Je saldo staat gemeten op 125.612 en de ledger klopt tot op de credit.",
-      "stappen": [
-        "Kies hoeveel er opnieuw moet",
-        "Bij twijfel: alles opnieuw — dan vergelijk je 17 finalisten op precies hetzelfde model"
-      ],
-      "opties": [
-        {
-          "label": "Alleen de 21 getagde clips opnieuw",
-          "waarde": "21",
-          "gevolg": "1.439 credits. Tier 0 komt daarmee op 3.959 van de 6.000. Nadeel: je vergelijkt straks clips van twee verschillende modellen naast elkaar, en dat is precies wat een castingoordeel vertroebelt."
-        },
-        {
-          "label": "Alle 51 opnieuw op eleven_v3",
-          "waarde": "51",
-          "gevolg": "2.470 credits. Tier 0 komt op 4.990 van de 6.000, dus nog steeds binnen het plafond. Alle 17 finalisten op een model, eerlijke vergelijking. Dit is mijn advies."
-        },
-        {
-          "label": "Niets opnieuw — ik oordeel op wat er ligt",
-          "waarde": "geen",
-          "gevolg": "Nul credits. Maar 21 van de 51 clips zijn dan op een model gemaakt dat de tags niet aankan, en casting is permanent — omcasten herbetaalt elke regel van dat personage."
-        }
-      ],
-      "advies": "Alles opnieuw. 2.470 credits is 2% van je budget, en casting is de enige beslissing die je niet goedkoop kunt terugdraaien.",
-      "vrijtekst": true
-    },
-    {
-      "id": "T-8",
-      "vraag": "MetaHuman-downloads afronden?",
-      "waarom": "De basis staat er (SentinelC + Common, 908 MB). Voor de resterende MetaHuman-onderdelen is per stuk één Download-klik nodig. Daarna kan de curatie van de named-character-slots verder.",
-      "stappen": [
-        "Open de Unreal Editor → Window → Fab → My Library",
-        "Klik bij elk resterend MetaHuman-item op Download",
-        "Klaar? Druk hieronder op de knop"
-      ],
-      "opties": [
-        {
-          "label": "Staan erin",
-          "waarde": "gedaan",
-          "gevolg": "De agent pikt ze op en gaat verder met de curatie."
-        },
-        {
-          "label": "Doe ik later",
-          "waarde": "later",
-          "gevolg": "De curatie loopt intussen door op wat al binnen is."
-        }
-      ],
-      "advies": "Ongeveer 5 minuten.",
-      "vrijtekst": false,
-      "prio": "gauw"
-    },
-    {
-      "id": "O-3",
-      "prio": "nu",
-      "vraag": "Stemmen kiezen — en twee slots houden nu de bar rood",
-      "waarom": "Je hebt er twaalf gedaan. Twee dingen vragen nog aandacht, en het eerste is klein maar blokkerend: ECLIPSE_FIGHTER HEEFT VIER SLOTS EN TWEE STEMMEN. De scripts gebruiken eclipse_fighter_a t/m _d, en A en B zijn gebonden aan jouw twee keuzes — maar C en D hangen aan niets. Dat is nu het enige rode punt op de bar. En het zou geen foutmelding geven maar STILTE: een lege stem-ID wordt gelogd en overgeslagen, dus die regels bestaan gewoon niet in een run die er gezond uitziet. Er zit hier een dubbelzinnigheid in de vraag die ik je gesteld heb: 'top 2' betekende voor een personage een EERSTE KEUZE EN EEN RESERVE, maar voor een pool (de bark-registers) betekent het TWEE STEMMEN DIE ALLEBEI GEBRUIKT WORDEN. Voor eclipse_fighter moet het dat laatste zijn, dus daar zijn er nog twee nodig. Dat is mijn onduidelijkheid, niet die van jou. Verder wachten nog zes rollen, waarvan de Iron Chorus-emissaris de belangrijkste is: 71 regels, de tweede hoofdrol van een hele dialoogmissie, en M1.5 kan zonder hem niet genereren. Zeven kandidaten staan klaar, gekozen op een eigenschap die je kunt horen — kan deze stem VLAK zijn zonder dood te klinken.",
-      "stappen": [
-        "Open http://127.0.0.1:8377/progress_media/casting/CASTING.html",
-        "Kies TWEE EXTRA stemmen voor eclipse_fighter (slot C en D) — dat haalt de bar weer groen",
-        "Kies de emissaris uit de zeven kandidaten; let op: hij noemt in de hele missie geen enkele naam, dus de vraag is of de stem vlak kan zijn zonder dood",
-        "De overige vijf rollen als je toch bezig bent"
-      ],
-      "meer_info": "**Waar de audio staat en hoe je hem hoort**\n\nDe fragmenten komen in Eclipse/Content/Audio/Generated/. Zodra ze er zijn verschijnen ze **hier op deze kaart** als afspeelknopjes — je hoeft de Unreal Editor niet te openen en geen mappen te zoeken.\n\n**Per stem hoor je drie fragmenten, niet een:**\n\n1. De signature-regel — klinkt dit als het personage?\n2. Een emotioneel uiterste — Mara in haar laatste scène, Vex die dreigt, Kaya in paniek\n3. Een korte gevechtsregel — hoor je hem nog over geweervuur heen?\n\n**Waar je op let:**\n\n- Een stem die een rustige zin prachtig draagt maar instort bij het uiterste is de verkeerde stem, hoe mooi die eerste zin ook was\n- Personages die samen scenes hebben krijg je naast elkaar te horen. Vervagen ze in elkaar? Zeg het — dan ruilen we er een nu, niet na 90.000 credits\n- Twijfel je? Zeg dat. Twijfel bij de auditie wordt zekerheid dat het fout is na duizend regels\n\n**Doe er gerust lang over.** De screening was gratis; deze fragmenten zijn al betaald tegen de tijd dat jij luistert.",
-      "audio_map": "Eclipse/Content/Audio/Casting",
-      "opties": [
-        {
-          "label": "Ik heb gekozen — zie tekstveld",
-          "waarde": "gekozen",
-          "gevolg": "voice-director lockt de castingtabel en begint te genereren in tier-volgorde."
-        },
-        {
-          "label": "Nog geen audio te horen",
-          "waarde": "wacht",
-          "gevolg": "De agent meldt zich zodra de fragmenten klaarstaan."
-        }
-      ],
-      "advies": null,
-      "vrijtekst": true
-    },
-    {
-      "id": "O-4",
-      "prio": "gauw",
-      "vraag": "IJkmissie M1.1: klinkt het zoals het moet?",
-      "waarom": "M1.1 gaat als eerste helemaal door de pijplijn — beats, dialoog, kwaliteitspoort, stem, in de game. Een missie volledig af voor er 41 andere gemaakt worden. Pas na jouw akkoord start de massaproductie.",
-      "stappen": [
-        "NOG NIET AAN DE BEURT — M1.1 is pas rond 7 augustus speelbaar",
-        "Start dan de game via '1 - SPEEL ECLIPSE' op je bureaublad",
-        "Speel M1.1 (Thirteen Bullets) van begin tot eind en let op de dialoog"
-      ],
-      "meer_info": "**Waarom dit de belangrijkste knop van het project is**\n\nAls de schrijfstandaard fout is, wil je dat weten bij missie 1 — niet bij missie 34.\n\n**Waar je op let (jouw oordeel, niet dat van een test):**\n\n- Zijn de personages van elkaar te onderscheiden zonder dat je de naam ziet?\n- Legt iemand iets uit wat je al begreep? Dat is de meest voorkomende fout\n- Is er een zin waarvan je denkt: dat zegt niemand?\n- Praat iemand over het geweervuur heen?\n- Zit er humor in, en komt die van het personage of van de schrijver?\n\n**Bij nee gebeurt er iets nuttigs:** de standaard wordt bijgesteld en M1.1 gaat er nog eens doorheen. Dat kost dagen. Hetzelfde probleem ontdekken na 42 missies kost de maand. Zeg dus gerust nee.",
-      "opties": [
-        {
-          "label": "Ja — zo moet het klinken",
-          "waarde": "akkoord",
-          "gevolg": "Massaproductie start: 4-6 schrijvers parallel op de rest."
-        },
-        {
-          "label": "Nee — zie tekstveld",
-          "waarde": "afgekeurd",
-          "gevolg": "Standaard bijgesteld op jouw punten; M1.1 gaat er nog eens doorheen."
-        },
-        {
-          "label": "Nog niet klaar",
-          "waarde": "wacht",
-          "gevolg": "De agent meldt zich als M1.1 speelbaar is."
-        }
-      ],
-      "advies": null,
-      "vrijtekst": true
+     "label": "Laat maar even — ik kies eerst de rest af",
+     "waarde": "later",
+     "gevolg": "Prima, maar dan blijft casting open en kan Tier 1 niet starten. De botsingen moeten voor generatie weg."
     }
-  ]
+   ],
+   "advies": "Alice bij Reyes houden en Kaine de reserve geven ligt voor de hand — een medic die je 25 uur hoort weegt zwaarder dan een schurk in akte 3. Maar het is jouw oor.",
+   "vrijtekst": true
+  },
+  {
+   "id": "O-14",
+   "prio": "nu",
+   "vraag": "Act 1 kost bijna alles wat je nog aan credits hebt",
+   "waarom": "IK MOET EEN GETAL CORRIGEREN DAT IK JE ZELF GEGEVEN HEB. Deze kaart zei “Act 1 kost 65.015 credits”. Dat bedrag klopte op wat het telde, maar het telde ZES VAN DE ACHT MISSIES — M1.7, M1.8 (de climax) en alle twaalf hub-gesprekken waren toen nog niet geschreven en telden dus als nul. Nul kosten leest als gratis, terwijl het ‘nog niet geschreven’ betekende. \n\nIk heb er nu een herhaalbare teller voor gebouwd (Eclipse/Tools/count_generation_cost.py) die ALTIJD zijn eigen dekking meldt. Gemeten vannacht: 84.328 credits, en er zijn nog twee M1.8-scènes en twaalf hub-gesprekken ongeschreven. ACT 1 COMPLEET LANDT ROND DE 100.000. \n\nJe hebt er 125.612. Act 1 alleen is dus ongeveer VIER VIJFDE VAN ALLES WAT ER NOG IS — en daarna komen barks, muziek, SFX en de acts 2 tot en met 4 nog. Dat is een andere vraag dan “20.015 tekort op één potje”. \n\nDE OORZAAK ZIT NOG STEEDS OP ÉÉN PLEK: VOSS KOST 41.140, oftewel de helft van act 1. Twee vermenigvuldigingen stapelen. Hij spreekt in twee stemmen (mannelijk en vrouwelijk, want de speler kiest), dus elke regel wordt twee keer ingesproken. En 148 van zijn 418 regels zijn persoonlijkheidsvarianten — vier assen waarop hij anders reageert — die ook verdubbelen. \n\nDe bedragen hieronder zijn opnieuw doorgerekend op de meting van vannacht, niet op de oude 65.015. Ze lopen nog iets op zolang M1.8 en de hub geschreven worden; de teller zegt op elk moment waar hij staat.",
+   "stappen": [
+    "Bekijk de tabel in phase0/VOICE_LEDGER.md — gemeten bedrag, geschat bedrag en wat er NIET in zit staan er los",
+    "Of kies hieronder de richting en laat mij het uitwerken",
+    "Wil je het zelf narekenen: python Eclipse/Tools/count_generation_cost.py"
+   ],
+   "opties": [
+    {
+     "label": "Varianten halveren",
+     "waarde": "varianten",
+     "gevolg": "De vier persoonlijkheidsassen terugbrengen naar twee op de scènes waar het minst verschil hoorbaar is. Bespaart circa 8.900 van de 17.770 die de varianten kosten, en geen enkele scène verdwijnt. Dit is de hefboom die story-architect aanwijst."
+    },
+    {
+     "label": "Een Voss-stem deze maand",
+     "waarde": "een-stem",
+     "gevolg": "Alleen mannelijk of alleen vrouwelijk genereren nu, de andere na 21 augustus via de Starter-route. Bespaart 20.570 in één klap, maar tot die tijd hoort de helft van de spelers zichzelf niet."
+    },
+    {
+     "label": "Allebei",
+     "waarde": "beide",
+     "gevolg": "Bespaart 29.455. Dan past act 1 ruim, maar Voss is deze maand één stem zonder persoonlijkheidsvarianten — en hij is het personage waar de speler zichzelf in hoort."
+    },
+    {
+     "label": "Kies jij, met cijfers erbij",
+     "waarde": "agent",
+     "gevolg": "Ik kies de combinatie met de minste hoorbare schade en leg per beat uit wat er sneuvelt. Niets wordt gegenereerd tot jij het gezien hebt."
+    }
+   ],
+   "advies": "Varianten halveren, en de tweede Voss-stem pas na 21 augustus. Een variant is een andere KLEUR van dezelfde beat; een tweede geslacht is de helft van je spelers. Maar dit is nadrukkelijk jouw keuze — hij gaat over wat de speler hóórt, niet over boekhouding.",
+   "vrijtekst": true
+  },
+  {
+   "id": "O-12",
+   "prio": "nu",
+   "vraag": "2.475 credits zijn op het verkeerde model gegaan — opnieuw doen, en hoeveel?",
+   "waarom": "Je hebt de API-scopes aangezet terwijl een agent aan het werk was. Goed nieuws: de generatie is daarmee open, eleven_v3 is bevestigd beschikbaar, en het saldo is nu ECHT te meten. Slecht nieuws: precies daardoor ging de rem eraf midden in een run, en die run draaide op het verkeerde model. 51 auditieclips zijn gegenereerd op multilingual_v2 in plaats van eleven_v3, en 21 daarvan dragen audio-tags die v2 niet kan. De agent had die controle als WAARSCHUWING geschreven in plaats van als poort, en zag hem niet omdat de uitvoer werd weggegooid. Dat is nu een harde poort (exit 6) en geverifieerd weigerend; het standaardmodel is eleven_v3. DE SCHADE IS GEMETEN EN NIET GESCHAT: zelfde stem, zelfde regel, tag weg — 4,44 s met tag tegen 2,14 s zonder. Een uitschieter van 2,30 s op een basis van 2,14 s is veel meer dan een woord uitspreken, dus v2 doet iets groots en onbedoelds met die haakjes. Wat precies — de tag voorlezen of de voordracht veranderen — scheidt die meting NIET, en dat wordt ook niet geclaimd. Wat wel vaststaat: die 21 clips zijn geen eerlijke basis voor een permanente castingbeslissing. Je saldo staat gemeten op 125.612 en de ledger klopt tot op de credit.",
+   "stappen": [
+    "Kies hoeveel er opnieuw moet",
+    "Bij twijfel: alles opnieuw — dan vergelijk je 17 finalisten op precies hetzelfde model"
+   ],
+   "opties": [
+    {
+     "label": "Alleen de 21 getagde clips opnieuw",
+     "waarde": "21",
+     "gevolg": "1.439 credits. Tier 0 komt daarmee op 3.959 van de 6.000. Nadeel: je vergelijkt straks clips van twee verschillende modellen naast elkaar, en dat is precies wat een castingoordeel vertroebelt."
+    },
+    {
+     "label": "Alle 51 opnieuw op eleven_v3",
+     "waarde": "51",
+     "gevolg": "2.470 credits. Tier 0 komt op 4.990 van de 6.000, dus nog steeds binnen het plafond. Alle 17 finalisten op een model, eerlijke vergelijking. Dit is mijn advies."
+    },
+    {
+     "label": "Niets opnieuw — ik oordeel op wat er ligt",
+     "waarde": "geen",
+     "gevolg": "Nul credits. Maar 21 van de 51 clips zijn dan op een model gemaakt dat de tags niet aankan, en casting is permanent — omcasten herbetaalt elke regel van dat personage."
+    }
+   ],
+   "advies": "Alles opnieuw. 2.470 credits is 2% van je budget, en casting is de enige beslissing die je niet goedkoop kunt terugdraaien.",
+   "vrijtekst": true
+  },
+  {
+   "id": "T-8",
+   "vraag": "MetaHuman-downloads afronden?",
+   "waarom": "De basis staat er (SentinelC + Common, 908 MB). Voor de resterende MetaHuman-onderdelen is per stuk één Download-klik nodig. Daarna kan de curatie van de named-character-slots verder.",
+   "stappen": [
+    "Open de Unreal Editor → Window → Fab → My Library",
+    "Klik bij elk resterend MetaHuman-item op Download",
+    "Klaar? Druk hieronder op de knop"
+   ],
+   "opties": [
+    {
+     "label": "Staan erin",
+     "waarde": "gedaan",
+     "gevolg": "De agent pikt ze op en gaat verder met de curatie."
+    },
+    {
+     "label": "Doe ik later",
+     "waarde": "later",
+     "gevolg": "De curatie loopt intussen door op wat al binnen is."
+    }
+   ],
+   "advies": "Ongeveer 5 minuten.",
+   "vrijtekst": false,
+   "prio": "gauw"
+  },
+  {
+   "id": "O-3",
+   "prio": "nu",
+   "vraag": "Stemmen kiezen — en twee slots houden nu de bar rood",
+   "waarom": "Je hebt er twaalf gedaan. Twee dingen vragen nog aandacht, en het eerste is klein maar blokkerend: ECLIPSE_FIGHTER HEEFT VIER SLOTS EN TWEE STEMMEN. De scripts gebruiken eclipse_fighter_a t/m _d, en A en B zijn gebonden aan jouw twee keuzes — maar C en D hangen aan niets. Dat is nu het enige rode punt op de bar. En het zou geen foutmelding geven maar STILTE: een lege stem-ID wordt gelogd en overgeslagen, dus die regels bestaan gewoon niet in een run die er gezond uitziet. Er zit hier een dubbelzinnigheid in de vraag die ik je gesteld heb: 'top 2' betekende voor een personage een EERSTE KEUZE EN EEN RESERVE, maar voor een pool (de bark-registers) betekent het TWEE STEMMEN DIE ALLEBEI GEBRUIKT WORDEN. Voor eclipse_fighter moet het dat laatste zijn, dus daar zijn er nog twee nodig. Dat is mijn onduidelijkheid, niet die van jou. ER ZIJN VANNACHT TWEE SLEUTELS BIJGEKOMEN in de scripts: threx en petra. Threx bleek alleen een naamkwestie — de schrijvers van M1.7 en M1.8 schreven 'threx' waar de tabel 'dahl_threx' kende, dus 23 regels zouden als stilte zijn gegenereerd. Dat heb ik zelf opgelost, want de afspraak lag al vast. PETRA IS WEL VAN JOU: elf regels, ze staat in de castingtabel maar heeft nog geen stem. Verder wachten nog zes rollen, waarvan de Iron Chorus-emissaris de belangrijkste is: 71 regels, de tweede hoofdrol van een hele dialoogmissie, en M1.5 kan zonder hem niet genereren. Zeven kandidaten staan klaar, gekozen op een eigenschap die je kunt horen — kan deze stem VLAK zijn zonder dood te klinken.",
+   "stappen": [
+    "Open http://127.0.0.1:8377/progress_media/casting/CASTING.html",
+    "Kies TWEE EXTRA stemmen voor eclipse_fighter (slot C en D) — dat haalt de bar weer groen",
+    "Kies de emissaris uit de zeven kandidaten; let op: hij noemt in de hele missie geen enkele naam, dus de vraag is of de stem vlak kan zijn zonder dood",
+    "Kies een stem voor PETRA VOSS (elf regels, en haar scène in M1.8 is naar haar vernoemd)",
+    "De overige vijf rollen als je toch bezig bent"
+   ],
+   "meer_info": "**Waar de audio staat en hoe je hem hoort**\n\nDe fragmenten komen in Eclipse/Content/Audio/Generated/. Zodra ze er zijn verschijnen ze **hier op deze kaart** als afspeelknopjes — je hoeft de Unreal Editor niet te openen en geen mappen te zoeken.\n\n**Per stem hoor je drie fragmenten, niet een:**\n\n1. De signature-regel — klinkt dit als het personage?\n2. Een emotioneel uiterste — Mara in haar laatste scène, Vex die dreigt, Kaya in paniek\n3. Een korte gevechtsregel — hoor je hem nog over geweervuur heen?\n\n**Waar je op let:**\n\n- Een stem die een rustige zin prachtig draagt maar instort bij het uiterste is de verkeerde stem, hoe mooi die eerste zin ook was\n- Personages die samen scenes hebben krijg je naast elkaar te horen. Vervagen ze in elkaar? Zeg het — dan ruilen we er een nu, niet na 90.000 credits\n- Twijfel je? Zeg dat. Twijfel bij de auditie wordt zekerheid dat het fout is na duizend regels\n\n**Doe er gerust lang over.** De screening was gratis; deze fragmenten zijn al betaald tegen de tijd dat jij luistert.",
+   "audio_map": "Eclipse/Content/Audio/Casting",
+   "opties": [
+    {
+     "label": "Ik heb gekozen — zie tekstveld",
+     "waarde": "gekozen",
+     "gevolg": "voice-director lockt de castingtabel en begint te genereren in tier-volgorde."
+    },
+    {
+     "label": "Nog geen audio te horen",
+     "waarde": "wacht",
+     "gevolg": "De agent meldt zich zodra de fragmenten klaarstaan."
+    }
+   ],
+   "advies": null,
+   "vrijtekst": true
+  },
+  {
+   "id": "O-4",
+   "prio": "gauw",
+   "vraag": "IJkmissie M1.1: klinkt het zoals het moet?",
+   "waarom": "M1.1 gaat als eerste helemaal door de pijplijn — beats, dialoog, kwaliteitspoort, stem, in de game. Een missie volledig af voor er 41 andere gemaakt worden. Pas na jouw akkoord start de massaproductie.",
+   "stappen": [
+    "NOG NIET AAN DE BEURT — M1.1 is pas rond 7 augustus speelbaar",
+    "Start dan de game via '1 - SPEEL ECLIPSE' op je bureaublad",
+    "Speel M1.1 (Thirteen Bullets) van begin tot eind en let op de dialoog"
+   ],
+   "meer_info": "**Waarom dit de belangrijkste knop van het project is**\n\nAls de schrijfstandaard fout is, wil je dat weten bij missie 1 — niet bij missie 34.\n\n**Waar je op let (jouw oordeel, niet dat van een test):**\n\n- Zijn de personages van elkaar te onderscheiden zonder dat je de naam ziet?\n- Legt iemand iets uit wat je al begreep? Dat is de meest voorkomende fout\n- Is er een zin waarvan je denkt: dat zegt niemand?\n- Praat iemand over het geweervuur heen?\n- Zit er humor in, en komt die van het personage of van de schrijver?\n\n**Bij nee gebeurt er iets nuttigs:** de standaard wordt bijgesteld en M1.1 gaat er nog eens doorheen. Dat kost dagen. Hetzelfde probleem ontdekken na 42 missies kost de maand. Zeg dus gerust nee.",
+   "opties": [
+    {
+     "label": "Ja — zo moet het klinken",
+     "waarde": "akkoord",
+     "gevolg": "Massaproductie start: 4-6 schrijvers parallel op de rest."
+    },
+    {
+     "label": "Nee — zie tekstveld",
+     "waarde": "afgekeurd",
+     "gevolg": "Standaard bijgesteld op jouw punten; M1.1 gaat er nog eens doorheen."
+    },
+    {
+     "label": "Nog niet klaar",
+     "waarde": "wacht",
+     "gevolg": "De agent meldt zich als M1.1 speelbaar is."
+    }
+   ],
+   "advies": null,
+   "vrijtekst": true
+  }
+ ]
 }

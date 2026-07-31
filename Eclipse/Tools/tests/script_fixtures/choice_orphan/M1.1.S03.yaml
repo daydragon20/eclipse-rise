@@ -1,0 +1,36 @@
+# CHOICE: a choice.set on a flag NOBODY READS.
+# This is one of the five errors found by hand on 2026-07-31, and it was
+# the architect's own: decoration that reads to the player as a choice.
+# Invisible inside one mission; obvious from above.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    choice:
+      group: fx_orphan
+      set:   'story.m12_ghost = true'
+      label: "Quiet."
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    choice:
+      group: fx_orphan
+      set:   'story.m12_ghost = false'
+      label: "Loud."
+    text:    "A perfectly ordinary line of dialogue here."

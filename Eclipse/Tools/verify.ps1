@@ -155,6 +155,35 @@ if ($LASTEXITCODE -ne 0) { $Failures += "creditmeter kan blind genereren" }
 python "$Root\Tools\check_voice_resolves.py"
 if ($LASTEXITCODE -ne 0) { $Failures += "scriptstem komt nergens op uit" }
 
+# DE SCRIPTVALIDATOR, EN EERST HET BEWIJS DAT HIJ ROOD KAN WORDEN.
+#
+# Deze volgorde is niet netheid. Op 31-07 meldde check_voice_resolves.py een
+# spreker als "CAST AND READY" terwijl er geen stem aan zijn slot hing: de
+# controle stond groen, het groen was niets waard, en niemand kon dat zien
+# omdat die controle nog nooit rood was geweest. Een validator die alleen
+# groen is geweest op het huidige script meet niets - hij is niet te
+# onderscheiden van `exit 0`.
+#
+# De zelftest draait dus VOOR de validator. Zakt het bewijs, dan is het
+# oordeel over het script waardeloos en hoort de bar rood, ook al zou de
+# validator zelf niets vinden.
+python "$Root\Tools\tests\test_validate_script.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "scriptvalidator kan niet meer rood worden" }
+
+# En dan het oordeel zelf (SCRIPT_FORMAT 6). Hij vangt de fouten van de
+# architect net zo goed als die van de schrijvers, en dat is het punt: een
+# vlag die van vorm verandert breekt bij de LEZER, en de lezer staat per
+# definitie in een andere missie dan de zetter (L1-R12). Dat is onzichtbaar
+# van binnenuit een missie en overduidelijk van bovenaf.
+#
+# --no-voice omdat check_voice_resolves.py hierboven al zijn eigen poort is.
+# De validator kan hem zelf aanroepen (dat doet hij losstaand ook), maar twee
+# keer dezelfde uitslag afdrukken maakt een bar langer en niet strenger. Hij
+# meldt de stemcontrole dan als OVERGESLAGEN en niet als schoon - een
+# controle die niet gedraaid heeft mag nooit in het rijtje geslaagde staan.
+python "$Root\Tools\validate_script.py" --no-voice
+if ($LASTEXITCODE -ne 0) { $Failures += "scriptvalidatie meldt bevindingen" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"

@@ -1,0 +1,36 @@
+# TRIGGER: a bark set pointing at an event that does not exist. If the
+# event is missing that is a systems task, not a writing task -- escalate,
+# do not invent (SCRIPT_FORMAT section 5).
+bark_set:    SQUAD.MATE_DOWN
+trigger:     Event.Squad.ThisEventWasInvented
+faction:     eclipse
+type:        bark
+credit_tier: 1
+status:      draft
+critic:      null
+
+variants:
+  - id:    BARK.SQ.MD.010
+    voice: eclipse_fighter_a
+    text:  "Down! Cover me, cover me!"
+
+  - id:    BARK.SQ.MD.020
+    voice: eclipse_fighter_a
+    text:  "They got him. Push up, push up!"
+
+  - id:    BARK.SQ.MD.030
+    voice: eclipse_fighter_a
+    text:  "Talk to me! Say something!"
+
+  - id:    BARK.SQ.MD.040
+    voice: eclipse_fighter_a
+    text:  "Man down, man down!"
+
+  - id:    BARK.SQ.MD.050
+    voice: eclipse_fighter_a
+    text:  "He is not moving. Cover!"
+
+  - id:    BARK.SQ.MD.060
+    voice: eclipse_fighter_a
+    text:  "Get a hand on him now!"
+

@@ -1,0 +1,28 @@
+# TAG: a tag outside the 19.4 approved set with no note, and three stacked
+# tags. Novelty tags are how a script drifts; stacked tags produce mush.
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        40
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    tags:    [smouldering]
+    text:    "A perfectly ordinary line of dialogue here."
+
+  - id:      M1.1.S03.020
+    speaker: MARA
+    voice:   mara
+    tags:    [pause, quietly, urgent]
+    text:    "A perfectly ordinary line of dialogue here."
