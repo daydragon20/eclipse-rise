@@ -54,6 +54,35 @@
       "vrijtekst": true
     },
     {
+      "id": "O-11",
+      "prio": "gauw",
+      "vraag": "De gele wegmarkeringen: vervangen, weghalen, of alleen de grammatica breken?",
+      "waarom": "Jouw klacht ging over verkeersborden. Die zijn weg. Maar de audit vond iets dat er nog langer stond en STERKER aards is: de gele markeringen op de grond. Uitgerekend uit de code: twee DOORLOPENDE kantlijnen van 190 m op 9,2 m uit elkaar, plus 24 ONDERBROKEN asstreepjes van 1,6 m precies op de middenas. Dat is niet 'geel op de grond' — dat is de grammatica van het Weens Verdrag bijlage 8, letterlijk: doorlopende lijn = rand van de rijbaan, onderbroken aslijn = rijstrookscheiding waar inhalen mag. Geel op grijs asfalt is bovendien de Noord-Amerikaanse code voor 'scheidt tegengesteld verkeer'. EEN BORD ZEGT 'PAS OP'; DEZE MARKERING CODEERT EEN VERKEERSREGEL — waar je mag rijden en waar inhalen mag. Het is de meest specifieke aardse wetgeving die in je district staat, en het valt minder op juist omdat er geen tekst in zit. Zichtbaar op elk frame van elke camera, meestal als het langste lijnstuk in beeld. WAAROM DIT JOUW KEUZE IS en niet die van mij: verf op de grond is op zichzelf convergent — elke beschaving met wielvoertuigen kan dat bedenken. De GRAMMATICA is het probleem, niet het bestaan. Wat niet mag is 'laten staan, het is maar verf' — dat is dezelfde redenering als 'labor is maar een werkbord', en die bleek het men-at-work-wegwerkpictogram.",
+      "stappen": [
+        "Je hoeft niets te testen — kies alleen de richting",
+        "Bij twijfel: A. Dat is wat 20.2 zelf al voorstelt en het gooit het minste weg"
+      ],
+      "opties": [
+        {
+          "label": "A — vervangen door Dominion lane-codes",
+          "waarde": "vervangen",
+          "gevolg": "20.2 noemt de vervanging al met zoveel woorden: 'lane-codes en sectornummers'. Grondtallies en sectorcodes in dezelfde taal als het nieuwe lane-bord, zodat grond en bebording een systeem worden. Levert het meeste op en gooit het minste weg."
+        },
+        {
+          "label": "B — helemaal weghalen",
+          "waarde": "weghalen",
+          "gevolg": "Goedkoopst en snelst. Maar het district verliest zijn enige leesbare circulatiecue: niets vertelt de speler dan nog waar je hoort te lopen of rijden."
+        },
+        {
+          "label": "C — verf houden, grammatica breken",
+          "waarde": "grammatica",
+          "gevolg": "Geen aslijn, geen paarsgewijze kantlijnen. Bijvoorbeeld een asymmetrische geleidingsband met tally-onderbrekingen. Houdt de leesbaarheid, haalt de aardse regel eruit, maar is meer ontwerpwerk dan A."
+        }
+      ],
+      "advies": "A. Het staat al als vervanging in je eigen dressing-standaard, en het maakt grond en borden een taal in plaats van twee.",
+      "vrijtekst": true
+    },
+    {
       "id": "O-8",
       "prio": "nu",
       "vraag": "HUD-uiterlijk: hoe Borderlands mag het worden?",
