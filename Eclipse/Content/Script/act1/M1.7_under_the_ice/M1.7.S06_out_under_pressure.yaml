@@ -14,7 +14,7 @@ turn:         "They get out, and afterwards nobody can say why it was that easy.
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        134
 words_heard:  114
 words_generated: 151

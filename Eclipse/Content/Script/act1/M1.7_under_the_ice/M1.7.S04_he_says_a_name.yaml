@@ -14,7 +14,7 @@ turn:         "He says an Ember name, kindly, and pronounces it correctly."
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        152
 words_heard:  152
 words_generated: 179

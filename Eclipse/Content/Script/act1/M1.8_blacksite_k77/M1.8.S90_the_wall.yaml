@@ -14,7 +14,7 @@ turn:         "He welds a bunk plate to the wall and etches the name, nobody ask
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           39
 words_heard:     39
 words_generated: 39

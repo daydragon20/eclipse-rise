@@ -14,7 +14,7 @@ turn:         "She overrules all of them, and the terrible thing is that she is 
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        405
 words_heard:  295
 words_generated: 541

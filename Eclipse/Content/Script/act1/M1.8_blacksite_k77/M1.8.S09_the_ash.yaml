@@ -14,7 +14,7 @@ turn:         "Petra gives it, out loud, with the numbers, because somebody has 
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           118
 words_heard:     118
 words_generated: 139

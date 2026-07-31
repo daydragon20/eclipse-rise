@@ -14,7 +14,7 @@ turn:         "He tells Voss something true about Petra, kindly, and it works â€
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           177
 words_heard:     117
 words_generated: 224

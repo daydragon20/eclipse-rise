@@ -14,7 +14,7 @@ turn:         "Threx uses Voss's first name, and Ember learns in one word how lo
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          "NO-GO: het turn:-veld belooft Voss' voornaam, wat L1-R10 permanent onuitvoerbaar maakt -- architect-actie, geen schrijversactie"
 words:           167
 words_heard:     167
 words_generated: 190

@@ -1,0 +1,555 @@
+{
+ "mara": {
+  "label": "Mara Sovann (52)",
+  "kandidaten": [
+   {
+    "stem": "Heather - Warm, Raspy American Female",
+    "voice_id": "plP9aw1rizYgjFfuvLQ7",
+    "waarom": "Rauw en rijp - 52 jaar en gesleten. Draagt haar sterfscene.",
+    "eigenschappen": "female / middle_aged / american / mature / narrative_story",
+    "bestand": "stemmen_library/mara_lib_plP9aw1r.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=plP9aw1rizYgjFfuvLQ7",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "6dd5963bed12bb2983ec5da7336e218bd360fab99534215325ee244a3368f64d"
+     }
+    }
+   },
+   {
+    "stem": "Mora - Gritty and Enigmatic",
+    "voice_id": "YHcCpa6SBWnKDaCPZJQR",
+    "waarom": "Grit plus karakteracteerwerk; een celleider, geen verteller.",
+    "eigenschappen": "female / old / american / raspy / characters_animation",
+    "bestand": "stemmen_library/mara_lib_YHcCpa6S.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=YHcCpa6SBWnKDaCPZJQR",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "64cbc624eb5aab4e95a968e1f41d75402277cca6e549036ed17e56ea33bbbc9e"
+     }
+    }
+   },
+   {
+    "stem": "Blue - Low, Calm with Grit",
+    "voice_id": "YGWwh1G8pUwWmJyCCpma",
+    "waarom": "Laag en kalm met rafels - korte mededelingen passen hier.",
+    "eigenschappen": "female / old / canadian / confident / narrative_story",
+    "bestand": "stemmen_library/mara_lib_YGWwh1G8.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=YGWwh1G8pUwWmJyCCpma",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "8d1d0024941d4ae1a0d0a82548e13742f805ff45269aea7f9a9ea0ab5118e949"
+     }
+    }
+   },
+   {
+    "stem": "Eleanor – Gracious and Authoritative",
+    "voice_id": "2qQJWjw5XdG80GreshqG",
+    "waarom": "Gezag met gratie. LET OP: Brits.",
+    "eigenschappen": "female / old / british / calm / narrative_story",
+    "bestand": "stemmen_library/mara_lib_2qQJWjw5.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=2qQJWjw5XdG80GreshqG",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "64cbc624eb5aab4e95a968e1f41d75402277cca6e549036ed17e56ea33bbbc9e"
+     }
+    }
+   },
+   {
+    "stem": "Kate Mercer - Warm, Clear and Expressive",
+    "voice_id": "OpYgEDvHiCmxNeiCNPr6",
+    "waarom": "Warm en expressief, lage ligging. LET OP: Brits.",
+    "eigenschappen": "female / middle_aged / british / deep / narrative_story",
+    "bestand": "stemmen_library/mara_lib_OpYgEDvH.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=OpYgEDvHiCmxNeiCNPr6",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "b466f90f2fa4791040f512e47273221b027ee20fbcfd44b5b2845f12116d0bce"
+     }
+    }
+   },
+   {
+    "stem": "Sharon Duvall - Warm, Confident, Engaging",
+    "voice_id": "hCLMtDrFPq4THEIO6zWf",
+    "waarom": "Warm gezag - de mentor die je meeneemt.",
+    "eigenschappen": "female / middle_aged / american / confident / conversational",
+    "bestand": "stemmen_library/mara_lib_hCLMtDrF.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=hCLMtDrFPq4THEIO6zWf",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "4a0a07a420212b54ea4dc279295127d4b55a488f9c884a9cd40490b97a5d1ed4"
+     }
+    }
+   }
+  ]
+ },
+ "kaine": {
+  "label": "Grootmaarschalk Sera Kaine (49)",
+  "kandidaten": [
+   {
+    "stem": "Katherine - Calm & Serious",
+    "voice_id": "J7gii3pWdApH2b9t8Q3G",
+    "waarom": "Kalm en serieus - precies, zonder wreedheid.",
+    "eigenschappen": "female / middle_aged / canadian / professional / narrative_story",
+    "bestand": "stemmen_library/kaine_lib_J7gii3pW.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=J7gii3pWdApH2b9t8Q3G",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "34883c8a2a97f7688e9e728e23136741ad8b91f4eac9e41a6b6adea63286d999"
+     }
+    }
+   },
+   {
+    "stem": "Quendrith",
+    "voice_id": "6YL69CQCYlIoI5cReoeU",
+    "waarom": "Kraakhelder. Geen eufemisme, geen omweg.",
+    "eigenschappen": "female / middle_aged / american / crisp / entertainment_tv",
+    "bestand": "stemmen_library/kaine_lib_6YL69CQC.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=6YL69CQCYlIoI5cReoeU",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 365,
+      "public_owner_id": "d561a330888d75e8b2034ac507b70b917d5d117830fd477d89dd04359a8ae33a"
+     }
+    }
+   },
+   {
+    "stem": "Amanda - Calm, Professional, Empowering",
+    "voice_id": "tKBQrlxp4oMJNdRuKqwM",
+    "waarom": "Beheerst gezag; een commandant die niet hoeft te dreigen.",
+    "eigenschappen": "female / middle_aged / american / professional / narrative_story",
+    "bestand": "stemmen_library/kaine_lib_tKBQrlxp.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=tKBQrlxp4oMJNdRuKqwM",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "810388b1884b2b5863f46520879df53164b5f28e7e601774ad4e893989154f64"
+     }
+    }
+   },
+   {
+    "stem": "Martyna",
+    "voice_id": "read99bvcn1JZlgGrsUC",
+    "waarom": "Zelfverzekerd en zakelijk; eervol binnen haar eigen code.",
+    "eigenschappen": "female / middle_aged / canadian / confident / narrative_story",
+    "bestand": "stemmen_library/kaine_lib_read99bv.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=read99bvcn1JZlgGrsUC",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "3519c8b28c1bf15b1080bd361475cf52181b47d16652cd44bc1319fbabc08b5b"
+     }
+    }
+   },
+   {
+    "stem": "Harriet - British Actress",
+    "voice_id": "aAsWcN5jdLdiYG7Hq0YL",
+    "waarom": "Actrice: het meeste bereik. LET OP: Brits.",
+    "eigenschappen": "female / old / british / mature / informative_educational",
+    "bestand": "stemmen_library/kaine_lib_aAsWcN5j.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=aAsWcN5jdLdiYG7Hq0YL",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "3f2ca29fd2019c4a0516b646c73c6f21140f676ac6d45236a2b5ef291bf8d8e1"
+     }
+    }
+   }
+  ]
+ },
+ "vex": {
+  "label": "Hoog-Arbiter Malachar Vex (68)",
+  "kandidaten": [
+   {
+    "stem": "Elder Rowan",
+    "voice_id": "N8jsIhEtPnj3PWFmH8hZ",
+    "waarom": "Oud en wijs, zacht register - de langste zinnen van het spel.",
+    "eigenschappen": "male / old / british / wise / narrative_story",
+    "bestand": "stemmen_library/vex_lib_N8jsIhEt.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=N8jsIhEtPnj3PWFmH8hZ",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "967a5f5942acb44079855690c3a292c8637dbc54ca90436a477c5551af7d761c"
+     }
+    }
+   },
+   {
+    "stem": "Malcolm Gooding - Calm trused gravitas",
+    "voice_id": "VC6vCXhVaI8BZefRtXZV",
+    "waarom": "Kalme gravitas; overtuigt door bedaardheid, niet door volume.",
+    "eigenschappen": "male / old / british / professional / narrative_story",
+    "bestand": "stemmen_library/vex_lib_VC6vCXhV.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=VC6vCXhVaI8BZefRtXZV",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "c365fa6526e6198aeb9b0224c968f9979f29a9b460a9fe6065a7a9390281e7ae"
+     }
+    }
+   },
+   {
+    "stem": "Roger One - Rich, Mature & British",
+    "voice_id": "yRkCcID7C7SG09Wb6tIg",
+    "waarom": "Rijk en rijp; de grootvader die de hongersnood ontwierp.",
+    "eigenschappen": "male / old / british / calm / narrative_story",
+    "bestand": "stemmen_library/vex_lib_yRkCcID7.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=yRkCcID7C7SG09Wb6tIg",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "700ae48894afafa78802dc7ba87b6d102073399556d09b877e39ef451db20e58"
+     }
+    }
+   },
+   {
+    "stem": "Victor - Deep, Dark Psychology",
+    "voice_id": "U1nBX3lzKSM937PaYYfk",
+    "waarom": "De dreigende lezing. Maakt hem enger, niet luider.",
+    "eigenschappen": "male / old / british / deep / narrative_story",
+    "bestand": "stemmen_library/vex_lib_U1nBX3lz.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=U1nBX3lzKSM937PaYYfk",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "1ddb6d6639d26ecc1aa8523fd55a2bffd02382ab76c171ec5c4c3feb4b02c100"
+     }
+    }
+   },
+   {
+    "stem": "Nick - Old, Raspy & Experienced",
+    "voice_id": "lysAcYDrfyxpR1LiWJrt",
+    "waarom": "Accent-neutraal alternatief (Amerikaans), oud en gerafeld.",
+    "eigenschappen": "male / old / american / wise / narrative_story",
+    "bestand": "stemmen_library/vex_lib_lysAcYDr.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=lysAcYDrfyxpR1LiWJrt",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "4e9ae289d67079b210cadcd629aa78d2cdd5159deb46afd5c73a6c15d5d79002"
+     }
+    }
+   }
+  ]
+ },
+ "callis": {
+  "label": "Magistraat Oren Callis (56)",
+  "kandidaten": [
+   {
+    "stem": "Mr Wellington",
+    "voice_id": "HSBWXljo3oivWhybh3YX",
+    "waarom": "De ambtenaar zelf: kalm, uitgestreken, nergens aanspreekbaar.",
+    "eigenschappen": "male / old / american / calm / narrative_story",
+    "bestand": "stemmen_library/callis_lib_HSBWXljo.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=HSBWXljo3oivWhybh3YX",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "4fc33465b7df800de37f6aca831da2c4022a666e26c8420e474667e645feb3e6"
+     }
+    }
+   },
+   {
+    "stem": "Mike Weinberger",
+    "voice_id": "ltbmbnwfUORor5VY3adr",
+    "waarom": "Bestuurlijk en zelfverzekerd; legt alles bij het beleid.",
+    "eigenschappen": "male / old / american / confident / informative_educational",
+    "bestand": "stemmen_library/callis_lib_ltbmbnwf.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=ltbmbnwfUORor5VY3adr",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "5b9dd29811a405fb54b669d96fea35a17f228b26b9b98d34f5543a4cc313cc3d"
+     }
+    }
+   },
+   {
+    "stem": "Philip - Clear, Measured & Professional",
+    "voice_id": "2styzLg7OSeuhPP6uQ26",
+    "waarom": "Afgemeten en professioneel. LET OP: Brits.",
+    "eigenschappen": "male / middle_aged / british / professional / social_media",
+    "bestand": "stemmen_library/callis_lib_2styzLg7.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=2styzLg7OSeuhPP6uQ26",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "8c4d0040e8ba89571eb344897e922ae576c71fe4ae3dd1438bfece200113362e"
+     }
+    }
+   },
+   {
+    "stem": "Tom",
+    "voice_id": "XYbC45eiRX6i05sW3miR",
+    "waarom": "Gladder; de magistraat die je bijna aardig vindt. LET OP: Brits.",
+    "eigenschappen": "male / old / british / calm / advertisement",
+    "bestand": "stemmen_library/callis_lib_XYbC45ei.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=XYbC45eiRX6i05sW3miR",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "3bf3eec8636180b59f32d5ba6b506f7e1d551f54f85eff2530d29eff6bc28dd9"
+     }
+    }
+   }
+  ]
+ },
+ "torren": {
+  "label": "Torren Vale (45)",
+  "kandidaten": [
+   {
+    "stem": "Steve - Deep & Authoritative",
+    "voice_id": "lPVHDJjq0RhPU2UxBOD3",
+    "waarom": "Diep en gezaghebbend - bevelen die als suggestie klinken.",
+    "eigenschappen": "male / middle_aged / american / professional / narrative_story",
+    "bestand": "stemmen_library/torren_lib_lPVHDJjq.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=lPVHDJjq0RhPU2UxBOD3",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "7d47155ee7f3714496edfc589978b708b57113cad457e3b8f8f977703e08e817"
+     }
+    }
+   },
+   {
+    "stem": "Marcus K - Calm Documentary Narrator",
+    "voice_id": "3H55HGnNE1XjYxigHSAS",
+    "waarom": "Beheerst; verheft nooit zijn stem.",
+    "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+    "bestand": "stemmen_library/torren_lib_3H55HGnN.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=3H55HGnNE1XjYxigHSAS",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "04d328a06def177d0943b07160f62ef026eca26bf148e11f9b89724e6beea3a1"
+     }
+    }
+   },
+   {
+    "stem": "Cain - Calm & Grounded",
+    "voice_id": "tX9AxXOGVaX1mDbRjN0f",
+    "waarom": "Geaard en rustig; draagt de lange [pause]-beats.",
+    "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+    "bestand": "stemmen_library/torren_lib_tX9AxXOG.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=tX9AxXOGVaX1mDbRjN0f",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "b5b2a8519b0ef8aa20d1eeb882c8cf0c5e30f2fa5cdd562eba97c172447248f5"
+     }
+    }
+   },
+   {
+    "stem": "Mr A",
+    "voice_id": "fhiytt8dYcYpPDbE5T3g",
+    "waarom": "Rijper, meer sleet - de kolonel met een verleden.",
+    "eigenschappen": "male / middle_aged / american / mature / narrative_story",
+    "bestand": "stemmen_library/torren_lib_fhiytt8d.mp3",
+    "bron": "voice_library",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "hoe_te_verifieren": "open de kaart en lees het licentieveld",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=fhiytt8dYcYpPDbE5T3g",
+     "api_biedt_geen_licentieveld": true,
+     "gemeten_velden": {
+      "category": "professional",
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "fiat_rate": null,
+      "notice_period_dagen": 730,
+      "public_owner_id": "5a2d0b6d5065dcf87002f6c61f67ca6e2dccaba1a576343763a1c49e88e05880"
+     }
+    }
+   }
+  ]
+ }
+}

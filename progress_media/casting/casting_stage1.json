@@ -434,6 +434,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/reyes/reyes_kandidaat1_Alice.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/reyes/reyes_kandidaat2_Bella.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "waarom": "",
+     "bestand": "progress_media/casting/reyes/reyes_kandidaat3_Matilda.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Lily",
+     "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+     "eigenschappen": "female / middle_aged / british / confident",
+     "waarom": "",
+     "bestand": "progress_media/casting/reyes/reyes_kandidaat4_Lily.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Ava – Professional Female News & Explainer Voice",
      "voice_id": "BHf91PCMVcVwq6r1ku7L",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -444,10 +480,11 @@
      "bron": "shared-library",
      "gebruik": 32599777,
      "klonen": 18899,
-     "populariteit": "33 mln tekens door anderen gebruikt"
+     "populariteit": "33 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_BHf91PCM.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Juliet - Customer Care: Professional, Empathic, Warm",
      "voice_id": "WyFXw4PzMbRnp8iLMJwY",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -458,10 +495,11 @@
      "bron": "shared-library",
      "gebruik": 54461914,
      "klonen": 18838,
-     "populariteit": "54 mln tekens door anderen gebruikt"
+     "populariteit": "54 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_WyFXw4Pz.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Kai - Real AI Receptionist ",
      "voice_id": "gh9yOzacZabdERF6GI7O",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -472,10 +510,11 @@
      "bron": "shared-library",
      "gebruik": 39979887,
      "klonen": 1659,
-     "populariteit": "40 mln tekens door anderen gebruikt"
+     "populariteit": "40 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_gh9yOzac.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Eryn - Confident Corporate Training American Female Voice",
      "voice_id": "8tsLeAV5vPVuzCCvqbbU",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -486,10 +525,11 @@
      "bron": "shared-library",
      "gebruik": 18980608,
      "klonen": 9967,
-     "populariteit": "19 mln tekens door anderen gebruikt"
+     "populariteit": "19 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_8tsLeAV5.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Liz - Customer Service Assistant",
      "voice_id": "uMM5TEnpKKgD758knVJO",
      "eigenschappen": "female / young / american / professional",
@@ -500,10 +540,11 @@
      "bron": "shared-library",
      "gebruik": 236437278,
      "klonen": 4380,
-     "populariteit": "236 mln tekens door anderen gebruikt"
+     "populariteit": "236 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_uMM5TEnp.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Dr. Kendall",
      "voice_id": "BVA1oNX6xZt6o7QaUwxr",
      "eigenschappen": "female / young / us southern / casual",
@@ -514,10 +555,11 @@
      "bron": "shared-library",
      "gebruik": 278623132,
      "klonen": 2911,
-     "populariteit": "279 mln tekens door anderen gebruikt"
+     "populariteit": "279 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_BVA1oNX6.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Ngozi - Calm & Descriptive",
      "voice_id": "QqgW7xZ3mjIAgZVFMwJz",
      "eigenschappen": "female / middle_aged / nigerian / calm",
@@ -528,10 +570,11 @@
      "bron": "shared-library",
      "gebruik": 56972447,
      "klonen": 2503,
-     "populariteit": "57 mln tekens door anderen gebruikt"
+     "populariteit": "57 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_QqgW7xZ3.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Katherine - Warm & Calm",
      "voice_id": "Tfv2PGiTliSQ4XSXrJmA",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -542,7 +585,8 @@
      "bron": "shared-library",
      "gebruik": 49470135,
      "klonen": 17599,
-     "populariteit": "49 mln tekens door anderen gebruikt"
+     "populariteit": "49 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/reyes_lib_Tfv2PGiT.mp3"
     }
    ]
   },
@@ -555,6 +599,51 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Adam",
+     "voice_id": "pNInz6obpgDQGcFmaJgB",
+     "eigenschappen": "male / middle_aged / american",
+     "waarom": "",
+     "bestand": "progress_media/casting/torren/torren_kandidaat1_Adam.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "waarom": "",
+     "bestand": "progress_media/casting/torren/torren_kandidaat2_Daniel.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Brian",
+     "voice_id": "nPczCjzI2devNBz1zQrb",
+     "eigenschappen": "male / middle_aged / american / confident",
+     "waarom": "Kolonel op rust. Geeft bevelen als voorstellen; de langste stiltes van iedereen.",
+     "bestand": "progress_media/casting/torren/torren_kandidaat3_Brian.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "",
+     "bestand": "progress_media/casting/torren/torren_kandidaat4_Roger.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
+     "stem": "Bill",
+     "voice_id": "pqHfZKP75CvOlQylNhV4",
+     "eigenschappen": "male / old / american / crisp",
+     "waarom": "",
+     "bestand": "progress_media/casting/torren/torren_kandidaat5_Bill.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 6,
      "stem": "Connery - Deep & Immersive Documentary",
      "voice_id": "vLZJLcQMJCqxjrHGEVDO",
      "eigenschappen": "male / middle_aged / american / deep",
@@ -565,10 +654,11 @@
      "bron": "shared-library",
      "gebruik": 26873844,
      "klonen": 7563,
-     "populariteit": "27 mln tekens door anderen gebruikt"
+     "populariteit": "27 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_vLZJLcQM.mp3"
     },
     {
-     "nr": 2,
+     "nr": 7,
      "stem": "Benjamin - Warm Professional",
      "voice_id": "N7LzE1aKJlaTs6Brxx5J",
      "eigenschappen": "male / middle_aged / american / mature",
@@ -579,10 +669,11 @@
      "bron": "shared-library",
      "gebruik": 4758550,
      "klonen": 4062,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_N7LzE1aK.mp3"
     },
     {
-     "nr": 3,
+     "nr": 8,
      "stem": "Onyx – Calm & Friendly Podcast Narrator",
      "voice_id": "An7r4HL8TAw73K5uSMpy",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -593,10 +684,11 @@
      "bron": "shared-library",
      "gebruik": 1891272,
      "klonen": 1163,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_An7r4HL8.mp3"
     },
     {
-     "nr": 4,
+     "nr": 9,
      "stem": "Matt - Deep Authoritative Narrator",
      "voice_id": "0aXOy31Cjamp6gJcyqYu",
      "eigenschappen": "male / middle_aged / american / deep",
@@ -607,10 +699,11 @@
      "bron": "shared-library",
      "gebruik": 1757301,
      "klonen": 283,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_0aXOy31C.mp3"
     },
     {
-     "nr": 5,
+     "nr": 10,
      "stem": "Arthur",
      "voice_id": "ca7REQGRQ5JssBZnoS5E",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -621,10 +714,11 @@
      "bron": "shared-library",
      "gebruik": 1499952,
      "klonen": 241,
-     "populariteit": "1 mln tekens door anderen gebruikt"
+     "populariteit": "1 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_ca7REQGR.mp3"
     },
     {
-     "nr": 6,
+     "nr": 11,
      "stem": "Brian",
      "voice_id": "n8kTUi6dVrplENT9Un56",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -635,10 +729,11 @@
      "bron": "shared-library",
      "gebruik": 99827022,
      "klonen": 45263,
-     "populariteit": "100 mln tekens door anderen gebruikt"
+     "populariteit": "100 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_n8kTUi6d.mp3"
     },
     {
-     "nr": 7,
+     "nr": 12,
      "stem": "Bill - Social Media",
      "voice_id": "AGhk9wKpcIV2UvBus4CY",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -649,10 +744,11 @@
      "bron": "shared-library",
      "gebruik": 58553483,
      "klonen": 13172,
-     "populariteit": "59 mln tekens door anderen gebruikt"
+     "populariteit": "59 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_AGhk9wKp.mp3"
     },
     {
-     "nr": 8,
+     "nr": 13,
      "stem": "Jon - Calm Presence",
      "voice_id": "enzbGixeo55iqn1QxbbC",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -663,7 +759,8 @@
      "bron": "shared-library",
      "gebruik": 6499185,
      "klonen": 1933,
-     "populariteit": "6 mln tekens door anderen gebruikt"
+     "populariteit": "6 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_enzbGixe.mp3"
     }
    ]
   },
@@ -676,6 +773,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Sarah",
+     "voice_id": "EXAVITQu4vr4xnSDxMaL",
+     "eigenschappen": "female / young / american / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/sela/sela_kandidaat1_Sarah.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Jessica",
+     "voice_id": "cgSgspJ2msm6clMCkdW9",
+     "eigenschappen": "female / young / american / cute",
+     "waarom": "",
+     "bestand": "progress_media/casting/sela/sela_kandidaat2_Jessica.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Laura",
+     "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+     "eigenschappen": "female / young / american / sassy",
+     "waarom": "",
+     "bestand": "progress_media/casting/sela/sela_kandidaat3_Laura.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/sela/sela_kandidaat4_Bella.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Rachel - Fun, Casual, Australian Woman, English speaker",
      "voice_id": "U9VgC8Xinl7nnNsyDd3J",
      "eigenschappen": "female / young / australian / casual",
@@ -686,10 +819,11 @@
      "bron": "shared-library",
      "gebruik": 29277986,
      "klonen": 34090,
-     "populariteit": "29 mln tekens door anderen gebruikt"
+     "populariteit": "29 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_U9VgC8Xi.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Liz - Customer Service Assistant",
      "voice_id": "uMM5TEnpKKgD758knVJO",
      "eigenschappen": "female / young / american / professional",
@@ -700,10 +834,11 @@
      "bron": "shared-library",
      "gebruik": 236437278,
      "klonen": 4380,
-     "populariteit": "236 mln tekens door anderen gebruikt"
+     "populariteit": "236 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_uMM5TEnp.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Zara – Efficient Recovery Agent",
      "voice_id": "6VrKLjZfyBIk9AEmnZBI",
      "eigenschappen": "female / young / indian / confident",
@@ -714,10 +849,11 @@
      "bron": "shared-library",
      "gebruik": 1979218148,
      "klonen": 1402,
-     "populariteit": "1979 mln tekens door anderen gebruikt"
+     "populariteit": "1979 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_6VrKLjZf.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Dr. Kendall",
      "voice_id": "BVA1oNX6xZt6o7QaUwxr",
      "eigenschappen": "female / young / us southern / casual",
@@ -728,10 +864,11 @@
      "bron": "shared-library",
      "gebruik": 278623132,
      "klonen": 2911,
-     "populariteit": "279 mln tekens door anderen gebruikt"
+     "populariteit": "279 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_BVA1oNX6.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Mid-30s Female, Intimate, Calming, Light Rasp",
      "voice_id": "xYa75LlayhWHCRl1yJSH",
      "eigenschappen": "female / young / american / confident",
@@ -742,10 +879,11 @@
      "bron": "shared-library",
      "gebruik": 14630101,
      "klonen": 7335,
-     "populariteit": "15 mln tekens door anderen gebruikt"
+     "populariteit": "15 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_xYa75Lla.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Athena - Clear, Professional, Human",
      "voice_id": "Qin2NRfiKVQMJLxnoZaY",
      "eigenschappen": "female / young / american / professional",
@@ -756,10 +894,11 @@
      "bron": "shared-library",
      "gebruik": 21881892,
      "klonen": 4628,
-     "populariteit": "22 mln tekens door anderen gebruikt"
+     "populariteit": "22 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_Qin2NRfi.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Dalida - Warm Global American",
      "voice_id": "E3mW95MIKt5YUzwjsfbi",
      "eigenschappen": "female / young / american / confident",
@@ -770,10 +909,11 @@
      "bron": "shared-library",
      "gebruik": 2013737,
      "klonen": 2400,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_E3mW95MI.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Emme",
      "voice_id": "QI7MqdLSOT7Xq48Th0oc",
      "eigenschappen": "female / young / american / confident",
@@ -784,7 +924,8 @@
      "bron": "shared-library",
      "gebruik": 1714986,
      "klonen": 2644,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_QI7MqdLS.mp3"
     }
    ]
   },
@@ -797,6 +938,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Laura",
+     "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+     "eigenschappen": "female / young / american / sassy",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaya/kaya_kandidaat1_Laura.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Jessica",
+     "voice_id": "cgSgspJ2msm6clMCkdW9",
+     "eigenschappen": "female / young / american / cute",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaya/kaya_kandidaat2_Jessica.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Sarah",
+     "voice_id": "EXAVITQu4vr4xnSDxMaL",
+     "eigenschappen": "female / young / american / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaya/kaya_kandidaat3_Sarah.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaya/kaya_kandidaat4_Matilda.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Candy - Young and Sweet",
      "voice_id": "Nggzl2QAXh3OijoXD116",
      "eigenschappen": "female / young / american / cute",
@@ -807,10 +984,11 @@
      "bron": "shared-library",
      "gebruik": 114778757,
      "klonen": 72261,
-     "populariteit": "115 mln tekens door anderen gebruikt"
+     "populariteit": "115 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_Nggzl2QA.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Hallie - Fun, Young & Feminine",
      "voice_id": "jpICOesdLlRSc39O1UB5",
      "eigenschappen": "female / young / american / cute",
@@ -821,10 +999,11 @@
      "bron": "shared-library",
      "gebruik": 17239050,
      "klonen": 12793,
-     "populariteit": "17 mln tekens door anderen gebruikt"
+     "populariteit": "17 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_jpICOesd.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Mia - Lively, Crisp, Expressive",
      "voice_id": "052jzHJceQiZr7ltnY0C",
      "eigenschappen": "female / young / american / upbeat",
@@ -835,10 +1014,11 @@
      "bron": "shared-library",
      "gebruik": 18101558,
      "klonen": 7100,
-     "populariteit": "18 mln tekens door anderen gebruikt"
+     "populariteit": "18 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_052jzHJc.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "River - Charismatic & Upbeat",
      "voice_id": "wkqe33083YLBV35we7yB",
      "eigenschappen": "female / young / african american / upbeat",
@@ -849,10 +1029,11 @@
      "bron": "shared-library",
      "gebruik": 271725083,
      "klonen": 5268,
-     "populariteit": "272 mln tekens door anderen gebruikt"
+     "populariteit": "272 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_wkqe3308.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Anjura – Expressive Social Media Voice \t",
      "voice_id": "bspiLwZDEcpIbBf6zWeq",
      "eigenschappen": "female / young / indian / upbeat",
@@ -863,10 +1044,11 @@
      "bron": "shared-library",
      "gebruik": 11867393,
      "klonen": 6758,
-     "populariteit": "12 mln tekens door anderen gebruikt"
+     "populariteit": "12 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_bspiLwZD.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Rachel - Fun, Casual, Australian Woman, English speaker",
      "voice_id": "U9VgC8Xinl7nnNsyDd3J",
      "eigenschappen": "female / young / australian / casual",
@@ -877,10 +1059,11 @@
      "bron": "shared-library",
      "gebruik": 29277986,
      "klonen": 34090,
-     "populariteit": "29 mln tekens door anderen gebruikt"
+     "populariteit": "29 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_U9VgC8Xi.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Neha - Messy and Relatable",
      "voice_id": "QTKSa2Iyv0yoxvXY2V8a",
      "eigenschappen": "female / young / indian / casual",
@@ -891,10 +1074,11 @@
      "bron": "shared-library",
      "gebruik": 156621831,
      "klonen": 18354,
-     "populariteit": "157 mln tekens door anderen gebruikt"
+     "populariteit": "157 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_QTKSa2Iy.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Annakay",
      "voice_id": "RRIjxt3K1iKEkfsLGRXU",
      "eigenschappen": "female / young / jamaican / upbeat",
@@ -905,7 +1089,8 @@
      "bron": "shared-library",
      "gebruik": 3703063,
      "klonen": 1492,
-     "populariteit": "4 mln tekens door anderen gebruikt"
+     "populariteit": "4 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaya_lib_RRIjxt3K.mp3"
     }
    ]
   },
@@ -918,6 +1103,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "River",
+     "voice_id": "SAz9YHcvj6GT2YYXdXww",
+     "eigenschappen": "neutral / middle_aged / american / calm",
+     "waarom": "",
+     "bestand": "progress_media/casting/whisper/whisper_kandidaat1_River.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "waarom": "",
+     "bestand": "progress_media/casting/whisper/whisper_kandidaat2_Daniel.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Eric",
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "",
+     "bestand": "progress_media/casting/whisper/whisper_kandidaat3_Eric.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Bill",
+     "voice_id": "pqHfZKP75CvOlQylNhV4",
+     "eigenschappen": "male / old / american / crisp",
+     "waarom": "",
+     "bestand": "progress_media/casting/whisper/whisper_kandidaat4_Bill.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Brian",
      "voice_id": "n8kTUi6dVrplENT9Un56",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -928,10 +1149,11 @@
      "bron": "shared-library",
      "gebruik": 99827022,
      "klonen": 45263,
-     "populariteit": "100 mln tekens door anderen gebruikt"
+     "populariteit": "100 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_n8kTUi6d.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Bill - Social Media",
      "voice_id": "AGhk9wKpcIV2UvBus4CY",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -942,10 +1164,11 @@
      "bron": "shared-library",
      "gebruik": 58553483,
      "klonen": 13172,
-     "populariteit": "59 mln tekens door anderen gebruikt"
+     "populariteit": "59 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_AGhk9wKp.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Dylan Malc - Calm & Educational",
      "voice_id": "PMWmvqAOXhLm54FLpmYS",
      "eigenschappen": "male / middle_aged / american / gentle",
@@ -956,10 +1179,11 @@
      "bron": "shared-library",
      "gebruik": 4586597,
      "klonen": 1682,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_PMWmvqAO.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Jamie - Confident & Friendly Male",
      "voice_id": "K3Ks4ke16Al1uadpOim6",
      "eigenschappen": "male / middle_aged / american / formal",
@@ -970,10 +1194,11 @@
      "bron": "shared-library",
      "gebruik": 4540370,
      "klonen": 1482,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_K3Ks4ke1.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Justin - Calm, Fun & Friendly",
      "voice_id": "q8LPG9jwtX7MRuAmvkLs",
      "eigenschappen": "male / middle_aged / american / casual",
@@ -984,10 +1209,11 @@
      "bron": "shared-library",
      "gebruik": 3358945,
      "klonen": 3652,
-     "populariteit": "3 mln tekens door anderen gebruikt"
+     "populariteit": "3 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_q8LPG9jw.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Ember - Warm Narrative Voice",
      "voice_id": "37i69iUK8H0KcGuz48hE",
      "eigenschappen": "male / middle_aged / british / calm",
@@ -998,10 +1224,11 @@
      "bron": "shared-library",
      "gebruik": 4975118,
      "klonen": 4524,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_37i69iUK.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Matt - Deep Authoritative Narrator",
      "voice_id": "0aXOy31Cjamp6gJcyqYu",
      "eigenschappen": "male / middle_aged / american / deep",
@@ -1012,10 +1239,11 @@
      "bron": "shared-library",
      "gebruik": 1757301,
      "klonen": 283,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_0aXOy31C.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Adam - Conversational",
      "voice_id": "zKTOd8cxZlIf5EKC5Giv",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -1026,7 +1254,8 @@
      "bron": "shared-library",
      "gebruik": 22972441,
      "klonen": 13313,
-     "populariteit": "23 mln tekens door anderen gebruikt"
+     "populariteit": "23 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_zKTOd8cx.mp3"
     }
    ]
   },
@@ -1039,6 +1268,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "George",
+     "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+     "eigenschappen": "male / middle_aged / british / mature",
+     "waarom": "",
+     "bestand": "progress_media/casting/threx/threx_kandidaat1_George.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Eric",
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "",
+     "bestand": "progress_media/casting/threx/threx_kandidaat2_Eric.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Chris",
+     "voice_id": "iP95p4xoKVk53GoZ742B",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "waarom": "",
+     "bestand": "progress_media/casting/threx/threx_kandidaat3_Chris.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Callum",
+     "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+     "eigenschappen": "male / middle_aged / american",
+     "waarom": "",
+     "bestand": "progress_media/casting/threx/threx_kandidaat4_Callum.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Adam - Conversational",
      "voice_id": "zKTOd8cxZlIf5EKC5Giv",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -1049,10 +1314,11 @@
      "bron": "shared-library",
      "gebruik": 22972441,
      "klonen": 13313,
-     "populariteit": "23 mln tekens door anderen gebruikt"
+     "populariteit": "23 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_zKTOd8cx.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Michael C. Vincent - Children's Books",
      "voice_id": "WyxfC66zZ4F16RqcMMHI",
      "eigenschappen": "male / middle_aged / american / gentle",
@@ -1063,10 +1329,11 @@
      "bron": "shared-library",
      "gebruik": 35379231,
      "klonen": 12320,
-     "populariteit": "35 mln tekens door anderen gebruikt"
+     "populariteit": "35 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_WyxfC66z.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Abbott - Expressive sincere authority",
      "voice_id": "AtEtJxZcH8TRn1nNhXol",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -1077,10 +1344,11 @@
      "bron": "shared-library",
      "gebruik": 20739845,
      "klonen": 1130,
-     "populariteit": "21 mln tekens door anderen gebruikt"
+     "populariteit": "21 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_AtEtJxZc.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Jamie - Confident & Friendly Male",
      "voice_id": "K3Ks4ke16Al1uadpOim6",
      "eigenschappen": "male / middle_aged / american / formal",
@@ -1091,10 +1359,11 @@
      "bron": "shared-library",
      "gebruik": 4540370,
      "klonen": 1482,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_K3Ks4ke1.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Connery - Deep & Immersive Documentary",
      "voice_id": "vLZJLcQMJCqxjrHGEVDO",
      "eigenschappen": "male / middle_aged / american / deep",
@@ -1105,10 +1374,11 @@
      "bron": "shared-library",
      "gebruik": 26873844,
      "klonen": 7563,
-     "populariteit": "27 mln tekens door anderen gebruikt"
+     "populariteit": "27 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_vLZJLcQM.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Benjamin - Warm Professional",
      "voice_id": "N7LzE1aKJlaTs6Brxx5J",
      "eigenschappen": "male / middle_aged / american / mature",
@@ -1119,10 +1389,11 @@
      "bron": "shared-library",
      "gebruik": 4758550,
      "klonen": 4062,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_N7LzE1aK.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Mike Mercer - Warm, Sincere & Dynamic",
      "voice_id": "O4Sq7yQC1fd484Lr500R",
      "eigenschappen": "male / middle_aged / american / professional",
@@ -1133,10 +1404,11 @@
      "bron": "shared-library",
      "gebruik": 20538178,
      "klonen": 5636,
-     "populariteit": "21 mln tekens door anderen gebruikt"
+     "populariteit": "21 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_O4Sq7yQC.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Martin Louw Professional Voice Clone",
      "voice_id": "jUPpyDXEJa6IgBrnTet4",
      "eigenschappen": "male / middle_aged / south african / confident",
@@ -1147,7 +1419,8 @@
      "bron": "shared-library",
      "gebruik": 12159029,
      "klonen": 126,
-     "populariteit": "12 mln tekens door anderen gebruikt"
+     "populariteit": "12 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/threx_lib_jUPpyDXE.mp3"
     }
    ]
   },
@@ -1160,6 +1433,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "River",
+     "voice_id": "SAz9YHcvj6GT2YYXdXww",
+     "eigenschappen": "neutral / middle_aged / american / calm",
+     "waarom": "",
+     "bestand": "progress_media/casting/aegis/aegis_kandidaat1_River.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "waarom": "",
+     "bestand": "progress_media/casting/aegis/aegis_kandidaat2_Daniel.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/aegis/aegis_kandidaat3_Alice.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Bill",
+     "voice_id": "pqHfZKP75CvOlQylNhV4",
+     "eigenschappen": "male / old / american / crisp",
+     "waarom": "",
+     "bestand": "progress_media/casting/aegis/aegis_kandidaat4_Bill.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Ava – Professional Female News & Explainer Voice",
      "voice_id": "BHf91PCMVcVwq6r1ku7L",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -1170,10 +1479,11 @@
      "bron": "shared-library",
      "gebruik": 32599777,
      "klonen": 18899,
-     "populariteit": "33 mln tekens door anderen gebruikt"
+     "populariteit": "33 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_BHf91PCM.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Eryn - Confident Corporate Training American Female Voice",
      "voice_id": "8tsLeAV5vPVuzCCvqbbU",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -1184,10 +1494,11 @@
      "bron": "shared-library",
      "gebruik": 18980608,
      "klonen": 9967,
-     "populariteit": "19 mln tekens door anderen gebruikt"
+     "populariteit": "19 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_8tsLeAV5.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Tobi - Clear, Steady and Calm African English     Voice  (Explainers and Corporates)",
      "voice_id": "D9xwB6HNBJ9h4YvQFWuE",
      "eigenschappen": "female / middle_aged / nigerian / confident",
@@ -1198,10 +1509,11 @@
      "bron": "shared-library",
      "gebruik": 16313914,
      "klonen": 8641,
-     "populariteit": "16 mln tekens door anderen gebruikt"
+     "populariteit": "16 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_D9xwB6HN.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Alice - Gentle Storyteller",
      "voice_id": "rv30Fd6w5bnbL0kHzWlr",
      "eigenschappen": "female / middle_aged / american / neutral",
@@ -1212,10 +1524,11 @@
      "bron": "shared-library",
      "gebruik": 22800896,
      "klonen": 16335,
-     "populariteit": "23 mln tekens door anderen gebruikt"
+     "populariteit": "23 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_rv30Fd6w.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Ngozi - Calm & Descriptive",
      "voice_id": "QqgW7xZ3mjIAgZVFMwJz",
      "eigenschappen": "female / middle_aged / nigerian / calm",
@@ -1226,10 +1539,11 @@
      "bron": "shared-library",
      "gebruik": 56972447,
      "klonen": 2503,
-     "populariteit": "57 mln tekens door anderen gebruikt"
+     "populariteit": "57 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_QqgW7xZ3.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Katherine - Warm & Calm",
      "voice_id": "Tfv2PGiTliSQ4XSXrJmA",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -1240,10 +1554,11 @@
      "bron": "shared-library",
      "gebruik": 49470135,
      "klonen": 17599,
-     "populariteit": "49 mln tekens door anderen gebruikt"
+     "populariteit": "49 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_Tfv2PGiT.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Juliet - Customer Care: Professional, Empathic, Warm",
      "voice_id": "WyFXw4PzMbRnp8iLMJwY",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -1254,10 +1569,11 @@
      "bron": "shared-library",
      "gebruik": 54461914,
      "klonen": 18838,
-     "populariteit": "54 mln tekens door anderen gebruikt"
+     "populariteit": "54 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_WyFXw4Pz.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Kai - Real AI Receptionist ",
      "voice_id": "gh9yOzacZabdERF6GI7O",
      "eigenschappen": "female / middle_aged / american / calm",
@@ -1268,7 +1584,8 @@
      "bron": "shared-library",
      "gebruik": 39979887,
      "klonen": 1659,
-     "populariteit": "40 mln tekens door anderen gebruikt"
+     "populariteit": "40 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/aegis_lib_gh9yOzac.mp3"
     }
    ]
   },
@@ -1281,6 +1598,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Bill",
+     "voice_id": "pqHfZKP75CvOlQylNhV4",
+     "eigenschappen": "male / old / american / crisp",
+     "waarom": "",
+     "bestand": "progress_media/casting/vex/vex_kandidaat1_Bill.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "George",
+     "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+     "eigenschappen": "male / middle_aged / british / mature",
+     "waarom": "",
+     "bestand": "progress_media/casting/vex/vex_kandidaat2_George.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Brian",
+     "voice_id": "nPczCjzI2devNBz1zQrb",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "",
+     "bestand": "progress_media/casting/vex/vex_kandidaat3_Brian.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "waarom": "",
+     "bestand": "progress_media/casting/vex/vex_kandidaat4_Daniel.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Victor - Deep, Dark Psychology",
      "voice_id": "U1nBX3lzKSM937PaYYfk",
      "eigenschappen": "male / old / british / deep",
@@ -1291,10 +1644,11 @@
      "bron": "shared-library",
      "gebruik": 4047066,
      "klonen": 3038,
-     "populariteit": "4 mln tekens door anderen gebruikt"
+     "populariteit": "4 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_U1nBX3lz.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Onyx – Calm & Friendly Podcast Narrator",
      "voice_id": "An7r4HL8TAw73K5uSMpy",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -1305,10 +1659,11 @@
      "bron": "shared-library",
      "gebruik": 1891272,
      "klonen": 1163,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_An7r4HL8.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Arthur",
      "voice_id": "ca7REQGRQ5JssBZnoS5E",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -1319,10 +1674,11 @@
      "bron": "shared-library",
      "gebruik": 1499952,
      "klonen": 241,
-     "populariteit": "1 mln tekens door anderen gebruikt"
+     "populariteit": "1 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_ca7REQGR.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Jim - Calm & Friendly",
      "voice_id": "GwgxNQwmgtBTVysWUO5t",
      "eigenschappen": "male / old / american / casual",
@@ -1333,10 +1689,11 @@
      "bron": "shared-library",
      "gebruik": 1252336,
      "klonen": 634,
-     "populariteit": "1 mln tekens door anderen gebruikt"
+     "populariteit": "1 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_GwgxNQwm.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Atlas ",
      "voice_id": "zfWx5IjUaWGWTId9hv9t",
      "eigenschappen": "male / middle_aged / american / wise",
@@ -1347,10 +1704,11 @@
      "bron": "shared-library",
      "gebruik": 2266973,
      "klonen": 1585,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_zfWx5IjU.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Jon - Calm Presence",
      "voice_id": "enzbGixeo55iqn1QxbbC",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -1361,10 +1719,11 @@
      "bron": "shared-library",
      "gebruik": 6499185,
      "klonen": 1933,
-     "populariteit": "6 mln tekens door anderen gebruikt"
+     "populariteit": "6 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_enzbGixe.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Abbott - Expressive sincere authority",
      "voice_id": "AtEtJxZcH8TRn1nNhXol",
      "eigenschappen": "male / middle_aged / american / confident",
@@ -1375,10 +1734,11 @@
      "bron": "shared-library",
      "gebruik": 20739845,
      "klonen": 1130,
-     "populariteit": "21 mln tekens door anderen gebruikt"
+     "populariteit": "21 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_AtEtJxZc.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Chris - Deep, Friendly, Storyteller ",
      "voice_id": "dVgrl3DfAp8V0tM7LCsE",
      "eigenschappen": "male / middle_aged / american / calm",
@@ -1389,7 +1749,8 @@
      "bron": "shared-library",
      "gebruik": 2854705,
      "klonen": 1433,
-     "populariteit": "3 mln tekens door anderen gebruikt"
+     "populariteit": "3 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_dVgrl3Df.mp3"
     }
    ]
   },
@@ -1402,6 +1763,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Lily",
+     "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+     "eigenschappen": "female / middle_aged / british / confident",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaine/kaine_kandidaat1_Lily.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaine/kaine_kandidaat2_Alice.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaine/kaine_kandidaat3_Bella.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "waarom": "",
+     "bestand": "progress_media/casting/kaine/kaine_kandidaat4_Matilda.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Adalina - Professional & Friendly",
      "voice_id": "i2SoWWnAm3qCyr53Jenw",
      "eigenschappen": "female / middle_aged / american / confident",
@@ -1412,10 +1809,11 @@
      "bron": "shared-library",
      "gebruik": 17589837,
      "klonen": 10914,
-     "populariteit": "18 mln tekens door anderen gebruikt"
+     "populariteit": "18 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_i2SoWWnA.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Miss B. - Inspirational, Authoritative, Confident Narrator",
      "voice_id": "PFqo8D2UY6vd5tzJUrsl",
      "eigenschappen": "female / middle_aged / american / confident",
@@ -1426,10 +1824,11 @@
      "bron": "shared-library",
      "gebruik": 1894710,
      "klonen": 1157,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_PFqo8D2U.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Mid-30s Female, Intimate, Calming, Light Rasp",
      "voice_id": "xYa75LlayhWHCRl1yJSH",
      "eigenschappen": "female / young / american / confident",
@@ -1440,10 +1839,11 @@
      "bron": "shared-library",
      "gebruik": 14630101,
      "klonen": 7335,
-     "populariteit": "15 mln tekens door anderen gebruikt"
+     "populariteit": "15 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_xYa75Lla.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Glinda - Confident, Sly, Sultry",
      "voice_id": "o9yXv9EFSasRrRM3x6xK",
      "eigenschappen": "female / middle_aged / american / serious",
@@ -1454,10 +1854,11 @@
      "bron": "shared-library",
      "gebruik": 9743171,
      "klonen": 5030,
-     "populariteit": "10 mln tekens door anderen gebruikt"
+     "populariteit": "10 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_o9yXv9EF.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Meaghan",
      "voice_id": "mrmaApeLxpgZi4RK7oGq",
      "eigenschappen": "female / middle_aged / american / casual",
@@ -1468,10 +1869,11 @@
      "bron": "shared-library",
      "gebruik": 14485341,
      "klonen": 7848,
-     "populariteit": "14 mln tekens door anderen gebruikt"
+     "populariteit": "14 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_mrmaApeL.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Charlotte - Storytelling & Narration",
      "voice_id": "wScwPA1qCkWo5R2dmlS8",
      "eigenschappen": "female / middle_aged / australian / calm",
@@ -1482,10 +1884,11 @@
      "bron": "shared-library",
      "gebruik": 20577488,
      "klonen": 11148,
-     "populariteit": "21 mln tekens door anderen gebruikt"
+     "populariteit": "21 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_wScwPA1q.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Vexa – Bold, Firm & Commanding ",
      "voice_id": "WPSw8dUqeNii5nBXr9gS",
      "eigenschappen": "female / middle_aged / american / confident",
@@ -1496,10 +1899,11 @@
      "bron": "shared-library",
      "gebruik": 12848786,
      "klonen": 1741,
-     "populariteit": "13 mln tekens door anderen gebruikt"
+     "populariteit": "13 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_WPSw8dUq.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Tessa - SaaS Demo & User Onboarding",
      "voice_id": "kw7MsfzXoT4yQD1Lgo5A",
      "eigenschappen": "female / middle_aged / american / pleasant",
@@ -1510,7 +1914,8 @@
      "bron": "shared-library",
      "gebruik": 10967710,
      "klonen": 2870,
-     "populariteit": "11 mln tekens door anderen gebruikt"
+     "populariteit": "11 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_kw7MsfzX.mp3"
     }
    ]
   },
@@ -1523,6 +1928,42 @@
    "kandidaten": [
     {
      "nr": 1,
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "waarom": "",
+     "bestand": "progress_media/casting/callis/callis_kandidaat1_Daniel.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 2,
+     "stem": "Bill",
+     "voice_id": "pqHfZKP75CvOlQylNhV4",
+     "eigenschappen": "male / old / american / crisp",
+     "waarom": "",
+     "bestand": "progress_media/casting/callis/callis_kandidaat2_Bill.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 3,
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "",
+     "bestand": "progress_media/casting/callis/callis_kandidaat3_Roger.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 4,
+     "stem": "Eric",
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "waarom": "",
+     "bestand": "progress_media/casting/callis/callis_kandidaat4_Eric.mp3",
+     "categorie": "premade"
+    },
+    {
+     "nr": 5,
      "stem": "Ken - Confident ",
      "voice_id": "sP6cqUGhZxuStGV0pn9o",
      "eigenschappen": "male / old / american / confident",
@@ -1533,10 +1974,11 @@
      "bron": "shared-library",
      "gebruik": 3868048,
      "klonen": 3259,
-     "populariteit": "4 mln tekens door anderen gebruikt"
+     "populariteit": "4 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_sP6cqUGh.mp3"
     },
     {
-     "nr": 2,
+     "nr": 6,
      "stem": "Mike Mercer - Warm, Sincere & Dynamic",
      "voice_id": "O4Sq7yQC1fd484Lr500R",
      "eigenschappen": "male / middle_aged / american / professional",
@@ -1547,10 +1989,11 @@
      "bron": "shared-library",
      "gebruik": 20538178,
      "klonen": 5636,
-     "populariteit": "21 mln tekens door anderen gebruikt"
+     "populariteit": "21 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_O4Sq7yQC.mp3"
     },
     {
-     "nr": 3,
+     "nr": 7,
      "stem": "Victor - Deep, Dark Psychology",
      "voice_id": "U1nBX3lzKSM937PaYYfk",
      "eigenschappen": "male / old / british / deep",
@@ -1561,10 +2004,11 @@
      "bron": "shared-library",
      "gebruik": 4047066,
      "klonen": 3038,
-     "populariteit": "4 mln tekens door anderen gebruikt"
+     "populariteit": "4 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_U1nBX3lz.mp3"
     },
     {
-     "nr": 4,
+     "nr": 8,
      "stem": "Uyi - Nigerian American Male ",
      "voice_id": "NwBN5lRnglDs8TBVmser",
      "eigenschappen": "male / middle_aged / nigerian / confident",
@@ -1575,10 +2019,11 @@
      "bron": "shared-library",
      "gebruik": 2756166,
      "klonen": 857,
-     "populariteit": "3 mln tekens door anderen gebruikt"
+     "populariteit": "3 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_NwBN5lRn.mp3"
     },
     {
-     "nr": 5,
+     "nr": 9,
      "stem": "Ember - Warm Narrative Voice",
      "voice_id": "37i69iUK8H0KcGuz48hE",
      "eigenschappen": "male / middle_aged / british / calm",
@@ -1589,10 +2034,11 @@
      "bron": "shared-library",
      "gebruik": 4975118,
      "klonen": 4524,
-     "populariteit": "5 mln tekens door anderen gebruikt"
+     "populariteit": "5 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_37i69iUK.mp3"
     },
     {
-     "nr": 6,
+     "nr": 10,
      "stem": "Sanket - Professional Indian English",
      "voice_id": "hg1icMxI2KADq9a81ecq",
      "eigenschappen": "male / middle_aged / indian / calm",
@@ -1603,10 +2049,11 @@
      "bron": "shared-library",
      "gebruik": 1796422,
      "klonen": 1469,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_hg1icMxI.mp3"
     },
     {
-     "nr": 7,
+     "nr": 11,
      "stem": "Don Bailey",
      "voice_id": "j5w4qbCIKAKbitmCgizR",
      "eigenschappen": "male / middle_aged / american / casual",
@@ -1617,10 +2064,11 @@
      "bron": "shared-library",
      "gebruik": 1937675,
      "klonen": 636,
-     "populariteit": "2 mln tekens door anderen gebruikt"
+     "populariteit": "2 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_j5w4qbCI.mp3"
     },
     {
-     "nr": 8,
+     "nr": 12,
      "stem": "Vincent Davis ",
      "voice_id": "rMxoUiufNLar6QLKTnA2",
      "eigenschappen": "male / old / american / confident",
@@ -1631,7 +2079,311 @@
      "bron": "shared-library",
      "gebruik": 1404263,
      "klonen": 616,
-     "populariteit": "1 mln tekens door anderen gebruikt"
+     "populariteit": "1 mln tekens door anderen gebruikt",
+     "bestand": "progress_media/casting/stemmen_library/callis_lib_rMxoUiuf.mp3"
+    }
+   ]
+  },
+  {
+   "rol": "iron_chorus_emissary",
+   "label": "Iron Chorus-emissaris (M1.5)",
+   "prio": 2,
+   "tier": "Tier 2 - blokkeert M1.5",
+   "fingerprint": "Afgekapte mededelingen; telt waar een ander een bijvoeglijk naamwoord gebruikt; kaatst je laatste woord vlak terug; noemt NOOIT een naam - niet die van Mara, niet die van Voss, niet zijn eigen. Hij heeft drie keer gelijk en de speler moet dat voelen. Casten op: vlak kunnen zijn zonder dood te klinken.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Marcus K - Calm Documentary Narrator",
+     "voice_id": "3H55HGnNE1XjYxigHSAS",
+     "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+     "waarom": "Documentaire-voordracht is precies wat hij doet: feiten geven zonder ze te kleuren. Een man die telt in plaats van bijvoeglijke naamwoorden gebruikt.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat1_3H55HGnN.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=3H55HGnNE1XjYxigHSAS",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 2,
+     "stem": "Cain - Calm & Grounded",
+     "voice_id": "tX9AxXOGVaX1mDbRjN0f",
+     "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+     "waarom": "Geaard en rustig - de industriedistrict-kwaliteit, zonder een greintje warmte te veel. Kan 'Nobody.' laten staan zonder het op te tuigen.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat2_tX9AxXOG.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=tX9AxXOGVaX1mDbRjN0f",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 3,
+     "stem": "Steve - Deep & Authoritative",
+     "voice_id": "lPVHDJjq0RhPU2UxBOD3",
+     "eigenschappen": "male / middle_aged / american / professional / narrative_story",
+     "waarom": "Gewicht zonder warmte. Als 'Three.' een gescoord punt moet zijn, heeft deze stem de massa om dat te dragen.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat3_lPVHDJjq.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=lPVHDJjq0RhPU2UxBOD3",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 4,
+     "stem": "Dak",
+     "voice_id": "CPcy0Dnz30Ix06J8m95k",
+     "eigenschappen": "male / old / american / deep / narrative_story",
+     "waarom": "Diep en kaal. Geen enkele neiging tot versieren, wat bij afgekapte mededelingen precies goed is.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat4_CPcy0Dnz.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=CPcy0Dnz30Ix06J8m95k",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 5,
+     "stem": "Mr A",
+     "voice_id": "fhiytt8dYcYpPDbE5T3g",
+     "eigenschappen": "male / middle_aged / american / mature / narrative_story",
+     "waarom": "Rijp en onopgesmukt. De cellleider die al twintig jaar mensen doorlicht.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat5_fhiytt8d.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=fhiytt8dYcYpPDbE5T3g",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 6,
+     "stem": "Steven Hauer - Minnesota Author",
+     "voice_id": "MqdBjMcqClsTO77t1vGB",
+     "eigenschappen": "male / middle_aged / american / mature / narrative_story",
+     "waarom": "Vlak affect als streekeigenschap - vlak zijn zonder dood klinken is letterlijk de eis, en hier zit het in de stem zelf.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat6_MqdBjMcq.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=MqdBjMcqClsTO77t1vGB",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 7,
+     "stem": "Matthew Paul - Scouse, Liverpool, Calm",
+     "voice_id": "m3ERpbBFjTAqD5PJozID",
+     "eigenschappen": "male / middle_aged / british / confident / narrative_story",
+     "waarom": "Arbeidersaccent uit een industriestad. BREEKT DE ACCENT-NEUTRALITEIT, bewust: het markeert de Iron Chorus hoorbaar als een ANDERE plek dan Ember. Precies de factie-differentiatie die de schrijver miste. Alleen kiezen als je dat wilt.",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat7_m3ERpbBF.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=m3ERpbBFjTAqD5PJozID",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "rol": "petra",
+   "label": "Petra Voss (55)",
+   "prio": 2,
+   "tier": "Tier 2 - blokkeert M1.8",
+   "fingerprint": "Imperatieven met het voornaamwoord weggelaten; huishoud- en keukenzelfstandignaamwoorden waar iedereen om haar heen operationele gebruikt; op een na de kortste regels in de game. ZIJ GEBRUIKT GEEN ENKEL VOORNAAMWOORD - geen \"you\", geen \"I\", geen \"we\" - en noemt niemand bij naam; vier opeenvolgende regels in S09 bevatten nul persoonsaanduidingen. Waar Mara een PLAATS en een GROEP noemt (\"Everyone in the corridor.\"), noemt zij een DING en een WERKWOORD (\"Cups. Both of them.\" / \"Roll it.\" / \"Boil water.\"). Casten op: KAN DEZE STEM EEN REEKS KORTE IMPERATIEVEN DRAGEN ZONDER KIL OF ROBOTACHTIG TE WORDEN - zij komt net uit een blacksite en de vlakheid is schade, geen karakter. Zij deelt scenes met Mara (owner-keuze 1: Matilda) en Reyes (Alice); geen van deze acht kandidaten komt in een andere rol voor.",
+   "kandidaten": [
+    {
+     "nr": 1,
+     "stem": "Empress - Smoky, Breathy, and Neutral",
+     "voice_id": "MHPwHxLx0nmGIb5Jnbly",
+     "eigenschappen": "female / old / american / deep / narrative_story",
+     "waarom": "Zestig, laag en rokerig: op die diepte landt \"Cups. Both of them.\" als een vaststelling en niet als een commando. En zij is de enige oude vrouwenstem in de cast, dus ze staat meteen los van Mara (Matilda) en Reyes (Alice) die allebei mid-helder zijn.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat1_MHPwHxLx.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=MHPwHxLx0nmGIb5Jnbly",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": true,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 2,
+     "stem": "Blue - Low, Calm with Grit ",
+     "voice_id": "YGWwh1G8pUwWmJyCCpma",
+     "eigenschappen": "female / old / canadian / confident / narrative_story",
+     "waarom": "Laag, kalm en met grit - dat zijn precies de drie eigenschappen die vlakheid tot slijtage maken in plaats van tot kilte. Kalm zonder grit is een machine; grit zonder kalm is boosheid; zij is geen van beide.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat2_YGWwh1G8.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=YGWwh1G8pUwWmJyCCpma",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 3,
+     "stem": "Veronica - Candid Grit Authentic Narrator",
+     "voice_id": "oFnUs65XPN5XcT0txEbR",
+     "eigenschappen": "female / middle_aged / american / calm / narrative_story",
+     "waarom": "De stemkaart zegt letterlijk dat ze \"announcer\"-glans vermijdt ten gunste van een ongerepeteerde voordracht. Die glans is exact wat een imperatief van vier woorden in een systeemmelding verandert.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat3_oFnUs65X.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=oFnUs65XPN5XcT0txEbR",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": true,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 4,
+     "stem": "Sedona - Calm Grounded Female",
+     "voice_id": "Y02DpjDrIqEQiinPoGZG",
+     "eigenschappen": "female / middle_aged / american / calm / narrative_story",
+     "waarom": "De enige kaart in de hele vrouwelijke bibliotheek die \"minimal affect\" en \"warm calming tone\" in dezelfde beschrijving zet. Dat is woordelijk de opdracht: vlak van binnen, warm van timbre.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat4_Y02DpjDr.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=Y02DpjDrIqEQiinPoGZG",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": true,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 5,
+     "stem": "Mother - Strong, Warm  & Calm",
+     "voice_id": "TLeBnGDqmcwGf936zZyW",
+     "eigenschappen": "female / middle_aged / us midwest / calm / narrative_story",
+     "waarom": "\"Gentle grit\" plus een moederlijke aanwezigheid, terwijl haar tekst nergens moederlijk is. Zij heeft hem vanaf zijn zevende grootgebracht en dat mag alleen in de klank zitten, want in de woorden staat het niet.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat5_TLeBnGDq.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=TLeBnGDqmcwGf936zZyW",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": true,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 6,
+     "stem": "Harper - Female American Documentary",
+     "voice_id": "Fihx1nL7DQV0DEuFJSG1",
+     "eigenschappen": "female / middle_aged / american / calm / narrative_story",
+     "waarom": "Feitelijke voordracht, zachter en dieper. Haar S09-telling (\"Six out of the west stair. Four not walking.\") is letterlijk documentairetekst - de test is of dezelfde stem daarna \"Left arm.\" nog kan dragen.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat6_Fihx1nL7.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=Fihx1nL7DQV0DEuFJSG1",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": true,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 7,
+     "stem": "Sabrina - Authentic Chill Female",
+     "voice_id": "mHPpgPSVrgsh61IlrDeD",
+     "eigenschappen": "female / middle_aged / american / casual / conversational",
+     "waarom": "\"Komt over als een echt mens dat praat, niet overgepolijst\", met een lichte rasp. De scherpste test of vlakheid als vermoeidheid leest. Risico: haar register is casual en Petra lacht nergens.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat7_mHPpgPSV.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=mHPpgPSVrgsh61IlrDeD",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
+    },
+    {
+     "nr": 8,
+     "stem": "Chloe Croft - Credible, Impartial & Grit",
+     "voice_id": "g0IbRtKD9udkTNA4RqEN",
+     "eigenschappen": "female / middle_aged / american / casual / narrative_story",
+     "waarom": "Recht door zee, onpartijdig, met grit - een stem die informatie geeft zonder haar te verkopen, en dat is wat zij vier regels lang doet in S09.",
+     "bestand": "progress_media/casting/petra/petra_kandidaat8_g0IbRtKD.mp3",
+     "categorie": "voice_library",
+     "licentie": {
+      "status": "NIET_GEVERIFIEERD",
+      "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=g0IbRtKD9udkTNA4RqEN",
+      "gemeten_velden": {
+       "category": "professional",
+       "notice_period_dagen": 730,
+       "free_users_allowed": false,
+       "rate": 1.0
+      }
+     }
     }
    ]
   }

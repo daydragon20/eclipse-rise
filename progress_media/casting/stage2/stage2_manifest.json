@@ -1,0 +1,514 @@
+{
+ "clips": {
+  "dominion_conscript_keus1_Harry_signature.mp3": {
+   "role": "dominion_conscript",
+   "rank": 1,
+   "voice_name": "Harry",
+   "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+   "kind": "signature",
+   "text": "[nervous] Contact, grid seven! Requesting authorization!",
+   "chars": 56,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dominion_conscript_keus1_Harry_extreme.mp3": {
+   "role": "dominion_conscript",
+   "rank": 1,
+   "voice_name": "Harry",
+   "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+   "kind": "extreme",
+   "text": "[shouting] I can't see him! He's inside the perimeter, he's inside!",
+   "chars": 67,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dominion_conscript_keus1_Harry_combat.mp3": {
+   "role": "dominion_conscript",
+   "rank": 1,
+   "voice_name": "Harry",
+   "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+   "kind": "combat",
+   "text": "Reloading! Cover me!",
+   "chars": 20,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dominion_conscript_keus2_Liam_signature.mp3": {
+   "role": "dominion_conscript",
+   "rank": 2,
+   "voice_name": "Liam",
+   "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+   "kind": "signature",
+   "text": "[nervous] Contact, grid seven! Requesting authorization!",
+   "chars": 56,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dominion_conscript_keus2_Liam_extreme.mp3": {
+   "role": "dominion_conscript",
+   "rank": 2,
+   "voice_name": "Liam",
+   "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+   "kind": "extreme",
+   "text": "[shouting] I can't see him! He's inside the perimeter, he's inside!",
+   "chars": 67,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dominion_conscript_keus2_Liam_combat.mp3": {
+   "role": "dominion_conscript",
+   "rank": 2,
+   "voice_name": "Liam",
+   "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+   "kind": "combat",
+   "text": "Reloading! Cover me!",
+   "chars": 20,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "veil_operative_keus1_River_signature.mp3": {
+   "role": "veil_operative",
+   "rank": 1,
+   "voice_name": "River",
+   "voice_id": "SAz9YHcvj6GT2YYXdXww",
+   "kind": "signature",
+   "text": "[cold] He is not armed. Continue the sweep.",
+   "chars": 43,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "veil_operative_keus1_River_extreme.mp3": {
+   "role": "veil_operative",
+   "rank": 1,
+   "voice_name": "River",
+   "voice_id": "SAz9YHcvj6GT2YYXdXww",
+   "kind": "extreme",
+   "text": "[quietly] You will tell me. Everyone does. The only variable is when.",
+   "chars": 69,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "veil_operative_keus1_River_combat.mp3": {
+   "role": "veil_operative",
+   "rank": 1,
+   "voice_name": "River",
+   "voice_id": "SAz9YHcvj6GT2YYXdXww",
+   "kind": "combat",
+   "text": "Target displaced. Sweep left.",
+   "chars": 29,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "veil_operative_keus2_Eric_signature.mp3": {
+   "role": "veil_operative",
+   "rank": 2,
+   "voice_name": "Eric",
+   "voice_id": "cjVigY5qzO86Huf0OWal",
+   "kind": "signature",
+   "text": "[cold] He is not armed. Continue the sweep.",
+   "chars": 43,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "veil_operative_keus2_Eric_extreme.mp3": {
+   "role": "veil_operative",
+   "rank": 2,
+   "voice_name": "Eric",
+   "voice_id": "cjVigY5qzO86Huf0OWal",
+   "kind": "extreme",
+   "text": "[quietly] You will tell me. Everyone does. The only variable is when.",
+   "chars": 69,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "veil_operative_keus2_Eric_combat.mp3": {
+   "role": "veil_operative",
+   "rank": 2,
+   "voice_name": "Eric",
+   "voice_id": "cjVigY5qzO86Huf0OWal",
+   "kind": "combat",
+   "text": "Target displaced. Sweep left.",
+   "chars": 29,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "eclipse_fighter_keus1_Roger_signature.mp3": {
+   "role": "eclipse_fighter",
+   "rank": 1,
+   "voice_name": "Roger",
+   "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+   "kind": "signature",
+   "text": "Reyes is down - someone get to Reyes!",
+   "chars": 37,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "eclipse_fighter_keus1_Roger_extreme.mp3": {
+   "role": "eclipse_fighter",
+   "rank": 1,
+   "voice_name": "Roger",
+   "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+   "kind": "extreme",
+   "text": "[shouting] That's my sister's building! That's my sister's building!",
+   "chars": 68,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "eclipse_fighter_keus1_Roger_combat.mp3": {
+   "role": "eclipse_fighter",
+   "rank": 1,
+   "voice_name": "Roger",
+   "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+   "kind": "combat",
+   "text": "Two of them, upstairs!",
+   "chars": 22,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "eclipse_fighter_keus2_Matilda_signature.mp3": {
+   "role": "eclipse_fighter",
+   "rank": 2,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "signature",
+   "text": "Reyes is down - someone get to Reyes!",
+   "chars": 37,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "eclipse_fighter_keus2_Matilda_extreme.mp3": {
+   "role": "eclipse_fighter",
+   "rank": 2,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "extreme",
+   "text": "[shouting] That's my sister's building! That's my sister's building!",
+   "chars": 68,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "eclipse_fighter_keus2_Matilda_combat.mp3": {
+   "role": "eclipse_fighter",
+   "rank": 2,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "combat",
+   "text": "Two of them, upstairs!",
+   "chars": 22,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_m_keus1_Callum_signature.mp3": {
+   "role": "voss_m",
+   "rank": 1,
+   "voice_name": "Callum",
+   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+   "kind": "signature",
+   "text": "The coupling's already cracked. Give me thirty seconds and it's ours.",
+   "chars": 69,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_m_keus1_Callum_extreme.mp3": {
+   "role": "voss_m",
+   "rank": 1,
+   "voice_name": "Callum",
+   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+   "kind": "extreme",
+   "text": "[angry] Don't tell me what it cost. I was standing in it.",
+   "chars": 57,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_m_keus1_Callum_combat.mp3": {
+   "role": "voss_m",
+   "rank": 1,
+   "voice_name": "Callum",
+   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+   "kind": "combat",
+   "text": "Contact left! Falling back!",
+   "chars": 27,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_m_keus2_Roger_signature.mp3": {
+   "role": "voss_m",
+   "rank": 2,
+   "voice_name": "Roger",
+   "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+   "kind": "signature",
+   "text": "The coupling's already cracked. Give me thirty seconds and it's ours.",
+   "chars": 69,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_m_keus2_Roger_extreme.mp3": {
+   "role": "voss_m",
+   "rank": 2,
+   "voice_name": "Roger",
+   "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+   "kind": "extreme",
+   "text": "[angry] Don't tell me what it cost. I was standing in it.",
+   "chars": 57,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_m_keus2_Roger_combat.mp3": {
+   "role": "voss_m",
+   "rank": 2,
+   "voice_name": "Roger",
+   "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+   "kind": "combat",
+   "text": "Contact left! Falling back!",
+   "chars": 27,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_f_keus1_Laura_signature.mp3": {
+   "role": "voss_f",
+   "rank": 1,
+   "voice_name": "Laura",
+   "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+   "kind": "signature",
+   "text": "The coupling's already cracked. Give me thirty seconds and it's ours.",
+   "chars": 69,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_f_keus1_Laura_extreme.mp3": {
+   "role": "voss_f",
+   "rank": 1,
+   "voice_name": "Laura",
+   "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+   "kind": "extreme",
+   "text": "[angry] Don't tell me what it cost. I was standing in it.",
+   "chars": 57,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_f_keus1_Laura_combat.mp3": {
+   "role": "voss_f",
+   "rank": 1,
+   "voice_name": "Laura",
+   "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+   "kind": "combat",
+   "text": "Contact left! Falling back!",
+   "chars": 27,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_f_keus2_Matilda_signature.mp3": {
+   "role": "voss_f",
+   "rank": 2,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "signature",
+   "text": "The coupling's already cracked. Give me thirty seconds and it's ours.",
+   "chars": 69,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_f_keus2_Matilda_extreme.mp3": {
+   "role": "voss_f",
+   "rank": 2,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "extreme",
+   "text": "[angry] Don't tell me what it cost. I was standing in it.",
+   "chars": 57,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "voss_f_keus2_Matilda_combat.mp3": {
+   "role": "voss_f",
+   "rank": 2,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "combat",
+   "text": "Contact left! Falling back!",
+   "chars": 27,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "mara_keus1_Matilda_signature.mp3": {
+   "role": "mara",
+   "rank": 1,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "signature",
+   "text": "We don't get to be tired. Not yet.",
+   "chars": 34,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "mara_keus1_Matilda_extreme.mp3": {
+   "role": "mara",
+   "rank": 1,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "extreme",
+   "text": "[quietly] Don't carry me. Carry the work. We were always going to be more than one of us.",
+   "chars": 89,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "mara_keus1_Matilda_combat.mp3": {
+   "role": "mara",
+   "rank": 1,
+   "voice_name": "Matilda",
+   "voice_id": "XrExE9yKIg1WjnnlVkGX",
+   "kind": "combat",
+   "text": "Cover the stairwell. Go.",
+   "chars": 24,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "mara_keus2_Lily_signature.mp3": {
+   "role": "mara",
+   "rank": 2,
+   "voice_name": "Lily",
+   "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+   "kind": "signature",
+   "text": "We don't get to be tired. Not yet.",
+   "chars": 34,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "mara_keus2_Lily_extreme.mp3": {
+   "role": "mara",
+   "rank": 2,
+   "voice_name": "Lily",
+   "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+   "kind": "extreme",
+   "text": "[quietly] Don't carry me. Carry the work. We were always going to be more than one of us.",
+   "chars": 89,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "mara_keus2_Lily_combat.mp3": {
+   "role": "mara",
+   "rank": 2,
+   "voice_name": "Lily",
+   "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+   "kind": "combat",
+   "text": "Cover the stairwell. Go.",
+   "chars": 24,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dex_keus1_Liam_signature.mp3": {
+   "role": "dex",
+   "rank": 1,
+   "voice_name": "Liam",
+   "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+   "kind": "signature",
+   "text": "That's not a reactor. That's a bomb with a job.",
+   "chars": 47,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dex_keus1_Liam_extreme.mp3": {
+   "role": "dex",
+   "rank": 1,
+   "voice_name": "Liam",
+   "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+   "kind": "extreme",
+   "text": "[nervous] Coolant's gone. Housing's cracked. Ninety seconds, maybe. I've got a joke about this one but it isn't any good.",
+   "chars": 121,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dex_keus1_Liam_combat.mp3": {
+   "role": "dex",
+   "rank": 1,
+   "voice_name": "Liam",
+   "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+   "kind": "combat",
+   "text": "Breach charge is live! Back!",
+   "chars": 28,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dex_keus2_Will_signature.mp3": {
+   "role": "dex",
+   "rank": 2,
+   "voice_name": "Will",
+   "voice_id": "bIHbv24MWmeRgasZH58o",
+   "kind": "signature",
+   "text": "That's not a reactor. That's a bomb with a job.",
+   "chars": 47,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dex_keus2_Will_extreme.mp3": {
+   "role": "dex",
+   "rank": 2,
+   "voice_name": "Will",
+   "voice_id": "bIHbv24MWmeRgasZH58o",
+   "kind": "extreme",
+   "text": "[nervous] Coolant's gone. Housing's cracked. Ninety seconds, maybe. I've got a joke about this one but it isn't any good.",
+   "chars": 121,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "dex_keus2_Will_combat.mp3": {
+   "role": "dex",
+   "rank": 2,
+   "voice_name": "Will",
+   "voice_id": "bIHbv24MWmeRgasZH58o",
+   "kind": "combat",
+   "text": "Breach charge is live! Back!",
+   "chars": 28,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "brick_keus1_Adam_signature.mp3": {
+   "role": "brick",
+   "rank": 1,
+   "voice_name": "Adam",
+   "voice_id": "pNInz6obpgDQGcFmaJgB",
+   "kind": "signature",
+   "text": "Tam. Oyelaran. Vic.",
+   "chars": 19,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "brick_keus1_Adam_extreme.mp3": {
+   "role": "brick",
+   "rank": 1,
+   "voice_name": "Adam",
+   "voice_id": "pNInz6obpgDQGcFmaJgB",
+   "kind": "extreme",
+   "text": "[grieving] I said their names. Somebody has to say them.",
+   "chars": 56,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "brick_keus1_Adam_combat.mp3": {
+   "role": "brick",
+   "rank": 1,
+   "voice_name": "Adam",
+   "voice_id": "pNInz6obpgDQGcFmaJgB",
+   "kind": "combat",
+   "text": "Gun's dry. Ten seconds.",
+   "chars": 23,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "brick_keus2_Brian_signature.mp3": {
+   "role": "brick",
+   "rank": 2,
+   "voice_name": "Brian",
+   "voice_id": "nPczCjzI2devNBz1zQrb",
+   "kind": "signature",
+   "text": "Tam. Oyelaran. Vic.",
+   "chars": 19,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "brick_keus2_Brian_extreme.mp3": {
+   "role": "brick",
+   "rank": 2,
+   "voice_name": "Brian",
+   "voice_id": "nPczCjzI2devNBz1zQrb",
+   "kind": "extreme",
+   "text": "[grieving] I said their names. Somebody has to say them.",
+   "chars": 56,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "brick_keus2_Brian_combat.mp3": {
+   "role": "brick",
+   "rank": 2,
+   "voice_name": "Brian",
+   "voice_id": "nPczCjzI2devNBz1zQrb",
+   "kind": "combat",
+   "text": "Gun's dry. Ten seconds.",
+   "chars": 23,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "reyes_keus1_Alice_signature.mp3": {
+   "role": "reyes",
+   "rank": 1,
+   "voice_name": "Alice",
+   "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+   "kind": "signature",
+   "text": "I do not need you to be brave. I need you to be still.",
+   "chars": 54,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "reyes_keus1_Alice_extreme.mp3": {
+   "role": "reyes",
+   "rank": 1,
+   "voice_name": "Alice",
+   "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+   "kind": "extreme",
+   "text": "[cold] Four of them. Was that the plan, or was that simply what happened?",
+   "chars": 73,
+   "model_id": "eleven_multilingual_v2"
+  },
+  "reyes_keus1_Alice_combat.mp3": {
+   "role": "reyes",
+   "rank": 1,
+   "voice_name": "Alice",
+   "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+   "kind": "combat",
+   "text": "Pressure on the wound. Now.",
+   "chars": 27,
+   "model_id": "eleven_multilingual_v2"
+  }
+ }
+}

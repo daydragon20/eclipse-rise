@@ -14,7 +14,7 @@ turn:         "She says \"you\" for the first time in the game, and Voss underst
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           117
 words_heard:     79
 words_generated: 184

@@ -14,7 +14,7 @@ turn:         "He plays the first one, because he is the only person in the vaul
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           137
 words_heard:     137
 words_generated: 158

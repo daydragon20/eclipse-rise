@@ -14,7 +14,7 @@ turn:         "Somebody from Ember's original eleven dies holding a door, and th
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           147
 words_heard:     147
 words_generated: 160

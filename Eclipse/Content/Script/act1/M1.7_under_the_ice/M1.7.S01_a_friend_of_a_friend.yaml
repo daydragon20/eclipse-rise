@@ -14,7 +14,7 @@ turn:         "Voss asks where the tip came from, and Mara ends the conversation
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .180 'There isn't one.' heeft geen antecedent -- op de letter spreekt hij .160 tegen"
 words:        268
 words_heard:  268
 words_generated: 290

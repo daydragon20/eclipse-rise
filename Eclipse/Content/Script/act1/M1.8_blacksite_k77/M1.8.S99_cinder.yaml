@@ -14,7 +14,7 @@ turn:         "Somebody uses a name that was not a name an hour ago, it goes aro
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          "NO-GO: .010 zet de Iron Chorus onvoorwaardelijk in de kamer en telt onvoorwaardelijk drie cellen, terwijl de regels op pact gated zijn"
 words:           224
 words_heard:     182
 words_generated: 252

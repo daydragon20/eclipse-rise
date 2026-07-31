@@ -14,7 +14,7 @@ turn:         "Voss reads the building the way he was trained to read a foundry,
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        157
 words_heard:  135
 words_generated: 235

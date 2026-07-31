@@ -14,7 +14,7 @@ turn:         "Voss counts the guards, the number is too small, he says so — a
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           141
 words_heard:     141
 words_generated: 173

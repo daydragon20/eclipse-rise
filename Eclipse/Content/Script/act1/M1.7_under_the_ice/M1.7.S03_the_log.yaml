@@ -14,7 +14,7 @@ turn:         "Ember's own operations are in the log by date — and so is a que
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: C1 zakt (62% wisselbaar), P4-c niet vlak (.210 is een antithese die aan het eind draait), .130/.250 onspeelbaar in de dex_along==false-tak"
 words:        225
 words_heard:  199
 words_generated: 309

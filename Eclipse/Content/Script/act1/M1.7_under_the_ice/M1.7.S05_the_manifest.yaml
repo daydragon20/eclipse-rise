@@ -14,7 +14,7 @@ turn:         "Voss stops being a technician reading a system and becomes a man 
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        137
 words_heard:  110
 words_generated: 222

@@ -14,7 +14,7 @@ turn:         "The lift stops at an administrative floor by accident, the doors 
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           102
 words_heard:     102
 words_generated: 131
