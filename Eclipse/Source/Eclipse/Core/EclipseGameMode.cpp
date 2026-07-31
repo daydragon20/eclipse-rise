@@ -1660,105 +1660,123 @@ void AEclipseGameMode::AdvanceWeaponProof()
 		return;
 	}
 
-	// TOESTAND ZETTEN EN OPNEMEN IN DEZELFDE STAP, en dat mag hier wel — anders
-	// dan bij de camera. Een materiaalsectie aan- of uitzetten is een
-	// renderstate-wijziging zonder blend: het volgende getekende frame heeft hem
-	// al. De camerablends in de hoofdronde hebben die stap-ertussen wél nodig, en
-	// dat verschil hoort benoemd te zijn in plaats van gekopieerd.
-	switch (WeaponProofStep)
+	// ============ ZETTEN EN OPNEMEN ZIJN TWEE STAPPEN, EN DAT IS GEMETEN =========
+	//
+	// DE FOUT DIE HIER STOND, want die is leerzamer dan de reparatie. Er stond:
+	//
+	//   "TOESTAND ZETTEN EN OPNEMEN IN DEZELFDE STAP, en dat mag hier wel [...]
+	//    een renderstate-wijziging zonder blend: het VOLGENDE getekende frame
+	//    heeft hem al."
+	//
+	// Die zin draagt zijn eigen weerlegging. "Het VOLGENDE frame heeft hem al" is
+	// precies waarom je niet in DIT frame mag fotograferen. ShowMaterialSection zet
+	// niets direct: het legt de nieuwe HiddenMaterials in een render-commando en
+	// roept MarkRenderStateDirty() aan. Allebei landen pas na deze functie.
+	//
+	// GEMETEN GEVOLG, en het is exact een stap: op de ronde van 20:37 toonde
+	// `wapen_B_zonder_wapensectie` GEEN lichaam en twee zwevende donkere voorwerpen.
+	// Dat is de toestand die bij label C hoort (alleen de wapensectie). Elk frame
+	// droeg dus het label van een toestand die nog niet getekend was.
+	//
+	// Dezelfde les staat in dit bestand al opgeschreven, bij PLAYSHOT stap 8: "een
+	// meetmoment dat samenvalt met de gebeurtenis die het meet, meet de overgang in
+	// plaats van de toestand". Die stond er, en ik heb hem hieronder alsnog
+	// overtreden met een argument waarom hij hier niet gold.
+	//
+	// EVEN = toestand zetten. ONEVEN = meten en fotograferen.
+	const int32 Phase = WeaponProofStep / 2;
+	const bool bSetPhase = (WeaponProofStep % 2) == 0;
+
+	struct FProofState
+	{
+		const TCHAR* Label;
+		const TCHAR* File;
+		bool bBuiltIn;
+		bool bAttached;
+		bool bOnlyWeapon;
+	};
+	static const FProofState States[] = {
+		// A - zoals verscheept: de ingebouwde sectie, geen los wapen.
+		{ TEXT("A"), TEXT("wapen_A_ingebouwd"),          true,  false, false },
+		// C - ALLEEN de wapensectie. Overhouden i.p.v. weglaten: wat hier staat, IS
+		//     de sectie. Het lichaam hoort volledig weg te zijn.
+		{ TEXT("C"), TEXT("wapen_C_alleen_wapensectie"), true,  false, true  },
+		// B - het lichaam ZONDER die sectie. A min B hoort C te zijn.
+		{ TEXT("B"), TEXT("wapen_B_zonder_wapensectie"), false, false, false },
+		// G - de tegenproef: allebei aan, dus TWEE wapens. Zonder dit frame is "ik
+		//     zie er een op D" ook te verklaren doordat het losse mesh helemaal niet
+		//     getekend wordt - dan telt het oude geweer als bewijs voor het nieuwe.
+		{ TEXT("G"), TEXT("wapen_G_BEIDE_tegenproef"),   true,  true,  false },
+		// D - stap 1, 2 en 3 samen: precies EEN wapen, en wel het losse.
+		{ TEXT("D"), TEXT("wapen_D_los_aan_hand"),       false, true,  false },
+	};
+	constexpr int32 StateCount = UE_ARRAY_COUNT(States);
+
+	if (Phase < StateCount)
+	{
+		const FProofState& State = States[Phase];
+		if (bSetPhase)
+		{
+			if (Phase == 0)
+			{
+				// EERST STILZETTEN, EN DAT IS DE MEETOPSTELLING.
+				//
+				// De eerste proefronde liep hierop onderuit: het personage LIEP door
+				// tijdens de toestanden, dus de frames verschilden sowieso en "A min B"
+				// was niet te berekenen. Een reeks die een variabele isoleert, moet alle
+				// andere vasthouden.
+				GetWorldTimerManager().ClearTimer(PlayShotDriveTimer);
+				bPlayShotWalking = false;
+				bPlayShotFiring = false;
+				bPlayShotTurning = false;
+				if (UCharacterMovementComponent* Move = Body->GetCharacterMovement())
+				{
+					Move->StopMovementImmediately();
+				}
+			}
+			Body->SetOnlyBuiltInWeaponVisible(State.bOnlyWeapon);
+			if (!State.bOnlyWeapon)
+			{
+				Body->SetBuiltInWeaponVisible(State.bBuiltIn);
+			}
+			Body->SetAttachedWeaponVisible(State.bAttached);
+			++WeaponProofStep;
+			return;
+		}
+
+		// De opnamestap: nu pas is de renderstate van de vorige stap getekend.
+		MeasureWeaponVisual(State.Label);
+		// HET LABEL EN HET PERSPECTIEF OP DE REGEL. Twee frames van verschillende
+		// camera's zijn anders niet uit elkaar te houden: de screenshot-inspecteur
+		// las `wapen_B` en `wapen_F` als dezelfde camerastand en kon met beeld alleen
+		// niet kiezen. Dit getal beslist dat zonder discussie.
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s TOESTAND] ingebouwd=%d los=%d alleen-wapen=%d 1epersoon=%d -> %s.png"),
+			State.Label, State.bBuiltIn ? 1 : 0, State.bAttached ? 1 : 0,
+			State.bOnlyWeapon ? 1 : 0, Body->IsFirstPerson() ? 1 : 0, State.File);
+		CaptureHudFrame(State.File);
+		++WeaponProofStep;
+		return;
+	}
+
+	switch (WeaponProofStep - StateCount * 2)
 	{
 	case 0:
-		// EERST STILZETTEN, EN DAT IS GEEN NETHEID MAAR DE MEETOPSTELLING.
-		//
-		// De eerste proefronde (31-07 20:17) liep hier onderuit en het is leerzaam
-		// genoeg om te bewaren: het personage LIEP door tijdens de vijf toestanden,
-		// dus A, G en D zijn op verschillende plekken en in verschillende poses
-		// opgenomen. Daarmee is "A min B" niet uit te rekenen en is "ik zie er één"
-		// niet te vergelijken met "ik zie er twee" — de frames verschillen sowieso.
-		//
-		// Een reeks die bedoeld is om ÉÉN variabele te isoleren, moet alle andere
-		// vasthouden. Dat is precies de fout die dit project al eerder maakte met
-		// de speler-weglaten-proef: twee frames verschilden altijd, dus het
-		// verschil bewees niets.
-		GetWorldTimerManager().ClearTimer(PlayShotDriveTimer);
-		bPlayShotWalking = false;
-		bPlayShotFiring = false;
-		bPlayShotTurning = false;
-		if (UCharacterMovementComponent* Move = Body->GetCharacterMovement())
-		{
-			Move->StopMovementImmediately();
-		}
-		// A — ZOALS VERSCHEEPT. De nulmeting: ingebouwde sectie zichtbaar, geen
-		// los wapen. Dit is de toestand die de owner op HighresScreenshot00915 zag.
-		Body->SetOnlyBuiltInWeaponVisible(false);
-		Body->SetBuiltInWeaponVisible(true);
-		Body->SetAttachedWeaponVisible(false);
-		MeasureWeaponVisual(TEXT("A"));
-		CaptureHudFrame(TEXT("wapen_A_ingebouwd"));
-		break;
-	case 1:
-		// C — ALLEEN de wapensectie. Overhouden in plaats van weglaten, dezelfde
-		// truc als opname 5 van de hoofdronde: wat hier staat, ÍS de wapensectie.
-		// Eerst geprobeerd als het omgekeerde (weglaten en het verschil zoeken) —
-		// dat werkt niet, want dan bewijst een verschil alleen dát er iets weg is.
-		Body->SetOnlyBuiltInWeaponVisible(true);
-		Body->SetAttachedWeaponVisible(false);
-		CaptureHudFrame(TEXT("wapen_C_alleen_wapensectie"));
-		break;
-	case 2:
-		// B — het lichaam zonder de wapensectie. A min B hoort C te zijn.
-		Body->SetOnlyBuiltInWeaponVisible(false);
-		Body->SetBuiltInWeaponVisible(false);
-		Body->SetAttachedWeaponVisible(false);
-		MeasureWeaponVisual(TEXT("B"));
-		CaptureHudFrame(TEXT("wapen_B_zonder_wapensectie"));
-		break;
-	case 3:
-		// G — DE TWEE-GEWEREN-TOESTAND, met opzet opgezocht.
-		//
-		// Dit is de tegenproef en hij is het scherpste frame van de hele reeks.
-		// Zonder hem is "ik zie er één op frame D" net zo goed te verklaren
-		// doordat het NIEUWE mesh helemaal niet gerenderd wordt — dan telt het
-		// oude geweer als bewijs voor het nieuwe. Dat is exact de vorm van fout
-		// die dit project blijft opleveren: een uitkomst die twee verklaringen
-		// niet scheidt.
-		//
-		// Staan er op G TWEE geweren en op D ÉÉN, dan is bewezen dat (a) het losse
-		// mesh echt getekend wordt en (b) stap 1 echt werk doet. Elk van beide
-		// alleen bewijst niets.
-		Body->SetBuiltInWeaponVisible(true);
-		Body->SetAttachedWeaponVisible(true);
-		MeasureWeaponVisual(TEXT("G"));
-		CaptureHudFrame(TEXT("wapen_G_BEIDE_tegenproef"));
-		break;
-	case 4:
-		// D — stap 2 en 3 samen, en stap 1 erbij: precies ÉÉN geweer.
-		Body->SetBuiltInWeaponVisible(false);
-		Body->SetAttachedWeaponVisible(true);
-		MeasureWeaponVisual(TEXT("D"));
-		CaptureHudFrame(TEXT("wapen_D_los_aan_hand"));
-		break;
-	case 5:
 	{
-		// E — STAP 4, de echte proef op de som. Dit is wat vandaag visueel niets
-		// doet, en de reden dat dit hele dossier bestaat.
-		//
-		// Via de wapencomponent en niet via een eigen mesh-wissel: het moet door
-		// dezelfde SwapWeapon die de RB-knop gebruikt, anders toetst deze ronde een
-		// pad dat niemand speelt.
+		// E - STAP 4, de echte proef op de som, via dezelfde SwapWeapon als de
+		// RB-knop. Het frame valt een stap later, zodat de HUD-tekst en de 3D-mesh
+		// dezelfde toestand tonen. Op de vorige ronde zei de HUD al 'Sidearm_Scrap'
+		// terwijl de geometrie nog een frame achterliep - twee bronnen die
+		// verschillende toestanden toonden op een frame dat als bewijs gold.
 		UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
 		const FName Before = Weapon != nullptr ? Weapon->GetActiveWeaponName() : NAME_None;
 		const FEclipseWeaponVisualReport R0 = Body->SampleWeaponVisual();
 		const bool bSwapped = Weapon != nullptr && Weapon->SwapWeapon();
 		const FEclipseWeaponVisualReport R1 = Body->SampleWeaponVisual();
 		const FName After = Weapon != nullptr ? Weapon->GetActiveWeaponName() : NAME_None;
-
-		// DE UITSLAG IS HET VERSCHIL IN GEOMETRIE, niet het feit dat SwapWeapon
-		// true gaf. Dat laatste was op 27-07 al waar terwijl er visueel niets
-		// gebeurde; een teller die twee verklaringen niet scheidt is geen meting.
 		const bool bMeshChanged = R0.AttachedMeshName != R1.AttachedMeshName;
 		UE_LOG(LogEclipse, Display,
-			TEXT("[WAPEN E STAP4] wissel %d: rij '%s' -> '%s', mesh '%s' -> '%s', langste as %.1f -> %.1f cm — ZICHTBAAR VERSCHIL: %s"),
+			TEXT("[WAPEN E STAP4] wissel %d: rij '%s' -> '%s', mesh '%s' -> '%s', langste as %.1f -> %.1f cm - ZICHTBAAR VERSCHIL: %s"),
 			bSwapped ? 1 : 0, *Before.ToString(), *After.ToString(),
 			R0.AttachedMeshName.IsEmpty() ? TEXT("(geen)") : *R0.AttachedMeshName,
 			R1.AttachedMeshName.IsEmpty() ? TEXT("(geen)") : *R1.AttachedMeshName,
@@ -1767,23 +1785,26 @@ void AEclipseGameMode::AdvanceWeaponProof()
 		if (bSwapped && !bMeshChanged)
 		{
 			UE_LOG(LogEclipse, Warning,
-				TEXT("[WAPEN E STAP4 FOUT] de wissel lukte maar het zichtbare mesh veranderde NIET — dat is precies de klacht van owner-punt 5."));
+				TEXT("[WAPEN E STAP4 FOUT] de wissel lukte maar het zichtbare mesh veranderde NIET - dat is precies de klacht van owner-punt 5."));
 		}
+		break;
+	}
+	case 1:
 		MeasureWeaponVisual(TEXT("E"));
 		CaptureHudFrame(TEXT("wapen_E_na_wissel"));
 		break;
-	}
-	case 6:
-		// EN NU IN EERSTE PERSOON. Het scherpste stuk van de owner-eis: een wapen
-		// dat in 3e persoon klopt en in 1e door het scherm steekt, is niet af.
-		// [GEZIEN — HUD_1e_persoon.png van 31-07: daar staat HELEMAAL niets, geen
-		// loop en geen handen.] Dat is de nulmeting waartegen dit frame afsteekt.
+	case 2:
+		// EN NU IN EERSTE PERSOON. [GEZIEN - HUD_1e_persoon.png van 31-07: daar
+		// staat helemaal niets.] Dat is de nulmeting waartegen dit frame afsteekt.
 		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Pressed, 1.0, false));
 		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Released, 1.0, false));
 		break;
-	case 7:
+	case 3:
 		MeasureWeaponVisual(TEXT("1E"));
 		MeasureFirstPersonView(TEXT("met_los_wapen"));
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN 1E TOESTAND] 1epersoon=%d -> wapen_F_eerste_persoon.png"),
+			Body->IsFirstPerson() ? 1 : 0);
 		CaptureHudFrame(TEXT("wapen_F_eerste_persoon"));
 		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Pressed, 1.0, false));
 		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Released, 1.0, false));

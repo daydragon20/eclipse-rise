@@ -399,3 +399,88 @@ reproductie komt.
 een echt getal (Delay: 2) en wees een echte zwaarte aan (Lumen op SM5) — en was toch fout,
 omdat het getal een *instelling* was en niet een *gebeurtenis*. Het gereedschap dat het
 antwoord wél had, had de hele tijd naast het log gelegen.
+
+#### De SkyAtmosphere-hervouw-hypothese is GETOETST en VALT (31-07, 20:0x-21:0x)
+
+De hypothese luidde: `EclipseGrayboxBuilder` vernietigt de `ASkyAtmosphere` en spawnt een
+nieuwe *terwijl de renderthread midden in een frame zit*, de LUT-compute-pass leest daardoor
+vrijgegeven geheugen, en dat verklaart zowel de page fault bij *lezen* als de grilligheid.
+Aantrekkelijk, want het paste op álle gemeten feiten. Hij is nu op twee onafhankelijke
+manieren onderuit gegaan.
+
+**1. De premisse is gemeten en is onwaar.** `RebuildDistrictSky` (uit `BuildDistrict`
+gelicht, juist om dit te kunnen meten) logt bij elke herbouw waar hij staat ten opzichte van
+het renderen. In een opnameronde staat er precies één regel van de bouwer zelf:
+
+```
+[SKYBOUW 1] t=0.00s spelframe=0 renderframe=0 speelt=0 | sloopt 0 zon / 0 skylight / 0 atmosphere / 0 mist
+```
+
+`renderframe` is `GFrameCounterRenderThread`: het aantal frames dat de RENDERthread heeft
+afgemaakt. Nul betekent letterlijk *er is nog geen beeld geweest*. `speelt=0` is
+`HasBegunPlay()` — dit draait in `InitGame`, vóór BeginPlay. En `sloopt 0/0/0/0`: er is
+niets om te vernietigen, want GrayboxDistrict draagt zelf geen zon, sky, skylight of mist.
+De sloopregels waar de hypothese op rust zijn op deze map **dode code**, en er is in een
+opnameronde **geen mid-play herbouw**. Het commentaar dat over een "mid-play rebuild"
+spreekt beschrijft een mogelijkheid, geen gebeurtenis — precies het soort zin dat je moet
+meten in plaats van lezen.
+
+**2. Het mechanisme afgedwongen, en het crasht niet.** `-EclipseSkyChurn=<N>` sloopt en
+herbouwt de hele sfeerlaag N keer per spelframe tijdens het spelen, via exact het pad van de
+bouwer. Uitkomst over 19 rondes: **123.572 sloop-en-herbouwcycli van `ASkyAtmosphere` + zon
++ mist, verspreid over 17.650 gerenderde frames, nul crashes.** Als een vrijgegeven-proxy-
+race in de SkyAtmosphere-LUT het defect was, is dit de stressproef die hem had moeten
+opwekken.
+
+**En de eerlijke beperking van die tweede meting, want zonder deze regel is hij misleidend:
+de nulmeting crashte óók niet.** 16 ongewijzigde opnamerondes, nul crashes. Een arm die 0
+scoort tegen een controle die óók 0 scoort, bewijst niets over het mechanisme. Meting 1 is
+wat de hypothese doodt; meting 2 sluit alleen uit dat dit pad de kans *verhoogt*.
+
+#### Het echte probleem voor wie hier verder gaat: ER IS OP DIT MOMENT GEEN SIGNAAL
+
+| Arm | Rondes | Crashes | Frames | Sky-herbouwen |
+|---|---|---|---|---|
+| nulmeting (ongewijzigde ronde) | 16 | **0** | 15.264 | 0 |
+| churn (gedwongen herbouw) | 19 | **0** | 17.650 | 123.572 |
+| **totaal** | **35** | **0** | 32.914 | |
+
+Bij de eerder gemeten grondkans van 1-op-9 is de kans op nul crashes in 35 rondes **1,6%**
+(en 15% als je alleen de 16 nulrondes telt). De crash is vandaag dus niet gereproduceerd, en
+waarschijnlijk niet meer met dezelfde frequentie aanwezig — op een binary die sinds de crash
+van 19:20 door meerdere agents is aangeraakt.
+
+**Daarmee is elke fix-test op dit moment onmeetbaar, en dat is de belangrijkste uitkomst van
+deze ronde.** `r.SkyAtmosphere 0` uitproberen — de stap die hierboven nog als "volgende
+falsificatie" stond — kan nu per constructie niets aantonen: je vergelijkt nul met nul. Een
+fix bouwen tegen een defect dat niet meer afgaat levert een groene meting op die alleen
+maar zegt dat er niets gebeurde. Eerst een signaal, dan pas een fix.
+
+**Wat wél gemeten open ligt, en niet is uitgeprobeerd:**
+
+- De crash viel **vroeg**, niet laat: frame 259, ongeveer 1,5 s na `HighresScreenshot00002`,
+  bij `[PLAYSHOT 1]` — de ronde was net begonnen. Elke verklaring die "na lang draaien loopt
+  iets vol" veronderstelt, botst met dat feit.
+- Het crashende log heet `Eclipse_2`. UE hangt er `_2` aan wanneer een ANDER proces
+  `Eclipse.log` al vasthoudt: er draaide iets tweedes op dezelfde GPU (1080 Ti, SM5).
+  Getoetst met zes gelijktijdige rondeparen — geen crash — maar twee `-game`-rondes zijn
+  niet hetzelfde als een open **editor**, en dat laatste is wat hier meestal meedraait.
+- `Scalability::SetQualityLevels(3)` draait bij StartPlay in elke opnameronde. Uit het
+  crashlog blijkt dat de `r.SkyAtmosphere.*`-cvars alleen op frame 0 uit config gezet
+  worden, dus dit herschaalt de LUT's waarschijnlijk niet — maar "waarschijnlijk" is hier
+  nog niet gemeten.
+
+**Het harnas blijft staan en is het bruikbare resultaat van deze ronde:**
+`Eclipse/Tools/gpu_crash_repro.ps1` draait N rondes, schrijft per ronde een eigen log
+(`-abslog`, zodat een tweede instantie de meting niet steelt) en rapporteert crash, frames,
+shots en herbouwen per ronde plus een csv. Het merkt een ronde die nooit gerenderd heeft aan
+als **ONGELDIG** in plaats van als schone ronde — dat was geen theorie: de allereerste
+proefronde sloot na 18 s af op een verouderde module-DLL, en de teller schreef er vrolijk
+"geen crash" bij. En de crashdetectie is tegen het echte crashlog van 19:20 gehouden vóór
+gebruik: hij gaat daar rood, en op een schone ronde niet.
+
+**Waarom dit hier staat:** de hypothese was goed gebouwd — hij paste op elk gemeten feit en
+wees een echte, verdachte constructie aan. Hij viel niet op een tegenargument maar op één
+logregel die zei wanneer de code draait. En de tweede les is de duurdere: de reden dat er
+nu geen fix te bewijzen valt, is niet dat de fix moeilijk is, maar dat het defect niet meer
+afgaat. Een meetbaar defect is meer waard dan een plausibele verklaring.
