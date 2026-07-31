@@ -88,6 +88,21 @@ words:        318
 #            does not write names down.
 # split:     reachable only with the pact. No Iron Chorus voice is used - Q-4 leaves the
 #            emissary uncast. The Chorus takes the car in a SHOT.
+# flags:     CORRECTED 2026-07-31, rulings L1-R12 / L1-R3 / L1-R13. .080 and .120 now read
+#            `story.m15_pact == "full"`. The old `story.choice_m15_ironchoruspact == true`
+#            is set by nothing; M1.5.S99 sets `story.m15_pact` = full | limited | none.
+#            *** ESCALATION - THIS IS THE ONE PLACE I DID NOT APPLY THE REPAIR AS HANDED
+#            TO ME. *** The repair brief specifies `!= "none"` here, the same test S02.160 /
+#            .170 get. That test is correct for S02 (the Chorus fights beside Ember in the
+#            limited branch too) and wrong here. L1-R13 gates `split` on the pact and says
+#            in as many words that the limited branch gets TWO options and no replacement
+#            third: there is no custody mechanism without a pact, the two act-1 branches
+#            must stay distinguishable for 2.11, and offering the names-off-a-list option
+#            to the man who just refused it turns M1.5.S99.030 into decoration. `!= "none"`
+#            would open `split` in the limited branch and break all three. .080 moves with
+#            .120 because Sela may not price an option the player cannot take.
+#            If the architect rules the other way it is a one-token edit on two lines.
+#            Not one letter of text changes either way.
 # brick:     .130 is his one line in this scene (stub beat 5) and his last of the mission.
 #            Three words, and they are the whole of what a man does who has spent eleven days
 #            in a car with the doors shut. He does not mention Krad-9 and nobody connects it
@@ -140,7 +155,7 @@ lines:
   - id:        M1.6.S04.080
     speaker:   SELA
     voice:     sela
-    condition: 'story.choice_m15_ironchoruspact == true'
+    condition: 'story.m15_pact == "full"'
     text:      "Splitting costs the ones who go with people none of us can name."
 
   - id:      M1.6.S04.090
@@ -181,7 +196,7 @@ lines:
   - id:        M1.6.S04.120
     speaker:   VOSS
     voice:     voss
-    condition: 'story.choice_m15_ironchoruspact == true'
+    condition: 'story.m15_pact == "full"'
     choice:
       group: m16_train
       set:   'story.m16_train_choice = "split"'

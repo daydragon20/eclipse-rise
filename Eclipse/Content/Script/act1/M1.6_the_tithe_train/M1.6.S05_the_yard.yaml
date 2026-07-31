@@ -35,9 +35,19 @@ words:        216
 #            names. It should be audibly the same person as S03 doing a different job.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      `in-mission-radio`. Sela and the firefight run on explicit per-line `band:`
-#            overrides (L1-R1). Register carried by .010 (11 w), .020 (13 w), .140 (14 w).
-#            Spread 1 w (.420) to 14 w (.140) = 14x.
+# band:      `in-mission-radio`, ceiling 25. CORRECTED 2026-07-31 - six lines sat over
+#            their own override and every one of them came from the same category error.
+#            `bark` is SYSTEMIC dialogue (18.5): a trigger fires it, the player hears it
+#            hundreds of times, and it is capped at eight words because it competes with
+#            gunfire. Authored squad dialogue under fire is not that. It is a callout when
+#            it fits in six words and it runs on the scene band when it does not. So every
+#            `band: bark` in this scene is gone - .070 .100 .200 .220 .230 .250 .330 .340
+#            .400 .410 - and nine- and ten-word lines are legal on a 25-word ceiling.
+#            .040 (7 w) lost its `callout` override for the same reason. `band: callout`
+#            survives only where the line is six words or under: .050 .060 .080 .090 .110
+#            .120 .130 .210 .240 .420, all checked.
+#            NOT ONE LETTER OF TEXT CHANGED. Register carried by .010 (11 w), .020 (14 w),
+#            .140 (14 w). Spread 1 w (.420) to 14 w (.140) = 14x.
 # branches:  branch conditions read `story.m16_train_choice` from S04 (L1-R3 leaf-tag form).
 # sela:      audibly the same person as S03, doing a different job. Same structure - a
 #            grouping, then an instruction, then who goes first - compressed into four to
@@ -85,7 +95,6 @@ lines:
   - id:      M1.6.S05.040
     speaker: VOSS
     voice:   voss
-    band:    callout
     text:    "They don't know what cover looks like."
     note:    "Pillar 3 as a tactical problem, in seven words. Nobody explains it further."
 
@@ -105,7 +114,6 @@ lines:
   - id:      M1.6.S05.070
     speaker: SELA
     voice:   sela
-    band:    bark
     tags:    [shouting]
     text:    "Hands on the shoulder in front of you!"
 
@@ -126,7 +134,6 @@ lines:
   - id:      M1.6.S05.100
     speaker: FIGHTER_A
     voice:   eclipse_fighter_a
-    band:    bark
     text:    "An old man's sat down. He's just sitting--"
 
   - id:         M1.6.S05.110
@@ -158,7 +165,6 @@ lines:
   - id:        M1.6.S05.200
     speaker:   FIGHTER_B
     voice:     eclipse_fighter_b
-    band:      bark
     condition: 'story.m16_train_choice == "run"'
     text:      "They're shooting at the cars. They know what's in them."
 
@@ -173,14 +179,12 @@ lines:
   - id:        M1.6.S05.220
     speaker:   VOSS
     voice:     voss
-    band:      bark
     condition: 'story.m16_train_choice == "run"'
     text:      "Off the rails. That's all anyone's aiming at."
 
   - id:        M1.6.S05.230
     speaker:   FIGHTER_A
     voice:     eclipse_fighter_a
-    band:      bark
     condition: 'story.m16_train_choice == "run"'
     text:      "The woman in the yard coat. She's not getting up."
 
@@ -195,7 +199,6 @@ lines:
   - id:        M1.6.S05.250
     speaker:   MARA
     voice:     mara
-    band:      bark
     condition: 'story.m16_train_choice == "run"'
     text:      "Count at the wall. Count again inside."
 
@@ -221,27 +224,23 @@ lines:
   - id:        M1.6.S05.330
     speaker:   MARA
     voice:     mara
-    band:      bark
     condition: 'story.m16_train_choice == "emptied"'
     text:      "Nothing goes back across that yard tonight."
 
   - id:        M1.6.S05.340
     speaker:   VOSS
     voice:     voss
-    band:      bark
     condition: 'story.m16_train_choice == "emptied"'
     text:      "Wall, then the culvert. Nobody stops at the wall."
 
   - id:      M1.6.S05.400
     speaker: VOSS
     voice:   voss
-    band:    bark
     text:    "Nothing came down the Spire road. Not one vehicle."
 
   - id:      M1.6.S05.410
     speaker: MARA
     voice:   mara
-    band:    bark
     text:    "It's a freight yard. Freight yards get freight guards."
     note:    "The running M1.2.S03 thread: the Dominion under-reacts and somebody explains it away. She believes it. Act 4 will not."
 

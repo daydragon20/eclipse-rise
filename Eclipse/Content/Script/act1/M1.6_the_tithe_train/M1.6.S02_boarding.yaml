@@ -53,6 +53,14 @@ words:        134
 # brick:     ZERO lines. BEATS section 8 gives him S01, four words in S03 and one line in
 #            S04, and silence for the rest of the mission. His knowledge at .190 is a SHOT.
 #            It costs nothing to generate and it says more than a line would.
+# flags:     CORRECTED 2026-07-31, rulings L1-R12 / L1-R3. .160 and .170 read
+#            `story.m15_pact != "none"` - the flag M1.5.S99 actually sets (full | limited |
+#            none). The old `story.choice_m15_ironchoruspact == true` was set by nothing and
+#            would either never have played or, resolved via the parent tag, have played in
+#            the `none` branch as well. `!= "none"` is the correct test HERE because the
+#            Chorus is on this train in the full AND the limited branch - M1.5.S99.200 puts
+#            the Tithe line on the board on exactly that condition. Not one letter of text
+#            changed.
 # chorus:    the pact image is one line and one shot (.160). No Iron Chorus voice is used:
 #            Q-4 leaves the emissary uncast and a generic Chorus fighter has no casting row.
 #            Escalated in the report rather than invented.
@@ -161,7 +169,7 @@ lines:
     speaker:   FIGHTER_A
     voice:     eclipse_fighter_a
     band:      callout
-    condition: 'story.choice_m15_ironchoruspact == true'
+    condition: 'story.m15_pact != "none"'
     text:      "Chorus has the ninth open already."
     shot:      "ONE IMAGE. Two of them are on the roof of the ninth car with the pins already out. They step clear as the door goes, and neither of them looks down at the two guards lying face down on the gravel between the rails. Nobody checks whether those two are breathing."
 
@@ -169,7 +177,7 @@ lines:
     speaker:   MARA
     voice:     mara
     band:      callout
-    condition: 'story.choice_m15_ironchoruspact == true'
+    condition: 'story.m15_pact != "none"'
     text:      "Let them work."
     note:      "She does not judge it out loud. Sela will, in S06."
 
