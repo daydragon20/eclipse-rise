@@ -14,8 +14,8 @@ turn:         "She hands him the number back as a promise instead of a limit."
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .040 'Six of them. Thirteen of us.' -- 'of us' hecht aan mensen, de cel is elf, en dezelfde drie woorden betekenen in S04.030 zes vijandelijke soldaten"
-words:        27
+critic:       null
+words:        21
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS
@@ -42,19 +42,39 @@ words:        27
 
 # ---- dialogue-writer notes (L2) ----
 # The three seed lines are kept VERBATIM on their reserved ids, exactly as advised.
-# I took ONE of the permitted post-.030 beats and not two: .040, Voss reusing the count
-# as a plan. Nothing added before .010. Nothing renumbered.
+# Nothing added before .010. Nothing renumbered. Nothing after .030 either - see below.
 #
-# I deliberately did NOT add a Mara acknowledgement after .040. The scene ends on Voss
-# alone with the number, which is the whole point of it, and a fourth speaker turn
-# softens the exit. This is the one place in M1.1 where 21_quality_mandate's "generous
-# in count" is spent elsewhere on purpose - the surplus went into S01, S04, S05, S99.
+# *** M1.1.S03.040 IS RETIRED, 01-08. ID PENSIONED, NOT RENUMBERED. ***
+# The one permitted post-.030 beat was written - VOSS, "Six of them. Thirteen of us." -
+# and it does not survive its own critic pass. Three grounds, each fatal alone:
+#   1) "of us" attaches to PEOPLE in spoken English. The cell is eleven; thirteen is the
+#      round count. The line hands the player the wrong referent for the mission title.
+#   2) the same three words already mean six ENEMY SOLDIERS one scene later - S04.030,
+#      "Six of them. Two crates on a hand hoist." The protagonist would be overwriting
+#      his own vocabulary across two adjacent scenes, and the later use is the load-
+#      bearing one: it is the read that sets up the ambush.
+#   3) it converted nothing. Its own note claimed the count "becomes what he can spend";
+#      what the line does is hand .030 back to Mara with the pronouns swapped. The
+#      conversion is already made, in her mouth, and that is the turn of the scene.
+# Same treatment as M1.1.S01.220 under L1-R18: the line is deleted, the id is retired,
+# and M1.1.S03.040 is never reused - not here, not anywhere.
 #
-# band:     type is `in-mission-radio` (10-25). ALL FOUR LINES ARE BELOW 10 WORDS,
-#           including the three that phase0/SCRIPT_FORMAT.md ships as its own example.
-#           The canonical example fails a mechanical floor check. It should not be
-#           changed; the check should be a ceiling. ESCALATED - see report.
-# variance: 1 w to 9 w = 9x.
+# I did NOT write a replacement on that id. Anything standing there has to say something
+# .030 does not, before S04 - and S04 is where Voss actually spends the count, out loud,
+# under fire, in front of people who then follow him. Spending it early, alone, over his
+# own magazine is the thin version of the mission's best beat arriving a scene too soon.
+# The scene now ends on .030's shot: "She moves off. Camera stays on Voss." A held frame
+# on a man with a number and no line is the exit the architect asked for when he wrote
+# "three lines carry this scene. Everything you add takes it down." 18.9 C2's deletion
+# test says the cut is the fix; here the cut WAS the fix.
+# 21_quality_mandate's "generous in count" is spent elsewhere in this mission on purpose -
+# the surplus went into S01, S04, S05 and S99, and this is the scene it was taken from.
+#
+# band:     type is `in-mission-radio` (10-25). ALL THREE LINES ARE BELOW 10 WORDS, and
+#           they are the three that phase0/SCRIPT_FORMAT.md ships as its own example.
+#           Bands are ceilings (RULED, L1-R1), so the short lines stand.
+# variance: 1 w (.010) to 9 w (.030) = 9x. Three lines, so register and spread are not
+#           checked at all (L1-R1) - the scene clears both regardless.
 # no interruption in this scene: it is two people and three reserved lines. 18.7's
 #           "one interruption per multi-character scene" is waived here by the reserve.
 
@@ -81,9 +101,5 @@ lines:
     text:    "It was enough for the ones who had six."
     shot:    "She moves off. Camera stays on Voss."
 
-  - id:      M1.1.S03.040
-    speaker: VOSS
-    voice:   voss
-    text:    "Six of them. Thirteen of us."
-    shot:    "He thumbs the last round back into the magazine. He is talking to nobody."
-    note:    "The permitted post-.030 beat: the number stops being what he has and becomes what he can spend. This is the axis change BEATS section 8 asks for, said once, to no one."
+# M1.1.S03.040 stood here and is RETIRED (01-08, see the L2 block above). The id is
+# permanent and dead: it is never reused and the scene is never renumbered.

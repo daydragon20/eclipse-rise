@@ -14,7 +14,7 @@ turn:         "Dex talks them down a route he has never walked, is right, and ca
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .250 shot beweert onvoorwaardelijk een leeg dek, en .050 draait het besluit uit S05.200 ongemerkt terug"
+critic:       null
 words:        184
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
@@ -42,6 +42,26 @@ words:        184
 #            back out as procedure.
 # slow one:  the obstacle is the load, not a wound. That keeps the scene identical in the
 #            zero-casualty run, where nobody should be limping.
+# takel:     GEEN REGEL IN DEZE SCENE IS VERANDERD OM DE TAKEL-TEGENSPRAAK OP TE LOSSEN,
+#            en dat is een besluit, geen nalatigheid. .050 "The hoist won't clear the
+#            stair." en .060 "Take the drum off the frame..." leken het besluit uit
+#            M1.1.S05.200 ("Leave the hoist. It carries sound.") terug te draaien. S05
+#            week. Reden: hier hangt een plant-met-betaling aan - de vijand wijst de
+#            trommel zelf aan als het lawaaiige deel in S04.100, .060 neemt precies dat
+#            deel mee, en .070 is het gewicht ervan op een trap, wat de hindernis van deze
+#            hele scene is. In S05 hing er niets aan. Het alternatief - .050/.060
+#            taksbewust maken - zou de belading van een extractie laten afhangen van de
+#            keuze bij de gewonde dienstplichtige, waar hij niets mee te maken heeft, en
+#            twee extra regels genereren om hetzelfde tweemaal te zeggen.
+#            De takel ZELF blijft achter: .050 zegt dat het frame de trap niet haalt, .060
+#            neemt alleen de trommel, .200 telt "two crates" en geen takel, en het
+#            slotbeeld op .250 laat het frame op het dek staan. Dat is nu overal hetzelfde
+#            verhaal. S01.120 (de takel als buit) betaalt daarmee ook uit: een deel van de
+#            buit die de briefing beloofde, haalt de trap niet.
+# zes:       .110 "Two. For six of theirs." is NIET aangeraakt en dat is een besluit. Het
+#            is geen dodentelling zoals S99.230 die was, maar de maat van wat ze geraakt
+#            hebben: de patrouille van zes is in elke tak van het bord. Wie dat anders
+#            leest, moet hem terugsturen - het staat in het rapport, niet verstopt.
 # variance:  1 w (".250 Go.") to 16 w (.230) = 16x.
 # jokes:     none in this scene. See S01 (1), S02 (2), S99 (3, clean run only).
 
@@ -179,4 +199,5 @@ lines:
     speaker: MARA
     voice:   mara
     text:    "Go."
-    shot:    "The grate closes. Sodium light on wet scrap, and then nothing on the deck but a hoist."
+    shot:    "The grate closes. Sodium light on wet scrap. Last look at the deck: the hoist frame stands where it was left, and the rest of the frame is branch state - five dead in all three branches, and the sixth man is a body on the finished branch and is still breathing on the other two. The camera neither goes looking for him nor avoids him."
+    note:    "SHOT HERSCHREVEN 01-08. Stond: 'nothing on the deck but a hoist' - onvoorwaardelijk, terwijl er in de takken left en bound een levende man ligt en in alle drie de takken doden. Een `shot:` wordt nooit ingesproken, dus dit kost geen credit, maar het is het slotbeeld van het velddeel van de ijkmissie en het stuurt de cinematic pass. De regel is nu geschreven zoals hij gelezen moet worden: het frame ligt vast (de takel), de inhoud is takstaat. Geen conditie op deze regel - Mara's 'Go.' is voor iedereen dezelfde."

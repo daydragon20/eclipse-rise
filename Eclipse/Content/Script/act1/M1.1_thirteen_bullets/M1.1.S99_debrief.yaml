@@ -14,19 +14,31 @@ turn:         "She gives the night's credit to Voss in front of everyone, and he
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .230 is onwaar in de takken left en bound; .090 schrijft voornaamwoorden tegen een runtime-roster (L1-R8)"
-words:        273
+critic:       null
+words:        280
 
 # Een tak die BEWUST niets afspeelt. De criticus heeft deze stilte op 01-08
 # uitdrukkelijk goedgekeurd; zonder dit veld bleef BRANCH voor altijd rood op een
 # scene die de poort al door is, en een bar die altijd rood staat verbergt
 # evenveel als een test die nooit rood wordt.
+#
+# HET BESLUIT IS ONGEWIJZIGD; DE REDEN HEEFT ER 01-08 EEN ZIN BIJ GEKREGEN. De
+# goedgekeurde tekst hieronder staat er woordelijk nog; wat erachter staat is van de
+# schrijver en is gemarkeerd. Aanleiding: .245 is er bij gekomen en dat is een DERDE
+# echo, dus de zin "beide bestaande echo's" zou anders niet meer kloppen. Een stilte
+# waarvan de motivering stilletjes onwaar wordt, dekt precies de volgende echte
+# omissie af. De criticus moet deze aanvulling opnieuw aftekenen.
 silence:
-  left: "Beide bestaande echo's zijn INVENTARISFEITEN: .190 een verband dat weg is, .200 een patroon dat weg is. De left-tak geeft niets uit, dus het grootboek heeft niets te melden - de stilte volgt uit het apparaat en niet uit nalatigheid. Bovendien krijgt die speler al de hardste echo van de drie en die staat op de goede plek: M1.1.S05.190 'Four six two. Four six two.', met shot 'It is still going when the camera leaves.' Een debriefregel erbij verdunt de beste beat van die tak, en elke left-regel nodigt uit tot het oordeel dat het beat-sheet juist verbiedt."
+  left: "Beide bestaande echo's zijn INVENTARISFEITEN: .190 een verband dat weg is, .200 een patroon dat weg is. De left-tak geeft niets uit, dus het grootboek heeft niets te melden - de stilte volgt uit het apparaat en niet uit nalatigheid. Bovendien krijgt die speler al de hardste echo van de drie en die staat op de goede plek: M1.1.S05.190 'Four six two. Four six two.', met shot 'It is still going when the camera leaves.' Een debriefregel erbij verdunt de beste beat van die tak, en elke left-regel nodigt uit tot het oordeel dat het beat-sheet juist verbiedt. -- AANVULLING SCHRIJVER 01-08, zelfde uitkomst: er is sinds vandaag een derde echo, .245, en die is geen inventarisfeit maar de betaling van de plant in M1.1.S05.220 - ons verband dat in HUN logboek terechtkomt. Die plant staat alleen in de tak bound, dus ook langs die weg komt er links niets bij: geen verband, geen logregel. Wat de left-speler over de vijandelijke boekhouding te horen krijgt, krijgt hij op .230, net als iedereen."
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
-# flags-in:  story.m11_conscript_choice ("finished" | "left" | "bound")  - L1-R3
+# flags-in:  story.m11_conscript_choice  - L1-R3. THE FLAG HAS THREE LEAVES AND THIS SCENE
+#            READS TWO OF THEM: "bound" (.190 and .245) and "finished" (.200). "left" is
+#            read by nothing here, ON PURPOSE, and the reason is written out in the
+#            `silence:` block above. CORRECTED 01-08: this line used to list all three
+#            values, which reads as three readers and delivered two - exactly the kind of
+#            header that makes a real omission look like a documented one.
 #            run.zero_casualty  - L1-R4. The extra Reyes line and Dex's third joke hang off
 #            this. It is a RUN fact, not a story flag: it reads the existing downed-soldier
 #            latch from the SPEC-P2-04 amendment and needs no new state, only access.
@@ -62,14 +74,32 @@ silence:
 # credit:    .170 is the first time 18.4's "never claims credit in front of the people who
 #            did the work" is visible. Mara refuses the refusal at .180 - she writes it
 #            down over his objection, which is what building a leader looks like.
-# t4:        .230 is the mission's zichtbaarheid beat. Six men missing, filed as theft.
-#            In act 1 that is safety. In act 4 it is a decision somebody made.
-# p5-a:      .190 and .200 point back at S05 with no verdict, from two different mouths.
-#            The stub asked for the spared case only; I wrote the counterpart as well,
-#            because a choice that echoes on one side and is silent on the other reads as
-#            approval. Both are facts about the inventory. Neither judges.
+# t4:        .230 is de zichtbaarheidsbeat van de missie: de kratten worden geteld, het
+#            dossier heet diefstal. In act 1 is dat veiligheid. In act 4 is het een besluit
+#            dat iemand genomen heeft. HERZIEN 01-08 - hij telde eerst zes doden, en dat is
+#            in twee van de drie takken onwaar. De regel telt nu geen mensen meer. Dat is
+#            geen verzwakking: dat de vijand de lading telt en de mannen niet, IS de
+#            onderreactie, en die staat er nu in alle drie de takken even hard.
+# p5-a:      .190 (bound) en .200 (finished) wijzen terug naar S05 zonder oordeel, uit twee
+#            monden. De stub vroeg alleen het gespaarde geval; de tegenhanger staat er ook,
+#            want een keuze die aan een kant echoot en aan de andere zwijgt leest als
+#            goedkeuring. Beide zijn feiten over de inventaris. Geen van beide oordeelt.
+#            .245 is er 01-08 bij gekomen en het is GEEN tweede echo van hetzelfde: .190
+#            gaat over ONS grootboek (een verband dat weg is uit de tas), .245 over HUN
+#            grootboek (waar dat verband terechtkomt). Twee vragen, niet een vraag tweemaal.
+#            De tak left blijft leeg en waarom staat in `silence:` hierboven.
 # name-slot: .170 personal variant uses {name}, pronoun-free (18.5 rule 6, AR-10).
-# variance:  1 w (".240 Theft.") to 21 w (.190) = 21x.
+#            .090 is 01-08 voornaamwoordvrij gemaakt om dezelfde reden en heeft met opzet
+#            GEEN {name}: die conditie vuurt op elke neergegane squadgenoot, dus elke naam
+#            en elk getal in die regel zou bij twee gewonden over de verkeerde gaan.
+# variance:  1 w (".240 Theft.") to 21 w (.190) = 21x. Ongewijzigd: .090 is 18 w en .245
+#            is 7 w, dus beide uitersten staan waar ze stonden. Register: .190 haalt de
+#            20 van de cutscene-band, en die regel is niet aangeraakt.
+# words:     280, met de hand herteld op 01-08 (gesproken woorden, varianten meegerekend,
+#            notes/shots/labels niet - dezelfde telling die S03 op 27 en S05 op 239 zette).
+#            Het veld stond op 273 en dat was al een woord naast de eigen telling; er is
+#            geen tool die het vult, dus het is hier opnieuw geteld in plaats van
+#            bijgewerkt met een verschil bovenop een getal dat niet klopte.
 
 lines:
   - id:      M1.1.S99.010
@@ -119,8 +149,8 @@ lines:
     speaker:   REYES
     voice:     reyes
     condition: 'run.zero_casualty == false'
-    text:      "One through the meat above the knee. He keeps the leg. He does not keep the week."
-    note:      "Her first complete clinical sentence in the game. No contractions."
+    text:      "Nothing tonight went through bone. Everyone who went down walks again. Not one of them walks this week."
+    note:      "Her first complete clinical sentences in the game. No contractions - she is stressed and the training reasserts (18.4). HERSCHREVEN 01-08. Stond: 'One through the meat above the knee. He keeps the leg. He does not keep the week.' Twee dingen mis. (1) Twee keer 'he' tegen een roster dat pas bij runtime beslist wie er neerging - L1-R8 eist voornaamwoordvrij, en dit bestand doet het elders goed (.170 personal, '{name} took the low rail first.'). (2) De regel telde precies een gewonde, terwijl run.zero_casualty == false op ELKE neergegane squadgenoot vuurt; bij twee gewonden sprak de arts over de verkeerde. Nu telt hij niemand: 'everyone who went down' klopt bij een en bij vier. Geen {name} hier, en dat is de reden - een naamslot zou juist weer een gewonde vastzetten. 'Went down' is bovendien het woord van de latch die de conditie leest (SPEC-P2-04). De antithese van het origineel staat er nog: het been houden en de week kwijt zijn, in het valutastelsel van deze cel."
 
   - id:        M1.1.S99.100
     speaker:   REYES
@@ -209,13 +239,21 @@ lines:
   - id:      M1.1.S99.230
     speaker: MARA
     voice:   mara
-    text:    "They'll count six men missing and write it up as theft."
-    note:    "Visibility 1/8. The Dominion under-reacts and a human being explains it away as good luck - the P4 pattern this mission lays the first stone of."
+    text:    "They'll count the crates missing and write it up as theft."
+    note:    "Visibility 1/8. The Dominion under-reacts and it is filed as a property matter - the P4 pattern this mission lays the first stone of. In act 1 that is safety. In act 4 it is a decision somebody made. HERSCHREVEN 01-08: stond 'They'll count six men missing and write it up as theft.' Dat telde zes doden onvoorwaardelijk, terwijl er in de takken left en bound vijf dood zijn en er een leeft - en het sprak daarmee de plant tegen die M1.1.S05.220 met opzet legde ('You have to log it. If a wound is dressed, it gets logged.'). Het lijk is uit de regel gehaald en niet vervangen door een ander getal: wat de vijand telt is nu de LADING, en dat is dezelfde onderreactie in een scherpere vorm. Vijf of zes mannen van het dek, en het dossier gaat over twee kratten. Mara voorspelt hier; een overlevende maakt haar voorspelling niet onwaar, hij maakt hem erger. Geen getal toegevoegd - L1-R14, zes is 29x verzadigd in act 1."
 
   - id:      M1.1.S99.240
     speaker: DEX
     voice:   dex
     text:    "Theft."
+
+  - id:        M1.1.S99.245
+    speaker:   FIGHTER_B
+    voice:     eclipse_fighter_b
+    condition: 'story.m11_conscript_choice == "bound"'
+    text:      "We're a line in their log now."
+    shot:      "He says it to the crate, not to the room. Mara answers without turning round."
+    note:      "NIEUW 01-08, en het is de betaling van de plant in M1.1.S05.220. Die plant is bound-only en zijn betaling is dat nu ook: de dienstplichtige zei op het dek dat een verbonden wond gelogd MOET worden, deze man antwoordde daar 'That's our dressing.' op, en hier komt het bij hem terug. Wat de speler leert is een feit, geen oordeel: zijn genade staat in het dossier van de vijand. Ingevoegd op .245 en niet hernummerd - SCRIPT_FORMAT sectie 2 houdt de tussenruimtes juist hiervoor vrij. Het staat NA .240 zodat Dex' 'Theft.' direct op Mara volgt zoals in de andere takken, en VOOR .250, want daardoor beantwoordt 'Nobody down there has said our name yet' in deze tak een zorg in plaats van een beat af te sluiten. De tak left blijft stil - zie het `silence:`-blok; deze regel vuurt daar niet."
 
   - id:      M1.1.S99.250
     speaker: MARA

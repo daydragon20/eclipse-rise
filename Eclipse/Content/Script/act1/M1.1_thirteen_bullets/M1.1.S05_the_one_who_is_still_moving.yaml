@@ -14,8 +14,8 @@ turn:         "Whatever Voss decides, the cell watches him decide it, and that i
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .080 'eleven minutes' valt onder L1-R14 en de missie is nu open; plus .150 label is een herinterpunctie van text"
-words:        239
+critic:       null
+words:        236
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      VOSS, MARA, one wounded Dominion conscript, one Ember fighter
@@ -57,6 +57,31 @@ words:        239
 # 2) NO PLAYER-CHOICE CONSTRUCT. phase0/SCRIPT_FORMAT.md has no way to say "these three
 #    lines are the player's options". .140 / .150 / .160 are marked by note only. Forty-two
 #    missions of choices need a real field. Escalated.
+#
+# DE TAKEL, 01-08 - EEN TEGENSPRAAK DIE MAAR EEN KANT KON WINNEN.
+#    .200 zei "Leave the hoist. It carries sound." en S06.050/.060 haalt veertig seconden
+#    later, in ELKE tak, de trommel van diezelfde takel en draagt hem de trap af. Een op
+#    de drie spelers hoorde een besluit terugdraaien zonder dat iemand het benoemde.
+#    DEZE KANT WEEK. In deze volgorde:
+#    a) S06's takel is een PLANT MET EEN BETALING. In S04.080/.100 wijst de vijand zelf de
+#       trommel aan als het deel dat herrie maakt; S06.060 neemt precies dat deel mee;
+#       S06.070 is het gewicht ervan op een trap, en dat IS de hindernis van die scene
+#       ("they are carrying more than they came with and one of them is slow"). Haal er
+#       een van de drie weg en de extractiescene heeft geen obstakel meer. .200 was een
+#       losse regel met geen plant erachter en geen betaling ervoor.
+#    b) S06 taksbewust maken was het alternatief en het is twee keer slechter: het hangt
+#       de belading van een extractie aan een morele keuze waar hij niets mee te maken
+#       heeft, en het genereert twee extra regels om hetzelfde tweemaal te zeggen.
+#    c) het geluidsargument stond al in deze scene, korter, uit dezelfde mond: .100
+#       "Noise like that runs the whole span." .200 herhaalde hem.
+#    De id is NIET gepensioneerd - de tak heeft die beurt nodig. Tekst en spreker zijn
+#    vervangen. S05 GAAT HIERDOOR IN ZIJN GEHEEL OPNIEUW LANGS DE CRITICUS; dat staat ook
+#    met zoveel woorden in het rapport, want het is niet de fout die hem terugstuurde.
+#
+# label:     .150 had "Leave him and move." naast de gesproken regel "Leave him. Move." -
+#            dezelfde regel met andere leestekens. Nu "Leave him as he is.", wat de
+#            gesproken regel niet zegt: dat er niets aan hem gebeurt. .140 en .160 zijn
+#            niet aangeraakt.
 #
 # mara:      she has NO line until after the choice is made. The silence at .110 is the
 #            scene's content (18.7). It is written as a shot, because a line with empty
@@ -160,9 +185,9 @@ lines:
     choice:
       group: m11_conscript
       set:   'story.m11_conscript_choice = "left"'
-      label: "Leave him and move."
+      label: "Leave him as he is."
     text:    "Leave him. Move."
-    note:    "PLAYER OPTION 2 of 3 - walk on. Sets story.m11_conscript_choice = left."
+    note:    "PLAYER OPTION 2 of 3 - walk on. Sets story.m11_conscript_choice = left. LABEL HERSCHREVEN 01-08: hij was 'Leave him and move.', en dat was de gesproken regel met andere leestekens - geen tweede stuk schrijfwerk, en L1-R2 zegt dat weglaten dan de betere default is. De nieuwe wieltekst zegt wat de gesproken regel NIET zegt: dat er niets aan hem gebeurt. Op het wiel staat optie 3 als 'Dress the wound, then leave him.' - het verschil tussen die twee opties IS het verband, en dat is precies wat de T5-telling straks meet. De speler ziet dat verschil nu voor hij kiest in plaats van erna."
     variants:
       pragmatist: "Nothing here gets spent on a man already down."
       idealist:   "The relief takes him. That's what a relief is for."
@@ -177,7 +202,7 @@ lines:
       set:   'story.m11_conscript_choice = "bound"'
       label: "Dress the wound, then leave him."
     text:    "Dressing. Above the hip."
-    note:    "PLAYER OPTION 3 of 3 - bind and leave. Sets story.m11_conscript_choice = bound, leaf Story.Choice.M11_Conscript.Bound. CORRECTED 2026-07-31: this note used to ask systems to ALSO set Story.Choice.M11_ConscriptSpared. That tag is WITHDRAWN by ruling L1-R3 and no derived boolean replaces it - two homes for one truth is a divergence bug. Readers use the leaf; M1.1.S99.190 is the only one in this mission. P5-a, first entry in the twist-5 tally."
+    note:    "PLAYER OPTION 3 of 3 - bind and leave. Sets story.m11_conscript_choice = bound, leaf Story.Choice.M11_Conscript.Bound. CORRECTED 2026-07-31: this note used to ask systems to ALSO set Story.Choice.M11_ConscriptSpared. That tag is WITHDRAWN by ruling L1-R3 and no derived boolean replaces it - two homes for one truth is a divergence bug. Readers use the leaf; in this mission that is M1.1.S99.190 and, since 01-08, M1.1.S99.245 - de betaling van de plant op .220, die deze regel pas mogelijk maakt. Deze regel zelf is NIET aangeraakt; alleen dit lezersoverzicht is bijgewerkt, want een notitie die claimt dat er een lezer is terwijl er twee zijn, is precies de drift die L1-R12 opleverde. P5-a, first entry in the twist-5 tally."
     variants:
       pragmatist: "Dress it. Their relief spends an hour on him instead of us."
       idealist:   "He came up here pushing a crate."
@@ -207,10 +232,11 @@ lines:
     shot:      "It keeps going while they walk. It is still going when the camera leaves."
 
   - id:        M1.1.S05.200
-    speaker:   FIGHTER_A
-    voice:     eclipse_fighter_a
+    speaker:   FIGHTER_B
+    voice:     eclipse_fighter_b
     condition: 'story.m11_conscript_choice == "left"'
-    text:      "Leave the hoist. It carries sound."
+    text:      "Count's the same."
+    note:      "HERSCHREVEN 01-08. Stond: FIGHTER_A, 'Leave the hoist. It carries sound.' Dat besluit werd veertig seconden later ongemerkt teruggedraaid in S06.050/.060, waar de trommel - het lawaaiige deel, aangewezen door de vijand zelf in S04.100 - alsnog meegaat. Deze kant week, en waarom staat in het L2-blok. De regel doet nu het werk dat de andere twee takken ook doen: hij is een grootboekregel. .170 'Four.' is een uitgave, .230 'That's our dressing.' is een uitgave, en deze tak geeft niets uit - dat is de hele tak, in drie woorden, zonder oordeel. Spreker is nu FIGHTER_B, zodat alle drie de vechtersreacties uit een mond komen en de strip test ze naast elkaar kan leggen. En het is de opzet van de stilte in M1.1.S99: wie niets uitgeeft, heeft in het debrief niets te melden."
 
   - id:        M1.1.S05.210
     speaker:   MARA
@@ -223,7 +249,7 @@ lines:
     voice:     dominion_conscript_a
     condition: 'story.m11_conscript_choice == "bound"'
     text:      "You have to log it. If a wound is dressed, it gets logged."
-    note:      "He cannot thank them. He cites the regulation instead. That is the character and the faction in one line."
+    note:      "He cannot thank them. He cites the regulation instead. That is the character and the faction in one line. PLANT - BETAALD PER 01-08 IN M1.1.S99.245, op dezelfde conditie. De regel zei wat er met een verbonden wond gebeurt en het debrief liet het niet gebeuren; die twee bewegen nu samen of niet. Deze regel is verder ongewijzigd."
 
   - id:        M1.1.S05.230
     speaker:   FIGHTER_B
