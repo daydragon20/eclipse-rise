@@ -248,9 +248,39 @@ is de hypothese dood en is de eerste bouw zelf de volgende verdachte.
 
 **Waarom dit hier staat:** dit is precies een §1-stap-0-geval. Het is bekend gedrag van het gereedschap, niet van de game, en het kost tien seconden om te herkennen zodra je het één keer hebt opgeschreven.
 
-### 4.3 Inslagspoor rendert niet — **OPEN, maar de transform is nu met een meting UITGESLOTEN**
+### 4.3 Inslagspoor — **GESLOTEN 01-08. Het rendeerde altijd al; het was 14 pixels groot.**
 
-*Stand 31-07. Deze regel vervangt de vorige conclusie ("transform-bug, geen rendering-bug"); die is weerlegd.*
+*Stand 01-08. Twee conclusies zijn hier achtereenvolgens weerlegd — eerst "transform-bug",
+daarna "renderbug" — en de derde is geen bug maar een MAAT.*
+
+**De sluiting, met de getallen.** Geen transform-fout (`ac09980`) én geen renderfout: het
+spoor is **9×9 cm**, plat, gezien onder een scherende hoek vanaf ~10 m. Van bovenaf gemeten
+**5.459 veranderde pixels**, fel amber, GEZIEN. Vanaf de spelercamera: **14 pixels**, 0,02
+promille van het beeld. De 44 grondvlakken samen halen daar 6. De laag rendeerde dus prima
+en was op ooghoogte niets waard.
+
+**De meting scheidde de twee verklaringen door constructie**: twee opnames van hetzelfde
+frame met exact één verschil (het object verborgen), zodat elke bewegende pixel per definitie
+van dat object komt. Controles eerst en alle drie groen: ruisvloer **0**, wereld-kanarie
+**894.610**, negatieve controle **0**.
+
+**Er moest eerst een duplicaat weg.** Elke treffer zette er **twee** neer, exact samenvallend
+(`SpawnImpactMark` én `OnWorldImpact`), dus elk differentieel las 0 en de diagnose saboteerde
+zichzelf. Dat was bovendien verscheept dubbel gedrag, geen meetartefact.
+
+**De reparatie was een eis en geen schaalgetal** (`7bffdbc`). Niet "maak het groter" maar:
+hoe groot moet een kogelspoor zijn om op 8–15 m te lezen. Het antwoord is de **kleinste as**,
+niet het aantal pixels — 24 pixels breed en 2 hoog is aliasing en geen vorm. Bij deze
+resolutie is 4 pixels ongeveer een kwart graad: ruim boven wat het oog kan onderscheiden en
+precies aan de ondergrens van wat je terloops opmerkt terwijl je op iets anders richt. Dat
+doelgetal is **vóór** de bouw genoemd in plaats van achteraf verantwoord.
+Gemeten na afloop op drie afstanden: 8 m van 16 → **327** pixels, 10 m van 6 → **240**,
+15 m van 4 → **105**.
+
+---
+
+*Wat hieronder staat is de geschiedenis van de twee weerlegde conclusies. Het blijft staan
+omdat de manier waarop ze allebei ontstonden niet gerepareerd is.*
 
 **Wat hier stond, en waarom het weg moest.** De conclusie luidde: het enige zichtbare object stond *bij het personage* in plaats van op de inslagplek, dus de transform is fout en het renderen werkt prima. Dat feit kwam uit een controleproef die het niet kan dragen — het was een magenta blok dat **vastgemaakt was aan het personage** en bij BeginPlay was neergezet. Een object dat per constructie bij het personage staat, zegt niets over waar een *gespawnd* spoor terechtkomt; het kón nergens anders staan. Dezelfde aantekening meldde bovendien dat de echte sporen gemeten op **8,4–8,5 m vóór de camera** stonden, wat de tegenovergestelde kant op wijst. En de logregel die het had kunnen beslissen, logde wel `Spot` (waar het spoor *naartoe* ging) maar nooit `Mark->GetActorLocation()` (waar het *staat*). Dit is anti-patroon 1 uit §2 in zuivere vorm: een conclusie zonder observatie die hem aantoont.
 
@@ -535,6 +565,17 @@ als **ONGELDIG** in plaats van als schone ronde — dat was geen theorie: de all
 proefronde sloot na 18 s af op een verouderde module-DLL, en de teller schreef er vrolijk
 "geen crash" bij. En de crashdetectie is tegen het echte crashlog van 19:20 gehouden vóór
 gebruik: hij gaat daar rood, en op een schone ronde niet.
+
+**TWEE LEADS DIE OPEN BLIJVEN — hier vastgelegd zodat ze niet met een sessie verdwijnen:**
+
+1. **De crash viel VROEG, op frame 259.** Dat spreekt elke "loopt vol"-verklaring tegen —
+   geheugendruk, een lek, een cache die volloopt: die hebben alle drie tijd nodig en die
+   was er niet.
+2. **Het crashende log heette `Eclipse_2`, dus er was CONTENTIE.** Er draaide een tweede
+   instantie. Dat is de enige vorm die in de 35 reproductierondes **niet is nagebootst**,
+   en de scherpste variant ervan is een **open owner-editor** tijdens een ronde. Die kost
+   het build-slot volledig (Live Coding), dus dat nabootsen is een **owner-afweging en geen
+   agent-besluit** — vraag het, bouw er niet omheen.
 
 **Waarom dit hier staat:** de hypothese was goed gebouwd — hij paste op elk gemeten feit en
 wees een echte, verdachte constructie aan. Hij viel niet op een tegenargument maar op één

@@ -86,37 +86,19 @@ vooruit is gekomen terwijl het build-slot bezet was. De 71 scène-stubs uit
 *Volledige metingen staan in `phase0/DEBUG_DISCIPLINE.md`. Lees die vóór je iets aanraakt;
 alle drie zijn eerder de verkeerde kant op gestuurd door een plausibele redenering.*
 
-1. **Inslagspoor — OPGELOST. Het rendert prima; het is 14 pixels groot.** Geen
-   transform-bug (`ac09980`) én geen renderbug: het spoor is **9×9 cm**, plat, onder een
-   scherende hoek vanaf ~10 m. **Gemeten**: van bovenaf 5.459 veranderde pixels, fel amber,
-   GEZIEN — vanaf de spelercamera **14 pixels** (0,02 promille). De 44 grondvlakken samen
-   halen daar 6. De laag rendert en is op ooghoogte niets waard.
-   **De meting scheidt de twee verklaringen door constructie**: twee opnames van hetzelfde
-   frame met exact één verschil (object verborgen), dus elke bewegende pixel komt van dat
-   object. Controles eerst en alle drie groen: ruisvloer 0, wereld-kanarie 894.610,
-   negatieve controle 0.
-   **Volgende stap is dus geen RenderDoc maar een maat**: hoe groot moet een kogelspoor zijn
-   om op 8–15 m te lezen. Falsificatie ligt klaar — hetzelfde harnas telt de pixels.
-   **Eerst de dubbele spawner weg**: elke treffer zet er **twee** exact samenvallend neer
-   (`SpawnImpactMark` + `OnWorldImpact`), dus elk differentieel leest 0 en de diagnose
-   saboteert zichzelf. Dat is bovendien een duplicaat in verscheept gedrag.
-
-
+1. **Inslagspoor — GESLOTEN.** Het rendeerde altijd al; het was **14 pixels** groot vanaf
+   de spelercamera. Nu 105 px op 15 m, 327 op 8 m. Twee conclusies zijn onderweg weerlegd
+   (transform-bug, daarna renderbug) en de derde bleek geen bug maar een **maat**.
+   Volledige meting, de controleproeven en de dubbele spawner: `DEBUG_DISCIPLINE.md` §4.3.
 2. **Trillen bij het schieten** — mechanisme **vast** (`bc881f4`, §4.2): de envelope
    herstart per schot. Géén AnimBP, dus geen vechtende blend-nodes. Fix is een aparte
    iteratie; falsificatie ligt klaar.
-3. **GPU-crash — GEPAUZEERD: hij reproduceert niet meer** (§4.5). Page fault, geen
-   TDR-timeout; breadcrumbs wezen **SkyAtmosphere** aan (Lumen/TSR/SSR stonden op "Niet
-   gestart"). **Maar de sky-hypothese is dood:** de bouwer draait één keer, op
-   `renderframe=0` vóór BeginPlay, en sloopt daar `0/0/0/0` — GrayboxDistrict draagt zelf
-   geen zon of sky, dus die sloopregels zijn op deze map dode code. Er ís geen mid-play
-   herbouw. En **35 rondes met 123.572 geforceerde sky-herbouwen gaven 0 crashes**; bij de
-   historische 1-op-9 is dat 1,6% waarschijnlijk. **Niet verder zoeken zonder signaal** —
-   `r.SkyAtmosphere 0` zou nul met nul vergelijken. Twee leads liggen open: de crash viel
-   *vroeg* (frame 259), wat elke "loopt vol"-verklaring tegenspreekt, en het crashende log
-   heette `Eclipse_2`, dus er was **contentie**. De enige niet-nagebootste vorm is een
-   **open editor** tijdens een ronde — en die kost het build-slot, dus dat is een
-   owner-afweging, geen agent-besluit.
+3. **GPU-crash — GEPAUZEERD: hij reproduceert niet meer.** Page fault, geen TDR-timeout.
+   De sky-hypothese is dood (die code draait één keer, vóór BeginPlay, op een map zonder
+   zon) en **35 rondes met 123.572 geforceerde herbouwen gaven 0 crashes** — bij de
+   historische 1-op-9 is dat 1,6% waarschijnlijk. **Niet verder zoeken zonder signaal.**
+   Twee leads liggen open, waarvan één een owner-afweging is (een open editor tijdens een
+   ronde kost het build-slot): `DEBUG_DISCIPLINE.md` §4.5.
 
 **Twee dingen die alleen een frame liet zien — allebei GEREPAREERD, hier bewaard omdat de
 manier waarop ze binnenkwamen niet gerepareerd is.** Het STOP-verkeersbord, de
