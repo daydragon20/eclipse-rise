@@ -26,6 +26,34 @@
 
 ---
 
+## Drie bevindingen, één oorzaak: **er ligt nergens een plaat onder tekst** (01-08)
+
+Deze staan los in de lijst hieronder en zijn dat niet. Alle drie zijn dezelfde fout:
+
+| waar | wat je ziet |
+|---|---|
+| HUD-debuglaag | witte tekst wordt wit-op-geel waar een felle wereldbalk erachter valt — contrast **1,39 : 1** |
+| Basis/kaartbord (`HUD_hub_kaart.png`) | het hele bord staat **direct over de 3D-wereld**: dwars door een personage en een zonnebanner. Gemeten: de ondergrond loopt van 0,078 tot 0,163 luminantie binnen één scherm, met geclipte wit erin |
+| Munitieteller | **geen probleem** — die heeft wél een eigen donker paneel en meet **18 : 1** |
+
+**Die laatste rij is het bewijs dat het geen stijlvraag is maar een ontbrekend onderdeel.**
+Eén element in de schermlaag heeft een plaat en is leesbaar; de rest heeft er geen en is
+het niet. De oplossing is niet "maak de tekst helderder" — dat werkt niet tegen een
+ondergrond die zelf 255 haalt — maar een plaat of contour onder elke tekstlaag, zodat de
+leesbaarheid niet afhangt van wat er toevallig achter staat.
+
+> **De projecteis is er wel en hij is niet numeriek.** `REFERENTIE_HUD_BORDERLANDS.md` r49:
+> *"je moet je munitie binnen een halve seconde kunnen aflezen midden in een gevecht.
+> Toets dat op een screenshot tijdens gevecht, niet in een stilstaand menu."* De 4,5:1 die
+> in de meting hierboven genoemd wordt is WCAG, geen projectnorm — bruikbaar als proxy,
+> maar het project heeft hem niet aangenomen. Zeg erbij welke van de twee je gebruikt.
+
+> **En een les over het meten zelf.** Ik heb dit contrast eerst over een heel vak gemeten
+> (98e percentiel tekst tegen 10e percentiel achtergrond) en kwam op 11 : 1 waar de
+> inspecteur 1,39 : 1 mat. Zijn getal was het juiste: een percentiel over een vak middelt
+> precies weg waar witte letters een felle balk **raken**. **Een contrast gemeten over een
+> vak is niet het contrast dat een lezer bij een letter ziet.**
+
 ## De vault, 01-08 — het licht is de zwakke schakel, en het is gemeten
 
 *Frames: `Eclipse/Saved/Screenshots/WindowsEditor/HighresScreenshot00033.png` (commandopost),
