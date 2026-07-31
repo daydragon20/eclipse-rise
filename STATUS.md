@@ -59,6 +59,12 @@ district (`EclipseGrayboxBuilder.cpp:1432`) terwijl `20_world_dressing_standard.
 dat verbiedt — doc geschreven, code nooit aangepast. En de squad-lijst toont `45434C53`
 in plaats van namen: de ASCII-kop "ECLS" van de GUID uit `EclipseRosterLogic.cpp:15`.
 
+## Fouten uit screenshots halen — autonoom
+
+**Spawn `screenshot-inspector` aan het begin van elke werkcyclus.** Hij kijkt naar nieuwe beelden in `Eclipse/Saved/Screenshots` én in `C:\Users\natha\Pictures\Screenshots` (daar staan Nathans Win+PrtSc-opnames van foutmeldingen), en schrijft wat er mis is naar `phase0/SHOT_FINDINGS.md`.
+
+Waarom: Nathan zat foutmeldingen door te sturen — een verminkt pad, een GPU-crash, een omgekeerd wapen, ontbrekende handen. Dat is werk dat een agent kan doen, want hij kijkt naar dezelfde beelden. Owner-instructie 31-07: *"laat een agent die fouten er zelf uit halen, ook autonoom."*
+
 ## Hoe je Nathan iets vraagt
 
 **Niet in de chat — met een knop.** Vraag in `phase0/owner_questions.json` (id, vraag,

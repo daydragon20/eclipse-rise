@@ -591,8 +591,25 @@ function vSchrijf(){
 }
 
 function vBeeld(){
-  const s=S.shots||[], cur=D.screenshots||[];
+  const s=S.shots||[], cur=D.screenshots||[], b=S.bevindingen||{};
+  const ernstTag=e=>e&&e.startsWith("blokkeer")?"bad":e==="fout"?"warn":"";
   return `
+  ${(b.rows||[]).length?`
+  <h2>Wat de AI zelf uit de beelden haalde <span class="tag ${b.blokkeert?"bad":"ok"}">${b.totaal} bevindingen</span></h2>
+  <div class="card">
+    <div class="note" style="margin:0 0 12px">Je hoeft foutmeldingen niet meer door te sturen. <code>screenshot-inspector</code> kijkt elke werkcyclus naar nieuwe beelden — ook naar je eigen Win+PrtSc-opnames — en zet hier wat er mis is.</div>
+    ${(b.rows||[]).map(r=>`
+      <div class="ow">
+        <div class="ow-h"><span class="tag ${ernstTag(r.ernst)}">${esc(r.ernst)}</span>
+          <strong>${esc(r.wat)}</strong></div>
+        <div class="ow-m">
+          <span><b>vermoedelijk:</b> ${esc(r.oorzaak)}</span>
+          <span class="src">${esc(r.bestand)} · ${esc(r.datum)}</span>
+        </div>
+      </div>`).join("")}
+    <div class="note">Beoordeeld tot en met: <code>${esc(b.beoordeeldTot||"—")}</code> · ${b.beeldenTotaal||0} beelden op schijf · nieuwste ${esc(b.laatsteBeeld||"—")}</div>
+  </div>`:""}
+`+`
   ${cur.length?`<h2>Uitgelicht — door de agent gekozen</h2>
   <div class="shots" style="margin-bottom:22px">${cur.map(x=>`<div class="shot">
     <img src="${esc(x.file)}" loading="lazy" onclick="openImg('${esc(x.file)}','${esc(x.caption||"")}')">

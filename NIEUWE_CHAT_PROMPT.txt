@@ -119,8 +119,17 @@ Spoor B:
   code-reviewer     na elke groene iteratie, vóór commit. GO/NO-GO.
   art-reviewer      bij elke art-landing, keurt op 20_world_dressing_standard.md
 
-Altijd:
-  game-planner      begin van elke cyclus / als er geen duidelijke taak is
+Altijd, aan het BEGIN van elke werkcyclus:
+  screenshot-inspector  kijkt naar nieuwe screenshots en haalt er ZELF de
+                    fouten uit - foutmeldingen, verkeerd vastgehouden
+                    wapens, ontbrekende handen, HUD- en art-problemen.
+                    Kijkt in Eclipse/Saved/Screenshots EN in
+                    C:\Users\natha\Pictures\Screenshots (daar staan mijn
+                    Win+PrtSc-opnames van foutmeldingen).
+                    Schrijft naar phase0/SHOT_FINDINGS.md.
+                    DRAAI DEZE ELKE CYCLUS. Ik hoor niet zelf te melden
+                    wat er op mijn scherm mis is - dat kun jij zien.
+  game-planner      volgende taak / als er geen duidelijke stap is
 
 --------------------------------------------------------------------
 DE STAANDE KWALITEITSOPDRACHT — lees 21_quality_mandate.md (kort)

@@ -688,6 +688,56 @@ def scan_shots(limit: int = 24) -> list[dict]:
     return out
 
 
+OWNER_SHOTS = Path.home() / "Pictures" / "Screenshots"
+
+
+def scan_findings() -> dict:
+    """Bevindingen die screenshot-inspector uit de beelden heeft gehaald."""
+    p = REPO / "phase0" / "SHOT_FINDINGS.md"
+    rows: list[dict] = []
+    beoordeeld = ""
+    if p.is_file():
+        try:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            text = ""
+        m = re.search(r"\*\*Beoordeeld tot en met:\*\*\s*`?([^`\n]+)`?", text)
+        if m:
+            beoordeeld = m.group(1).strip()
+        for line in text.splitlines():
+            cells = [c.strip() for c in line.split("|")[1:-1]]
+            if len(cells) >= 5 and re.match(r"^\d{4}-\d{2}-\d{2}", cells[0]):
+                rows.append({
+                    "datum": cells[0], "bestand": _clean_cell(cells[1]),
+                    "ernst": cells[2].lower(), "wat": _clean_cell(cells[3]),
+                    "oorzaak": _clean_cell(cells[4]),
+                })
+
+    # hoeveel beelden wachten nog op beoordeling?
+    nieuw = 0
+    laatste = 0.0
+    for folder in (SHOTS_DIR, OWNER_SHOTS):
+        if not folder.is_dir():
+            continue
+        try:
+            for f in folder.iterdir():
+                if f.is_file() and f.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+                    laatste = max(laatste, f.stat().st_mtime)
+                    nieuw += 1
+        except OSError:
+            pass
+
+    rows.reverse()
+    return {
+        "rows": rows[:25],
+        "totaal": len(rows),
+        "beoordeeldTot": beoordeeld,
+        "beeldenTotaal": nieuw,
+        "laatsteBeeld": ago(laatste) if laatste else "",
+        "blokkeert": sum(1 for r in rows if r["ernst"].startswith("blokkeer")),
+    }
+
+
 def scan_tests() -> dict:
     auto = REPO / "progress_auto.js"
     if not auto.is_file():
@@ -1035,6 +1085,7 @@ def scanner_loop() -> None:
                 cached_disk = disk_info()
             fresh["owner"] = scan_owner_actions()
             fresh["vragen"] = scan_questions()
+            fresh["bevindingen"] = scan_findings()
             fresh["docs"] = cached_docs
             fresh["disk"] = cached_disk
             slow_counter += 1
