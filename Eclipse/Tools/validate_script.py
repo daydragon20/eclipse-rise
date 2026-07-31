@@ -699,14 +699,15 @@ class Validator:
 
         lengths: list[int] = []
         register_hits: list[int] = []
+        variant_hits: list[int] = []
         prev_num = -1
         for it in items:
             self.lines += 1
             self._fields(it, LINE_REQUIRED, LINE_OPTIONAL, rel, "line")
-            self.visit_line(rel, header, it, band, lengths, register_hits)
+            self.visit_line(rel, header, it, band, lengths, register_hits, variant_hits)
             prev_num = self.check_id(rel, scene, it, prev_num)
 
-        self.check_shape(rel, header, stype, band, items, lengths, register_hits)
+        self.check_shape(rel, header, stype, band, items, lengths, register_hits, variant_hits)
 
     def visit_bark(self, rel: str, header: Node, items: list[Node]) -> None:
         self._fields(header, BARK_REQUIRED, BARK_OPTIONAL, rel, "bark header")
@@ -722,11 +723,12 @@ class Validator:
         for it in items:
             self.lines += 1
             self._fields(it, VARIANT_REQUIRED, VARIANT_OPTIONAL, rel, "bark variant")
-            self.visit_line(rel, header, it, band, [], [])
+            self.visit_line(rel, header, it, band, [], [], [])
 
     # -- one line -----------------------------------------------------------
     def visit_line(self, rel: str, header: Node, it: Node,
-                   band, lengths: list[int], register_hits: list[int]) -> None:
+                   band, lengths: list[int], register_hits: list[int],
+                   variant_hits: list[int]) -> None:
         at = f"{rel}:{it.data.get('__line__', 0)}"
         lid = it.get("id") or "?"
 
@@ -787,6 +789,16 @@ class Validator:
             if label == "" and not it.get("band") and line_band and line_band[0] \
                     and n >= line_band[0]:
                 register_hits.append(n)
+            # Varianten tellen NIET mee voor het register -- dat is opzet, anders
+            # haalt een scene zijn ondergrens met tekst die de meeste spelers nooit
+            # horen. Maar ze worden wel APART geteld, want er is een geval waarin
+            # dat het oordeel omdraait: staat de variantset op de WENDING, dan
+            # hoort elke speler er een, en dan is de bevinding waar over het
+            # bestand en onwaar over de speelbeurt (M1.2.S01). Dat is geen reden
+            # om de check te versoepelen; het is een reden om het erbij te zeggen.
+            elif label and not it.get("band") and line_band and line_band[0] \
+                    and n >= line_band[0]:
+                variant_hits.append(n)
             if "{name}" in txt and PRONOUN.search(txt):
                 self.add("NAMESLOT", at,
                          f"{lid}: uses {{name}} and a pronoun in the same line -- the roster "
@@ -855,17 +867,31 @@ class Validator:
         # get to have them.
         return max(num, prev_num)
 
-    def check_shape(self, rel, header, stype, band, items, lengths, register_hits) -> None:
+    def check_shape(self, rel, header, stype, band, items, lengths, register_hits,
+                    variant_hits=None) -> None:
         """Register and spread -- scenes of >=6 lines only (L1-R1)."""
         if len(items) < 6 or not band or not lengths:
             return
         floor, _ = band
         gauged = [it for it in items if not it.get("band")]
         if floor and gauged and not register_hits:
+            # Als de VARIANTEN de ondergrens wel halen, hoort dat in de bevinding.
+            # Niet als vrijstelling -- de check blijft rood -- maar omdat het het
+            # oordeel omdraait: staat die set op de wending, dan hoort elke speler
+            # er een en is de bevinding waar over het BESTAND en onwaar over de
+            # SPEELBEURT. Een bevinding die dat verzwijgt laat een schrijver een
+            # goede scene repareren.
+            staart = ""
+            if variant_hits:
+                staart = (f" -- LET OP: {len(variant_hits)} VARIANT(EN) halen {floor} wel "
+                          f"(langste {max(variant_hits)}). Varianten tellen hier met opzet "
+                          "niet mee, anders haalt een scene zijn register met tekst die de "
+                          "meeste spelers nooit horen. Maar staat die set op de wending, dan "
+                          "hoort elke speler er een: kijk voor je iets herschrijft.")
             self.add("REGISTER", f"{rel}:{header.line('type')}",
                      f"{len(items)}-line `{stype}` scene: no un-overridden line reaches "
                      f"{floor} words (longest is {max(lengths)}) -- the scene never uses "
-                     "the room its delivery context gives it")
+                     "the room its delivery context gives it" + staart)
         lo, hi = min(lengths), max(lengths)
         if lo and hi / lo < 3:
             self.add("SPREAD", f"{rel}:{header.line('type')}",
