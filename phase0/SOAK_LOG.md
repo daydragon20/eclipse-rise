@@ -150,3 +150,7 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 17:50 | `9e0a66e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
 | 2026-07-31 17:55 | `74f0ea1` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 1 beeld(en) VERANDERD -> stap 6] |
 | 2026-07-31 17:59 | `74f0ea1` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 1 beeld(en) VERANDERD -> stap 6] |
+| 2026-07-31 18:17 | `f01d8a6` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 9 | Eclipse.Feel.Input.DocumentedConsoleCommandsExist [beeld: 1 beeld(en) VERANDERD -> stap 6] |
+| 2026-07-31 18:24 | `23d2915` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Feel.Input.DocumentedConsoleCommandsExist |
+| 2026-07-31 18:27 | `23d2915` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Feel.Input.DocumentedConsoleCommandsExist |
+| 2026-07-31 18:29 | `23d2915` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Feel.Input.DocumentedConsoleCommandsExist |

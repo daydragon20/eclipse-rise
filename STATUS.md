@@ -22,11 +22,48 @@ De owner-stop op nieuwe features is **opgeheven** (31-07). Er geldt nog één vo
 
 Spoor A raakt de build niet aan en kan dus altijd doorlopen.
 
+## ⚠️ ÉÉN TEST STAAT ROOD — en hij is NIET van de wijzigingen van 31-07 avond
+
+`Eclipse.Feel.Input.DocumentedConsoleCommandsExist` faalt. **Drie keer gedraaid, drie
+keer rood, óók nadat de enige codewijziging van die avond was teruggedraaid** — dus
+hij is niet veroorzaakt door dat werk. Bar verder: 185 tests, 1 gefaald, ValidateData
+0 fouten.
+
+De test faalt **zonder assertiemelding** (`BeginEvents` leeg). Dat past bij een
+vroege uitgang: hij start eerst een `FHarness`, en als dat mislukt geeft hij `false`
+terug zonder ooit een commando te controleren. **Zoek dus eerst waarom het harnas
+niet start, niet welk commando ontbreekt** — alle acht commando's zijn nagelopen en
+hebben een registratieplek in de code.
+
+Volg `DEBUG_DISCIPLINE.md`: minimaal reproduceren, dán observeren. Niet nog een
+hypothese.
+
 ## Open dossiers (spoor B)
 
 1. **Inslagspoor rendert niet.** **Diagnose staat en is nu ook gemeten bevestigd (31-07):** het gespawnde object verschijnt *bij het personage*, niet op de inslagplek — dat is een **transform-bug, geen rendering-bug**. De twaalf eerdere "uitsluitingen" zaten in de verkeerde helft van de zoekruimte. Volgende stap per `DEBUG_DISCIPLINE.md` §4.3: hit-locatie uit de trace naast de uiteindelijke spawn-transform loggen, 20 schoten. Geen dertiende hypothese.
 2. **Trillen bij het schieten — NIET opgelost.** Stand 31-07: de **additieve terugslag-take is geland** (`b19929e`, ligt nu op het bovenlijf), maar de hand-omklappen staan nog op **28**. Dat was oorzaak 4 van de vier in `DEBUG_DISCIPLINE.md` §4.2. **De hoofdverdachte is oorzaak 1: een oscillerend blendgewicht** — bovenlichaamslaag en aim-offset die om dezelfde bones vechten. Begin daar, en begin met *kijken*: open de **Rewind Debugger** op de AnimBP en lees het gewicht per frame af. Niet opnieuw repareren vóór die meting er is — twee eerdere fixes zijn juist daarom teruggedraaid.
 3. **Zwevend wapen.** Ook bekend UE-gedrag: socket-lag van 0,5–1,5 frame door tick-volgorde. Oplossing in `DEBUG_DISCIPLINE.md` §4.1.
+
+## Wat er 31-07 's avonds landde
+
+- **Zes ingesproken zinnen** ("Contact." / "Taking fire!" / "Reloading!" × twee
+  stemmen): gegenereerd (9 gecached, 6 nieuw, 0 mislukt) én bedraad via
+  `Event.Squad.SelfAction`, met 2 s rem per soldaat. Twee van de drie momenten vuren
+  echt; **herladen niet, want squadmates herladen nergens in de code.**
+  Daarvoor moest de seed van *create-only* naar *ontbrekende regels aanvullen* —
+  nieuwe zinnen bereikten een bestaand stemasset anders nooit.
+- **Terugslag is additief geworden.** `Primary_Fire_Med_MSA` lag al in het
+  Belica-pack (mesh space additive); er hoefde niets ingekocht te worden. Eerste
+  poging faalde omdat ik de *bron* maskeerde — een mesh-space-additief telt ná de
+  blend op. Werkende vorm: additief op een kopie, per bot ingemengd. Voet-omklappen
+  2–3, gelijk aan wat er stond. **Niet aangetoond dat het beter is**, wel de vorm die
+  de referentie vraagt (`DEBUG_DISCIPLINE.md` §4.2 oorzaak 4).
+- **HUD-nulmeting** staat in `phase0/EXECUTION_PLAN.md §1b`.
+- Owner-lijst van **22 naar 4**; zijn vier beslissingen uitgevoerd.
+
+**Wat NIET is gelukt:** de spelergerichte HUD vóór `IsDebugHudAllowed()` zetten zodat
+de opnameronde hem kan zien. Teruggedraaid; zie §1b voor waarom die poort de eerste
+bouwstap is.
 
 ## Wacht op Nathan
 
