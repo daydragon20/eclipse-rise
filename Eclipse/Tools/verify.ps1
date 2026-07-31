@@ -216,6 +216,22 @@ if (-not $SkipShots) {
     $script:ShotCount = $Shots.Count
     Write-Host "$($Shots.Count) opnames:"
     $Shots | ForEach-Object { Write-Host "  $($_.FullName)" }
+
+    # STAAT ER OOK IETS OP? Deze bar meldde "0 frame-fouten" terwijl 22 van de 50
+    # editor-frames van diezelfde nacht hun onderste kwart op luminantie NUL hadden.
+    # De controle hieronder grept het LOGBOEK op fouten die de game zelf meldt --
+    # een frame waar de grond niet op staat meldt niets, dus die kon het per
+    # constructie niet zien. Zelfde vorm als de vault die nooit getekend werd.
+    #
+    # Alleen de frames van DEZE ronde, want de historische 22 zijn geen regressie.
+    # Zelftest eerst: hij bevat de negatieve controle dat DONKER niet LEEG is, en
+    # zonder die controle valt de vault om terwijl hij klopt.
+    if ($Shots.Count -gt 0) {
+        python "$Root\Tools\check_shot_sanity.py" --zelftest
+        if ($LASTEXITCODE -ne 0) { $Failures += "opnamecontrole kan niet meer rood worden" }
+        python "$Root\Tools\check_shot_sanity.py" @($Shots | ForEach-Object { $_.FullName })
+        if ($LASTEXITCODE -ne 0) { $Failures += "opnameronde: een frame bevat geen gerenderde scene" }
+    }
     if ($Shots.Count -eq 0) {
         Write-Host "GEEN BEELD — kijk in Saved\Logs\Eclipse.log, niet in de screenshotmap."
         $Failures += "opnameronde leverde niets op"
