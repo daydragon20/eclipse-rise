@@ -15,7 +15,7 @@ turn:         "She admits the third invitation was not hers — it was theirs, a
 # ---- state ----
 status:       draft
 critic:       null
-words:        245
+words:        259
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      MARA, VOSS, DEX, BRICK, REYES
@@ -55,6 +55,10 @@ words:        245
 #            on that and nobody may.
 # dex:       one joke (.220), the smallest he has. This is not a downtime scene; 18.6's
 #            one-in-six ratio is not owed here.
+# player:    .154 / .156 are the player's interjection, inserted between tens exactly as
+#            SCRIPT_FORMAT section 2 intends. Both are answered by .160 and neither sets a
+#            flag - 18.7 wants the player in a scene this long, and it does not want a
+#            branch nothing reads.
 # brick:     six words, both lines late, neither of them first (18.4).
 # reyes:     no contractions anywhere - she is stressed and the training reasserts (18.4).
 # omitted:   any line explaining what the Iron Chorus IS. Reputation only, three scraps
@@ -146,11 +150,23 @@ lines:
     shot:    "Nobody picks it up. Mara moves the chip an inch and the room follows her hand."
     note:    "*** THE M1.3.S06 LINK. ONE LINE. NOBODY ANSWERS IT. *** Do not add a second. The name itself is deliberately unspoken so M1.3's writer keeps the choice."
 
+  - id:      M1.5.S01.154
+    speaker: VOSS
+    voice:   voss
+    text:    "What changed for them?"
+    note:    "PLAYER OPTION 1 of 2 (interjection). No flag - .160 answers either one, exactly as M1.1.S01.230 answers either approach. The player gets the floor in a scene of 28 turns (18.7) without inventing state nothing reads."
+
+  - id:      M1.5.S01.156
+    speaker: VOSS
+    voice:   voss
+    text:    "What do we have now that we didn't have in the spring?"
+    note:    "PLAYER OPTION 2 of 2 (interjection). The obvious answer is forty rifles, and Mara declines to give it."
+
   - id:      M1.5.S01.160
     speaker: MARA
     voice:   mara
     text:    "This time the asking came the other way."
-    note:    "The turn. She does not say what that does to her. 18.9 A."
+    note:    "The turn, and it answers option 1 directly and option 2 by refusing it. She does not say what any of it does to her. 18.9 A."
 
   - id:      M1.5.S01.170
     speaker: REYES

@@ -15,7 +15,7 @@ turn:         "Voss decides, and whichever way he decides, one of the two cells 
 # ---- state ----
 status:       draft
 critic:       null
-words:        290
+words:        291
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, the emissary, BRICK, MARA; the shift boss
@@ -86,7 +86,7 @@ lines:
   - id:      M1.5.S04.010
     speaker: EMISSARY
     voice:   iron_chorus_emissary
-    text:    "He files for the fourth gallery and the sixth. Absentee sheets. Tuesdays, before the second horn."
+    text:    "He files for the fourth gallery and the sixth. Absentee sheets, every Tuesday before the second horn."
     shot:    "A kitchen. Two cups on the drainer. The man is standing, because they came in while he was standing."
 
   - id:      M1.5.S04.020

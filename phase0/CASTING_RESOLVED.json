@@ -1,0 +1,287 @@
+{
+ "bron": "phase0/CASTING_KEUZE.json",
+ "toelichting": "Index = positie op progress_media/casting/CASTING.html (premade eerst, daarna Voice Library). Controleer ordering_fingerprint als de shortlist opnieuw is gebouwd.",
+ "rollen_gekozen": 9,
+ "finalisten_totaal": 17,
+ "library_finalisten_zonder_licentiecheck": [],
+ "conflicten_eerste_keuze": {},
+ "conflicten_inclusief_reserves": {
+  "TX3LPaxmHKxFdv7VOQHJ": [
+   [
+    "Dominion-conscript A/B/C",
+    "Liam",
+    2
+   ],
+   [
+    "Dex Callum (31)",
+    "Liam",
+    1
+   ]
+  ],
+  "CwhRBWXzGAHq8TQ4Fs17": [
+   [
+    "Eclipse-fighter A/B/C/D",
+    "Roger",
+    1
+   ],
+   [
+    "Voss \"Cinder\" (M)",
+    "Roger",
+    2
+   ]
+  ],
+  "XrExE9yKIg1WjnnlVkGX": [
+   [
+    "Eclipse-fighter A/B/C/D",
+    "Matilda",
+    2
+   ],
+   [
+    "Voss \"Cinder\" (V)",
+    "Matilda",
+    2
+   ],
+   [
+    "Mara Sovann (52)",
+    "Matilda",
+    1
+   ]
+  ]
+ },
+ "rollen": {
+  "dominion_conscript": {
+   "label": "Dominion-conscript A/B/C",
+   "prio": 1,
+   "tier": "Tier 1 - barks",
+   "aantal_kandidaten": 5,
+   "ordering_fingerprint": "70568ec79a6fe402",
+   "finalisten": [
+    {
+     "stem": "Harry",
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "bron": "premade",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat3_Harry.mp3",
+     "eigenschappen": "male / young / american / rough",
+     "keuze_index": 3,
+     "rang": 1
+    },
+    {
+     "stem": "Liam",
+     "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+     "bron": "premade",
+     "bestand": "progress_media/casting/dominion_conscript/dominion_conscript_kandidaat2_Liam.mp3",
+     "eigenschappen": "male / young / american / confident",
+     "keuze_index": 2,
+     "rang": 2
+    }
+   ]
+  },
+  "veil_operative": {
+   "label": "Veil-operative A/B",
+   "prio": 1,
+   "tier": "Tier 1 - barks",
+   "aantal_kandidaten": 4,
+   "ordering_fingerprint": "a128679e79bfec96",
+   "finalisten": [
+    {
+     "stem": "River",
+     "voice_id": "SAz9YHcvj6GT2YYXdXww",
+     "bron": "premade",
+     "bestand": "progress_media/casting/veil_operative/veil_operative_kandidaat1_River.mp3",
+     "eigenschappen": "neutral / middle_aged / american / calm",
+     "keuze_index": 1,
+     "rang": 1
+    },
+    {
+     "stem": "Eric",
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "bron": "premade",
+     "bestand": "progress_media/casting/veil_operative/veil_operative_kandidaat2_Eric.mp3",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "keuze_index": 2,
+     "rang": 2
+    }
+   ]
+  },
+  "eclipse_fighter": {
+   "label": "Eclipse-fighter A/B/C/D",
+   "prio": 1,
+   "tier": "Tier 1 - barks",
+   "aantal_kandidaten": 5,
+   "ordering_fingerprint": "9989d197c5661b6f",
+   "finalisten": [
+    {
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "bron": "premade",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat5_Roger.mp3",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "keuze_index": 5,
+     "rang": 1
+    },
+    {
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "bron": "premade",
+     "bestand": "progress_media/casting/eclipse_fighter/eclipse_fighter_kandidaat2_Matilda.mp3",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "keuze_index": 2,
+     "rang": 2
+    }
+   ]
+  },
+  "voss_m": {
+   "label": "Voss \"Cinder\" (M)",
+   "prio": 2,
+   "tier": "Tier 2 - elke scene",
+   "aantal_kandidaten": 6,
+   "ordering_fingerprint": "37bdc152ef8fd35c",
+   "finalisten": [
+    {
+     "stem": "Callum",
+     "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+     "bron": "premade",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat5_Callum.mp3",
+     "eigenschappen": "male / middle_aged / american",
+     "keuze_index": 5,
+     "rang": 1
+    },
+    {
+     "stem": "Roger",
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "bron": "premade",
+     "bestand": "progress_media/casting/voss_m/voss_m_kandidaat6_Roger.mp3",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "keuze_index": 6,
+     "rang": 2
+    }
+   ]
+  },
+  "voss_f": {
+   "label": "Voss \"Cinder\" (V)",
+   "prio": 2,
+   "tier": "Tier 2 - elke scene",
+   "aantal_kandidaten": 6,
+   "ordering_fingerprint": "13905168778a029e",
+   "finalisten": [
+    {
+     "stem": "Laura",
+     "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+     "bron": "premade",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat4_Laura.mp3",
+     "eigenschappen": "female / young / american / sassy",
+     "keuze_index": 4,
+     "rang": 1
+    },
+    {
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "bron": "premade",
+     "bestand": "progress_media/casting/voss_f/voss_f_kandidaat3_Matilda.mp3",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "keuze_index": 3,
+     "rang": 2
+    }
+   ]
+  },
+  "mara": {
+   "label": "Mara Sovann (52)",
+   "prio": 2,
+   "tier": "Tier 2 + 4",
+   "aantal_kandidaten": 10,
+   "ordering_fingerprint": "ba518efa7732d491",
+   "finalisten": [
+    {
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "bron": "premade",
+     "bestand": "progress_media/casting/mara/mara_kandidaat4_Matilda.mp3",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "keuze_index": 4,
+     "rang": 1
+    },
+    {
+     "stem": "Lily",
+     "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+     "bron": "premade",
+     "bestand": "progress_media/casting/mara/mara_kandidaat1_Lily.mp3",
+     "eigenschappen": "female / middle_aged / british / confident",
+     "keuze_index": 1,
+     "rang": 2
+    }
+   ]
+  },
+  "dex": {
+   "label": "Dex Callum (31)",
+   "prio": 2,
+   "tier": "Tier 2 + 4",
+   "aantal_kandidaten": 5,
+   "ordering_fingerprint": "62504805d7dc7609",
+   "finalisten": [
+    {
+     "stem": "Liam",
+     "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+     "bron": "premade",
+     "bestand": "progress_media/casting/dex/dex_kandidaat3_Liam.mp3",
+     "eigenschappen": "male / young / american / confident",
+     "keuze_index": 3,
+     "rang": 1
+    },
+    {
+     "stem": "Will",
+     "voice_id": "bIHbv24MWmeRgasZH58o",
+     "bron": "premade",
+     "bestand": "progress_media/casting/dex/dex_kandidaat4_Will.mp3",
+     "eigenschappen": "male / young / american / chill",
+     "keuze_index": 4,
+     "rang": 2
+    }
+   ]
+  },
+  "brick": {
+   "label": "Brick / Oram Bex (34)",
+   "prio": 2,
+   "tier": "Tier 4",
+   "aantal_kandidaten": 4,
+   "ordering_fingerprint": "95e167c3aca1f7dd",
+   "finalisten": [
+    {
+     "stem": "Adam",
+     "voice_id": "pNInz6obpgDQGcFmaJgB",
+     "bron": "premade",
+     "bestand": "progress_media/casting/brick/brick_kandidaat2_Adam.mp3",
+     "eigenschappen": "male / middle_aged / american",
+     "keuze_index": 2,
+     "rang": 1
+    },
+    {
+     "stem": "Brian",
+     "voice_id": "nPczCjzI2devNBz1zQrb",
+     "bron": "premade",
+     "bestand": "progress_media/casting/brick/brick_kandidaat1_Brian.mp3",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "keuze_index": 1,
+     "rang": 2
+    }
+   ]
+  },
+  "reyes": {
+   "label": "Dr. Elin Reyes (38)",
+   "prio": 2,
+   "tier": "Tier 4",
+   "aantal_kandidaten": 4,
+   "ordering_fingerprint": "721e3166bf2d8fc5",
+   "finalisten": [
+    {
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "bron": "premade",
+     "bestand": "progress_media/casting/reyes/reyes_kandidaat1_Alice.mp3",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "keuze_index": 1,
+     "rang": 1
+    }
+   ]
+  }
+ }
+}
