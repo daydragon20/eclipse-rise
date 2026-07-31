@@ -7,7 +7,7 @@
 ## Waar we staan
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
-Bar: build groen (`-NoUba`) · **185/185 tests, 0 gefaald, 0 niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog in sync. *(Gemeten 31-07 19:00; de laatste rode test is opgelost, zie hieronder.)*
+Bar: build groen (`-NoUba`) · **188/188 tests, 0 gefaald, 0 niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog 37/37 in sync. *(Gemeten 31-07 ~19:40; de suite groeide van 185 naar 188 door het parallelle agentwerk van die avond.)*
 
 > **De testteller op het dashboard was stuk, niet verouderd — gerepareerd 31-07.**
 > Hier stond "draai `Tools/update_progress.ps1` om het te verversen". Dat kón niet
@@ -60,7 +60,7 @@ gelezen te worden.
 ## Open dossiers (spoor B)
 
 1. **Inslagspoor rendert niet.** **Diagnose staat en is nu ook gemeten bevestigd (31-07):** het gespawnde object verschijnt *bij het personage*, niet op de inslagplek — dat is een **transform-bug, geen rendering-bug**. De twaalf eerdere "uitsluitingen" zaten in de verkeerde helft van de zoekruimte. Volgende stap per `DEBUG_DISCIPLINE.md` §4.3: hit-locatie uit de trace naast de uiteindelijke spawn-transform loggen, 20 schoten. Geen dertiende hypothese.
-2. **Trillen bij het schieten — NIET opgelost.** Stand 31-07: de **additieve terugslag-take is geland** (`b19929e`, ligt nu op het bovenlijf), maar de hand-omklappen staan nog op **28**. Dat was oorzaak 4 van de vier in `DEBUG_DISCIPLINE.md` §4.2. **De hoofdverdachte is oorzaak 1: een oscillerend blendgewicht** — bovenlichaamslaag en aim-offset die om dezelfde bones vechten. Begin daar, en begin met *kijken*: open de **Rewind Debugger** op de AnimBP en lees het gewicht per frame af. Niet opnieuw repareren vóór die meting er is — twee eerdere fixes zijn juist daarom teruggedraaid.
+2. **Trillen bij het schieten — GEMETEN 31-07 (`bc881f4`), mechanisme vast, fix nog niet gedaan.** De diagnose "oscillerend blendgewicht" klopt: pieken lopen **exact 1:1 met het aantal schoten** (10/20/27 schoten → 10/20/27 pieken), identiek bij 120, 60 én 77 Hz — dat derde raster juist omdat 120 en 60 allebei een veelvoud van het vuurinterval zijn en het dus samen eens kunnen zijn over een artefact. **Maar het mechanisme uit §4.2 was fout:** de speler draait **geen AnimBP** maar een C++-proxy, dus er is geen blend-node die met een aim-offset om bones vecht en de Rewind Debugger heeft niets om terug te spoelen. De echte oorzaak is dat `PlayOneShot` de envelope **bij elk schot herstart** (`OneShotTime = 0.0f`). Afkappen is uitgesloten als verklaring: bij snelvuur zónder stille frames zijn het exact dezelfde 27 pieken. **Volgende stap (aparte iteratie):** een doorlopende envelope die vanaf het huidige gewicht verder loopt; de falsificatie ligt klaar in `Tests/EclipseAnimOneShotWeightTests.cpp` — pieken moeten dan ≪ N worden bij ongewijzigde bemonstering.
 3. **Zwevend wapen.** Ook bekend UE-gedrag: socket-lag van 0,5–1,5 frame door tick-volgorde. Oplossing in `DEBUG_DISCIPLINE.md` §4.1.
 
 ## Wat er 31-07 's avonds landde
