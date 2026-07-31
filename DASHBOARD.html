@@ -85,6 +85,7 @@ h3{font-size:17px;margin:0 0 8px}
 .agent{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s}
 .agent:hover{border-color:var(--acc)}
 .agent.live{border-color:#3ecf8e55}
+.agent.ongebruikt{opacity:.5}
 .agent .hd{display:flex;align-items:center;gap:9px;margin-bottom:8px}
 .agent .id{font:12px monospace;color:var(--dim2)}
 .agent .last{font-size:13px;color:var(--dim);max-height:60px;overflow:hidden;margin-top:7px}
@@ -143,6 +144,7 @@ h3{font-size:17px;margin:0 0 8px}
   <div class="pulse"><span class="dot" id="dot"></span><span id="pulse">verbinden…</span></div>
   <nav>
     <button class="on" data-v="nu">Nu</button>
+    <button data-v="voortgang">Voortgang</button>
     <button data-v="agents">Agents</button>
     <button data-v="taken">Taken</button>
     <button data-v="schrijf">Schrijflaag</button>
@@ -154,6 +156,7 @@ h3{font-size:17px;margin:0 0 8px}
 
 <main>
   <section class="view on" id="v-nu"></section>
+  <section class="view" id="v-voortgang"></section>
   <section class="view" id="v-agents"></section>
   <section class="view" id="v-taken"></section>
   <section class="view" id="v-schrijf"></section>
@@ -232,6 +235,16 @@ function vNu(){
     </div>`).join(""):'<div class="empty">Niets — de agent heeft alles wat hij nodig heeft.</div>'}
   </div>
 
+  ${(()=>{const ab=(D.abTests||[]).filter(t=>t.status!=="beslist");
+    if(!ab.length)return "";
+    return `<h2>Keuzes die op jou wachten</h2><div class="card">${ab.map(t=>`
+      <div class="item gauw">
+        <h4>${esc(t.titel||"")}</h4>
+        ${t.vraag?`<p>${esc(String(t.vraag).slice(0,600))}</p>`:""}
+        ${t.opties?`<ul>${(Array.isArray(t.opties)?t.opties:[t.opties]).map(o=>`<li>${esc(typeof o==="string"?o:(o.label||o.tekst||JSON.stringify(o)))}</li>`).join("")}</ul>`:""}
+        ${t.aanbeveling?`<div class="note"><strong>Mijn advies:</strong> ${esc(t.aanbeveling)}</div>`:""}
+      </div>`).join("")}</div>`;})()}
+
   <div class="grid g2">
     <div class="card">
       <h2>Credits — ElevenLabs</h2>
@@ -259,30 +272,103 @@ function vNu(){
 }
 
 function vAgents(){
-  const a=S.agents||[];
-  if(!a.length)return '<h2>Agents</h2><div class="card"><div class="empty">Geen sessies gevonden.</div></div>';
-  return `<h2>Agents — klik voor de chat</h2><div class="grid g2">${a.map(x=>`
-    <div class="agent ${x.active?"live":""}" onclick="openAgent('${esc(x.id)}')">
+  const A=S.agents||{}, defs=A.definities||[], runs=A.runs||[], ses=A.sessies||[];
+  if(!defs.length&&!runs.length)return '<h2>Agents</h2><div class="card"><div class="empty">Scannen…</div></div>';
+
+  const spoorTag=s=>s==="A"?'<span class="tag info">spoor A</span>'
+                  :s==="B"?'<span class="tag warn">spoor B</span>'
+                  :'<span class="tag">altijd</span>';
+
+  return `
+  <h2>De agents — ${defs.length} gedefinieerd · ${A.totaalRuns||0} keer ingezet</h2>
+  <div class="grid g2" style="margin-bottom:18px">${defs.map(d=>`
+    <div class="agent ${d.runs?"":"ongebruikt"}">
       <div class="hd">
-        <span class="dot ${x.active?"live":""}"></span>
-        <strong>${x.active?"Actief":"Rust"}</strong>
-        <span class="id">${esc(x.short)}</span>
-        <span style="margin-left:auto" class="m">${esc(x.modified)}</span>
+        <strong>${esc(d.name)}</strong>
+        ${spoorTag(d.spoor)}
+        <span style="margin-left:auto" class="m">${d.runs?d.runs+"× ingezet":"nog nooit"}</span>
       </div>
-      <div class="note">${x.messages} berichten · ${x.sizeMB} MB${x.subagents?` · ${x.subagents} subagents`:""}</div>
-      <div class="last">${esc((x.lastRole==="assistant"?"→ ":"‹ ")+(x.lastText||"(gereedschap)")).slice(0,240)}</div>
-      <div class="tools">${(x.topTools||[]).map(t=>`<span class="tag">${esc(t[0])} ${t[1]}</span>`).join("")}</div>
-    </div>`).join("")}</div>`;
+      <div class="last">${esc(d.desc)}</div>
+      ${d.lastTask?`<div class="note" style="margin-top:8px">Laatst: <strong>${esc(d.lastTask)}</strong><br><span class="m">${esc((d.lastTime||"").slice(0,16).replace("T"," "))}</span></div>`:""}
+    </div>`).join("")}</div>
+
+  <h2>Wat de agents gedaan hebben — laatste ${runs.length}</h2>
+  <div class="card">${runs.length?runs.map((r,i)=>`
+    <div class="row" ${r.file?`style="cursor:pointer" onclick="openRun(${i})"`:""}>
+      <span class="t"><span class="tag ${r.type&&r.type.indexOf("-")>0?"info":""}">${esc(r.type)}</span> ${esc(r.desc||"(geen omschrijving)")}</span>
+      <span class="m">${esc(r.ago||"")}${r.file?" · klik":""}</span>
+    </div>`).join(""):'<div class="empty">Nog geen agents ingezet.</div>'}
+  </div>
+
+  <h2>Levende sessies <span class="tag">laatste 24 uur</span></h2>
+  <div class="card">
+    ${ses.length?ses.map(s=>`
+      <div class="row" style="cursor:pointer" onclick="openAgent('${esc(s.id)}')">
+        <span class="t"><span class="dot ${s.active?"live":""}" style="display:inline-block;margin-right:7px"></span>
+          ${s.active?"<strong>Actief nu</strong>":"Rust"} — ${esc((s.lastText||"(gereedschap)").slice(0,90))}</span>
+        <span class="m">${esc(s.modified)} · ${s.sizeMB} MB</span>
+      </div>`).join(""):'<div class="empty">Geen sessie in de laatste 24 uur.</div>'}
+    <div class="note">Oudere chatsessies worden bewust niet getoond — daar staat niets in dat nog meespeelt.</div>
+  </div>`;
+}
+
+const STATUS_TAG={bezig:"warn","af":"ok",klaar:"ok",gedaan:"ok",wacht:"bad",gepland:"",open:""};
+const STATUS_ORDER=["bezig","wacht","gepland","open","af","klaar","gedaan"];
+
+function vVoortgang(){
+  const s=D.secties||[], e=D.eta||{};
+  if(!s.length)return '<h2>Voortgang</h2><div class="card"><div class="empty">Geen secties in progress_data.js.</div></div>';
+  return `
+  <h2>Inschatting</h2>
+  <div class="card">
+    ${Object.entries(e).filter(([k])=>k!=="bijgesteld"&&k!=="toelichting").map(([k,v])=>
+      `<div class="item later"><h4>${esc(k)}</h4><p>${esc(v)}</p></div>`).join("")}
+    ${e.toelichting?`<div class="note">${esc(e.toelichting)}${e.bijgesteld?" · bijgesteld "+esc(e.bijgesteld):""}</div>`:""}
+  </div>
+
+  <h2>Per onderdeel</h2>
+  ${s.map(sec=>{
+    const items=sec.items||[];
+    const gem=items.length?Math.round(items.reduce((a,i)=>a+(i.pct||0),0)/items.length):0;
+    return `<div class="card">
+      <h3>${esc(sec.titel)} <span class="tag">${esc(sec.scope||"")}</span>
+        <span style="float:right;font-size:14px;color:var(--acc)">${gem}%</span></h3>
+      <div class="bar" style="margin-bottom:14px"><i style="width:${gem}%"></i></div>
+      ${items.map(i=>`
+        <div style="padding:11px 0;border-bottom:1px solid var(--line)">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">
+            <strong style="font-size:14px">${esc(i.naam||"")}</strong>
+            <span class="m">${i.pct!=null?i.pct+"%":""}${i.doel?" · doel "+esc(i.doel):""}</span>
+          </div>
+          <div class="bar" style="margin:7px 0"><i style="width:${i.pct||0}%"></i></div>
+          ${i.groot?`<p style="font-size:13px;color:var(--dim);margin-top:5px">${esc(i.groot)}</p>`:""}
+          ${i.notitie?`<div class="note">${esc(i.notitie)}</div>`:""}
+        </div>`).join("")}
+    </div>`;
+  }).join("")}`;
 }
 
 function vTaken(){
   const t=D.taken||[];
   if(!t.length)return '<h2>Taken</h2><div class="card"><div class="empty">Geen taken in progress_data.js.</div></div>';
   const groups={};
-  t.forEach(x=>{const k=x.status||"overig";(groups[k]=groups[k]||[]).push(x)});
-  return `<h2>Taken</h2>`+Object.entries(groups).map(([k,v])=>`
-    <div class="card"><h3>${esc(k)} <span class="tag">${v.length}</span></h3>
-    ${v.map(x=>`<div class="row"><span class="t">${esc(x.titel||x.naam||"")}</span><span class="m">${x.pct!=null?x.pct+"%":""}</span></div>`).join("")}
+  t.forEach(x=>{const k=(x.status||"overig").toLowerCase();(groups[k]=groups[k]||[]).push(x)});
+  const keys=Object.keys(groups).sort((a,b)=>{
+    const ia=STATUS_ORDER.indexOf(a), ib=STATUS_ORDER.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+  return `<h2>Taken — ${t.length} totaal</h2>`+keys.map(k=>`
+    <div class="card">
+      <h3>${esc(k)} <span class="tag ${STATUS_TAG[k]||""}">${groups[k].length}</span></h3>
+      ${groups[k].map(x=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--line)">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">
+            <span style="font-size:14px">${esc(x.taak||"")}</span>
+            <span class="m">${x.pct!=null?x.pct+"%":""}</span>
+          </div>
+          ${x.pct!=null?`<div class="bar" style="margin:6px 0"><i style="width:${x.pct}%"></i></div>`:""}
+          ${x.detail?`<p style="font-size:12.5px;color:var(--dim);margin-top:4px">${esc(String(x.detail).slice(0,420))}</p>`:""}
+        </div>`).join("")}
     </div>`).join("");
 }
 
@@ -309,13 +395,19 @@ function vSchrijf(){
 }
 
 function vBeeld(){
-  const s=S.shots||[];
-  return `<h2>Wat de agent ziet — laatste ${s.length}</h2>
-  <div class="card"><div class="note">Er worden er automatisch maar 50 bewaard; oudere worden opgeruimd door <code>Tools/prune_screenshots.py</code>.</div></div>
+  const s=S.shots||[], cur=D.screenshots||[];
+  return `
+  ${cur.length?`<h2>Uitgelicht — door de agent gekozen</h2>
+  <div class="shots" style="margin-bottom:22px">${cur.map(x=>`<div class="shot">
+    <img src="${esc(x.file)}" loading="lazy" onclick="openImg('${esc(x.file)}','${esc(x.caption||"")}')">
+    <div class="c" style="display:block"><span>${esc(x.caption||"")}</span></div></div>`).join("")}</div>`:""}
+
+  <h2>Wat de agent nu ziet — laatste ${s.length}</h2>
   ${s.length?`<div class="shots">${s.map(x=>`<div class="shot">
     <img src="${x.url}" loading="lazy" onclick="openImg('${x.url}','${esc(x.name)}')">
     <div class="c"><span>${esc(x.modified)}</span><span>${x.kb} KB</span></div></div>`).join("")}</div>`
-   :'<div class="card"><div class="empty">Geen screenshots.</div></div>'}`;
+   :'<div class="card"><div class="empty">Geen screenshots.</div></div>'}
+  <div class="card" style="margin-top:14px"><div class="note">Er worden er automatisch maar 50 bewaard — de dashboardserver ruimt de rest zelf op, zodat de map niet weer naar 1,9 GB groeit.</div></div>`;
 }
 
 function vDocs(){
@@ -331,18 +423,29 @@ function vDocs(){
 }
 
 function vHistorie(){
-  const g=S.git||{}, gd=D.jijGedaan||[];
+  const g=S.git||{}, gd=D.jijGedaan||[], cl=D.changelog||[];
   return `<h2>Historie</h2>
-  <div class="card"><h3>Laatste commits</h3>
+  <div class="card"><h3>Laatste commits <span class="tag">${(g.commits||[]).length}</span></h3>
     ${(g.commits||[]).map(c=>`<div class="row"><span class="t"><code>${esc(c.hash)}</code> ${esc(c.msg)}</span><span class="m">${esc(c.date)}</span></div>`).join("")}
   </div>
-  <div class="card"><h3>Wat jij hebt aangeleverd</h3>
-    ${gd.length?gd.slice(0,14).map(x=>`<div class="item later"><p>${esc(String(x.wat||"")).slice(0,520)}</p>
-      <span class="m">${esc(x.tijd||"")}</span></div>`).join(""):'<div class="empty">—</div>'}
+
+  <div class="card"><h3>Wat jij hebt aangeleverd <span class="tag">${gd.length}</span></h3>
+    ${gd.length?gd.slice(0,12).map(x=>`<div class="item later"><p>${esc(String(x.wat||"")).slice(0,600)}</p>
+      ${x.tijd?`<span class="m">${esc(x.tijd)}</span>`:""}</div>`).join(""):'<div class="empty">—</div>'}
+  </div>
+
+  <div class="card"><h3>Sessielogboek <span class="tag">${cl.length}</span></h3>
+    ${cl.length?cl.slice(0,8).map(c=>`
+      <div style="padding:12px 0;border-bottom:1px solid var(--line)">
+        <strong style="font-size:14px">${esc(c.datum||"")}</strong>
+        <ul style="margin:7px 0 0 18px;font-size:12.5px;color:var(--dim)">
+          ${(c.punten||[]).slice(0,6).map(p=>`<li style="margin:4px 0">${esc(String(p).slice(0,320))}</li>`).join("")}
+        </ul>
+      </div>`).join(""):'<div class="empty">—</div>'}
   </div>`;
 }
 
-const VIEWS={nu:vNu,agents:vAgents,taken:vTaken,schrijf:vSchrijf,beeld:vBeeld,docs:vDocs,historie:vHistorie};
+const VIEWS={nu:vNu,voortgang:vVoortgang,agents:vAgents,taken:vTaken,schrijf:vSchrijf,beeld:vBeeld,docs:vDocs,historie:vHistorie};
 
 function render(){
   try{document.getElementById("v-"+cur).innerHTML=VIEWS[cur]();}
@@ -378,6 +481,15 @@ async function openAgent(id){
       <div class="tx">${esc(x.text||"(gereedschap)")}</div></div>`).join(""):'<div class="empty">Geen berichten.</div>';
     const b=document.getElementById("ov-b");b.scrollTop=b.scrollHeight;
   }catch(e){document.getElementById("ov-b").innerHTML='<div class="empty">Kon niet laden.</div>'}
+}
+function openRun(i){
+  const r=((S.agents||{}).runs||[])[i]; if(!r)return;
+  document.getElementById("ov-t").textContent=r.type+" — "+(r.desc||"");
+  document.getElementById("ov-b").innerHTML=
+    `<div class="msg"><div class="who">Opdracht</div><div class="tx">${esc(r.desc||"—")}</div></div>`+
+    `<div class="msg assistant"><div class="who">Wat eruit kwam</div><div class="tx">${esc(r.result||"(geen resultaat vastgelegd)")}</div></div>`+
+    `<div class="note" style="margin-top:14px">${esc(r.ago||"")}</div>`;
+  ov.classList.add("on");
 }
 function openImg(u,n){
   document.getElementById("ov-t").textContent=n;

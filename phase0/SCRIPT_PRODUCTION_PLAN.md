@@ -36,7 +36,7 @@ De sporen raken elkaar op precies twee plekken: de **ijkmissie** (§3) en **laag
 
 1. **De schermlaag (HUD).** Alles rond het vizier in 1e én 3e persoon: munitie, herlaad-indicatie, magazijnen, minimap, squad-status, gezondheid, objective-marker, stance. Nathan speelt pas als dit op niveau is. `hud-builder` bezit dit. Het is ook infrastructuur: zodra het staat, kan Claude de game zelf zinvol testen — daarna gaat elke andere iteratie sneller.
 2. De twee open dossiers: het inslagspoor dat niet rendert, en het trillen bij het schieten.
-3. De wapenbron (owner-actie — er bestaat nergens een los wapenmesh).
+3. Het wapen (owner-keuze, zie `JOUW_ACTIES.md` O-5). Er *hángt* een wapen; het zit alleen in de karaktermesh in plaats van als los object. Dat verklaart de ontbrekende attachment én de wapenwissel die visueel niets doet. Goedkope tint-stap of volledige isolatie — dat is Nathans weging, geen inkoop.
 4. Daarna de reguliere `EXECUTION_PLAN.md`-backlog.
 
 ---
@@ -50,7 +50,7 @@ Elke laag is **compleet en gelockt** voordat de volgende begint. Een laag is gel
 | **L0** | **IJkmissie** — M1.1 door álle lagen heen (§3) | allen | De eigenaar heeft de missie gehoord en gezegd: "zo moet het klinken" |
 | **L1** | **Verhaalfundering** — beat-sheets voor alle 42 authored missies, 4 acts | story-architect | Continuïteitsaudit: elke twist geplant én betaald, geen weesdraad, geen tegenstrijdigheid met `02_story_bible.md` |
 | **L2** | **Dialoog** — elke regel van elke scène, `SCRIPT_FORMAT`-conform | dialogue-writer ×N → dialogue-critic | 100% van de scènes op `critic: GO`. Steekproef van 10 scènes doorstaat de strip-test (§18.9 C1) |
-| **L3** | **Stem** — generatie in credit-tier-volgorde | voice-director | `VOICE_LEDGER.md` sluit; ≤290k besteed; alles importeert en speelt af |
+| **L3** | **Stem** — generatie in credit-tier-volgorde | voice-director | `VOICE_LEDGER.md` sluit; **310k besteed, 0 over** op 19/08; alles importeert en speelt af |
 | **L4** | **Wereldbeschrijving** — per locatie: wat staat er, hoe ziet het eruit, wat moet bestaan | story-architect + art-reviewer | Elke missielocatie heeft een objectlijst die een element-builder zonder vragen kan bouwen |
 | **L5** | **Assets & implementatie** — meshes, materialen, missies bedraad, scènes gespeeld | element-builder ×N + main | Groene bar + speelbaar + art-review GO |
 
@@ -92,12 +92,13 @@ M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
 
 | Datum | Spoor A (schrijven & stem) | Spoor B (systemen & feel) |
 |---|---|---|
-| **31/07 – 01/08** | Casting-tests: 2–3 kandidaatstemmen × 12 signature-regels, eigenaar kiest, tabel gelockt (Tier 0, 5k) | HUD: de drie hoogtes, 1e/3e persoon |
+| **31/07 – 01/08** | Casting: fase 1 = brede screening uit de Voice Library (**0 credits** — bladeren en previews zijn gratis), fase 2 = diepe test op 2 finalisten per rol. Eigenaar kiest, tabel gelockt (Tier 0, 12k) | HUD: de drie hoogtes, 1e/3e persoon |
 | **02/08 – 06/08** | **IJkmissie M1.1** door alle lagen. Eigenaar hoort hem. | HUD verder; inslagspoor in de editor |
 | **07/08** | **Gate L0.** Akkoord? → massaproductie. Nee? → standaard bijstellen, één iteratie, opnieuw. | trillen-dossier (Rewind Debugger eerst) |
-| **07/08 – 11/08** | **L1: beat-sheets alle 42 missies.** story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
-| **09/08 – 17/08** | **L2: dialoog.** dialogue-writer ×4–6 parallel, één missie per agent. Critic-gate per scène. Start zodra act 1's beats gelockt zijn — niet wachten op act 4. | reguliere backlog `EXECUTION_PLAN.md` |
-| **10/08 – 19/08** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Stopt bij 290k. | audio-import, bark-bedrading |
+| **31/07** | **L1 act 1 GELAND** — P0 + M1.1–M1.8 beat-sheets, 69 scène-stubs, plant/payoff-tabel. `phase0/beats/ACT1_OVERVIEW.md`. | |
+| **01/08 – 11/08** | **L1: beat-sheets acts 2–4** (34 resterende missies + 8 loyaliteitsmissies). story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
+| **vanaf gate L0** | **L2: dialoog, act 1 eerst.** dialogue-writer ×4–6 parallel, één missie per agent. Critic-gate per scène. **Niet geblokkeerd door L1 acts 2–4** — act 1's beats liggen er al sinds 31/07. | reguliere backlog `EXECUTION_PLAN.md` |
+| **10/08 – 19/08** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Reserve niet toewijzen tot **17/08**, dan vrijgeven. Doel: **310k besteed, 0 over.** | audio-import, bark-bedrading |
 | **19/08** | **HARDE STOP generatie.** Ledger sluiten. | |
 | **20/08 – 21/08** | Acts 2–4 script-compleet afmaken (kost geen credits) | L4-wereldbeschrijving start |
 

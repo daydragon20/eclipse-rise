@@ -162,8 +162,121 @@ def _extract_entry(obj: dict) -> dict | None:
     }
 
 
-def scan_agents() -> list[dict]:
-    agents: list[dict] = []
+# Welk spoor hoort bij welke agent (SCRIPT_PRODUCTION_PLAN §5)
+AGENT_SPOOR = {
+    "story-architect": "A", "dialogue-writer": "A",
+    "dialogue-critic": "A", "voice-director": "A",
+    "hud-builder": "B", "element-builder": "B",
+    "code-reviewer": "B", "art-reviewer": "B",
+    "game-planner": "*",
+}
+
+_runs_cache: dict[str, tuple[float, list]] = {}
+
+
+def scan_agent_definitions() -> list[dict]:
+    """De agents zoals ze in .claude/agents/ gedefinieerd staan."""
+    out = []
+    adir = REPO / ".claude" / "agents"
+    if not adir.is_dir():
+        return out
+    for md in sorted(adir.glob("*.md")):
+        try:
+            head = md.read_text(encoding="utf-8", errors="replace")[:1500]
+        except OSError:
+            continue
+        name = md.stem
+        desc = ""
+        m = re.search(r"^description:\s*(.+)$", head, re.M)
+        if m:
+            desc = m.group(1).strip()
+        out.append({
+            "name": name,
+            "desc": desc[:240],
+            "spoor": AGENT_SPOOR.get(name, "?"),
+        })
+    return out
+
+
+def _norm_key(text: str) -> str:
+    return re.sub(r"\s+", " ", str(text))[:120].strip().lower()
+
+
+def _index_subagent_files() -> dict[str, Path]:
+    """Koppelt de openingsprompt van een subagent-transcript aan zijn bestand."""
+    idx: dict[str, Path] = {}
+    for base in TRANSCRIPT_DIRS:
+        if not base.is_dir():
+            continue
+        for sf in base.glob("*/subagents/*.jsonl"):
+            try:
+                with sf.open("rb") as fh:
+                    first = fh.readline().decode("utf-8", errors="replace")
+                obj = json.loads(first)
+                content = (obj.get("message") or {}).get("content")
+                if isinstance(content, list):
+                    content = " ".join(
+                        b.get("text", "") for b in content if isinstance(b, dict)
+                    )
+                if content:
+                    idx[_norm_key(content)] = sf
+            except Exception:
+                continue
+    return idx
+
+
+def _parse_runs_from(jf: Path) -> list[dict]:
+    """Haalt elke Task-aanroep (agent-spawn) uit een sessie-transcript."""
+    runs: list[dict] = []
+    pending: dict[str, dict] = {}
+    try:
+        with jf.open("r", encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                # goedkope voorfilter: JSON parsen is duur op 60 MB
+                has_spawn = '"subagent_type"' in line
+                has_result = '"tool_result"' in line
+                if not (has_spawn or has_result):
+                    continue
+                try:
+                    d = json.loads(line)
+                except Exception:
+                    continue
+                content = (d.get("message") or {}).get("content")
+                if not isinstance(content, list):
+                    continue
+                for b in content:
+                    if not isinstance(b, dict):
+                        continue
+                    if b.get("type") == "tool_use":
+                        inp = b.get("input") or {}
+                        if "subagent_type" in inp:
+                            run = {
+                                "type": inp.get("subagent_type", "?"),
+                                "desc": str(inp.get("description", ""))[:120],
+                                "prompt": _norm_key(inp.get("prompt", "")),
+                                "time": d.get("timestamp", ""),
+                                "result": "",
+                            }
+                            runs.append(run)
+                            if b.get("id"):
+                                pending[b["id"]] = run
+                    elif b.get("type") == "tool_result":
+                        run = pending.pop(b.get("tool_use_id", ""), None)
+                        if run is not None:
+                            c = b.get("content")
+                            if isinstance(c, list):
+                                c = " ".join(
+                                    x.get("text", "") for x in c if isinstance(x, dict)
+                                )
+                            run["result"] = re.sub(r"\s+", " ", str(c or ""))[:400]
+    except OSError:
+        pass
+    return runs
+
+
+def scan_agent_runs() -> list[dict]:
+    """Alle agent-spawns over alle sessies, nieuwste eerst. Gecachet op mtime."""
+    all_runs: list[dict] = []
     for base in TRANSCRIPT_DIRS:
         if not base.is_dir():
             continue
@@ -172,51 +285,91 @@ def scan_agents() -> list[dict]:
                 st = jf.stat()
             except OSError:
                 continue
-            if st.st_size < 400:
+            key = str(jf)
+            cached = _runs_cache.get(key)
+            if cached and cached[0] == st.st_mtime:
+                all_runs.extend(cached[1])
                 continue
+            runs = _parse_runs_from(jf)
+            _runs_cache[key] = (st.st_mtime, runs)
+            all_runs.extend(runs)
 
-            chunk = tail_bytes(jf, 220_000)
-            entries: list[dict] = []
+    subidx = _index_subagent_files()
+    for r in all_runs:
+        sf = subidx.get(r.get("prompt", ""))
+        r["file"] = str(sf) if sf else ""
+        r.pop("prompt", None)
+
+    all_runs.sort(key=lambda r: r.get("time", ""), reverse=True)
+    return all_runs
+
+
+def scan_agents() -> dict:
+    """De agent-tab: definities met gebruik, recente runs, en levende sessies."""
+    runs = scan_agent_runs()
+
+    per_agent: dict[str, list[dict]] = {}
+    for r in runs:
+        per_agent.setdefault(r["type"], []).append(r)
+
+    definities = []
+    for d in scan_agent_definitions():
+        mine = per_agent.get(d["name"], [])
+        last = mine[0] if mine else None
+        definities.append({
+            **d,
+            "runs": len(mine),
+            "lastTime": (last or {}).get("time", ""),
+            "lastTask": (last or {}).get("desc", ""),
+        })
+    definities.sort(key=lambda a: (-a["runs"], a["name"]))
+
+    # Sessies: alleen wat leeft. De grafvelden van oude chats hebben geen waarde.
+    sessies = []
+    cutoff = time.time() - 86400
+    for base in TRANSCRIPT_DIRS:
+        if not base.is_dir():
+            continue
+        for jf in base.glob("*.jsonl"):
+            try:
+                st = jf.stat()
+            except OSError:
+                continue
+            if st.st_size < 400 or st.st_mtime < cutoff:
+                continue
+            chunk = tail_bytes(jf, 160_000)
+            entries = []
             for line in chunk.splitlines():
                 line = line.strip()
                 if not line.startswith("{"):
                     continue
                 try:
-                    obj = json.loads(line)
+                    e = _extract_entry(json.loads(line))
                 except Exception:
                     continue
-                e = _extract_entry(obj)
                 if e:
                     entries.append(e)
-
             last = entries[-1] if entries else None
-            tool_counts: dict[str, int] = {}
-            for e in entries[-80:]:
-                for t in e["tools"]:
-                    tool_counts[t] = tool_counts.get(t, 0) + 1
-
-            # subagents = submappen met dezelfde sessie-id
-            subdir = base / jf.stem
-            subagents = 0
-            if subdir.is_dir():
-                subagents = len(list(subdir.glob("*.jsonl")))
-
-            agents.append({
+            sessies.append({
                 "id": jf.stem,
                 "short": jf.stem[:8],
-                "mtime": st.st_mtime,
                 "modified": ago(st.st_mtime),
                 "active": (time.time() - st.st_mtime) < 180,
                 "sizeMB": round(st.st_size / 1048576, 1),
-                "messages": len(entries),
-                "subagents": subagents,
-                "lastRole": last["role"] if last else "",
-                "lastText": last["text"] if last else "",
-                "topTools": sorted(tool_counts.items(), key=lambda kv: -kv[1])[:5],
+                "lastText": (last or {}).get("text", ""),
+                "lastRole": (last or {}).get("role", ""),
             })
+    sessies.sort(key=lambda s: s["active"], reverse=True)
 
-    agents.sort(key=lambda a: a["mtime"], reverse=True)
-    return agents[:12]
+    for r in runs[:40]:
+        r["ago"] = r.get("time", "")[:16].replace("T", " ")
+
+    return {
+        "definities": definities,
+        "runs": runs[:40],
+        "totaalRuns": len(runs),
+        "sessies": sessies,
+    }
 
 
 def agent_messages(agent_id: str, limit: int = 60) -> list[dict]:
