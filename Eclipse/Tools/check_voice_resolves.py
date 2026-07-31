@@ -55,7 +55,19 @@ def main() -> int:
         bindings = {rid: r.get("slot_binding", {}) for rid, r in _r.items()}
         unbound_slots = {rid: r.get("slots_unbound", []) for rid, r in _r.items()}
 
+    # Rank-1 finalist per role, so "resolves" can be checked against an actual
+    # voice id and not merely against the role existing.
+    rank1 = {}
+    if RESOLVED.is_file():
+        for rid, r in json.loads(RESOLVED.read_text("utf-8"))["rollen"].items():
+            top = [f for f in r.get("finalisten", []) if f.get("rang") == 1]
+            if top:
+                rank1[rid] = (top[0]["voice_id"], top[0]["stem"])
+
     unmapped, mapped_uncast, ready, known_uncast, unbound = [], [], [], [], []
+    # voice_id -> [(speaker, lines, label)], to catch two characters sharing one
+    # voice. See the collision block below for why this is a hard failure.
+    by_voice = {}
     for key, n in usage.most_common():
         if key in mapping:
             entry = mapping[key]
@@ -76,12 +88,34 @@ def main() -> int:
                     continue
                 ready.append((key, n, [f"{entry['role']}:{slot}="
                                        f"{bound['stem']}"], []))
+                by_voice.setdefault(bound["voice_id"], []).append(
+                    (key, n, f"{entry['role']}:{slot}={bound['stem']}"))
             else:
                 ready.append((key, n, roles, []))
+                for r in roles:
+                    if r in rank1:
+                        vid, stem = rank1[r]
+                        by_voice.setdefault(vid, []).append(
+                            (key, n, f"{r}={stem}"))
         elif key in uncast:
             known_uncast.append((key, n))
         else:
             unmapped.append((key, n))
+
+    # A voice id used by two different ROLES is not a near-miss, it is the same
+    # performance twice: the cache key is hash(voiceId + text + emotion +
+    # modelId), so two characters on one id are literally indistinguishable.
+    # Resolving is not the same as resolving UNIQUELY, and this check reported
+    # "CAST AND READY" for both halves of such a pair -- green on a corpus where
+    # Mara and an Eclipse fighter shared one voice. Casting is permanent
+    # (19.1 point 2), so a collision found after generation re-costs every line
+    # of whichever character moves.
+    #
+    # Grouped by role label, not by speaker key: `threx` and `dahl_threx` are
+    # two script keys for ONE character and are supposed to share a voice.
+    # Counting keys flagged that as a collision; counting roles does not.
+    collisions = {v: s for v, s in by_voice.items()
+                  if len({x[2] for x in s}) > 1}
 
     total = sum(usage.values())
     print(f"{len(usage)} distinct speakers over {total} script lines "
@@ -124,10 +158,31 @@ def main() -> int:
               "'map' if they have a casting role, under 'uncast' if they still "
               "need one from the owner.")
 
-    if unmapped or unbound:
+    if collisions:
+        n_lines = sum(x[1] for s in collisions.values() for x in s)
+        print(f"\nFAIL - {len(collisions)} voice id(s) are cast on more than one "
+              f"role ({n_lines} lines). These roles would be the SAME voice:")
+        for vid, sp in collisions.items():
+            stem = sp[0][2].split("=")[-1]
+            per_role = {}
+            for k, n, label in sp:
+                per_role.setdefault(label, []).append((k, n))
+            print(f"  {stem} ({vid}):")
+            for label, keys in per_role.items():
+                who = ", ".join(f"{k} [{n} lines]" for k, n in keys)
+                print(f"    {label:<26} <- {who}")
+        print("\n  Two characters on one voice id are not similar, they are\n"
+              "  identical - same id, same model, same cache key. Casting is\n"
+              "  permanent (19.1 point 2), so fixing this after generation\n"
+              "  re-costs every line of whichever character moves.\n"
+              "  Fix: the owner assigns the reserve voice to one of each pair\n"
+              "  (owner question O-13), then re-run.")
+
+    if unmapped or unbound or collisions:
         return 1
 
-    print("\nOK: every speaker resolves to a role or is a declared uncast speaker.")
+    print("\nOK: every speaker resolves to a role or is a declared uncast speaker,\n"
+          "and no two speakers share a voice id.")
     return 0
 
 

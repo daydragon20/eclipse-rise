@@ -39,6 +39,7 @@
 | 2026-07-24 | 3+4 | SFX-set (7 one-shots) + muziek-sting — gegenereerd toen de meter kapot was; bedrag **afgeleid** uit het accountsaldo, niet gemeten tijdens de run | 8 | 2.868 | 128.132 |
 | 2026-07-31 | 0 | Stage 2 casting-test — 9 rollen, 17 finalisten, 51 clips. **VERKEERD MODEL** (multilingual_v2 i.p.v. eleven_v3); 21 getagde clips onbruikbaar | 51 | 2.475 | 125.657 |
 | 2026-07-31 | 0 | A/B-controleproef: gedraagt een audiotag zich op multilingual_v2? | 1 | 45 | 125.612 |
+| 2026-08-01 | 2 | IJkmissie M1.1 — **AFGEBROKEN VÓÓR DE EERSTE CALL**, casting niet vastgelegd (zie hieronder) | 0 | 0 | 125.612 |
 
 > **Formaat:** het dashboard leest deze tabel automatisch uit. Houd de kolomvolgorde
 > aan en begin de datumkolom met `JJJJ-MM-DD`, anders telt de regel niet mee.
@@ -74,6 +75,66 @@ De ledger sluit op de cent.
 *Onverwachte spend hier noteren, met de oorzaak. Een batch die credits kost terwijl
 hij uit cache had moeten komen, betekent dat tekst of een audio-tag is veranderd —
 zoek uit wát vóór je opnieuw draait.*
+
+### 2026-08-01 — M1.1 stond klaar om ingesproken te worden en is NIET gegenereerd
+
+**Gemeten saldo vóór: 125.612. Gemeten saldo ná: 125.612. Delta 0.**
+`require_usage_measurement()` slaagde in beide richtingen — de meter werkt, dit is
+geen ongemeten run maar een run die niet begonnen is.
+
+**Wat er wél klopte.** Alle zeven scenes `critic: GO`. Alle audio-tags binnen de
+goedgekeurde set van §19.4 (`[pause]`×6, `[quietly]`×4, `[shouting]`×3, `[nervous]`×2,
+`[exhausted]`×2, `[whispering]`, `[amused]`), nul regels met meer dan twee tags.
+`validate_script.py --no-voice` heeft nul bevindingen in M1.1. Gemeten kosten 9.316
+credits (niet 9.332 — S03/S05/S06/S99 zijn vannacht nog geraakt; 0,2% drift, ruim
+binnen de 25%-grens).
+
+**Waarom het toch niet doorging: casting ligt niet vast, en drie stemmen zijn dubbel
+gecast.** Gemeten uit `phase0/CASTING_RESOLVED.json` + `VoiceKeyMap.json`:
+
+| Stem-ID | Rol 1 | Rol 2 |
+|---|---|---|
+| `XrExE9yKIg1WjnnlVkGX` (Matilda) | **mara** (328 regels) | **eclipse_fighter_b** (52) |
+| `TX3LPaxmHKxFdv7VOQHJ` (Liam) | **dex** (267 regels) | **dominion_conscript_b** (9) |
+| `cjVigY5qzO86Huf0OWal` (Eric) | **threx** (28 regels) | **veil_operative_b** (8) |
+
+De eerste twee zitten allebei ín M1.1. Mara en een Eclipse-schutter zouden dezelfde
+stem hebben; Dex en een Dominion-conscript ook — dat zijn tegenstanders in hetzelfde
+vuurgevecht. Niet *lijkend*: dezelfde stem-ID, dus dezelfde cachesleutel, dus dezelfde
+stem.
+
+**Exposure in M1.1: 6.111 van 9.316 credits = 66%** hangt aan stemmen die nog kunnen
+wijzigen (de twee botsingen, plus `voss_f`=Laura en `reyes`=Alice, die allebei in de
+eerste-keuze-botsingen van O-13 staan).
+
+**Waarom dat een stop is en geen risico dat je neemt.** §19.1 punt 2: casting is
+permanent, want de cachesleutel is `hash(voiceId + text + emotion + modelId)`. Wie
+later van stem wisselt, herbetaalt élke regel van dat personage. O-13 zegt het zelf,
+in de optie "later": *"dan blijft casting open en kan Tier 1 niet starten. De
+botsingen moeten voor generatie weg."* De castingtabel in §19.3 is nog volledig leeg
+en O-3 én O-13 zijn onbeantwoord — Tier 0 is dus niet af, en §19.2 verbiedt aan een
+tier te beginnen voor de vorige klaar is.
+
+**Derde blokkade, los van casting.** `Eclipse/Content/Audio/DialogueSeed.json` bevat
+alleen `Squad.VoiceA` en `Squad.VoiceB` (generieke barkstemmen, `eleven_multilingual_v2`).
+**Geen enkele M1.1-spreker staat erin** — het readme zegt zelf dat de companions "in
+Phase 2" komen. De commandlet-route uit §16.12 kan M1.1 op dit moment dus überhaupt
+niet genereren zonder eerst seed-entries te schrijven, en dát is precies het opschrijven
+van de castingkeuze die nog niet gemaakt is. Let op: het model in die seed is
+`eleven_multilingual_v2`, niet `eleven_v3` — wie hem ongewijzigd draait, herhaalt de
+fout van 31-07.
+
+**Wat "alle acht stemmen resolven" wél en niet betekende.** Dat klopte: geen lege
+sleutel. Maar resolven is niet hetzelfde als *uniek* resolven, en die controle bestond
+niet — `check_voice_resolves.py` meldde beide helften van elk botsend paar als "CAST
+AND READY". Dat is nu gerepareerd: de tool groepeert op stem-ID en faalt (exit 1) als
+twee **rollen** er een delen. Aliassen van één personage (`threx`/`dahl_threx`) tellen
+terecht niet mee. Controleproef gedaan: met de drie botsingen opgelost verdwijnt het
+blok en gaat de check groen — hij kan dus echt bewegen en staat niet permanent rood.
+
+**Wat er nodig is om dit alsnog te draaien:** antwoord op O-13 (zes botsingen, waarvan
+twee in M1.1) en O-3 (eclipse_fighter slot C en D hebben nog geen stem). Daarna is
+M1.1 een run van ~9.316 credits, S05 eerst.
 
 **2026-07-31 — casting stage 1 afgerond, 0 credits.** 18 rollen, 80 kandidaat-slots,
 uitsluitend metadata + de gratis previewfragmenten. Geen enkele TTS-call gedaan.

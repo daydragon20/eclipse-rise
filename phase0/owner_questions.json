@@ -24,12 +24,13 @@
   {
    "id": "O-13",
    "prio": "nu",
-   "vraag": "Drie stemmen zijn twee keer gekozen — welke verhuist?",
-   "waarom": "Een stem kan geen twee rollen spelen: de cache-sleutel bevat de stem-ID, dus twee personages met dezelfde stem klinken letterlijk identiek. Je eerste keuze botst op drie plekken, en een ervan is pijnlijk: LAURA staat bij Voss (vrouwelijk) en bij Kaya. ALICE staat bij Reyes en bij Kaine — je companion-medic en de Grand Marshal van de Dominion, die elkaar in akte 3 tegenkomen. DANIEL staat bij Torren en bij AEGIS, dus een mens en een machine. Je hebt per rol een reserve gekozen, dus voor elke botsing hoeft er maar EEN te verhuizen naar nummer twee. Zeg per botsing welke van de twee rollen de reserve krijgt; heb je geen voorkeur, dan kies ik en leg ik uit waarom.",
+   "vraag": "Zes stemmen zijn twee keer gekozen - welke verhuist?",
+   "waarom": "Een stem kan geen twee rollen spelen: de cache-sleutel bevat de stem-ID, dus twee personages met dezelfde stem klinken LETTERLIJK identiek - niet lijkend, identiek. Hier stonden drie botsingen. Het zijn er ZES, en de drie die ontbraken zijn de ergste, want ze zitten in de ijkmissie M1.1 die nu ingesproken zou worden.\n\nEERSTE KEUZE TEGEN EERSTE KEUZE (stonden er al):\n- LAURA bij Voss (vrouwelijk) en bij Kaya.\n- ALICE bij Reyes en bij Kaine - je companion-medic en de Grand Marshal van de Dominion, die elkaar in akte 3 tegenkomen.\n- DANIEL bij Torren en bij AEGIS, dus een mens en een machine.\n\nNIEUW EN LIVE - je tweede keuze is als bark-stem gebruikt, en botst daar met een eerste keuze:\n- MATILDA is Mara EN Eclipse-fighter B. Mara is de vrouw naar wie de missie heet; een willekeurige schutter naast haar zou exact haar stem hebben. 328 + 52 regels.\n- LIAM is Dex EN Dominion-conscript B - je monteur en een vijandelijke soldaat, tegenover elkaar in hetzelfde vuurgevecht. 267 + 9 regels.\n- ERIC is Threx EN Veil-operative B. 28 + 8 regels.\n\nDit kwam doordat 'top 2' twee dingen betekende: voor een personage een eerste keuze plus een RESERVE, voor een bark-register TWEE STEMMEN DIE ALLEBEI SPELEN. Jouw reserve voor Mara, Dex en Threx is daardoor als tweede bark-stem ingezet. Dat is mijn onduidelijkheid geweest, niet die van jou - dezelfde die in O-3 staat.\n\nPer botsing hoeft er maar EEN te verhuizen. Zeg per botsing welke rol de andere stem krijgt; heb je geen voorkeur, dan kies ik en leg ik uit waarom.",
    "stappen": [
     "Open de castingpagina; de botsende rollen staan gemarkeerd",
-    "Zeg per botsing wie de reservestem krijgt",
-    "Of laat het aan mij — dan verhuist de rol met de minste regels, want daar is omcasten later het goedkoopst"
+    "Zeg per botsing wie de andere stem krijgt",
+    "Voor de drie nieuwe botsingen is de goedkope kant de bark-slot: die hebben 52, 9 en 8 regels tegen 328, 267 en 28 voor de personages",
+    "Of laat het aan mij - dan verhuist steeds de rol met de minste regels, want daar is omcasten later het goedkoopst"
    ],
    "opties": [
     {
@@ -48,7 +49,7 @@
      "gevolg": "Prima, maar dan blijft casting open en kan Tier 1 niet starten. De botsingen moeten voor generatie weg."
     }
    ],
-   "advies": "Alice bij Reyes houden en Kaine de reserve geven ligt voor de hand — een medic die je 25 uur hoort weegt zwaarder dan een schurk in akte 3. Maar het is jouw oor.",
+   "advies": "Alice bij Reyes houden en Kaine de andere stem geven ligt voor de hand - een medic die je 25 uur hoort weegt zwaarder dan een schurk in akte 3. Voor de drie nieuwe: laat Mara, Dex en Threx staan en geef de bark-slots een verse stem; dat is de kant met veruit de minste regels. Maar het is jouw oor.",
    "vrijtekst": true
   },
   {
@@ -171,13 +172,14 @@
   },
   {
    "id": "O-4",
-   "prio": "gauw",
-   "vraag": "IJkmissie M1.1 — hij wordt NU ingesproken",
-   "waarom": "STAND VERANDERD VANNACHT. Deze kaart stond op 'wacht op mij'. Dat klopt niet meer: M1.1 is door de kwaliteitspoort. Alle zeven scènes staan op GO na DRIE rondes — de eerste vond zeven defecten, de tweede vier, en de derde tekende af.\n\nTwee voorbeelden van wat die poort tegenhield, zodat je weet waar hij voor betaalt. In de debrief zei Mara 'ze zullen zes vermiste mannen tellen', terwijl er in twee van de drie takken víjf doden zijn en één man leeft — en dat is niet te repareren nadat het ingesproken is. En de arts sprak over 'één gewonde' terwijl de conditie op elke neergegane squadgenoot vuurt: bij twee gewonden had ze het over de verkeerde.\n\nOOK GEMETEN: alle acht stemmen die deze missie nodig heeft resolven — Mara, Voss (mannelijk én vrouwelijk), Dex, Reyes en de vier bark-slots die jij hebt gekozen. Er is geen enkele lege sleutel in M1.1.\n\nHij wordt nu ingesproken: ongeveer 9.332 credits van je 125.612, alleen deze missie, met de opdracht te stoppen als de gemeten uitgave meer dan een kwart van mijn schatting afwijkt. Zodra het klaar is verschijnen hier afspeelknopjes en is de vraag echt aan jou.\n\nWAAROM DIT VÓÓR O-14 GAAT: je kunt niet zinnig beslissen hoe act 1 binnen het budget moet als je nooit gehoord hebt hoe act 1 klinkt.",
+   "prio": "nu",
+   "vraag": "IJkmissie M1.1 - klaar om ingesproken te worden, maar casting blokkeert",
+   "waarom": "STAND VERANDERD. Deze kaart zei 'hij wordt NU ingesproken'. Dat is niet gebeurd, en je hoort waarom - er is geen krediet uitgegeven, saldo staat nog op 125.612.\n\nHET SCRIPT IS WEL KLAAR. Alle zeven scenes staan op GO na DRIE rondes - de eerste vond zeven defecten, de tweede vier, de derde tekende af. In de debrief zei Mara 'ze zullen zes vermiste mannen tellen' terwijl er in twee van de drie takken vijf doden zijn en een man leeft, en dat is niet te repareren nadat het ingesproken is. De arts sprak over 'een gewonde' terwijl de conditie op elke neergegane squadgenoot vuurt. Ook nagemeten: alle audio-tags vallen binnen de goedgekeurde set en geen regel heeft er meer dan twee.\n\nWAT WEL BLOKKEERT: twee stemmen zijn in deze missie dubbel gecast. MARA en Eclipse-fighter B zijn allebei Matilda; DEX en Dominion-conscript B zijn allebei Liam. Niet lijkend - dezelfde stem-ID, dus dezelfde stem. De vorige melding zei 'alle acht stemmen resolven', en dat klopte ook: ze wijzen alle acht ergens naar. Alleen wees er niet bij dat twee paren naar HETZELFDE wijzen. Die controle bestond niet; hij bestaat nu wel.\n\nWAAROM IK NIET TOCH BEGONNEN BEN. Casting is permanent: de cache-sleutel is hash(stem + tekst + emotie + model), dus wie later van stem wisselt, betaalt elke regel van dat personage opnieuw. Van de 9.316 credits van M1.1 hangt 6.111 - 66% - aan stemmen die nog niet vastliggen. En je zou naar een Mara luisteren die niet de Mara is die je gaat horen, om daarmee O-14 te beantwoorden.\n\nAntwoord O-13 en O-3, dan draait dit dezelfde dag.",
    "stappen": [
-    "Nog even niets — de generatie loopt",
-    "Zodra er audio is: luister of de stemmen NÁÁST elkaar werken, niet alleen los",
-    "Één ding zeggen: 'zo moet het klinken' of 'nee, want…' — bij nee gaat de standaard bij en gaat M1.1 er nog een keer doorheen"
+    "Beantwoord O-13: zes stembotsingen, waarvan twee in deze missie",
+    "Beantwoord O-3: Eclipse-fighter slot C en D hebben nog geen stem",
+    "Daarna gaat M1.1 in een keer door de generatie, scene S05 eerst",
+    "Zodra er audio is: luister of de stemmen NAAST elkaar werken, niet alleen los"
    ],
    "meer_info": "**Waarom dit de belangrijkste knop van het project is**\n\nAls de schrijfstandaard fout is, wil je dat weten bij missie 1 — niet bij missie 34.\n\n**Waar je op let (jouw oordeel, niet dat van een test):**\n\n- Zijn de personages van elkaar te onderscheiden zonder dat je de naam ziet?\n- Legt iemand iets uit wat je al begreep? Dat is de meest voorkomende fout\n- Is er een zin waarvan je denkt: dat zegt niemand?\n- Praat iemand over het geweervuur heen?\n- Zit er humor in, en komt die van het personage of van de schrijver?\n\n**Bij nee gebeurt er iets nuttigs:** de standaard wordt bijgesteld en M1.1 gaat er nog eens doorheen. Dat kost dagen. Hetzelfde probleem ontdekken na 42 missies kost de maand. Zeg dus gerust nee.",
    "opties": [
