@@ -26,7 +26,9 @@ Three consequences follow, and all three are load-bearing:
 
 ## 19.2 The Budget — 310,000 credits, one month, no rollover
 
-**The situation.** The account holds **310,000 credits**, they expire at the end of the month, and they do not roll over. A €11 top-up month is possible but the owner would rather not. So: spend it all, spend it on the right things, and spend nothing twice.
+**The situation.** The account holds **310,000 credits**. They **expire on 21 August 2026** (owner-confirmed 2026-07-31) and they do not roll over. A €11 top-up month is possible but the owner would rather not. So: spend it all, spend it on the right things, and spend nothing twice.
+
+**That is 21 days.** The working deadline is **19 August**, not the 21st — two days of buffer, because a failed batch on the last evening cannot be re-run.
 
 **The arithmetic.** ≈1 credit = 1 character. ~6 characters per word including spaces.
 

@@ -71,7 +71,7 @@ bouwstap is.
 
 | # | Actie | Blokkeert |
 |---|---|---|
-| O-1 | **Verloopdatum van de 310k ElevenLabs-credits bevestigen** | de hele spoor-A-kalender |
+| ~~O-1~~ | ~~Verloopdatum credits~~ — **✓ beantwoord 31-07: 21 augustus 2026.** Werkdeadline generatie = **19 augustus** (2 dagen buffer). Kalender staat in `SCRIPT_PRODUCTION_PLAN.md` §4. | — |
 | O-2 | Commerciële gebruiksrechten bevestigen op het abonnement | bulk-generatie |
 | O-3 | Stemmen kiezen uit de kandidaten (smaak, niet techniek) | alles wat gesproken wordt |
 | O-4 | IJkmissie M1.1 beluisteren en goed-/afkeuren | de massaproductie |

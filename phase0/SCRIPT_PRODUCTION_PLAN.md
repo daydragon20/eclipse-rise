@@ -88,18 +88,20 @@ M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
 
 ## 4. De sprintkalender
 
-De credits vervallen einde maand en rollen niet door. Dagnummers, niet datums — **de eigenaar moet de exacte verloopdatum bevestigen** (zie §7, O-1), want die schuift alles.
+**De credits vervallen op 21 augustus 2026** (owner-bevestigd 31-07) en rollen niet door. Dat zijn 21 dagen. **Werkdeadline is 19 augustus** — twee dagen buffer, want een mislukte batch op de laatste avond is niet meer over te doen.
 
-| Dagen | Spoor A (schrijven & stem) | Spoor B (systemen & feel) |
+| Datum | Spoor A (schrijven & stem) | Spoor B (systemen & feel) |
 |---|---|---|
-| **D1–D2** | Casting-tests: 2–3 kandidaatstemmen × 12 signature-regels, eigenaar kiest, tabel gelockt (Tier 0, 5k) | HUD-laag: schermelementen 1e/3e persoon |
-| **D3–D7** | **IJkmissie M1.1** door alle lagen. Eigenaar hoort hem. | HUD verder; inslagspoor-dossier in de editor |
-| **D8** | **Gate L0.** Akkoord? → massaproductie. Nee? → standaard bijstellen, één iteratie, opnieuw. | trillen-dossier |
-| **D8–D12** | **L1: beat-sheets alle 42 missies.** story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
-| **D10–D24** | **L2: dialoog.** dialogue-writer ×4–6 parallel, één missie per agent. critic gate per scène. Loopt over L1 heen zodra act 1 se beats gelockt zijn. | reguliere backlog `EXECUTION_PLAN.md` |
-| **D12–D28** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Stopt bij 290k. | audio-import, bark-bedrading |
-| **D26–D30** | Acts 2–4 script-compleet afmaken (kost geen credits) | L4-wereldbeschrijving start |
-| **D30** | **Ledger sluiten.** Wat niet gegenereerd is, staat als tekst klaar. | |
+| **31/07 – 01/08** | Casting-tests: 2–3 kandidaatstemmen × 12 signature-regels, eigenaar kiest, tabel gelockt (Tier 0, 5k) | HUD: de drie hoogtes, 1e/3e persoon |
+| **02/08 – 06/08** | **IJkmissie M1.1** door alle lagen. Eigenaar hoort hem. | HUD verder; inslagspoor in de editor |
+| **07/08** | **Gate L0.** Akkoord? → massaproductie. Nee? → standaard bijstellen, één iteratie, opnieuw. | trillen-dossier (Rewind Debugger eerst) |
+| **07/08 – 11/08** | **L1: beat-sheets alle 42 missies.** story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
+| **09/08 – 17/08** | **L2: dialoog.** dialogue-writer ×4–6 parallel, één missie per agent. Critic-gate per scène. Start zodra act 1's beats gelockt zijn — niet wachten op act 4. | reguliere backlog `EXECUTION_PLAN.md` |
+| **10/08 – 19/08** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Stopt bij 290k. | audio-import, bark-bedrading |
+| **19/08** | **HARDE STOP generatie.** Ledger sluiten. | |
+| **20/08 – 21/08** | Acts 2–4 script-compleet afmaken (kost geen credits) | L4-wereldbeschrijving start |
+
+**Waarom de generatie op 19/08 stopt en niet op de 21e:** als een batch op de laatste avond misgaat — verkeerde tag, verkeerde stem, afgebroken run — is er geen tijd meer om hem over te doen, en de credits zijn weg. Twee dagen buffer is het verschil tussen een deadline halen en hem missen.
 
 **Parallelle overlap is bewust.** L2 start op dag 10, terwijl L1 nog aan act 3 werkt — omdat act 1's beats dan al gelockt zijn en schrijvers daar meteen op kunnen. Lagen locken *per act*, niet pas als alle vier klaar zijn. Dat is het verschil tussen een lagenmodel en een waterval.
 
@@ -138,7 +140,7 @@ Negen agents, waarvan vijf nieuw. Precieze systeemprompts staan in `.claude/agen
 
 | # | Actie | Blokkeert | Wanneer |
 |---|---|---|---|
-| **O-1** | **Bevestig de exacte verloopdatum van de 310k credits** in het ElevenLabs-account (Billing → renewal date). De hele kalender in §4 hangt hieraan. | Alles in spoor A | **Nu, 2 min** |
+| ~~O-1~~ | ~~Verloopdatum credits bevestigen~~ — **✓ gedaan 31-07: 21 augustus 2026.** §4 staat nu op echte datums, met 19/08 als werkdeadline. | — | Afgerond |
 | **O-2** | **Bevestig commerciële gebruiksrechten** op het huidige abonnement — en of de gekozen stemmen uit de Voice Library eigen voorwaarden dragen. Dit is een ship-blocker, geen detail. | L3 bulk-generatie | Vóór D3 |
 | **O-3** | **Kies de stemmen** uit de kandidaten die `voice-director` voorlegt (§19.3). Smaak, niet techniek — dit is jouw beslissing. | L3, en dus alles | D2 |
 | **O-4** | **Luister naar de ijkmissie** en geef akkoord of afkeuring. | L0-gate → massaproductie | D7–D8 |
