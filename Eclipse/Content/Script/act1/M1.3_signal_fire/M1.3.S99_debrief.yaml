@@ -15,7 +15,7 @@ turn:         "She marks it anyway, and asks Voss where the next one goes."
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        204
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
@@ -37,4 +37,210 @@ words:        0
 # writer:    NOBODY SAYS THIS IS A TURNING POINT. 18.9 A bans the thesis line. The mark on
 #            the map does the work; a character announcing it makes it smaller.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+#
+# *** THE STRATEGY LAYER ANSWERS, AND NOBODY EXPLAINS IT. ***
+# Three places, none of them a statement:
+#   .080-.110  a fighter reports people at the top of the stair. Mara asks how many. The
+#              number he gives is bigger than the number he saw on his way down. That is
+#              the district turning, measured in the only unit this game trusts - people -
+#              and it takes four lines and no adjectives.
+#   .230       Voss names the next place. He is answering a strategic question with a
+#              district, which is the map layer coming out of a mouth. The `strategic`
+#              variant is the strongest version of the owner's note: a man who has already
+#              worked out that a deaf district is an open door. He never says the region
+#              flipped; he says what the flip is FOR.
+#   .140       eleven bunks. The cost of winning arrives as furniture.
+# Nothing in this file commits the flip. SPEC-P2-05 does that off Event.Mission.Completed
+# and it must stay the only writer of region state.
+#
+# omitted:  the depot optional. The beat sheet lists "+60 M, SupplyDepot stores intact",
+#           but MT_M13 ships with NO optional objective in data, on purpose (see the
+#           comment in setup_story_missions.py). Nobody in this room mentions a depot,
+#           because a debrief that congratulates the squad on an objective the runtime
+#           never scored is a lying line. ESCALATED - see report.
+# peak:     the map mark is a `shot` (.190) and the dialogue around it is a question about
+#           stationery and a one-word answer. That is on purpose. The banality is what
+#           makes it land, and it is the only way to hit the emotional peak of movement II
+#           without a thesis sentence. No direct_beat is spent in this mission (AR-12
+#           reserves act 1's single one for M1.8).
+# threx:    the walk-around is .160-.190. Dex says the air is open, says "anybody" twice,
+#           and does not say the name. Mara answers with one word about a time of day.
+#           Nobody mentions Threx and everybody in the room is thinking about him.
+# haste:    .260 "Four days." She overrules a week without giving a reason and nobody asks
+#           for one. Second plant of the thing that kills her, after M1.3.S06.210.
+# defer:    .220 is the second time she puts Voss's judgement above her own (after
+#           M1.1.S04), and she does it by handing him an object, not a compliment.
+# reyes:    zero contractions in six lines. She is the one keeping the count and she is
+#           the one who is cut off for keeping it (.140/.150).
+# dex:      his joke comes back at .280 and it is a callback to S01.360 - the gloves. Half
+#           strength, which is the right strength, because he lost the other half in S06.
+# band:     `cutscene` (20-60) read as a ceiling. Longest line 15 w. Same ruling as S01.
+# variance: 1 w (.100 "Nine.") to 15 w (.130) = 15x.
+# em-dash:  two interrupted lines in 28 (.070/.080, .140/.150). Rate 1:14.
+
+lines:
+  - id:      M1.3.S99.010
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Two burns and a shoulder."
+    shot:    "They come down the last flight one at a time. Reyes is counting them in without appearing to."
+
+  - id:      M1.3.S99.020
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "The shoulder will not lift above here for six weeks."
+
+  - id:      M1.3.S99.030
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Six weeks."
+
+  - id:      M1.3.S99.040
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "I do not guess at that. Six."
+    note:    "18.4 Reyes: never guesses out loud, and says so when somebody hopes she might. No contractions - she has been awake for nineteen hours."
+
+  - id:      M1.3.S99.050
+    speaker: DEX
+    voice:   dex_callum
+    text:    "It didn't fall. It folded. Like it sat down."
+
+  - id:      M1.3.S99.060
+    speaker: DEX
+    voice:   dex_callum
+    text:    "That's a good casting failing correctly. That's a beautiful thing."
+
+  - id:      M1.3.S99.070
+    speaker: DEX
+    voice:   dex_callum
+    text:    "And the crowns came in on top of it and the whole plaza just--"
+
+  - id:         M1.3.S99.080
+    speaker:    FIGHTER_A
+    voice:      eclipse_fighter_a
+    interrupts: true
+    text:       "There's people at the top of the stair."
+
+  - id:      M1.3.S99.090
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "How many."
+
+  - id:      M1.3.S99.100
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Nine."
+
+  - id:      M1.3.S99.110
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "There were four when I came down."
+    shot:    "Nobody says anything for a moment. Somewhere above them a door is being held open."
+    note:    "The Foothold, felt and not stated. The number grew while a man walked down a stair. Nobody in the room comments on it, which is the only reason it works."
+
+  - id:      M1.3.S99.120
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "Take names. Nothing else tonight."
+    note:    "She wants them and she holds. M1.6.S06 is where she stops holding, and that beat belongs to that writer - this is a rhyme, not a payment."
+
+  - id:      M1.3.S99.130
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Names and hands. I would like to know which of them can hold a light."
+
+  - id:      M1.3.S99.140
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "There are eleven bunks in that room and I have counted--"
+
+  - id:         M1.3.S99.150
+    speaker:    MARA
+    voice:      mara_sovann
+    interrupts: true
+    text:       "Then somebody gives up a bunk."
+    note:       "She cuts off the person doing the arithmetic. That is the haste, one scene before it is named as anything."
+
+  - id:      M1.3.S99.160
+    speaker: DEX
+    voice:   dex_callum
+    text:    "The band's open now. The whole district."
+
+  - id:      M1.3.S99.170
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Anybody can hear anything."
+
+  - id:      M1.3.S99.180
+    speaker: DEX
+    voice:   dex_callum
+    tags:    [beat]
+    text:    "Anybody."
+    shot:    "He is talking to the table. Nobody picks it up."
+    note:    "The walk-around. The name is never said in this room, tonight or in this act."
+
+  - id:      M1.3.S99.190
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Morning."
+    shot:    "She pulls the district sheet flat, takes a grease pencil out of her coat, and marks the checkpoint. It takes about two seconds. Nobody in this cell has seen her use that pencil."
+    note:    "EMOTIONAL PEAK OF MOVEMENT II. One word about a time of day, and a mark. No thesis line, no music cue in the text, nobody names what it is."
+
+  - id:      M1.3.S99.200
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Is that pencil going to come off?"
+
+  - id:      M1.3.S99.210
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "No."
+
+  - id:      M1.3.S99.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Say where the next one goes."
+    shot:    "She holds the pencil out. Not to the room."
+    note:    "Second deferral to Voss after M1.1.S04, and she does it with an object instead of a compliment. AR-5 clean - no 'you' anywhere in the line."
+
+  - id:      M1.3.S99.230
+    speaker: VOSS
+    voice:   voss
+    text:    "Foundry Row."
+    note:    "The strategy layer in a mouth. FoundryRow is exactly what SPEC-P2-05's Foothold opens up (setup_story_missions.py: MT_M14 becomes selectable because TransitCheckpoint is now player-held). He is reading a map that changed tonight and he does not say that it changed."
+    variants:
+      pragmatist: "Foundry Row. They keep the rifles and we keep counting rounds."
+      idealist:   "Foundry Row. The nine at the top of that stair came with nothing."
+      personal:   "Foundry Row. My shift-mark is still cut in that gate."
+      strategic:  "Foundry Row. This district is deaf for a week. Deaf is a door."
+
+  - id:      M1.3.S99.240
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "When."
+
+  - id:      M1.3.S99.250
+    speaker: VOSS
+    voice:   voss
+    text:    "Give it a week."
+
+  - id:      M1.3.S99.260
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Four days."
+    note:    "No reason offered, none asked for. This is the haste that kills her, planted twice in one mission and explained neither time."
+
+  - id:      M1.3.S99.270
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Four days."
+
+  - id:      M1.3.S99.280
+    speaker: DEX
+    voice:   dex_callum
+    text:    "I want the gloves back before then."
+    shot:    "Mara is still holding the pencil. She has not put it down since she marked the sheet."
+    note:    "The joke returns at half strength, and it is the S01.360 gloves. He got some of it back. Not all of it."

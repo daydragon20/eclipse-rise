@@ -178,6 +178,7 @@ Each finalist speaks **three** lines, not one:
    - Kaine: *"I am going to burn the eastern span. I am telling you so you can move your people."*
    - Threx: *"You have your aunt's hands. Did anyone ever tell you that?"*
    - AEGIS: *"Compliance probability is falling. Intervention is scheduled."*
+   - Petra: *"Sit. Eat. Then tell me who died."*
 Once the owner has chosen, the `voiceId` goes into the casting table below **and into the dialogue DataAsset**, and is treated as canon. Locked means locked.
 
 ### Casting table
@@ -196,6 +197,7 @@ Once the owner has chosen, the `voiceId` goes into the casting table below **and
 | Whisper | — | — | — | ☐ |
 | Sela Vann | — | — | — | ☐ |
 | Brick (Oram Bex) | — | — | — | ☐ |
+| Petra Voss | — | — | — | ☐ |
 | Malachar Vex | — | — | — | ☐ |
 | Sera Kaine | — | — | — | ☐ |
 | Dahl Threx | — | — | — | ☐ |

@@ -36,16 +36,32 @@ Structureel is dit de scène waar de motor van act 1 zijn cirkel sluit. Elke ove
 | Veil, Radiant Guard-achtige bewaking | barks |
 | Gevangenen (3–4 sprekende bijrollen) | S03, S09 |
 
-### Petra Voss — voorstel voor haar fingerprint *(C-5, owner-akkoord nodig)*
-§18.4 geeft haar niets, en vier schrijvers zonder fingerprint leveren vier Petra's. Mijn voorstel, in het formaat van §18.4:
+### Petra Voss — fingerprint VASTGESTELD *(ruling L1-R9, 2026-07-31)*
+Staat nu in `18_writing_standard.md` §18.4, sectie *Recurring non-companion voices*. Signature-regel in §19.3: ***"Sit. Eat. Then tell me who died."*** **Schrijfbaar. Nog niet gecast** — dat is de owner-keuze die overblijft van Q-3.
 
 | | |
 |---|---|
-| **Syntax** | Korte imperatieven. Huishoudelijk vocabulaire waar iedereen om haar heen militair praat ("ga zitten", "eet", "je handen zijn koud"). |
-| **Tic** | Beantwoordt een moeilijke vraag met een taak. Vraag haar wat ze hebben gedaan, en ze zegt dat je moet gaan zitten. |
-| **Nooit** | Laat zich bedanken. Noemt nooit wat haar is aangedaan. Zegt nooit dat ze trots is — ze laat het zien door werk te geven. |
+| **Syntax** | Imperatieven **met weggelaten voornaamwoord**. Huishoudelijk/keukenvocabulaire waar iedereen om haar heen operationeel praat. Op één na kortste regels van het spel. |
+| **Tic** | Beantwoordt een vraag die ze niet wil beantwoorden door een taak uit te delen. |
+| **Nooit** | **Zegt nooit "je" of "jouw".** Laat zich nooit bedanken. Noemt nooit wat haar is aangedaan. |
 
 Waarom dit werkt: het maakt haar het **tegengif voor de hele act**. Iedereen om haar heen praat in operaties; zij praat in maaltijden. En het maakt haar latere rol (§2.11: *"the hideout's quiet heart"*) mechanisch: ze deelt taken uit, en dat is precies wat een basis nodig heeft.
+
+**Twee harde scheidingen, en ze zijn allebei controleerbaar:**
+- **Tegen Brick:** hij geeft je een zelfstandig naamwoord, zij een werkwoord. Nodig voor de strip-test (§18.9 C1) — twee laconieke personages in één cast.
+- **Tegen Mara, en dit is de dragende:** Mara spendeert vier scènes later in S08 de enige "jij" van het spel, en dat woord ís de commando-overdracht (AR-5b). Petra's imperatieven laten het voornaamwoord weg, dus het woord blijft schaars over de hele climax en Mara's ene gebruik landt in een vacuüm. **Een regex over S04 moet nul treffers geven op "you"/"your".**
+
+**Ze noemt hem ook nergens bij naam** (ruling L1-R10). Zie §2b.
+
+### 2b. De gedeelde achternaam — wat vastligt *(ruling L1-R10)*
+
+Canon (§2.4): de ouders stierven bij de **Foundry Collapse van 484 AE**, die AEGIS boekte als *optimal loss allocation* — ontdekbaar in act 3. Voss was toen **zeven**; Petra was **36** toen ze hem overnam.
+
+1. Ze draagt de naam **door bloed**. Wiens zus ze is blijft open — dat invullen kost canon en levert niets op.
+2. **Zij is de laatste volwassene die de naam draagt.**
+3. **De achternaam is de draad tussen de Foundry Collapse en de AEGIS-onthulling.** De doden die AEGIS als optimale verliesallocatie boekte, zijn de mensen wier naam de speler de hele game draagt. Die draad lag ongebruikt in de canon.
+4. **Petra noemt de hoofdpersoon nergens iets.** Geen naam, geen "je" — alleen taken. §2.4 zet de achternaam vast *"for voiced dialogue"*, dus de voornaam wordt nooit ingesproken; iedereen zegt "Voss", vanaf M1.8 "Cinder". Zij is de enige levende die hem kende voordat een van beide woorden iets betekende. **Zo wordt de hardste VO-beperking van het spel een eigenschap in plaats van een gat.**
+5. **De beat waar dit samenvalt is S99**, niet S04. Zie daar.
 
 ---
 

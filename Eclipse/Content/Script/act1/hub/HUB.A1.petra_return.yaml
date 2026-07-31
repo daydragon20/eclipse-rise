@@ -22,8 +22,14 @@ words:        0
 # condition: story.char_petrarescued == true
 # flags-out: none
 #
-# BLOCKED ON OWNER QUESTION Q-3 (casting row + fingerprint - findings C-4 and C-5).
-# Architect fingerprint proposal is in phase0/beats/BEATS_M1.8.md section 2.
+# UNBLOCKED for writing 2026-07-31 - ruling L1-R9. Fingerprint: 18_writing_standard.md 18.4.
+# Casting still open (owner picks the voice).
+#
+# NOT VOICED THIS MONTH - ruling L1-R11. The credit budget was corrected to 131,000 and the
+# act 1 hub tier fell out. This scene stays as text and waits. Write it anyway: it costs
+# nothing and it ships the moment credits exist.
+#
+# Petra: elided imperatives, no "you"/"your", never accepts thanks, never names him.
 #
 # purpose:   Petra fills the hole Mara left with WORK, not with comfort, and that is
 #            exactly why it works. 2.11: she becomes "the hideout's quiet heart" - this is

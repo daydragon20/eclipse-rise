@@ -88,7 +88,21 @@ This is the spine of parallel writing. Each character has a **syntax fingerprint
 | **Sela Vann** (23, organizer) | Rhetorical structure even in private. Second person plural. | Reframes a personal question as a collective one | Never speaks about herself for more than one line. |
 | **Brick** (34, heavy) | Fewest words of anyone. Often a single noun. | Answers difficult questions by naming a dead soldier | Never lies. Never speaks first in a group. |
 
-### Villains
+### Recurring non-companion voices
+
+Not squad members, but they speak across acts and therefore need fingerprints. Added by `story-architect` 2026-07-31 (ruling L1-R9); reasoning in `phase0/beats/RULINGS_L1.md`.
+
+| Character | Syntax fingerprint | Tic | Never |
+|---|---|---|---|
+| **Petra Voss** (55, the aunt) | **Imperatives with the pronoun elided.** Household and kitchen nouns where everyone around her uses operational ones. Second-shortest lines in the game. | Answers a question she will not answer by assigning a task | **Never says "you" or "your".** Never accepts thanks. Never names what was done to her. |
+
+**Petra vs. Brick — the two laconic characters must not blur.** Both are terse, so §18.9 C1's strip test needs a mechanical difference: **Brick hands you a noun, Petra hands you a verb.** He answers with a name; she answers with a job. Two short lines side by side should be reassignable on that alone.
+
+**Petra vs. Mara — deliberately separated, and this one is load-bearing.** Mara's arc turns on a pronoun: she says "we" for the entire game and spends "you" exactly once, in `M1.8.S08`, and that word *is* the transfer of command (`ACT1_OVERVIEW.md` AR-5/AR-5b). Petra speaks in the same act climax, four scenes earlier. If she were also working in second person, that ladder would collapse.
+
+She is not, because **her imperatives elide the pronoun**: "Sit down." contains no "you". So the word is scarce across the whole climax, and Mara's single use of it lands in a vacuum. This is checkable with a regex, which is the point — it is a designed separation, not a lucky one.
+
+**Her one reserved break:** exactly once in the campaign, Petra **asks instead of instructs**. Not before Act 3. Unspent as of Act 1.
 
 | Character | Syntax fingerprint | Tic | Never |
 |---|---|---|---|

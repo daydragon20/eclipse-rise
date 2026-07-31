@@ -15,7 +15,7 @@ turn:         "Voss decides, and whichever way he decides, one of the two cells 
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        290
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, the emissary, BRICK, MARA; the shift boss
@@ -45,4 +45,178 @@ words:        0
 #            He is just a man in his kitchen.
 #            Full Voss variant coverage on both axes.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# format:    L1-R2 choice field used, group m15_shiftboss, three options, one flag.
+#            L1-R3 honoured: story.m15_shiftboss = killed | prevented | warned, mapping to
+#            Story.Choice.M15_ShiftBoss.Killed / .Prevented / .Warned. Not collapsed.
+#            Read by S05.170 and by M1.6.S06.
+# band:      cutscene (20-60). Ceiling respected (max 22 w), register reached at .060.
+# spread:    1 w (.100 / .170) to 22 w (.060) = 22x.
+#
+# NOTE FOR THE M1.6 WRITER (Sela's judgement, M1.6.S06):
+#   killed    = dead. The sheets stop. Two hundred and six names' worth of arithmetic
+#               is on Ember's side of the ledger and Sela will not be impressed by it.
+#   prevented = alive, still in the district, files again on Tuesday. Nothing changed
+#               except that Ember was in the room and said no.
+#   warned    = alive, gone, sheet unfiled, and somewhere out there a frightened man
+#               knows two cells' faces.
+#   Those are three different worlds. That is why they are three tags.
+#
+# mara:      ZERO LINES. Not one, in the entire scene. Her silence is written as two shots
+#            (.090, .100) and this is the second time in the act she leaves a decision with
+#            Voss - after M1.1.S05.110, deliberately echoed at .100. Same word, same
+#            silence, and this time she does not even turn around.
+# brick:     zero lines. A man who never lies has nothing to add to an execution, and
+#            saying so would be a speech.
+# counterweight:
+#            .060 IS THE MISSION'S MOST IMPORTANT LINE AND IT BELONGS TO THE RIVAL. The
+#            emissary himself puts the case for the man he came to kill, without softening
+#            his own case by a word. That is what stops the Iron Chorus being a straw man,
+#            and .070 is why he is going to do it anyway.
+# boss:      exactly two lines (.050, .080). He confirms, then gives one fact about his
+#            household. No plea, no denial, no explanation. His second line is the most
+#            dangerous thing in the scene precisely BECAUSE it is not a plea - he is telling
+#            them when to be gone, not asking them to leave.
+# variants:  full four-axis coverage on all three options. This scene, S02 and S99 are where
+#            act 1's variant budget belongs (C-6 option b).
+# omitted:   any line stating what the choice means. Nobody delivers a verdict before or
+#            after; the emissary's three reactions are observations. See report.
+
+lines:
+  - id:      M1.5.S04.010
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "He files for the fourth gallery and the sixth. Absentee sheets. Tuesdays, before the second horn."
+    shot:    "A kitchen. Two cups on the drainer. The man is standing, because they came in while he was standing."
+
+  - id:      M1.5.S04.020
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Two hundred and six names off those sheets since the winter. The Tithe took every one."
+
+  - id:      M1.5.S04.030
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Ask him."
+
+  - id:      M1.5.S04.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Is that right?"
+
+  - id:      M1.5.S04.050
+    speaker: CIVILIAN_A
+    voice:   civilian_kessara_a
+    text:    "Fourth and sixth. Tuesdays."
+    note:    "SHIFT BOSS, LINE 1 OF 2. He denies nothing and corrects nothing. He answers the way he files."
+
+  - id:      M1.5.S04.060
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "He kept two galleries fed right through the winter as well. Signed men onto the sheet who were never at the bench."
+    note:    "*** THE COUNTERWEIGHT, AND IT COMES FROM THE MAN HOLDING THE LIST. *** He will not win this with an incomplete file. It costs him nothing, because of .070, and it is why the Iron Chorus is worth an alliance."
+
+  - id:      M1.5.S04.070
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "The galleries were last winter. The sheets are Tuesday."
+
+  - id:      M1.5.S04.080
+    speaker: CIVILIAN_A
+    voice:   civilian_kessara_a
+    text:    "My wife works the night line. She's back at the fourth horn."
+    shot:    "He says it to the table. It is not a plea and he does not let it become one."
+    note:    "SHIFT BOSS, LINE 2 OF 2. A fact, offered by a man whose whole trade is facts on a form. He is telling them when to be gone."
+
+  - id:      M1.5.S04.090
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "She has nothing to say. I noticed that in the gallery too."
+    shot:    "Mara is at the door with her back to the kitchen. She has not come inside."
+
+  - id:      M1.5.S04.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Mara."
+    shot:    "She does not turn around."
+    note:    "Deliberate echo of M1.1.S05.110. Same word, same silence, and this time she does not even face him. 18.7 - the silence is the scene."
+
+  - id:      M1.5.S04.110
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_shiftboss
+      set:   'story.m15_shiftboss = "killed"'
+      label: "Let it happen."
+    text:    "It's your list."
+    variants:
+      pragmatist: "It's your list and your night. Do it."
+      idealist:   "It's your list. I'm not going to pretend I stopped it."
+      personal:   "Your list. I'll stand where I am."
+      strategic:  "Your list. Ember counts the ones after this."
+
+  - id:      M1.5.S04.120
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_shiftboss
+      set:   'story.m15_shiftboss = "prevented"'
+      label: "Stop it."
+    text:    "Nobody does this tonight."
+    variants:
+      pragmatist: "He files Tuesday. There are ways to take a Tuesday off a man."
+      idealist:   "Nobody does this tonight. Not with us standing in his kitchen."
+      personal:   "His wife is back at the fourth horn. Nobody does this tonight."
+      strategic:  "Kill him and the next one files scared, and files faster."
+
+  - id:      M1.5.S04.130
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_shiftboss
+      set:   'story.m15_shiftboss = "warned"'
+      label: "Warn him. Let him vanish."
+    text:    "Tuesday there's no sheet. Be gone by the second horn."
+    variants:
+      pragmatist: "No sheet Tuesday, and no house Tuesday either. Take her with you."
+      idealist:   "Don't file. Then take her and go, and don't stop in this district."
+      personal:   "Take your wife and go. Tuesday there is no sheet."
+      strategic:  "Stop filing and disappear. A missing clerk costs them a month."
+
+  - id:        M1.5.S04.140
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_shiftboss == "killed"'
+    text:      "Now we know each other."
+    shot:      "One of his fighters closes the kitchen door from the inside. The camera stays in the yard, with Mara."
+    note:      "No verdict. He got what he came for, and it was never the shift boss."
+
+  - id:        M1.5.S04.150
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_shiftboss == "prevented"'
+    text:      "Then we come back next Tuesday, and nobody from Ember will be here to have an opinion."
+
+  - id:        M1.5.S04.160
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_shiftboss == "warned"'
+    text:      "Warned men talk. That's not mercy. That's a delay with a mouth on it."
+    note:      "He is right a fourth time. Deferring keeps everybody alive tonight and it is also the option he can take apart."
+
+  - id:        M1.5.S04.170
+    speaker:   FIGHTER_C
+    voice:     eclipse_fighter_c
+    condition: 'story.m15_shiftboss != "killed"'
+    text:      "Tuesday."
+    shot:      "She says it on her way past the shift boss, and not to him."
+
+  - id:      M1.5.S04.180
+    speaker: FIGHTER_D
+    voice:   eclipse_fighter_d
+    text:    "Lights on the row. Both ends."
+
+  - id:      M1.5.S04.190
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "That's not a warden patrol."

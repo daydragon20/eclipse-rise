@@ -15,7 +15,7 @@ turn:         "Brick speaks first, for the only time in the act, and after that 
 # ---- state ----
 status:       draft
 critic:       null
-words:        232
+words:        229
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
@@ -34,73 +34,74 @@ words:        232
 #            explain the beat, and explaining it is what kills it.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      type is `cutscene` (20-60 per 18.3), read as a CEILING, exactly as M1.1
-#            established (see M1.1.S01 L2 notes). The 3x variance rule and a 20-word floor
-#            cannot both hold. Ceiling respected: longest line 20 w.
-# variance:  1 w (.150 "No." is in S03; here 4 w ".020") to 20 w (.070) = 5x.
-# ar-5:      Mara spends no "you" and no "your" anywhere in this scene. Checked line by line.
-# brick:     .140 is the beat. It is written as an INTERRUPTION, not a turn - he cuts across
-#            a question that was not aimed at him and answers a different one. Nobody in the
-#            room acknowledges that he spoke; the shot is the only reaction and it is silence.
+# band:      `cutscene`. Ceiling 60, respected (longest 21 w at .070). Register reached at
+#            .070 (21 w >= 20). Spread 4 w (.020) to 21 w (.070) = 5.25x. L1-R1 clean.
+# ar-5:      no "you" and no "your" in any Mara line in this scene. Checked line by line.
+# brick:     .140 IS the beat, and it is written as an INTERRUPTION. He cuts across a
+#            question that was not aimed at him and answers a different one. 18.4 says he
+#            never speaks first in a group; this once he does, over the top of somebody
+#            else, and no line in the room acknowledges it. The shot is silence and Dex
+#            looking at the map instead of at him. That is the entire reaction, per the stub.
 #            His two sentences are a fact about the cars that only a passenger would own.
 #            The player does not know that yet. He will in S03.
-# plants:    - the SWITCH (.180/.190) - Voss names the mechanism S04's choice turns on. Cashed
-#              in M1.6.S04.010-.060. Unremarked here.
-#            - "pays us in mouths" (.060) - Dex's phrase is the seed of S99's word problem.
-#            - "the ninth of the month" (.040) - Sela re-uses the date in S03.150 as the
-#              Blight's instalment plan. Same three words, different meaning.
-# choice:    .150 / .160 are the player's interjection (supplies angle / people angle).
-#            SCRIPT_FORMAT still has no player-choice construct - marked by note only, same
-#            escalation M1.1 already filed. .170 answers either one, so no flag is needed.
-# jokes:     Dex gets one comic beat in this scene (.060) and it is the frightened one (18.6).
-# omitted:   nobody says the mission is different from the other missions. The room already
-#            knows and saying it would be the thesis statement 18.9 A bans.
+# plants:    - THE SWITCH (.170 / .180). Voss names the mechanism S04's choice turns on.
+#              Cashed at M1.6.S04.010-.090. Unremarked here, and nobody asks him why.
+#            - "pays us in mouths" (.060). Dex's phrase is the seed of S99's word problem.
+#            - "the ninth of the month" (.040). Sela re-uses those five words in S03.170 as
+#              the Blight's instalment plan. The player hears them here as a freight timetable.
+# player:    .150 is Voss's interjection (18.7 - interjection satisfies the participation
+#            rule). It carries no `choice:` block on purpose: an option pair whose `set`
+#            nothing reads would fail L1-R2's choice-integrity check. One question, real,
+#            unbranched.
+# jokes:     Dex gets one comic beat (.060) and it is the frightened one (18.6).
+# omitted:   nobody says that this mission is different from the other missions. The room
+#            already knows, and saying it is the thesis statement 18.9 A bans.
 
 lines:
   - id:      M1.6.S01.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Fourteen cars leave the Mid-Works on the ninth. Twelve of them are ore."
     shot:    "Map table. She lays a length of cable across it for the line and weights both ends."
 
   - id:      M1.6.S01.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "And the other two?"
 
   - id:      M1.6.S01.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Grates in the roof. So they can be counted from above without anybody opening a door."
-    note:    "18.8 - the Tithe is told through what it takes, never explained."
+    note:    "18.8 - the Tithe is told through what it takes, and never explained."
 
   - id:      M1.6.S01.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "It runs on the ninth of every month, and it has never once been late."
-    note:    "The date. Sela re-uses it in S03.170."
+    note:    "The date. Sela re-uses it in S03.170 and it stops being a timetable."
 
   - id:      M1.6.S01.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Twelve cars of ore and we're going for the two with nothing in them."
 
   - id:      M1.6.S01.060
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     tags:    [nervous]
     text:    "Four cutting charges. That's the whole cabinet, on a train that pays us in mouths."
-    note:    "Dex's objection is GOOD and it is also his joke, and the joke costs him (18.6). Seeds S99."
+    note:    "Dex's objection is GOOD, and it is also his joke, and the joke costs him (18.6). Seeds S99's problem."
 
   - id:      M1.6.S01.070
     speaker: REYES
-    voice:   elin_reyes
-    text:    "How many of the wounded will be ours, and how many will be the ones we take off it?"
+    voice:   reyes
+    text:    "How many of the wounded will be ours, and how many will be the ones we are taking off the train?"
     note:    "18.4 Reyes: asks a question instead of accusing. It is also the only pricing nobody in the room had done."
 
   - id:      M1.6.S01.080
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "I have plasma for six people. I do not have it for sixty-six."
     note:    "No contractions. She is stressed and the training reasserts."
 
@@ -116,8 +117,8 @@ lines:
 
   - id:      M1.6.S01.110
     speaker: MARA
-    voice:   mara_sovann
-    text:    "Nobody outside the yard has ever counted them."
+    voice:   mara
+    text:    "Nobody outside that yard has ever counted them."
 
   - id:      M1.6.S01.120
     speaker: FIGHTER_B
@@ -135,52 +136,43 @@ lines:
     interrupts: true
     text:       "They water them at the yard. Not before."
     shot:       "Nobody had asked him anything. Nobody answers. Dex looks at the map instead of at him."
-    note:       "THE BEAT. AR-11's first payment. 18.4 says Brick never speaks first in a group; this once he does, and he does it over the top of somebody else. No explanation, no reaction line. The room's silence is the whole of it."
+    note:       "THE TURN. AR-11's first payment. 18.4: Brick never speaks first in a group; this once he does, and he does it over the top of somebody else. No explanation, no reaction line."
 
   - id:      M1.6.S01.150
     speaker: VOSS
     voice:   voss
     tags:    [pause]
-    text:    "What's in the other twelve?"
-    note:    "PLAYER OPTION 1 of 2 (supplies angle). No axis variants - budget ruling C-6/Q-7 option (b): variants only where the scene branches."
+    text:    "What happens to them at the yard?"
 
   - id:      M1.6.S01.160
-    speaker: VOSS
-    voice:   voss
-    tags:    [pause]
-    text:    "What happens to them at the yard?"
-    note:    "PLAYER OPTION 2 of 2 (people angle)."
+    speaker: MARA
+    voice:   mara
+    text:    "The manifest counts the ore. It counts the rest the same way."
 
   - id:      M1.6.S01.170
-    speaker: MARA
-    voice:   mara_sovann
-    text:    "The manifest counts the ore. It counts the rest the same way."
-    note:    "Answers either option, so no approach flag is required."
+    speaker: VOSS
+    voice:   voss
+    text:    "That line runs our side of the depot for a kilometre. There's a switch at the end of it."
+    note:    "18.4 Voss: names the mechanism, unasked. PLANT - S04's choice happens at this switch."
 
   - id:      M1.6.S01.180
     speaker: VOSS
     voice:   voss
-    text:    "That line runs our side of the depot for a kilometre. There's a switch at the end of it."
-    note:    "18.4 Voss: names the mechanism. PLANT - S04's choice happens at this switch."
+    text:    "Underworks spur one way, muster yard the other. Whoever's standing at that lever picks."
 
   - id:      M1.6.S01.190
-    speaker: VOSS
-    voice:   voss
-    text:    "Underworks spur one way, muster yard the other. Whoever's standing at that lever picks."
+    speaker: MARA
+    voice:   mara
+    text:    "Then we stand at it."
 
   - id:      M1.6.S01.200
     speaker: MARA
-    voice:   mara_sovann
-    text:    "Then we stand at it."
+    voice:   mara
+    text:    "Charges on the couplings, not the cars."
 
   - id:      M1.6.S01.210
     speaker: MARA
-    voice:   mara_sovann
-    text:    "Charges on the couplings, not the cars."
-
-  - id:      M1.6.S01.220
-    speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "Put it on the table."
     shot:    "She moves the cable up past the depot and leaves her hand on it. Dex is already looking at the cabinet with the four charges in it."

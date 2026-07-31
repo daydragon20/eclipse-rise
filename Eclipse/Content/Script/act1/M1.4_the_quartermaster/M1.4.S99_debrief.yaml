@@ -15,7 +15,7 @@ turn:         "She stops asking about his body and asks about the names, and he 
 # ---- state ----
 status:       draft
 critic:       null
-words:        301
+words:        302
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
@@ -92,13 +92,14 @@ lines:
   - id:      M1.4.S99.010
     speaker: DEX
     voice:   dex_callum
-    text:    "Twenty-six crates. Eleven rifles that fire today. Four more when I've had a night with them."
+    text:    "Nine crates out. Eleven rifles that fire today. Four more when I've had a night with them."
     shot:    "Bunk row. The haul is laid down the middle of the floor and there is nowhere left to walk."
+    note:    "Nine, against the four Dex costed in S01. The difference is Brick and nobody says so."
 
   - id:      M1.4.S99.020
     speaker: DEX
     voice:   dex_callum
-    text:    "Their book says forty. Their book has said forty for three weeks."
+    text:    "And their book said forty were in that hall. There were twenty-six."
 
   - id:      M1.4.S99.030
     speaker: FIGHTER_B
@@ -236,7 +237,7 @@ lines:
   - id:      M1.4.S99.260
     speaker: DEX
     voice:   dex_callum
-    text:    "There's twenty-six crates on that floor and no paper on any of it."
+    text:    "There's nine crates on that floor and no paper on any of it."
 
   - id:      M1.4.S99.270
     speaker: DEX

@@ -35,36 +35,37 @@ words:        134
 # writer:    callout band under fire. The insight in beat 3 is Voss's line and it is short.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      type is `in-mission-radio` (10-25). Pre-contact lines use it as a ceiling.
-#            From .070 onward everything is CALLOUT (2-6), per the stub and per the
-#            precedent M1.1.S04 set in this same act. Nothing under fire runs past 10 words.
-# variance:  1 w (.060 "Go.") to 12 w (.010) = 12x.
+# band:      `in-mission-radio`. Everything from .070 to .190 carries an explicit per-line
+#            `band:` override (L1-R1): Ember callouts run `callout`, Dominion guard shouts
+#            run `bark`. Register is carried by the two non-overridden lines, .010 (12 w)
+#            and .180 (11 w). Spread 2 w (.150) to 12 w (.010) = 6x.
 # ar-5:      no "you" or "your" in any Mara line.
-# causality: the insight at .130 is earned, not announced. The player hears the guards
-#            shout twice about the count (.080, .120), sees them fall back ONTO the ore
-#            (.090), hears that nothing is coming past the third car (.100) - and only then
-#            does Voss say three words. A marker would have said it in one. 11.3.
-# guards:    .070 / .080 / .100 / .120 are the NEW Dominion register the stub asks for:
-#            conscript guards whose fear is the tally, not the rifle. They never shout about
-#            dying. They shout about the count and about the locks. This is a scene-local
-#            sample, not the bark set - the trigger set itself is a BARK.* file and belongs
-#            to whoever writes DOMINION.*; flagged in the report, not invented here.
-# brick:     ZERO lines. BEATS section 8 gives him S01, four words in S03, and one line in
-#            S04, and silence for the rest of the mission. His competence at .190 is a SHOT.
-#            It costs no credits and it says more than a line would.
-# chorus:    the pact image is one line and one shot (.160). No Iron Chorus voice is used -
+# causality: the insight at .130 is EARNED, not announced. The player hears the guards shout
+#            twice about the count and the locks (.080, .120), watches them fall back onto
+#            the ore (.090), hears that nothing is coming past the third car (.100) - and
+#            only then does Voss say three words. A marker would have said it in one. 11.3.
+# guards:    .070 / .080 / .110 / .120 are the new Dominion register the stub asks for.
+#            Conscript guards whose fear is the tally, not the rifle. They never shout about
+#            dying; they shout about the count and the locks, because that is what they will
+#            be asked about afterwards. This is a scene-local sample. The trigger set itself
+#            belongs in a BARK.DOMINION.* file and to whoever owns that set - flagged in the
+#            report, not invented here.
+# brick:     ZERO lines. BEATS section 8 gives him S01, four words in S03 and one line in
+#            S04, and silence for the rest of the mission. His knowledge at .190 is a SHOT.
+#            It costs nothing to generate and it says more than a line would.
+# chorus:    the pact image is one line and one shot (.160). No Iron Chorus voice is used:
 #            Q-4 leaves the emissary uncast and a generic Chorus fighter has no casting row.
 #            Escalated in the report rather than invented.
-# fallback:  written so the SPEC-P2-04 fallback (train standing at a switch, clock instead of
-#            motion) needs no rewrite. Nothing here depends on speed - only on horns, locks
-#            and where people are standing.
+# fallback:  written so the SPEC-P2-04 fallback (train standing at a switch, pressure from a
+#            clock instead of motion) needs no rewrite. Nothing here depends on speed - only
+#            on locks, hinges and where people are standing.
 
 lines:
   - id:      M1.6.S02.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nothing goes into a grate car. Not one round, not a ricochet."
-    shot:    "Low along the ballast. The train is a wall of the same car, fourteen times."
+    shot:    "Low along the ballast. The train is a wall of the same car, fourteen times over."
 
   - id:      M1.6.S02.020
     speaker: FIGHTER_B
@@ -87,94 +88,108 @@ lines:
     speaker: VOSS
     voice:   voss
     text:    "Drawbar, not the buffer plate. The plate turns under a boot."
-    note:    "18.4 Voss: technician's vocabulary, names mechanisms, and nobody asked."
+    note:    "18.4 Voss: technician's vocabulary, names the mechanism, and nobody asked."
 
   - id:      M1.6.S02.060
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
+    band:    callout
     text:    "Go."
 
   - id:      M1.6.S02.070
-    speaker: GUARD_A
+    speaker: CONSCRIPT_A
     voice:   dominion_conscript_a
+    band:    bark
     tags:    [shouting]
     text:    "Contact on the drawbars! Ore side!"
 
   - id:      M1.6.S02.080
-    speaker: GUARD_B
+    speaker: CONSCRIPT_B
     voice:   dominion_conscript_b
+    band:    bark
     tags:    [shouting]
     text:    "Hold the ore line! Nobody opens a lock!"
 
   - id:      M1.6.S02.090
     speaker: FIGHTER_A
     voice:   eclipse_fighter_a
+    band:    callout
     text:    "They're backing onto the ore cars."
 
   - id:      M1.6.S02.100
     speaker: FIGHTER_B
     voice:   eclipse_fighter_b
+    band:    callout
     text:    "Nothing's coming past the third car."
 
   - id:      M1.6.S02.110
-    speaker: GUARD_A
+    speaker: CONSCRIPT_A
     voice:   dominion_conscript_a
+    band:    bark
     tags:    [shouting]
     text:    "Off the grates! Get off the grates!"
 
   - id:      M1.6.S02.120
-    speaker: GUARD_B
+    speaker: CONSCRIPT_B
     voice:   dominion_conscript_b
+    band:    bark
     tags:    [nervous]
-    text:    "The count is on me! The count is on me!"
-    note:    "18.5 rule 5 and the stub's new Dominion variant: his terror is the tally, not the rifle."
+    text:    "The count is on me!"
+    note:    "18.5 rule 5, and the stub's new Dominion variant: his terror is the tally, not the rifle."
 
   - id:      M1.6.S02.130
     speaker: VOSS
     voice:   voss
+    band:    callout
     text:    "Nobody guards ore."
-    note:    "THE TURN, three words. Read out of enemy behaviour, not off a marker."
+    note:    "THE TURN, three words, read out of enemy behaviour instead of off a marker."
 
   - id:      M1.6.S02.140
     speaker: FIGHTER_B
     voice:   eclipse_fighter_b
+    band:    callout
     text:    "Third and ninth. It's third and--"
 
   - id:         M1.6.S02.150
     speaker:    MARA
-    voice:      mara_sovann
+    voice:      mara
+    band:       callout
     interrupts: true
     text:       "Both. Now."
 
   - id:        M1.6.S02.160
     speaker:   FIGHTER_A
     voice:     eclipse_fighter_a
-    condition: story.m15_iron_chorus_pact == true
+    band:      callout
+    condition: 'story.choice_m15_ironchoruspact == true'
     text:      "Chorus has the ninth open already."
-    shot:      "ONE IMAGE. Two of them are on the roof of the ninth car with the pins already out. They step back from the door as it goes and neither of them looks at the two guards face down on the gravel between the rails. They do not check whether those two are breathing."
+    shot:      "ONE IMAGE. Two of them are on the roof of the ninth car with the pins already out. They step clear as the door goes, and neither of them looks down at the two guards lying face down on the gravel between the rails. Nobody checks whether those two are breathing."
 
   - id:        M1.6.S02.170
     speaker:   MARA
-    voice:     mara_sovann
-    condition: story.m15_iron_chorus_pact == true
+    voice:     mara
+    band:      callout
+    condition: 'story.choice_m15_ironchoruspact == true'
     text:      "Let them work."
     note:      "She does not judge it out loud. Sela will, in S06."
 
   - id:      M1.6.S02.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Take the ones on the gravel alive if they stay down."
-    note:    "Mercy as an order, not as a sentiment. Feeds the twist-5 tally in tone, not in flags."
+    note:    "Mercy issued as an order, not as a sentiment. Feeds the twist-5 tally in tone, not in flags."
 
   - id:      M1.6.S02.190
     speaker: VOSS
     voice:   voss
+    band:    callout
     text:    "Torch on the lock."
     shot:    "Brick puts a flat hand on his arm, moves him a pace sideways, and knocks the hinge pins out with two hits. He does not explain and nobody asks."
     note:    "BRICK SAYS NOTHING (BEATS section 8). He knows how the door comes off. That is the line."
 
   - id:      M1.6.S02.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
+    band:    bark
     text:    "Weapons down before that door comes off."
     shot:    "The door goes over sideways. The light gets in before anybody does."

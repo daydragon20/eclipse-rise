@@ -22,16 +22,29 @@ words:        0
 # flags-in:  Story.Char.PetraLocated
 # flags-out: none (Story.Char.PetraRescued commits at S99)
 #
-# *** BLOCKED ON OWNER QUESTION Q-3 ***
-# Petra has NO casting row in 19.3 (finding C-4) and NO fingerprint in 18.4 (finding C-5).
-# She speaks in the act climax. Do not generate this scene until both exist.
+# UNBLOCKED 2026-07-31 - ruling L1-R9. Petra's fingerprint is now in 18_writing_standard.md
+# 18.4 ("Recurring non-companion voices") and her signature line is in 19.3. WRITEABLE NOW.
+# Still open: the CASTING (owner picks the voice) - so write, do not generate.
 #
-# ARCHITECT PROPOSAL for her fingerprint (owner approval required - 18.4 is bible):
-#   syntax : short imperatives. Household vocabulary where everyone around her is military
-#            ("sit down", "eat", "your hands are cold")
-#   tic    : answers a hard question with a task
-#   never  : lets herself be thanked; never names what was done to her; never says she is
-#            proud - she shows it by giving you work
+#   syntax : imperatives WITH THE PRONOUN ELIDED. Household and kitchen nouns where
+#            everyone around her uses operational ones. Second-shortest lines in the game
+#   tic    : answers a question she will not answer by assigning a task
+#   never  : NEVER SAYS "YOU" OR "YOUR". Never accepts thanks. Never names what was done
+#            to her
+#
+# *** THE PRONOUN RULE IS LOAD-BEARING, NOT A STYLE NOTE. ***
+# Mara spends the game's only "you" four scenes later in S08, and that word IS the command
+# transfer (AR-5/AR-5b). Petra's elided imperatives keep the word scarce across the whole
+# climax so Mara's single use lands in a vacuum. A regex over this scene must return zero
+# hits for "you"/"your". If you need her to address him, she assigns a task instead.
+#
+# SHE ALSO NEVER NAMES HIM (ruling L1-R10). No "Voss", no callsign, nothing. She is the
+# only living person who knew him before either word meant anything, and the protagonist's
+# first name is player-chosen and therefore unvoiced. Everyone else says "Voss" then
+# "Cinder"; she says "sit down". That turns the hardest VO constraint in the game into
+# characterisation - do not spend it by having her use a name here or anywhere.
+#
+# Distinguish from Brick: HE HANDS YOU A NOUN, SHE HANDS YOU A VERB (18.9 C1 strip test).
 #
 # beats:     1) the cell. She is sitting. She stands before he says anything
 #            2) HER FIRST LINE IS A TASK. She does not thank him and she does not cry
