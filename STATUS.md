@@ -96,6 +96,13 @@ bark-varianten, geen zes. Volledig in `21_quality_mandate.md` — kort, lees het
 
 - Bouw met **`-NoUba`**. Elke iteratie eindigt groen: build, tests, `EclipseValidateData`
   0 fouten, EventCatalog in sync — vóór elke commit.
+- **Laat de werkboom nooit onbouwbaar achter, ook niet tussen twee stappen door.** Meerdere
+  agents delen één checkout, en Nathan kan op elk moment willen spelen. Schrijf een aanroep
+  dus pas als het ding dat je aanroept bestaat — header en cpp in **dezelfde** stap — en
+  bouw na elke stap die een aanroep toevoegt. *Dit is geen theorie: op 31-07 kon Nathan de
+  game niet starten omdat een aanroep en zijn declaratie in twee stappen waren gesplitst.
+  De melding luidde "Missing Eclipse Modules" en wees dus naar een ontbrekend bestand,
+  terwijl het probleem twee modules met verschillende BuildIds was.*
 - Bouwvolgorde per spec = **14.5**: dataschema → pure-logic core + tests →
   subsystem-wrapper + events → debug-UI → echte UI/content laatst.
 - Commits: `[System] Verb summary (GDD-ref)`. Cross-system alleen via de event-bus.
