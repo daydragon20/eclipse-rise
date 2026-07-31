@@ -238,6 +238,41 @@ staat in `phase0/REFERENTIE_HUD_BORDERLANDS.md` r36-37 expliciet linksonder, met
 **Wacht op het build-slot** (N-b heeft het). Twee C++-agents tegelijk is de fout die op
 31-07 drie keer de werkboom brak.
 
+### 2a-quinquies. N-d — van lijst met topologie naar GRAAF
+
+*Gescopet 01-08 na N-b. De element-builder noemde dit een owner-beslissing; ik denk dat
+de staande opdracht hem al beantwoordt, en leg hieronder uit waarom — omkeerbaar als
+iemand het anders leest.*
+
+Het bord toont nu per regio zijn buren en per lane status/tijd/risico, maar als **tekst**.
+`REFERENTIE_BASE_MAP.md` §1.4 rij 1 vraagt knopen op posities met lanes als lijnen. Twee
+dingen ontbreken:
+
+1. **Posities per regio.** `FEclipseRegionDefinition` heeft ze niet.
+2. **Een tekenlaag** die knopen en lijnen zet in plaats van regels.
+
+**De databeslissing — geauthorde coördinaten of afgeleide layout — beschouw ik als BESLIST
+door de staande kwaliteitsopdracht** (`21_quality_mandate.md`, en Nathan verbatim):
+
+> *"GRAPHICS en UITGEBREIDHEID zijn altijd mijn twee hoogste prioriteiten. NOOIT de
+> kortste weg naar het doel — altijd de beste weg."*
+
+Een automatische layout **ís** de kortste weg, en hij levert bij zes regio's een
+willekeurige spreiding die niets zegt over het district. Geauthorde coördinaten laten de
+Underworks ónder liggen, de Spire bovenaan, en Comms Relay aan het eind van de gepoorte
+lane — dan draagt de vorm de fictie. **Dus: geauthord**, als veld op de regiodefinitie,
+naast de lanes die daar al staan.
+
+**Waarom dit geen owner-kaart wordt:** hij heeft die vraag al beantwoord in algemene vorm,
+en er staan zeven kaarten op zijn scherm waarvan er twee over geld gaan. Een achtste kaart
+voor iets dat zijn eigen mandaat beslist, verdunt de kaarten die er wél toe doen.
+**Eén veld terugdraaien als een architect het anders leest.**
+
+**Kleiner stuk dat er los van vastligt en eerst kan:** het bord heeft **geen
+achtergrondplaat** — elke regel staat op wat er toevallig achter ligt (gemeten: ondergrond
+van 0,078 tot 0,163 luminantie binnen één scherm, met geclipt wit erin). Dat is dezelfde
+oorzaak als de onleesbare HUD-debugtekst; zie `phase0/SHOT_FINDINGS.md`, blok bovenaan.
+
 ### 2b. Daarna klaarstaand (in deze volgorde)
 
 **N-a — Munitie- en wapenstatus op de bus** *(element-builder; tweede helft van de datalaag onder boots)*
