@@ -183,6 +183,13 @@ bark-varianten, geen zes. Volledig in `21_quality_mandate.md` — kort, lees het
   de bestandsgrootte tegen wat je toevoegde. Escaping in een heredoc vecht bovendien met
   Python-escapes; bij `
 ` of quotes in het patroon is de Edit-tool altijd sneller.
+- **`.git` staat op 3,8 GB en dat is onderhoud, geen probleem.** Gemeten 01-08:
+  `size-pack` is **326 MB** — de historie zelf is gezond. De rest zijn **2.873 losse
+  objecten** (3,4 GB) die sinds de laatste opruiming niet gepakt zijn. `git gc` haalt dat
+  weg zonder één commit te wijzigen. **Doe het niet terwijl er een agent draait die credits
+  uitgeeft** — gc zet de repo kort op slot, en dat risico is klein maar een verwarde
+  generatie is duur. De grootste enkele objecten zijn 4K-textures van 12–27 MB in
+  `Art/Imported/Textures`; die horen er via de `SOURCES.md`-route thuis en blijven.
 - **Bugs:** volg `DEBUG_DISCIPLINE.md`. Drie iteraties zonder diagnose = escaleren.
 - **Owner-consent:** geen installs/downloads/security-prompts zonder akkoord. Nathan heeft
   **geen adminrechten** — queue dat als owner-actie, bouw er niet stil omheen.
