@@ -84,6 +84,18 @@ gelezen te worden.
 de opnameronde hem kan zien. Teruggedraaid; zie §1b voor waarom die poort de eerste
 bouwstap is.
 
+## De drie documenten van Nathan — houd ze vers
+
+Hij leest deze drie als **achtergrond** bij de keuzekaarten op het dashboard. Verouderde info kost hem een verkeerde beslissing, dus het dashboard kleurt ze **rood** zodra ze over hun houdbaarheid gaan.
+
+| Document | Bijwerken wanneer | Max |
+|---|---|---|
+| `STATUS.md` | aan het eind van **elke sessie** | 24 u |
+| `JOUW_ACTIES.md` | zodra een owner-actie verandert | 24 u |
+| `BESTURING.md` | zodra de besturing verandert | 7 d |
+
+Staat er een rood op het dashboard: eerst bijwerken, dan pas verder.
+
 ## Hoe je Nathan iets vraagt
 
 **Niet in de chat — met een knop.** Zet je vraag in `phase0/owner_questions.json` (id, vraag, waarom, stappen, opties met label/waarde/gevolg, advies, vrijtekst). Hij ziet hem dan als kaart mét knoppen op het dashboard en beantwoordt hem met één klik.

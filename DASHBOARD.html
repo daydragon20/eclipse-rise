@@ -134,6 +134,9 @@ h3{font-size:17px;margin:0 0 8px}
 .msg .tx{font-size:13.5px;white-space:pre-wrap;word-break:break-word}
 
 /* beslissingen met knoppen */
+.docown{transition:border-color .15s}
+.docown:hover{border-color:var(--acc)}
+.docown.oud{border-color:#ef5f5f55}
 .stat.klik{cursor:pointer;transition:border-color .15s}
 .stat.klik:hover{border-color:var(--acc)}
 .vraag{border-left:3px solid var(--dim2)}
@@ -551,13 +554,16 @@ function vDocs(){
   const rest=keys.filter(k=>k!=="Voor jou");
 
   return `
-  ${mijn.length?`<h2>Voor jou</h2>
-  <div class="grid g3" style="margin-bottom:22px">${mijn.map(d=>`
-    <div class="card" style="margin:0;cursor:pointer" onclick="openDoc('${esc(d.path)}')">
+  ${mijn.length?`<h2>Voor jou — lees dit als achtergrond bij de keuzes</h2>
+  <div class="grid g3" style="margin-bottom:8px">${mijn.map(d=>`
+    <div class="card docown ${d.oud?"oud":""}" style="margin:0;cursor:pointer" onclick="openDoc('${esc(d.path)}')">
       <h3 style="color:var(--acc2)">${esc(d.name.replace(/\.md$/,"").replace(/_/g," "))}</h3>
       <p style="font-size:13px;color:var(--dim);margin:6px 0 0">${esc(DOC_UITLEG[d.name]||"")}</p>
-      <div class="note">${d.kb} KB · ${esc(d.modified)}</div>
-    </div>`).join("")}</div>`:""}
+      <div class="note">${d.kb} KB · bijgewerkt ${esc(d.modified)}
+        ${d.oud?`<br><span style="color:var(--bad)">⚠ ouder dan afgesproken (max ${d.limiet} u) — de agent moet dit bijwerken</span>`
+                :(d.limiet?`<br><span style="color:var(--ok)">✓ vers</span>`:"")}</div>
+    </div>`).join("")}</div>
+  <div class="card"><div class="note" style="margin:0">Deze drie zijn je <strong>achtergrond</strong>: uitgebreide uitleg om na te lezen. Het <strong>doorgeven</strong> van keuzes gaat via de kaarten onder <strong>Nu</strong> — daar hoef je alleen op een knop te drukken.</div></div>`:""}
 
   <h2>Voor de agents</h2>
   <div class="card"><div class="note" style="margin:0">Deze documenten zijn geschreven om door agents gelezen te worden — daarom zijn ze dicht en technisch. Je hoeft ze nooit te openen; alles wat jou aangaat staat hierboven en op het tabblad <strong>Nu</strong>.</div></div>

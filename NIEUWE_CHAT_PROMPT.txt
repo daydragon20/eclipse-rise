@@ -167,6 +167,18 @@ HARDE REGELS
   taken-statussen, ownerActies; afgehandelde punten naar jijGedaan).
   Bewerk NOOIT PROGRESS.html, progress_auto.js of DASHBOARD.html.
 
+- DRIE DOCUMENTEN ZIJN VAN MIJ EN MOETEN VERS BLIJVEN. Ik lees ze als
+  achtergrond bij de keuzekaarten, dus verouderde info kost me een
+  verkeerde beslissing. Het dashboard kleurt ze ROOD als ze te oud zijn:
+
+    STATUS.md         bijwerken aan het EIND VAN ELKE SESSIE   (max 24 u)
+    JOUW_ACTIES.md    bijwerken zodra een owner-actie verandert (max 24 u)
+    BESTURING.md      bijwerken zodra de besturing verandert    (max 7 d)
+
+  Zie je er een rood staan op het dashboard, werk hem dan bij voor je
+  aan iets anders begint. Het kost vijf minuten en het is de enige
+  manier waarop ik weet wat er speelt.
+
 - SCHRIJF NOOIT EEN DICHT MARKDOWN-DOCUMENT VOOR MIJ. Ik lees maar één
   scherm: het dashboard. Een lange .md met tabellen en secties is prima
   voor jullie agents, maar voor mij onleesbaar - EXECUTION_PLAN.md is

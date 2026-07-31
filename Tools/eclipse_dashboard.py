@@ -463,6 +463,16 @@ def scan_voice() -> dict:
 # moet zoeken naar de drie die hem aangaan.
 OWNER_DOCS = {"JOUW_ACTIES.md", "STATUS.md", "BESTURING.md"}
 
+# Hoe vers een owner-document hoort te zijn, in uren. Wordt er ouder
+# gemeten, dan kleurt het dashboard hem — Nathan leest deze drie als
+# achtergrond bij de keuzekaarten, dus verouderde info kost hem een
+# verkeerde beslissing.
+OWNER_DOC_VERS = {
+    "STATUS.md": 24,        # bijwerken aan het eind van elke sessie
+    "JOUW_ACTIES.md": 24,   # bijwerken zodra een owner-actie verandert
+    "BESTURING.md": 168,    # bijwerken zodra de besturing verandert
+}
+
 DOC_GROUPS = [
     ("Voor jou", lambda p: p.name in OWNER_DOCS and len(p.parts) == 1),
     ("Game Design Bible", lambda p: re.match(r"^\d\d_", p.name)),
@@ -495,6 +505,12 @@ def scan_docs() -> dict:
             "modified": ago(st.st_mtime),
             "mtime": st.st_mtime,
         }
+        limiet = OWNER_DOC_VERS.get(md.name)
+        if limiet and len(rel.parts) == 1:
+            uren = (time.time() - st.st_mtime) / 3600
+            entry["uren"] = round(uren, 1)
+            entry["limiet"] = limiet
+            entry["oud"] = uren > limiet
         placed = False
         for label, test in DOC_GROUPS:
             try:
