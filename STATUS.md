@@ -79,12 +79,14 @@ opnieuw iets dat hij al besloot.
 
 | # | Actie | Blokkeert |
 |---|---|---|
-| **scopes** | Drie ElevenLabs-API-scopes (`user_read`, `speech_history_read`, `models_read`) | **alle generatie — staat nu stil** |
+| **T-12** | Drie ElevenLabs-API-scopes (`user_read`, `speech_history_read`, `models_read`) | **alle generatie — staat nu stil** |
 | O-3 | Stemmen kiezen uit de 104 kandidaten | alles wat gesproken wordt |
 | O-4 | IJkmissie M1.1 beluisteren | massaproductie |
-| O-8 | Hoe ver mag de HUD de Borderlands-kant op | schermlaag-vormgeving |
+| O-9 | Wat wil je in eerste persoon van jezelf zien | first-person-inhoud |
 
-*Beantwoord en verwerkt: O-1, O-2, O-5, O-6, O-7, T-2, T-10, T-11. Zie `OWNER_ANSWERS.md`.*
+*Beantwoord en verwerkt: O-1, O-2, O-5, O-6, O-7, **O-8**, **T-1**, T-2, **T-7**, T-10, T-11. Zie `OWNER_ANSWERS.md` — **lees dat elke sessie**, antwoorden komen via de dashboardknoppen binnen en niet via de chat.*
+
+> **Twee antwoorden die de koers veranderen.** **O-8 = "vol"**: de HUD mag vól Borderlands worden — `phase0/REFERENTIE_HUD_BORDERLANDS.md` is de maatstaf, met §3 als tegeneis (vol in vórm, streng in hiërarchie; leesbaarheid gaat vóór stijl). En **T-1 = "nog niet"**, verbatim: *"Ik speel nog NIET. Eerst laat ik alle basisdingen bouwen waar je nu mee bezig bent. **Fase 0 en 1 zijn hiermee afgesloten — wacht niet meer op mijn playtest, die staat niet langer in de weg.**"* De staande 13.2-playtestpoort is dus **weg**; niets hoeft meer op zijn speelronde te wachten.*
 
 ## De staande kwaliteitsopdracht
 
