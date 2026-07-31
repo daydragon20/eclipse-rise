@@ -72,10 +72,10 @@ bouwstap is.
 | # | Actie | Blokkeert |
 |---|---|---|
 | ~~O-1~~ | ~~Verloopdatum credits~~ — **✓ beantwoord 31-07: 21 augustus 2026.** Werkdeadline generatie = **19 augustus** (2 dagen buffer). Kalender staat in `SCRIPT_PRODUCTION_PLAN.md` §4. | — |
-| O-2 | Commerciële gebruiksrechten bevestigen op het abonnement | bulk-generatie |
+| ~~O-2~~ | ~~Commerciële rechten~~ — **✓ bevestigd 31-07: abonnement heeft ze, en per stem is in de Voice Library zichtbaar of die rechten draagt.** `voice-director` weigert elke stem zonder commerciële licentie. | — |
 | O-3 | Stemmen kiezen uit de kandidaten (smaak, niet techniek) | alles wat gesproken wordt |
 | O-4 | IJkmissie M1.1 beluisteren en goed-/afkeuren | de massaproductie |
-| O-5 | **Wapenbron** — er bestaat nergens een los wapenmesh | wapenwerk spoor B |
+| O-5 | **Wapen** — er hángt een wapen; het is alleen geen los object. Herweging, geen inkoop. Zie `phase0/REFERENTIE_TPS.md` §WIJ NU | wapenwerk spoor B |
 | O-6 | **Stijlvraag**: blijft de Borderlands-lock, of wil je fotorealisme? | `20_world_dressing_standard.md` §20.8 |
 
 ## De staande kwaliteitsopdracht

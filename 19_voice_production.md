@@ -43,12 +43,12 @@ Ordered by *lowest rewrite risk × highest perceived value*. Do not start a tier
 
 | Tier | What | Credits | ≈ Words | Why here |
 |---|---|---|---|---|
-| **0** | **Casting tests** — one signature line per candidate voice (§19.3) | 5,000 | 800 | Must happen first. Getting casting wrong after Tier 1 costs 100k to fix. |
-| **1** | **Bark & systemic library** — the 16 priority triggers × 6–12 variants × 3 faction vocabularies | 95,000 | 15,800 | Safest spend on the board. The systems already exist, the lines never change, and this is the single biggest "the world is alive" gain per credit. |
-| **2** | **Act 1 story dialogue** — Prologue + M1.1–M1.8 | 90,000 | 15,000 | Beats are locked (SPEC-P2-04 ACCEPTED, no prologue, recap opening). Low rewrite risk. |
-| **3** | **Adaptive music** — main theme, Kessara layers, combat layers, Dominion faction stems | 45,000 | — | Front-loaded once, then near-zero forever (§16.7). Never-silent floor is a §16 requirement. |
-| **4** | **Act 1 hub & companion conversations** — Mara, Dex, Brick, Reyes at Hollow Point | 35,000 | 5,800 | Establishes the companion voices the player lives with for 25 hours. |
-| **5** | **Core SFX one-shots** — weapons, impacts, UI, ambient beds | 20,000 | — | Cheap, high polish return. |
+| **0** | **Casting** — two-stage: wide screen then deep test on finalists (§19.3) | 18,000 | 3,000 | Must happen first, and properly. Getting casting wrong after Tier 1 costs 90k+ to fix, so 18k here is the cheapest insurance on the board. |
+| **1** | **Bark & systemic library** — the 16 priority triggers × 6–12 variants × 3 faction vocabularies | 90,000 | 15,000 | Safest spend on the board. The systems already exist, the lines never change, and this is the single biggest "the world is alive" gain per credit. |
+| **2** | **Act 1 story dialogue** — Prologue + M1.1–M1.8 | 88,000 | 14,600 | Beats are locked (SPEC-P2-04 ACCEPTED, no prologue, recap opening). Low rewrite risk. |
+| **3** | **Adaptive music** — main theme, Kessara layers, combat layers, Dominion faction stems | 42,000 | — | Front-loaded once, then near-zero forever (§16.7). Never-silent floor is a §16 requirement. |
+| **4** | **Act 1 hub & companion conversations** — Mara, Dex, Brick, Reyes at Hollow Point | 33,000 | 5,500 | Establishes the companion voices the player lives with for 25 hours. |
+| **5** | **Core SFX one-shots** — weapons, impacts, UI, ambient beds | 19,000 | — | Cheap, high polish return. |
 | **—** | **Reserve** — retakes, mistakes, a mis-tagged batch | 20,000 | — | Insurance *during* the sprint — see the rule below. |
 | | **Total** | **310,000** | | |
 
@@ -90,10 +90,35 @@ ElevenLabs' free plan gives ~10,000 credits/month, and the owner asked whether t
 
 **Casting is locked before Tier 1 and never changed.** Re-casting a character re-costs every line they have.
 
-### Protocol
+### Protocol — two stages, because casting is permanent
 
-1. `voice-director` shortlists 2–3 candidate ElevenLabs voices per role, matched on age, register, and accent-neutrality.
-2. Each candidate speaks **the same signature line** — a line chosen to expose the character's fingerprint (§18.4). Suggested signature lines:
+Owner instruction (2026-07-31): *"doe ook moeite om de juiste voice te gebruiken."* An earlier draft of this section called for two candidates and one line. That was the shortest path, and `21_quality_mandate.md` forbids it. Casting is the one decision that cannot be undone cheaply — a re-cast invalidates every line that character has ever spoken. So it gets the effort it deserves.
+
+**Stage 1 — wide screen (cheap, ~5k credits).**
+Shortlist **6–8 candidates** for every companion and villain, 3–4 for each bark register. Match on age, register, and accent-neutrality. Every candidate speaks **the same short signature line** (below). Cut ruthlessly to **two finalists** per role.
+
+**Stage 2 — deep test on the finalists only (~11k credits).**
+Each finalist speaks **three** lines, not one:
+
+1. **The signature line** — does the fingerprint (§18.4) survive in this voice?
+2. **An emotional extreme the character actually reaches** — Mara's last scene, Vex threatening, Kaya panicking, Brick grieving. A voice that carries a calm line beautifully and collapses at the extreme is the wrong voice, no matter how good it sounded first.
+3. **A short combat/systemic line** — because the same voice must also work at 5 words over gunfire.
+
+**Then five checks before anything is locked:**
+
+| Check | Why it kills a candidate |
+|---|---|
+| **Licence** | Voice Library voices carry their own terms. Non-commercial or attribution-required = rejected, however good it sounds. The owner confirmed this is visible on the voice card. |
+| **Tag range** (§19.4) | Does the voice support the tags this character needs? A voice cast for shouting will not whisper. If the character needs both extremes, that decides the casting. |
+| **In context, not in silence** | Audition over real game audio, not in a quiet browser tab. A voice that is gorgeous in silence can vanish in a firefight. |
+| **Pairing** | Audition characters who share scenes **together**, never separately. Mara + Reyes, Dex + Kaya, Vex + Kaine. If two voices blur when heard back to back, one of them is recast now — not after 90k credits. |
+| **Written justification** | One sentence per role on why this voice won. Prevents the decision being re-litigated in three weeks. |
+
+**Cast in order of line count, not story order:** Voss, Mara, Dex, Brick and the Eclipse bark register carry Act 1 and get the most attention. Vex and Kaine appear in Act 3–4 and can be cast later if time runs short.
+
+**The owner picks.** This is taste, not technique, and he has to live with it for a year.
+
+### Signature lines
    - Mara: *"We don't get to be tired. Not yet."*
    - Dex: *"That's not a reactor. That's a bomb with a job."*
    - Reyes: *"I do not need you to be brave. I need you to be still."*
@@ -106,8 +131,7 @@ ElevenLabs' free plan gives ~10,000 credits/month, and the owner asked whether t
    - Kaine: *"I am going to burn the eastern span. I am telling you so you can move your people."*
    - Threx: *"You have your aunt's hands. Did anyone ever tell you that?"*
    - AEGIS: *"Compliance probability is falling. Intervention is scheduled."*
-3. **Owner listens and picks.** This is Nathan's call, not the agent's — voice is taste, and he has to live with these for a year.
-4. The chosen `voiceId` goes into the casting table below **and into the dialogue DataAsset**, and is treated as canon.
+Once the owner has chosen, the `voiceId` goes into the casting table below **and into the dialogue DataAsset**, and is treated as canon. Locked means locked.
 
 ### Casting table
 

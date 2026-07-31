@@ -25,13 +25,16 @@
 
 | Tier | Wat | Begroot | Besteed | Klaar |
 |---|---|---|---|---|
-| 0 | Casting-tests | 5.000 | 0 | ☐ |
-| 1 | Bark- & systeembibliotheek | 95.000 | 0 | ☐ |
-| 2 | Act 1 story-dialoog | 90.000 | 0 | ☐ |
-| 3 | Adaptieve muziek | 45.000 | 0 | ☐ |
-| 4 | Act 1 hub & companions | 35.000 | 0 | ☐ |
-| 5 | Kern-SFX | 20.000 | 0 | ☐ |
-| — | Reserve | 20.000 | 0 | — |
+| 0 | Casting — 2 fasen (wide screen + diepe test op finalisten) | 18.000 | 0 | ☐ |
+| 1 | Bark- & systeembibliotheek | 90.000 | 0 | ☐ |
+| 2 | Act 1 story-dialoog | 88.000 | 0 | ☐ |
+| 3 | Adaptieve muziek | 42.000 | 0 | ☐ |
+| 4 | Act 1 hub & companions | 33.000 | 0 | ☐ |
+| 5 | Kern-SFX | 19.000 | 0 | ☐ |
+| — | Reserve (niet toewijzen; 17/08 vrijgeven) | 20.000 | 0 | — |
+| | **Totaal** | **310.000** | **0** | |
+
+*Tier 0 ging van 5.000 naar 18.000 op owner-instructie "doe moeite om de juiste voice te vinden". Gedekt uit tiers 1–5. Casting fout hebben na tier 1 kost 90k+ om te herstellen, dus dit is de goedkoopste verzekering op het bord.*
 
 ## Aantekeningen
 
