@@ -13,9 +13,11 @@ obstacle:     "Nobody has a week and there is no steel."
 turn:         "He shows him anyway, and the plan is far too big, and it is the first blueprint of Hollow Point as the player will eventually know it."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           164
+words_heard:     164
+words_generated: 182
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      DEX, VOSS
@@ -30,4 +32,141 @@ words:        0
 #            No line here may function as a tutorial. If a line only conveys a mechanic,
 #            delete it and let the UI do its job.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      hub (12-35) as a ceiling (L1-R1). Longest 25 w (.030 and .070), ceiling clear.
+#            Register reached at .010 (12), .030 (25), .040 (23), .060 (14), .070 (25),
+#            .100 (19), .110 (16). Spread 1 w (.130 "Seven.") to 25 w = 25x.
+#
+# *** THE SYSTEM IS TAUGHT AS FOUR COMPLAINTS AND TWO WISHES. NOT ONE LINE IS A TUTORIAL. ***
+#   .030  ENERGY      - 05_base_building 5.2's "generator that coughs", said as the reason
+#                       everything he wants is impossible. He is not describing an upkeep
+#                       stat; he is describing the thing he hates.
+#   .040  SLOTS       - act 1 has four slots (5.2: 4 -> 8 -> 12 -> 16). Here that is four
+#                       patches of floor that are rock instead of fill. The scarcity is
+#                       geology, so the player never hears a rule, and "Everything heavy
+#                       has to stand on one of them" is the entire slot system in ten words.
+#   .060  OCCUPANCY   - what is standing on the four now. Bunks, table, generator, bench.
+#                       An inventory, said flat, and it is why he cannot have anything.
+#   .070  MEDBAY      - the first thing he would build is not for him, and he does not say
+#                       so. He says a bench comes off a rock patch and a room goes on it.
+#   .100  HANGAR      - 5.3.1's Hangar, wished for in act 1 by a man who knows it is absurd.
+#   .110  BUILD COST  - a week of nobody needing him, and forty kilos of plate. Time and
+#                       materials, priced by the person paying, which is 5.4 without 5.4.
+# If any of these lines were deleted the scene would lose a want, not a fact. That is the
+# test the stub sets and it is the only reason they are allowed to be in the file.
+#
+# *** THE PLAN IS SEVEN RATION CARDS AND THAT IS THE SHOT. ***
+# M1.2.S99.120: "It's on the back of a ration card in my kit. Two years." One card was the
+# repeater. This is seven, laid down one at a time as he talks, and by .130 they are lying
+# on the bench in the shape of a building - Medbay, Power, Workshop, a way down for a
+# vehicle. The player will build exactly this over four acts and nobody in the room knows
+# that. The plan is measured in ration cards because that is what Kessara measures things
+# in (RULINGS_L1 ronde 1) and because it is the cheapest possible way to say TOO BIG.
+#
+# humour:    two comic beats in thirteen lines (18.6's ratio for downtime): .090, where a
+#            sentimental line about his own bench is refused by explaining what the bench
+#            is made of, and .100, where he asks for a hangar and prices it himself at
+#            never. He is funniest describing what he will not be allowed to build, exactly
+#            as the stub says. .060 is dry, not comic, and I am not counting it.
+# dex:       nine of the thirteen lines. This is the one scene in act 1 where he is
+#            allowed to talk, and the shape of the scene is a man who has been holding this
+#            in since before the player arrived. He never states a feeling; the closest he
+#            comes is .110, where the obstacle is "a week where nobody needs me" and he
+#            says it as a materials problem.
+# voss:      four lines, eighteen words, and three of them are questions. He is the reason
+#            the plan comes out and he adds nothing to it. .120 is the counting move that
+#            turns a wish into a number, which is what he does to everything (M1.1 circuit,
+#            M1.2 mast feed, M1.7 arithmetic).
+#            NO VARIANTS - BEATS_HUB_A1 section 7.6 restricts axis variants to scenes 2, 6,
+#            8 and 11. Nothing here branches and nothing here is a judgement.
+# interrupt: .080/.090. One dash in thirteen lines (18.9 B), and it is Dex refusing to let
+#            a sentence about him finish. Third time in the act; the player is starting to
+#            be able to predict it, which is what makes M1.8's silence readable.
+# eleven:    L1-R14 checked. Not used - the plan is seven cards and the floor has four
+#            hard patches.
+# omitted:   a promise, a costing in Materials or Credits, any line where Voss says the
+#            plan is good, and any explanation of what a Workshop is for. See report.
+
+lines:
+  - id:      HUB.A1.dex_workshop.010
+    speaker: DEX
+    voice:   dex
+    text:    "Stand where the lamp is. You can't see it from the door."
+    shot:    "Workshop, two nights after the mast. The bench is clear, which nobody has ever seen. He puts one ration card down on it, drawn on both sides in grease pencil."
+    note:    "He has been waiting for somebody to be in this room with nothing to do. The first card goes down before he has said what any of it is."
+
+  - id:      HUB.A1.dex_workshop.020
+    speaker: VOSS
+    voice:   voss
+    text:    "What am I looking at?"
+
+  - id:      HUB.A1.dex_workshop.030
+    speaker: DEX
+    voice:   dex
+    text:    "Everything down here runs off one machine that stops when it feels like it, and every single thing I want to build makes that worse."
+    shot:    "Second card down, left of the first."
+    note:    "ENERGY. 05_base_building 5.2's generator that coughs, delivered as the reason he cannot have anything rather than as an upkeep number."
+
+  - id:      HUB.A1.dex_workshop.040
+    speaker: DEX
+    voice:   dex
+    text:    "There are four places in this floor that are rock and not fill. Four. Everything heavy has to stand on one of them."
+    shot:    "He kicks the floor twice in two different places and it sounds like two different floors."
+    note:    "SLOTS. Act 1 has four (5.2). Here they are geology, so scarcity arrives as a fact about a vault instead of a rule about a game."
+
+  - id:      HUB.A1.dex_workshop.050
+    speaker: VOSS
+    voice:   voss
+    text:    "What's on the four now?"
+
+  - id:      HUB.A1.dex_workshop.060
+    speaker: DEX
+    voice:   dex
+    text:    "Bunks, the table, the generator, and a bench I made out of a door."
+    note:    "The inventory, flat. One enumeration in the scene (18.9 B triads). Everything in this vault is made out of a door, including the thing Reyes lays people on."
+
+  - id:      HUB.A1.dex_workshop.070
+    speaker: DEX
+    voice:   dex
+    text:    "First thing that comes off is the bench. Put a room there with a door on it, and she stops treating people on the floor."
+    shot:    "Third card, and this one he squares up with the edge of the bench before he lets go of it."
+    note:    "MEDBAY, wished for by the engineer, out of his own slot, for somebody else, without one word about why. He does not name a feeling and does not name her either."
+
+  - id:      HUB.A1.dex_workshop.080
+    speaker: VOSS
+    voice:   voss
+    text:    "That's your bench--"
+
+  - id:         HUB.A1.dex_workshop.090
+    speaker:    DEX
+    voice:      dex
+    interrupts: true
+    text:       "Bench is a door on two drums. I'll steal another door."
+    note:       "Comic beat 1 of 2, and it is a deflection: he kills a sentence about himself by explaining what the furniture is made of. Third time in the act he does this."
+
+  - id:      HUB.A1.dex_workshop.100
+    speaker: DEX
+    voice:   dex
+    tags:    [amused]
+    text:    "And when there's steel, a stair wide enough to bring a vehicle down. Not this year. Not ever, probably."
+    shot:    "He goes into his kit for three more cards and lays them out fast, like he is dealing."
+    note:    "Comic beat 2 of 2. It is the Hangar (5.3.1), asked for in a damp vault by a man who prices it himself at never. He is funniest describing what he will not be allowed to build."
+
+  - id:      HUB.A1.dex_workshop.110
+    speaker: DEX
+    voice:   dex
+    text:    "All of it needs a week where nobody needs me, and about forty kilos of plate."
+    note:    "BUILD COST, priced by the person who pays it. The obstacle from the stub, said by him instead of by Voss, and said as a materials problem because that is the only way he can say it."
+
+  - id:      HUB.A1.dex_workshop.120
+    speaker: VOSS
+    voice:   voss
+    text:    "How many cards is that?"
+    shot:    "PLAYER BEAT (18.7): the cards are on the bench and the player can walk the length of them or walk out. Dex does not stop talking either way."
+
+  - id:      HUB.A1.dex_workshop.130
+    speaker: DEX
+    voice:   dex
+    text:    "Seven."
+    shot:    "Laid out edge to edge under the lamp they are a floor plan, and it is the base the player will spend four acts building. Neither man says that. He does not put them away."
+    note:    "One word. The whole scene is the size of the thing, and the size is measured in ration cards because that is the unit this district has."

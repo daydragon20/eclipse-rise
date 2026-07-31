@@ -13,9 +13,11 @@ obstacle:     "He finds her recording something, alone, and she shuts it off whe
 turn:         "She tells him what it is in one sentence, deflects the second question, and asks him to leave the light on."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           100
+words_heard:     100
+words_generated: 128
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      MARA, VOSS
@@ -41,4 +43,108 @@ words:        0
 # writer:    "leave the light on" is a placeholder for the turn, not a line. Find the
 #            domestic request that does the same job in her voice.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      hub (12-35), read as a ceiling (L1-R1). Longest 26 w (.060), ceiling clear.
+#            Register reached at .010 (20), .040 (19), .050 (14), .060 (26).
+#            Spread 4 w (.020 / .080) to 26 w = 6.5x.
+# length:    EIGHT lines against the stub's maximum of nine. There is no greeting, no exit,
+#            and nobody explains anything to anybody.
+# symmetry:  18.9 B - a two-hander of eight turns will alternate A-B-A-B unless somebody
+#            doubles, and strict alternation past six turns is a listed structural failure.
+#            MARA DOUBLES AT .050/.060, and the double is not a repair, it is the scene:
+#            she refuses to answer and hands him the job in the same breath, without
+#            leaving him a turn in between. Turn order M V M V M M V M.
+#
+# *** THE TURN IS THE WATER ROTA, AND IT IS NOT A NEW OBJECT. ***
+# "Leave the light on" is the stub's placeholder for a domestic request that presumes a
+# morning. The one already in canon is the water rota: M1.8.S91.090/.100 is Mara's first
+# recorded letter and it is a housekeeping note to Reyes about keeping the rota on paper
+# where everybody can see it. So the request she makes of Voss here is the same request
+# she is making of the future on that console, four hours earlier and out loud, and the
+# player who was in this room hears it twice. It costs no canon, no new prop and no line
+# of explanation, and it is why she asks for something instead of answering him.
+# The second half of the turn is .090 - four words, unexplained, and the only crack in
+# the scene. She has just refused to say whether the raid is survivable and then asks him
+# not to shut the door behind him.
+#
+# *** THE LAMP IS OFF, AND THAT IS CANON I AM SERVING, NOT SETTING. ***
+# M1.8.S91.140 (already written) has Voss say "She did them at this table. With the lamp
+# off." That line only exists for the player who was here, so this scene has to BE that:
+# lamp off, console screen turned away, one hand across it. .050 gives the reason as a
+# security fact, in her mouth, as a deflection - three jobs from one flat sentence.
+# ELEVEN:    L1-R14. The number is in the shot on .010 and in NO line of dialogue, per the
+#            stub. M1.8.S91.020 is where it is spoken aloud, once, by Dex.
+# mara:      pronoun audit - zero "you", zero "your", zero "I". Two "we"s (.030 "after us",
+#            .070 "We keep"). AR-5 and AR-5b hold; nothing here spends anything.
+#            .070 is a standard, not an order: she says what the cell does and lets him
+#            pick the job up himself at .080. That is the mechanical separation from
+#            Petra (L1-R9), whose whole tic is answering a question by ASSIGNING a task.
+#            Mara hands over a plural; Petra hands over an imperative.
+# voss:      three lines, twenty-eight words, and he asks the question once. .040 is the
+#            K-77 question put the only way he can put it - as arithmetic - and the three
+#            numbers in it are Dex's one door, Reyes's four beds and Mara's three days
+#            from M1.7.S99. He hands her the room's three objections as one sentence.
+#            He does not press: .070 opens on one word and that word is him letting it go.
+#            NO VARIANTS - BEATS_HUB_A1 section 7.6 gives Voss axis variants in scenes
+#            2, 6, 8 and 11 only, and this scene branches on nothing. That is also the
+#            reason it costs what it costs.
+# flag:      Story.Thread.MaraLetters_Open commits on the closing shot of .090, the same
+#            shape M1.8.S90 and M1.8.S91 use for a scene commit. No `choice:` block: there
+#            is no option here, and a set with no option is not a choice.
+# omitted:   an answer, a reassurance, the word "letter", the word "if", any line where
+#            she says what the recordings are for, and any acknowledgement from either of
+#            them that she is planning around not being here. See report.
+
+lines:
+  - id:      HUB.A1.mara_letters.010
+    speaker: MARA
+    voice:   mara
+    text:    "Whoever gets this: the second pump has never once started on the first try. Hit the housing twice and wait--"
+    shot:    "Map table, lamp off. She is sitting in the dark with the console turned away from the room, speaking into it. ELEVEN files in a column on the screen, on for about a second, and then her hand comes across it. CLEAN ROOM VOICE, not the compressed console playback M1.8.S91.090 asks for - the player is hearing one being made, not one being heard."
+    note:    "She is recording, not replaying, and she kills it mid-word herself. It is a maintenance note, not a farewell, which is the whole reason the letters work in act 2."
+
+  - id:      HUB.A1.mara_letters.020
+    speaker: VOSS
+    voice:   voss
+    text:    "That was your voice."
+
+  - id:      HUB.A1.mara_letters.030
+    speaker: MARA
+    voice:   mara
+    text:    "Notes. For whoever has this table after us."
+    note:    "What it is, in one sentence, per the stub. Deliberately NOT the four words - M1.8.S91.040 is where the player first hears the address they all carry."
+
+  - id:      HUB.A1.mara_letters.040
+    speaker: VOSS
+    voice:   voss
+    text:    "One door, four beds, three days. Somebody in that room should have said out loud whether that adds up."
+    note:    "The K-77 question in his own register. One door is Dex (M1.7.S99.050), four beds is Reyes (.070), three days is hers (.140). He gives her the room back as arithmetic because he cannot ask it any other way."
+
+  - id:      HUB.A1.mara_letters.050
+    speaker: MARA
+    voice:   mara
+    text:    "The lamp stays off in here after the horns. It shows under the door."
+    note:    "The deflection: he asks whether the raid adds up and she answers with a rule about a lamp. It is also the canon M1.8.S91.140 depends on, and it is five years of not being found, said as housekeeping."
+
+  - id:      HUB.A1.mara_letters.060
+    speaker: MARA
+    voice:   mara
+    text:    "We keep the rota on paper, on the board, where the whole room can see it. That one has been wrong since the mast came down."
+    shot:    "She has not turned round. The console screen is still angled away from him and she has one hand flat on the cloth beside it."
+    note:    "*** THE TURN. *** Same instruction as her first recorded letter (M1.8.S91.100), given out loud, four hours earlier, to a living person. She takes this turn WITHOUT letting him answer .050 - that is a woman closing a subject, and it is why the request lands with nothing between it and the refusal."
+
+  - id:      HUB.A1.mara_letters.070
+    speaker: VOSS
+    voice:   voss
+    tags:    [quietly]
+    text:    "Right. I'll write it out."
+    shot:    "PLAYER BEAT (18.7): he takes the old rota card off the board on his way past. The scene does not wait for him to; if he walks out, the card stays where it is."
+    note:    "He does not ask the question again. One word of acceptance and a job taken, and the not-pressing is the whole of his half of this scene."
+
+  - id:      HUB.A1.mara_letters.080
+    speaker: MARA
+    voice:   mara
+    tags:    [pause]
+    text:    "And leave the door."
+    shot:    "He leaves it open. She does not put the lamp on. The console comes back up behind her before he is out of the corridor and the column of files is on it again. Story.Thread.MaraLetters_Open commits here."
+    note:    "The domestic request the stub asked for, four words, unexplained, and nobody in the scene remarks on it. She told him ninety seconds ago that light shows under that door."

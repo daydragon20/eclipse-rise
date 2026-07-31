@@ -13,9 +13,11 @@ obstacle:     "She has already found the kitchen, the water line, and three peop
 turn:         "She gives him a job, he takes it, and that is how they both survive the week."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           107
+words_heard:     107
+words_generated: 145
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      PETRA VOSS, VOSS
@@ -38,4 +40,115 @@ words:        0
 #            NO SCENE IN THE GAME MAY HAVE HER DESCRIBE WHAT WAS DONE TO HER.
 #            Aftermath: zero comic beats (18.6).
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a ceiling. Longest 16 w (.030). Register reached at .010, .030,
+#            .060 and .090. Spread 2 w (.100 "How long?") to 16 w = 8x.
+#
+# *** THE PRONOUN REGEX, WHOLE-FILE. ***
+# Zero occurrences of "you" or "your" in any text: field in this file - hers AND his. The
+# M1.8.S04 writer held the same line across a whole scene and the reasoning carries: the word
+# stays scarce around this woman, so nothing anybody says near her competes with Mara's one
+# use of it in M1.8.S08. Voss's five lines are built round it without strain ("There's a
+# bunk", "Nobody's asking"), which is the test that it is not a cage.
+# Petra additionally uses no "I" and no "we", names nobody, and never once uses his name or a
+# callsign (L1-R10). SCOPE: text: fields. This comment block uses the words in prose.
+#
+# *** BRICK vs PETRA, DEMONSTRATED. ***
+# He hands you a noun, she hands you a verb (18.4). Every one of her seven lines opens on a
+# verb or lands on one - Fill, Take, Go and look, Get the salt, Stir it, Roll the sleeves -
+# and the one line that starts with a noun (.090) turns into an instruction inside four
+# words. Read .070 against M1.8.S09.110 ("Coats."): same length, same room, and neither is
+# deliverable by the other person.
+#
+# the tic:   fires three times and never as a refusal. .030 answers an offer of a bed with
+#            three people at the far end. .070 answers a sentence he cannot finish with the
+#            salt shelf. .090 answers his last attempt at making her stop by handing her the
+#            largest job in the room.
+# .060/.070: 18.7's required interruption, and it is the whole scene. He starts the only
+#            emotional sentence either of them attempts and she cuts it off with a condiment.
+#            She does not refuse it, disapprove of it, or acknowledge it. She gives him
+#            something to do with his hands instead, which is the only comfort she has.
+# .100:      TWO WORDS AND IT IS THE TURN. He stops trying to make her rest and asks how long
+#            to stir a pot. That is the stub's "and that is how they both survive the week",
+#            and it is written as a question about cooking.
+# .120:      the last line and it is a woman rolling up a grown man's sleeves in her kitchen
+#            without touching him or saying so. Nothing that was done to her is named, K-77
+#            is not mentioned, and nobody thanks anybody.
+# aftermath: ZERO comic beats (18.6). Audited.
+# eleven:    L1-R14 checked. Not used. Nine and six are not used either.
+# omitted:   thanks, an embrace, a question about the cell, any mention of Mara, and any line
+#            in which either of them says that the other should be resting instead. See
+#            report.
+
+lines:
+  - id:      HUB.A1.petra_return.010
+    speaker: PETRA
+    voice:   petra
+    text:    "Water line runs dry at the second horn. Fill everything before then."
+    shot:    "The corner of the vault that has become a kitchen because she stood in it. A pot, a burner, two crates and a queue that has not formed yet."
+    note:    "Her first line back in the base is a task, and it is about a pipe. She has been here under a day and already knows the shift horns."
+
+  - id:      HUB.A1.petra_return.020
+    speaker: VOSS
+    voice:   voss
+    text:    "There's a bunk behind the gallery with nobody in it."
+    note:    "The want, and he never states it more directly than this. No second person anywhere in it."
+
+  - id:      HUB.A1.petra_return.030
+    speaker: PETRA
+    voice:   petra
+    text:    "Three at the far end have not eaten since the ramp. Take a bowl to each."
+    note:    "THE TIC. An offer of a bed comes back as three people and a job. The ramp is M1.8.S09 and she does not say the word K-77."
+
+  - id:      HUB.A1.petra_return.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Reyes has a list of who's eaten."
+
+  - id:      HUB.A1.petra_return.050
+    speaker: PETRA
+    voice:   petra
+    text:    "The list has them fed. Go and look."
+
+  - id:      HUB.A1.petra_return.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Nobody expected any of this. When the lift came up I thought--"
+    note:    "The only emotional sentence either of them attempts, and he does not get to the end of it. Nobody in this game finishes that sentence."
+
+  - id:         HUB.A1.petra_return.070
+    speaker:    PETRA
+    voice:      petra
+    interrupts: true
+    text:       "Get the salt. Shelf above the pipe."
+    note:       "18.7's required interruption, and it is the fingerprint doing the work. She does not refuse the sentence, disapprove of it or acknowledge it - she gives his hands something else. Verb first: Brick would have said 'Salt.'"
+
+  - id:      HUB.A1.petra_return.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Nobody's asking for any of this tonight."
+
+  - id:      HUB.A1.petra_return.090
+    speaker: PETRA
+    voice:   petra
+    text:    "Second pot on the burner. Stir it, and do not let it catch."
+    note:    "THE TIC, third firing, and it is the turn arriving: his last attempt at stopping her is answered with the biggest job in the room."
+
+  - id:      HUB.A1.petra_return.100
+    speaker: VOSS
+    voice:   voss
+    text:    "How long?"
+    shot:    "He has taken the spoon. Neither of them remarks on it and the camera does not hold on either face."
+    note:    "*** THE TURN, IN TWO WORDS. *** He stops trying to make her rest and asks how long to stir a pot. That is the stub's 'that is how they both survive the week', written as a question about cooking."
+
+  - id:      HUB.A1.petra_return.110
+    speaker: PETRA
+    voice:   petra
+    text:    "Until it stops smelling like water."
+
+  - id:      HUB.A1.petra_return.120
+    speaker: PETRA
+    voice:   petra
+    text:    "Roll the sleeves. Both, above the elbow."
+    shot:    "She says it going past him with the bowls. She does not touch him and she does not stop. Last line of the scene; hold on the pot."
+    note:    "A woman rolling up a grown man's sleeves in her kitchen without touching him and without saying so. No thanks are offered and none would be accepted. Nothing that was done to her is named, here or in any later act."

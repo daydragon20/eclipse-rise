@@ -13,9 +13,11 @@ obstacle:     "It was Mara's, and it did not need repairing."
 turn:         "He works on it anyway, and when Voss offers to help he says yes, which he has never done."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           53
+words_heard:     53
+words_generated: 61
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      DEX, VOSS
@@ -33,4 +35,104 @@ words:        0
 #            reaches its act 1 terminus here: the machine is fine and the person is gone.
 #            Nobody says that sentence.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      hub (12-35) as a ceiling (L1-R1). Longest 20 w (.030), ceiling clear.
+#            Register reached at .030 (20). Spread 1 w (.050 "Yes.") to 20 w = 20x.
+# length:    eight lines, fifty-three words, which is the whole scene and not a shortcut.
+#            21_quality_mandate's generosity is spent in dex_workshop and dex_first; here
+#            the content is two men and a lamp that works.
+#
+# *** THE OBJECT IS THE MAP-TABLE LAMP AND IT IS ALREADY IN THE CORPUS. ***
+# M1.7.S99.270: the lamp comes down over K-77 on the oilcloth and nobody moves it away
+# again. M1.8.S91.010: one lamp, over her console. HUB.A1.mara_letters: the lamp is off,
+# because light shows under that door. No new prop, no new canon: the thing he has in
+# pieces on the bench is the light that was over the map every time she marked it.
+# IT WORKS. The switch cracks when it turns and it has cracked for a year. He is repairing
+# a fault that is not one, at an hour that is not a time, and .030 is the only reason he
+# gives - if the switch ever fails there is no light over that map. That sentence is a
+# maintenance argument and it is also the entire scene, and nobody in the room hears it as
+# anything else, including him.
+#
+# *** THE YES. ***
+# .040 is Voss offering help. .050 is one word. Across act 1 Dex has answered
+# a thank-you with a maintenance task (M1.1.S06.230), conceded an idea while refusing to
+# say it twice (M1.2.S99.210), and abandoned two sentences about himself inside the
+# sentence (M1.3.S06.230, M1.8.S91.050). He has never taken anything from anybody. He
+# takes this, in one syllable, and neither of them remarks on it.
+# The three tool lines after it are not filler and they are not a joke: they are the help
+# happening. He starts using him inside four seconds, which is the only way this character
+# can accept company. The scene ends on the third tool name and no line closes it.
+#
+# dex:       six lines, no feeling named, no sentimental sentence started. His arc terminus
+#            is carried entirely by which object he chose to fix.
+# voss:      two lines, eight words, and neither is comfort. .020 is the obstacle spoken
+#            once and then never again. .040 is a yes/no question, which is the only shape
+#            of offer this man can answer.
+#            NO VARIANTS - BEATS_HUB_A1 section 7.6 gives Voss axis variants in scenes 2,
+#            6, 8 and 11 only, and nothing here branches.
+# interrupt: .020/.030, one dash in eight lines. He cuts off the sentence that would have
+#            made him explain, which is armour, and it is the last time it goes up before
+#            the yes takes it down.
+# direct_beat: NONE. AR-12 gives act 1 exactly one and it is spent on Brick in M1.8.S90.
+#            This scene is the argument for that rationing: it is the same emotional
+#            register and it names nothing.
+# humour:    ZERO comic beats (18.6, aftermath). Checked line by line. The tool names are
+#            work, not deadpan, and they should be directed flat.
+# omitted:   her name, the word "her", the word "sorry", any line where either of them says
+#            what the lamp is, any reference to K-77, and any answer to the yes. Nobody
+#            says the machine is fine and the person is gone. See report.
+
+lines:
+  - id:      HUB.A1.dex_after.010
+    speaker: DEX
+    voice:   dex
+    text:    "Cord's gone hard behind the switch."
+    shot:    "Workshop, an hour that is not a time. The map-table lamp is in pieces on the bench under a hand torch - shade off, cord out, the switch body in a tin lid. It is the only thing he has touched since they came back."
+    note:    "He states a fault. It is a real fault and it has been there for a year, and none of that is why he is doing this at this hour."
+
+  - id:      HUB.A1.dex_after.020
+    speaker: VOSS
+    voice:   voss
+    text:    "That was working--"
+    note:    "The obstacle, spoken once, in three words, and nobody returns to it."
+
+  - id:         HUB.A1.dex_after.030
+    speaker:    DEX
+    voice:      dex
+    interrupts: true
+    text:       "It cracks when it turns, and the day it stops turning nobody in here has a light over that map."
+    shot:       "He does not look up. The oilcloth is on the table behind them in the dark with K-77 still marked on it high up in the clean part."
+    note:       "The only reason he gives, and it is a maintenance argument. It is also the whole scene. He would deny the second reading and nobody offers it to him."
+
+  - id:      HUB.A1.dex_after.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Want a hand with it?"
+    shot:    "PLAYER BEAT (18.7): the offer is the player's move. If he walks out instead, Dex is still at the bench when he next comes down."
+    note:    "A yes-or-no question, which is the only shape of offer this man has ever been able to answer."
+
+  - id:      HUB.A1.dex_after.050
+    speaker: DEX
+    voice:   dex
+    text:    "Yes."
+    shot:    "He moves a tin lid six inches to make room at the bench. That is the entire acknowledgement."
+    note:    "*** ONE WORD, AND IT IS THE SCENE. *** He has not taken anything from anybody in the whole act. Nobody remarks on it, here or ever."
+
+  - id:      HUB.A1.dex_after.060
+    speaker: DEX
+    voice:   dex
+    text:    "Small driver. The cross head."
+    note:    "Tool name 1 of 3. The help starts inside four seconds, because being useful to him is the only way in."
+
+  - id:      HUB.A1.dex_after.070
+    speaker: DEX
+    voice:   dex
+    text:    "Flux, and then hold it there."
+    note:    "Tool name 2 of 3. Two men and one pair of hands too few, which is what the scene is about and what it never says."
+
+  - id:      HUB.A1.dex_after.080
+    speaker: DEX
+    voice:   dex
+    text:    "Wire. The blue spool, not the grey."
+    shot:    "Voss finds the spool. Neither of them says anything else. The lamp is still in pieces when the shift horns go, and it is still in pieces the next time the player comes down."
+    note:    "Tool name 3 of 3, and the scene ends on it. No closing line, no beat where either of them looks at the other. He is not finishing it tonight and he is not going to bed."

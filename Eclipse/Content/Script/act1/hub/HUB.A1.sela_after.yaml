@@ -13,9 +13,11 @@ obstacle:     "Voss did not choose the name and cannot control what people put i
 turn:         "She tells him what the district is already saying about him, it is not true, and she advises him not to correct it."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           228
+words_heard:     191
+words_generated: 290
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      SELA, VOSS
@@ -30,4 +32,130 @@ words:        0
 #            Voss variants on all four axes: whether he corrects the story is the character
 #            statement act 4's Vex confrontation will use as ammunition.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a ceiling. Longest 24 w (.010). Register reached at .010,
+#            .030, .060, .070, .080, .110, .120, .150.
+#            Spread 1 w (.100 "No.") to 24 w = 24x.
+#
+# *** THE RUMOUR, AND WHY IT IS THIS ONE. ***
+# The district is saying that everybody who went down the shaft came back up it. Three
+# things it has to do and does:
+#   1. IT IS FALSE, and correcting it means saying the names out loud. That is what makes
+#      her advice cost something instead of being tact.
+#   2. IT TOUCHES NOTHING THE ACT LEFT OPEN. It does not answer how Threx had the names
+#      (P3-d must stay unresolved, M1.8.S99), it does not state a casualty figure (M1.8.S09
+#      forbids one anywhere in the mission), and it does not mention Mara.
+#   3. IT ALREADY HAS A TRUE VERSION AVAILABLE - the wall in M1.8.S90 - so her compromise is
+#      not "hide it", it is "let it live somewhere quieter". That is exactly the size of
+#      compromise a person takes the first time.
+#
+# sela:      NO ORATION (AR-7). Her tic fires at .060 and .110: a man's private objection
+#            about his own name comes back as what a row of doors is deciding this week.
+#            She speaks about herself ONCE, at .140, and it is the moment her arc turns.
+#            She calls it lying, in her own mouth, and nobody in the scene contradicts her,
+#            softens it, forgives her, or brings it up again.
+# voss:      HE NEVER SAYS THE WORD. Not in the base line, not in any of the four variants.
+#            M1.8.S99 established that he never speaks it and this scene holds the rule -
+#            he says "the doors", "it", "that story". Checked line by line.
+# variants:  full four-axis coverage on .130, the scene's branch point and the player's
+#            18.7 input. The axis is what he does about a story that flatters him, which is
+#            the thing act 4's Vex confrontation has to be able to reach for.
+#            The base is three words, which is also the file's second-shortest line.
+# aftermath: ZERO comic beats (18.6). Audited. Nothing in the file is set up to land.
+# eleven:    L1-R14 checked. Not used. Nine and six are not used either.
+# omitted:   Mara, the casualty count, any answer to how Threx had the names, any line where
+#            he thanks her or she asks to be forgiven, and any moment where either of them
+#            says the word Cinder. See report.
+
+lines:
+  - id:      HUB.A1.sela_after.010
+    speaker: SELA
+    voice:   sela
+    text:    "There is a word chalked on three doors on my row this morning. None of the people who put it there have met you."
+    shot:    "The vault, two days after. She has the intake list under one arm and has not sat down since she came in."
+
+  - id:      HUB.A1.sela_after.020
+    speaker: VOSS
+    voice:   voss
+    text:    "I know what's on the doors."
+    note:    "He does not say the word. He never does, in this file or anywhere in the game."
+
+  - id:      HUB.A1.sela_after.030
+    speaker: SELA
+    voice:   sela
+    text:    "Then you know it is not a name yet. It is a space, and this week the district fills it in."
+
+  - id:      HUB.A1.sela_after.040
+    speaker: SELA
+    voice:   sela
+    text:    "So what goes in it?"
+
+  - id:      HUB.A1.sela_after.050
+    speaker: VOSS
+    voice:   voss
+    text:    "I didn't put it there--"
+
+  - id:         HUB.A1.sela_after.060
+    speaker:    SELA
+    voice:      sela
+    interrupts: true
+    text:       "Nobody puts a word like that anywhere. It arrives, and then people decide what it was for."
+    note:       "HER TIC and 18.7's required interruption in the same line. His objection about himself comes back as what a district is doing with a word."
+
+  - id:      HUB.A1.sela_after.070
+    speaker: SELA
+    voice:   sela
+    text:    "What they are saying on the Row is that everybody who went down that shaft came back up it."
+    note:    "THE RUMOUR. False, flattering, and correctable only by saying the names out loud. It touches nothing act 1 left open on purpose."
+
+  - id:      HUB.A1.sela_after.080
+    speaker: SELA
+    voice:   sela
+    text:    "It is a good story and it is going door to door on its own."
+
+  - id:      HUB.A1.sela_after.090
+    speaker: VOSS
+    voice:   voss
+    text:    "That's not what happened."
+
+  - id:      HUB.A1.sela_after.100
+    speaker: SELA
+    voice:   sela
+    tags:    [pause]
+    text:    "No."
+    note:    "She agrees with him immediately and completely. Everything after this line is her arguing for it anyway, which is what makes it a compromise instead of a lie she believes."
+
+  - id:      HUB.A1.sela_after.110
+    speaker: SELA
+    voice:   sela
+    text:    "And the correction is a list of names, said out loud, on a row that has not decided yet whether to be afraid."
+
+  - id:      HUB.A1.sela_after.120
+    speaker: SELA
+    voice:   sela
+    text:    "So let it run. Put the names on the wall where the people who need them will find them."
+    note:    "The compromise, and it is small: the true version already exists in M1.8.S90 and she is routing people to it instead of to a correction. No justification is offered beyond usefulness and nobody offers her one."
+
+  - id:      HUB.A1.sela_after.130
+    speaker: VOSS
+    voice:   voss
+    text:    "For how long?"
+    note:    "FULL FOUR-AXIS COVERAGE, and the player's 18.7 input. The axis is what he does about a story that flatters him. No variant says the word, and no variant settles it - the answer is hers, and she does not have one."
+    variants:
+      idealist:   "Then I say it at the water line in the morning."
+      pragmatist: "Until somebody who was down there says otherwise in a queue."
+      personal:   "Some of them will hear that from somebody who was not down there."
+      strategic:  "A story that size gets checked, and then everything else does."
+
+  - id:      HUB.A1.sela_after.140
+    speaker: SELA
+    voice:   sela
+    text:    "I don't know. I've never had anything worth lying about before."
+    note:    "*** HER FIRST COMPROMISE, NAMED BY HER AND BY NOBODY ELSE. *** The one line in the file about herself (18.4). Nobody contradicts it, softens it or returns to it, here or in act 2."
+
+  - id:      HUB.A1.sela_after.150
+    speaker: SELA
+    voice:   sela
+    text:    "The intake list needs a second signature. It can wait until the morning."
+    shot:    "She puts the list down on the crate between them and goes, and the list is still there when the camera leaves."
+    note:    "She goes back to work inside one line, which is how everybody in this game ends a conversation they cannot finish. No goodbye (18.7)."

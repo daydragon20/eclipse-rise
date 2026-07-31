@@ -13,9 +13,11 @@ obstacle:     "Any order she writes is a version of the order she once refused t
 turn:         "She makes him choose, then tells him what the Dominion's version of that order was."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           222
+words_heard:     164
+words_generated: 257
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      REYES, VOSS
@@ -30,4 +32,185 @@ words:        0
 #            it in a note:.
 #            Voss variants on all four axes - the order he signs is a character statement.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a ceiling. Longest 22 w (.010). Register reached at .010,
+#            .030, .040, .070, .130, .140, .150, .160, .170, .180.
+#            Spread 2 w (.020 "What order?") to 22 w = 11x.
+#
+# *** THE 18.9 A LINE IS .170, AND IT IS NOT A direct_beat. TWO SEPARATE EXEMPTIONS. ***
+# 18.9 A forbids a character naming their own emotion "UNLESS the character is Reyes,
+# clinically, OR it is one of the game's ~30 rationed direct beats and is marked as such".
+# Those are two exemptions joined by "or", not one. AR-12 rations act 1 to a single
+# direct_beat and the M1.8 writer has spent it on Brick in M1.8.S90.050 - so if .170 were
+# marked direct_beat: true it would either be act 1's second, or it would force S90's line
+# back open. It is neither. It is the standing Reyes exemption, used once in the act, in the
+# scene the stub reserves for it. FLAGGED IN THE REPORT so the architect can overrule
+# cheaply; the only thing that changes is one boolean.
+# The line names the feeling and then triages it as clinically unhelpful in the same breath,
+# which is the only way this woman is capable of saying it.
+#
+# *** THE CHOICE, AND WHY run. ***
+# The stub's turn is "she makes him CHOOSE" and its flags-out is "none". Both are honoured:
+# group `hub_a1_triage` sets run.hub_triage_order, which is set by the choice, read four
+# lines later in this same file, and read by nothing else - the exact shape and the exact
+# reasoning the M1.8.S06 writer used for run.m18_threx_probe (L1-R4: a conversational branch
+# must not outlive its scene, and nothing persists). No new story flag, so no missing row in
+# ACT1_OVERVIEW section 6 and no FLAGREG finding.
+# FOUR OPTIONS REPLACE FOUR-AXIS VARIANTS, per the M1.8.S06 precedent, and here it is
+# strictly better: a variant set shares one reply, and the whole content of this scene is
+# that the four orders are four different documents she has to live inside. It also costs
+# less - four short Voss lines doubled, against a base plus four variants doubled.
+# ESCALATED: if the architect wants this to persist into act 2 it needs a section 6 row and
+# a reader, and I will not add one myself.
+# NO OPTION LINE CARRIES A CONDITION ON THE FLAG IT SETS. Checked.
+#
+# reyes:     ZERO CONTRACTIONS in this file. Audited word by word. The L1-R19 ladder is
+#            M1.4.S99 baseline -> M1.6.S06 drops -> M1.8.S07 drops hard; this scene sits
+#            between the first two and she is stressed throughout it, which is the whole
+#            subject. Voss contracts twice (.050) so the contrast is audible inside the
+#            scene and not only across missions.
+# the four:  none of them is the wrong answer and none is the Dominion's. Her four replies
+#            are four different clerical problems - one fits, one needs a second author,
+#            one will be argued with, one is short enough to shout - and not one of them
+#            approves or objects. She is measuring a plate, not scoring a man.
+# .160:      the canon, and it arrives as a fact about typography. The scene's one permitted
+#            triad (18.9 B). Nobody asks a follow-up and she never mentions it again, here
+#            or in any later act. THE WORD DOMINION IS NOT SPOKEN. It does not need to be.
+# .180:      the real turn and nobody names it. The order she refused had no name at the
+#            bottom of it; this one will. That is the entire difference between the two
+#            documents and no line in the file points at it.
+# eleven:    L1-R14 checked. Not used. Nine and six are not used either.
+# omitted:   the word Dominion, the word defected, any account of what she did or did not
+#            sign, gratitude, and any line where Voss tells her this one is different.
+
+lines:
+  - id:      HUB.A1.reyes_triage.010
+    speaker: REYES
+    voice:   reyes
+    text:    "There is a piece of plate on my crate with nothing on it. I want the order that goes on it in your words."
+    shot:    "Bunk row. A rectangle of bunk plate propped against a crate, a scribe punch beside it, and her kit closed for once."
+
+  - id:      HUB.A1.reyes_triage.020
+    speaker: VOSS
+    voice:   voss
+    text:    "What order?"
+
+  - id:      HUB.A1.reyes_triage.030
+    speaker: REYES
+    voice:   reyes
+    text:    "Two people come down that ramp at the same time and I have one pair of hands. Who do I open first?"
+    note:    "Her tic, and it is not rhetorical. Zero contractions from here to the end of the file."
+
+  - id:      HUB.A1.reyes_triage.040
+    speaker: REYES
+    voice:   reyes
+    text:    "Do not tell me it depends. It always depends, and then somebody dies while two people--"
+
+  - id:         HUB.A1.reyes_triage.050
+    speaker:    VOSS
+    voice:      voss
+    interrupts: true
+    text:       "You've written one already."
+    note:       "18.7's required interruption, and it is Voss seeing through her four lines before she gets to the part she cannot say."
+
+  - id:      HUB.A1.reyes_triage.060
+    speaker: REYES
+    voice:   reyes
+    text:    "I have started it four times."
+    note:    "The obstacle, entire. She does not say what stops her and nothing in the scene explains it."
+
+  - id:      HUB.A1.reyes_triage.070
+    speaker: REYES
+    voice:   reyes
+    text:    "So it is yours. Say it once and I will punch it into the plate and it stops being a conversation."
+
+  - id:      HUB.A1.reyes_triage.080
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: hub_a1_triage
+      set:   'run.hub_triage_order = "worst"'
+      label: "Worst first."
+    text:    "Whoever is closest to dying."
+    note:    "PLAYER OPTION 1 of 4. Idealist quadrant. Four options in place of four-axis variants, per the M1.8.S06 precedent - a variant set shares one reply, and the content of this scene is that the four orders are four different documents."
+
+  - id:      HUB.A1.reyes_triage.090
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: hub_a1_triage
+      set:   'run.hub_triage_order = "saved"'
+      label: "Whoever can be saved."
+    text:    "Whoever your hands can still get back."
+    note:    "PLAYER OPTION 2 of 4. Pragmatist quadrant."
+
+  - id:      HUB.A1.reyes_triage.100
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: hub_a1_triage
+      set:   'run.hub_triage_order = "ours"'
+      label: "Ours first."
+    text:    "Ours first. Then everybody else."
+    note:    "PLAYER OPTION 3 of 4. Personal quadrant, and it is the one closest to the document she refused. Nothing in the scene says so."
+
+  - id:      HUB.A1.reyes_triage.110
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: hub_a1_triage
+      set:   'run.hub_triage_order = "watch"'
+      label: "Whoever can fight tomorrow."
+    text:    "Whoever can stand a watch in the morning."
+    note:    "PLAYER OPTION 4 of 4. Strategic quadrant."
+
+  - id:        HUB.A1.reyes_triage.120
+    speaker:   REYES
+    voice:     reyes
+    condition: 'run.hub_triage_order == "worst"'
+    text:      "Nearest death first. That fits on one line."
+
+  - id:        HUB.A1.reyes_triage.130
+    speaker:   REYES
+    voice:     reyes
+    condition: 'run.hub_triage_order == "saved"'
+    text:      "The ones who can be brought back. I will have to write down who decides that."
+
+  - id:        HUB.A1.reyes_triage.140
+    speaker:   REYES
+    voice:     reyes
+    condition: 'run.hub_triage_order == "ours"'
+    text:      "Ours first. I will put that word on a plate and let the vault argue with it."
+    note:      "No objection anywhere in the line. She reports what the word will do once it is hanging on a wall, and then she punches it in."
+
+  - id:        HUB.A1.reyes_triage.150
+    speaker:   REYES
+    voice:     reyes
+    condition: 'run.hub_triage_order == "watch"'
+    text:      "Whoever stands a watch. That one is short enough to shout down a corridor."
+
+  - id:      HUB.A1.reyes_triage.160
+    speaker: REYES
+    voice:   reyes
+    tags:    [pause]
+    text:    "Mine came printed. Loyalty score, then rank, then everybody else, and no name at the bottom of it."
+    shot:    "She is holding the punch and she has not started. Her hand is not steady and the camera is on the plate, not on her face."
+    note:    "THE CANON, 2.5, arriving as a fact about typography. The scene's one permitted triad (18.9 B). The word Dominion is never spoken and nobody asks a follow-up."
+
+  - id:      HUB.A1.reyes_triage.170
+    speaker: REYES
+    voice:   reyes
+    text:    "I am frightened of that plate. That is not a useful thing to be and it will pass."
+    note:    "*** 18.9 A, THE REYES CLINICAL EXEMPTION - NOT AR-12'S RATIONED direct_beat, WHICH IS SPENT IN M1.8.S90.050. *** She names the feeling and triages it as clinically unhelpful in the same breath, which is the only way this woman can say it out loud. One such line in act 1 and it is this one. See the L2 header note and the report."
+
+  - id:      HUB.A1.reyes_triage.180
+    speaker: REYES
+    voice:   reyes
+    text:    "Second line, under the order. Whoever wrote it puts a name under it."
+    note:    "THE TURN, and nobody names it. The order she refused had no name at the bottom; this one will. That is the whole difference between the two documents and no line in the file points at it."
+
+  - id:      HUB.A1.reyes_triage.190
+    speaker: VOSS
+    voice:   voss
+    text:    "Give me the punch."
+    shot:    "She hands it over and goes back to the kit while he is still working out how to hold it. Nobody says the order out loud again."

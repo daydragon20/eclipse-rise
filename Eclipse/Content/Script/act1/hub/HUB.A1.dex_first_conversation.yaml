@@ -13,9 +13,11 @@ obstacle:     "Voss wants to talk about what happened out there, and Dex would r
 turn:         "The rifle turns out to be fine, which leaves them nothing to look at, and Dex says the one honest thing he says in act 1."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           124
+words_heard:     124
+words_generated: 167
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      DEX, VOSS
@@ -28,4 +30,118 @@ words:        0
 #            Hub band 12-35 words, but Dex sits at the bottom of it. Somebody has to sit
 #            at the top for the variance rule, and in a two-hander that is Voss.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      hub (12-35) as a ceiling (L1-R1). Longest 25 w (.020 and .080), ceiling clear.
+#            Register reached at .020 (25), .050 (15), .060 (14), .080 (25), .110 (14).
+#            Spread 1 w (.010 "Rifle.") to 25 w = 25x.
+#            VOSS SITS AT THE TOP AND DEX AT THE BOTTOM exactly as the stub asks, with one
+#            deliberate exception: .080, the honest line, is the longest thing Dex says in
+#            act 1. That is the point of it - the door opens and the sentences get long.
+#
+# *** THE SENTENCE HE CANNOT FINISH IS THE SAME SENTENCE, AND THAT IS CHECKABLE. ***
+# M1.1.S06.160: "Nobody's walked it. Not since the survey, so if the roof's come in--"
+# Mara interrupts him there. He starts it again at .080 of this scene, alone, in a room
+# with nobody in a hurry, and this time NOBODY interrupts him - he stops himself. One
+# sentence, twice, and the second time the only thing in his way is him. It is the one
+# honest line the stub asks for and it is also the strongest available proof that the
+# deflection is armour and not personality (18.4: never finishes a sentimental sentence).
+#
+# dex:       eight lines, six of them fragments. .010 is one word and a hand out. Comic
+#            beats: .030 (the flat refusal, which is funny because it is true) and .050
+#            (technical noun as insult - 18.6 says roughly one per six lines in downtime,
+#            this is two in eleven). ZERO comic beats after .060, because the door is open
+#            from there and 18.6's ratio is about texture, not about filling a quota.
+#            .090 is the door shutting: three fragments, no feeling, and a task.
+# rifle:     it is the pre-M1.4 weapon and it is junk, which is why he can insult it and
+#            why M1.4's "real rifles" lands. He never says it is junk; he says what has
+#            been ground flat twice.
+# voss:      three lines, and all three are him handing Dex something. .020 is the night,
+#            offered and refused. .060 is the night again, smaller, and it is about two
+#            other people because 18.4 says he does not claim credit in front of the ones
+#            who did the work - so he cannot make the account about himself even when the
+#            account is what he came here to give away.
+#            .100 is four words and it is the only comfort in the scene: it is a FACT, not
+#            reassurance. Dex's paper was right. That is all anybody can give him.
+#            NO VARIANTS - BEATS_HUB_A1 section 7.6 gives Voss axis variants in scenes 2,
+#            6, 8 and 11 only, and nothing here branches.
+# interrupt: .020/.030 - Dex cuts off the story he asked for. Two dashes in eleven lines,
+#            rate 1:5.5, inside 18.9 B. The second (.080) is him cutting off himself and
+#            carries no `interrupts:` flag, same shape as M1.8.S91.050.
+# branch:    nothing in this scene reads a flag. The conscript on the ramp (M1.1.S05) is
+#            deliberately absent: it branches three ways and a hub line about it would
+#            either need three variants or contradict one branch in every third run.
+# omitted:   thanks, an apology, the word "alone", any line where Voss notices what Dex is
+#            actually asking, and any answer to .110. See report.
+
+lines:
+  - id:      HUB.A1.dex_first_conversation.010
+    speaker: DEX
+    voice:   dex
+    text:    "Rifle."
+    shot:    "Workshop. He has a hand out before Voss is through the doorway. The two crates off the deck are behind him, opened and counted twice, and he has not been to bed."
+    note:    "One word and a hand. The want, complete, and the last thing he will say plainly for ninety seconds."
+
+  - id:      HUB.A1.dex_first_conversation.020
+    speaker: VOSS
+    voice:   voss
+    text:    "The circuit dropped, and after that they came up the column one at a time, and it was over before anybody down there said a--"
+    note:    "Voss at the top of the band. He is trying to give away the night, which is the only thing he brought back that Dex can use."
+
+  - id:         HUB.A1.dex_first_conversation.030
+    speaker:    DEX
+    voice:      dex
+    interrupts: true
+    text:       "Didn't ask about the deck. Asked for the rifle."
+    note:       "He cuts off the story he wanted. Comic beat 1 of 2 and it is funny because it is a lie he tells at normal volume."
+
+  - id:      HUB.A1.dex_first_conversation.040
+    speaker: DEX
+    voice:   dex
+    text:    "Gas port. Spring. Sear."
+    shot:    "He has it apart on the bench in under a minute, in the order he says the words."
+
+  - id:      HUB.A1.dex_first_conversation.050
+    speaker: DEX
+    voice:   dex
+    text:    "This one's got a sear off a shop door. Somebody has ground it flat twice."
+    note:    "Comic beat 2 of 2. Technical noun as insult (18.4), and it is also why M1.4's real rifles are worth a mission."
+
+  - id:      HUB.A1.dex_first_conversation.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Two of them went down the low rail on five rounds. Nobody made them."
+    note:    "Second attempt, smaller, and it is about somebody else - 18.4's fixed Voss trait holding even when the scene would be easier if it did not."
+
+  - id:      HUB.A1.dex_first_conversation.070
+    speaker: DEX
+    voice:   dex
+    text:    "It's fine. Not a mark on it anywhere."
+    shot:    "He puts the parts back down in the same order. There is nothing left on the bench to look at."
+    note:    "*** THE TURN. *** The instrument tells him nothing, so there is nothing between him and the question he actually came in with."
+
+  - id:      HUB.A1.dex_first_conversation.080
+    speaker: DEX
+    voice:   dex
+    text:    "Four of you on a deck, and me down here with a scanner and half a page of a survey, and if that roof had--"
+    shot:    "Nobody interrupts him. He stops on his own, with both hands still on the bench."
+    note:    "*** THE ONE HONEST THING. *** It is M1.1.S06.160's sentence, restarted. Mara cut it off the first time; this time there is nobody to blame for it not finishing."
+
+  - id:      HUB.A1.dex_first_conversation.090
+    speaker: DEX
+    voice:   dex
+    text:    "Anyway. Barrel's sound. Take it."
+    note:    "The door shuts inside three fragments and the last one is a task. He has done this in every scene he is in; this is the first time the player can see what it is for."
+
+  - id:      HUB.A1.dex_first_conversation.100
+    speaker: VOSS
+    voice:   voss
+    text:    "The gallery was there."
+    shot:    "PLAYER BEAT (18.7): the rifle is on the bench between them and the player takes it back or leaves it. Dex does not look up either way."
+    note:    "Four words, and it is a fact rather than comfort: his paper was right and four people are standing because of it. Nobody in the room says the second half of that."
+
+  - id:      HUB.A1.dex_first_conversation.110
+    speaker: DEX
+    voice:   dex
+    text:    "Next time there's a deck, leave the set open. Even with nothing on it."
+    shot:    "He is already reaching for something else on the bench. Out on the movement, not on an answer."
+    note:    "Radio discipline as a request for company, and he would deny that reading if anybody offered it to him. Nobody does. It is the same move as label the crates, please (M1.1.S06.240) and the player now knows how to hear it."

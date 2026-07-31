@@ -13,9 +13,11 @@ obstacle:     "She is not asking as an accusation, and Voss cannot tell that yet
 turn:         "She writes his answer down, and explains that she keeps records because someone should."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           205
+words_heard:     130
+words_generated: 277
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      REYES, VOSS
@@ -29,4 +31,149 @@ words:        0
 #            contractions stay - which makes their absence later meaningful.
 #            Voss variants on all four axes.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a CEILING per L1-R1. Longest base line 21 w (.140), longest
+#            variant 14 w. Register reached at .010, .020, .100, .140, .170.
+#            Spread 2 w (.160 "Someone should.") to 21 w = 10.5x.
+#
+# *** THE FLAG. The stub names story.choice_m11_conscriptspared. THAT TAG IS WITHDRAWN
+# (L1-R3) and nothing sets it; a condition on it would never play and would still be paid
+# for. The three branches read story.m11_conscript_choice = finished | left | bound, which
+# is what M1.1.S05.140/.150/.160 actually set. All three leaves are handled in this file -
+# a scene that reads two of three is the L1-R12 shape. ***
+#
+# reyes:     SHE CONTRACTS. "I've" (.010), "doesn't" (.090), "That's" (.100), "it's" (.140).
+#            This is the second baseline (L1-R19) and it is deliberately unspectacular:
+#            an unstressed medic doing inventory. It cannot be leaned on - the hub tier is
+#            unvoiced (L1-R11) - so it duplicates M1.4.S99's work rather than replacing it.
+#            Her tic (a question instead of an accusation) fires at .030 and again at .170.
+# no verdict: audited line by line. .090 is a bookkeeping distinction between two columns.
+#            .100 is a duration. .110 is a correction to a knot. None of the three praises,
+#            blames, or asks a follow-up, and she never returns to any of them.
+#            The word "should" appears once in the file, at .160, and it is about HER.
+# .040:      the obstacle, played straight. He hears a question about a killing and assumes
+#            the book is a charge sheet. Nothing in the scene tells him otherwise except
+#            what she does with it, which is the whole point of writing it as behaviour.
+# variants:  full four-axis coverage on .150, which is the scene's single branch point and
+#            the player's 18.7 input (interjection, per the L1-R18 precedent). All five
+#            versions are the same objection - why is anybody keeping this - so "Someone
+#            should." answers every one of them and means something different each time.
+#            No other Voss line in this file carries variants; that is the budget decision
+#            the beat sheet section 7.6 asks for (variants in scenes 2, 6, 8, 11 only).
+# eleven:    L1-R14 checked. Not used. Nine and six are not used either.
+# jokes:     zero. Downtime allows roughly one per six lines (18.6); the comedy carriers are
+#            Dex, Kaya and Brick and none of them is in this room. A joke here would have to
+#            be Reyes's or Voss's, and neither of them has ever made one.
+# omitted:   any line where she says she is not judging him, any line where he thanks her,
+#            and any explanation of where she learned to keep a casualty book. See report.
+
+lines:
+  - id:      HUB.A1.reyes_first_conversation.010
+    speaker: REYES
+    voice:   reyes
+    text:    "Two plasma. I counted them on the ramp and I've counted them again down here."
+    shot:    "Bunk row, late. Her kit is open on a bunk and the contents are laid out in rows. A hard-backed book sits closed on the blanket beside it."
+
+  - id:      HUB.A1.reyes_first_conversation.020
+    speaker: REYES
+    voice:   reyes
+    text:    "There was a conscript on that deck. Through the hip, still talking when the squad came off."
+
+  - id:      HUB.A1.reyes_first_conversation.030
+    speaker: REYES
+    voice:   reyes
+    text:    "What happened to him?"
+    note:    "Her tic. She does not look up and she does not stop sorting. The question has no edge on it and there is no way for him to know that yet."
+
+  - id:      HUB.A1.reyes_first_conversation.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Who's asking? You, or that book?"
+    note:    "The obstacle in six words. He has decided the book is a charge sheet, which is a reasonable thing to decide."
+
+  - id:      HUB.A1.reyes_first_conversation.050
+    speaker: REYES
+    voice:   reyes
+    text:    "I am. The book keeps it."
+
+  - id:        HUB.A1.reyes_first_conversation.060
+    speaker:   VOSS
+    voice:     voss
+    condition: 'story.m11_conscript_choice == "finished"'
+    text:      "One round. It's done."
+
+  - id:        HUB.A1.reyes_first_conversation.070
+    speaker:   VOSS
+    voice:     voss
+    condition: 'story.m11_conscript_choice == "left"'
+    text:      "We walked. He was still talking."
+
+  - id:        HUB.A1.reyes_first_conversation.080
+    speaker:   VOSS
+    voice:     voss
+    condition: 'story.m11_conscript_choice == "bound"'
+    text:      "Dressed, above the hip. Then we walked."
+
+  - id:        HUB.A1.reyes_first_conversation.090
+    speaker:   REYES
+    voice:     reyes
+    condition: 'story.m11_conscript_choice == "finished"'
+    text:      "Then he doesn't go in the column for wounded. He goes in the other one."
+    shot:      "She opens the book on her knee and writes for about four seconds. She does not look up at the end of it."
+    note:      "NOT A VERDICT. It is a bookkeeping distinction between two columns, spoken by the person who has to keep both. She never says which column is which and nobody asks."
+
+  - id:        HUB.A1.reyes_first_conversation.100
+    speaker:   REYES
+    voice:     reyes
+    condition: 'story.m11_conscript_choice == "left"'
+    text:      "Through the hip, in the open, and their relief cycles on the hour. That's an hour."
+    shot:      "She writes. The pause before she writes is longer than the writing."
+    note:      "NOT A VERDICT. A duration, arrived at from two facts the player heard in M1.1.S05.060 and .080. She does not say what an hour is like and she does not have to."
+
+  - id:        HUB.A1.reyes_first_conversation.110
+    speaker:   REYES
+    voice:     reyes
+    condition: 'story.m11_conscript_choice == "bound"'
+    text:      "A dressing above the hip. Whoever tied it, tell them two fingers higher next time."
+    note:      "NOT PRAISE. A correction to a knot, which is the only register in which this woman knows how to be pleased. Mara fixed the same knot in M1.1.S05.240 and said nothing about it either."
+
+  - id:      HUB.A1.reyes_first_conversation.120
+    speaker: VOSS
+    voice:   voss
+    text:    "You're writing it down."
+
+  - id:      HUB.A1.reyes_first_conversation.130
+    speaker: REYES
+    voice:   reyes
+    text:    "I write down what was done and who did it. Then I sleep."
+
+  - id:      HUB.A1.reyes_first_conversation.140
+    speaker: REYES
+    voice:   reyes
+    text:    "It lives in the kit and goes where I go. In a year it's the only place tonight is written down--"
+
+  - id:         HUB.A1.reyes_first_conversation.150
+    speaker:    VOSS
+    voice:      voss
+    interrupts: true
+    text:       "Nobody asked you to keep that."
+    note:       "FULL FOUR-AXIS COVERAGE, and the scene's only branch point for the player (18.7 interjection, L1-R18 precedent). Every version is the same objection - why is anybody keeping this - so the two words that follow answer all five and change meaning against each one."
+    variants:
+      pragmatist: "Nobody's paying you to carry that."
+      idealist:   "Then all of it goes in. Not the half that reads well."
+      personal:   "He gave a unit number four times and never a name."
+      strategic:  "That book is a map of everybody in this vault."
+
+  - id:      HUB.A1.reyes_first_conversation.160
+    speaker: REYES
+    voice:   reyes
+    text:    "Someone should."
+    shot:    "She closes the book and puts it under the folded shirt at the bottom of the kit, which is where it lives."
+    note:    "THE TURN, in two words, and it is the only time the word appears in the file. She does not explain it, defend it, or offer him the book, here or in any later act."
+
+  - id:      HUB.A1.reyes_first_conversation.170
+    speaker: REYES
+    voice:   reyes
+    text:    "Now, the thing you came down here for. Where does it hurt?"
+    shot:    "She has already pulled a crate over for him to sit on. She does not wait to see whether he sits."
+    note:    "Her tic again, and it ends the scene by revealing that he came to her for something he never said out loud. Enter late, leave early (18.7): no goodbye, no thanks, and he never answers."

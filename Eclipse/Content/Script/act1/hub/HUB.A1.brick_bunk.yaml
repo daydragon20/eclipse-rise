@@ -13,9 +13,11 @@ obstacle:     "Brick needs nothing, and says so in one word."
 turn:         "He asks Voss for the names of the people who died before he arrived, writes them somewhere, and that is the entire conversation."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           68
+words_heard:     68
+words_generated: 130
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      BRICK, VOSS
@@ -28,4 +30,77 @@ words:        0
 #            He does not explain why he wants the names. Voss does not ask.
 #            The variance rule survives because Voss's lines are long and Brick's are not.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a ceiling. Longest 23 w (.030). Register reached at .010 and
+#            .030. Spread 1 w (.020 "No.") to 23 w = 23x - Brick sits at the floor of the
+#            band and Voss at the top of it, which is the beat sheet's section 7.2
+#            instruction taken literally.
+# length:    seven lines, sixty-seven words. Brick has three lines and six words in total.
+#
+# *** THE TIC IS INVERTED HERE, NOT REPEATED. ***
+# 18.4 gives Brick "answers difficult questions by naming a dead soldier", and the M1.8
+# writer spends that device in M1.8.S90 where the deflection finally runs out. This scene
+# does the opposite and does it three missions earlier: HE ASKS FOR THE NAMES. He is not
+# putting a name where a feeling should go; he is collecting other people's. Nothing in the
+# file explains why, nobody asks, and the two lines that would explain it are omitted.
+# .040 is four words and it is not even a question - he hands Voss a noun phrase and lets
+# him work it out, which is why .050 exists.
+#
+# never first: 18.4 audited. Every Brick line here answers something Voss said.
+# .010/.030:  Voss talking too much is the content of the first half. He offers bedding, then
+#            rations, then a share, then the absence of anybody counting his food - four
+#            things nobody asked for, to a man who has already made the bed. The joke, such
+#            as it is, is 18.6's Brick joke: he tries least and wins.
+# .060:      VOSS DOES NOT HAVE THE NAMES. That is the beat. The cell is a year older than
+#            he is and two of its dead are already only Mara's to remember, which is the same
+#            fact M1.8.S91.120 lands from the other side.
+# .070:      one word, and it is an instruction from the man who never speaks first. The shot
+#            is the whole payoff of the scene and it costs no words: he is already scratching
+#            the two he has been given into the bunk frame with a punch. M1.8.S90.020 is that
+#            punch, that hand and those letters, four missions later.
+# eleven:    L1-R14 checked. Not used, and the bunks are not counted out loud.
+# omitted:   why he wants them, what he does with them, any reaction from Voss, and any line
+#            in which either man says the word dead. See report.
+
+lines:
+  - id:      HUB.A1.brick_bunk.010
+    speaker: VOSS
+    voice:   voss
+    text:    "The end bunk's yours. There's blankets in the crate and Dex has a spare kit if you need anything else."
+    shot:    "Bunk row. He is sitting on the bare frame with the bedding already squared at the foot of it, which he did an hour ago."
+
+  - id:      HUB.A1.brick_bunk.020
+    speaker: BRICK
+    voice:   brick
+    text:    "No."
+    note:    "The obstacle in one word, as the stub asks. He does not look up and he does not soften it."
+
+  - id:      HUB.A1.brick_bunk.030
+    speaker: VOSS
+    voice:   voss
+    text:    "You're on the roster as of tonight. Rations, a share of what comes off the next run, and nobody counts what you eat."
+    shot:    "Voss is still standing. There is nowhere in this row for a conversation to happen and neither of them moves to fix that."
+
+  - id:      HUB.A1.brick_bunk.040
+    speaker: BRICK
+    voice:   brick
+    text:    "The ones before me."
+    note:    "*** THE TURN, AND THE TIC INVERTED. *** He does not answer a hard question with a name - he asks for names. Four words, not a question, and no explanation follows it here or ever."
+
+  - id:      HUB.A1.brick_bunk.050
+    speaker: VOSS
+    voice:   voss
+    text:    "Before you got here?"
+
+  - id:      HUB.A1.brick_bunk.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Two I've got. The rest were before I came, and I'd have to ask Mara."
+    note:    "VOSS DOES NOT HAVE THEM. The cell is older than he is and two of its dead are already only Mara's to remember - the same fact M1.8.S91.120 lands from the other side."
+
+  - id:      HUB.A1.brick_bunk.070
+    speaker: BRICK
+    voice:   brick
+    text:    "Ask."
+    shot:    "There is a punch already in his hand. He turns to the underside of the bunk frame and starts scratching, and the letters are wrong and deep. The camera never gets close enough to read them. Voss watches for a second and then goes."
+    note:    "One word, and it is an instruction from the man who never speaks first. The shot is the payoff and it costs nothing: this punch, this hand and these letters are M1.8.S90.020, four missions early."

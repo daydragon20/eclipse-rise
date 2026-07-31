@@ -13,9 +13,11 @@ obstacle:     "Ember has never had a rule about anything, and rules are how move
 turn:         "They write the movement's first rule together, it is about food, and it is short."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           217
+words_heard:     193
+words_generated: 285
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      SELA, VOSS
@@ -30,4 +32,136 @@ words:        0
 #            Voss variants on all four axes: what the first rule says is a character
 #            statement, and act 3 will quote it back at him.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a ceiling. Longest 19 w (.010). Register reached at .010,
+#            .020, .040, .050, .070, .080, .090, .110, .130, .140.
+#            Spread 4 w (.100 "That is a paragraph.") to 19 w = 4.75x.
+#
+# *** WHERE THE VARIANTS SIT, AND WHY NOT ON THE FIRST ATTEMPT. ***
+# .090 is Voss's first go at the rule and it is UNBRANCHED, because it is a bad rule on
+# every axis - long, hedged, and full of conditions. Sela cuts it off. The four axes are on
+# .120, the SHORT version, because that is the sentence act 3 quotes back at him and act 3
+# has to be able to quote the player's own. Five one-line rules, all five quotable, all five
+# things a movement could genuinely open with:
+#   base       - "Everybody once, before anybody twice."   the plainest
+#   idealist   - "Everybody eats, or nobody does."          a threat to himself
+#   pragmatist - "One bowl each until the pot is empty."    an inventory rule
+#   personal   - "Whoever came in last eats first."         the man who arrived last
+#   strategic  - "Whoever serves it eats last."             an anti-corruption rule
+# No flag is set. The axis is character state, not campaign state, so act 3 reads it without
+# ACT1_OVERVIEW section 6 growing a row - which is what the stub's "flags-out: none" and its
+# "act 3 will quote it back" only both mean if the branch lives on the axis.
+#
+# sela:      NO ORATION (AR-7). Longest line 19 w, inside the hub band, and she never speaks
+#            for more than two turns without asking something.
+#            Her tic fires twice: .040 turns his flat statement about the vault into what
+#            the people off the train are afraid of, and .130 hands a rule two men agreed on
+#            back to three hundred people to argue with.
+#            SHE SPEAKS ABOUT HERSELF ONCE, at .040, and it is two words ("I know").
+#            18.4's limit is one line and this is under it.
+# .050:      the obstacle turned inside out, and it is why she wins without arguing. He is
+#            afraid a rule makes them the Dominion; she points out that no rule makes them
+#            whoever is loudest. Nobody in the scene says the word Dominion.
+# .080:      "Not what we are. The food." - the whole of AR-7 in five words. This is a
+#            movement's founding document being written about a cooking pot, and no line
+#            anywhere in the file remarks on that.
+# .140:      the last line, and it is a piece of joinery. The Concord's first sentence gets
+#            hung above the water line because that is where the queue stands. Nobody says
+#            Concord, nobody says first, and nobody says history. See report.
+# eleven:    L1-R14 checked. Not used. Nine and six are not used either. Forty-one is M1.6's
+#            head count (M1.6.S06.010) and is quoted, not re-derived.
+# jokes:     zero. There are 41 strangers on the floor of this vault and the two people in
+#            the room are deciding how they eat; 18.6's downtime ratio is a permission, not
+#            a quota, and neither of these characters has ever made a joke.
+# omitted:   any line where either of them says this is important, any reference to what the
+#            rule will become, and any mention of vetting - Mara settled that in M1.6.S06
+#            and reopening it here would make Sela's win in that scene provisional.
+
+lines:
+  - id:      HUB.A1.sela_intake.010
+    speaker: SELA
+    voice:   sela
+    text:    "Forty-one people ate tonight because somebody stood at the pot and decided. Tomorrow it is somebody else standing there."
+    shot:    "The vault floor. She has a stub of chalk and a rectangle of bunk plate on her knee and has been sitting there long enough that people step over her."
+
+  - id:      HUB.A1.sela_intake.020
+    speaker: SELA
+    voice:   sela
+    text:    "So who eats first, who says so, and what happens the night the answer is somebody's cousin?"
+    note:    "The scene's one permitted triad (18.9 B). Rhetorical structure in a private conversation is her fingerprint and this is where it is allowed to show."
+
+  - id:      HUB.A1.sela_intake.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Nothing in this vault has a rule on it."
+
+  - id:      HUB.A1.sela_intake.040
+    speaker: SELA
+    voice:   sela
+    text:    "I know. It is the only thing down here that frightens the people who came off that train."
+    note:    "HER TIC. His fact about the vault comes back as what forty-one strangers are afraid of. Also the one line in the file where she says anything about herself, and it is two words."
+
+  - id:      HUB.A1.sela_intake.050
+    speaker: SELA
+    voice:   sela
+    text:    "A room with no rule in it is not free. It is a room where whoever shouts is the rule."
+    note:    "The obstacle turned inside out, and it is why she wins without arguing. Nobody says the word Dominion in this scene."
+
+  - id:      HUB.A1.sela_intake.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Write one and there's a second one by the spring."
+    note:    "18.4 Voss: he sees the mechanism, not the principle. It is also the stub's obstacle said by the person it frightens."
+
+  - id:      HUB.A1.sela_intake.070
+    speaker: SELA
+    voice:   sela
+    text:    "Then make this one small. Everything after it has to fit under it."
+
+  - id:      HUB.A1.sela_intake.080
+    speaker: SELA
+    voice:   sela
+    text:    "Say what happens to the food. Not what we are. The food."
+    note:    "AR-7 in five words. A movement's founding document is being written about a cooking pot and no line in the file remarks on it."
+
+  - id:      HUB.A1.sela_intake.090
+    speaker: VOSS
+    voice:   voss
+    text:    "Everybody gets fed before anybody gets asked anything, and nobody goes back for a second bowl while there's still somebody--"
+    note:    "DELIBERATELY UNBRANCHED. It is a bad rule on every axis - long, hedged, conditional - which is why it is the version that gets cut off. The axes are on .120."
+
+  - id:         HUB.A1.sela_intake.100
+    speaker:    SELA
+    voice:      sela
+    interrupts: true
+    text:       "That is a paragraph."
+
+  - id:      HUB.A1.sela_intake.110
+    speaker: SELA
+    voice:   sela
+    text:    "A paragraph gets argued with. Make it short enough that whoever breaks it knows they broke it."
+
+  - id:      HUB.A1.sela_intake.120
+    speaker: VOSS
+    voice:   voss
+    text:    "Everybody once, before anybody twice."
+    shot:    "She writes it while he is still saying it and turns the plate around so he can read his own sentence."
+    note:    "FULL FOUR-AXIS COVERAGE. This is the sentence act 3 quotes back, so the branch has to live on the line act 3 quotes - not on .090. All five are one-line rules a movement could open with, and none of them is a slogan."
+    variants:
+      idealist:   "Everybody eats, or nobody does."
+      pragmatist: "One bowl each until the pot is empty."
+      personal:   "Whoever came in last eats first."
+      strategic:  "Whoever serves it eats last."
+
+  - id:      HUB.A1.sela_intake.130
+    speaker: SELA
+    voice:   sela
+    text:    "That will do. Say it to the room in the morning and let somebody argue with it."
+    note:    "Her tic again: a rule two people agreed on at a crate gets handed back to the floor to be argued with. She does not tell him it is good."
+
+  - id:      HUB.A1.sela_intake.140
+    speaker: SELA
+    voice:   sela
+    text:    "It goes above the water line, where everybody has to stand and wait anyway."
+    shot:    "She wedges the plate behind the pipe bracket and goes back to the blankets. Nobody looks up. It is the first written rule the movement has and it is hanging over a queue."
+    note:    "Nobody says Concord, nobody says first, and nobody says history. The scene ends on joinery."

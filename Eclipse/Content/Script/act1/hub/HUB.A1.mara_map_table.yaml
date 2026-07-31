@@ -13,9 +13,11 @@ obstacle:     "She answers questions about herself by answering a different ques
 turn:         "She gives him a number of years, then a number of people, and the second number is smaller than he expected."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           100
+words_heard:     100
+words_generated: 141
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      MARA, VOSS
@@ -29,4 +31,115 @@ words:        0
 #            The second number being SMALL is the whole scene. Do not have anyone react
 #            to it out loud.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      hub (12-35) as a ceiling (L1-R1). Longest 21 w (.010), ceiling clear.
+#            Register reached at .010 (21) and .040 (18). Spread 2 w (.050) to 21 w = 10.5x.
+# length:    eleven of the permitted fourteen lines. The three I did not write are the
+#            three where somebody would have said what the numbers meant.
+# open:      the scene ENTERS LATE (18.7) - his question was asked before the camera got
+#            here, and the first thing the player hears is her not answering it. That is
+#            the obstacle staged instead of described, and it costs one line to do.
+#
+# *** THE TWO NUMBERS, AND WHY THE SECOND ONE IS A PRONOUN. ***
+# The stub asks for years and then a smaller number of people. The years are .050. The
+# people are .070, and it is ONE - said in the plural, because "we were one person" is her
+# 18.4 fingerprint carried out to the end of its own logic. She has been saying "we" since
+# it was arithmetically false. That is the writer note in the stub ("even about years when
+# there was no we") turned into the load-bearing line rather than a colour note, and it
+# explains the pronoun the player has been hearing for two missions without one word of
+# explanation attached to it (18.8).
+# NOBODY REACTS. .080 is Voss asking who, not Voss being moved, and .090 refuses him.
+#
+# mara:      pronoun audit - zero "you", zero "your", zero "I" in six lines. AR-5 and
+#            AR-5b untouched; the second person is still unspent going into M1.8.S08.
+#            .090 is a refusal that is not a rebuff: the name is in the book (M1.1.S99.180
+#            "Write it in the book anyway", M1.1.S99.260 "Count it into the book"), which
+#            is where this cell puts things it will not say out loud.
+# voss:      he asks the question three times and gets there by COUNTING, not by pressing -
+#            .040 measures her past off the object in front of him, the same move he makes
+#            on a lighting circuit in M1.1 and on a mast feed in M1.2.S99.180. That is the
+#            fixed Voss trait (18.4: sees systems, names mechanisms) doing emotional work.
+#            NO VARIANTS - BEATS_HUB_A1 section 7.6 restricts axis variants to scenes 2, 6,
+#            8 and 11, and nothing here branches.
+# interrupt: .040/.050. SHE CUTS OFF THE MAN DOING ARITHMETIC, which is exactly what she
+#            does to Reyes in M1.3.S99.150 and to Sela in M1.7.S99.140 - except this time
+#            the interruption is a surrender rather than a refusal. Same gesture, opposite
+#            meaning, and no line points at it. One dash in eleven lines (18.9 B).
+# counting:  RULINGS_L1 ronde 1 - Kessara counts, and both people in this room count in
+#            their own unit. He counts layers of pencil on an oilcloth; she counts years
+#            and then people. One count carries the turn, which is the cap the ruling sets.
+# eleven:    L1-R14 checked. Not used, and deliberately: M1.2.S99's writer refused to put a
+#            spoken number on the cell because the roster is systemic and goes stale inside
+#            one playthrough. That reasoning holds here.
+# omitted:   the name, the other person's fate, what happened to the first cell, any date,
+#            any reference to a canon event, and any line where either of them says that
+#            twenty-two years is a long time. See report.
+
+lines:
+  - id:      HUB.A1.mara_map_table.010
+    speaker: MARA
+    voice:   mara
+    text:    "This cloth came off a pump housing. It was the only thing down here wide enough to draw a district on."
+    shot:    "Map table, late. The checkpoint mast is on it in fresh grease pencil from tonight. She is folding the cloth's edge back over the table rail and not looking at him."
+    note:    "Deflection one. He asked how long; she answers where the map came from. The scene enters after his question, which is the cheapest way to stage the obstacle."
+
+  - id:      HUB.A1.mara_map_table.020
+    speaker: VOSS
+    voice:   voss
+    text:    "That's not what I asked."
+
+  - id:      HUB.A1.mara_map_table.030
+    speaker: MARA
+    voice:   mara
+    text:    "Grease pencil comes off glass. It does not come off this."
+    note:    "Deflection two, and it is why she took the pencil off Dex without asking in M1.2.S99.250. Nothing in this scene explains that and nobody needs it explained."
+
+  - id:      HUB.A1.mara_map_table.040
+    speaker: VOSS
+    voice:   voss
+    text:    "There are marks under the marks. Somebody has been rubbing this out and starting again for a long--"
+    note:    "He asks the third time by measuring the object instead of the woman. Technician's vocabulary, and it is the only version of this question she cannot answer sideways."
+
+  - id:         HUB.A1.mara_map_table.050
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "Twenty-two years."
+    note:       "She cuts off the arithmetic - her move from M1.3.S99.150 and M1.7.S99.140 - and this time cutting it off IS the answer. Flat, no elaboration, and she does not look up."
+
+  - id:      HUB.A1.mara_map_table.060
+    speaker: VOSS
+    voice:   voss
+    text:    "How many were there at the start?"
+
+  - id:      HUB.A1.mara_map_table.070
+    speaker: MARA
+    voice:   mara
+    tags:    [quietly]
+    text:    "Six of those years, we were one person."
+    shot:    "She squares the pencil against the rail. Nothing in the room changes. No music, no push in, and Voss does not move."
+    note:    "*** THE SECOND NUMBER, AND IT IS ONE. *** Said in the plural because that is her (18.4). Nobody reacts to it out loud, per the stub. It is also the entire explanation of her pronoun and it is never given as one."
+
+  - id:      HUB.A1.mara_map_table.080
+    speaker: VOSS
+    voice:   voss
+    text:    "Who was it?"
+
+  - id:      HUB.A1.mara_map_table.090
+    speaker: MARA
+    voice:   mara
+    text:    "Names go in the book. That one is in the book."
+    note:    "The refusal, and it is not cold - she is telling him where to find it. The book is M1.1.S99.180 and .260."
+
+  - id:      HUB.A1.mara_map_table.100
+    speaker: VOSS
+    voice:   voss
+    text:    "What goes on the cloth after the mast?"
+    shot:    "PLAYER BEAT (18.7): the grease pencil is on the rail between them and he can pick it up or leave it. Either way she takes it back at the end of the line."
+
+  - id:      HUB.A1.mara_map_table.110
+    speaker: MARA
+    voice:   mara
+    text:    "The mast is not down yet."
+    shot:    "She puts the pencil in her coat and folds the cloth's edge back down over the oldest marks on it. Out on the first word of the next line, whatever it is."
+    note:    "She will not plan past tomorrow and she gives no reason. Two missions later she is planning three days ahead of a transport and overruling five people to do it - same woman, and this is the floor that reading stands on."

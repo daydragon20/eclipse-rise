@@ -13,9 +13,11 @@ obstacle:     "Brick does not explain things."
 turn:         "He says the name of the man who was taken off Krad-9 in his place, and that is the answer."
 
 # ---- state ----
-status:       draft
-critic:       null
-words:        0
+status:          draft
+critic:          null
+words:           42
+words_heard:     42
+words_generated: 72
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      BRICK, VOSS
@@ -29,4 +31,69 @@ words:        0
 #            in this scene. It is the literal answer, and the player has heard it enough
 #            times by now to feel the difference.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub` (12-35) as a ceiling. Longest 17 w (.010). FIVE LINES, so the scene is
+#            exempt from register and spread (L1-R1) - and compression is the point of it.
+#
+# *** THE NAME IS TAM, AND THAT IS NOT A NEW NAME. ***
+# The stub asks for "the name of the man who was taken off Krad-9 in his place". I have not
+# invented one. It is Tam, from "Tam. Oyelaran. Vic." - Brick's first line in the game
+# (M1.4.S03.040) and the three names he counted for three months (M1.4.S99.180). The player
+# has heard those three words twice without ever learning what they are. This scene tells
+# them one third of it, in five words, and never mentions the other two.
+# That makes the scene a PAYOFF rather than an addition: zero new canon, zero new proper
+# nouns, and one of the game's most repeated lines acquires a floor under it.
+# WHAT IS NOT EXPLAINED, HERE OR ANYWHERE: how a place changes hands on that list, who did
+# the swapping, whether Tam volunteered, and what happened to him. 18.8 - the codex explains,
+# dialogue never does.
+#
+# *** THE TIC IS NOT BEING RE-RUN. ***
+# In M1.4 and M1.6 the three names arrive INSTEAD of an answer. Here the name IS the answer -
+# it is literally responsive to the question Voss asked, and it is the only line in act 1
+# where that is true. The difference is the whole scene and no line points at it. The M1.8
+# writer spends the deflection for good in M1.8.S90.050; nothing here touches that, because
+# this is not a deflection.
+#
+# .010:      the want, and it is about a rule of the room rather than about Brick. 18.4 says
+#            he never speaks first in a group, and M1.6.S01.140 is the one time he did.
+# .020:      a fact about rolling stock offered instead of a fact about himself. It is a real
+#            answer to a question nobody asked and it is how this man changes the subject.
+# .050:      Voss gives him work rather than sympathy, in eight words, and does not look at
+#            him while he does it. That is the whole of the game's idea of tenderness.
+# eleven:    L1-R14 checked. Not used, and no duration is stated - M1.6.S03.220 already owns
+#            the seventeen days and this scene does not re-price them.
+# omitted:   what the Tithe is, what happened to Tam, an apology, a reaction, and any second
+#            beat after .040. See report.
+
+lines:
+  - id:      HUB.A1.brick_the_tithe.010
+    speaker: VOSS
+    voice:   voss
+    text:    "You went first at the map table. Nobody in that room had ever heard you go first."
+    shot:    "Bunk row, days after the yard. Brick is re-seating a bolt on somebody else's rifle and has not asked whose it is."
+
+  - id:      HUB.A1.brick_the_tithe.020
+    speaker: BRICK
+    voice:   brick
+    text:    "Cars are the same on every line."
+    note:    "A true fact about rolling stock, offered in place of a fact about himself. Nothing in it is a lie (18.4) and nothing in it is an answer."
+
+  - id:      HUB.A1.brick_the_tithe.030
+    speaker: VOSS
+    voice:   voss
+    text:    "That isn't what I asked."
+
+  - id:      HUB.A1.brick_the_tithe.040
+    speaker: BRICK
+    voice:   brick
+    tags:    [pause]
+    text:    "Tam went in my place."
+    shot:    "He does not stop working. He does not look up. Nothing in the room reacts and no line follows it."
+    note:    "*** AR-11 PAID IN FULL, IN FIVE WORDS. *** Tam is one of the three names the player has heard twice (M1.4.S03.040, M1.4.S99.180) without ever learning what they were. No new proper noun. And the tic is not being re-run: here the name IS the answer to the question that was asked, which is true of no other Brick line in act 1."
+
+  - id:      HUB.A1.brick_the_tithe.050
+    speaker: VOSS
+    voice:   voss
+    text:    "Next one that moves people, you're on it."
+    shot:    "He says it to the rifle, not to Brick, and goes. Brick finishes the bolt."
+    note:    "Work instead of sympathy, in eight words, and neither man looks at the other. Nobody says Tam again in act 1."
