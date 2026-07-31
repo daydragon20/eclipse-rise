@@ -203,6 +203,41 @@ DoD-basis (14.4): *spec gerefereerd + code + data + tests + EventCatalog/docs bi
 
 **Eén build-slot.** Schrijven mag parallel, **landen is serieel**. Spoor A raakt de build niet en loopt dus altijd door.
 
+### 2a-quater. GESCOPET EN KLAAR OM TE STARTEN — N-c: gezondheid op het scherm
+
+*Gemeten 01-08 ~11:30, en het is kleiner dan het klinkt.*
+
+De schermlaag tekent nu **vizier, treffermarkering, munitie/wapen en een
+richtingsindicator**. De screenshotronde vond in tien frames **geen gezondheidsbalk en
+geen minimap**, en dat is geen datagat maar een ontbrekende consument:
+
+| | gemeten |
+|---|---|
+| `health` / `vitals` in `UI/EclipseMissionHudWidget.cpp` | **nul treffers** |
+| `minimap` in heel `UI/` | **nul treffers** |
+| `Event.Player.VitalsChanged` | **bestaat** (`4747010`), met payload en tests |
+
+**De feed is er, de consument niet** — precies de vorm die het munitiewerk van vannacht
+had, en dat werd één stap van een halve dag. Het patroon ligt er dus al: abonneren,
+cachen, tekenen uit de cache, en de tekenbeurten tellen.
+
+**De falsificatie, in dezelfde vorm als bij de munitie** — controleproef eerst, want een
+test die nooit rood wordt is geen test:
+- 100 → 60 HP geeft **precies één** tekenbeurt met de nieuwe waarde;
+- **60 getickte frames zonder verandering geven nul**;
+- neergaan en gestabiliseerd worden zijn **twee onderscheidbare** toestanden op het scherm,
+  niet één "gewond";
+- en zet het pollen er tijdelijk in terug: dan moeten die nullen bewegen, anders bewijst
+  de test niets. (Bij de munitie telden pollen en luisteren **op**: 20 werd 200.)
+
+**De minimap is een aparte stap en hoort niet hierbij** — die vraagt een tweede
+databron (regio-/objectposities) en de owner heeft er nooit naar gevraagd. Gezondheid
+staat in `phase0/REFERENTIE_HUD_BORDERLANDS.md` r36-37 expliciet linksonder, met de regel
+*"eerst compleet, dan mooi"*.
+
+**Wacht op het build-slot** (N-b heeft het). Twee C++-agents tegelijk is de fout die op
+31-07 drie keer de werkboom brak.
+
 ### 2b. Daarna klaarstaand (in deze volgorde)
 
 **N-a — Munitie- en wapenstatus op de bus** *(element-builder; tweede helft van de datalaag onder boots)*
