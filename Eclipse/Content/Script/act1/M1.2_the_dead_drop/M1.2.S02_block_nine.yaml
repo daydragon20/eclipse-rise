@@ -134,7 +134,7 @@ lines:
     note:    "AEGIS sentence 2 of 2. THE TURN happens in this shot, not in a line: the Dominion's own broadcast becomes the cell's cover, and she never says a word to them."
 
   - id:      M1.2.S02.140
-    speaker: CIVILIAN
+    speaker: CIVILIAN_A
     voice:   civilian_kessara_a
     text:    "Inside. Both of you."
     shot:    "She says it to her own doorway, not to the gallery. Two children go in. She leaves the door open a hand's width behind them."

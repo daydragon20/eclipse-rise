@@ -71,13 +71,13 @@ lines:
     shot:    "The lid comes up. Somewhere three floors of building start closing."
 
   - id:      M1.4.S04.020
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "Attention. The facility is at condition two. Bay doors are closing on my count from ten."
     shot:    "A lit office on the bridge. A man at a desk microphone with a clipboard flat in front of him."
 
   - id:      M1.4.S04.030
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "All personnel to muster points. Rifles are drawn against a signature and not before."
 
@@ -105,12 +105,12 @@ lines:
     note:    "The S03 offer, paid at the worst possible moment, without comment."
 
   - id:      M1.4.S04.080
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "Inventory check. Racks one through eight are sealed and accounted for. Rack nine is open."
 
   - id:      M1.4.S04.090
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "Rack nine reads open and it did not open itself."
 
@@ -126,7 +126,7 @@ lines:
     text:    "Post four, answer. Post four."
 
   - id:      M1.4.S04.120
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "Post four does not answer. Post five will take post four's line and continue the count."
     note:    "He reassigns a dead man's paperwork without changing pace. This is the whole character."
@@ -150,7 +150,7 @@ lines:
     shot:    "The grating is already leaning against the rack. He did not ask for help with it."
 
   - id:      M1.4.S04.160
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "Crates six-one-one through six-one-nine are unaccounted. Anyone with eyes on six-one-one, call it to the office."
 
@@ -167,7 +167,7 @@ lines:
     text:    "Down the trench. Do not stop to look at anybody."
 
   - id:      M1.4.S04.190
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     text:    "Do not go past the yellow line alone. That is procedure."
     note:    "The one line where the manual is also care. They go past it anyway."
@@ -183,7 +183,7 @@ lines:
     text:    "Let him."
 
   - id:      M1.4.S04.220
-    speaker: QUARTERMASTER
+    speaker: OFFICER_A
     voice:   dominion_officer
     tags:    [pause]
     text:    "Note for the morning shift. The shortfall is written against the district allocation, not against this depot."
