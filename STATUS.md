@@ -186,12 +186,21 @@ bark-varianten, geen zes. Volledig in `21_quality_mandate.md` — kort, lees het
 - **Start de game nooit via de Bash-tool.** Argumenten die met `/Game/`, `/Script/` of
   `-ExecCmds=` beginnen worden door Git Bash verminkt. PowerShell. (`DEBUG_DISCIPLINE.md`
   §4.4 — dit kostte een halve avond.)
-- **Een zoek-en-vervang-script zonder `assert` is een stil falend script.** `s.find()` geeft
-  **-1** als het anker niet matcht, en `s[:-1] + nieuw + s[29:]` plakt het hele document er
-  een tweede keer achter — terwijl je `print("bijgewerkt")` gewoon afgaat. Gebeurd op 01-08
-  met `STATUS.md` (11 KB → 24 KB, elk kopje dubbel), op één afwijkend aanhalingsteken.
-  **Assert dat het anker gevonden is vóór je schrijft**, en controleer daarna de
-  bestandsgrootte tegen wat je toevoegde.
+- **Bewerk bestanden met de Edit-tool, niet met een script — tenzij de wijziging herhaald
+  of berekend is.** Dit ging op 01-08 **twee keer** mis, in twee smaken:
+  - `s.find()` geeft **-1** als het anker niet matcht, en `s[:-1] + nieuw + s[29:]` plakt
+    het hele document er een tweede keer achter terwijl je `print("bijgewerkt")` gewoon
+    afgaat. `STATUS.md` ging van 11 naar 24 KB met elk kopje dubbel, op één afwijkend
+    aanhalingsteken.
+  - Een regex met `re.S` en een niet-verankerde `.+?` matcht over het **hele bestand**.
+    `check_owner_questions.py` klapte daarmee tot één regel samen.
+
+  Moet het toch met een script: **assert dat het anker precies één keer voorkomt vóór je
+  schrijft**, laat het script **atomair falen** (bouw de hele nieuwe tekst op en schrijf pas
+  aan het eind — dan laat een mislukte tweede stap niets half achter), en controleer daarna
+  de bestandsgrootte tegen wat je toevoegde. Escaping in een heredoc vecht bovendien met
+  Python-escapes; bij `
+` of quotes in het patroon is de Edit-tool altijd sneller.
 - **Bugs:** volg `DEBUG_DISCIPLINE.md`. Drie iteraties zonder diagnose = escaleren.
 - **Owner-consent:** geen installs/downloads/security-prompts zonder akkoord. Nathan heeft
   **geen adminrechten** — queue dat als owner-actie, bouw er niet stil omheen.
