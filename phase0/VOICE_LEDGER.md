@@ -123,6 +123,38 @@ Ik heb de scriptbestanden geteld in plaats van aangenomen: elke `text:` plus elk
 | overige sprekers | — | — | ~9.610 | |
 | | | | **65.015** | **tier 2 is begroot op 45.000** |
 
+### ✅ ACT 1 IS GESCHREVEN OP DE HUB NA — de eindstand van de nacht (01-08 ~03:50)
+
+Alle acht missies plus de proloog staan er. Gemeten met
+`Eclipse/Tools/count_generation_cost.py`:
+
+| Missie | Regels | Credits |
+|---|---|---|
+| M1.1 Thirteen Bullets | 182 | 9.332 |
+| M1.2 The Dead Drop | 181 | 11.333 |
+| M1.3 Signal Fire | 211 | 8.793 |
+| M1.4 The Quartermaster | 132 | 8.655 |
+| M1.5 Cells | 221 | 13.279 |
+| M1.6 The Tithe Train | 187 | 12.997 |
+| M1.7 Under the Ice | 154 | 10.206 |
+| M1.8 Blacksite K-77 | 187 | 10.450 |
+| Proloog | 16 | 1.450 |
+| **Gemeten totaal** | **1.471** | **86.495** |
+| Hub — 12 gesprekken, nog niet geschreven | — | ~14.000 (schatting) |
+| **Act 1 compleet** | | **~100.000** |
+
+Saldo 125.612. **Act 1 alleen is dus ~80% van alles wat er nog is**, en daarna komen
+barks, muziek, SFX en de acts 2 t/m 4. Dat is de vraag die op O-14 ligt.
+
+**4.390 van die credits waren tot vannacht onbereikbaar.** Vijf condities hingen aan
+vlaggen die niemand zette — 96 regels die gegenereerd én betaald zouden worden en nooit
+zouden klinken. M1.1, M1.3 en M1.4 zijn geschreven vóór het `choice:`-veld bestond en de
+retrofit was nooit gelopen. Zes keuzeblokken toegevoegd (geen ervan verzonnen: elke
+optieregel noemde de vlag en de waarde al in zijn eigen note). Wat overblijft is
+`run.m17_record`: 96 credits, en een systemtaak die de M1.7-schrijver zelf meldde.
+
+---
+
 ### ⚠⚠ EN DIE 65.015 GAAT OVER ZES VAN DE ACHT MISSIES (01-08)
 
 De telling hierboven klopt op wat ze telde. **Maar ze telde niet heel act 1**, en dat
