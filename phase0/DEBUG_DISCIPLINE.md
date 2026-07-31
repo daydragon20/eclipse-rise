@@ -222,6 +222,30 @@ C:/Users/natha/AppData/Local/Programs/Git/Game/Maps/GrayboxDistrict
 
 **Algemene regel voor dit project:** elk argument dat met `/Game/`, `/Script/`, `/Engine/` of `-ExecCmds=` begint, gaat **nooit** door de Bash-tool. Dat geldt ook voor commandlets en `-EclipseStartMission=…`.
 
+#### De hypothese die nu getoetst wordt — expliciet nog GEEN diagnose
+
+`Core/EclipseGrayboxBuilder.cpp` **vernietigt** rond regel 2456-2468 alle bestaande
+`ASkyAtmosphere`, `ASkyLight`, `ADirectionalLight` en `AExponentialHeightFog`, en spawnt
+daarna nieuwe (de SkyAtmosphere op ~2516). Het district wordt volledig at-runtime gebouwd,
+en het commentaar op ~2460 noemt met zoveel woorden een **mid-play rebuild**.
+
+Een SkyAtmosphere die vernietigd en herbouwd wordt terwijl de renderthread midden in een
+frame zit, is een klassieke bron van precies dit defect: de renderthread houdt een proxy of
+GPU-resource vast die de gamethread net heeft vrijgegeven, en de LUT-compute-pass leest
+vrijgegeven geheugen.
+
+Het past op **alle** gemeten feiten — page fault bij *lezen*, precies in de
+SkyAtmosphere-LUT's, en **grillig**, want het gaat alleen mis als het vernietigen in het
+verkeerde venster valt. Maar passen is niet bewijzen, en dit blijft een hypothese tot de
+meting er is.
+
+**De toets gaat de andere kant op dan gebruikelijk, en dat is met opzet: probeer de crash
+VAKER te laten gebeuren.** Aantonen dat je hem kunt opwekken is veel goedkoper dan aantonen
+dat hij weg is — 1-op-9 wegtesten kost tientallen runs, maar als geforceerd herbouwen
+tijdens het renderen de kans ver boven 1-op-9 tilt, is het mechanisme aangetoond én ligt er
+meteen een reproductie waarmee een latere fix te bewijzen valt. Blijft de kans gelijk, dan
+is de hypothese dood en is de eerste bouw zelf de volgende verdachte.
+
 **Waarom dit hier staat:** dit is precies een §1-stap-0-geval. Het is bekend gedrag van het gereedschap, niet van de game, en het kost tien seconden om te herkennen zodra je het één keer hebt opgeschreven.
 
 ### 4.3 Inslagspoor rendert niet — **OPEN, maar de transform is nu met een meting UITGESLOTEN**
