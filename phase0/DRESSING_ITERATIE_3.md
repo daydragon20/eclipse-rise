@@ -116,6 +116,40 @@ kleiner, niet onmogelijk — die compositing-wijziging is een eigen stap, net al
 bloom/halo (gemeten afwezig), de contactschaduwen op alle massaklassen, en de grijze
 vorken.
 
+## 1f. De vault is op dezelfde as GEBOUWD, en hij staat er slechter voor (01-08)
+
+*Gemeten op de vier vault-frames van vannacht met een luminantie-histogram (Rec.709,
+lineair, 480×270 downsample). Het district ter vergelijking op `NA_cam4_wide_overview`.*
+
+| band | district (cam 4) | **vault (barakken)** |
+|---|---|---|
+| 0,00–0,02 zwart/leeg | 21,6% | **45,3%** |
+| 0,02–0,06 grond-tier | 74,0% | 37,5% |
+| 0,06–0,15 laag-mid | 2,3% | 17,2% |
+| **0,15–0,30 middenband** | **1,4%** | **0,0%** |
+| 0,30–0,60 hoog | 0,6% | **0,0%** |
+
+**Het district bevestigt §1e** — de lege middenband die daar op 2,0% in cam 7 gemeten is,
+staat hier op 1,4% in cam 4. Die analyse klopt en is niet verouderd.
+
+**De vault is nieuw en hij is erger.** Nul procent boven 0,15. Niet één pixel. De
+plafondregel uit stap 7 — *"niets dat geen lichtbron is mag boven de pool-kernwaarde
+uitkomen"* — is daar duidelijk toegepast, en het resultaat is een ruimte waarin **ook de
+lichtbronnen eronder blijven**. Gemeten in `SHOT_FINDINGS.md`: de GlowStrip-balk haalt
+0,0563 tegen een vloer van 0,0642, en de twee plafondlampen in de commandopost zitten op
+0,0093 en 0,0118 — **donkerder dan de wand ernaast**.
+
+> **Wat dit toevoegt aan stap 7.** De regel heeft een plafond en geen VLOER. Hij zegt wat
+> niet-emissieve dressing niet mag overschrijden en zwijgt over wat een lichtbron minimaal
+> moet halen. Het gevolg is voorspelbaar zodra je het zo formuleert: een ruimte waarin de
+> regel netjes gevolgd is en niets meer licht geeft.
+>
+> **Voorstel, niet besloten:** de tegenhanger van stap 7 — *een emissieve fixture haalt
+> minstens N× de vloerwaarde van de ruimte waarin hij hangt.* Het getal is een art-vraag;
+> dat het er moet zijn, is dat niet. **Meet het aan een referentie voordat je een N kiest**
+> (`phase0/REFERENTIE_BASE_MAP.md`, en de Borderlands-referentie in
+> `phase0/REFERENTIE_HUD_BORDERLANDS.md` voor hoe een gestileerde game dat oplost).
+
 ## 1e. Stap 7 (waardeplafond) eerste bisectiestap — shots 00105-00111
 
 Uitgevoerd in de volgorde die §1d voorschrijft, met de probe als scheidsrechter.
