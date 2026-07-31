@@ -25,6 +25,10 @@ EERST DOEN — het dashboard aanzetten
 --------------------------------------------------------------------
     START_DASHBOARD.bat        (of: python Tools/eclipse_dashboard.py)
 
+Draait hij al? Dan meldt hij "poort 8377 in gebruik" — dat is GOED, niet
+kapot. Controleer met http://127.0.0.1:8377/api/state en ga verder.
+Start nooit een tweede server op dezelfde poort.
+
 Dit is het ENIGE scherm dat ik lees: http://127.0.0.1:8377/
 Het is live (ververst elke 5 s, ook zonder open chat) en toont taken,
 owner-acties, de agents mét hun chats, alle documenten, screenshots,

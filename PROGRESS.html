@@ -183,7 +183,18 @@ function render(){
      '<span>▸ <b>klik een blok</b> → wat gebeurt er + wat jij moet doen</span></div></section>';
 
   // WAT MOET JIJ DOEN
-  var acts = D.ownerActies||[];
+  // Leest dezelfde afvinklijst als START_HIER.html (localStorage 'eclipseDone').
+  // Zonder dit tonen de twee dashboards een verschillende werkelijkheid: hier
+  // stond alles nog open terwijl het daar afgevinkt was. Afvinken zelf gebeurt
+  // in START_HIER; deze pagina leest alleen mee.
+  var slugP = function(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); };
+  var doneP = {};
+  try { doneP = JSON.parse(localStorage.getItem('eclipseDone')||'{}'); } catch(e) {}
+
+  var alle = D.ownerActies||[];
+  var acts = [], klaar = [];
+  alle.forEach(function(a){ (doneP[slugP(a.titel)] && !a.afgekeurd) ? klaar.push(a) : acts.push(a); });
+
   h+='<section class="kaart warn"><h2>Wat moet JIJ doen? <span class="scope">de rest doet de agent zelf</span></h2>';
   if (acts.length){ h+='<div class="acties">';
     acts.forEach(function(a){
@@ -191,7 +202,18 @@ function render(){
       h+='<div class="actie"><div class="titel">'+esc(a.titel)+(a.prio?'<span class="prio">'+esc(a.prio)+'</span>':'')+(a.waarom?'<span class="waarom">— '+esc(a.waarom)+'</span>':'')+'</div><ol>'+st+'</ol></div>';
     }); h+='</div>';
   } else { h+='<p class="geen-actie">✓ Op dit moment hoef je niets te doen — de agent werkt door.</p>'; }
+  if (klaar.length){
+    h+='<p class="scope" style="margin-top:10px;opacity:.75">Afgevinkt in START_HIER, wacht op de agent ('+klaar.length+'): '
+      + klaar.map(function(a){return esc(a.titel);}).join(' · ') + '</p>';
+  }
   h+='</section>';
+
+  // LOGO — ownerwerk, geen agentwerk; staat daarom bij "wat moet JIJ doen"
+  h+='<section class="kaart"><h2>Logo maken <span class="scope">vier prompts voor een beeldgenerator</span></h2>'
+    + '<p>Wordmark met eclips-symbool · alleen het symbool (Steam-tegel) · gestencild verzetsmerk · brede titelkaart.</p>'
+    + '<p class="scope">Sodium-oranje verzet tegen Dominion wit-goud, cel-shaded met inktcontouren. '
+    + 'De zon staat zwart, de corona brandt — dat is het licht dat niet volledig bedekt kán worden.</p>'
+    + '<p><a href="LOGO_PROMPTS.md"><b>LOGO_PROMPTS.md</b></a></p></section>';
 
   // FASES (klikbaar)
   var road=D.secties&&D.secties[0];

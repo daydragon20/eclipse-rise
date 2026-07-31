@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- De data laadt met een cache-buster, maar deze PAGINA werd gecachet door de
+     Simple Browser van VS Code. Gevolg: verse cijfers in oude renderlogica, en
+     dan staat er "de robot slaapt · 23 uur" terwijl de commits van 5 minuten
+     geleden zijn. -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>ECLIPSE — Start hier</title>
 <style>
   :root{
@@ -11,10 +18,38 @@
     --amber:#f5a623; --amber2:#ffcb6b; --groen:#37d67a; --rood:#ff5c6c; --oranje:#ff9f43; --geel:#ffd24d; --blauw:#5b9dff;
     --radius:18px;
   }
+  /* Licht = wat het systeem zegt. Een expliciete keuze via de knop overrult dat:
+     [data-thema] heeft hogere specificiteit dan de media query, dus die wint in
+     beide richtingen. */
   @media (prefers-color-scheme: light){
     :root{ --bg:#eef1f7; --bg2:#e3e8f2; --card:#ffffff; --card2:#f4f6fb;
       --tekst:#161a25; --grijs:#5b6684; --lijn:#dbe1ee; }
   }
+  :root[data-thema="licht"]{ --bg:#eef1f7; --bg2:#e3e8f2; --card:#ffffff; --card2:#f4f6fb;
+    --tekst:#161a25; --grijs:#5b6684; --lijn:#dbe1ee; }
+  :root[data-thema="donker"]{ --bg:#0e1017; --bg2:#161a25; --card:#1b2030; --card2:#222839;
+    --tekst:#f2f5fb; --grijs:#9aa6be; --lijn:#2b3245; }
+
+  /* Rechtsonder, niet rechtsboven: daar botste hij met de statusregel
+     ("Live — de robot werkt"), en op smalle schermen liep hij eroverheen. */
+  #themaknop{
+    position:fixed; bottom:16px; right:16px; z-index:50;
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--card); color:var(--tekst);
+    border:1px solid var(--lijn); border-radius:999px;
+    padding:8px 14px; font:600 14px/1 inherit; cursor:pointer;
+    box-shadow:0 2px 10px rgba(0,0,0,.18);
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  #themaknop:hover{ transform:translateY(-1px); border-color:var(--amber) }
+  #themaknop .ico{ font-size:15px; line-height:1 }
+  /* Op smal scherm alleen het icoon: met tekst erbij lag de knop over de
+     inhoud heen in plaats van ernaast. */
+  @media (max-width:560px){
+    #themaknop{ padding:9px; border-radius:50% }
+    #themaknop .tx{ display:none }
+  }
+  @media print{ #themaknop{ display:none } }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
@@ -33,9 +68,14 @@
   /* Header + stoplicht */
   .top{display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between}
   .brand{display:flex;align-items:center;gap:14px}
-  .logo{width:52px;height:52px;border-radius:14px;background:
-     radial-gradient(circle at 35% 35%, var(--amber2), var(--amber) 55%, #7a4b06);
-     box-shadow:0 0 0 3px rgba(245,166,35,.18), inset -6px -6px 12px rgba(0,0,0,.35);flex:none}
+  /* Het gekozen wordmark in plaats van het oude gele blokje. Als banner en niet
+     als vierkant icoon: in alle vier de gegenereerde beelden overlappen de
+     letters de eclips, dus er valt geen bruikbaar vierkant uit te snijden. */
+  .brand{display:block}
+  .merk{display:block;max-width:min(380px,62vw);height:auto;margin:0 0 2px -6px}
+  @media (prefers-color-scheme: light){ .merk{filter:drop-shadow(0 1px 3px rgba(0,0,0,.25))} }
+  :root[data-thema="licht"] .merk{filter:drop-shadow(0 1px 3px rgba(0,0,0,.25))}
+  :root[data-thema="donker"] .merk{filter:none}
   .status{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--lijn);
      border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600}
   .dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.06)}
@@ -58,6 +98,42 @@
   .tile .herk{font-size:11px;letter-spacing:.3px;opacity:.85}
   .tile .herk.g::before{content:"● ";color:var(--groen)}
   .tile .herk.s::before{content:"◐ ";color:var(--amber2)}
+  /* Live werkoverzicht — leest uit git, dus het veroudert nooit */
+  .nu{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:16px}
+  .tbl{width:100%;border-collapse:collapse;font-size:14px}
+  .tbl td{padding:7px 10px;border-bottom:1px solid var(--lijn);vertical-align:top}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl .g{font-weight:700;white-space:nowrap;width:1%}
+  .tbl .n{color:var(--amber2);font-weight:700;text-align:right;width:1%;padding-right:14px}
+  .tbl .f{color:var(--grijs);font-size:13px;word-break:break-word}
+  .uurbalk{flex:1;max-width:190px;height:6px;background:var(--card2);border-radius:999px;overflow:hidden}
+  .uurbalk>span{display:block;height:100%;border-radius:999px;
+    background:linear-gradient(90deg,var(--amber),var(--amber2))}
+  .tijdlijn{display:grid;gap:14px}
+  .uur{border-left:2px solid var(--lijn);padding-left:14px;position:relative}
+  .uur::before{content:"";position:absolute;left:-5px;top:6px;width:8px;height:8px;border-radius:50%;
+    background:var(--amber);box-shadow:0 0 0 3px var(--card)}
+  .uurkop{display:flex;align-items:center;gap:9px;font-size:15px}
+  .uurn{background:var(--card2);border:1px solid var(--lijn);border-radius:999px;
+    padding:1px 9px;font-size:12px;color:var(--grijs);font-weight:600}
+  .uurlijst{margin:6px 0 0;padding-left:18px;color:var(--grijs);font-size:14px;line-height:1.45}
+  .uurlijst li{margin:2px 0}
+  .uurlijst .meer{opacity:.6;font-style:italic;list-style:none;margin-left:-18px}
+  /* Drie groepen op betrouwbaarheid: live > gemeten > geschat. Een cijfer dat je
+     kunt narekenen hoort niet even groot naast een cijfer dat iemand gokte. */
+  .groep{margin-top:16px}
+  .groepkop{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+    letter-spacing:1.4px;color:var(--grijs);margin-bottom:8px;flex-wrap:wrap}
+  .groepbron{margin-left:auto;font-weight:600;letter-spacing:0;font-size:12px;opacity:.8;text-transform:none}
+  .bron{width:9px;height:9px;border-radius:50%;flex:none}
+  .bron.g{background:var(--groen)}
+  .bron.w{background:var(--geel)}
+  .bron.s{background:var(--amber2)}
+  .tiles.klein .tile{padding:11px}
+  .tiles.klein .big{font-size:26px}
+  .tile .eenh{font-size:15px;font-weight:600;color:var(--grijs);margin-left:3px}
+  .waarsch{margin:9px 0 0;padding:9px 12px;border-radius:10px;font-size:13px;
+    background:rgba(255,210,77,.10);border:1px solid rgba(255,210,77,.35);color:var(--tekst)}
   .vers{background:var(--card2,var(--card));border:1px solid var(--lijn);border-radius:var(--radius);
         padding:10px 14px;margin-top:14px;display:grid;gap:6px}
   .versrij{display:flex;align-items:center;gap:9px;font-size:13px;flex-wrap:wrap}
@@ -101,7 +177,10 @@
 
   /* jijGedaan chips */
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-  .chip{display:inline-flex;align-items:flex-start;gap:10px;background:var(--card2);border:1px solid var(--lijn);border-radius:999px;padding:7px 14px 7px 10px;font-size:14px;transition:opacity .25s ease,transform .25s ease}
+  /* max-width + min-width:0 zodat een lange regel afbreekt in plaats van het
+     hele document breder te maken — dit veroorzaakte h-scroll onder 400px. */
+  .chip{display:inline-flex;align-items:flex-start;gap:10px;background:var(--card2);border:1px solid var(--lijn);border-radius:999px;padding:7px 14px 7px 10px;font-size:14px;transition:opacity .25s ease,transform .25s ease;max-width:100%;min-width:0}
+  .chip>span{min-width:0;overflow-wrap:anywhere}
   .chip.weg{opacity:0;transform:scale(.96)}
   .chip .t{color:var(--grijs);font-size:12px;margin-left:0;white-space:nowrap}
   /* klikbaar kruisje: haalt de regel weg en onthoudt dat */
@@ -156,6 +235,46 @@
 </style>
 </head>
 <body>
+<button id="themaknop" type="button" title="Wissel tussen donker en licht"><span class="ico">🌙</span><span class="tx">Donker</span></button>
+<script>
+/* Meteen uitvoeren, vóór de rest van de pagina: anders zie je eerst het
+   systeemthema en daarna een sprong naar je eigen keuze. */
+(function(){
+  var KEY='eclipseThema';
+  function systeem(){ return matchMedia('(prefers-color-scheme: light)').matches ? 'licht' : 'donker'; }
+  function pas(thema){
+    document.documentElement.setAttribute('data-thema', thema);
+    var k=document.getElementById('themaknop');
+    if(k){
+      // De knop toont waar je NAARTOE gaat, niet waar je bent.
+      var naar = thema==='donker' ? 'licht' : 'donker';
+      k.querySelector('.ico').textContent = naar==='donker' ? '🌙' : '☀️';
+      k.querySelector('.tx').textContent  = naar==='donker' ? 'Donker' : 'Licht';
+    }
+  }
+  var opgeslagen=null;
+  try{ opgeslagen=localStorage.getItem(KEY); }catch(e){}
+  pas(opgeslagen || systeem());
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var huidig = document.documentElement.getAttribute('data-thema');
+    pas(huidig);
+    document.getElementById('themaknop').addEventListener('click',function(){
+      var nu = document.documentElement.getAttribute('data-thema');
+      var nieuw = nu==='donker' ? 'licht' : 'donker';
+      try{ localStorage.setItem(KEY,nieuw); }catch(e){}
+      pas(nieuw);
+    });
+  });
+
+  // Systeem wisselt (bv. nachtmodus van Windows): alleen volgen zolang je
+  // zelf niets gekozen hebt.
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change',function(){
+    var eigen=null; try{ eigen=localStorage.getItem(KEY); }catch(e){}
+    if(!eigen) pas(systeem());
+  });
+})();
+</script>
 <div class="wrap" id="app">laden…</div>
 <div class="lightbox" id="lb" onclick="this.style.display='none'"><img src="" alt=""></div>
 
@@ -213,7 +332,13 @@ function actIcon(t){t=(t||'').toLowerCase();
 
 /* ================= RENDER ================= */
 function render(){
-  const laatst = parseNL(D.bijgewerkt) || parseNL(A.generatedAt);
+  // De laatste COMMIT is het bewijs dat de agent werkt, niet het handmatige
+  // 'bijgewerkt'-veld: dat zet de dev-sessie zelf en het loopt uren achter op
+  // het echte werk. Daardoor stond hier "de robot slaapt · 6 uur geleden"
+  // terwijl er elf minuten eerder nog gecommit was.
+  const laatst = parseNL(A.tempo && A.tempo.laatsteCommit)
+              || parseNL(D.bijgewerkt)
+              || parseNL(A.generatedAt);
   const minOud = laatst ? (Date.now()-laatst)/60000 : 9999;
   let sl_kl,sl_tx,sl_pulse,slaapt;
   if(minOud<90){sl_kl='var(--groen)';sl_tx='Live — de robot werkt';sl_pulse=true;slaapt=false;}
@@ -223,11 +348,13 @@ function render(){
   let H='';
   // HEADER
   H+=`<div class="top">
-    <div class="brand"><div class="logo"></div>
-      <div><h1>ECLIPSE</h1><p class="sub">Jouw game — in gewone taal</p></div></div>
-    <div class="status"><span class="dot ${sl_pulse?'pulse':''}" style="background:${sl_kl}"></span>
-      ${sl_tx} · ${geleden(laatst)}</div>
+    <div class="brand">
+      <img class="merk" src="brand/ECLIPSE_logo_wordmark.png" alt="ECLIPSE"
+           onerror="this.outerHTML='&lt;h1&gt;ECLIPSE&lt;/h1&gt;'">
+      <p class="sub">Jouw game — in gewone taal</p></div>
   </div>`;
+  // De statuspil stond hier en zei hetzelfde als de LIVE-tegel "sinds laatste
+  // wijziging" én als de kop van de AI-sectie. Drie plekken, één feit.
 
   // WAKE BOX
   if(slaapt){
@@ -258,37 +385,78 @@ function render(){
     if(!m) return null;
     return Math.round((Date.now()-new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime())/60000);
   };
-  const zegAge=min=>min===null?'onbekend':min<1?'zojuist':min<60?`${min} min geleden`:min<1440?`${Math.floor(min/60)} uur geleden`:`${Math.floor(min/1440)} dagen geleden`;
+  const zegAge=min=>{
+    if(min===null) return 'onbekend';
+    if(min<1) return 'zojuist';
+    if(min<60) return `${min} min geleden`;
+    if(min<1440){ const u=Math.floor(min/60); return `${u} uur geleden`; }
+    const d=Math.floor(min/1440); return `${d} ${d===1?'dag':'dagen'} geleden`;
+  };
   const kleurAge=(min,grens)=>min===null?'var(--grijs)':min<=grens?'var(--groen)':min<=grens*8?'var(--amber2)':'var(--rood)';
 
-  const autoMin=ouderdom(A.generatedAt), dataMin=ouderdom(W.dataStamp);
-  const versheid=[
-    {lab:'Meetcijfers', wat:'tests, commits, tellingen', min:autoMin, grens:20, bron:'watcher, elke 15 min'},
-    {lab:'Schattingen', wat:'de percentages hieronder', min:dataMin, grens:1440, bron:'door de dev-sessie gezet'}
-  ];
+  // De schattingen dateren op D.bijgewerkt en NIET op de bestandstijd van
+  // progress_data.js: dat bestand wordt vaak aangeraakt terwijl de percentages
+  // erin al een dag oud zijn. De bestandstijd zei "18 min", het veld "gisteren".
+  const autoMin=ouderdom(A.generatedAt);
+  const dataMin=ouderdom(D.bijgewerkt) ?? ouderdom(W.dataStamp);
+  const OH = A.onderhanden, RW = A.recentWerk;
+  const commitMin = ouderdom(A.tempo && A.tempo.laatsteCommit);
+  const actief = commitMin !== null && commitMin < 25;
 
-  H+=`<div class="vers">
-    ${versheid.map(v=>`<div class="versrij">
-      <span class="versdot" style="background:${kleurAge(v.min,v.grens)}"></span>
-      <b>${v.lab}</b> <span class="versw">${esc(v.wat)}</span>
-      <span class="verst" style="color:${kleurAge(v.min,v.grens)}">${zegAge(v.min)}</span>
-      <span class="versb">${esc(v.bron)}</span>
-    </div>`).join('')}
+  // DRIE GROEPEN OP BETROUWBAARHEID.
+  // Hiervoor stonden schattingen en tellingen als vijf gelijke tegels naast
+  // elkaar, met een aparte versheid-balk erboven die hetzelfde nog eens zei.
+  // Een cijfer dat je kunt narekenen en een cijfer dat iemand heeft geschat
+  // horen niet even groot en even zeker te staan.
+  const testAge = ouderdom(W.dataStamp)!==null ? (A.tests&&A.tests.reportAge) : null;
+  const testOud = /uur|dag/.test(String(A.tests&&A.tests.reportAge||''));
+
+  H+=`<div class="groep">
+    <div class="groepkop"><span class="bron g"></span>LIVE — uit de projectgeschiedenis
+      <span class="groepbron">ververst elk kwartier · ${zegAge(autoMin)}</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="big" style="color:var(--groen)">${A.tempo?A.tempo.vandaag:'—'}</div>
+        <div class="lab">COMMITS VANDAAG</div>
+        <small>${A.tempo&&A.tempo.week?`${A.tempo.week} deze week`:''}</small></div>
+      <div class="tile"><div class="big" style="color:${commitMin!==null&&commitMin<25?'var(--groen)':'var(--geel)'}">${commitMin!==null?(commitMin<60?commitMin:Math.floor(commitMin/60)):'—'}<span class="eenh">${commitMin!==null&&commitMin<60?'min':'uur'}</span></div>
+        <div class="lab">SINDS LAATSTE WIJZIGING</div>
+        <small>${commitMin!==null&&commitMin<25?'hij werkt':'even stil'}</small></div>
+      <div class="tile"><div class="big" style="color:${OH&&OH.totaal?'var(--amber2)':'var(--grijs)'}">${OH?OH.totaal:'—'}</div>
+        <div class="lab">NU ONDERHANDEN</div>
+        <small>${OH&&OH.gebieden&&OH.gebieden.length?esc(OH.gebieden[0].gebied.toLowerCase()):'niets open'}</small></div>
+    </div>
   </div>`;
 
-  H+=`<div class="tiles">
-    <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div><small class="herk s">schatting · ${zegAge(dataMin)}</small></div>
-    <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div><div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div><small class="herk s">schatting · ${zegAge(dataMin)}</small></div>
-    <div class="tile"><div class="big" style="color:var(--groen)">${testTx}</div><div class="lab">TESTS GESLAAGD</div><small class="herk g">geteld · ${zegAge(autoMin)}</small></div>
-    <div class="tile"><div class="big" style="color:var(--groen)">${W.klaar!=null?`${W.klaar}/${W.taken}`:'—'}</div><div class="lab">TAKEN AF</div><small class="herk g">geteld · ${W.bezig!=null?`${W.bezig} bezig, ${W.open} open`:'—'}</small></div>
-    <div class="tile"><div class="big" style="color:${(A.tempo&&A.tempo.vandaag)?'var(--groen)':'var(--grijs)'}">${A.tempo?A.tempo.vandaag:'—'}</div><div class="lab">COMMITS VANDAAG</div><small class="herk g">geteld · laatste ${A.tempo&&A.tempo.laatsteAge?esc(A.tempo.laatsteAge):'—'}</small></div>
+  H+=`<div class="groep">
+    <div class="groepkop"><span class="bron ${testOud?'w':'g'}"></span>GEMETEN — uit de laatste testronde
+      <span class="groepbron">${A.tests?esc(A.tests.reportAge):'geen rapport'}</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="big" style="color:${A.tests&&A.tests.failed?'var(--rood)':'var(--groen)'}">${testTx}</div>
+        <div class="lab">TESTS GESLAAGD</div>
+        <small>${A.tests&&A.tests.failed?`${A.tests.failed} gefaald`:'niets gefaald'}</small></div>
+      <div class="tile"><div class="big" style="color:var(--groen)">${W.klaar!=null?`${W.klaar}/${W.taken}`:'—'}</div>
+        <div class="lab">TAKEN AF</div>
+        <small>${W.bezig!=null?`${W.bezig} bezig · ${W.open} open`:'—'}</small></div>
+    </div>
+    ${testOud?`<p class="waarsch">⚠ Dit testrapport is <b>${esc(A.tests.reportAge)}</b> geschreven, dus dit
+      getal loopt achter op de code. De actuele stand staat in de commit-titels hieronder.</p>`:''}
+  </div>`;
+
+  H+=`<div class="groep">
+    <div class="groepkop"><span class="bron s"></span>SCHATTING — met de hand gezet
+      <span class="groepbron">${zegAge(dataMin)} · door de dev-sessie</span></div>
+    <div class="tiles klein">
+      <div class="tile"><div class="big">${heel}%</div><div class="lab">VAN DE HELE GAME</div></div>
+      <div class="tile"><div class="big" style="color:var(--amber2)">${fase?fase.pct:0}%</div>
+        <div class="lab">${fase?esc(fase.naam.split('—')[0].trim().toUpperCase()):'HUIDIGE FASE'}</div></div>
+    </div>
   </div>`;
 
   if(autoMin!==null&&autoMin>60){
     H+=`<div class="card" style="border-color:var(--rood);background:rgba(220,60,60,.08)">
-      <b style="color:var(--rood)">De meetcijfers zijn ${zegAge(autoMin)} bijgewerkt.</b>
-      <p class="sub" style="margin:6px 0 0">De watcher hoort elke 15 minuten te draaien. Draait hij niet, dan zijn tests, commits en tellingen hierboven verouderd — ze zien er alleen niet zo uit.
-      Herstellen: dubbelklik <b>start_progress_watcher.bat</b>, of laat de taak "ECLIPSE Dashboard" in Taakplanner opnieuw starten.</p></div>`;
+      <b style="color:var(--rood)">De live-cijfers zijn ${zegAge(autoMin)} bijgewerkt.</b>
+      <p class="sub" style="margin:6px 0 0">De watcher hoort elk kwartier te draaien. Herstellen:
+      dubbelklik <b>start_progress_watcher.bat</b>, of start de taak "ECLIPSE Dashboard" opnieuw in Taakplanner.</p></div>`;
   }
 
   // WAT MOET JIJ DOEN — met aanvink-knoppen
@@ -318,7 +486,7 @@ function render(){
             <h3>${esc(a.titel)}<span class="badge" style="background:${p.k}">${p.l}</span></h3>
             ${a.afgekeurd?`<div class="reject">⚠️ De AI kon dit nog niet afvinken: ${esc(a.afgekeurd)} — probeer opnieuw.</div>`:''}
             ${a.waarom?`<p class="why">Waarom: ${esc(a.waarom)}</p>`:''}
-            <ol>${(a.stappen||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+            <ol>${(a.stappen||[]).map(x=>`<li>${esc(String(x).replace(/^\s*\d{1,2}[.)]\s+/,''))}</li>`).join('')}</ol>
             <button class="actbtn" data-mark="${esc(s)}" data-titel="${esc(a.titel)}">✓ Ik heb dit gedaan</button>
           </div></div>`;
       });
@@ -346,7 +514,7 @@ function render(){
     const weg=hiddenSet();
     const alle=D.jijGedaan;
     const zichtbaar=alle.filter(g=>!weg.has(chipKey(g)));
-    H+=`<h2>✅ Wat de AI al van jou heeft gezien <span style="font-size:11px;font-weight:600;color:var(--grijs);letter-spacing:0">v4</span></h2>
+    H+=`<h2>✅ Wat de AI al van jou heeft gezien</h2>
       <div class="card"><div class="chips">
       ${zichtbaar.map(g=>`<span class="chip"><button class="x" data-hide="${esc(chipKey(g))}" title="Wegklikken">✕</button><span>${esc(g.wat)}</span><span class="t">${esc(g.tijd||'')}</span></span>`).join('')}
       </div>
@@ -360,20 +528,50 @@ function render(){
   const bezig=(D.taken||[]).filter(t=>t.status==='bezig');
   const gepland=(D.taken||[]).filter(t=>t.status==='gepland');
   const cl=(D.changelog||[])[0];
-  H+=`<h2>🤖 Waar is de AI mee bezig?</h2><div class="card"><div class="cols">
-    <div class="mini"><h4>⚙️ Nu bezig</h4>
-      ${bezig.map(t=>`<div class="work"><div class="wt">${esc(t.taak)}</div>
-        <div class="wd">${esc(trim(t.detail,120))}</div>
-        <div class="bar"><span style="width:${Math.min(100,t.pct||0)}%"></span></div></div>`).join('')||'<div class="wd">—</div>'}
-    </div>
-    <div class="mini"><h4>🕒 Straks</h4>
-      <div class="taglist">${gepland.map(t=>`<span class="tag">${esc(t.taak)}</span>`).join('')||'<span class="wd">—</span>'}</div>
-      ${cl?`<h4 style="margin-top:16px">✅ Net gedaan</h4>
-        <div class="wd" style="color:var(--amber2);font-weight:600">${esc(cl.datum.replace(/^Sessie\s*/,''))}</div>
-        <ul style="margin:6px 0 0;padding-left:18px;color:var(--grijs);font-size:13px">
-          ${(cl.punten||[]).slice(0,3).map(p=>`<li>${esc(trim(p,120))}</li>`).join('')}</ul>`:''}
-    </div>
-  </div></div>`;
+  // WAAR IS DE AI MEE BEZIG — alles uit git, niets uit handmatige velden.
+  // De oude versie las D.taken en D.changelog: die liepen anderhalve dag en drie
+  // dagen achter, en toonden werk als "bezig" dat al lang klaar was.
+  H+=`<h2>🤖 Waar is de AI mee bezig?</h2>
+    <p class="sub" style="margin:-6px 0 12px">Alles hieronder komt rechtstreeks uit de
+    projectgeschiedenis. Er staat dus nooit iets dat al af is, en niemand hoeft iets bij te werken.</p>
+    <div class="card">
+      <div class="nu">
+        <span class="dot ${actief?'pulse':''}" style="background:${actief?'var(--groen)':'var(--geel)'}"></span>
+        <b>${actief?'Aan het werk':'Even stil'}</b>
+        <span class="wd">laatste wijziging ${zegAge(commitMin)}${A.tempo?` · ${A.tempo.vandaag} commits vandaag`:''}</span>
+      </div>`;
+
+  if(OH && OH.totaal > 0){
+    H+=`<h4 style="margin:16px 0 8px">⚙️ Nu onderhanden <span class="uurn">${OH.totaal} bestanden</span></h4>
+      <table class="tbl"><tbody>
+      ${OH.gebieden.map(g=>`<tr>
+        <td class="g">${esc(g.gebied)}</td>
+        <td class="n">${g.aantal}</td>
+        <td class="f">${esc(g.bestanden.join(' · '))}${g.aantal>g.bestanden.length?` <span class="wd">+${g.aantal-g.bestanden.length}</span>`:''}</td>
+      </tr>`).join('')}
+      </tbody></table>`;
+  } else {
+    H+=`<p class="wd" style="margin:16px 0 0">⚙️ Niets onderhanden — alles is gecommit.</p>`;
+  }
+
+  if(RW && RW.perUur && RW.perUur.length){
+    const toon = RW.perUur.slice(0, 6);
+    const rest = RW.perUur.length - toon.length;
+    const piek = Math.max(...RW.perUur.map(u=>u.aantal), 1);
+    H+=`<h4 style="margin:22px 0 10px">🕓 De laatste ${RW.urenTerug} uur
+        <span class="uurn">${RW.totaal} commits</span></h4>
+      <div class="tijdlijn">
+        ${toon.map(u=>`<div class="uur">
+          <div class="uurkop"><b>${esc(u.uur)}</b>
+            <span class="uurbalk"><span style="width:${Math.round(u.aantal/piek*100)}%"></span></span>
+            <span class="uurn">${u.aantal}</span></div>
+          <ul class="uurlijst">${u.titels.map(t=>`<li>${esc(trim(t,105))}</li>`).join('')}
+            ${u.aantal > u.titels.length ? `<li class="meer">+ ${u.aantal - u.titels.length} meer</li>` : ''}</ul>
+        </div>`).join('')}
+        ${rest > 0 ? `<div class="wd" style="padding-top:2px">… en ${rest} eerdere ${rest===1?'uur':'uren'}</div>` : ''}
+      </div>`;
+  }
+  H+=`</div>`;
 
   // STAPPENPLAN
   H+=`<h2>📊 Hoe ver zijn we? (het stappenplan)</h2>
@@ -400,6 +598,32 @@ function render(){
         <figcaption>${esc(s.caption||'')}</figcaption></figure>`).join('')}
       </div>${D.screenshotNoot?`<p class="noot">${esc(D.screenshotNoot)}</p>`:''}</div>`;
   }
+
+  // LOGO — ownerwerk, en sinds 27-07 gekozen
+  H+=`<h2>🎨 Het logo</h2>
+    <div class="card">
+      <div class="gal" style="margin-bottom:12px">
+        <figure onclick="zoom('brand/ECLIPSE_logo_wordmark.png')">
+          <img src="brand/ECLIPSE_logo_wordmark.png" alt="" onerror="this.parentElement.style.display='none'">
+          <figcaption>Het logo — titelscherm</figcaption></figure>
+        <figure onclick="zoom('brand/ECLIPSE_titelkaart.png')">
+          <img src="brand/ECLIPSE_titelkaart.png" alt="" onerror="this.parentElement.style.display='none'">
+          <figcaption>Key art — trailer, paginakop</figcaption></figure>
+        <figure onclick="zoom('brand/ECLIPSE_stencil_ingame.png')">
+          <img src="brand/ECLIPSE_stencil_ingame.png" alt="" onerror="this.parentElement.style.display='none'">
+          <figcaption>Stencil — op een muur in Kessara</figcaption></figure>
+      </div>
+      <p class="sub" style="margin:0 0 8px">Gekozen 27-07 uit vier Gemini-varianten. De titelkaart is
+      de enige die de kleurspanning van je wereld toont: Dominion-torens in wit-goud tegenover
+      sodium-oranje verzet. De stencil is geen logo maar een <b>in-game element</b> — de tegenhanger
+      van de propagandaborden die al in het district staan.</p>
+      <p class="sub" style="margin:0"><b>Nog te doen:</b> de cyaan randlijn weg (hoort bij Vel'Naar,
+      niet bij Kessara) · de zwarte balk boven de titelkaart wegsnijden ·
+      <b>het losse symbool genereren</b> voor de Steam-tegel en de favicon — een wordmark werkt niet
+      op 64×64.</p>
+      <p style="margin:12px 0 0"><a href="LOGO_PROMPTS.md"><b>→ LOGO_PROMPTS.md</b></a>
+      <span class="sub">(de keuzes, de prompts, en waarom welke waarvoor is)</span></p>
+    </div>`;
 
   // FOOTER
   H+=`<div class="footer">
@@ -457,8 +681,31 @@ function laadData(klaar){
 }
 
 /* Verversen zonder de pagina te herladen: geen flits, scrollpositie blijft
-   staan, en je verliest geen open lightbox. */
-function ververs(){ laadData(render); }
+   staan, en je verliest geen open lightbox.
+
+   MAAR: dan blijft de RENDERLOGICA staan die er was toen je de tab opende. Een
+   tab die sinds gisteren openstaat draait dus oude code op verse data — en dan
+   staat er "de robot slaapt · 23 uur" terwijl de commits van 5 minuten geleden
+   zijn. Daarom hieronder een controle op de pagina zelf. */
+let paginaStempel = null;
+function controleerPagina(){
+  // Op de lengte van de pagina zelf, niet op Last-Modified: de server (de VS
+  // Code-extensie op 8377) stuurt die header niet, dus daar viel niets mee te
+  // vergelijken. 30 kB per halve minuut over localhost is verwaarloosbaar.
+  fetch(location.pathname + '?stempel=' + Date.now(), { cache: 'no-store' })
+    .then(r => r.text())
+    .then(tekst => {
+      const nu = tekst.length;
+      if (paginaStempel === null) { paginaStempel = nu; return; }
+      if (nu !== paginaStempel) {
+        sessionStorage.setItem('eclipseScroll', window.scrollY);
+        location.reload();
+      }
+    })
+    .catch(() => {});                        // file:// mag dit weigeren; niet erg
+}
+
+function ververs(){ laadData(render); controleerPagina(); }
 
 laadData(()=>{
   render();

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controller-test — ECLIPSE</title>
+<style>
+  :root{
+    --bg:#0e1017; --card:#161a25; --card2:#1c2130; --lijn:#2b3245;
+    --tekst:#f2f5fb; --grijs:#9aa6be; --amber:#f5a623; --groen:#37d67a; --rood:#ff5c6c;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --card:#fff; --card2:#f7f9fd; --lijn:#dbe1ee;
+           --tekst:#161a25; --grijs:#5b6684; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 20px 70px;background:var(--bg);color:var(--tekst);
+       font:15px/1.55 -apple-system,Segoe UI,Roboto,system-ui,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:-.3px}
+  .sub{color:var(--grijs);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--lijn);border-radius:16px;padding:20px;margin-bottom:16px}
+  h2{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--grijs);
+     margin:0 0 14px;font-weight:800}
+  .status{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:700}
+  .dot{width:13px;height:13px;border-radius:50%;flex:none;background:var(--rood);
+       box-shadow:0 0 0 4px rgba(255,92,108,.18)}
+  .dot.on{background:var(--groen);box-shadow:0 0 0 4px rgba(55,214,122,.2)}
+  .hint{color:var(--grijs);font-size:14px;margin-top:10px}
+  .name{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--grijs);
+        margin-top:8px;word-break:break-all}
+  .warn{background:rgba(245,166,35,.12);border:1px solid var(--amber);border-radius:10px;
+        padding:12px 14px;margin-top:14px;font-size:14px}
+  .knop{background:var(--amber);color:#0e1017;border:none;border-radius:9px;padding:9px 15px;
+        font:700 14px inherit;cursor:pointer}
+  .knop.sec{background:var(--card2);color:var(--tekst);border:1px solid var(--lijn)}
+
+  /* controller-tekening */
+  .padwrap{display:flex;justify-content:center;padding:6px 0 2px}
+  svg.ctrl{width:100%;max-width:520px;height:auto}
+  .body{fill:var(--card2);stroke:var(--lijn);stroke-width:2}
+  .part{fill:var(--card2);stroke:var(--lijn);stroke-width:1.6;transition:fill .06s,stroke .06s}
+  .part.on{fill:var(--groen);stroke:var(--groen)}
+  .plabel{fill:var(--grijs);font:600 10px sans-serif;text-anchor:middle;pointer-events:none}
+  .part.on + .plabel{fill:#0b1a10}
+  .stickdot{fill:var(--amber)}
+
+  /* lijsten */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .row{background:var(--card2);border:1px solid var(--lijn);border-radius:9px;
+       padding:8px 11px;font-size:13px;display:flex;justify-content:space-between;
+       align-items:center;gap:10px;transition:all .08s}
+  .row.on{background:var(--groen);border-color:var(--groen);color:#0b1a10;font-weight:700}
+  .row .waar{font-size:11px;opacity:.72;display:block;font-weight:400}
+  .row .v{font-size:11px;opacity:.75;font-variant-numeric:tabular-nums;flex:none}
+  .bars{display:grid;gap:7px}
+  .bar{display:flex;align-items:center;gap:10px;font-size:13px}
+  .bar .idx{width:52px;color:var(--grijs);font-size:12px;font-family:ui-monospace,monospace}
+  .bar .track{flex:1;height:10px;background:var(--card2);border:1px solid var(--lijn);
+              border-radius:99px;position:relative;overflow:hidden}
+  .bar .mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--lijn)}
+  .bar .fill{position:absolute;top:0;bottom:0;background:var(--amber);transition:all .04s linear}
+  .bar .n{width:56px;color:var(--grijs);font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
+  .bar.moving .idx{color:var(--amber);font-weight:700}
+  ol{margin:8px 0 0;padding-left:22px} li{margin-bottom:8px}
+  code{background:var(--card2);border:1px solid var(--lijn);border-radius:5px;padding:1px 6px;font-size:13px}
+  .muted{color:var(--grijs)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Controller-test</h1>
+  <p class="sub">Werkt hij hier, dan werkt hij ook in ECLIPSE. Elke knop licht op waar hij op de controller zit.</p>
+
+  <div class="card">
+    <div class="status"><span class="dot" id="dot"></span><span id="status">Geen controller gevonden</span></div>
+    <div class="hint" id="hint">Sluit aan en <strong>druk op een knop</strong> — browsers tonen een gamepad pas na gebruik.</div>
+    <div class="name" id="name"></div>
+    <div id="mapwarn"></div>
+  </div>
+
+  <div class="card" id="live" style="display:none">
+    <h2>Waar zit wat</h2>
+    <div class="padwrap">
+      <svg class="ctrl" viewBox="0 0 460 300" aria-label="Xbox-controller">
+        <!-- body -->
+        <path class="body" d="M92 92 C50 92 22 132 18 182 C13 240 34 268 62 268 C88 268 104 246 122 232
+                              C140 218 168 212 230 212 C292 212 320 218 338 232 C356 246 372 268 398 268
+                              C426 268 447 240 442 182 C438 132 410 92 368 92 Z"/>
+        <!-- shoulders -->
+        <rect class="part" id="p4" x="72"  y="62" width="86" height="24" rx="12"/>
+        <text class="plabel" x="115" y="78">LB</text>
+        <rect class="part" id="p5" x="302" y="62" width="86" height="24" rx="12"/>
+        <text class="plabel" x="345" y="78">RB</text>
+        <rect class="part" id="p6" x="84"  y="30" width="62" height="22" rx="11"/>
+        <text class="plabel" x="115" y="45">LT</text>
+        <rect class="part" id="p7" x="314" y="30" width="62" height="22" rx="11"/>
+        <text class="plabel" x="345" y="45">RT</text>
+
+        <!-- linkerstick -->
+        <circle class="part" id="p10" cx="115" cy="140" r="30"/>
+        <circle class="stickdot" id="lsdot" cx="115" cy="140" r="9"/>
+        <text class="plabel" x="115" y="184">Linkerstick (L3)</text>
+
+        <!-- D-pad -->
+        <rect class="part" id="p12" x="176" y="176" width="22" height="20" rx="4"/>
+        <text class="plabel" x="187" y="190">▲</text>
+        <rect class="part" id="p13" x="176" y="222" width="22" height="20" rx="4"/>
+        <text class="plabel" x="187" y="236">▼</text>
+        <rect class="part" id="p14" x="152" y="199" width="22" height="20" rx="4"/>
+        <text class="plabel" x="163" y="213">◀</text>
+        <rect class="part" id="p15" x="200" y="199" width="22" height="20" rx="4"/>
+        <text class="plabel" x="211" y="213">▶</text>
+        <text class="plabel" x="187" y="262">D-pad</text>
+
+        <!-- ABXY -->
+        <circle class="part" id="p3" cx="345" cy="112" r="17"/><text class="plabel" x="345" y="117">Y</text>
+        <circle class="part" id="p1" cx="375" cy="142" r="17"/><text class="plabel" x="375" y="147">B</text>
+        <circle class="part" id="p0" cx="345" cy="172" r="17"/><text class="plabel" x="345" y="177">A</text>
+        <circle class="part" id="p2" cx="315" cy="142" r="17"/><text class="plabel" x="315" y="147">X</text>
+
+        <!-- rechterstick -->
+        <circle class="part" id="p11" cx="272" cy="196" r="28"/>
+        <circle class="stickdot" id="rsdot" cx="272" cy="196" r="8"/>
+        <text class="plabel" x="272" y="238">Rechterstick (R3)</text>
+
+        <!-- midden -->
+        <rect class="part" id="p8" x="192" y="128" width="26" height="16" rx="8"/>
+        <text class="plabel" x="205" y="140">▣</text>
+        <rect class="part" id="p9" x="242" y="128" width="26" height="16" rx="8"/>
+        <text class="plabel" x="255" y="140">☰</text>
+        <circle class="part" id="p16" cx="230" cy="104" r="16"/>
+        <text class="plabel" x="230" y="109">XBOX</text>
+        <text class="plabel" x="205" y="122">View</text>
+        <text class="plabel" x="255" y="122">Menu</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card" id="live2" style="display:none">
+    <h2>Knoppen — naam en plek</h2>
+    <div class="grid" id="buttons"></div>
+  </div>
+
+  <div class="card" id="live3" style="display:none">
+    <h2>Assen (sticks en triggers)</h2>
+    <p class="muted" style="margin:-6px 0 14px;font-size:13px">
+      Raak niets aan en klik <strong>Nulstellen</strong>. Blijft een balk daarna toch uitslaan
+      zonder dat je iets aanraakt, dan is dát de as die hangt (stick-drift of een trigger die
+      als stick wordt gelezen).
+    </p>
+    <div class="bars" id="axes"></div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="knop" id="zero">Nulstellen</button>
+      <button class="knop sec" id="unzero">Nulstelling wissen</button>
+    </div>
+    <div id="zeroinfo" class="muted" style="font-size:13px;margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Waarom knoppen soms verkeerd staan</h2>
+    <p class="muted" style="margin:0 0 8px">
+      Een Xbox-controller meldt zich <strong>via Bluetooth anders aan dan via USB</strong>. De browser
+      krijgt dan een afwijkende volgorde van knoppen en assen. Daarom kan een knop de verkeerde
+      naam krijgen, of lijkt een stick permanent uitgeslagen: dat is meestal een trigger-as die
+      als stick wordt gelezen — een losgelaten trigger rust op −1,00 en dat leest als "volledig omhoog".
+    </p>
+    <ol>
+      <li>Klik <strong>Nulstellen</strong> terwijl je niets aanraakt. Dat corrigeert een vaste offset.</li>
+      <li>Beweeg één stick en kijk welke as-nummers meebewegen — daaraan zie je de echte indeling.</li>
+      <li>Werkt hij hier goed maar in de game niet, dan is het de game; werkt hij hier al niet, dan is het de controller of de verbinding.</li>
+      <li><strong>Sluit hem met een USB-datakabel aan</strong> voor de betrouwbaarste indeling. Bluetooth is voor testen prima, maar USB geeft de standaard XINPUT-volgorde die de game verwacht.</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+// Standaard-indeling (XINPUT). Bij Bluetooth kan die afwijken — daarom tonen we ook de ruwe index.
+const BTN = [
+  ['A','onderste van de vier ronde knoppen rechts'],
+  ['B','rechtse van de vier ronde knoppen'],
+  ['X','linkse van de vier ronde knoppen'],
+  ['Y','bovenste van de vier ronde knoppen'],
+  ['LB','linker schouderknop, bovenop links'],
+  ['RB','rechter schouderknop, bovenop rechts'],
+  ['LT','linker trekker, achterkant links'],
+  ['RT','rechter trekker, achterkant rechts'],
+  ['View / Back','kleine knop links van het Xbox-logo'],
+  ['Menu / Start','kleine knop rechts van het Xbox-logo'],
+  ['L3','linkerstick indrukken'],
+  ['R3','rechterstick indrukken'],
+  ['D-pad omhoog','kruis linksonder, bovenkant'],
+  ['D-pad omlaag','kruis linksonder, onderkant'],
+  ['D-pad links','kruis linksonder, linkerkant'],
+  ['D-pad rechts','kruis linksonder, rechterkant'],
+  ['Xbox-knop','het grote logo in het midden'],
+];
+const AXN = ['Linkerstick links/rechts','Linkerstick omhoog/omlaag',
+             'Rechterstick links/rechts','Rechterstick omhoog/omlaag',
+             'As 4 (vaak LT)','As 5 (vaak RT)','As 6','As 7'];
+
+const $=id=>document.getElementById(id);
+let cells=[], axRows=[], zero=null;
+
+try { zero = JSON.parse(localStorage.getItem('ctrlZero')||'null'); } catch(_){}
+
+$('zero').onclick=()=>{
+  const gp=(navigator.getGamepads?[...navigator.getGamepads()]:[]).filter(Boolean)[0];
+  if(!gp) return;
+  zero=[...gp.axes];
+  localStorage.setItem('ctrlZero', JSON.stringify(zero));
+  $('zeroinfo').textContent='Nulstelling opgeslagen: ['+zero.map(v=>v.toFixed(2)).join(', ')+']';
+};
+$('unzero').onclick=()=>{ zero=null; localStorage.removeItem('ctrlZero'); $('zeroinfo').textContent='Nulstelling gewist.'; };
+
+function buildBtns(n){
+  $('buttons').innerHTML=''; cells=[];
+  for(let i=0;i<n;i++){
+    const [nm,waar]=BTN[i]||['Knop '+i,'onbekende plek'];
+    const d=document.createElement('div');
+    d.className='row';
+    d.innerHTML='<span><strong>'+nm+'</strong><span class="waar">'+waar+' · index '+i+'</span></span><span class="v">0.00</span>';
+    $('buttons').appendChild(d); cells.push(d);
+  }
+}
+function buildAxes(n){
+  $('axes').innerHTML=''; axRows=[];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='bar';
+    d.innerHTML='<span class="idx">as '+i+'</span><span class="track"><span class="mid"></span><span class="fill"></span></span><span class="n">0.00</span>';
+    d.title=AXN[i]||('As '+i);
+    $('axes').appendChild(d); axRows.push(d);
+  }
+}
+function setPart(id,on){ const e=$(id); if(e) e.classList.toggle('on',on); }
+
+function loop(){
+  const gp=(navigator.getGamepads?[...navigator.getGamepads()]:[]).filter(Boolean)[0];
+  if(!gp){
+    $('dot').classList.remove('on');
+    $('status').textContent='Geen controller gevonden';
+    $('live').style.display=$('live2').style.display=$('live3').style.display='none';
+    $('name').textContent=''; $('mapwarn').innerHTML='';
+  } else {
+    $('dot').classList.add('on');
+    $('status').textContent='Controller verbonden';
+    $('hint').textContent='Druk knoppen in — ze lichten op in de tekening én in de lijst.';
+    $('name').textContent=gp.id+'  ·  mapping: '+(gp.mapping||'(niet standaard)');
+    $('live').style.display=$('live2').style.display=$('live3').style.display='';
+    $('mapwarn').innerHTML = gp.mapping==='standard' ? '' :
+      '<div class="warn"><strong>Let op — niet-standaard indeling.</strong> Deze controller meldt zich ' +
+      'niet in de standaardvolgorde aan (typisch voor Bluetooth). De namen hieronder kunnen daardoor ' +
+      'bij de verkeerde knop staan. Kijk naar het <em>index</em>-nummer dat oplicht: dat is wat de game ziet. ' +
+      'Sluit hem met een USB-datakabel aan voor de juiste volgorde.</div>';
+
+    if(cells.length!==gp.buttons.length) buildBtns(gp.buttons.length);
+    if(axRows.length!==gp.axes.length) buildAxes(gp.axes.length);
+
+    gp.buttons.forEach((b,i)=>{
+      const on=b.pressed||b.value>0.12;
+      const c=cells[i]; if(c){ c.classList.toggle('on',on); c.lastChild.textContent=b.value.toFixed(2); }
+      setPart('p'+i,on);
+    });
+
+    gp.axes.forEach((raw,i)=>{
+      const v=Math.max(-1,Math.min(1, raw-(zero?zero[i]:0)));
+      const r=axRows[i]; if(!r) return;
+      const f=r.querySelector('.fill');
+      if(v>=0){ f.style.left='50%'; f.style.width=(v*50)+'%'; }
+      else    { f.style.left=(50+v*50)+'%'; f.style.width=(-v*50)+'%'; }
+      r.querySelector('.n').textContent=v.toFixed(2);
+      r.classList.toggle('moving', Math.abs(v)>0.15);
+    });
+
+    const ax=i=>Math.max(-1,Math.min(1,(gp.axes[i]||0)-(zero?zero[i]:0)));
+    $('lsdot').setAttribute('cx', 115+ax(0)*17); $('lsdot').setAttribute('cy', 140+ax(1)*17);
+    $('rsdot').setAttribute('cx', 272+ax(2)*16); $('rsdot').setAttribute('cy', 196+ax(3)*16);
+  }
+  requestAnimationFrame(loop);
+}
+if(zero) $('zeroinfo').textContent='Nulstelling actief: ['+zero.map(v=>v.toFixed(2)).join(', ')+']';
+loop();
+</script>
+</body>
+</html>

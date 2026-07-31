@@ -6,7 +6,9 @@
 
 ---
 
-> **Start here for development sessions:** [DOCUMENTATION_README.md](DOCUMENTATION_README.md) — document hierarchy, reading order, session protocol, and forbidden actions.
+> **Start here for development sessions:** [STATUS.md](STATUS.md) — the compact status card: where we stand, the two tracks, open dossiers, owner queue, hard rules. Read this first, not the full bible.
+> **Nathan's screen:** `START_DASHBOARD.bat` → **http://127.0.0.1:8377/** — the live dashboard (tasks, agents + their chats, all documents, screenshots, credits).
+> **Document hierarchy and session protocol:** [DOCUMENTATION_README.md](DOCUMENTATION_README.md).
 
 ## Document Map
 
@@ -29,6 +31,20 @@
 | 15 | [Visual Quality Charter](15_visual_quality_charter.md) | AAA art & rendering target, hardware reality, per-phase fidelity plan, optimization discipline |
 | 16 | [Audio System](16_audio_system.md) | Audio architecture, ElevenLabs pipeline (TTS/music/SFX), always-on adaptive music, credit budget |
 | 17 | [Cinematic & Animation System](17_cinematic_animation_system.md) | MetaHuman animation, motion matching, facial performance, dynamic camera, runtime cinematics |
+| 18 | [Writing Standard](18_writing_standard.md) | Dialogue craft, line-length bands, character voice fingerprints, bark design, the anti-slop gate |
+| 19 | [Voice Production](19_voice_production.md) | ElevenLabs casting, audio tags, the credit ladder, the generation workflow |
+| 20 | [World Dressing Standard](20_world_dressing_standard.md) | Composition, believability, the no-filler law, what makes a view epic |
+| 21 | [Quality Mandate](21_quality_mandate.md) | **Standing owner instruction** — graphics and comprehensiveness are always the two highest priorities. Never the shortest path. |
+
+## Working documents (phase0)
+
+| Document | Contents |
+|---|---|
+| [EXECUTION_PLAN](phase0/EXECUTION_PLAN.md) | Track B backlog — risk-first, with falsification tests |
+| [SCRIPT_PRODUCTION_PLAN](phase0/SCRIPT_PRODUCTION_PLAN.md) | Track A — the layer model, the calibration mission, the sprint calendar |
+| [SCRIPT_FORMAT](phase0/SCRIPT_FORMAT.md) | The one file shape every scene uses |
+| [DEBUG_DISCIPLINE](phase0/DEBUG_DISCIPLINE.md) | How a bug takes hours instead of sessions — plus the known-cause catalogue |
+| [VOICE_LEDGER](phase0/VOICE_LEDGER.md) | Actual ElevenLabs credit spend |
 
 ## Canon Glossary (names — single source of truth)
 

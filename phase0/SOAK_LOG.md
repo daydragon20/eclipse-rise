@@ -59,3 +59,94 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-27 12:34 | `4dd040a` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Audio.Subsystem.BusContract |
 | 2026-07-27 12:37 | `4dd040a` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
 | 2026-07-27 12:43 | `42de670` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 13:35 | `b8693b9` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 13:42 | `b8693b9` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 13:47 | `bc0c670` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Guide.StepListNamesBothDevicesAndAnExpectation |
+| 2026-07-27 13:52 | `bc0c670` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Guide.PanelShowsTheActiveExpectationAndCollapsesTheRest |
+| 2026-07-27 13:54 | `bc0c670` | **GROEN** | 184 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 14:12 | `e862cc6` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 14:18 | `c3c46ae` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 14:23 | `c3c46ae` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 9 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 5, stap 6, stap 7, stap 8, stap 9] |
+| 2026-07-27 14:33 | `69b7c7f` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 9 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 5, stap 6, stap 7, stap 8, stap 9] |
+| 2026-07-27 14:47 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 14:52 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 14:57 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:00 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:04 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:08 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:11 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 2] |
+| 2026-07-27 15:16 | `08d3c77` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 5 beeld(en) VERANDERD -> stap 1, stap 2, stap 4, stap 5, stap 6] |
+| 2026-07-27 15:21 | `ea4714d` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:25 | `ea4714d` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:37 | `3a42a4a` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:41 | `3a42a4a` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:46 | `a1c9dcd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:50 | `a1c9dcd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:54 | `a1c9dcd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 15:58 | `a1c9dcd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:02 | `a1c9dcd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:06 | `c74b12a` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:09 | `c74b12a` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:12 | `c74b12a` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:16 | `c74b12a` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:25 | `e3b1815` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:30 | `62dc487` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:34 | `62dc487` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:38 | `62dc487` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:42 | `f45b3ce` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:46 | `f45b3ce` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:49 | `f45b3ce` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:53 | `f45b3ce` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 16:57 | `f45b3ce` | **ROOD** | 184 tests / 1 gefaald / 0 niet gedraaid | 9 | Eclipse.Playthrough.M11PlaysItselfFromLaunchToDebrief; opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:01 | `f45b3ce` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 8 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 5, stap 6, stap 7, stap 9] |
+| 2026-07-27 17:08 | `8f24a4e` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame [beeld: 7 beeld(en) VERANDERD -> stap 1, stap 2, stap 3, stap 4, stap 5, stap 6, stap 7] |
+| 2026-07-27 17:13 | `df9e2e2` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:18 | `df9e2e2` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:21 | `df9e2e2` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:24 | `df9e2e2` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:32 | `a6076e0` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:37 | `998a8fd` | **ROOD** | 184 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:43 | `998a8fd` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 17:44 | `998a8fd` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Feel.LocomotionBlendsBetweenDirections |
+| 2026-07-27 17:48 | `998a8fd` | **ROOD** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 17:55 | `1618914` | **ROOD** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 18:06 | `339d4ab` | **ROOD** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 18:09 | `339d4ab` | **ROOD** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | opnameronde: 1 fout(en) in het frame |
+| 2026-07-27 18:14 | `dae67f5` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:17 | `dae67f5` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:19 | `dae67f5` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:29 | `1c42756` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:33 | `1c42756` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:36 | `1c42756` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:40 | `1c42756` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:45 | `1dfec1e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:48 | `1dfec1e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:53 | `c1a31c3` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 18:57 | `c1a31c3` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:00 | `c1a31c3` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:05 | `1db1fb8` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 2 beeld(en) VERANDERD -> stap 1, stap 2] |
+| 2026-07-27 19:09 | `1db1fb8` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:14 | `1db1fb8` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:18 | `1db1fb8` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:22 | `1db1fb8` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:25 | `1db1fb8` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:33 | `3f95319` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:36 | `3f95319` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:39 | `3f95319` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:43 | `3f95319` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:50 | `d10918c` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:54 | `d10918c` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 19:57 | `993c8f6` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 20:01 | `993c8f6` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 20:04 | `79684ae` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-27 20:13 | `84686b2` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 4 beeld(en) VERANDERD -> stap 6, stap 7, stap 8, stap 9] |
+| 2026-07-27 20:23 | `8e2d07d` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-27 20:42 | `814872e` | **ROOD** | 185 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Audio.Subsystem.BusContract |
+| 2026-07-27 20:45 | `814872e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-31 17:28 | `a3f8cd7` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-31 17:39 | `9e0a66e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 1 beeld(en) VERANDERD -> stap 6] |
+| 2026-07-31 17:42 | `9e0a66e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-31 17:46 | `9e0a66e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 1 beeld(en) VERANDERD -> stap 6] |
+| 2026-07-31 17:50 | `9e0a66e` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 | - |
+| 2026-07-31 17:55 | `74f0ea1` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 1 beeld(en) VERANDERD -> stap 6] |
+| 2026-07-31 17:59 | `74f0ea1` | **GROEN** | 185 tests / 0 gefaald / 0 niet gedraaid | 9 |  [beeld: 1 beeld(en) VERANDERD -> stap 6] |

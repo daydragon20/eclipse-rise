@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECLIPSE — Live</title>
+<style>
+:root{
+  --bg:#0b0e14; --panel:#131822; --panel2:#1a2130; --line:#232c3d;
+  --tx:#e6ebf5; --dim:#8a97ad; --dim2:#5f6b80;
+  --acc:#f5a524; --acc2:#ffcf70;
+  --ok:#3ecf8e; --warn:#f5a524; --bad:#ef5f5f; --info:#5b9dff;
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--tx);
+  font:15px/1.55 "Segoe UI",system-ui,-apple-system,sans-serif;
+  padding:0 0 80px;
+}
+a{color:var(--info);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font:13px/1.4 "Cascadia Code",Consolas,monospace;background:#0000004d;padding:1px 5px;border-radius:4px}
+
+/* ---------- topbar ---------- */
+header{
+  position:sticky;top:0;z-index:50;background:#0b0e14f2;backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:14px 26px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.logo{font-size:19px;font-weight:700;letter-spacing:.14em}
+.logo span{color:var(--acc)}
+.pulse{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--bad)}
+.dot.live{background:var(--ok);box-shadow:0 0 0 0 #3ecf8e99;animation:p 2s infinite}
+@keyframes p{70%{box-shadow:0 0 0 9px #3ecf8e00}100%{box-shadow:0 0 0 0 #3ecf8e00}}
+nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav button{
+  background:transparent;border:1px solid transparent;color:var(--dim);
+  padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13.5px;font-family:inherit;
+}
+nav button:hover{color:var(--tx);background:var(--panel)}
+nav button.on{color:#0b0e14;background:var(--acc);font-weight:600}
+
+main{max-width:1280px;margin:0 auto;padding:26px}
+.view{display:none}.view.on{display:block}
+
+h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 14px}
+h3{font-size:17px;margin:0 0 8px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stat .n{font-size:30px;font-weight:700;line-height:1.1}
+.stat .l{font-size:12.5px;color:var(--dim);margin-top:5px}
+.stat .s{font-size:12px;color:var(--dim2);margin-top:3px}
+
+.bar{height:7px;background:#00000059;border-radius:99px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .5s}
+
+.tag{display:inline-block;font-size:11.5px;padding:2.5px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+.tag.ok{color:var(--ok);border-color:#3ecf8e44;background:#3ecf8e14}
+.tag.bad{color:var(--bad);border-color:#ef5f5f44;background:#ef5f5f14}
+.tag.warn{color:var(--warn);border-color:#f5a52444;background:#f5a52414}
+.tag.info{color:var(--info);border-color:#5b9dff44;background:#5b9dff14}
+
+.item{border-left:3px solid var(--line);padding:11px 0 11px 14px;margin-bottom:10px}
+.item.nu{border-color:var(--bad)}
+.item.gauw{border-color:var(--warn)}
+.item.later{border-color:var(--dim2)}
+.item h4{font-size:15px;margin-bottom:5px}
+.item p{font-size:13.5px;color:var(--dim);margin-bottom:6px}
+.item ul{margin:6px 0 0 17px;font-size:13px;color:var(--dim)}
+.item li{margin:3px 0}
+
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.row .t{font-size:13.5px}
+.row .m{font-size:12px;color:var(--dim2);white-space:nowrap}
+
+.agent{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s}
+.agent:hover{border-color:var(--acc)}
+.agent.live{border-color:#3ecf8e55}
+.agent .hd{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.agent .id{font:12px monospace;color:var(--dim2)}
+.agent .last{font-size:13px;color:var(--dim);max-height:60px;overflow:hidden;margin-top:7px}
+.agent .tools{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:11px}
+.shot{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
+.shot img{width:100%;height:132px;object-fit:cover;display:block;cursor:pointer}
+.shot .c{padding:7px 9px;font-size:11.5px;color:var(--dim2);display:flex;justify-content:space-between}
+
+.doclist{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:7px}
+.doc{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;
+     background:var(--panel2);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:13.5px}
+.doc:hover{border-color:var(--acc);color:var(--acc2)}
+.doc .meta{font-size:11px;color:var(--dim2);white-space:nowrap}
+
+/* ---------- overlay ---------- */
+.ov{position:fixed;inset:0;background:#000000d9;z-index:100;display:none;padding:34px}
+.ov.on{display:block}
+.ov-in{max-width:900px;margin:0 auto;background:var(--panel);border:1px solid var(--line);
+       border-radius:var(--r);max-height:100%;display:flex;flex-direction:column}
+.ov-hd{padding:15px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:14px}
+.ov-bd{padding:22px 26px;overflow:auto}
+.ov-bd img{max-width:100%}
+.x{background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:7px;
+   padding:6px 13px;cursor:pointer;font-family:inherit;font-size:13px}
+.x:hover{border-color:var(--acc)}
+
+/* markdown */
+.md h1{font-size:24px;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.md h2{font-size:19px;margin:22px 0 10px;color:var(--acc2);text-transform:none;letter-spacing:0}
+.md h3{font-size:16px;margin:17px 0 8px;color:var(--tx)}
+.md p{margin:9px 0}
+.md ul,.md ol{margin:9px 0 9px 22px}
+.md li{margin:4px 0}
+.md table{border-collapse:collapse;width:100%;margin:13px 0;font-size:13px;display:block;overflow-x:auto}
+.md th,.md td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+.md th{background:var(--panel2)}
+.md blockquote{border-left:3px solid var(--acc);padding:3px 0 3px 15px;margin:12px 0;color:var(--dim)}
+.md pre{background:#00000059;padding:13px;border-radius:8px;overflow-x:auto;margin:11px 0}
+.md hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+
+.msg{padding:11px 0;border-bottom:1px solid var(--line)}
+.msg .who{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim2);margin-bottom:5px}
+.msg.assistant .who{color:var(--acc)}
+.msg .tx{font-size:13.5px;white-space:pre-wrap;word-break:break-word}
+
+.empty{color:var(--dim2);font-size:13.5px;padding:14px 0;font-style:italic}
+.note{font-size:12.5px;color:var(--dim2);margin-top:9px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ECLIPSE<span>.</span></div>
+  <div class="pulse"><span class="dot" id="dot"></span><span id="pulse">verbinden…</span></div>
+  <nav>
+    <button class="on" data-v="nu">Nu</button>
+    <button data-v="agents">Agents</button>
+    <button data-v="taken">Taken</button>
+    <button data-v="schrijf">Schrijflaag</button>
+    <button data-v="beeld">Beeld</button>
+    <button data-v="docs">Documenten</button>
+    <button data-v="historie">Historie</button>
+  </nav>
+</header>
+
+<main>
+  <section class="view on" id="v-nu"></section>
+  <section class="view" id="v-agents"></section>
+  <section class="view" id="v-taken"></section>
+  <section class="view" id="v-schrijf"></section>
+  <section class="view" id="v-beeld"></section>
+  <section class="view" id="v-docs"></section>
+  <section class="view" id="v-historie"></section>
+</main>
+
+<div class="ov" id="ov">
+  <div class="ov-in">
+    <div class="ov-hd"><h3 id="ov-t">—</h3><button class="x" onclick="closeOv()">sluiten ✕</button></div>
+    <div class="ov-bd" id="ov-b"></div>
+  </div>
+</div>
+
+<script src="progress_data.js"></script>
+<script>
+let S={}, D=(window.PROGRESS_DATA||{}), lastOk=0, cur="nu";
+
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- mini markdown ---------- */
+function md(src){
+  const lines=String(src).split(/\r?\n/); let out=[],i=0,inCode=false,code=[];
+  const inline=t=>esc(t)
+    .replace(/`([^`]+)`/g,"<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g,"$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  while(i<lines.length){
+    const l=lines[i];
+    if(/^```/.test(l)){
+      if(inCode){out.push("<pre>"+esc(code.join("\n"))+"</pre>");code=[];inCode=false}
+      else inCode=true;
+      i++;continue;
+    }
+    if(inCode){code.push(l);i++;continue}
+    if(/^\|/.test(l)&&/^\|/.test(lines[i+1]||"")&&/^[\s|:-]+$/.test(lines[i+1])){
+      const cells=r=>r.split("|").slice(1,-1).map(c=>c.trim());
+      let t="<table><thead><tr>"+cells(l).map(c=>"<th>"+inline(c)+"</th>").join("")+"</tr></thead><tbody>";
+      i+=2;
+      while(i<lines.length&&/^\|/.test(lines[i])){t+="<tr>"+cells(lines[i]).map(c=>"<td>"+inline(c)+"</td>").join("")+"</tr>";i++}
+      out.push(t+"</tbody></table>");continue;
+    }
+    let m;
+    if(m=l.match(/^(#{1,4})\s+(.*)/)){out.push(`<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`);i++;continue}
+    if(/^(---|===)\s*$/.test(l)){out.push("<hr>");i++;continue}
+    if(m=l.match(/^>\s?(.*)/)){let b=[m[1]];i++;while(i<lines.length&&/^>/.test(lines[i])){b.push(lines[i].replace(/^>\s?/,""));i++}out.push("<blockquote>"+inline(b.join(" "))+"</blockquote>");continue}
+    if(/^\s*[-*]\s+/.test(l)){let b=[];while(i<lines.length&&/^\s*[-*]\s+/.test(lines[i])){b.push("<li>"+inline(lines[i].replace(/^\s*[-*]\s+/,""))+"</li>");i++}out.push("<ul>"+b.join("")+"</ul>");continue}
+    if(/^\s*\d+\.\s+/.test(l)){let b=[];while(i<lines.length&&/^\s*\d+\.\s+/.test(lines[i])){b.push("<li>"+inline(lines[i].replace(/^\s*\d+\.\s+/,""))+"</li>");i++}out.push("<ol>"+b.join("")+"</ol>");continue}
+    if(l.trim()===""){i++;continue}
+    out.push("<p>"+inline(l)+"</p>");i++;
+  }
+  return out.join("\n");
+}
+
+/* ---------- views ---------- */
+function vNu(){
+  const g=S.git||{}, t=S.tests||{}, v=S.voice||{}, sc=S.script||{}, dk=S.disk||{};
+  const acties=D.ownerActies||[];
+  const bar=t.total?(t.failed===0?"ok":"bad"):"";
+  return `
+  <div class="grid g4" style="margin-bottom:18px">
+    <div class="stat"><div class="n" style="color:var(--acc)">${(D.hero&&D.hero.pct)||0}%</div><div class="l">Hele game</div><div class="s">${esc((D.hero&&D.hero.label)||"")}</div></div>
+    <div class="stat"><div class="n" style="color:var(--${bar||"dim"})">${t.ok||0}/${t.total||0}</div><div class="l">Tests groen</div><div class="s">${esc(t.age||"—")}</div></div>
+    <div class="stat"><div class="n">${(g.commits||[]).length?esc(g.commits[0].date):"—"}</div><div class="l">Laatste commit</div><div class="s">${g.dirty?g.dirty+" bestanden open":"werkboom schoon"}</div></div>
+    <div class="stat"><div class="n" style="color:${acties.length?"var(--bad)":"var(--ok)"}">${acties.length}</div><div class="l">Wacht op jou</div><div class="s">${acties.length?"actie nodig":"niets te doen"}</div></div>
+  </div>
+
+  <h2>Wacht op jou</h2>
+  <div class="card">${acties.length?acties.map(a=>`
+    <div class="item ${esc(a.prio||"later")}">
+      <h4>${esc(a.titel||"")} <span class="tag ${a.prio==="nu"?"bad":a.prio==="gauw"?"warn":""}">${esc(a.prio||"")}</span></h4>
+      ${a.waarom?`<p>${esc(a.waarom).slice(0,700)}</p>`:""}
+      ${a.stappen?`<ul>${a.stappen.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
+    </div>`).join(""):'<div class="empty">Niets — de agent heeft alles wat hij nodig heeft.</div>'}
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>Credits — ElevenLabs</h2>
+      <div style="font-size:27px;font-weight:700">${(v.spent||0).toLocaleString("nl")} <span style="font-size:15px;color:var(--dim)">/ ${(v.budget||0).toLocaleString("nl")}</span></div>
+      <div class="bar"><i style="width:${Math.min(100,v.pct||0)}%"></i></div>
+      <div class="note">${(v.remaining||0).toLocaleString("nl")} over · reserve 20.000 · stop bij 290.000</div>
+    </div>
+    <div class="card">
+      <h2>Schrijflaag</h2>
+      <div style="font-size:27px;font-weight:700">${sc.total||0} <span style="font-size:15px;color:var(--dim)">scènes</span></div>
+      <div class="note">
+        <span class="tag">${(sc.counts&&sc.counts.draft)||0} draft</span>
+        <span class="tag info">${(sc.counts&&sc.counts["critic-pass"])||0} goedgekeurd</span>
+        <span class="tag ok">${(sc.counts&&sc.counts.generated)||0} ingesproken</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Systeem</h2>
+    <div class="row"><span class="t">Screenshots op schijf</span><span class="m">${dk.shotCount||0} bestanden · ${dk.screenshotsGB||0} GB</span></div>
+    <div class="row"><span class="t">Branch</span><span class="m">${esc(g.branch||"?")}</span></div>
+    <div class="row"><span class="t">Laatste scan</span><span class="m">${esc(S.generatedAt||"—")}</span></div>
+  </div>`;
+}
+
+function vAgents(){
+  const a=S.agents||[];
+  if(!a.length)return '<h2>Agents</h2><div class="card"><div class="empty">Geen sessies gevonden.</div></div>';
+  return `<h2>Agents — klik voor de chat</h2><div class="grid g2">${a.map(x=>`
+    <div class="agent ${x.active?"live":""}" onclick="openAgent('${esc(x.id)}')">
+      <div class="hd">
+        <span class="dot ${x.active?"live":""}"></span>
+        <strong>${x.active?"Actief":"Rust"}</strong>
+        <span class="id">${esc(x.short)}</span>
+        <span style="margin-left:auto" class="m">${esc(x.modified)}</span>
+      </div>
+      <div class="note">${x.messages} berichten · ${x.sizeMB} MB${x.subagents?` · ${x.subagents} subagents`:""}</div>
+      <div class="last">${esc((x.lastRole==="assistant"?"→ ":"‹ ")+(x.lastText||"(gereedschap)")).slice(0,240)}</div>
+      <div class="tools">${(x.topTools||[]).map(t=>`<span class="tag">${esc(t[0])} ${t[1]}</span>`).join("")}</div>
+    </div>`).join("")}</div>`;
+}
+
+function vTaken(){
+  const t=D.taken||[];
+  if(!t.length)return '<h2>Taken</h2><div class="card"><div class="empty">Geen taken in progress_data.js.</div></div>';
+  const groups={};
+  t.forEach(x=>{const k=x.status||"overig";(groups[k]=groups[k]||[]).push(x)});
+  return `<h2>Taken</h2>`+Object.entries(groups).map(([k,v])=>`
+    <div class="card"><h3>${esc(k)} <span class="tag">${v.length}</span></h3>
+    ${v.map(x=>`<div class="row"><span class="t">${esc(x.titel||x.naam||"")}</span><span class="m">${x.pct!=null?x.pct+"%":""}</span></div>`).join("")}
+    </div>`).join("");
+}
+
+function vSchrijf(){
+  const sc=S.script||{}, v=S.voice||{};
+  return `<h2>Schrijflaag & stem</h2>
+  <div class="grid g3" style="margin-bottom:14px">
+    <div class="stat"><div class="n">${sc.total||0}</div><div class="l">Scènes</div></div>
+    <div class="stat"><div class="n">${(sc.words||0).toLocaleString("nl")}</div><div class="l">Woorden geschreven</div></div>
+    <div class="stat"><div class="n">${(v.remaining||0).toLocaleString("nl")}</div><div class="l">Credits over</div></div>
+  </div>
+  <div class="card"><h3>Scènes</h3>
+    ${(sc.scenes||[]).length?(sc.scenes||[]).map(s=>`<div class="row">
+      <span class="t">${esc(s.title)}</span>
+      <span class="m"><span class="tag ${s.status==="generated"?"ok":s.status==="critic-pass"?"info":""}">${esc(s.status)}</span></span>
+    </div>`).join(""):'<div class="empty">Nog geen scriptbestanden. Ze komen in Eclipse/Content/Script/.</div>'}
+  </div>
+  <div class="card"><h3>Credit-ledger</h3>
+    ${(v.rows||[]).length?(v.rows||[]).map(r=>`<div class="row">
+      <span class="t">${esc(r.scope)} <span class="tag">tier ${esc(r.tier)}</span></span>
+      <span class="m">${r.credits.toLocaleString("nl")} · ${esc(r.datum)}</span></div>`).join(""):
+      '<div class="empty">Nog niets uitgegeven. phase0/VOICE_LEDGER.md is leeg.</div>'}
+  </div>`;
+}
+
+function vBeeld(){
+  const s=S.shots||[];
+  return `<h2>Wat de agent ziet — laatste ${s.length}</h2>
+  <div class="card"><div class="note">Er worden er automatisch maar 50 bewaard; oudere worden opgeruimd door <code>Tools/prune_screenshots.py</code>.</div></div>
+  ${s.length?`<div class="shots">${s.map(x=>`<div class="shot">
+    <img src="${x.url}" loading="lazy" onclick="openImg('${x.url}','${esc(x.name)}')">
+    <div class="c"><span>${esc(x.modified)}</span><span>${x.kb} KB</span></div></div>`).join("")}</div>`
+   :'<div class="card"><div class="empty">Geen screenshots.</div></div>'}`;
+}
+
+function vDocs(){
+  const g=S.docs||{};
+  const keys=Object.keys(g);
+  if(!keys.length)return '<h2>Documenten</h2><div class="card"><div class="empty">Scannen…</div></div>';
+  return `<h2>Documenten — klik om te lezen</h2>`+keys.map(k=>`
+    <div class="card"><h3>${esc(k)} <span class="tag">${g[k].length}</span></h3>
+    <div class="doclist">${g[k].map(d=>`
+      <div class="doc" onclick="openDoc('${esc(d.path)}')">
+        <span>${esc(d.name)}</span><span class="meta">${d.kb} KB · ${esc(d.modified)}</span>
+      </div>`).join("")}</div></div>`).join("");
+}
+
+function vHistorie(){
+  const g=S.git||{}, gd=D.jijGedaan||[];
+  return `<h2>Historie</h2>
+  <div class="card"><h3>Laatste commits</h3>
+    ${(g.commits||[]).map(c=>`<div class="row"><span class="t"><code>${esc(c.hash)}</code> ${esc(c.msg)}</span><span class="m">${esc(c.date)}</span></div>`).join("")}
+  </div>
+  <div class="card"><h3>Wat jij hebt aangeleverd</h3>
+    ${gd.length?gd.slice(0,14).map(x=>`<div class="item later"><p>${esc(String(x.wat||"")).slice(0,520)}</p>
+      <span class="m">${esc(x.tijd||"")}</span></div>`).join(""):'<div class="empty">—</div>'}
+  </div>`;
+}
+
+const VIEWS={nu:vNu,agents:vAgents,taken:vTaken,schrijf:vSchrijf,beeld:vBeeld,docs:vDocs,historie:vHistorie};
+
+function render(){
+  try{document.getElementById("v-"+cur).innerHTML=VIEWS[cur]();}
+  catch(e){document.getElementById("v-"+cur).innerHTML='<div class="card"><div class="empty">Renderfout: '+esc(e.message)+'</div></div>';}
+}
+
+/* ---------- overlay ---------- */
+const ov=document.getElementById("ov");
+function closeOv(){ov.classList.remove("on")}
+ov.addEventListener("click",e=>{if(e.target===ov)closeOv()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeOv()});
+
+async function openDoc(p){
+  document.getElementById("ov-t").textContent=p;
+  document.getElementById("ov-b").innerHTML='<div class="empty">Laden…</div>';
+  ov.classList.add("on");
+  try{
+    const r=await fetch("/api/doc?path="+encodeURIComponent(p));
+    const j=await r.json();
+    document.getElementById("ov-b").innerHTML=j.error?'<div class="empty">'+esc(j.error)+'</div>':'<div class="md">'+md(j.text)+'</div>';
+  }catch(e){document.getElementById("ov-b").innerHTML='<div class="empty">Kon niet laden.</div>'}
+}
+async function openAgent(id){
+  document.getElementById("ov-t").textContent="Agent "+id.slice(0,8);
+  document.getElementById("ov-b").innerHTML='<div class="empty">Laden…</div>';
+  ov.classList.add("on");
+  try{
+    const r=await fetch("/api/agent?id="+encodeURIComponent(id));
+    const j=await r.json();
+    const m=j.messages||[];
+    document.getElementById("ov-b").innerHTML=m.length?m.map(x=>`
+      <div class="msg ${esc(x.role)}"><div class="who">${x.role==="assistant"?"Claude":"Nathan"}${x.tools&&x.tools.length?" · "+x.tools.map(esc).join(", "):""}</div>
+      <div class="tx">${esc(x.text||"(gereedschap)")}</div></div>`).join(""):'<div class="empty">Geen berichten.</div>';
+    const b=document.getElementById("ov-b");b.scrollTop=b.scrollHeight;
+  }catch(e){document.getElementById("ov-b").innerHTML='<div class="empty">Kon niet laden.</div>'}
+}
+function openImg(u,n){
+  document.getElementById("ov-t").textContent=n;
+  document.getElementById("ov-b").innerHTML='<img src="'+u+'">';
+  ov.classList.add("on");
+}
+
+/* ---------- nav ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");cur=b.dataset.v;
+  document.getElementById("v-"+cur).classList.add("on");render();
+});
+
+/* ---------- live poll ---------- */
+async function poll(){
+  try{
+    const r=await fetch("/api/state",{cache:"no-store"});
+    S=await r.json();lastOk=Date.now();render();
+  }catch(e){/* server plat */}
+  const live=Date.now()-lastOk<12000;
+  document.getElementById("dot").className="dot"+(live?" live":"");
+  document.getElementById("pulse").textContent=live
+    ? "live · "+new Date().toLocaleTimeString("nl")
+    : "GEEN VERBINDING — start START_DASHBOARD.bat";
+}
+poll();setInterval(poll,5000);
+setInterval(()=>{const l=Date.now()-lastOk<12000;document.getElementById("dot").className="dot"+(l?" live":"")},2000);
+</script>
+</body>
+</html>

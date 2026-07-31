@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controller kalibreren — ECLIPSE</title>
+<style>
+  :root{
+    --bg:#0e1017; --card:#161a25; --card2:#1c2130; --lijn:#2b3245;
+    --tekst:#f2f5fb; --grijs:#9aa6be; --amber:#f5a623; --groen:#37d67a; --rood:#ff5c6c;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --card:#fff; --card2:#f7f9fd; --lijn:#dbe1ee;
+           --tekst:#161a25; --grijs:#5b6684; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 20px 70px;background:var(--bg);color:var(--tekst);
+       font:15px/1.55 -apple-system,Segoe UI,Roboto,system-ui,sans-serif}
+  .wrap{max-width:940px;margin:0 auto}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:-.3px}
+  .sub{color:var(--grijs);margin:0 0 18px}
+  .card{background:var(--card);border:1px solid var(--lijn);border-radius:16px;padding:20px;margin-bottom:14px}
+  h2{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--grijs);margin:0 0 12px;font-weight:800}
+  .conn{display:flex;align-items:center;gap:11px;font-weight:700}
+  .dot{width:12px;height:12px;border-radius:50%;background:var(--rood);flex:none;box-shadow:0 0 0 4px rgba(255,92,108,.18)}
+  .dot.on{background:var(--groen);box-shadow:0 0 0 4px rgba(55,214,122,.2)}
+  .gpid{color:var(--grijs);font-size:12px;font-family:ui-monospace,monospace;margin-top:6px}
+
+  .instr{background:var(--card2);border:1px solid var(--amber);border-radius:12px;
+         padding:14px 16px;margin-bottom:14px;font-size:16px;font-weight:700;text-align:center}
+  .instr small{display:block;font-weight:400;font-size:14px;color:var(--grijs);margin-top:4px}
+
+  svg.ctrl{width:100%;max-width:560px;height:auto;display:block;margin:0 auto}
+  .body{fill:var(--card2);stroke:var(--lijn);stroke-width:2}
+  .hit{fill:var(--card2);stroke:var(--lijn);stroke-width:1.6;cursor:pointer;transition:all .12s}
+  .hit:hover{stroke:var(--amber);stroke-width:2.4}
+  .hit.armed{fill:var(--amber);stroke:var(--amber);animation:pulse 1s infinite}
+  .hit.done{fill:var(--groen);stroke:var(--groen)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .plabel{font:700 10px sans-serif;text-anchor:middle;pointer-events:none;fill:var(--grijs)}
+  .hit.armed + .plabel,.hit.done + .plabel{fill:#0b1a10}
+  .idxlabel{font:800 9px ui-monospace,monospace;text-anchor:middle;pointer-events:none;fill:#0b1a10}
+
+  .live{text-align:center;font-family:ui-monospace,monospace;font-size:13px;color:var(--grijs);min-height:22px;margin-top:8px}
+  .live b{color:var(--groen)}
+  button{background:var(--card2);color:var(--tekst);border:1px solid var(--lijn);border-radius:10px;
+         padding:9px 15px;font:600 14px inherit;cursor:pointer}
+  button.pri{background:var(--amber);color:#0e1017;border-color:var(--amber);font-weight:800}
+  button:hover{filter:brightness(1.12)}
+  .knoppen{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+
+  .sticklist{display:grid;gap:9px}
+  .srow{display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--lijn);
+        border-radius:10px;padding:10px 13px;font-size:14px}
+  .srow .nm{font-weight:700;width:170px;flex:none}
+  .srow .st{color:var(--grijs);font-size:13px;flex:1}
+  .srow.done .st{color:var(--groen);font-weight:700}
+  .srow.armed{border-color:var(--amber);background:rgba(245,166,35,.1)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--lijn)}
+  th{color:var(--grijs);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+  td.idx{font-family:ui-monospace,monospace;color:var(--amber);font-weight:700}
+  pre{background:var(--card2);border:1px solid var(--lijn);border-radius:10px;padding:13px;
+      overflow:auto;font-size:12px;line-height:1.5;max-height:240px}
+  .muted{color:var(--grijs);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Controller kalibreren</h1>
+  <p class="sub">Klik een knop aan in de tekening, druk hem dan fysiek in. Jij bepaalt de volgorde.</p>
+
+  <div class="card">
+    <div class="conn"><span class="dot" id="dot"></span><span id="conn">Geen controller — druk een knop</span></div>
+    <div class="gpid" id="gpid"></div>
+  </div>
+
+  <div class="card">
+    <div class="instr" id="instr">Klik een knop aan in de tekening hieronder
+      <small>daarna druk je die knop op je controller in</small></div>
+
+    <svg class="ctrl" viewBox="0 0 460 300">
+      <path class="body" d="M92 92 C50 92 22 132 18 182 C13 240 34 268 62 268 C88 268 104 246 122 232
+                            C140 218 168 212 230 212 C292 212 320 218 338 232 C356 246 372 268 398 268
+                            C426 268 447 240 442 182 C438 132 410 92 368 92 Z"/>
+
+      <rect class="hit" data-k="LT" x="84"  y="28" width="62" height="22" rx="11"/><text class="plabel" x="115" y="43">LT</text>
+      <rect class="hit" data-k="RT" x="314" y="28" width="62" height="22" rx="11"/><text class="plabel" x="345" y="43">RT</text>
+      <rect class="hit" data-k="LB" x="72"  y="60" width="86" height="24" rx="12"/><text class="plabel" x="115" y="76">LB</text>
+      <rect class="hit" data-k="RB" x="302" y="60" width="86" height="24" rx="12"/><text class="plabel" x="345" y="76">RB</text>
+
+      <circle class="hit" data-k="L3" cx="115" cy="140" r="30"/><text class="plabel" x="115" y="144">L3</text>
+      <text class="plabel" x="115" y="182">Linkerstick</text>
+
+      <rect class="hit" data-k="Dup"    x="176" y="176" width="22" height="20" rx="4"/><text class="plabel" x="187" y="190">▲</text>
+      <rect class="hit" data-k="Ddown"  x="176" y="222" width="22" height="20" rx="4"/><text class="plabel" x="187" y="236">▼</text>
+      <rect class="hit" data-k="Dleft"  x="152" y="199" width="22" height="20" rx="4"/><text class="plabel" x="163" y="213">◀</text>
+      <rect class="hit" data-k="Dright" x="200" y="199" width="22" height="20" rx="4"/><text class="plabel" x="211" y="213">▶</text>
+      <text class="plabel" x="187" y="262">D-pad</text>
+
+      <circle class="hit" data-k="Y" cx="345" cy="112" r="17"/><text class="plabel" x="345" y="116">Y</text>
+      <circle class="hit" data-k="B" cx="375" cy="142" r="17"/><text class="plabel" x="375" y="146">B</text>
+      <circle class="hit" data-k="A" cx="345" cy="172" r="17"/><text class="plabel" x="345" y="176">A</text>
+      <circle class="hit" data-k="X" cx="315" cy="142" r="17"/><text class="plabel" x="315" y="146">X</text>
+
+      <circle class="hit" data-k="R3" cx="272" cy="196" r="28"/><text class="plabel" x="272" y="200">R3</text>
+      <text class="plabel" x="272" y="238">Rechterstick</text>
+
+      <rect class="hit" data-k="View" x="190" y="128" width="28" height="16" rx="8"/><text class="plabel" x="204" y="140">▣</text>
+      <rect class="hit" data-k="Menu" x="242" y="128" width="28" height="16" rx="8"/><text class="plabel" x="256" y="140">☰</text>
+      <circle class="hit" data-k="Xbox" cx="230" cy="102" r="16"/><text class="plabel" x="230" y="106">XBOX</text>
+      <text class="plabel" x="204" y="122">View</text>
+      <text class="plabel" x="256" y="122">Menu</text>
+
+      <g id="idxlabels"></g>
+    </svg>
+
+    <div class="live" id="live"></div>
+    <div class="knoppen" style="justify-content:center">
+      <button id="annuleer">Selectie annuleren</button>
+      <button id="wis">Wis deze knop</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Sticks en triggers</h2>
+    <p class="muted" style="margin:-4px 0 12px">Begin met de ruststand — dat is de fix voor een stick die blijft hangen.</p>
+    <div class="sticklist" id="sticks"></div>
+  </div>
+
+  <div class="card">
+    <h2>Resultaat</h2>
+    <table id="tabel"></table>
+    <div class="knoppen">
+      <button class="pri" id="kopieer">Kopieer als JSON</button>
+      <button id="download">Opslaan als bestand</button>
+      <button id="reset">Alles wissen</button>
+    </div>
+    <p class="muted" style="margin-top:12px">Opgeslagen in deze browser. Zeg tegen Claude
+      <strong>"kalibratie klaar"</strong> — dan leest hij het uit.</p>
+    <pre id="json"></pre>
+  </div>
+</div>
+
+<script>
+const AS_STAPPEN = [
+  ['rust','Ruststand meten','Laat alles los en klik hier — 1,5 s niet aanraken'],
+  ['LX','Linkerstick naar RECHTS','klik, duw dan de linkerstick helemaal naar rechts'],
+  ['LY','Linkerstick OMLAAG','klik, duw dan de linkerstick helemaal omlaag'],
+  ['RX','Rechterstick naar RECHTS','klik, duw dan de rechterstick helemaal naar rechts'],
+  ['RY','Rechterstick OMLAAG','klik, duw dan de rechterstick helemaal omlaag'],
+];
+const $=id=>document.getElementById(id);
+let res, armed=null, armedType=null, prev=[], holdStart=0, holdIdx=null;
+
+try{ res=JSON.parse(localStorage.getItem('eclipseCtrlCal')||'null'); }catch(_){}
+if(!res) res={buttons:{},axes:{},rest:null,id:'',mapping:'',gemaakt:''};
+
+function bewaar(){ res.gemaakt=new Date().toISOString();
+  localStorage.setItem('eclipseCtrlCal',JSON.stringify(res)); teken(); }
+
+function teken(){
+  document.querySelectorAll('.hit').forEach(el=>{
+    const k=el.getAttribute('data-k');
+    el.classList.toggle('done', res.buttons[k]!=null);
+    el.classList.toggle('armed', armed===k && armedType==='btn');
+  });
+  // index-labels in de tekening
+  const g=$('idxlabels'); g.innerHTML='';
+  document.querySelectorAll('.hit').forEach(el=>{
+    const k=el.getAttribute('data-k'), v=res.buttons[k];
+    if(v==null) return;
+    const b=el.getBBox();
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('class','idxlabel');
+    t.setAttribute('x', b.x+b.width/2);
+    t.setAttribute('y', b.y+b.height/2+11);
+    t.textContent = v.as!=null ? ('as'+v.as) : ('#'+v.index);
+    g.appendChild(t);
+  });
+  // sticklijst
+  $('sticks').innerHTML = AS_STAPPEN.map(([k,nm,uitleg])=>{
+    const done = k==='rust' ? res.rest!=null : res.axes[k]!=null;
+    const st = k==='rust'
+      ? (res.rest? 'gemeten: ['+res.rest.map(v=>v.toFixed(2)).join(', ')+']' : uitleg)
+      : (res.axes[k]? ('as '+res.axes[k].index+', richting '+(res.axes[k].sign>0?'+':'−')) : uitleg);
+    return '<div class="srow '+(done?'done':'')+' '+(armed===k?'armed':'')+'">'+
+      '<span class="nm">'+nm+'</span><span class="st">'+st+'</span>'+
+      '<button data-ax="'+k+'">'+(armed===k?'bezig…':(done?'opnieuw':'start'))+'</button></div>';
+  }).join('');
+  // tabel + json
+  const rows=['<tr><th>Naam</th><th>Wat de controller stuurt</th></tr>'];
+  Object.keys(res.buttons).forEach(k=>{ const v=res.buttons[k];
+    rows.push('<tr><td>'+k+'</td><td class="idx">'+(v.as!=null?('as '+v.as):('button '+v.index))+'</td></tr>'); });
+  Object.keys(res.axes).forEach(k=>{ const v=res.axes[k];
+    rows.push('<tr><td>'+k+'</td><td class="idx">as '+v.index+' ('+(v.sign>0?'+':'−')+')</td></tr>'); });
+  $('tabel').innerHTML=rows.join('');
+  $('json').textContent=JSON.stringify(res,null,2);
+}
+
+document.querySelector('svg.ctrl').addEventListener('click',e=>{
+  const h=e.target.closest('.hit'); if(!h) return;
+  armed=h.getAttribute('data-k'); armedType='btn'; prev=[];
+  $('instr').innerHTML='Druk nu op <strong>'+armed+'</strong><small>op je controller — of klik een andere knop aan</small>';
+  teken();
+});
+$('sticks').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ax]'); if(!b) return;
+  armed=b.getAttribute('data-ax'); armedType='ax'; holdStart=0; holdIdx=null;
+  const st=AS_STAPPEN.find(s=>s[0]===armed);
+  $('instr').innerHTML=st[1]+'<small>'+st[2]+'</small>';
+  teken();
+});
+$('annuleer').onclick=()=>{ armed=null;armedType=null;
+  $('instr').innerHTML='Klik een knop aan in de tekening hieronder<small>daarna druk je die knop op je controller in</small>'; teken(); };
+$('wis').onclick=()=>{ if(armed&&armedType==='btn'){ delete res.buttons[armed]; bewaar(); } };
+$('reset').onclick=()=>{ res={buttons:{},axes:{},rest:null,id:res.id,mapping:res.mapping,gemaakt:''};
+  localStorage.removeItem('eclipseCtrlCal'); armed=null; teken(); };
+$('kopieer').onclick=()=>{ navigator.clipboard.writeText(JSON.stringify(res,null,2));
+  $('kopieer').textContent='Gekopieerd!'; setTimeout(()=>$('kopieer').textContent='Kopieer als JSON',1400); };
+$('download').onclick=()=>{ const b=new Blob([JSON.stringify(res,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='controller_kalibratie.json'; a.click(); };
+
+function ok(txt){ $('live').innerHTML='<b>'+txt+'</b>'; armed=null; armedType=null;
+  $('instr').innerHTML='Klik de volgende knop aan<small>of klik dezelfde opnieuw om te overschrijven</small>';
+  bewaar(); }
+
+function loop(){
+  const gp=(navigator.getGamepads?[...navigator.getGamepads()]:[]).filter(Boolean)[0];
+  if(!gp){ $('dot').classList.remove('on'); $('conn').textContent='Geen controller — druk een knop';
+    prev=[]; requestAnimationFrame(loop); return; }
+  $('dot').classList.add('on'); $('conn').textContent='Controller verbonden';
+  $('gpid').textContent=gp.id+'  ·  mapping: '+(gp.mapping||'niet-standaard');
+  res.id=gp.id; res.mapping=gp.mapping||'';
+
+  if(armed && armedType==='btn'){
+    for(let i=0;i<gp.buttons.length;i++){
+      const nu=gp.buttons[i].pressed||gp.buttons[i].value>0.5;
+      if(nu && !prev[i]){ res.buttons[armed]={index:i}; ok(armed+' = button '+i); break; }
+    }
+    if(res.rest){ for(let i=0;i<gp.axes.length;i++){
+      if(Math.abs(gp.axes[i]-res.rest[i])>0.7){ res.buttons[armed]={as:i}; ok(armed+' = as '+i); break; } } }
+    prev=gp.buttons.map(b=>b.pressed||b.value>0.5);
+  }
+  else if(armed && armedType==='ax'){
+    if(armed==='rust'){
+      if(!holdStart) holdStart=performance.now();
+      const t=performance.now()-holdStart;
+      $('live').textContent='meten… '+Math.min(100,Math.round(t/1500*100))+'%';
+      if(t>1500){ res.rest=[...gp.axes]; holdStart=0; ok('ruststand vastgelegd'); }
+    } else {
+      let best=-1,bv=0;
+      for(let i=0;i<gp.axes.length;i++){
+        const d=gp.axes[i]-(res.rest?res.rest[i]:0);
+        if(Math.abs(d)>Math.abs(bv)){ bv=d; best=i; }
+      }
+      if(Math.abs(bv)>0.6){
+        if(holdIdx!==best){ holdIdx=best; holdStart=performance.now(); }
+        const t=performance.now()-holdStart;
+        $('live').textContent='as '+best+' = '+bv.toFixed(2)+' — vasthouden… '+Math.min(100,Math.round(t/700*100))+'%';
+        if(t>700){ res.axes[armed]={index:best,sign:bv>0?1:-1,rest:(res.rest?res.rest[best]:0)};
+          holdIdx=null; holdStart=0; ok(armed+' = as '+best); }
+      } else { holdIdx=null; holdStart=0; $('live').textContent='nog niets gedetecteerd'; }
+    }
+  }
+  requestAnimationFrame(loop);
+}
+teken(); loop();
+</script>
+</body>
+</html>

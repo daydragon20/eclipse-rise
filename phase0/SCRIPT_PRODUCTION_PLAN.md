@@ -1,0 +1,158 @@
+# SCRIPT PRODUCTION PLAN — het lagenplan
+*Werkdocument | aangemaakt 2026-07-31 | owner-instructie Nathan | eigenaar: story-architect*
+*Bronnen: 18_writing_standard.md, 19_voice_production.md, SCRIPT_FORMAT.md, 02_story_bible.md, EXECUTION_PLAN.md*
+
+---
+
+## 0. Waarom dit document bestaat
+
+De eigenaar heeft een productiemodel opgelegd: **werk in lagen, en leg elke laag volledig voordat je de volgende begint.** Zijn argument, verbatim:
+
+> *"Als je een hele missie hebt gemaakt van tekst tot graphics en je wilt dan iets veranderen, dan kan het niks structureels zijn — omdat dan al de dingen daarboven ook in elkaar vallen."*
+
+**Dat argument klopt en het is de kern van dit plan.** Een dialoogregel veranderen nadat hij is ingesproken, geanimeerd en van camera's voorzien, kost het tienvoudige van diezelfde verandering op papier. Door de bovenste laag compleet en gelockt te maken, wordt élke latere verandering cosmetisch in plaats van structureel.
+
+Dit document maakt dat model uitvoerbaar, met **één correctie** (§3) die het model redt in plaats van het te ondermijnen.
+
+---
+
+## 1. Twee sporen, niet één
+
+De grootste fout die dit plan kan maken is watervalwerk: eerst alles schrijven, dan pas bouwen, en drie maanden lang geen speelbare game. Dat gebeurt hier niet, om een structurele reden:
+
+> **Het schrijfspoor raakt de build niet aan.** Het produceert `.yaml`-bestanden in `Content/Script/`. Het compileert niets, het breekt niets, het heeft geen groene bar nodig, en het kan niet stuk. Daarom kan het op volle snelheid parallel lopen aan het bouwspoor, permanent.
+
+| | **Spoor A — Schrijven & Stem** | **Spoor B — Systemen & Feel** |
+|---|---|---|
+| Produceert | scriptbestanden, audio-assets | C++, data, UI, art |
+| Agents | story-architect, dialogue-writer, dialogue-critic, voice-director | main, element-builder, hud-builder, code-reviewer, art-reviewer |
+| Groene bar nodig? | nee | ja, elke iteratie |
+| Geblokkeerd door | niets | de openstaande dossiers |
+| Deadline | **credits vervallen einde maand** | geen |
+
+De sporen raken elkaar op precies twee plekken: de **ijkmissie** (§3) en **laag 5** (§4), waar tekst code wordt.
+
+**Wat spoor B als eerste doet** — dit is expliciete owner-prioriteit, want het is Nathans poort om de game ooit zelf te spelen:
+
+1. **De schermlaag (HUD).** Alles rond het vizier in 1e én 3e persoon: munitie, herlaad-indicatie, magazijnen, minimap, squad-status, gezondheid, objective-marker, stance. Nathan speelt pas als dit op niveau is. `hud-builder` bezit dit. Het is ook infrastructuur: zodra het staat, kan Claude de game zelf zinvol testen — daarna gaat elke andere iteratie sneller.
+2. De twee open dossiers: het inslagspoor dat niet rendert, en het trillen bij het schieten.
+3. De wapenbron (owner-actie — er bestaat nergens een los wapenmesh).
+4. Daarna de reguliere `EXECUTION_PLAN.md`-backlog.
+
+---
+
+## 2. De lagen
+
+Elke laag is **compleet en gelockt** voordat de volgende begint. Een laag is gelockt wanneer zijn gate groen is.
+
+| Laag | Inhoud | Wie | Gate om te locken |
+|---|---|---|---|
+| **L0** | **IJkmissie** — M1.1 door álle lagen heen (§3) | allen | De eigenaar heeft de missie gehoord en gezegd: "zo moet het klinken" |
+| **L1** | **Verhaalfundering** — beat-sheets voor alle 42 authored missies, 4 acts | story-architect | Continuïteitsaudit: elke twist geplant én betaald, geen weesdraad, geen tegenstrijdigheid met `02_story_bible.md` |
+| **L2** | **Dialoog** — elke regel van elke scène, `SCRIPT_FORMAT`-conform | dialogue-writer ×N → dialogue-critic | 100% van de scènes op `critic: GO`. Steekproef van 10 scènes doorstaat de strip-test (§18.9 C1) |
+| **L3** | **Stem** — generatie in credit-tier-volgorde | voice-director | `VOICE_LEDGER.md` sluit; ≤290k besteed; alles importeert en speelt af |
+| **L4** | **Wereldbeschrijving** — per locatie: wat staat er, hoe ziet het eruit, wat moet bestaan | story-architect + art-reviewer | Elke missielocatie heeft een objectlijst die een element-builder zonder vragen kan bouwen |
+| **L5** | **Assets & implementatie** — meshes, materialen, missies bedraad, scènes gespeeld | element-builder ×N + main | Groene bar + speelbaar + art-review GO |
+
+**De regel die de lagen laat werken:** *binnen* een laag mag je zoveel itereren als je wilt. Je gaat nooit terug naar een laag erboven. Als L2 een gat in L1 blootlegt, is dat een **escalatie naar story-architect**, geen stille rewrite door de schrijver. Dat is precies het verschil tussen een fundering die houdt en een die verschuift.
+
+---
+
+## 3. De correctie: de ijkmissie (L0)
+
+Dit is het enige punt waar ik van de opgegeven volgorde afwijk, en het is de reden dat de rest kan slagen.
+
+**Het probleem met "schrijf eerst alles":** als je 132.000 woorden schrijft voordat je één regel in de game hebt gehoord, ontdek je een fout in de schrijfstandaard bij woord 132.000. Dan is de fundering compleet — en compleet verkeerd. Dat is precies het scenario dat het lagenmodel moest voorkomen.
+
+**De oplossing:** vóór de massaproductie gaat **één missie door alle lagen tegelijk**. M1.1 *Thirteen Bullets* — hij is al gespecificeerd (SPEC-P2-04, ACCEPTED), hij is de openingsmissie, en zijn beats liggen vast.
+
+```
+M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
+      ───────────────── één week, ~8.000 credits ─────────────────
+```
+
+**Wat de ijkmissie bewijst, terwijl fouten nog goedkoop zijn:**
+
+- Klopt de schrijfstandaard? Klinken de personages als personages?
+- Werken de castingkeuzes? (Fout ontdekt hier: 8k credits. Fout ontdekt na laag 3: 90k credits.)
+- Klopt de line-length-band voor radio tijdens gevecht, of praten ze over het schieten heen?
+- Wat kost een missie écht in credits? Nu is de hele planning een schatting; na M1.1 is het een meting.
+- Werkt `SCRIPT_FORMAT` → `script_to_seed.py` → generator → import → afspelen, end to end?
+- Vindt de eigenaar het goed? **Dit is de belangrijkste vraag en hij moet vroeg worden gesteld.**
+
+**Dit ondermijnt het lagenmodel niet — het kalibreert de mal voordat je er 42 giet.** Een gieterij maakt ook eerst één proefstuk. Nathan is derde-generatie gietertechnicus in de fictie van zijn eigen game; het beeld klopt.
+
+**L0 is klaar wanneer** de eigenaar M1.1 in PIE heeft gehoord en akkoord geeft. Pas dan spawnt de massaproductie.
+
+---
+
+## 4. De sprintkalender
+
+De credits vervallen einde maand en rollen niet door. Dagnummers, niet datums — **de eigenaar moet de exacte verloopdatum bevestigen** (zie §7, O-1), want die schuift alles.
+
+| Dagen | Spoor A (schrijven & stem) | Spoor B (systemen & feel) |
+|---|---|---|
+| **D1–D2** | Casting-tests: 2–3 kandidaatstemmen × 12 signature-regels, eigenaar kiest, tabel gelockt (Tier 0, 5k) | HUD-laag: schermelementen 1e/3e persoon |
+| **D3–D7** | **IJkmissie M1.1** door alle lagen. Eigenaar hoort hem. | HUD verder; inslagspoor-dossier in de editor |
+| **D8** | **Gate L0.** Akkoord? → massaproductie. Nee? → standaard bijstellen, één iteratie, opnieuw. | trillen-dossier |
+| **D8–D12** | **L1: beat-sheets alle 42 missies.** story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
+| **D10–D24** | **L2: dialoog.** dialogue-writer ×4–6 parallel, één missie per agent. critic gate per scène. Loopt over L1 heen zodra act 1 se beats gelockt zijn. | reguliere backlog `EXECUTION_PLAN.md` |
+| **D12–D28** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Stopt bij 290k. | audio-import, bark-bedrading |
+| **D26–D30** | Acts 2–4 script-compleet afmaken (kost geen credits) | L4-wereldbeschrijving start |
+| **D30** | **Ledger sluiten.** Wat niet gegenereerd is, staat als tekst klaar. | |
+
+**Parallelle overlap is bewust.** L2 start op dag 10, terwijl L1 nog aan act 3 werkt — omdat act 1's beats dan al gelockt zijn en schrijvers daar meteen op kunnen. Lagen locken *per act*, niet pas als alle vier klaar zijn. Dat is het verschil tussen een lagenmodel en een waterval.
+
+---
+
+## 5. Agent-orkestratie
+
+Negen agents, waarvan vijf nieuw. Precieze systeemprompts staan in `.claude/agents/`.
+
+| Agent | Spoor | Parallel? | Rol |
+|---|---|---|---|
+| `game-planner` | beide | 1 | Bestaand. Volgende taak + `progress_data.js`. |
+| **`story-architect`** | A | 1 | **Nieuw.** Bezit L1 en L4. Beat-sheets, continuïteit, canon-bewaking. De enige die verhaalstructuur mag wijzigen. |
+| **`dialogue-writer`** | A | **4–6** | **Nieuw.** Eén missie of trigger-set per agent. Schrijft tegen 18. Escaleert i.p.v. canon te wijzigen. |
+| **`dialogue-critic`** | A | 2–3 | **Nieuw.** Alleen-lezen. Scoort §18.9. GO/NO-GO. Geen enkele regel gaat naar de generator zonder GO. |
+| **`voice-director`** | A | 1 | **Nieuw.** Bezit casting, tags, generatie, de ledger. De enige agent die credits mag uitgeven. |
+| **`hud-builder`** | B | 1–2 | **Nieuw.** Bezit de schermlaag: vizier, munitie, herladen, minimap, squad-status, 1e/3e persoon. |
+| `element-builder` | B | **N** | Bestaand. Eén element per agent. |
+| `code-reviewer` | B | 1 | Bestaand. GO/NO-GO vóór commit. |
+| `art-reviewer` | B | 1 | Bestaand. §15.8-rondes. |
+
+**Waarom er géén research-agent is.** Het onderzoek naar schrijftechniek is één keer gedaan en zit ingebakken in `18_writing_standard.md` §18.2–18.9, met bronnen in §18.11. Als elke schrijf-agent zelf research zou doen, betaalt de eigenaar veertig keer voor hetzelfde antwoord en drijven de standaarden uit elkaar. **Onderzoek doe je één keer en schrijf je op.** Dat is meteen de belangrijkste token-besparing in dit hele plan.
+
+---
+
+## 6. Wat dit plan bewust NIET doet
+
+- **Niet de hele campagne inspreken.** Dat kost ~790k credits; er zijn er 310k. Alles wordt geschreven, ~40% wordt gesproken, de rest wacht als tekst op credits. Zie `19_voice_production.md` §19.2.
+- **Niet de EXECUTION_PLAN vervangen.** De risk-first backlog, de falsificatietests (R1–R11) en de owner-wachtrij blijven leidend voor spoor B. Dit document is spoor A plus de koppeling.
+- **Niet stoppen met bouwen tijdens het schrijven.** Zie §1.
+- **Niet genereren zonder critic-GO.** Ook niet op D29. Zie `SCRIPT_FORMAT.md` §7.
+
+---
+
+## 7. Owner-acties (blokkerend)
+
+| # | Actie | Blokkeert | Wanneer |
+|---|---|---|---|
+| **O-1** | **Bevestig de exacte verloopdatum van de 310k credits** in het ElevenLabs-account (Billing → renewal date). De hele kalender in §4 hangt hieraan. | Alles in spoor A | **Nu, 2 min** |
+| **O-2** | **Bevestig commerciële gebruiksrechten** op het huidige abonnement — en of de gekozen stemmen uit de Voice Library eigen voorwaarden dragen. Dit is een ship-blocker, geen detail. | L3 bulk-generatie | Vóór D3 |
+| **O-3** | **Kies de stemmen** uit de kandidaten die `voice-director` voorlegt (§19.3). Smaak, niet techniek — dit is jouw beslissing. | L3, en dus alles | D2 |
+| **O-4** | **Luister naar de ijkmissie** en geef akkoord of afkeuring. | L0-gate → massaproductie | D7–D8 |
+| **O-5** | **Wapenbron** — er bestaat nergens een los wapenmesh (staande actie uit `JOUW_TAKEN.md`). | Spoor B wapenwerk | Staand |
+
+---
+
+## 8. Definition of Done — de maand is geslaagd als
+
+- [ ] Alle 42 authored missies hebben een beat-sheet (L1 gelockt, alle 4 acts)
+- [ ] Act 1 is volledig geschreven én gesproken en speelt af in PIE
+- [ ] De bark-bibliotheek leeft: 16 triggers × 3 factievocabulaires
+- [ ] Acts 2–4 zijn script-compleet als tekst, wachtend op credits alleen
+- [ ] `VOICE_LEDGER.md` sluit op ≤290k, met ≥20k reserve onaangeroerd of bewust besteed
+- [ ] Geen enkele gegenereerde regel zonder `critic: GO`
+- [ ] De HUD-laag staat op een niveau waarop de eigenaar de game wíl spelen
+- [ ] De groene bar is nooit rood geweest langer dan één iteratie
