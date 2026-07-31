@@ -1,0 +1,37 @@
+# ---- header ----
+scene:        M1.6.S05
+mission:      M1.6
+title:        "The Yard"
+act:          1
+location:     "Kessara / Mid-Works / Supply Depot Yard"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get several dozen unarmed people across a rail yard."
+obstacle:     "Unarmed people do not move like a squad and cannot be ordered."
+turn:         "Sela moves them, using her voice where Ember would have used cover."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      VOSS, MARA, BRICK, SELA, fighters, freed conscripts; Dominion response
+# flags-in:  Story.Choice.M16_TrainRun
+# flags-out: none
+# beats:     1) the yard; searchlights; the response
+#            2) THE TACTICAL PROBLEM IS NEW: civilians are not units. That is pillar 3
+#               expressed as mechanics
+#            3) Sela organises them - shouting, short instructions, names
+#            4) Ember covers
+#            5) losses, if any, are visible and have faces
+# branches:  run   -> harder fight, more pressure, higher chance of civilian loss
+#            empty -> shorter fight, and on the way out the player sees the people who did
+#                     not come, counted and marked
+#            Both hurt. That is the design (2.7 rule 2).
+# writer:    Sela's lines here are the only place she uses the callout band. Short, loud,
+#            names. It should be audibly the same person as S03 doing a different job.
+
+lines: []

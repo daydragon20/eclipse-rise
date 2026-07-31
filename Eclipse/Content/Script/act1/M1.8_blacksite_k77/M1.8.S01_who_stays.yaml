@@ -1,0 +1,38 @@
+# ---- header ----
+scene:        M1.8.S01
+mission:      M1.8
+title:        "Who Stays"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants a plan that puts the fewest people inside the building."
+obstacle:     "The fewest people is still more than Ember can afford to lose, and everyone in the room volunteers."
+turn:         "She assigns Voss the extraction route instead of the entry — the first time she has ever kept him out of a door."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      MARA, VOSS, DEX, REYES, BRICK, SELA
+# flags-in:  Story.Beat.M17_UnderTheIce · Story.Intel.K77Manifest
+# flags-out: none
+# beats:     1) Dex's floor plan, built from the manifest and guesswork
+#            2) who goes, who stays - Sela stays, with the forty new people. That decision
+#               counts later
+#            3) MARA GIVES VOSS THE EXTRACTION ROUTE. She does not explain why. The player
+#               only feels it in S08
+#            4) Reyes goes; first time; one clinical sentence about why
+#            5) Brick: one sentence, and it is a name
+#
+# DEX EXPLAINS THE LAST DOOR'S MECHANISM HERE, and nobody listens. That is the setup for
+# S08 - by the time it matters, the player already knows. Bury it in the floor plan beat.
+#
+# writer:    NOBODY SAYS GOODBYE. 18.7 - enter late, leave early. A farewell scene before
+#            a death is the cheapest trick available and it makes S08 worthless.
+
+lines: []

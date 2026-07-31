@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.8.S09
+mission:      M1.8
+title:        "The Ash"
+act:          1
+location:     "Kessara / Spire Levels / Service Lift"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants a head count."
+obstacle:     "Nobody wants to give him one."
+turn:         "Petra gives it, out loud, with the numbers, because somebody has to and she has done it before."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, PETRA, REYES, DEX, BRICK, survivors
+# flags-in:  Story.Char.MaraDead
+# flags-out: none
+# beats:     1) above ground; the lift; forty people with nowhere to go
+#            2) silence
+#            3) Voss asks for the count
+#            4) nobody answers
+#            5) PETRA COUNTS. Names and numbers, flat, no comfort. Her fingerprint does all
+#               the work here
+#            6) Reyes starts working
+#            7) P4-d FINAL TAP: somebody - Dex, or Brick - notes that nobody came after
+#               them. Nobody has an answer. THIS QUESTION LEAVES ACT 1 UNANSWERED, on
+#               purpose, with a payoff address in act 4 (twist 4)
+#
+# NO LINE MAY STATE A CASUALTY NUMBER (see S07). Petra counts as an ACTION; the camera does
+# not read the total over her shoulder.
+#
+# direct_beat: this scene OR S90 may spend the act's single rationed direct_beat line
+#              (18.9 A - roughly thirty in the whole game). Writer picks one, with a note:
+#              justification. In the scene where everyone would name a feeling, nobody
+#              does; in the quiet one afterwards, one person may say it flat, once.
+
+lines: []

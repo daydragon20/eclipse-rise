@@ -1,0 +1,37 @@
+# ---- header ----
+scene:        M1.8.S05
+mission:      M1.8
+title:        "The Door Closes"
+act:          1
+location:     "Kessara / Spire Levels / Blacksite K-77"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get everyone to the extraction route Mara assigned Voss."
+obstacle:     "The route is already closed, and the man closing it says so politely over the public address."
+turn:         "Threx uses Voss's first name, and Ember learns in one word how long he has been watching."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, MARA, DEX (radio), squad · THREX (public address)
+# flags-in:  Story.Clue.ThrexKnowsSector
+# flags-out: none
+# beats:     1) the first door that does not open
+#            2) Dex, on the radio, understands what it means before anyone says it
+#            3) THREX ON THE PA. Calm, friendly, and he names three people: one prisoner,
+#               one Ember fighter (THE SAME ONE as M1.7.S04), and VOSS
+#            4) AR-6 RUNG 4 - the ladder completes here
+#            5) containment begins
+#
+# HE DOES NOT GLOAT. He congratulates them, and he means it. Threx is at his worst when he
+# is warm; a single threat turns him into a stock villain and act 3 loses its catharsis.
+#
+# writer:    18.4 - never shouts, never uses rank when a first name will wound more.
+#            The horror is that he pronounces everything correctly.
+
+lines: []

@@ -1,0 +1,42 @@
+# ---- header ----
+scene:        M1.7.S06
+mission:      M1.7
+title:        "Out Under Pressure"
+act:          1
+location:     "Kessara / Underworks / Coolant Sublevel"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get out of a Veil facility that now knows it has been entered."
+obstacle:     "The Veil fights in a way Ember has not seen: quietly, patiently, and without reinforcements."
+turn:         "They get out, and afterwards nobody can say why it was that easy."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      VOSS, MARA, BRICK, DEX (if present); Veil operatives (barks)
+# flags-in:  Story.Clue.AegisDenial
+# flags-out: none
+# beats:     1) the post wakes up
+#            2) VEIL VOCABULARY UNDER PRESSURE: they do not shout, they do not panic, they
+#               coordinate. Audible contrast with M1.4's conscripts
+#            3) vapour, condensation, bad sightlines - the image works mechanically too
+#            4) out
+#            5) P4-d SET-UP: Voss says out loud that no reinforcement came. Mara waves it
+#               away with the SAME explanation she used in M1.2.S03. SECOND TIME, and the
+#               player remembers the first
+#            6) Dex, if present, says the line that comes closest to the truth - and it is
+#               a joke
+#
+# TWIST 4's DOUBLE TAP. Once is worldbuilding. Twice is a pattern. Three times (M1.8) is a
+# question. Four times (act 4) is the answer.
+#
+# barks:     the Veil NEVER CALLS FOR REINFORCEMENTS. That is a bark design rule with story
+#            consequences: the player must later be able to recall that nobody ever called
+#            for help. This belongs as an explicit instruction in the tier-1 Veil bark set.
+
+lines: []

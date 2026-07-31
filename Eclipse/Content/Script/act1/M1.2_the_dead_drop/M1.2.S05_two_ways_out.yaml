@@ -1,0 +1,44 @@
+# ---- header ----
+scene:        M1.2.S05
+mission:      M1.2
+title:        "Two Ways Out"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get two caches out of a residential block without anybody living in it paying for the visit."
+obstacle:     "Either nobody saw them or everybody did, and those are not the same exit."
+turn:         "In the quiet branch the block covers for them unasked; in the loud branch it cannot, and Voss carries that out along with the intel."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
+# cast:      VOSS, MARA, one Ember fighter, DEX (radio); loud branch adds Enforcer hunter set
+# flags-in:  none
+# flags-out: Story.Choice.M12_Ghost  (NEW TAG - set on the quiet branch)
+#
+# TWO FULL BRANCHES. Not one branch with a condition bolted on.
+# condition: story.m12_alarm == false   -> ghost block
+# condition: story.m12_alarm == true    -> alarmed block
+# 21_quality_mandate 21.2: rather two branches of twelve lines than one of six.
+#
+# ghost beats:   1) out along the galleries
+#                2) somebody opens a door that should have been shut
+#                3) nobody says anything
+#                4) Dex's route
+# alarm beats:   1) the hunter set
+#                2) civilians inside, doors shut
+#                3) somebody on the gallery who should not be there
+#                4) Mara's hard call about who they are not taking with them
+#
+# plants:    T5 (quiet) - the loud branch is where civilian casualties can first occur.
+#            The tally starts silently; nobody comments on it in this mission.
+# writer:    the hunter set is ENFORCERS, not Veil. Veil voices do not appear until M1.7,
+#            after Threx's introduction in M1.3. A Veil bark here breaks AR-6.
+
+lines: []

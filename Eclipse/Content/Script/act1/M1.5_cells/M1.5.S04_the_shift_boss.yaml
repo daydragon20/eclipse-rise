@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.5.S04
+mission:      M1.5
+title:        "The Shift Boss"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "The Iron Chorus wants the name on their list closed tonight, with Ember watching."
+obstacle:     "The name is a foundry shift boss who files the absentee lists the Tithe draws from — and who fed two galleries through last winter."
+turn:         "Voss decides, and whichever way he decides, one of the two cells learns exactly what Ember is."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
+# cast:      VOSS, the emissary, BRICK, MARA; the shift boss
+# flags-in:  none
+# flags-out: Story.Choice.M15_ShiftBossSpared  (NEW TAG - systems task)
+# beats:     1) the house; the man; his kitchen. Not brave, not monstrous
+#            2) the emissary lays out what he supplies. Factual, verifiable
+#            3) the shift boss gets TWO LINES AT MOST. He denies nothing
+#            4) THE CHOICE: allow it / prevent it / defer (warn him and let him vanish)
+#            5) the emissary's reaction
+#            6) MARA SAYS NOTHING. Her silence is the scene (18.7)
+#
+# 2.7 rule 2 - both sides in one sentence:
+#   kill:  without the lists the Tithe stops, and the Tithe takes people every month
+#   spare: whoever decides who dies for filling in a form has become the administration
+#          he is fighting
+#
+# PAYOFF INSIDE THE ACT: Sela judges this in M1.6.S06. This thread does not leave act 1
+# unclosed. Optional echo in act 2.
+#
+# writer:    the shift boss gets no defence speech. A man pleading makes the choice easy.
+#            He is just a man in his kitchen.
+#            Full Voss variant coverage on both axes.
+
+lines: []

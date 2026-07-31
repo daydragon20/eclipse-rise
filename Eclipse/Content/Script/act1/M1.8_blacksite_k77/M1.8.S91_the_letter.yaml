@@ -1,0 +1,42 @@
+# ---- header ----
+scene:        M1.8.S91
+mission:      M1.8
+title:        "The Letter"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants to shut down Mara's console before somebody else opens it."
+obstacle:     "There are eleven recordings on it, dated, addressed to \"the next of us\"."
+turn:         "He plays the first one, because he is the only person in the vault who could not stand to leave it unheard — and it is not addressed to Voss."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      DEX, VOSS · MARA (recording only - Story.Char.MaraDead is already set)
+# flags-in:  Story.Char.MaraDead · Story.Thread.MaraLetters_Open (if HUB.A1.mara_letters played)
+# flags-out: Story.Thread.MaraLetters_Open ✚  (NEW TAG)
+#
+# *** CANON PLANT. 02_story_bible 2.5: Mara's recorded "letters to the next of us" appear
+# through Act 4. WITHOUT THIS SCENE THOSE LETTERS ARRIVE FROM NOWHERE IN ACT 2. ***
+#
+# beats:     1) the console. Dex alone, then Voss
+#            2) the list of recordings. ELEVEN - as many as the cell used to be
+#            3) Dex's joke, and he does not land it (second time in the act he leaves an
+#               opening unused; the first was M1.3.S06, and now the player knows what it means)
+#            4) THE FIRST RECORDING PLAYS. Mara: short, practical, no pathos - AND IT IS
+#               ADDRESSED TO SOMEBODY OTHER THAN VOSS, which makes it infinitely better
+#            5) Voss lets it play
+#
+# condition:  add a conditional line pair on story.thread_mara_letters_open == true (the
+#             player saw her recording one in HUB.A1.mara_letters). Landing this ten times
+#             harder for that player is exactly what condition: exists for.
+#
+# writer:    the recorded Mara still says "we". She never got to spend the "you" twice.
+
+lines: []

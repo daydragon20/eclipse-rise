@@ -1,0 +1,37 @@
+# ---- header ----
+scene:        M1.4.S02
+mission:      M1.4
+title:        "The Grate / The Breach"
+act:          1
+location:     "Kessara / Foundry District / Foundry Row Armory"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get four people inside a working armory without starting the fight in the doorway."
+obstacle:     "The quiet way is a coolant grate built for one person at a time; the loud way announces itself."
+turn:         "Inside, the place is bigger than the plan, and the plan quietly becomes Voss's."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
+# cast:      VOSS, MARA, two Ember fighters, DEX (radio)
+# flags-in:  none
+# flags-out: none
+#
+# TWO FULL BRANCHES (SPEC-P2-04 decision 8 - both must ship, Stage B verbs never required)
+# condition: story.m14_entry == "grate"
+#   narrow, one at a time, exposed. Voss reads the coolant system - technician vocabulary.
+#   This also pre-seasons AR-2: M1.7 plays inside exactly such a system, and the player
+#   should already have been in one.
+# condition: story.m14_entry == "breach"
+#   loud, fast, and the first conscripts to fall are young.
+#
+# shared beat: the first look down the hall. The Foundry Row could have lived a year on
+#              what is stacked in here. WRITE IT, do not thesis it.
+# writer:    Mara's plan stops being Mara's plan in this scene, and nobody remarks on it.
+
+lines: []

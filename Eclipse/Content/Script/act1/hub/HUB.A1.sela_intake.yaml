@@ -1,0 +1,33 @@
+# ---- header ----
+scene:        HUB.A1.sela_intake
+mission:      HUB.A1
+title:        "The First Rule"
+act:          1
+location:     "Kessara / Underworks / Hollow Point"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Sela wants Voss to sign off on how the forty newcomers get fed, housed and asked."
+obstacle:     "Ember has never had a rule about anything, and rules are how movements become the thing they fought."
+turn:         "They write the movement's first rule together, it is about food, and it is short."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      SELA, VOSS
+# condition: story.char_selamet == true
+# flags-out: none
+# purpose:   politics as PRACTICE. Sela makes no argument (AR-7 - no oration is spent in
+#            act 1); she writes a rule on a piece of plate. It later turns out to be the
+#            first sentence of the Free Vantara Concord, and nobody says so here.
+# writer:    18.4 - rhetorical structure even in private, second person plural, reframes a
+#            personal question as a collective one, never speaks about herself for more
+#            than one line.
+#            Voss variants on all four axes: what the first rule says is a character
+#            statement, and act 3 will quote it back at him.
+
+lines: []

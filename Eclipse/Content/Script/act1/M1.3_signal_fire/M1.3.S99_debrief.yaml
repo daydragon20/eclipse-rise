@@ -1,0 +1,40 @@
+# ---- header ----
+scene:        M1.3.S99
+mission:      M1.3
+title:        "First Light"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to mark the map, because it is the first time in five years there has been anything to mark."
+obstacle:     "What they did tonight cannot be undone, and one of them keeps saying so."
+turn:         "She marks it anyway, and asks Voss where the next one goes."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      MARA, VOSS, DEX, REYES, the cell
+# flags-in:  Story.Clue.ThrexVoice_1 · Story.Clue.BlightBroadcast
+# flags-out: Story.Beat.M13_SignalFire  (exists)
+# commit:    +40 M / +60 C / +4 I, day +1, optional depot-intact +60 M.
+#            NO REGION FLIP HERE - SPEC-P2-04 decision 6. SPEC-P2-05 consumes
+#            Event.Mission.Completed and commits the Foothold flips (TransitCheckpoint +
+#            WorkerHousing + SupplyDepot). This scene may CELEBRATE the turn; it does not
+#            cause it.
+# beats:     1) coming back; who is hurt
+#            2) Dex cannot stop talking about the mast, and is pushing something else away
+#            3) the map. Mara's mark. EMOTIONAL PEAK OF MOVEMENT II
+#            4) Reyes's clinical line about what the night cost
+#            5) MARA ASKS VOSS WHERE THE NEXT ONE GOES - the second time she puts his
+#               judgement above her own (after M1.1.S04). The player should just now be
+#               starting to feel the pattern
+#            6) Threx's voice hangs unmentioned in the room. One line that walks around it
+# writer:    NOBODY SAYS THIS IS A TURNING POINT. 18.9 A bans the thesis line. The mark on
+#            the map does the work; a character announcing it makes it smaller.
+
+lines: []

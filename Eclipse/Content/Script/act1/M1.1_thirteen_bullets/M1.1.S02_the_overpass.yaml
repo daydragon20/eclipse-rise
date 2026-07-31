@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        M1.1.S02
+mission:      M1.1
+title:        "The Overpass"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         walk-and-talk
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to know what happens if the plan fails, without asking it out loud."
+obstacle:     "Mara answers questions about failure by talking about the route, the rain, anything else."
+turn:         "She tells him what she actually expects to lose tonight, and it is a smaller number than he feared and a worse one than he wanted."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      MARA, VOSS, two Ember fighters, DEX (radio only)
+# flags-in:  Story.Thread.Enforcer_BadgeHeld (optional line - see plants)
+# flags-out: none
+# plants:    Enforcer thread - ONE line where Voss recognises the patrol's unit marking
+#            as the detachment from the ration line. Sets up M1.2.S01. Write this line
+#            ONLY if owner question Q-2 (recap card 3) is green; otherwise omit silently.
+# beats:     1) the city from above - crane forests, Dominion white-gold far off on the Spire Levels
+#            2) Dex's first radio line - hardware humour about the transmitter
+#            3) a fighter asks after a name the player does not know yet; Mara answers with "we"
+#            4) Voss's question, and Mara's deflection
+#            5) the answer, which is a number
+# writer:    Mara says "we" where anyone else says "I" (18.4). She may say "you" about
+#            practical things ("stay left") but NEVER about the cause - that word is
+#            reserved for M1.8.S08 and is architect ruling AR-5.
+
+lines: []

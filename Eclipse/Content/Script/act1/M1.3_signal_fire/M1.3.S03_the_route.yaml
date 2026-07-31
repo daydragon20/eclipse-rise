@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.3.S03
+mission:      M1.3
+title:        "The Tunnel / The Plaza"
+act:          1
+location:     "Kessara / Foundry District / Relay Mast"
+type:         walk-and-talk
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get Dex within arm's reach of the mast footing with the charge intact."
+obstacle:     "The quiet way is long and floods; the loud way is short and lit."
+turn:         "Whichever they take, Dex talks the entire distance, and the cell lets him, because that is how they know he is frightened."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      VOSS, MARA, DEX, fighters
+# flags-in:  none
+# flags-out: none
+#
+# TWO FULL BRANCHES, chosen by the player in S01.
+# condition: story.m13_insertion == "tunnel"
+#   old geothermal service run, standing water. Voss knows this system - he is a
+#   third-generation foundry technician and this is literally his world (2.4). Give him
+#   one line that only he could say, and do not let anyone ask what it means.
+# condition: story.m13_insertion == "plaza"
+#   too much light, too little cover, an Enforcer patrol that has to pass on schedule.
+#
+# shared beat: Dex talks without stopping and nobody cuts him off. ONE Mara line that
+#              notices it without naming it.
+# writer:    18.4 - Dex deflects every emotional beat with a hardware joke. Under real
+#            fear the deflection speeds up rather than stopping. That is the fingerprint
+#            doing the emotional work, which is how this game does emotion.
+
+lines: []

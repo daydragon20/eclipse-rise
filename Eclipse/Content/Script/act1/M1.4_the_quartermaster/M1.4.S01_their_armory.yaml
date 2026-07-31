@@ -1,0 +1,35 @@
+# ---- header ----
+scene:        M1.4.S01
+mission:      M1.4
+title:        "Their Armory"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants the armory emptied in one night, because there will not be a second one."
+obstacle:     "Nobody in the room has ever carried more than they could run with."
+turn:         "Dex points out that the problem is not getting in — it is that eleven people cannot lift what is inside."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
+# cast:      MARA, VOSS, DEX, REYES
+# flags-in:  Story.Beat.M13_SignalFire
+# flags-out: none
+# beats:     1) what is in the armory, told as weight rather than firepower - that is how
+#               Dex's head works
+#            2) insertion: breach or grate. Player chooses
+#            3) REYES ASKS WHAT THEY DO ABOUT THE GUARDS. First time anyone asks. The
+#               question hangs over the rest of the act
+#            4) Mara's answer is not pretty
+#            5) Dex's arithmetic on carrying capacity - the problem the mission's ending
+#               solves, because Brick can carry
+# writer:    the carrying problem must be planted here or Brick's entrance in S05 is a
+#            coincidence instead of an answer.
+
+lines: []

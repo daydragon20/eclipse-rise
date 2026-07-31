@@ -1,0 +1,44 @@
+# ---- header ----
+scene:        HUB.A1.mara_letters
+mission:      HUB.A1
+title:        "Leave The Light On"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to ask Mara whether K-77 is a mistake."
+obstacle:     "He finds her recording something, alone, and she shuts it off when he comes in."
+turn:         "She tells him what it is in one sentence, deflects the second question, and asks him to leave the light on."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      MARA, VOSS
+# condition: story.beat_m17_undertheice == true
+# flags-out: Story.Thread.MaraLetters_Open ✚  (NEW TAG - systems task)
+#
+# *** THE LOAD-BEARING HUB SCENE OF ACT 1. ***
+# 02_story_bible 2.5: Mara's recorded "letters to the next of us" appear through act 4.
+# Without this scene those letters arrive out of nowhere in act 2, and M1.8.S91 is a
+# convenience instead of a payoff.
+#
+# IF BUDGET FORCES ONE HUB SCENE TO SURVIVE, IT IS THIS ONE. Tell voice-director.
+#
+# rules:     - Mara does not explain why she makes them
+#            - Voss does not press
+#            - the player sees ONE SECOND of a screen with ELEVEN files on it, and the
+#              number is never spoken
+#            - NINE LINES MAXIMUM
+#            - she still says "we" - AR-5 holds; the "you" is spent in M1.8.S08 and
+#              nowhere else
+# consumed:  M1.8.S91 reads this flag and adds a conditional line pair for players who
+#            were here.
+# writer:    "leave the light on" is a placeholder for the turn, not a line. Find the
+#            domestic request that does the same job in her voice.
+
+lines: []

@@ -1,0 +1,42 @@
+# ---- header ----
+scene:        M1.5.S05
+mission:      M1.5
+title:        "The Late Sweep"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Both cells want to be somewhere else before the sweep closes the block."
+obstacle:     "They are two groups who have never fought in the same street and do not use the same words."
+turn:         "The Iron Chorus fights the way they have survived — and Ember sees the price of surviving that long."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
+# cast:      VOSS, MARA, BRICK, the emissary, Iron Chorus fighters; VEIL SWEEP TEAM
+# flags-in:  Story.Choice.M15_ShiftBossSpared
+# flags-out: none
+# beats:     1) the sweep closes
+#            2) THE VEIL, PHYSICALLY, FOR THE FIRST TIME. Calm, clinical vocabulary
+#               (18.5 rule 5). The contrast with M1.4's conscripts must be audible inside
+#               ten seconds
+#            3) the two groups fight past each other - different commands, different reflexes
+#            4) THE IRON CHORUS METHOD: they break contact using a third party as a screen -
+#               a doorway full of civilians, a door they do not open. ONE IMAGE, NO ARGUMENT
+#            5) P4-b: the sweep is late and undermanned, and it is THE EMISSARY who says so,
+#               mockingly - "either you are lucky or you have something we do not". Ember
+#               laughs it off
+#            6) out
+#
+# WHY P4-b COMES FROM THE RIVAL: an outsider noticing it makes the fact hard without making
+# it a mystery. Ember can wave it away. The player remembers it. Twist 4 pays in act 4.
+#
+# writer:    lines under fire use the CALLOUT band. The emissary's P4-b line is the one
+#            exception and it should sound like a jab, not an observation.
+
+lines: []

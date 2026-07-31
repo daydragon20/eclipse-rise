@@ -1,0 +1,33 @@
+# ---- header ----
+scene:        HUB.A1.sela_after
+mission:      HUB.A1
+title:        "What They Are Saying"
+act:          1
+location:     "Kessara / Underworks / Hollow Point"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Sela wants to know what \"Cinder\" is going to mean, now that it means something."
+obstacle:     "Voss did not choose the name and cannot control what people put in it."
+turn:         "She tells him what the district is already saying about him, it is not true, and she advises him not to correct it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      SELA, VOSS
+# condition: story.char_cindernamed == true
+# flags-out: none
+# purpose:   HER FIRST COMPROMISE (2.5 - "learns power's compromises"). Small, defensible,
+#            and the seed of everything she has to swallow in acts 3-4. It is also the
+#            first time the movement's conscience recommends a lie.
+# writer:    she reframes the personal as collective (18.4), which is exactly how she talks
+#            herself into it - it is not about him, it is about what people need to believe.
+#            NO ORATION (AR-7). Hub band. Aftermath, so no comic beats.
+#            Voss variants on all four axes: whether he corrects the story is the character
+#            statement act 4's Vex confrontation will use as ammunition.
+
+lines: []

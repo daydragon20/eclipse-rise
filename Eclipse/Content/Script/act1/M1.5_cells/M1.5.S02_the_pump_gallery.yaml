@@ -1,0 +1,48 @@
+# ---- header ----
+scene:        M1.5.S02
+mission:      M1.5
+title:        "The Pump Gallery"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing — Pump Gallery"
+type:         hub
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "The emissary wants to know whether Ember is a cell or a crowd."
+obstacle:     "Ember has just taken forty rifles and has no idea what that looks like from outside."
+turn:         "He offers an alliance on one condition, and the condition is a name on a list."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
+# cast:      VOSS, MARA, BRICK · Iron Chorus emissary + two Iron Chorus fighters
+# flags-in:  none
+# flags-out: none (the pact commits at S99)
+# beats:     1) arrival; three exits; nobody sits down
+#            2) the emissary tests - no threat, just questions nobody can answer well
+#            3) P3-b: HE ASKS HOW EMBER VETS ITS PEOPLE. Ember vets nobody. He laughs,
+#               and it is not a kind laugh. PLANT FOR TWIST 3 - IT MUST SOUND LIKE
+#               ARROGANCE, NOT LIKE FORESHADOWING
+#            4) their doctrine: the Dominion does not fall until the people who keep it
+#               running pay a price. Defensible in one sentence (2.7 rule 2): shift bosses
+#               file the absentee lists the Tithe draws from
+#            5) THE OFFER: joint operation, their terms, one name first
+#            6) the player gets the floor
+#
+# LONGEST DIALOGUE SCENE IN ACT 1, and the only place the player genuinely negotiates.
+# Three or four options with REALLY different outcomes - not three flavours of yes.
+#
+# THE IRON CHORUS IS RIGHT ABOUT AT LEAST ONE THING AND THE PLAYER MUST NOTICE.
+# If they are only hard, the mission is a straw man and the act 3 payoff is worthless.
+#
+# casting:   the emissary has no name until owner question Q-4 is answered. Write him as
+#            "the emissary" - it suits a cell that does not give its names away, and it is
+#            reversible. DO NOT INVENT A NAME.
+# writer:    18.3 variance (factor 3) and 18.9 B symmetry bite hardest here. Put
+#            interruptions in. Let somebody dodge a question and never come back to it.
+#            Full Voss variant coverage on both axes.
+
+lines: []

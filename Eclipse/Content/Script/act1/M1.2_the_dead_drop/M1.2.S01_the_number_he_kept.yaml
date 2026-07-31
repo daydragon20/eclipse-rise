@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.2.S01
+mission:      M1.2
+title:        "The Number He Kept"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex needs a patrol rotation he cannot buy, cannot steal, and does not have."
+obstacle:     "Ember's entire intel holding is whatever four people happen to remember."
+turn:         "Voss produces a badge number he has been carrying since the ration line, and the room's arithmetic changes."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
+# cast:      DEX, MARA, VOSS, REYES
+# flags-in:  Story.Beat.M11_ThirteenBullets · Story.Thread.Enforcer_BadgeHeld
+# flags-out: none
+# pays off:  01_game_vision.md 1.7 moment 1 - "the intel seed used in Act 1". This is
+#            literally that payoff. The player gets a reward for something no quest asked
+#            him to do, twenty hours earlier.
+# beats:     1) Dex states what he does not know, in hardware terms
+#            2) Mara weighs waiting against going
+#            3) VOSS SAYS THE BADGE NUMBER
+#            4) Dex runs it, gets a rotation, is surprised, and resents being surprised
+#            5) Mara does not say it was clever - she changes the plan, which is bigger
+# fallback:  if owner question Q-2 is refused, the badge does not exist and this scene
+#            falls back to "Dex has a name in the ledger". It works. It costs the game
+#            signature moment 1 and one of the five 2.11 threads. Escalate before writing
+#            the fallback.
+# player:    the prep decision (spend 5 Intel or go blind) hangs off this scene - 11.1
+# writer:    nobody explains what intel is or how the Veil works (18.8).
+
+lines: []

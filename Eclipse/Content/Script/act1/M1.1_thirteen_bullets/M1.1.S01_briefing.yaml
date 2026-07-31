@@ -1,0 +1,37 @@
+# ---- header ----
+scene:        M1.1.S01
+mission:      M1.1
+title:        "Thirteen Between Us"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara needs eleven frightened people to spend their last ammunition on a supply patrol instead of hoarding it."
+obstacle:     "Everyone in the room has already done the arithmetic, and the arithmetic says wait."
+turn:         "She stops arguing the odds and hands them the count as an inheritance instead of a shortage."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      MARA, VOSS, DEX, REYES, two Ember fighters (bark-level or silent)
+# flags-in:  none (opening mission, UnlockBeatTag empty)
+# flags-out: none (the beat commits at S99)
+# plants:    none
+# beats:     1) the count is spoken aloud - thirteen across four people
+#            2) Dex lists what he does NOT have; his first joke, and he is frightened
+#            3) Reyes asks one question instead of raising an objection
+#            4) Voss reads the route off the map and says something technical nobody asked for
+#            5) Mara closes on the promise line
+# player:    one interjection or planning choice (overpass or underpass) - 18.7
+# seed:      the shipped briefing string is "Thirteen bullets between us and the first
+#            real strike. Make every one of them a promise." (DT_StoryMissions MT_M11).
+#            It may return verbatim as the closing line. It is a seed, not a ceiling.
+# writer:    Dex gets three jokes in this whole mission and the most frightened one is
+#            the first. Nobody names an emotion. No direct_beat is rationed to M1.1.
+
+lines: []

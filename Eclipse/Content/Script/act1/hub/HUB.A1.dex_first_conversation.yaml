@@ -1,0 +1,31 @@
+# ---- header ----
+scene:        HUB.A1.dex_first_conversation
+mission:      HUB.A1
+title:        "The Rifle Is Fine"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Workshop"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants the rifle back so he can see what the ambush did to it."
+obstacle:     "Voss wants to talk about what happened out there, and Dex would rather talk about the rifle."
+turn:         "The rifle turns out to be fine, which leaves them nothing to look at, and Dex says the one honest thing he says in act 1."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      DEX, VOSS
+# condition: story.beat_m11_thirteenbullets == true
+# flags-out: none
+# purpose:   the scene where the player learns that Dex's jokes are a door. One line
+#            behind the door, then it shuts again.
+# writer:    18.4 - fragments, technical nouns as insults, never finishes a sentimental
+#            sentence. The honest line must be CUT OFF by him, not completed.
+#            Hub band 12-35 words, but Dex sits at the bottom of it. Somebody has to sit
+#            at the top for the variance rule, and in a two-hander that is Voss.
+
+lines: []

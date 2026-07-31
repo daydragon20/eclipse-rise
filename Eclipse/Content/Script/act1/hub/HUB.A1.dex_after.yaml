@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        HUB.A1.dex_after
+mission:      HUB.A1
+title:        "It Did Not Need Repairing"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Workshop"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants to finish the repair he started before K-77."
+obstacle:     "It was Mara's, and it did not need repairing."
+turn:         "He works on it anyway, and when Voss offers to help he says yes, which he has never done."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      DEX, VOSS
+# condition: story.beat_act1complete == true
+# flags-out: none
+#
+# ZERO JOKES. 18.6: no comic beats in aftermath. This is the third time in act 1 that Dex
+# leaves an opening unused (M1.3.S06, M1.8.S91, here) and it is the one where the player
+# understands that the deflection was never the character - it was the armour.
+#
+# writer:    EIGHT LINES MAXIMUM, and three of them are tool names.
+#            18.4: never states a feeling directly, never finishes a sentimental sentence.
+#            Both hold here. The yes is one word and it is the whole scene.
+#            His 2.5 arc - "learns his machines are only as good as the people in them" -
+#            reaches its act 1 terminus here: the machine is fine and the person is gone.
+#            Nobody says that sentence.
+
+lines: []

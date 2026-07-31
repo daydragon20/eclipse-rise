@@ -1,0 +1,35 @@
+# ---- header ----
+scene:        M1.3.S04
+mission:      M1.3
+title:        "Sixty Seconds"
+act:          1
+location:     "Kessara / Foundry District / Relay Mast"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants sixty seconds and nobody standing over him."
+obstacle:     "The relief patrol is early, and Voss has to decide whether to tell him."
+turn:         "Voss tells him, and Dex works faster and worse, and it holds anyway."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      DEX, VOSS, MARA
+# flags-in:  none
+# flags-out: none
+# beats:     1) Dex at the mast footing; technique, no exposition
+#            2) the patrol is early
+#            3) VOSS CHOOSES: tell him or hold it
+#            4) Dex's reaction - on "tell", a joke that breaks in half; on "hold", a joke
+#               afterwards that lands harder
+#            5) the blast
+# player:    a choice with no systemic consequence. It changes only how the scene sounds.
+#            That is 21_quality_mandate 21.2 in practice: variation that earns itself.
+# writer:    both branches get their own full line set. The broken joke and the late joke
+#            are different jokes, not the same joke with a cut.
+
+lines: []

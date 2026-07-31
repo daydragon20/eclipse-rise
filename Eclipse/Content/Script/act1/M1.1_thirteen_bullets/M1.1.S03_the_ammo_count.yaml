@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.1.S03
+mission:      M1.1
+title:        "The Ammo Count"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara needs Voss moving before the patrol cycles back."
+obstacle:     "Voss has counted his rounds and the number has him."
+turn:         "She hands him the number back as a promise instead of a limit."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      MARA, VOSS
+# flags-in:  none
+# flags-out: none
+#
+# THIS SCENE IS THE CANONICAL EXAMPLE IN phase0/SCRIPT_FORMAT.md section 3.
+# want/obstacle/turn above are verbatim from that document and are NOT rewritten.
+#
+# RESERVED IDS - the three seed lines from SCRIPT_FORMAT section 3 own these:
+#   M1.1.S03.010  MARA  [quietly]  "Thirteen."
+#                 shot: CU Mara. Hand on his shoulder. She is not looking at him.
+#   M1.1.S03.020  VOSS             "That's not enough."
+#                 variants: pragmatist "That's four of them if I don't miss."
+#                           idealist   "That's not enough."
+#   M1.1.S03.030  MARA  [pause]    "It was enough for the ones who had six."
+#                 shot: She moves off. Camera stays on Voss.
+#
+# Architect recommendation: KEEP THEM. They are better than a second attempt and they
+# are the reason the format document exists. Add at most one beat AFTER .030 (ids .040+,
+# e.g. Voss reusing the number as a plan). Add NOTHING before .010. Never renumber.
+#
+# writer:    three lines carry this scene. Everything you add takes it down.
+
+lines: []

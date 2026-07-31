@@ -1,0 +1,52 @@
+# ---- header ----
+scene:        M1.7.S99
+mission:      M1.7
+title:        "The Box With One Door"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to raid Blacksite K-77 within the week, before the transfers ship."
+obstacle:     "Every single person in the room has a correct reason not to."
+turn:         "She overrules all of them, and the terrible thing is that she is not wrong either."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      MARA, VOSS, DEX, REYES, SELA, BRICK
+# flags-in:  Story.Intel.K77Manifest · Story.Char.PetraLocated · Story.Clue.ThrexKnowsSector
+# flags-out: Story.Beat.M17_UnderTheIce ✚  (NEW TAG)
+# commit:    day +1, intel rewards. Unlocks M1.8.
+#
+# *** THIS SCENE DECIDES WHETHER MARA'S DEATH IS TRAGEDY OR PLOT. ***
+# If the player ENDURES K-77, act 1 has failed. He has to want to go.
+#
+# beats:     1) the log on the table. What the Veil knows. The dates
+#            2) DEX: it is a box with one door. He is right, and he is the only one who
+#               understands the building
+#            3) REYES: how many wounded, how many beds, how many do not come back.
+#               Clinical, in numbers. She is right
+#            4) SELA: the forty new people are not ready; if Ember dies there, more than
+#               Ember dies. She is right
+#            5) BRICK: one sentence. The only one in favour, and his reason is that there
+#               are people inside. He is right
+#            6) VOSS gets the floor - the first time the player can take a strategic
+#               position AGAINST his mentor. His choice changes M1.8's tone, not its fact:
+#               Mara goes either way. Against -> he goes because she goes. For -> he goes
+#               because he wants to. THAT DIFFERENCE CARRIES THE ENTIRE AFTERMATH
+#            7) MARA CLOSES IT. Her argument: in three days those people are gone, and this
+#               cell has never once saved anything worth saving. This is the haste planted
+#               in M1.3.S99, now full grown
+#            8) last image: the map, K-77 marked
+#
+# writer:    EVERYONE IS RIGHT. NOBODY IS STUPID. If one character gets a weak argument,
+#            Mara's decision becomes a mistake instead of a tragedy, and the death lands
+#            as punishment instead of as loss.
+#            Full Voss variant coverage on both axes.
+
+lines: []

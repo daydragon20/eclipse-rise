@@ -1,0 +1,47 @@
+# ---- header ----
+scene:        M1.3.S02
+mission:      M1.3
+title:        "The Anniversary"
+act:          1
+location:     "Kessara / Foundry District / Relay Mast"
+type:         ambient
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Four people want to cross a lit plaza that is currently broadcasting to itself."
+obstacle:     "The mast is mid-address and the plaza is full of people standing still to listen, because standing still is what you do."
+turn:         "The address ends, the curfew tone empties the plaza, and the cell walks in behind the last of the crowd."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      VOSS, MARA, DEX, fighters · VEX (recording, loudspeakers)
+# flags-in:  none
+# flags-out: Story.Clue.BlightBroadcast  (NEW TAG - systems task)
+#
+# *** P1-a. PLANT FOR TWIST 1 (the Blight was engineered), and it is free. ***
+# The player hears the final antagonist defend his own crime sixty hours before learning
+# it was a crime. Rules:
+#   - Vex defends THE DOMINION, not the Blight. He cites the Blight as a disaster that
+#     happened, exactly as everyone in the Expanse believes.
+#   - No character responds to the content. They respond to the volume.
+#   - THREE LINES. He is wallpaper with a voice. Give him more and he is a character in
+#     hour eight, and act 4 has nothing left.
+#   - NOT an oration (AR-7 - only four exist in the game, all reserved for acts 3-4).
+#     Lines stay inside the ambient/cutscene band.
+#   - His 19.3 signature line ("Before us, one in nine children on Meridia...") is
+#     RESERVED for act 4. Write new copy in the same register.
+#
+# beats:     1) the plaza: white-gold light, people listening the way you listen when not
+#               listening is conspicuous
+#            2) the recording
+#            3) one reaction from the cell - short, flat, somebody who has heard this all
+#               his life
+#            4) the curfew tone; the plaza empties
+#            5) in
+# writer:    Vex never raises his voice and never says "I" - he says "one" (18.4).
+
+lines: []

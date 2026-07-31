@@ -1,0 +1,35 @@
+# ---- header ----
+scene:        HUB.A1.petra_return
+mission:      HUB.A1
+title:        "Three People Not Being Fed"
+act:          1
+location:     "Kessara / Underworks / Hollow Point"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants his aunt to rest."
+obstacle:     "She has already found the kitchen, the water line, and three people who are not being fed."
+turn:         "She gives him a job, he takes it, and that is how they both survive the week."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      PETRA VOSS, VOSS
+# condition: story.char_petrarescued == true
+# flags-out: none
+#
+# BLOCKED ON OWNER QUESTION Q-3 (casting row + fingerprint - findings C-4 and C-5).
+# Architect fingerprint proposal is in phase0/beats/BEATS_M1.8.md section 2.
+#
+# purpose:   Petra fills the hole Mara left with WORK, not with comfort, and that is
+#            exactly why it works. 2.11: she becomes "the hideout's quiet heart" - this is
+#            the scene where that becomes literal.
+# writer:    she does not thank anyone and she does not complain. She never mentions K-77.
+#            NO SCENE IN THE GAME MAY HAVE HER DESCRIBE WHAT WAS DONE TO HER.
+#            Aftermath: zero comic beats (18.6).
+
+lines: []

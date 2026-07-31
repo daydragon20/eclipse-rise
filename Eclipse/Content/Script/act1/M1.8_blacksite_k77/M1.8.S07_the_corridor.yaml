@@ -1,0 +1,42 @@
+# ---- header ----
+scene:        M1.8.S07
+mission:      M1.8
+title:        "The Corridor"
+act:          1
+location:     "Kessara / Spire Levels / Blacksite K-77"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Move forty people who cannot run down a corridor that is being closed from both ends."
+obstacle:     "Ember is a squad, this is a crowd, and the one person who can move a crowd is back at Hollow Point."
+turn:         "Somebody from Ember's original eleven dies holding a door, and the crowd moves because they saw it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, MARA, BRICK, REYES, fighters, prisoners; Veil (barks)
+# flags-in:  none
+# flags-out: none
+# beats:     1) the fight, in short callouts
+#            2) prisoners who cannot run. Reyes under pressure - HER CONTRACTIONS
+#               DISAPPEAR (18.4: training reasserts). Clearest fingerprint moment in the
+#               act. NOBODY REMARKS ON IT
+#            3) Brick carries
+#            4) THE FIRST NAME ON THE WALL: one of the eight dies, and it is the same name
+#               Threx spoke in M1.7.S04 (AR-10). Systemic recruit deaths may happen on top
+#               of this via the {name} slot, but THIS death is authored and guaranteed
+#            5) onward
+#
+# DESIGN CONSTRAINT - read this before writing any line:
+# 01_game_vision 1.7 moment 3 says a recruited soldier LIKELY dies. Likely, not certainly.
+# NO LINE ANYWHERE IN THIS MISSION MAY ASSUME A CASUALTY COUNT. Never "we lost four".
+# The authored death above is the only one the script may name.
+#
+# writer:    callout band throughout except Reyes, who is doing medicine and therefore
+#            speaks in complete sentences even here. That contrast IS the scene.
+
+lines: []

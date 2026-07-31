@@ -1,0 +1,48 @@
+# ---- header ----
+scene:        P0.S01
+mission:      P0
+title:        "Before"
+act:          1
+location:     "Kessara / Underworks / Hollow Point"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "The opening wants the player to understand what was taken from Voss before it asks him to take anything back."
+obstacle:     "There are ninety seconds and seven still frames, and no scene in which anything can be dramatised."
+turn:         "The last card stops describing a life and states a debt — eleven people, one night, thirteen rounds."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_P0_prologue.md ----
+# THIS IS THE RECAP OPENING, not a playable prologue (SPEC-P2-04 decision 1, ACCEPTED).
+# Approved copy for cards 1,2,4,5,6,7 lives in phase0/RECAP_CARDS_M1.md and is NOT
+# rewritten - it is transcribed here. Card 3 is a story-architect PROPOSAL pending
+# owner question Q-2 and repairs the orphaned Enforcer thread (finding C-2).
+#
+# voice:     open. Owner question Q-1: are the cards narrated at all? Recommendation is
+#            yes, in Voss's voice, both genders, ~2,200 credits. If the answer is no,
+#            this file stays as the text source and voice-director skips it.
+#
+# ID BLOCKS - three ids reserved per card, never renumbered:
+#   card 1  The city          010 020 030
+#   card 2  The Tithe         040 050 060
+#   card 3  The line (Q-2)    070 080 090   <- leave EMPTY and reserved if Q-2 is refused
+#   card 4  Petra             100 110 120
+#   card 5  Mara              130 140 150
+#   card 6  The container     160 170 180
+#   card 7  Ember Cell        190 200 210
+#
+# flags-in:  none
+# flags-out: Story.Thread.Enforcer_BadgeHeld  (card 3 only - NEW TAG, systems task)
+# plants:    T4 groundwork - AEGIS is introduced as an arresting machine, not a predictor.
+#            Keep that impression flat and hard. Act 4 inverts it; act 1 must not hedge it.
+# writer:    second person, past tense - the ONLY place in the game where that is allowed.
+#            Max three lines per card. No card names an emotion (18.9 A); the existing
+#            line "That was the day keeping your head down stopped working" names a
+#            behaviour, and that is the ceiling.
+
+lines: []

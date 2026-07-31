@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.1.S04
+mission:      M1.1
+title:        "One Volley"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "The cell wants the whole patrol down inside the free volley, before anyone can key a radio."
+obstacle:     "The patrol walks the chokepoint in the wrong order and the leader comes last."
+turn:         "Voss re-solves the ambush out loud, and Mara follows his call instead of her own."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      VOSS, MARA, two Ember fighters, Dominion conscripts (bark vocabulary)
+# flags-in:  none
+# flags-out: none
+# plants:    none
+# beats:     1) waiting; breathing; the patrol arrives
+#            2) the order is wrong - the leader is last, the volley cannot reach him
+#            3) Voss's fix: technical, short, over the radio
+#            4) Mara's permission, in two words
+#            5) the volley
+#            6) what goes wrong anyway
+# player:    combat throughout - this is the mission's teaching beat (Command Mode prompt)
+# writer:    THIS IS THE FIRST TIME ANYONE FOLLOWS VOSS. Keep it so small the player
+#            almost misses it. 2.4 requires that "people follow them" emerges from play,
+#            never from a speech.
+#            Lines under fire obey the CALLOUT band (2-6 words), not the radio band.
+#            This scene carries the SCRIPT_PRODUCTION_PLAN section 3 test: do they talk
+#            over the shooting?
+
+lines: []

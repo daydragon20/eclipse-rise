@@ -1,0 +1,53 @@
+# ---- header ----
+scene:        M1.8.S99
+mission:      M1.8
+title:        "Cinder"
+act:          1
+location:     "Kessara / Underworks / Hollow Point"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Three cells' worth of survivors need to know who they are following before morning."
+obstacle:     "Nobody in the room wants the job, and the only person who ever wanted it is dead."
+turn:         "Somebody uses a name that was not a name an hour ago, it goes around the room, and by the end of it Voss answers to it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, SELA, BRICK, DEX, REYES, PETRA, the Iron Chorus emissary (pact only),
+#            the crowd
+# flags-in:  Story.Choice.M15_IronChorusPact · Story.Flag.IntakeUnvetted · Story.Char.MaraDead
+# flags-out: Story.Beat.M18_BlacksiteK77 ✚ · Story.Char.CinderNamed ✚ ·
+#            Story.Char.PetraRescued ✚ · Story.Beat.Act1Complete ✚   (NEW TAGS)
+#
+# beats:     1) the vault, full. Ember, the Iron Chorus (pact), the freed, the forty
+#            2) SELA SPEAKS. Short - NO ORATION (AR-7: only four in the game, all reserved
+#               for acts 3-4). She asks the question nobody dares: and now?
+#            3) the argument. Iron Chorus wants its own line; some want to walk away; some
+#               want revenge
+#            4) P3-d: somebody asks how Threx knew. THREE ANSWERS COME AND NO CONCLUSION -
+#               the intake, the Veil's informant networks, or bad luck. The conversation
+#               moves on. NOBODY RESOLVES IT. This is the plant for twist 3 AND twist 4,
+#               and the player must be left holding anger with no address
+#            5) THE NAME. Somebody in the crowd - not a principal - uses the word "Cinder".
+#               It comes from how he looked coming up, or from something Mara once said.
+#               VOSS NEVER CALLS HIMSELF THAT
+#            6) BRICK REPEATS IT. That is what makes it stick: the man with the fewest
+#               words spends one, and it is the heaviest word in the room
+#            7) the vote - explicit, hands or voices. Canon 2.9: "the surviving cells vote
+#               to follow 'Cinder'"
+#            8) THE SIGIL. Somebody has painted it on the wall. Nobody knows who. The
+#               movement has a name. Last image
+#
+# ACT 1 ENDS HERE. Canon end state (2.9): one upgraded hideout, ~15 soldiers, the loyalty
+# of three fused cells, the Eclipse sigil on a wall.
+#
+# writer:    ANYONE WHO LETS ONE EXPLANATION WIN IN BEAT 4 DESTROYS TWIST 3.
+#            Half Voss variant set. He should speak less in this scene than in any other
+#            debrief in the act - being made leader is something that happens TO him.
+
+lines: []

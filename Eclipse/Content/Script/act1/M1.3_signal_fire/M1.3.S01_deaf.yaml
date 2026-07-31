@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        M1.3.S01
+mission:      M1.3
+title:        "Deaf"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants the district's ears shut for one night, and wants everyone in the room to know this is not a robbery."
+obstacle:     "Every cell on Kessara that ever made a noise this loud is a name Dex can recite."
+turn:         "Dex volunteers to set the charge himself, which is the first thing he has ever asked to do."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      MARA, VOSS, DEX, REYES, the cell
+# flags-in:  Story.Beat.M12_DeadDrop
+# flags-out: none
+# beats:     1) what a jammer mast does, told through what it costs the cell (never
+#               explained - 18.8)
+#            2) Dex's list of cells that tried this. He names them. That is a Brick beat
+#               and it is allowed exactly once in the act, here, because it is his fear
+#            3) the insertion choice - plaza or service tunnel. THE PLAYER CHOOSES
+#            4) Reyes asks what happens to the wounded if extraction is contested;
+#               Mara answers honestly
+#            5) DEX VOLUNTEERS
+# writer:    this is the mission where the engineer stops being the voice in your ear and
+#            walks out with you. From M1.4 he stays home again, and the player misses him.
+#            That absence is the point; do not undercut it by making him casual here.
+
+lines: []

@@ -1,0 +1,33 @@
+# ---- header ----
+scene:        HUB.A1.dex_workshop
+mission:      HUB.A1
+title:        "A Week And Some Steel"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Workshop"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants to show Voss what the vault could be if anyone gave him a week and some steel."
+obstacle:     "Nobody has a week and there is no steel."
+turn:         "He shows him anyway, and the plan is far too big, and it is the first blueprint of Hollow Point as the player will eventually know it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      DEX, VOSS
+# condition: story.beat_m13_signalfire == true
+# flags-out: none
+# purpose:   SYSTEM-TEACHER SCENE. 05_base_building: you learn base building from the
+#            person who loves it. Slots, energy, what a Workshop actually does - all of it
+#            carried by what he WANTS, never as explanation (18.8).
+# writer:    this is a downtime scene, so 18.6's ratio applies: roughly one comic beat per
+#            six lines. Dex is at his funniest when he is describing something he will
+#            never be allowed to build.
+#            No line here may function as a tutorial. If a line only conveys a mechanic,
+#            delete it and let the UI do its job.
+
+lines: []

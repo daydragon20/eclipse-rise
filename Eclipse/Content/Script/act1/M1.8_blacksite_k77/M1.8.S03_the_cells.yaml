@@ -1,0 +1,40 @@
+# ---- header ----
+scene:        M1.8.S03
+mission:      M1.8
+title:        "The Cells"
+act:          1
+location:     "Kessara / Spire Levels / Blacksite K-77"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Open every door on the manifest before the shift changes."
+obstacle:     "Some of the people inside have been there long enough that an open door means nothing to them."
+turn:         "Voss counts the guards, the number is too small, he says so — and Mara tells him to keep opening doors."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, MARA, BRICK, REYES; prisoners (3-4 speaking bit parts)
+# flags-in:  none
+# flags-out: none
+# beats:     1) the block. Bright, clean, quiet. Not a dungeon - AN OFFICE WITH CELLS IN IT,
+#               which is worse
+#            2) doors open. Some do not come out
+#            3) one prisoner asks whether it is over, and the question means something
+#               other than it sounds like
+#            4) P4-d: Voss counts the guards. For what Threx knew, there are far too few
+#               people here. HE SAYS IT OUT LOUD
+#            5) MARA WILL NOT HEAR IT. She uses the third variant of her M1.2.S03
+#               explanation, and this time it sounds thin
+#
+# THIRD TAP OF TWIST 4, and the last reminder before act 4 pays it.
+#   M1.2.S03 worldbuilding -> M1.7.S06 pattern -> HERE a question -> act 4 the answer
+#
+# writer:    Mara's explanation must be visibly weaker than it was in M1.2 without her
+#            noticing that it is. That is the whole tragedy in one line delivery.
+
+lines: []

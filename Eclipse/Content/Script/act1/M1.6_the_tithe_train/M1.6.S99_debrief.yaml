@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        M1.6.S99
+mission:      M1.6
+title:        "More Mouths"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to know what Ember is now, since it is plainly not a cell any more."
+obstacle:     "Nobody in the room has a word for it, and Sela has three."
+turn:         "Voss picks the smallest of her three words, and it sticks."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      MARA, VOSS, DEX, REYES, SELA, BRICK
+# flags-in:  Story.Char.SelaMet · Story.Flag.IntakeUnvetted · Story.Choice.M16_LettersAllowed
+# flags-out: Story.Beat.M16_TitheTrain ✚  (NEW TAG)
+# commit:    recruitment inflow (+roster), day +1, modest materials. No region flip.
+# beats:     1) the numbers: how many people, how much food, how many days. Dex's reality
+#            2) Reyes's list of what she needs and will not get
+#            3) Sela's position in the room: she is still here and nobody asked her to stay
+#            4) VOSS ASKS HER TO STAY - or does not. Make it a choice
+#            5) the word for what Ember is now. NOT "Eclipse" - that arrives in M1.8.
+#               Something smaller and more human
+#            6) Mara alone at the map, last image. No line
+# writer:    the last beat is a shot, not dialogue. 18.7: silence is content, and this one
+#            is doing four missions' worth of work - she is arranging something and the
+#            player still does not know what.
+
+lines: []

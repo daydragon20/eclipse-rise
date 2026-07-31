@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.5.S99
+mission:      M1.5
+title:        "Terms"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to know what Ember agreed to — in words, out loud, in front of everyone."
+obstacle:     "What was agreed depends on what Voss did at a kitchen table, and half the room disagrees with it."
+turn:         "She ratifies his decision without endorsing it, and tells the room it was his to make."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
+# cast:      MARA, VOSS, DEX, BRICK, REYES
+# flags-in:  Story.Choice.M15_ShiftBossSpared
+# flags-out: Story.Beat.M15_Cells ✚ · Story.Choice.M15_IronChorusPact ✚  (NEW TAGS)
+# commit:    modest materials + intel; the real reward is the alliance
+# beats:     1) the outcome: pact or refusal
+#            2) Dex's objection or agreement - he thinks in systems and immediately sees
+#               what an alliance costs in radio discipline and security
+#            3) Reyes's question about the civilians in the doorway
+#            4) Brick says one thing about the emissary
+#            5) MARA RATIFIES VOSS'S DECISION AND SAYS OUT LOUD THAT IT WAS HIS.
+#               First public transfer of authority in the game. Movement III's structural beat
+#            6) if there is a pact: the first joint operation goes on the map - and that
+#               operation is M1.6
+# writer:    Mara ratifies WITHOUT endorsing. Those are two different things and the
+#            distinction is the whole scene. She is arranging something. The player does
+#            not know what yet.
+#            Dex's joke here is the most bitter one in the act.
+
+lines: []

@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        M1.4.S05
+mission:      M1.4
+title:        "Carrying"
+act:          1
+location:     "Kessara / Foundry District / Foundry Row Armory"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get out with more than they can carry."
+obstacle:     "Every kilo they leave behind is somebody who does not get a rifle."
+turn:         "Brick picks up the load that was going to be left, and answers the offer of the door with one word."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
+# cast:      VOSS, MARA, BRICK, fighters
+# flags-in:  none
+# flags-out: none
+# beats:     1) what gets left - and who decides
+#            2) the back route
+#            3) BRICK LIFTS. More than two others together, and says nothing about it
+#            4) Voss repeats the offer
+#            5) BRICK'S YES. One word
+#            6) out - into burning dock lights or total silence, per loud/quiet
+#
+# THIS IS WHAT THE MISSION IS FOR AND IT CONTAINS FOUR SPOKEN WORDS.
+# Resist everything. Every line you add here is a line that makes his yes smaller.
+#
+# writer:    Dex is on the radio and will want to fill this silence. Do not let him.
+
+lines: []

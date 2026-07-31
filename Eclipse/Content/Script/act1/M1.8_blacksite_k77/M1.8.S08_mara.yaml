@@ -1,0 +1,58 @@
+# ---- header ----
+scene:        M1.8.S08
+mission:      M1.8
+title:        "Mara"
+act:          1
+location:     "Kessara / Spire Levels / Blacksite K-77"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants the last door held long enough for forty people to get past it."
+obstacle:     "It only holds from this side."
+turn:         "She says \"you\" for the first time in the game, and Voss understands the whole sentence before she has finished it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      MARA, VOSS · THREX (offscreen)
+# flags-in:  none
+# flags-out: Story.Char.MaraDead ✚  (NEW TAG)
+#            *** AFTER THIS FLAG, NO LIVE MARA LINE EVER PLAYS AGAIN. Recordings only. ***
+#
+# FIXED POINT. 02_story_bible 2.5 and 2.9: Mara dies at the end of act 1, executed
+# personally by Threx (2.6) while covering the escape. This does not move.
+#
+# beats:     1) the last door. The mechanism - DEX EXPLAINED IT IN S01 AND NOBODY LISTENED.
+#               The player already knows
+#            2) there is no argument. She does not say "go". She does something practical
+#               and by the time it reads it is too late to undo
+#            3) *** AR-5 - THE ONLY "YOU" IN THE GAME ***
+#               Mara says "we" for the entire game where anyone else would say "I" (18.4).
+#               Here she says one sentence with "you" in it, and that sentence IS the
+#               transfer of command. She does not say he is the leader. She uses a word she
+#               never uses, and that is enough
+#            4) Voss's answer. FULL VARIANTS ON BOTH AXES - the most expensive and most
+#               important variant set in the act
+#            5) the door closes
+#            6) THE EXECUTION. Threx does it personally (2.6). Player sees it through glass,
+#               or does not see it and hears it over a radio nobody switched off.
+#               RECOMMENDATION: the second. It is worse, it is cheaper, and it respects
+#               18.9 - you do not show feeling, you leave a channel open
+#            7) NO LAST WORDS AFTER THE SHOTS. No deathbed monologue
+#
+# HARD RULES:
+#   - Mara names no emotion. ZERO direct_beat lines (18.9 A)
+#   - She does not say "I'm proud of you", "lead them", or "this is yours now"
+#   - THE ENTIRE HANDOVER IS ONE PRONOUN. If the writer does not trust that, the scene is
+#     already broken
+#   - Voss gets no farewell line that lands. He is interrupted, or the door is already shut
+#   - FOURTEEN LINES MAXIMUM IN THE WHOLE SCENE
+#
+# writer:    every banned construction in 18.9 A was invented for this exact scene.
+#            Not one of them appears in it.
+
+lines: []

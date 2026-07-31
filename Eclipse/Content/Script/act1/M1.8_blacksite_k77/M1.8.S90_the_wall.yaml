@@ -1,0 +1,38 @@
+# ---- header ----
+scene:        M1.8.S90
+mission:      M1.8
+title:        "The Wall"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Bunk Row"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Brick wants a name somewhere people will see it every day."
+obstacle:     "There is nowhere in a geothermal vault that is meant for that."
+turn:         "He welds a bunk plate to the wall and etches the name, nobody asked him to, and by morning there are three more."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      BRICK, VOSS, others arriving
+# flags-in:  Story.Char.MaraDead
+# flags-out: Story.Thread.WallOpen ✚  (NEW TAG)
+# beats:     1) the sound of welding, at night, in a base that is not sleeping
+#            2) Brick, alone
+#            3) Voss comes to look and says nothing
+#            4) BRICK SAYS THE NAME. Once
+#            5) others join. No ceremony
+#
+# THIS IS 01_game_vision 1.7 MOMENT 3, LITERALLY, and it is the birth of the Memorial Hall
+# (05_base_building 5.3: "Grief is never a purchase" - the facility costs zero).
+#
+# writer:    Brick uses fewer words here than anywhere else in the act, which means one or
+#            two. His entire 2.5 arc - "he remembers every name on the wall" - becomes
+#            literally true starting with this weld, and nobody comments on that either.
+#            This scene OR S09 may spend the act's one rationed direct_beat.
+
+lines: []

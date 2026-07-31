@@ -1,0 +1,45 @@
+# ---- header ----
+scene:        M1.4.S03
+mission:      M1.4
+title:        "The Man In The Holding Cell"
+act:          1
+location:     "Kessara / Foundry District / Foundry Row Armory"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants a route to the second crate that does not cross the office bridge."
+obstacle:     "The only person who knows this building is locked in the third cell and has no reason to help anybody."
+turn:         "He gives Voss the route in nine words, asks for nothing, and that is what makes Voss come back for him."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
+# cast:      VOSS, BRICK (debut), one Ember fighter; MARA (radio)
+# flags-in:  none
+# flags-out: none
+#
+# *** BRICK'S ENTRANCE. 18.4: fewest words of anyone. Often a single noun. Answers hard
+# questions by naming a dead soldier. Never lies. Never speaks first in a group. ***
+#
+# canon:     34, ex-pit miner from Krad-9 (2.5). He is on Kessara because the Tithe of
+#            Hands moves labour between worlds (2.3) - architect ruling AR-11. It uses
+#            only existing canon and it buys a second payoff: M1.6 The Tithe Train hits
+#            him harder than anyone.
+# beats:     1) the holding block. Three cells. Two empty
+#            2) BRICK'S FIRST LINE IS THREE NAMES - not as an answer to "who are you" but
+#               to "why are you still standing here". His whole character in one beat.
+#               The player only understands it the second time
+#            3) Voss asks for the route
+#            4) Brick gives it. Short, exact, no condition attached
+#            5) Voss offers him the door
+#            6) BRICK DOES NOT SAY YES YET
+# why not:   a prisoner who gratefully follows you out is a quest item. A man who finishes
+#            his own work first and comes in S05 is a character. His yes is one word.
+# writer:    he is alone with Voss here, so he may answer - he still never begins.
+#            Under thirty spoken words for Brick in this ENTIRE mission. Count them.
+
+lines: []

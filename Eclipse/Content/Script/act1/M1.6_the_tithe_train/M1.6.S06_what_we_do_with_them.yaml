@@ -1,0 +1,53 @@
+# ---- header ----
+scene:        M1.6.S06
+mission:      M1.6
+title:        "What We Do With Them"
+act:          1
+location:     "Kessara / Underworks / Hollow Point"
+type:         hub
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants forty strangers fed, bunked and useful by morning."
+obstacle:     "Ember has no way to know who any of them are, and the only person who could check them is standing in the room asking her not to."
+turn:         "She admits out loud that they cannot vet anybody, decides to take them all anyway, and Sela wins the second argument of the night."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      MARA, VOSS, SELA, REYES, DEX, BRICK, dozens of newcomers (unnamed)
+# flags-in:  Story.Choice.M15_ShiftBossSpared · Story.Choice.M16_TrainRun
+# flags-out: Story.Flag.IntakeUnvetted ✚ (silent) · Story.Choice.M16_LettersAllowed ✚ ·
+#            Story.Thread.ConscriptLetters_Open ✚   (NEW TAGS - systems task)
+#
+# *** THE MOST IMPORTANT SCENE IN ACT 1 FOR TWIST 3, AND IT MAY NOT SMELL OF ANYTHING. ***
+#
+# beats:     1) the vault, too full. Blankets, head counts, somebody crying and somebody asleep
+#            2) Dex's logistics panic - the ledger from M1.4.S99 is now a real job, and he
+#               points at somebody. ONE LINE, IN PASSING, NO NAME THE CAMERA HOLDS ON
+#               (P3-a -> P3-c: the door is open)
+#            3) MARA SAYS OUT LOUD THAT SHE CANNOT VET ANYONE. She weighs it against what
+#               the Iron Chorus would do. She chooses people. THIS IS NOT A MISTAKE - it is
+#               her character, and it is why the player will not know who to blame in act 3
+#            4) Reyes: beds, water, disease. Clinical, and the only one who says the numbers
+#            5) P5-c: a freed conscript asks whether he can write home - his mother thinks
+#               he is dead. Mara says no (opsec). Sela says yes. THE PLAYER DECIDES.
+#               This opens the 2.11 thread "The Conscript Letters", which pays in the act 4
+#               mutiny path
+#            6) SHIFT BOSS PAYOFF: Sela knows what happened in M1.5.S04 - the district
+#               knows - and says exactly one thing about it. Spared: a compliment that does
+#               not sound like one. Killed: no reproach, just a fact she will remember
+#
+# *** THE BIGGEST TRAP IN THE ACT ***
+# No newcomer gets a name, a close-up, or a suspicious line. Anyone "setting up" the mole
+# with a shared glance ruins twist 3. The door is open. Nobody the camera follows walks
+# through it.
+#
+# writer:    MARA IS RIGHT HERE. Write her decision as the best available decision, not as
+#            a mistake with foreshadowing on it. If the player thinks "that was stupid" in
+#            act 3, the scene failed; he must think "I would have done the same".
+
+lines: []

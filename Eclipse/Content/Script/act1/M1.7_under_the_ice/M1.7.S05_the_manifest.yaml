@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        M1.7.S05
+mission:      M1.7
+title:        "The Manifest"
+act:          1
+location:     "Kessara / Underworks / Coolant Sublevel"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to leave with the log and nothing else."
+obstacle:     "The post also holds a Veil transfer manifest — a list of people — and one of the names is Petra Voss."
+turn:         "Voss stops being a technician reading a system and becomes a man reading a list."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      VOSS, MARA, BRICK
+# flags-in:  none
+# flags-out: Story.Intel.K77Manifest ✚ · Story.Char.PetraLocated ✚  (NEW TAGS)
+# beats:     1) the manifest - a transfer list to Blacksite K-77
+#            2) names. Many names
+#            3) PETRA
+#            4) Voss says nothing, or says her name. Both work - make it a variant
+#            5) BRICK READS ALONG AND NAMES NOBODY. The only time in the act he sees a
+#               list and stays silent, because this list is not his. That beat only works
+#               because the player already knows his tic (18.4)
+#            6) Mara sees Voss's face and knows the mission just changed
+# writer:    this is the payoff of the prologue's Petra card and the setup for the entire
+#            act climax. It needs no music cue in the writing - one name on a list.
+#            Full Voss variant coverage.
+
+lines: []

@@ -1,0 +1,32 @@
+# ---- header ----
+scene:        HUB.A1.reyes_first_conversation
+mission:      HUB.A1
+title:        "Someone Should"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Bunk Row"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Reyes wants to know what Voss did with the wounded conscript."
+obstacle:     "She is not asking as an accusation, and Voss cannot tell that yet."
+turn:         "She writes his answer down, and explains that she keeps records because someone should."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      REYES, VOSS
+# condition: story.beat_m11_thirteenbullets == true
+# branches:  three, on story.choice_m11_conscriptspared (killed / left / bound and left).
+#            NONE of the three is a judgement. She records; she does not score.
+# purpose:   first time the game shows the player that somebody is counting
+#            (2.5 - "holds the player accountable for casualty-heavy tactics")
+# writer:    18.4 - complete clinical sentences; asks a question instead of accusing;
+#            drops contractions when stressed. She is NOT stressed here, so the
+#            contractions stay - which makes their absence later meaningful.
+#            Voss variants on all four axes.
+
+lines: []

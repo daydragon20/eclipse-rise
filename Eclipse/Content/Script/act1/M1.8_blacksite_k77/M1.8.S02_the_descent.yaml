@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.8.S02
+mission:      M1.8
+title:        "The Descent"
+act:          1
+location:     "Kessara / Spire Levels / Service Lift"
+type:         walk-and-talk
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get eight people down a service shaft into the cleanest part of the city."
+obstacle:     "Nobody in this squad has ever been above the Mid-Works, and the light up here is wrong."
+turn:         "The lift stops at an administrative floor by accident, the doors open on a corridor of people going home from work, and nobody looks up."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, MARA, DEX, REYES, BRICK, fighters
+# flags-in:  none
+# flags-out: none
+# beats:     1) the lift; the light shifts from amber to white-gold
+#            2) THE DOORS OPEN ON THE WRONG FLOOR. Office workers. Coats. Somebody with a
+#               lunch tin. They do not look up
+#            3) the doors close
+#            4) ONE line, from anybody. ONE
+#            5) further down
+#
+# THIS IMAGE IS THE ENTIRE DOMINION IN TEN SECONDS and it costs one scene beat.
+# 21_quality_mandate 21.2: this is a graphic point. Write the shot: note.
+#
+# writer:    the temptation is a second line, then a third, then somebody saying something
+#            about how they are just people too. Do not. The silence is the argument.
+#            AR-3: K-77 sits beneath the Spire Levels, reached by service lift from
+#            Foundry Row. The clean light sits on top of the cells.
+
+lines: []

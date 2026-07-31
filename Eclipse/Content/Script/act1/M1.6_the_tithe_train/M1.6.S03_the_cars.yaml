@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.6.S03
+mission:      M1.6
+title:        "The Cars"
+act:          1
+location:     "Kessara / Mid-Works / Tithe Line"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants the cars open and everybody out."
+obstacle:     "A third of the people inside do not want to be out, because their families are on a list and the list has an address."
+turn:         "Sela stops arguing with Voss and starts arguing with them, and wins — and Ember has just found the only weapon it does not know how to build."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      VOSS, BRICK, MARA · SELA VANN (debut) · three conscripts
+# flags-in:  none
+# flags-out: Story.Char.SelaMet  (NEW TAG - systems task)
+# beats:     1) the hatch opens. The smell, the light, too many people not moving
+#            2) the first conscript who says he is staying. HIS REASON IS GOOD
+#            3) Voss tries. It does not work - AND THAT MATTERS: Voss cannot do this
+#            4) SELA. She does not talk to Voss. She talks to the car. Her 19.3 signature
+#               line lands here and nowhere else: "They didn't take your brother. We let them."
+#            5) the car starts to move
+#            6) BRICK, in the hatchway, three or four words, about Krad-9. Now the player
+#               understands why he spoke first in S01
+#
+# BEST SCENE IN MOVEMENT III. It proves pillar 3 (PEOPLE, NOT UNITS) without one statistic.
+#
+# plants:    P1-b - Sela's rhetoric names the Blight as the wound all of this came out of.
+#            ONE reference, no explanation (18.8). Twist 1 pays in act 3.
+# writer:    SELA DOES NOT MAKE A SPEECH. AR-7: no oration is spent in act 1. She wins with
+#            four to six short turns, at least two of which are questions. Rhetoric is
+#            structure, not volume. 18.4: she never speaks about herself for more than one line.
+#            The conscripts who want to stay have GOOD reasons. Written frightened or stupid,
+#            they make Sela's victory worthless.
+
+lines: []

@@ -1,0 +1,44 @@
+# ---- header ----
+scene:        M1.3.S06
+mission:      M1.3
+title:        "A Name On The Air"
+act:          1
+location:     "Kessara / Foundry District / Transit Checkpoint"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "With the jammer down, Dex wants to hear what the district's own channels sound like."
+obstacle:     "One of those channels is not meant for a district."
+turn:         "A man on a Veil frequency says a first name, warmly, about somebody Ember has never heard of — and Mara stops walking."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      DEX, VOSS, MARA · THREX (voice, radio)
+# flags-in:  none
+# flags-out: Story.Clue.ThrexVoice_1  (NEW TAG - systems task)
+#
+# *** AR-6, RUNG 2 OF FOUR. THREX APPROACHES BY MEDIUM. ***
+#   rung 1  propaganda, no name          (M1.3.S02 environment)
+#   rung 2  a stranger's first name      (THIS SCENE)
+#   rung 3  an Ember name                (M1.7.S04)
+#   rung 4  Voss's name, in person       (M1.8.S05/S06)
+# HE MAY NOT SAY AN EMBER NAME HERE. If he does, M1.7 loses its entire reason to exist.
+# The name he uses belongs to another cell - which is also what makes M1.5 possible.
+#
+# beats:     1) Dex scans; the air is empty for the first time
+#            2) a channel that should not be there
+#            3) THREX. Warm, intimate, question after question. He compliments the person
+#               sincerely while hurting them (18.4). Four to six lines.
+#            4) the channel drops
+#            5) Mara says one thing and it is not reassuring
+#            6) DEX MAKES NO JOKE. Write the silence - 18.7 says silence is content. It is
+#               the only place in act 1 where he leaves an opening unused.
+# writer:    Threx never shouts and never uses rank when a first name will wound more.
+#            He is at his most frightening when he is kind.
+
+lines: []

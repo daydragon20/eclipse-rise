@@ -1,0 +1,40 @@
+# ---- header ----
+scene:        M1.8.S06
+mission:      M1.8
+title:        "Threx"
+act:          1
+location:     "Kessara / Spire Levels / Blacksite K-77"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants a door open, and there is a man on the other side of the glass who can open it."
+obstacle:     "He is not going to, he would like to talk first, and he is in no hurry at all."
+turn:         "He tells Voss something true about Petra, kindly, and it works — Voss loses ten seconds, and ten seconds is what the containment needed."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, THREX (in person, behind glass)
+# flags-in:  none
+# flags-out: none
+# beats:     1) glass, or a sealed door with a speaking grille. Threx on the other side,
+#               alone, unarmed
+#            2) he opens with a compliment about the operation, and it is deserved
+#            3) THE 19.3 SIGNATURE LINE LANDS HERE - "You have your aunt's hands. Did
+#               anyone ever tell you that?" This is its canonical placement
+#            4) he asks three questions and answers none
+#            5) VOSS GETS DIALOGUE OPTIONS AND NONE OF THEM WIN. Essential: this is an
+#               unwinnable dialogue confrontation ten hours before the game gives one you
+#               CAN win (Vex, act 4). The shape rhymes; the outcome does not
+#            6) Threx leaves because he has to be somewhere else. THAT is the insult
+#
+# NO THREATS. NO MONOLOGUE. NO IDEOLOGY. He hurts with warmth.
+#
+# writer:    full Voss variant coverage on both axes. This and S08 are where the act's
+#            variant budget goes.
+
+lines: []

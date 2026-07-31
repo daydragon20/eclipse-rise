@@ -96,7 +96,7 @@ M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
 | **02/08 – 06/08** | **IJkmissie M1.1** door alle lagen. Eigenaar hoort hem. | HUD verder; inslagspoor in de editor |
 | **07/08** | **Gate L0.** Akkoord? → massaproductie. Nee? → standaard bijstellen, één iteratie, opnieuw. | trillen-dossier (Rewind Debugger eerst) |
 | **31/07** | **L1 act 1 GELAND** — P0 + M1.1–M1.8 beat-sheets, 69 scène-stubs, plant/payoff-tabel. `phase0/beats/ACT1_OVERVIEW.md`. | |
-| **01/08 – 11/08** | **L1: beat-sheets acts 2–4** (34 resterende missies + 8 loyaliteitsmissies). story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
+| **01/08 – 11/08** | **L1: beat-sheets acts 2–4** — de 34 resterende van de 42 (26 verhaalmissies M2.1–M4.7 + 8 loyaliteitsmissies). story-architect, act voor act. Continuïteitsaudit aan het eind. | HUD-review + wapenbron zodra owner levert |
 | **vanaf gate L0** | **L2: dialoog, act 1 eerst.** dialogue-writer ×4–6 parallel, één missie per agent. Critic-gate per scène. **Niet geblokkeerd door L1 acts 2–4** — act 1's beats liggen er al sinds 31/07. | reguliere backlog `EXECUTION_PLAN.md` |
 | **10/08 – 19/08** | **L3: stem, in tier-volgorde.** Tier 1 barks → Tier 2 Act 1 → Tier 3 muziek → Tier 4 hub → Tier 5 SFX. Reserve niet toewijzen tot **17/08**, dan vrijgeven. Doel: **310k besteed, 0 over.** | audio-import, bark-bedrading |
 | **19/08** | **HARDE STOP generatie.** Ledger sluiten. | |

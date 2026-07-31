@@ -1,0 +1,35 @@
+# ---- header ----
+scene:        M1.1.S06
+mission:      M1.1
+title:        "Off The Deck"
+act:          1
+location:     "Kessara / Foundry District / Transit Checkpoint"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get four people off an elevated position with a response cycle closing."
+obstacle:     "They are carrying more than they came with and one of them is slow."
+turn:         "Dex talks them down a route he has never walked, is right, and cannot take the compliment."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      MARA, VOSS, two Ember fighters, DEX (radio)
+# flags-in:  none
+# flags-out: none
+# plants:    P4-a family, light touch. ONE fighter line about how little came after them.
+#            In act 1 this reads as relief. In act 4 it reads as allocation. Do not
+#            make it a mystery here - nobody wonders aloud, they are just glad.
+# beats:     1) what they are carrying out - crates, magazines: the WHY of the mission
+#            2) the response arrives, and it is thin
+#            3) Dex's route
+#            4) somebody thanks Dex; he deflects with hardware (18.4)
+#            5) gone
+# writer:    Dex never finishes a sentimental sentence. The thank-you must land on him
+#            and bounce off in the same breath.
+
+lines: []

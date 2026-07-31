@@ -1,0 +1,38 @@
+# ---- header ----
+scene:        M1.5.S03
+mission:      M1.5
+title:        "Walking Them Out"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         walk-and-talk
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants the emissary off Ember's ground alive, whatever was agreed downstairs."
+obstacle:     "The emissary keeps testing him, and the tests are about Mara."
+turn:         "He tells Voss something about Mara's earlier refusals that Mara did not tell the room."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
+# cast:      VOSS, Iron Chorus emissary, BRICK, MARA (rear)
+# flags-in:  none
+# flags-out: none
+# beats:     1) walking the blocks; curfew; nobody outside
+#            2) the emissary's questions - why Ember trusts Voss, what happens when Mara
+#               is gone. NOBODY HAS ASKED THAT YET AND IT SEEDS M1.8
+#            3) what he tells Voss about Mara: something true, something small, something
+#               that does not make her worse but does make her human. Suggested: three
+#               years ago she asked THEM for help and was refused because Ember was too
+#               small to be worth the risk
+#            4) Brick's eight words. He names somebody, and the emissary knows the name.
+#               That is the first thing the two cells genuinely give each other
+# why Brick: he is the only one not negotiating. 18.4 - he never lies. For cells that live
+#            on distrust, a man who cannot lie is the best diplomat at the table.
+# writer:    the emissary is never menacing. He is somebody who has already buried the
+#            version of himself that would have liked Ember.
+
+lines: []

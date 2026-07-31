@@ -1,0 +1,31 @@
+# ---- header ----
+scene:        HUB.A1.brick_bunk
+mission:      HUB.A1
+title:        "The Ones Before"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Bunk Row"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to know if Brick needs anything."
+obstacle:     "Brick needs nothing, and says so in one word."
+turn:         "He asks Voss for the names of the people who died before he arrived, writes them somewhere, and that is the entire conversation."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      BRICK, VOSS
+# condition: story.beat_brickrecruited == true
+# flags-out: none
+# purpose:   the scene where the player understands what Brick DOES - three missions before
+#            he welds the wall in M1.8.S90.
+# writer:    SEVEN LINES MAXIMUM, and Brick has three of them. 18.4: fewest words of anyone,
+#            often a single noun, never speaks first.
+#            He does not explain why he wants the names. Voss does not ask.
+#            The variance rule survives because Voss's lines are long and Brick's are not.
+
+lines: []

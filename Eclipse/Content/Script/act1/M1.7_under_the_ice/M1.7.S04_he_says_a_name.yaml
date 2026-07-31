@@ -1,0 +1,45 @@
+# ---- header ----
+scene:        M1.7.S04
+mission:      M1.7
+title:        "He Says A Name"
+act:          1
+location:     "Kessara / Underworks / Coolant Sublevel"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to be gone before the post's watch rotates."
+obstacle:     "The live channel is still open and the man on it is talking about somebody they know."
+turn:         "He says an Ember name, kindly, and pronounces it correctly."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      VOSS, MARA · THREX (live Veil traffic)
+# flags-in:  Story.Clue.ThrexVoice_1
+# flags-out: none (Story.Clue.ThrexKnowsSector was set in S03; this scene makes it personal)
+#
+# *** AR-6, RUNG 3 OF FOUR. ***
+#   rung 1  propaganda, no name      M1.3.S02
+#   rung 2  a stranger's first name  M1.3.S06
+#   rung 3  AN EMBER NAME            THIS SCENE
+#   rung 4  Voss's name, in person   M1.8.S05/S06
+# HE DOES NOT SAY VOSS'S NAME. Not even nearly. He does not mention K-77. He gives no hint
+# of the trap.
+#
+# beats:     1) the live channel
+#            2) THREX. Four to six lines, warm, question-heavy. He uses the first name of
+#               one of Ember's eight (AR-1) - the fighter who goes on the wall first in
+#               M1.8 (AR-10)
+#            3) he says something kind about that person, sincerely, and it is unbearable (18.4)
+#            4) he does not name Voss
+#            5) Mara's reaction: the first time in the game she sounds frightened. ONE LINE.
+#               It is the only time
+#            6) Voss says out loud what has to happen next, and it is not what Mara thinks
+# writer:    Threx never shouts and never uses rank when a first name will wound more.
+#            He compliments you sincerely while hurting you. That is the whole character.
+
+lines: []

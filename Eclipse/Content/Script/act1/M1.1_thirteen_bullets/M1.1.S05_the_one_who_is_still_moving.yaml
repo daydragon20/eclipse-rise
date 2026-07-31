@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.1.S05
+mission:      M1.1
+title:        "The One Who Is Still Moving"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to leave, and the wounded conscript on the deck will not stop making noise."
+obstacle:     "Mara will not make this call for him, and the patrol's relief cycles in minutes."
+turn:         "Whatever Voss decides, the cell watches him decide it, and that is the thing that changes."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      VOSS, MARA, one wounded Dominion conscript, one Ember fighter
+# flags-in:  none
+# flags-out: Story.Choice.M11_ConscriptSpared   (NEW TAG - systems task, see ACT1_OVERVIEW section 6)
+# plants:    P5-a  first entry in the mercy tally that gates twist 5 (Kaine's conscience, act 4).
+#            MANDATORY carrier - this plant may never move to an optional objective.
+# beats:     1) the conscript is alive, young, and procedural because that is his training -
+#               he states his unit number, not his name
+#            2) the fighter wants to walk on
+#            3) Mara says nothing. Deliberately. She spends no "we" here.
+#            4) Voss chooses: finish him / leave him / bind him and leave him
+#            5) one reaction per branch from the fighter, one from Mara
+# player:    the choice IS the scene
+# writer:    NOBODY STATES THE MORAL. 18.9 A forbids it and the scene does not need it -
+#            the player knows what he did.
+#            The conscript is procedural, not pitiful. That is worse, and it is 18.5 rule 5.
+#            Voss variants required on all four axes here; this is one of the two scenes
+#            in M1.1 that earns full variant coverage (see C-6/Q-7).
+
+lines: []

@@ -1,0 +1,57 @@
+# ---- header ----
+scene:        M1.7.S03
+mission:      M1.7
+title:        "The Log"
+act:          1
+location:     "Kessara / Underworks / Coolant Sublevel"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants a number: how much does the Veil know."
+obstacle:     "The answer is on the screen in front of him and it is bigger than the question."
+turn:         "Ember's own operations are in the log by date — and so is a query nobody in this room ran."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      VOSS, MARA, DEX (present or radio)
+# flags-in:  none
+# flags-out: Story.Clue.ThrexKnowsSector ✚ · Story.Clue.OutsideQuery ✚ ·
+#            Story.Clue.AegisDenial ✚   (NEW TAGS - systems task)
+#
+# FOUR FINDINGS, IN THIS ORDER:
+#
+# 1. THE SECTOR IS FLAGGED  (mandatory)
+#    Ember is in the log, with dates. The earliest is AFTER M1.2 - so M1.1 and M1.2 were
+#    never seen and everything since was. That is act 1's engine on a screen: the player
+#    reads his own footprints.
+#
+# 2. THE OUTSIDER  (mandatory - P2-b, twist 2)
+#    Under the Veil queries there is one that is not the Veil's. Different authorisation
+#    chain, older, and no report ever followed it. Dex can say what it is NOT. Nobody can
+#    say what it is. TWO LINES, NO THEORY. Nobody speculates about who.
+#
+# 3. THE DENIED REQUISITION  (optional document, MANDATORY spoken carrier - P4-c, twist 4)
+#    Threx requested an interdiction package for this sector: extra teams, permanent
+#    surveillance, the whole hammer. DENIED. Not by a commander - the refusal carries an
+#    ALLOCATION stamp. Resources are needed elsewhere.
+#      act 1 reading: even the Veil has a budget. Dex jokes. Mara sees room. They move on.
+#      act 4 reading: AEGIS starved the hunter because a controlled rebellion modelled as
+#                     a survivable pressure valve.
+#    AR-9: the document is optional, THE OBSERVATION IS NOT. Dex reads the refusal aloud
+#    the moment the player touches the screen.
+#    *** THIS IS THE MOST IMPORTANT LINE IN ACT 1 AND IT MUST SOUND LIKE AN ASIDE. ***
+#
+# 4. THE REDACTED RECORD  (fully optional - P2-d)
+#    A personnel record from the Arbiter's household, unpersoned and redacted. One Dex line
+#    that does not understand it and moves on. No second beat.
+#
+# writer:    nobody looks twice at any of this. The scene's emotional content is finding 1;
+#            findings 2 and 3 are texture that the player will remember and the characters
+#            will not.
+
+lines: []

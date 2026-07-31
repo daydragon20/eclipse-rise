@@ -1,0 +1,37 @@
+# ---- header ----
+scene:        M1.6.S02
+mission:      M1.6
+title:        "Boarding"
+act:          1
+location:     "Kessara / Mid-Works / Tithe Line"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get onto the train without hitting the cars that have people in them."
+obstacle:     "Every car looks the same from outside, and the guards know which ones do not."
+turn:         "The guards defend the empty cars, which tells Ember exactly where everyone is."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      VOSS, MARA, BRICK, fighters; Iron Chorus fighters IF the pact holds;
+#            Dominion conscript guards (barks)
+# flags-in:  Story.Choice.M15_IronChorusPact
+# flags-out: none
+# beats:     1) the run-up; the train
+#            2) boarding
+#            3) the guards defend the WRONG cars - a tactical insight that comes out of
+#               enemy behaviour instead of a marker. That is 11.3's causality rule applied
+#               to a firefight
+#            4) if pact: the Iron Chorus does its part, efficiently, with no concern for
+#               the guards. ONE IMAGE
+#            5) the first car opens
+# barks:     conscript guards who know there are people behind them sound different from a
+#            garrison. New variant inside the Dominion vocabulary - flag to voice-director.
+# writer:    callout band under fire. The insight in beat 3 is Voss's line and it is short.
+
+lines: []

@@ -1,0 +1,38 @@
+# ---- header ----
+scene:        M1.2.S02
+mission:      M1.2
+title:        "Block Nine"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         walk-and-talk
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to cross a block of nine thousand people without one of them looking twice."
+obstacle:     "A woman on the third gallery looks twice."
+turn:         "She turns her radio up instead of shouting, and Voss learns the district is already choosing sides in ways nobody counts."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
+# cast:      VOSS, MARA, one Ember fighter, DEX (radio), one Kessaran civilian, AEGIS (public address)
+# flags-in:  none
+# flags-out: none
+# plants:    P1-c (dressing only) - a Bursary ration placard about Meridia relief on the
+#            gallery wall. Nobody mentions it. It is simply there, for act 3.
+# beats:     1) the galleries; the sound of too many people in too little room
+#            2) the AEGIS address - two sentences, present tense, a probability where a
+#               human would give an opinion (18.4)
+#            3) the woman sees them
+#            4) she does the only safe thing: more noise
+#            5) Mara's reaction teaches the player what that was worth
+#            6) the cache
+# writer:    THE CIVILIAN SPEAKS FOUR WORDS OR NONE. What she does is the line. A civilian
+#            delivering a speech about hope is exactly the failure mode in 18.9 D.
+#            AEGIS never argues and never prefers (18.4).
+# casting:   needs civilian_kessara_a - see owner question Q-5.
+
+lines: []

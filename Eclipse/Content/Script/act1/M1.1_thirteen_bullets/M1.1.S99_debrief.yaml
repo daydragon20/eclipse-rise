@@ -1,0 +1,38 @@
+# ---- header ----
+scene:        M1.1.S99
+mission:      M1.1
+title:        "What Thirteen Bought"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants the cell to understand what they now own, before they start celebrating what they survived."
+obstacle:     "They came back with more ammunition than they left with, and nobody can stop counting it."
+turn:         "She gives the night's credit to Voss in front of everyone, and he hands it straight to the two who walked the low route."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
+# cast:      MARA, VOSS, DEX, REYES, the cell
+# flags-in:  Story.Choice.M11_ConscriptSpared
+# flags-out: Story.Beat.M11_ThirteenBullets  (exists in EclipseGameplayTags.cpp)
+# commit:    +25 M / +50 C, day +1, optional zero-casualty +20 M, no region flip
+# beats:     1) the count again - this time going up
+#            2) Reyes treats what there is to treat; her first complete clinical sentence
+#            3) Dex takes the haul apart
+#            4) Mara names what Voss did
+#            5) Voss passes it on - 18.4: "never claims credit in front of the people
+#               who did the work". This is the first time that trait is visible.
+#            6) conditional: if the conscript was spared, one line points back at it
+#               WITHOUT a verdict
+# writer:    if anyone was wounded, this is AFTERMATH - 18.6 says zero comic beats in
+#            aftermath. Dex's third joke only exists in the clean-run variant.
+#            Voss variants required here (the credit hand-off reads differently on the
+#            personal/strategic axis).
+
+lines: []

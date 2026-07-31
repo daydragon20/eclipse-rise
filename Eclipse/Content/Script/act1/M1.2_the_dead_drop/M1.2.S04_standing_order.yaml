@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.2.S04
+mission:      M1.2
+title:        "Standing Order"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants to know what the Veil is actually spending its people on this quarter."
+obstacle:     "The block warden's terminal answers a question nobody asked."
+turn:         "Recovery of a stolen custodian key-token outranks cell suppression — and Ember hears it as good news."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
+# cast:      VOSS (at the terminal), DEX (radio), MARA (on watch)
+# flags-in:  none
+# flags-out: Story.Clue.CustodianKey  (NEW TAG - systems task)
+#
+# P2-a. Plant for twist 2 (Whisper = Ilan Vex, a former AEGIS custodian who fled with
+# root-access fragments). The writer must land exactly three facts and no more:
+#     custodian  ·  key-token  ·  ranked ABOVE cell suppression
+# NOBODY ASKS WHAT A CUSTODIAN IS. That is 18.8 in one beat, and it is the reason the
+# act 2 reveal lands instead of thudding.
+#
+# beats:     1) the warden's office: a desk, an ink pad, a list of absentees
+#            2) Voss opens the terminal - technician vocabulary, no explanation
+#            3) DEX READS THE STANDING ORDER ALOUD (this is what makes an optional
+#               document into a mandatory spoken plant, per AR-9)
+#            4) a joke about what the Veil has lost
+#            5) Mara: it means they are looking at somebody else. Relief.
+# optional:  P2-d - a second record, a redacted and unpersoned name inside the Arbiter's
+#            household. Only if the player searches further. One Dex line that does not
+#            understand it and moves on. No second beat.
+# writer:    Dex is the loudest character in this mission and it is the only mission in
+#            act 1 where that is true. This is where the player learns his voice.
+
+lines: []

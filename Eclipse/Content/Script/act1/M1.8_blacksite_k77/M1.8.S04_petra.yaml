@@ -1,0 +1,48 @@
+# ---- header ----
+scene:        M1.8.S04
+mission:      M1.8
+title:        "Petra"
+act:          1
+location:     "Kessara / Spire Levels / Blacksite K-77"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants his aunt to walk out of a room she has been in for months."
+obstacle:     "She is not the person the prologue remembers, and she starts by giving orders."
+turn:         "He stops trying to comfort her and does what she says, and she lets him take her arm."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
+# cast:      VOSS, PETRA VOSS (debut), MARA
+# flags-in:  Story.Char.PetraLocated
+# flags-out: none (Story.Char.PetraRescued commits at S99)
+#
+# *** BLOCKED ON OWNER QUESTION Q-3 ***
+# Petra has NO casting row in 19.3 (finding C-4) and NO fingerprint in 18.4 (finding C-5).
+# She speaks in the act climax. Do not generate this scene until both exist.
+#
+# ARCHITECT PROPOSAL for her fingerprint (owner approval required - 18.4 is bible):
+#   syntax : short imperatives. Household vocabulary where everyone around her is military
+#            ("sit down", "eat", "your hands are cold")
+#   tic    : answers a hard question with a task
+#   never  : lets herself be thanked; never names what was done to her; never says she is
+#            proud - she shows it by giving you work
+#
+# beats:     1) the cell. She is sitting. She stands before he says anything
+#            2) HER FIRST LINE IS A TASK. She does not thank him and she does not cry
+#            3) Voss tries the emotional register. It does not work
+#            4) she points at somebody else who needs help
+#            5) ONLY WHEN HE DOES WHAT SHE SAYS does she let him hold her up
+#            6) one line that touches the prologue without quoting it
+#
+# THIS IS THE PAYOFF OF THE ENTIRE PROLOGUE AND IT LASTS NINETY SECONDS.
+# No line names what happened to her. Not one.
+#
+# writer:    half Voss variant set (personal/strategic axis reads differently here).
+
+lines: []

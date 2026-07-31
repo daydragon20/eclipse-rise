@@ -1,0 +1,44 @@
+# ---- header ----
+scene:        M1.4.S99
+mission:      M1.4
+title:        "Real Rifles"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Bunk Row"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Reyes wants to examine the man who has spent three months in a Dominion holding cell."
+obstacle:     "Brick answers medical questions the way he answers every question: with a name."
+turn:         "She stops asking about his body and asks about the names, and he tells her — the first thing anyone in Ember has given her to treat."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
+# cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
+# flags-in:  Story.Beat.BrickRecruited
+# flags-out: Story.Beat.M14_Quartermaster (exists) · Story.Beat.BrickRecruited (exists)
+# commit:    +200 M / +100 C, day +1, Brick onto the roster, UnlockedLoadoutTags +=
+#            real-rifle tier, optional no-soldier-downed +15 M. No region flip.
+# beats:     1) the haul laid out; Dex unable to leave it alone
+#            2) the bill: what it cost
+#            3) REYES EXAMINES BRICK. Ex-Dominion medic facing ex-Dominion prisoner. She
+#               knows exactly what his cell looked like because she worked inside that
+#               system. SHE DOES NOT SAY SO. The player reads it off her hands
+#            4) the names
+#            5) Mara puts Brick on the list
+#            6) P3-a: Dex notes that somebody has to keep track of all this. There is a
+#               stock now, so there is a ledger, so there is a JOB
+#
+# *** P3-a IS THE TWIST-3 PLANT AND IT MUST LAND AS A JOKE. ***
+# "Somebody has to keep track of this" may not sound weighty under any circumstances. If
+# it sounds weighty, the player knows who the mole is in act 3 before the game tells him.
+#
+# writer:    Reyes's arc is "from penance to purpose" (2.5). This is the first stone: she
+#            treats a man she would once have been ordered to triage by loyalty score.
+#            The scene knows it. She does not say it.
+
+lines: []

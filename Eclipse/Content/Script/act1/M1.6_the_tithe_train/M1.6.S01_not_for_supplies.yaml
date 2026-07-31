@@ -1,0 +1,36 @@
+# ---- header ----
+scene:        M1.6.S01
+mission:      M1.6
+title:        "Not For Supplies"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to hit a train that carries nothing Ember can use."
+obstacle:     "Every previous target paid for itself; this one costs materials, ammunition and probably people."
+turn:         "Brick speaks first, for the only time in the act, and after that nobody argues."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
+# flags-in:  Story.Beat.M15_Cells · Story.Choice.M15_IronChorusPact
+# flags-out: none
+# beats:     1) what the Tithe is, told through what it takes every month. Never explained (18.8)
+#            2) Dex objects, and it is a GOOD objection: this yields nothing
+#            3) Reyes prices a train assault in wounded
+#            4) BRICK SPEAKS FIRST. 18.4 says he never does. This once he does, and
+#               nothing is explained about it. Two sentences maximum
+#            5) silence
+#            6) Mara puts it on the map
+# canon:     AR-11 pays here for the first time - the Tithe took Brick off Krad-9. He does
+#            not say so. He says something else, and the player is only sure in S03.
+# writer:    do not have anyone react to Brick speaking first. The room reacting would
+#            explain the beat, and explaining it is what kills it.
+
+lines: []

@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.5.S01
+mission:      M1.5
+title:        "Three Cells, One District"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants a meeting with the only other cell on Kessara that has lasted longer than Ember."
+obstacle:     "She has asked them twice before and been refused twice, and everyone in the room knows it."
+turn:         "She admits the third invitation was not hers — it was theirs, and that is what frightens her."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
+# cast:      MARA, VOSS, DEX, BRICK, REYES
+# flags-in:  Story.Beat.M14_Quartermaster · Story.Clue.ThrexVoice_1
+# flags-out: none
+# beats:     1) who the Iron Chorus are, told as reputation and not as a dossier
+#            2) Dex notes their radio discipline is better than Ember's. No envy - he
+#               admires it
+#            3) Mara's two previous refusals. SHE RAISES THEM HERSELF - Mara does not lie,
+#               least of all upward
+#            4) the inversion: this time they are asking
+#            5) Brick asks one thing. It is practical and it is the right question
+#
+# LINK TO M1.3.S06 - ONE LINE, NEVER TWO:
+# the first name Threx used on that Veil channel belonged to the Iron Chorus. THAT is why
+# they are talking now. If the player connects it himself it is one of the best moments in
+# the act. If a character explains it, it is a recap.
+#
+# writer:    Brick never speaks first in a group (18.4) - his question comes late.
+
+lines: []

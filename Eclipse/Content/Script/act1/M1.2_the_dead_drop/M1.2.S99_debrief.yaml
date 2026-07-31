@@ -1,0 +1,38 @@
+# ---- header ----
+scene:        M1.2.S99
+mission:      M1.2
+title:        "What It's Worth"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Dex wants to spend the new intel tonight, on the thing he has wanted for a year."
+obstacle:     "Mara weighs intel the way she weighs food, and there are eleven mouths."
+turn:         "Voss proposes a target that is neither of theirs, and it is the one that gets written on the map."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
+# cast:      MARA, DEX, VOSS, REYES
+# flags-in:  Story.Choice.M12_Ghost · Story.Clue.CustodianKey
+# flags-out: Story.Beat.M12_DeadDrop  (exists)
+# commit:    +15 M / +30 C / +8 I, day +1, ghost optional +10 M / +4 I, no region flip
+# beats:     1) what the caches held - names, rosters, a frequency table
+#            2) Dex's wish list
+#            3) Mara's weighing
+#            4) VOSS NAMES THE JAMMER TOWER - this is how M1.3 comes into being: out of
+#               the player's idea, not out of an assignment
+#            5) Reyes's single line: a question about what a tower costs in wounded
+#            6) Mara puts it on the map
+# writer:    Voss opened this mission by giving something nobody asked for (the badge) and
+#            closes it by proposing something nobody asked for (the tower). Same movement,
+#            twice. That is what leadership looks like before anyone calls it that -
+#            do not let a character point at it.
+#            Voss variants: how he proposes the tower differs on the strategic/personal axis.
+
+lines: []

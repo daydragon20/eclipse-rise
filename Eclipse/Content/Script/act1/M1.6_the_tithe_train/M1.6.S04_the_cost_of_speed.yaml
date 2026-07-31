@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.6.S04
+mission:      M1.6
+title:        "The Cost of Speed"
+act:          1
+location:     "Kessara / Mid-Works / Tithe Line"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss needs every person on this train somewhere the Dominion cannot reach tonight."
+obstacle:     "There is one train, two routes, and no version where everybody is safe."
+turn:         "He chooses, and Sela prices the choice before he has finished making it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
+# cast:      VOSS, MARA, SELA, BRICK
+# flags-in:  Story.Choice.M15_IronChorusPact
+# flags-out: Story.Choice.M16_TrainRun  (NEW TAG - systems task)
+#
+# THE CHOICE (2.7 archetype "The Cost of Speed"):
+#   run    - drive on to the Underworks spur. Slower, everybody comes, the train is a
+#            target, S05 is a harder fight, civilian deaths possible
+#   empty  - stop and unload. Faster, safer for Ember, some are re-taken at the yard
+#   split  - only with the Iron Chorus pact. They take the second car and Ember does not
+#            know where those people go
+#
+# beats:     1) the switch is coming up
+#            2) MARA HANDS THE DECISION TO VOSS - third time (after M1.1.S05 and M1.5.S04).
+#               The player should now consciously feel the pattern
+#            3) Sela's accounting: who pays under each option, in her vocabulary (second
+#               person plural, personal reframed as collective)
+#            4) the choice
+#            5) one Brick line
+# plants:    P5-d - civilian risk enters the twist-5 tally
+# writer:    all three branches fully written. Every branch hurts (2.7 rule 2).
+#            Full Voss variant coverage on both axes.
+
+lines: []

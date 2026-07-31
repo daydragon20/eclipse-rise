@@ -1,0 +1,32 @@
+# ---- header ----
+scene:        HUB.A1.brick_the_tithe
+mission:      HUB.A1
+title:        "In My Place"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Bunk Row"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Voss wants to know why Brick spoke first at the briefing."
+obstacle:     "Brick does not explain things."
+turn:         "He says the name of the man who was taken off Krad-9 in his place, and that is the answer."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      BRICK, VOSS
+# condition: story.beat_m16_tithetrain == true
+# flags-out: none
+# canon:     AR-11 pays in full here. Brick is an ex-pit miner from Krad-9 (2.5) who is on
+#            Kessara because the Tithe of Hands moves labour between worlds (2.3). Only
+#            existing canon; nothing invented.
+# writer:    FIVE LINES. Not one of them explains what the Tithe is (18.8).
+#            His tic - answering a hard question by naming a dead soldier - is not a tic
+#            in this scene. It is the literal answer, and the player has heard it enough
+#            times by now to feel the difference.
+
+lines: []

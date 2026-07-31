@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.3.S05
+mission:      M1.3
+title:        "The District Answers"
+act:          1
+location:     "Kessara / Foundry District / Transit Checkpoint"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get out through a district that has just discovered it is being attacked."
+obstacle:     "For the first time the Dominion is not policing them; it is hunting them."
+turn:         "Voss recognises a shoulder plate in the response line and keeps moving anyway."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
+# cast:      VOSS, MARA, DEX, fighters; Enforcer response (barks)
+# flags-in:  Story.Thread.Enforcer_BadgeHeld
+# flags-out: none
+# beats:     1) alarm tones, gates closing, people running indoors
+#            2) the response - Enforcers, pacification walkers in the distance
+#               (03_world_design 3.3)
+#            3) THE BADGE. One line, two at most: Voss sees the plate he knows from the
+#               ration line. He says nothing to the others, or exactly four words.
+#            4) the withdrawal
+#
+# *** THE ENFORCER DOES NOT DIE HERE. ***
+# 2.11 keeps this thread open to a final personal choice at the end of the campaign.
+# This is the only time in act 1 the player sees him alive. Writing him dead closes a
+# thread the bible holds open for a hundred hours. Forbidden.
+#
+# writer:    lines under fire use the CALLOUT band (2-6 words). The badge line is the
+#            exception and it is still short.
+
+lines: []

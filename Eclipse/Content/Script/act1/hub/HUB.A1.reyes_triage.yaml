@@ -1,0 +1,33 @@
+# ---- header ----
+scene:        HUB.A1.reyes_triage
+mission:      HUB.A1
+title:        "Standing Order"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Bunk Row"
+type:         hub
+credit_tier:  4
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Reyes wants Voss to approve a standing order about who gets treated first."
+obstacle:     "Any order she writes is a version of the order she once refused to follow."
+turn:         "She makes him choose, then tells him what the Dominion's version of that order was."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
+# cast:      REYES, VOSS
+# condition: story.beat_m14_quartermaster == true
+# flags-out: none
+# canon:     2.5 - she defected after being ordered to triage by loyalty score. That lands
+#            HERE for the first time, and only because Voss has just had to sign something
+#            comparable. Never as backstory delivery: as the reason her hand shakes over a
+#            piece of plate.
+# writer:    18.9 A EXCEPTION - Reyes is allowed to name an emotion clinically. If act 1
+#            contains exactly one such line, it belongs in this scene. Mark it and justify
+#            it in a note:.
+#            Voss variants on all four axes - the order he signs is a character statement.
+
+lines: []

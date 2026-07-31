@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.2.S03
+mission:      M1.2
+title:        "The Sweep That Never Came"
+act:          1
+location:     "Kessara / Mid-Works / Worker Housing"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "The second cache sits in a block the Veil flagged eight days ago, and Mara wants it lifted tonight anyway."
+obstacle:     "A flagged block should be crawling with Veil, and it is empty, and empty is worse than crowded."
+turn:         "Mara names it as the third time this has happened, decides it is luck, and moves — and Voss lets her."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
+# cast:      MARA, VOSS, DEX (radio)
+# flags-in:  none
+# flags-out: none - deliberately. The scene is mandatory, so "the player saw it" is
+#            always true and a flag would be noise.
+#
+# *** P4-a. THIS IS THE LOAD-BEARING PLANT FOR TWIST 4 (AEGIS permitted the rebellion). ***
+# Three rules, and they are not negotiable:
+#   1. MANDATORY and SPOKEN. Never move this to a document or an optional (AR-9).
+#   2. The explanation must CONVINCE. The player has to believe Mara. A plant that sounds
+#      suspicious is not a plant, it is an announcement.
+#   3. Nobody says "strange", "odd", or "that doesn't add up". Mara SOLVES it; she does
+#      not wonder at it. Wondering is what act 4 is for.
+#
+# beats:     1) the mark on the doorpost - Veil notation, eight days old
+#            2) Dex confirms over the radio that nothing has happened since
+#            3) Voss hesitates
+#            4) MARA: "that's the third one"
+#            5) her explanation: the Veil is police, not army, spread thin over nine
+#               districts (03_world_design 3.3 supports this exactly)
+#            6) they move
+# writer:    sixty seconds. It is the most important minute in the act for act 4.
+
+lines: []

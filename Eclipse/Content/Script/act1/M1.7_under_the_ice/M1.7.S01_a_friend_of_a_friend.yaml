@@ -1,0 +1,39 @@
+# ---- header ----
+scene:        M1.7.S01
+mission:      M1.7
+title:        "A Friend Of A Friend"
+act:          1
+location:     "Kessara / Underworks / Hollow Point — Map Table"
+type:         cutscene
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Mara wants to know how much the Veil has on Ember tonight, before it grows."
+obstacle:     "There is no way to know that without walking into the place where it is written down."
+turn:         "Voss asks where the tip came from, and Mara ends the conversation without answering it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      MARA, VOSS, DEX, BRICK, REYES, SELA
+# flags-in:  Story.Beat.M16_TitheTrain
+# flags-out: none
+# beats:     1) what changed in the last two weeks: patrols walking the right streets, a
+#               dead drop that had to be moved
+#            2) Dex found the heat - the coolant sublevel is drawing too much power.
+#               Technique, no exposition
+#            3) P2-c: Voss asks who gave the tip. Mara: a friend of a friend on the lanes.
+#               Nothing more. Dex looks up; nobody pushes
+#            4) Sela's first briefing - she is in the room now, and her presence changes
+#               what can be said out loud
+#            5) Reyes asks about the way back and the wounded. Mara has no good answer and
+#               says so
+#
+# P2-c IS A TWIST-2 PLANT (Whisper). ONE LINE. Do not defend it, do not emphasise it, do
+# not have anyone come back to it. Whisper does not exist until act 2; only his shadow is
+# here, and a shadow that gets pointed at is a spotlight.
+
+lines: []

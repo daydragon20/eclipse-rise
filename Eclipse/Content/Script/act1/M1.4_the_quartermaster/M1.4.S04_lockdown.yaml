@@ -1,0 +1,37 @@
+# ---- header ----
+scene:        M1.4.S04
+mission:      M1.4
+title:        "Lockdown"
+act:          1
+location:     "Kessara / Foundry District / Foundry Row Armory"
+type:         in-mission-radio
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "The quartermaster wants his building sealed and his inventory intact, in that order."
+obstacle:     "He is announcing his procedure over the public address while he executes it, because that is what the manual says."
+turn:         "The garrison coming down the aisles is nineteen years old, and Ember has to decide what winning costs tonight."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
+# cast:      VOSS, MARA, BRICK, fighters; Dominion quartermaster (PA); conscript garrison (barks)
+# flags-in:  none
+# flags-out: none
+# plants:    P5-b - conscript garrison, the mercy tally continues toward twist 5 (act 4)
+# beats:     1) crate 2 opens; the lockdown starts
+#            2) THE OFFICER ON THE PA - procedural, bureaucratic, reading crate numbers
+#               while people die. He is not cruel; he is a man completing a form.
+#               02_story_bible 2.2: "every atrocity has bureaucratic logic"
+#            3) the garrison: conscripts. Young, procedural bark vocabulary (18.5 rule 5)
+#            4) Brick opens the back route
+#            5) ONE Ember line about how old they are - and nobody answers it
+# writer:    NOBODY ARGUES ABOUT CONSCRIPTS. One line, no reply, keep moving. A debate
+#            moves the scene from the player to the characters.
+# casting:   needs dominion_officer - see owner question Q-5. Not a villain voice: a
+#            middle-aged administrator reading a checklist.
+
+lines: []

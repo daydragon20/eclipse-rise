@@ -1,0 +1,43 @@
+# ---- header ----
+scene:        M1.7.S02
+mission:      M1.7
+title:        "Into The Cold"
+act:          1
+location:     "Kessara / Underworks / Coolant Sublevel"
+type:         walk-and-talk
+credit_tier:  2
+
+# ---- the three-sentence contract (18.7) ----
+want:         "Get into a Veil listening post through the only door that is not a door."
+obstacle:     "The condenser galleries are loud, wet and cold, and the Veil chose them for exactly that reason."
+turn:         "Voss reads the building the way he was trained to read a foundry, and takes the lead without being given it."
+
+# ---- state ----
+status:       draft
+critic:       null
+words:        0
+
+# ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
+# cast:      VOSS, MARA, BRICK; DEX (present or on radio - player choice in S01)
+# flags-in:  none
+# flags-out: none
+#
+# AR-2 - WHY THIS PLACE EXISTS AND WHY IT IS CALLED THE ICE:
+# Kessara has no ice (03_world_design 3.3: permanent amber smog, warm grey rain). "The Ice"
+# is Kessaran slang for the Underworks coolant sublevel, where the Mid-Works heat is dumped
+# across condenser banks. It is the only genuinely cold place on a glowing planet.
+# The Veil put a listening post there because server banks make heat, and on Kessara heat
+# is the one thing you cannot hide. In a coolant hall it disappears.
+#
+# beats:     1) the coolant sublevel: condenser banks, vapour, frost on pipes in a city
+#               that is never cold. BEST IMAGE IN THE ACT - write shot: notes for it
+#               (21_quality_mandate 21.2, graphic points)
+#            2) Voss sees where the power is going. He says it in trade language and
+#               nobody asks what it means (18.8)
+#            3) Mara lets him lead. She does not remark on it
+#            4) Brick's first line: something about the cold, and it is not about the cold
+#            5) inside
+# writer:    this is the scene where Voss's 2.4 background stops being a biography line and
+#            becomes a capability. Do not let anyone praise him for it.
+
+lines: []
