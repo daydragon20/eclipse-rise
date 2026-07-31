@@ -15,11 +15,41 @@ STAP 0 — CONTEXT INLEZEN (in deze volgorde, vóór je iets doet):
 3. De `taken`-lijst in progress_data.js — de live status van vandaag.
 4. 13_roadmap.md (ACTIVE_MILESTONE) en 14_ai_dev_instructions.md (bouwregels).
 
-HUIDIGE STAND: Fase 2 "Thirteen Bullets" is de actieve milestone. P2-01
-(squad van 4 + classes) is GELAND (1a85b78). Lopende sporen: P2-02 Stage A
-(Command Mode, R3) + P2-03 stap 1-2 (Hollow Point data/logic) + commandlet-rij
-(pack-slim -> MetaHuman-curatie -> audio-import). Ga verder waar de
-`taken`-lijst in progress_data.js staat — die is leidend, niet deze regel.
+HUIDIGE STAND (27 juli 2026, avond — bijgewerkt na een sessie-uitval):
+Fase 2 "Thirteen Bullets" is de actieve milestone, MAAR er ligt een owner-stop op
+nieuwe features: "alles wat op de rij staat blijft op de rij tot ik een keer normaal
+kan spelen." Begin dus NIET aan P2-04/05 of ander nieuw werk.
+
+Wat vandaag geland is (alles met een meting, zie HANDOFF.md bovenaan):
+  - mikken maakte het personage x5,0 groter, nu x1,9 (arm 300->270, FOV 80->68)
+  - schieten/herladen zijn een BOVENLICHAAMSLAAG: benen lopen door (voet-omklappen
+    18 -> 2). Looprichtingen mengen nu i.p.v. omklappen op 45 graden, met test.
+  - het wapen is gunmetal, 3-4x donkerder dan het lichaam, ver onder DecoLine
+  - de gids toont weer wat er veranderd is (de opnameronde vervuilde de datum)
+  - zes ingesproken zinnen ("Contact." / "Taking fire!" / "Reloading!" x2 stemmen)
+    zijn gegenereerd EN bedraad via Event.Squad.SelfAction, met 2 s rem per soldaat
+  - de bar is voor het eerst volledig groen: 185 tests, ValidateData 0 fouten,
+    9 opnames; de geparkeerde 3-cm-val telt als BEKEND mee zonder rood te maken
+
+TWEE OPEN DOSSIERS, allebei gemeten en geen van beide opgelost:
+  1. Het zichtbare INSLAGSPOOR rendert niet. Twaalf oorzaken uitgesloten; het enige
+     dat ooit verscheen was een kubus BIJ HET PERSONAGE, alles op de inslagplek niet.
+     Ik heb er drie conclusies over teruggenomen — schrijf er geen vierde, maar kijk
+     in de EDITOR. Details staan bovenaan JOUW_TAKEN.md.
+  2. Het TRILLEN bij het schieten is de schietpose die per schot pulseert (27
+     richtingsomkeringen van de hand tegen hoogstens 2 daarbuiten). Twee reparaties
+     geprobeerd en allebei teruggedraaid omdat ze hun eigen meting niet haalden. Wat
+     rest is een additieve terugslag-take, en dat is content.
+
+WAT OP NATHAN WACHT staat in JOUW_TAKEN.md en in ownerActies (8 punten, opgeschoond
+van 22). Het zwaarste is de WAPENBRON: er bestaat nergens een los wapenmesh, en
+daar hangen punt 5 en zijn hele nieuwe wapen-opdracht (zweven bij herladen, aparte
+onderdelen, doorkijkbaar vizier) allemaal aan.
+
+ALS EERSTE DOEN — de dashboardserver draait niet vanzelf:
+  python -m http.server 8377 --bind 127.0.0.1     (draaien vanuit C:\Dev\ECLIPSE_GDD)
+Daarna opent http://127.0.0.1:8377/START_HIER.html weer. Hij valt om zodra de sessie
+eindigt; niets in de repo start hem, dus zet hem bij elke nieuwe chat opnieuw aan.
 
 WERK MET DE AGENTS (spin ze zelf op via de Task-tool):
 - game-planner: begin van elke werk-cyclus en telkens als er geen duidelijke
