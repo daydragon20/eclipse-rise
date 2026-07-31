@@ -82,13 +82,28 @@ def apply_lanes(graph):
         # from here (GDD 14.3.5 - degrade loudly, never quietly).
         raise RuntimeError("LANES references regions not in the graph: %s" % ", ".join(unknown))
 
+    # Assign back BY INDEX. Iterating an unreal.Array of USTRUCTs hands out a
+    # COPY per element, so `for region in regions: region.set_editor_property(...)`
+    # writes to a temporary that is thrown away - the asset saves, the file grows,
+    # every log line says success, and the lanes on disk are still the defaults.
+    # Measured on 31-07: the shipped-board test read 0 gated / 0 smuggler-only /
+    # 0 lanes over one day out of an asset the script had "authored" four times.
     written = 0
-    for region in regions:
+    for index in range(len(regions)):
+        region = regions[index]
         region_id = str(region.get_editor_property("region_id"))
         lanes = by_region.get(region_id, [])
         region.set_editor_property("lanes", lanes)
+        regions[index] = region
         written += len(lanes)
     graph.set_editor_property("regions", regions)
+
+    # Read back from the ASSET, not from the list we just built: the whole point
+    # is that the write-back is the step that silently does not happen.
+    verify = graph.get_editor_property("regions")
+    landed = sum(len(verify[i].get_editor_property("lanes")) for i in range(len(verify)))
+    if landed != written:
+        raise RuntimeError("lane write-back did not land: expected %d, asset holds %d" % (written, landed))
     return written
 
 

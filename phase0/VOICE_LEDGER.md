@@ -36,6 +36,9 @@
 |---|---|---|---|---|---|
 | 2026-07-31 | 0 | Casting stage 1 — brede screening, 18 rollen × 4–6 kandidaten (premade) | 0 | 0 | 131.000 |
 | 2026-07-31 | 0 | Casting stage 1 uitbreiding — Voice Library, 24 kandidaten voor Mara/Kaine/Vex/Callis/Torren | 0 | 0 | 131.000 |
+| 2026-07-24 | 3+4 | SFX-set (7 one-shots) + muziek-sting — gegenereerd toen de meter kapot was; bedrag **afgeleid** uit het accountsaldo, niet gemeten tijdens de run | 8 | 2.868 | 128.132 |
+| 2026-07-31 | 0 | Stage 2 casting-test — 9 rollen, 17 finalisten, 51 clips. **VERKEERD MODEL** (multilingual_v2 i.p.v. eleven_v3); 21 getagde clips onbruikbaar | 51 | 2.475 | 125.657 |
+| 2026-07-31 | 0 | A/B-controleproef: gedraagt een audiotag zich op multilingual_v2? | 1 | 45 | 125.612 |
 
 > **Formaat:** het dashboard leest deze tabel automatisch uit. Houd de kolomvolgorde
 > aan en begin de datumkolom met `JJJJ-MM-DD`, anders telt de regel niet mee.
@@ -44,13 +47,23 @@
 
 | Tier | Wat | Begroot | Besteed | Klaar |
 |---|---|---|---|---|
-| 0 | Casting — fase 1 GRATIS, fase 2 alleen Act-1-rollen | 6.000 | 0 | ☐ |
+| 0 | Casting — fase 1 GRATIS, fase 2 alleen Act-1-rollen | 6.000 | 2.520 | ☐ |
 | 1 | Bark- & systeembibliotheek | 48.000 | 0 | ☐ |
 | 2 | Act 1 story-dialoog (incl. ijkmissie) | 45.000 | 0 | ☐ |
-| 3 | Muziek — thema + never-silent-vloer | 15.000 | 0 | ☐ |
-| 4 | Kern-SFX | 7.000 | 0 | ☐ |
+| 3 | Muziek — thema + never-silent-vloer | 15.000 | 2.868 ᵃ | ☐ |
+| 4 | Kern-SFX | 7.000 | (zie ᵃ) | ☐ |
 | — | Reserve (niet toewijzen; 17/08 vrijgeven) | 10.000 | 0 | — |
-| | **Totaal** | **131.000** | **0** | |
+| | **Totaal** | **131.000** | **5.388** | |
+
+ᵃ De run van 24-07 maakte 7 SFX én 1 muziekstuk in één batch, met de meter kapot.
+Het totaal (2.868) is af te leiden uit het accountsaldo, maar de **verdeling over
+tier 3 en 4 is niet te reconstrueren** — sound-generation en music rekenen niet per
+teken af, en `/v1/history` was toen niet leesbaar. Niet alsnog verzinnen; vanaf nu
+meet elke run zichzelf.
+
+**Sluitproef 31-07:** account meldt **5.388 van 131.000** gebruikt.
+131.000 − 2.868 − 2.475 − 45 = **125.612 over**, en dat is exact wat het account zegt.
+De ledger sluit op de cent.
 
 *Herzien 31-07 laat: het budget bleek **131.000** en niet 310.000 — de owner had zich vergist. Alle tiers zijn opnieuw gesneden, niet alleen omgenummerd. Wat eraf viel: de Act-1-hub- en companiongesprekken (was 33.000). Die blijven geschreven en wachten op volgende maand.*
 
@@ -67,27 +80,22 @@ uitsluitend metadata + de gratis previewfragmenten. Geen enkele TTS-call gedaan.
 Resultaat staat in `progress_media/casting/` (zie `CASTING.html`). Stage 2 is
 **bevroren** tot de owner (a) O-2 beantwoordt en (b) per rol een top 2 kiest.
 
-**⚠ Deze ledger kan zichzelf niet controleren.** De API-sleutel in
-`Eclipse/Config/UserSecrets.ini` is *scoped* en mist de rechten `user_read`,
-`speech_history_read` en `models_read`. Gemeten op 31-07:
+**~~⚠ Deze ledger kan zichzelf niet controleren.~~ — OPGELOST later op 31-07.**
+*Hieronder de meting van eerder op de dag; ze staat er nog omdat ze verklaart
+waarom de run van 24-07 ongemeten is en waarom de meter is verbouwd. De scopes
+zijn inmiddels toegekend — zie het blok hieronder.*
 
-| Endpoint | Resultaat |
-|---|---|
-| `/v1/voices`, `/v1/shared-voices` | 200 — werkt |
-| `/v1/user/subscription` | 401 — `missing permission user_read` |
-| `/v1/history` | 401 — `missing permission speech_history_read` |
-| `/v1/models` | 401 — `missing permission models_read` |
+Toen gemeten: `/v1/voices` en `/v1/shared-voices` gaven 200, maar
+`/v1/user/subscription` 401 (`user_read`), `/v1/history` 401
+(`speech_history_read`) en `/v1/models` 401 (`models_read`).
 
-**Gevolgen, en ze zijn niet klein:**
-1. Het werkelijke saldo is **niet uit te lezen**. De 131.000 is een owner-mededeling,
-   geen meting. Elk saldo in dit bestand is dus een *aftreksom*, geen waarneming.
-2. `Eclipse/Tools/generate_audio_assets.py` roept `get_usage()` aan om spend te meten.
-   Die functie vangt de fout af en geeft `None` terug — het script schrijft dan
-   stilzwijgend géén `usage_credits` weg. **De ingebouwde kostenmeting is dood en
-   meldt dat niet.**
-3. Zonder `models_read` is niet te controleren of `eleven_v3` op dit abonnement
-   beschikbaar is. Dat is geen detail: §19.4 hangt volledig op v3-audiotags, en
-   `high_quality_base_model_ids` van de premade-stemmen noemt v3 **niet**.
+Gevolgen die dat destijds had:
+1. Het saldo was **niet uit te lezen**; elk getal hier was een aftreksom.
+2. `generate_audio_assets.py` ving de 401 af, gaf `None` terug en schreef stil
+   géén `usage_credits` weg. **De ingebouwde kostenmeting was dood en meldde dat
+   nergens** — daarom is de spend van 24-07 alleen achteraf af te leiden.
+3. Zonder `models_read` was niet te controleren of `eleven_v3` bestond. Dat is
+   precies de onzekerheid die later 2.475 credits op het verkeerde model kostte.
 
 **De meter is gerepareerd (31-07).** `generate_audio_assets.py` weigert nu te
 genereren zolang spend niet meetbaar is: `require_usage_measurement()` draait vóór
@@ -100,7 +108,56 @@ gegenereerd. Bewaakt door `Eclipse/Tools/test_credit_meter.py` (7 tests), die in
 `Eclipse/Tools/verify.ps1` als gate draait. Controleproef gedaan: die test wordt
 **rood** tegen de oude code, dus hij kan echt falen.
 
-### Owner-actie: drie scopes op de API-sleutel
+### ✅ De drie scopes zijn er (31-07) — en wat ze meteen opleverden
+
+Alle drie staan nu op de sleutel. Gemeten, niet aangenomen: `/v1/user/subscription`,
+`/v1/models` en `/v1/history` geven alle drie HTTP 200. Daarmee:
+
+- **Het saldo is leesbaar:** 5.388 van 131.000 gebruikt.
+- **`eleven_v3` bestaat op dit abonnement.** Dat sluit de open vraag uit de vorige
+  ronde: §19.4 leunt volledig op v3-audiotags, en v3 is beschikbaar. **v3 is dus het
+  model voor Tier 1 en 2**, en omdat `modelId` in de cachesleutel zit, is dat een
+  besluit dat je één keer neemt.
+
+**⚠ De teller loopt achter, dus een delta is geen meting.** Gemeten op 31-07: een
+echte generatie van 45 tekens gaf een before/after-delta van **0**, en 341 credits
+landden pas minuten later. De teller stabiliseerde daarna en bleef 60 seconden lang
+gelijk. Gevolg voor de boekhouding: **het aantal verzonden tekens is het gezaghebbende
+getal** (bij TTS geldt 1 credit = 1 teken en dat weten we exact); het accountsaldo is
+een *nalopende kruiscontrole*, af te lezen ná een wachttijd. `stage2_casting_test.py`
+doet dat nu zo en waarschuwt als de twee meer dan 10% uiteenlopen.
+
+### Fout van 31-07 — 2.475 credits op het verkeerde model
+
+**Wat er gebeurde.** Ik had in `stage2_casting_test.py` een *waarschuwing* gezet dat
+de §19.4-audiotags alleen op v3 werken, maar geen *poort*. Daarna draaide ik de echte
+run met de uitvoer naar `/dev/null`, zag de waarschuwing dus niet, en het script ging
+gewoon door op `eleven_multilingual_v2`. Resultaat: 51 auditieclips, waarvan **21 met
+audiotags die dat model niet ondersteunt**.
+
+**Hoe erg is het.** Gemeten met een A/B op dezelfde stem, hetzelfde model, dezelfde
+zin — alleen de tag weg: mét `[grieving]` 4,44 s, zonder 2,14 s. Een verschil van
+**+2,30 s op een basis van 2,14 s**. Dat is veel meer dan het uitspreken van één woord,
+dus multilingual_v2 doet iets groots en onbedoelds met blokhaken. Wat het precies doet
+— de tag voorlezen of de voordracht veranderen — scheidt deze meting níét, en dat moet
+je dus ook niet beweren. Wel vaststaand: **die 21 clips zijn geen eerlijke basis voor
+een castingbesluit**, en casting is permanent.
+
+**Wat er is gerepareerd.** De waarschuwing is nu een **harde poort** (exitcode 6): het
+script weigert getagde regels op een niet-v3-model. Standaardmodel is `eleven_v3`.
+
+**Wat er nog moet.** De 30 ongetagde clips (signature + gevechtsregel) zijn bruikbaar.
+Voor de 21 getagde clips zijn er twee opties, beide binnen het Tier-0-plafond:
+
+| Optie | Kosten | Tier 0 totaal daarna |
+|---|---|---|
+| Alleen de 21 getagde clips opnieuw op v3 | 1.439 | 3.959 van 6.000 |
+| Alle 51 clips opnieuw op v3 (één model, eerlijke vergelijking) | 2.470 | 4.990 van 6.000 |
+
+**Dit is niet stil doorgezet.** Na onverwachte spend hoort de regel te zijn: stoppen en
+melden. Wacht op akkoord.
+
+### Owner-actie (afgerond): drie scopes op de API-sleutel
 
 ElevenLabs-dashboard → API Keys → de sleutel bewerken. Per scope waaróm:
 

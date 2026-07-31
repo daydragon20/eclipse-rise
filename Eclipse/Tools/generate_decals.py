@@ -88,7 +88,14 @@ def save(img, name):
 # and a scuffed lower corner at the height where people brush past it. The old
 # poster was pixel-perfect clean, which is its own kind of fiction break.
 P_W, P_H = 512, 768
-P_GROUND = 26                        # the sheet's printed ground
+# GROUND 26 -> 72. At 26 the sheet rendered as a BLACK PANEL with gold marks
+# on it (seen in frame, the new poster review camera, before-state): the same
+# "printed plate screwed to the wall" read the stencil had, and the reason the
+# eye jumped out of the widest shot at all. A pasted sheet is paper - it sits
+# only a little brighter than the wall it hangs on, and the ink does the
+# talking. The measured gain drops to match, so the poster's average brightness
+# in the scene is unchanged; what changes is that the sheet stops being a hole.
+P_GROUND = 72                        # the sheet's printed ground
 P_GLYPH = 236                        # the mark
 P_DIM = 176                          # secondary / structural marks
 _poster_rng = random.Random(770)
@@ -342,10 +349,15 @@ for _y in range(STEN):
                 _s = min(_s, (_da - _tw * 0.42) * 30.0)
         _m = _smoothstep(_s / BLEED)
         if _m > 0.0:
-            _m *= (0.80 + 0.20 * (_dens_coarse[_x, _y] / 255.0)) * \
-                  (0.86 + 0.14 * (_dens_fine[_x, _y] / 255.0))
-            if _m < 0.97:                      # only the bleeding edge breaks up
-                _m += _st_rng.uniform(-0.26, 0.26)
+            _m *= (0.86 + 0.14 * (_dens_coarse[_x, _y] / 255.0)) * \
+                  (0.90 + 0.10 * (_dens_fine[_x, _y] / 255.0))
+            # The BREAK-UP is gated on distance to a cut edge, not on coverage.
+            # Gating it on coverage sprayed the whole mark with ±0.26 noise
+            # (measured: only 3.5% of pixels held above 0.90) and a mark that
+            # is speckled everywhere reads as television static, not as paint.
+            # A can lays down a dense body and falls apart at the edge.
+            _m += _st_rng.uniform(-0.30, 0.30) if _s < 3.0 * BLEED \
+                else _st_rng.uniform(-0.08, 0.08)
         elif -HALO < _s < 0.0:
             # Overspray: dust, densest against the edge, thinning outward.
             _p = 1.0 + _s / HALO

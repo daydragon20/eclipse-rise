@@ -22,35 +22,32 @@
   ],
   "vragen": [
     {
-      "id": "T-12",
+      "id": "O-12",
       "prio": "nu",
-      "vraag": "Drie API-scopes aanzetten — hier staat alle generatie op stil",
-      "waarom": "Dit is op dit moment de ENIGE echte rem in het project. De ingebouwde creditmeter was stuk en zei dat niet: generate_audio_assets.py vroeg bij ElevenLabs op wat een batch kost, kreeg daar een 401 op, slikte die fout en schreef stil geen verbruik weg. De ledger las dus als waarheid terwijl er niets gemeten was — en die 131.000 was daarmee jouw mededeling, geen meting. Dat is nu omgedraaid: generatie WEIGERT te draaien zonder gemeten spend (exit-code 3), en die weigering hangt als poort in verify.ps1 zodat hij niet stilletjes terug kan komen. Gevolg: zolang user_read ontbreekt komt er geen enkele regel audio uit, ook niet nadat je stemmen hebt gekozen. Goed nieuws: je saldo staat nog op de volle 131.000 — er is deze maand geen credit uitgegeven, ook casting fase 1 niet.",
+      "vraag": "2.475 credits zijn op het verkeerde model gegaan — opnieuw doen, en hoeveel?",
+      "waarom": "Je hebt de API-scopes aangezet terwijl een agent aan het werk was. Goed nieuws: de generatie is daarmee open, eleven_v3 is bevestigd beschikbaar, en het saldo is nu ECHT te meten. Slecht nieuws: precies daardoor ging de rem eraf midden in een run, en die run draaide op het verkeerde model. 51 auditieclips zijn gegenereerd op multilingual_v2 in plaats van eleven_v3, en 21 daarvan dragen audio-tags die v2 niet kan. De agent had die controle als WAARSCHUWING geschreven in plaats van als poort, en zag hem niet omdat de uitvoer werd weggegooid. Dat is nu een harde poort (exit 6) en geverifieerd weigerend; het standaardmodel is eleven_v3. DE SCHADE IS GEMETEN EN NIET GESCHAT: zelfde stem, zelfde regel, tag weg — 4,44 s met tag tegen 2,14 s zonder. Een uitschieter van 2,30 s op een basis van 2,14 s is veel meer dan een woord uitspreken, dus v2 doet iets groots en onbedoelds met die haakjes. Wat precies — de tag voorlezen of de voordracht veranderen — scheidt die meting NIET, en dat wordt ook niet geclaimd. Wat wel vaststaat: die 21 clips zijn geen eerlijke basis voor een permanente castingbeslissing. Je saldo staat gemeten op 125.612 en de ledger klopt tot op de credit.",
       "stappen": [
-        "Ga naar elevenlabs.io → je avatar rechtsboven → API Keys",
-        "Zet op de sleutel van dit project user_read aan — DIT is de blokkade: saldo lezen voor en na elke batch",
-        "Zet ook speech_history_read aan — anders is een uitschieter achteraf niet per regel te herleiden",
-        "Zet ook models_read aan — die checkt of eleven_v3 bestaat; de audio-tags uit 19.4 hangen eraan, en modelId zit in de cache-sleutel dus een verkeerde gok herbetaalt alles",
-        "Klik hieronder zodra het staat, dan meet ik het echte saldo na en zet dat in de ledger"
+        "Kies hoeveel er opnieuw moet",
+        "Bij twijfel: alles opnieuw — dan vergelijk je 17 finalisten op precies hetzelfde model"
       ],
       "opties": [
         {
-          "label": "Gedaan — alle drie staan aan",
-          "waarde": "gedaan",
-          "gevolg": "Ik meet het saldo na en zet de gemeten waarde in VOICE_LEDGER.md. Daarna kan Tier 1 draaien zodra jij stemmen gekozen hebt."
+          "label": "Alleen de 21 getagde clips opnieuw",
+          "waarde": "21",
+          "gevolg": "1.439 credits. Tier 0 komt daarmee op 3.959 van de 6.000. Nadeel: je vergelijkt straks clips van twee verschillende modellen naast elkaar, en dat is precies wat een castingoordeel vertroebelt."
         },
         {
-          "label": "Deels — alleen user_read gelukt",
-          "waarde": "deels",
-          "gevolg": "Genoeg om te deblokkeren. De ledger krijgt er dan bij dat het verbruik per regel niet te herleiden is, zodat niemand die precisie later aanneemt."
+          "label": "Alle 51 opnieuw op eleven_v3",
+          "waarde": "51",
+          "gevolg": "2.470 credits. Tier 0 komt op 4.990 van de 6.000, dus nog steeds binnen het plafond. Alle 17 finalisten op een model, eerlijke vergelijking. Dit is mijn advies."
         },
         {
-          "label": "Lukt niet",
-          "waarde": "lukt-niet",
-          "gevolg": "Zeg erbij wat je ziet. Waarschijnlijk staan de scopes op een ander sleuteltype, of hoort de sleutel bij een ander account dan het abonnement."
+          "label": "Niets opnieuw — ik oordeel op wat er ligt",
+          "waarde": "geen",
+          "gevolg": "Nul credits. Maar 21 van de 51 clips zijn dan op een model gemaakt dat de tags niet aankan, en casting is permanent — omcasten herbetaalt elke regel van dat personage."
         }
       ],
-      "advies": "Dit kost drie minuten en het is het enige dat spoor A tegenhoudt. Alles eromheen ligt klaar.",
+      "advies": "Alles opnieuw. 2.470 credits is 2% van je budget, en casting is de enige beslissing die je niet goedkoop kunt terugdraaien.",
       "vrijtekst": true
     },
     {

@@ -42,8 +42,10 @@ def ordered_candidates():
         rid = role["rol"]
         cands = [{
             "stem": c["stem"], "voice_id": c["voice_id"],
-            "bron": "premade", "bestand": c["bestand"],
-            "eigenschappen": c["eigenschappen"],
+            "bron": c.get("categorie", "premade"),
+            # A candidate without an audio file cannot have been listened to.
+            "bestand": c.get("bestand"),
+            "eigenschappen": c.get("eigenschappen", ""),
         } for c in role["kandidaten"]]
         for c in lib.get(rid, {}).get("kandidaten", []):
             cands.append({
@@ -70,6 +72,39 @@ def main() -> int:
     picks = json.loads(CHOICE.read_text("utf-8"))
     catalog = ordered_candidates()
 
+    # DRIFT GUARD. A pick is an index into a shortlist. If the shortlist is
+    # rebuilt in a different order -- or replaced outright -- the same index
+    # silently means a different actor, and casting is permanent. So compare
+    # against the fingerprint recorded when the pick was first resolved and
+    # refuse rather than re-resolve. This is not hypothetical: on 31-07 ten
+    # roles were swapped to Voice Library voices while the owner was still
+    # looking at the page built from the previous list.
+    previous = {}
+    if OUT.is_file():
+        previous = json.loads(OUT.read_text("utf-8")).get("rollen", {})
+    drifted = []
+    for rid in picks:
+        if rid in catalog and rid in previous:
+            now = fingerprint(catalog[rid]["kandidaten"])
+            was = previous[rid].get("ordering_fingerprint")
+            if was and now != was:
+                drifted.append((rid, was, now, previous[rid]))
+    if drifted:
+        print("REFUSING TO RE-RESOLVE - the shortlist moved under an existing pick.\n")
+        for rid, was, now, prev in drifted:
+            print(f"  {prev['label']}")
+            print(f"    fingerprint was {was}, is now {now}")
+            for f in prev.get("finalisten", []):
+                cur = catalog[rid]["kandidaten"]
+                i = f["keuze_index"]
+                new = cur[i - 1]["stem"] if i <= len(cur) else "(out of range)"
+                print(f"    pick #{i}: was '{f['stem']}' -> would now become '{new}'")
+        print("\nThe recorded casting in CASTING_RESOLVED.json is left untouched.")
+        print("Decide deliberately: either restore the shortlist the owner actually")
+        print("listened to, or have him re-pick against the new one. Do not let an")
+        print("index quietly change who plays the part.")
+        return 1
+
     resolved, problems = {}, []
     for rid, idxs in picks.items():
         role = catalog.get(rid)
@@ -84,6 +119,16 @@ def main() -> int:
                     f"{rid}: pick {idx} is out of range (1..{len(cands)})")
                 continue
             c = dict(cands[idx - 1])
+            # You cannot pick a voice you could not hear. If a candidate has no
+            # audio file, the shortlist was rebuilt without rebuilding the page,
+            # so this index refers to something the owner never listened to.
+            f = c.get("bestand")
+            if not f or not (ROOT / f).is_file():
+                problems.append(
+                    f"{rid}: pick #{idx} ('{c['stem']}') has no preview audio "
+                    f"({f or 'no file recorded'}). The shortlist was changed "
+                    f"without rebuilding CASTING.html - this pick cannot be trusted.")
+                continue
             c["keuze_index"] = idx
             c["rang"] = rank            # 1 = eerste keus, 2 = reserve
             finalists.append(c)

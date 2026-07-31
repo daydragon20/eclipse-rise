@@ -15,7 +15,7 @@ turn:         "The last card stops describing a life and states a debt — eleve
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        127
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_P0_prologue.md ----
 # THIS IS THE RECAP OPENING, not a playable prologue (SPEC-P2-04 decision 1, ACCEPTED).
@@ -45,4 +45,216 @@ words:        0
 #            line "That was the day keeping your head down stopped working" names a
 #            behaviour, and that is the ceiling.
 
-lines: []
+# ---- dialogue-writer notes (L2) — draft 2026-07-31 ----
+# WHAT WAS WRITTEN HERE, AND WHAT WAS NOT.
+#   The six approved cards are TRANSCRIBED, word for word, from phase0/RECAP_CARDS_M1.md.
+#   Not one syllable of that copy was rewritten - it is signed off and it carries an open
+#   cold-reader action. What this pass authored is line granularity, stills-as-shot,
+#   tags, bands, and the reserved gaps. If a reviewer wants copy changes, that is a
+#   RECAP_CARDS_M1.md change and therefore a story-architect + owner decision, not mine.
+#
+# CARD 3 IS NOT WRITTEN. Block 070-090 is left empty and reserved exactly as the stub
+#   instructs. Q-2 is unanswered, the Enforcer badge is a live canon conflict (C-2), and
+#   inventing it here would put uncleared canon into the first ninety seconds of the game.
+#   The architect's proposed copy already exists in BEATS_P0_prologue.md section 3; it is
+#   deliberately NOT copied into this file. See the escalation note at the gap below.
+#
+# ONE-TO-ONE MAPPING. Each '>' line of an approved card becomes exactly one script line.
+#   Cards with two copy lines leave their third id unused (030, 180). That is what the
+#   tens scheme is for: card 3's copy can land, or a second Petra line can be added in
+#   October, without renumbering a single generated asset.
+#
+# WHY EVERY LINE CARRIES 'band: ambient'.
+#   The scene's type is 'cutscene' (20-60), which is right for the SCENE REGISTER - this
+#   is a non-interactive opening - but wrong for the DELIVERY of any line in it. There is
+#   no held camera and no performance: the player reads two or three short lines off a
+#   static frame. The longest approved line is 12 words, so with 16 lines this scene fails
+#   SCRIPT_FORMAT section 4's register check as written, and the only two ways to "fix"
+#   that would be to rewrite signed-off copy or to edit a locked header field. Neither is
+#   a writer's call. 'band:' is the format's own per-line mechanism for exactly this
+#   divergence, and 'ambient' (6-16) is the closest existing band that every approved line
+#   sits inside. ESCALATED to story-architect: recap cards may deserve their own type.
+#
+# NO VOSS VARIANTS, ON PURPOSE. 18.10 asks for variants on every axis the scene branches
+#   on; this scene branches on nothing. The recap narrates events that happened identically
+#   in every playthrough, and FEclipseRecapCard { FName StillId; FText Lines; } has no
+#   variant slot to ship them in. Writing four axes here would quadruple the most
+#   expensive-per-word scene in the game to produce four identical readings, against a
+#   tier 2 that findings C-6 / Q-7 already show ~15% over budget.
+#
+# ZERO DIRECT BEATS. Not one line states an emotion. AR-12 spends act 1's single
+#   'direct_beat' in M1.8; the prologue spends none of the ~30.
+#
+# DELIVERY NOTE FOR voice-director (if Q-1 is yes). This is not Voss talking to someone.
+#   It is Voss reading his own past in the second person, flat, after the fact - closer to
+#   a man listing what happened than to a man remembering it. The two '[quietly]' tags are
+#   the whole emotional direction the text needs; the beat sheet forbids '[grieving]' and
+#   that ban should survive into generation.
+
+lines:
+  # ================= CARD 1 — THE CITY =================
+  - id:      P0.S01.010
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    tags:    [quietly]
+    text:    "Kessara. Your city, under Dominion curfew."
+    shot:    "STILL. Ration line at dusk, sodium orange. An AEGIS eye decal above the queue."
+    note:    "Approved copy, card 1. First line of the game. 'quietly' per beat sheet."
+
+  - id:      P0.S01.020
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    tags:    [quietly]
+    text:    "You are Voss. You keep your head down. Everyone does."
+    note:    "Cold-reader question 1 lives entirely in this line. 'Everyone does' is the
+              card that stops it being a character flaw and makes it a city."
+
+  # 030 reserved, unused. Card 1 is two lines of approved copy.
+
+  # ================= CARD 2 — THE TITHE =================
+  - id:      P0.S01.040
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "The Tithe of Hands — a labor lottery nobody wins."
+    shot:    "STILL. The Tithe of Hands lottery board; one name lit; nobody meets anyone's eyes."
+    note:    "18.8 in one line: the Tithe is used correctly and never defined. It stays
+              undefined until Sela in M1.6 and until Brick in HUB.A1.brick_the_tithe."
+
+  - id:      P0.S01.050
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "Last month it took your neighbor's son."
+
+  - id:      P0.S01.060
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "He has not come back."
+    note:    "Shortest line of the card and the only one with no information in it. The
+              deletion test (18.9 C2) was run on this card and it fails backwards: cut
+              this and the Tithe is an institution instead of a person. Kept."
+
+  # ================= CARD 3 — THE LINE — NOT WRITTEN, Q-2 =================
+  # IDS 070, 080, 090 ARE RESERVED AND DELIBERATELY EMPTY.
+  #
+  # This is the Enforcer badge card. It is a story-architect PROPOSAL (BEATS_P0_prologue.md
+  # section 3) against open canon conflict C-2 and open owner question Q-2, and it is the
+  # sole root of the section 2.11 thread 'The Enforcer' plus the trigger for M1.2.S01's
+  # intel beat. 01_game_vision.md section 1.7 and 02_story_bible.md section 2.11 both
+  # promise it; the six APPROVED cards do not contain it.
+  #
+  # The writer was instructed not to invent it, and did not. Nothing here should be read
+  # as the copy: the proposal lives in the beat sheet and is not duplicated into this file,
+  # because two copies of an unapproved card is how the wrong one gets generated.
+  #
+  # If Q-2 is YES: card copy lands at 070/080/090, this scene's word count rises by roughly
+  #   forty, and Story.Thread.Enforcer_BadgeHeld becomes a systems task (new tag).
+  # If Q-2 is NO: this block stays empty forever and story-architect must re-root or retire
+  #   the Enforcer thread, because M1.2.S01 currently pays off a plant that does not exist.
+  # Either way: DO NOT RENUMBER. That is how a script loses its audio.
+
+  # ================= CARD 4 — PETRA =================
+  - id:      P0.S01.100
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    tags:    [quietly]
+    text:    'Then AEGIS came "pre-compliance" — and took Aunt Petra.'
+    shot:    "STILL. A forced door, an overturned chair, an AEGIS notice on the table."
+    note:    "T4 groundwork. AEGIS enters as an arresting machine, flat and hard. No hedge,
+              no ambiguity - act 4 pays for this first impression by inverting it."
+
+  - id:      P0.S01.110
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    tags:    [quietly]
+    text:    "No charge. No date. No office that answers."
+    note:    "The scene's only rhetorical triple (18.9 B allows one). Voss's technician
+              vocabulary is doing the work: he grieves by naming a broken mechanism."
+
+  - id:      P0.S01.120
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "That was the day keeping your head down stopped working."
+    note:    "The ceiling line for 18.9 A in this whole scene. It names a BEHAVIOUR, never
+              a feeling, and no other line in the prologue may go further than this one."
+
+  # ================= CARD 5 — MARA =================
+  - id:      P0.S01.130
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "A stranger found you before the sweeps did. Mara."
+    shot:    "STILL. A gloved hand pushes a folded route card across a table. Face out of frame."
+    note:    "Face out of frame is load-bearing: Mara is a hand and a route before she is a
+              person, and the player meets her face for the first time in M1.1."
+
+  - id:      P0.S01.140
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "She slipped you a route out of the cordon."
+    note:    "The debt the whole act carries. Paid back inverted in M1.8.S08."
+
+  - id:      P0.S01.150
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "You took it."
+    note:    "Three words, the shortest line in the scene, and the only thing Voss does in
+              ninety seconds. He claims no credit for it (18.4, Voss fixed trait): she
+              found him, she slipped it, he took it."
+
+  # ================= CARD 6 — THE CONTAINER =================
+  - id:      P0.S01.160
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "Out of the city, folded into a cargo container."
+    shot:    "STILL. Interior of a cargo container. Light through the seams. Two eyes in the dark."
+
+  - id:      P0.S01.170
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "Breathing quietly through every checkpoint."
+    note:    "The card that earns section 8 of the beat sheet: the player arrives at Hollow
+              Point having hidden, not fought. Nothing here suggests he begins anything."
+
+  # 180 reserved, unused. Card 6 is two lines of approved copy.
+
+  # ================= CARD 7 — EMBER CELL =================
+  - id:      P0.S01.190
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "Hollow Point — a dead geothermal vault the Dominion forgot."
+    shot:    "STILL. The geothermal vault at Hollow Point. Eleven silhouettes around the glow of a pipe."
+    note:    "Cold-reader question 2. 'Forgot' is the smallest possible version of the T4
+              plant - the Dominion under-reacts from the first card onward and nobody in
+              act 1 ever finds that strange."
+
+  - id:      P0.S01.200
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "Ember Cell: eleven people who still say no."
+    note:    "AR-1: the eleven are Mara, Dex, Reyes and eight unnamed. Voss is the twelfth
+              and is NOT counted here - he has not joined anything yet."
+
+  - id:      P0.S01.210
+    speaker: VOSS
+    voice:   voss
+    band:    ambient
+    text:    "Tonight, Mara says, the first real strike. Thirteen bullets to our name."
+    shot:    "Hold on the pipe glow. Cut to the M1.1 briefing surface."
+    note:    "Longest line in the scene (12) against the shortest (3) - spread is 4x. It is
+              the only line in the present tense and the only one where the pronoun turns
+              plural: 'our'. That word is Mara's, quoted, and it is the handoff into
+              M1.1.S03's ammo count. Last line of the prologue; nothing follows it."

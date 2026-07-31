@@ -39,7 +39,10 @@ MANIFEST = OUT / "stage2_manifest.json"
 
 # Tier 0 is 6,000 credits on the corrected 131,000 budget. Stage 1 spent 0.
 CREDIT_CEILING = 6000
-MODEL_ID = "eleven_multilingual_v2"   # see --model; v3 unverified (no models_read)
+# eleven_v3 confirmed available on this account 2026-07-31 via /v1/models.
+# §19.4's audio tags only work on v3, and modelId is part of the cache key, so
+# this is also the model Tier 1/2 must ship on. Do not change casually.
+MODEL_ID = "eleven_v3"
 OUTPUT_FORMAT = "mp3_44100_128"       # auditions are for listening, not shipping
 SETTINGS = {"stability": 0.5, "similarity_boost": 0.75,
             "style": 0.0, "use_speaker_boost": True}
@@ -173,16 +176,19 @@ def main() -> int:
     print(f"\nTOTAL: {total} credits "
           f"({'fits' if total <= CREDIT_CEILING else 'EXCEEDS'} ceiling {CREDIT_CEILING})")
 
+    # HARD GATE, not a warning. This was a warning once and it cost 2,470 credits:
+    # the run went ahead on multilingual_v2 and produced 21 tagged clips whose
+    # delivery cannot be trusted. Measured on those clips: an identical line with
+    # and without [grieving] differed by +2.30 s on a 2.14 s baseline, so a non-v3
+    # model does something large and unintended with brackets. A casting decision
+    # made on that audio would be made on the wrong evidence, permanently.
     tagged = sum(1 for p in plan if "[" in p["text"])
     if tagged and not args.model.startswith("eleven_v3"):
-        print(f"\n  !! MODEL/TAG MISMATCH - {tagged} of {len(plan)} clips carry §19.4 "
-              f"audio tags,\n     but model '{args.model}' does not support them. On a "
-              f"non-v3 model a tag is\n     either ignored or read aloud "
-              f"(\"bracket nervous\"), which would ruin exactly\n     the emotional-extreme "
-              f"line the deep test exists to judge.\n"
-              f"     `models_read` is missing, so v3 availability is unverified. "
-              f"Settle this\n     before spending: run with --model eleven_v3 and let the "
-              f"probe decide.")
+        print(f"\nREFUSING: {tagged} of {len(plan)} clips carry §19.4 audio tags, but "
+              f"model\n  '{args.model}' does not support them. Tags are the whole point "
+              f"of the\n  emotional-extreme line. Use --model eleven_v3, or strip the "
+              f"tags first.")
+        return 6
     if args.dry_run:
         print("\ndry run - nothing generated, 0 credits spent.")
         return 0
@@ -255,15 +261,28 @@ def main() -> int:
         MANIFEST.write_text(json.dumps(man, indent=1, ensure_ascii=False), "utf-8")
         print(f"[ok]    {p['file']:<52} {p['chars']:>4}")
 
+    # The account counter is eventually consistent: measured 2026-07-31, a real
+    # 45-character generation read back as a delta of 0, and 341 credits landed
+    # minutes later. So the before/after delta is a LAGGING CROSS-CHECK, not the
+    # primary number. For TTS the billable quantity is exactly the characters we
+    # sent (1 credit = 1 character), and that we know precisely.
+    import time
+    time.sleep(20)                       # let the counter settle before reading
     after, err = gen.get_usage(key)
+    print(f"\nCHARACTERS SENT (authoritative for TTS): {spent}")
     if after is None:
-        print(f"\nSPEND UNMEASURED afterwards: {err}")
-        print(f"  estimate from characters sent: {spent}. Record as ESTIMATE.")
+        print(f"account read-back failed: {err}")
+        print("-> log the characters-sent figure, and note the read-back failed.")
         return 4
-    measured = (after["character_count"] or 0) - (before["character_count"] or 0)
-    print(f"\nestimated {spent}, MEASURED {measured} credits.")
-    print(f"account {after['character_count']}/{after['character_limit']}")
-    print("-> write the MEASURED number into phase0/VOICE_LEDGER.md")
+    delta = (after["character_count"] or 0) - (before["character_count"] or 0)
+    print(f"account read-back: {after['character_count']}/{after['character_limit']} "
+          f"(delta {delta})")
+    if abs(delta - spent) > max(50, spent * 0.1):
+        print(f"  NOTE: delta {delta} differs from characters sent {spent}. Usually "
+              f"counter lag;\n  re-read the account in a few minutes before closing "
+              f"the ledger entry.")
+    print("-> write CHARACTERS SENT into phase0/VOICE_LEDGER.md, and the account "
+          "reading as the cross-check.")
     return 0
 
 

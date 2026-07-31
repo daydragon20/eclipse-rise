@@ -218,7 +218,24 @@ namespace
 		// reverted by this pass) — the owner overruled A's quantitative edge on
 		// look. Also rejected: sun-yaw nudge — SunRotation is synced with the
 		// hard-coded SunTravel in EclipseCharacter.cpp (out of scope this round).
-		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.045f, 0.085f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },
+		// MAGENTA, DERDE KEER — en nu de kopie die de reparatie miste.
+		//
+		// De shade stond op (0.200, 0.045, 0.085): blauw op **1,89× groen**. Dat is
+		// letterlijk de signatuur die de gebankte regel verbiedt en die het
+		// commentaar bij `OxideShade` (~r2259) als de oorzaak aanwijst — *"blue above
+		// green in a rust family is magenta by construction"*. De regel luidt: **elke
+		// donkere/shade-tint houdt B ≤ G.**
+		//
+		// Dáár stond die reparatie ook, mét de zin *"BldgA shares this shade, so its
+		// facade warms with the container"*. Maar delen deed hij niet: BldgA droeg een
+		// eigen literal, en die is nooit meegegaan. Het bewijs dat ze één familie zijn
+		// staat in de lit-tint — die is byte-identiek aan `OxideLit`.
+		//
+		// Gevolg was zichtbaar op frame (`Saved/Screenshots/GLYPH_20_2/VOOR_cam7_poster.png`,
+		// 31-07): een felmagenta gevel die het halve beeld vult, in een district dat
+		// industriële onderdrukking moet uitstralen. Het document zei dat het gefixt
+		// was en de build deed iets anders — dezelfde vorm als het STOP-bord.
+		{ TEXT("BldgA"),  FLinearColor(0.560f, 0.160f, 0.085f), FLinearColor(0.200f, 0.062f, 0.038f), TEXT("/Game/Art/Textures/T_metal_plate_diff.T_metal_plate_diff"), 350.0f, 32.5f, 0.5f },
 		// Dressing-iteratie 3 — the teal DESATURATED, not re-hued, and that split is
 		// the whole point. Two sources disagreed: this palette calls it "worker
 		// teal" (deliberate Kessara colour), the second art-review called it Shroud
@@ -1525,18 +1542,27 @@ void BuildDistrict(UWorld& World)
 		struct FDecalDef { const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; FVector Location; FVector Scale; };
 		const FDecalDef Decals[] = {
 			// Dominion white-gold posters: compound north, east, and south walls.
-			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -1146, 210), FVector(1.6f, 0.04f, 2.4f) },
-			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(5854, -2000, 210), FVector(0.04f, 1.6f, 2.4f) },
-			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 7.8f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -2854, 210), FVector(1.6f, 0.04f, 2.4f) },
+			// Gain 7.8 -> 5.5 (20.2 fiction pass): the sheet is a NEW map, so it
+			// gets a NEW measurement — 1/0.1825 from Tools/measure_albedo_gain.py
+			// on the regenerated T_decal_poster_diff. Two things moved. The mark
+			// is no longer the Eye of Providence but the Radiance ring (see
+			// Tools/generate_decals.py for why an eye in a triangle could not
+			// stay), and the printed ground went 26 -> 72 because at 26 the
+			// poster rendered as a BLACK PANEL hung on the wall instead of paper
+			// pasted to it. Average scene brightness is unchanged by
+			// construction: gain is 1/mean, so lifting the mean lowers the gain.
+			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 5.5f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -1146, 210), FVector(1.6f, 0.04f, 2.4f) },
+			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 5.5f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(5854, -2000, 210), FVector(0.04f, 1.6f, 2.4f) },
+			{ TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff"), 5.5f, FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), FVector(4600, -2854, 210), FVector(1.6f, 0.04f, 2.4f) },
 			// Hazard pads at the artery/cross-street corners, amber. Gain 3.08 =
 			// 1/mean of the FIXED worn-stripe map (15.8 art-fix: the old
 			// generator tiled its bands edge-to-edge, so the pads were solid
 			// 225 plates reading as flat pure-yellow quads — shot 00013).
 			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 3.08f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-3200, 700, 4), FVector(2.4f, 2.4f, 0.04f) },
 			{ TEXT("/Game/Art/Decals/T_decal_hazard_diff.T_decal_hazard_diff"), 3.08f, FLinearColor(0.300f, 0.200f, 0.030f), FLinearColor(0.120f, 0.080f, 0.020f), FVector(-4800, -700, 4), FVector(2.4f, 2.4f, 0.04f) },
-			// Rebel eclipse stencils: west wall by Entry_Main, warehouse south face.
-			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-9944, 420, 240), FVector(0.04f, 2.0f, 2.0f) },
-			{ TEXT("/Game/Art/Decals/T_decal_stencil_diff.T_decal_stencil_diff"), 7.1f, FLinearColor(0.300f, 0.060f, 0.050f), FLinearColor(0.110f, 0.030f, 0.035f), FVector(-4300, 2146, 220), FVector(1.8f, 0.04f, 1.8f) },
+			// The rebel stencils USED to be two more rows here, on this opaque
+			// path with AlbedoMix 1.0. They are not decals of this kind: see the
+			// masked block right below the loop.
 		};
 
 		// Same master choice as the palette blocks and the well (15.8 look-ronde,
@@ -1576,6 +1602,81 @@ void BuildDistrict(UWorld& World)
 				Actor->GetStaticMeshComponent()->SetCastShadow(false);
 				Actor->SetActorEnableCollision(false);
 				Actor->Tags.Add(TEXT("Deco_Decal"));
+			}
+		}
+
+		// --- THE REBEL STENCIL IS PAINT, SO IT RIDES THE MASKED PATH ---------
+		//
+		// It used to be two more rows in the array above: an OPAQUE quad with
+		// T_decal_stencil_diff at AlbedoMix 1.0. That map's background value is
+		// 18 — dark grey, not transparent — so what the district actually got
+		// was a hard black rectangle with a geometrically perfect red "C" in it
+		// (seen in frame 31-07 on the wide overview camera and on the gate
+		// camera, next to the new Dominion placards). Three consequences, all
+		// three of them story:
+		//
+		//   1. It reads as PRINTED VINYL. §20.2 wants the Eclipse sigil
+		//      "gespoten, gekrast, weggeschuurd en terug".
+		//   2. On a black plate it reads as something the REGIME hung there,
+		//      not something the resistance sprayed on. The politics invert —
+		//      and that is the whole point of the mark existing.
+		//   3. A crisp round logo centred in a black square reads as an app icon.
+		//
+		// The stains a few metres away were already on M_EclipseToonDecal with
+		// a mask in .r driving opacity; generate_dominion_signs.py had written
+		// this exact diagnosis down for the sign plates and simply never got to
+		// the stencil. Now it does: T_decal_stencil_mask carries the paint as
+		// COVERAGE (hand-cut edge, stencil ties, bleed, overspray, drips,
+		// scrubbed-back bands, scratches, and the ghost of an earlier attempt),
+		// so what the wall shows through is wall, not a plate.
+		//
+		// No gain, by design — a mask modulates coverage, never luminance, so
+		// this placement needs no measurement round (same contract as the stain
+		// and light masks). The tints are the ones the 15.8 round tuned, kept
+		// exactly. Missing mask or missing master = logged and skipped (14.3.5):
+		// the district then simply has no rebel mark, which is honest, rather
+		// than a black rectangle, which lies.
+		{
+			UTexture* StencilMask = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_decal_stencil_mask.T_decal_stencil_mask"));
+			if (StencilMask == nullptr || ToonDecalMaterial == nullptr)
+			{
+				UE_LOG(LogEclipse, Warning,
+					TEXT("Graybox: rebellenstencil overgeslagen (mask %s, M_EclipseToonDecal %s) — draai Tools/generate_decals.py + import_generated_decals.py."),
+					StencilMask != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"),
+					ToonDecalMaterial != nullptr ? TEXT("ok") : TEXT("ONTBREEKT"));
+			}
+			else
+			{
+				const FLinearColor StencilLit(0.300f, 0.060f, 0.050f), StencilShade(0.110f, 0.030f, 0.035f);
+				const struct { FVector Location; FVector Scale; } Stencils[] = {
+					{ FVector(-9944, 420, 240), FVector(0.04f, 2.0f, 2.0f) },   // west wall by Entry_Main
+					{ FVector(-4300, 2146, 220), FVector(1.8f, 0.04f, 1.8f) },  // warehouse south face
+				};
+				UMaterialInstanceDynamic* StencilMid = UMaterialInstanceDynamic::Create(ToonDecalMaterial, &World);
+				StencilMid->SetVectorParameterValue(TEXT("LitColor"), StencilLit);
+				StencilMid->SetVectorParameterValue(TEXT("ShadeColor"), StencilShade);
+				StencilMid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunRotation.Vector(), 0.0f)));
+				StencilMid->SetScalarParameterValue(TEXT("EmissiveScale"), ToonEmissiveScale);
+				StencilMid->SetTextureParameterValue(TEXT("MaskTex"), StencilMask);
+				StencilMid->SetScalarParameterValue(TEXT("OpacityScale"), 1.0f);
+				// AlbedoMix stays at its 0 default: the mask already varies the
+				// paint's coverage, and what shows through IS the wall's own
+				// grain. Adding a second grain on top would only re-flatten it.
+				for (const auto& Stencil : Stencils)
+				{
+					AStaticMeshActor* Actor = World.SpawnActor<AStaticMeshActor>(Stencil.Location, FRotator::ZeroRotator, Params);
+					if (Actor != nullptr)
+					{
+						Actor->SetMobility(EComponentMobility::Movable);
+						Actor->GetStaticMeshComponent()->SetStaticMesh(CubeMesh);
+						Actor->SetActorScale3D(Stencil.Scale);
+						Actor->GetStaticMeshComponent()->SetMaterial(0, StencilMid);
+						Actor->GetStaticMeshComponent()->SetAffectDistanceFieldLighting(false);
+						Actor->GetStaticMeshComponent()->SetCastShadow(false);
+						Actor->SetActorEnableCollision(false);
+						Actor->Tags.Add(TEXT("Deco_Decal"));
+					}
+				}
 			}
 		}
 	}
@@ -1966,7 +2067,10 @@ void BuildDistrict(UWorld& World)
 			if (UTexture* PosterTex = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_decal_poster_diff.T_decal_poster_diff")))
 			{
 				PosterMid->SetTextureParameterValue(TEXT("AlbedoTex"), PosterTex);
-				PosterMid->SetScalarParameterValue(TEXT("AlbedoGain"), 7.8f);
+				// 5.5 = the same re-measurement as the wall posters above; this
+				// is the SECOND placement path for the same sheet (three boards
+				// carry it as a prop plane), and the eye was on all six.
+				PosterMid->SetScalarParameterValue(TEXT("AlbedoGain"), 5.5f);
 				PosterMid->SetScalarParameterValue(TEXT("AlbedoMix"), 1.0f);
 				PosterMid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
 			}
