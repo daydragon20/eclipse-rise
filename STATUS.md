@@ -10,7 +10,7 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (zelf nagedraaid 01-08 ~07:20): build groen `-NoUba` · **235 tests, 0 gefaald, 0
+Bar (zelf nagedraaid 01-08 ~11:00): build groen `-NoUba` · **237 tests, 0 gefaald, 0
 niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** ·
 EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 
@@ -23,7 +23,7 @@ EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 >    op Display gelogd en overgeslagen. **Owner-actie (O-3), bewust géén fallback** —
 >    terugvallen op stem A maakt de bar groen terwijl die acht regels nog steeds geen
 >    gekozen stem hebben.
-> 2. **`validate_script.py`** (nieuw, 01-08) — **9** bevindingen, waarvan twee de hele
+> 2. **`validate_script.py`** (nieuw, 01-08) — **5** bevindingen, waarvan twee de hele
 >    tool waard zijn: `M1.1.S99` vertakt op drie uitkomsten en handelt er **twee** af
 >    (`left` ontbreekt), `M1.6.S05` mist `split`. Plus vijf condities die door niemand
 >    gezet worden. Die bevindingen bestonden allemaal al; er kon alleen niets naar
@@ -45,10 +45,16 @@ dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 > van alles wat er nog is** — barks, muziek, SFX en de acts 2 t/m 4 komen daar nog bij.
 > Dat is de vraag op **O-14**.
 >
-> **De rem is nu de critic-poort, en dat hoort zo.** Stand: **17 GO, 9 NO-GO, 45 nog te
-> beoordelen**. De ijkmissie **M1.1 is NO-GO** (3 van 7 door) en blokkeert daarmee alle
-> generatie én owner-vraag O-4.
+> **DE IJKMISSIE IS DOOR DE POORT.** M1.1 staat op **7 van 7 GO** na drie critic-rondes.
+> Corpus: **21 GO, 4 NO-GO, 46 nog te beoordelen**.
 >
+> **De rem is nu de CASTING, niet de poort.** Alle acht stemmen van M1.1 resolven — en
+> dat was waar én misleidend: **resolven is niet UNIEK resolven**. Drie stem-ID's staan op
+> twee rollen, en twee daarvan zitten in de ijkmissie (Mara deelt een stem met een
+> schutter, Dex met een Dominion-dienstplichtige in hetzelfde vuurgevecht). De generatie is
+> daarop **afgeblazen met 0 credits uitgegeven**; `check_voice_resolves.py` vangt het nu.
+> Zie **O-3/O-13**.
+
 > ⚠ **Het `critic:`-veld werd tot 01-08 door niets gelezen** en stond 71 keer op `null`,
 > ook voor scènes die als GO gemeld waren — die oordelen leefden alleen in agentrapporten.
 > `EclipseGenerateVoicesCommandlet.cpp` noemt `critic`/`status`/`draft`/`GO` alle vier nul
