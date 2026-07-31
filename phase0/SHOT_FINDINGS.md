@@ -9,6 +9,65 @@
 
 ---
 
+## De vault, 01-08 — het licht is de zwakke schakel, en het is gemeten
+
+*Frames: `Eclipse/Saved/Screenshots/WindowsEditor/HighresScreenshot00033.png` (commandopost),
+`00034.png` (barakken), `00035.png` (werkplaats). Ik heb alle drie geopend — GEZIEN — en
+daarna gemeten met `Tools/measure_frame_values.py` (Rec.709-luminantie, lineair), want een
+indruk is geen bevinding.*
+
+**De vault-agent mat onderscheidbaarheid met een dieptebeeld dat expliciet KLEURENBLIND is
+(een hertint mag niet slagen). Precies daardoor kon zijn 16/16 niets zeggen over licht.**
+Twee defecten, allebei met een getal:
+
+### 1. Het plafond rendert als absoluut zwart
+
+| gebied | lum_lin |
+|---|---|
+| plafond (barakken, 144.000 px) | **0,0000** — max 0, geen enkele pixel boven nul |
+| plafond (commandopost) | 0,0002 |
+| vloer (barakken) | 0,0642 |
+
+Het plafond **bestaat** (`EclipseVaultBuilder.cpp:733` — één vloer- en één plafondplaat over
+de hele footprint), er valt alleen niets op. Ter vergelijking: de districtsgrond zit op
+0,03–0,06. Een ruimte van 4,2 m onder de grond leest daarmee als **open naar de nacht**.
+
+### 2. De lichtbronnen zijn donkerder dan wat ze verlichten
+
+| gebied | lum_lin | lineaire RGB |
+|---|---|---|
+| GlowStrip-balk (barakken) | 0,0563 | (0,0999 · 0,0481 · 0,0093) — **wél amber** |
+| vloer eronder | **0,0642** | — |
+| plafondlamp links (commandopost) | 0,0093 | (0,0075 · 0,0094 · **0,0144**) — **blauw** |
+| plafondlamp rechts | 0,0118 | (0,0095 · 0,0118 · **0,0181**) — **blauw** |
+| donkere wand ernaast | 0,0163 | — |
+| kaarttafel | **0,1933** | — |
+
+Twee dingen staan hier los van elkaar:
+
+- **De balk in de barakken is correct amber** (R:G:B ≈ 10,7 : 5,2 : 1 tegen de geauthorde
+  `GlowStrip` (2,2 · 1,0 · 0,3) ≈ 7,3 : 3,3 : 1) maar **haalt de vloer niet**: 0,0563 tegen
+  0,0642. Een werklamp die donkerder is dan de vloer die hij verlicht.
+- **De twee plafondlampen in de commandopost zijn niet eens amber.** Ze zijn blauw-dominant
+  (B > R), dezelfde tintfamilie als de donkere wand, en **donkerder dan die wand**. In dit
+  frame is het helderste ding het **meubilair** (kaarttafel 0,1933) — twintig keer de lamp.
+
+**Het is niet de tonemapper.** In hetzelfde frame, op dezelfde hoogte, meet de amberwand
+0,0781 met (0,1366 · 0,0671 · 0,0146) — R ≫ B. Amber komt er dus wel degelijk doorheen; een
+horizontale scan op lamphoogte bevestigt het (x=1440 → 0,0667, R ≫ B).
+
+**Twee kandidaat-oorzaken, geen van beide bewezen** — dit is een symptoombeschrijving:
+(a) die twee boxen krijgen het `GlowStrip`-materiaal niet toegewezen zoals de balk dat wel
+krijgt, of (b) wat ik zie is een niet-emissieve behuizing en het emissieve vlak wijst van de
+camera af. Wie dit oppakt: meet eerst welke van de twee, met een tweede frame vanuit een
+andere hoek — dat scheidt ze door constructie.
+
+> **De regel eronder is de oude:** `authored ≠ verscheept`. `GlowStrip` staat in de palettabel
+> op (2,2 · 1,0 · 0,3) met `EmissiveScale` 10, en één van de twee plaatsingen levert dat en
+> de andere niet.
+
+---
+
 ## Bevindingen
 
 | Datum | Bestand | Ernst | Wat er te zien is | Waarschijnlijke oorzaak |
