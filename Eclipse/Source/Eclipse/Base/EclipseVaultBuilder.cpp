@@ -1,8 +1,10 @@
 #include "Base/EclipseVaultBuilder.h"
 
 #include "Base/EclipseBaseLogic.h"
+#include "Components/ExponentialHeightFogComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Eclipse.h"
+#include "Engine/ExponentialHeightFog.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/TargetPoint.h"
 #include "Engine/World.h"
@@ -36,11 +38,13 @@ namespace
 	// Shell dimensions (cm). Chunky, confident proportions (15.5): a 7 m wide
 	// Spine, 9 x 9 m chambers, 4.2 m ceiling - corridors read heavy, not cramped.
 	constexpr float WallThk = 60.0f;
-	constexpr float CeilH = 420.0f;
 	constexpr float SpineHalfW = 350.0f;
 	constexpr float SlotSpacing = 1400.0f;
-	constexpr float ChamberW = 900.0f;
-	constexpr float ChamberD = 900.0f;
+	// The three that the fit-outs and the room-reading probe BOTH depend on live
+	// in the header now; these are the local names the shell code already used.
+	constexpr float CeilH = EclipseVault::CeilingHeightCm;
+	constexpr float ChamberW = EclipseVault::ChamberWidthCm;
+	constexpr float ChamberD = EclipseVault::ChamberDepthCm;
 	constexpr float DoorW = 320.0f;
 	constexpr float EndPad = 700.0f;
 	constexpr float AirlockDepth = 600.0f;
@@ -89,6 +93,19 @@ namespace
 		{ TEXT("Idler"),       FLinearColor(0.200f, 0.230f, 0.240f), FLinearColor(0.070f, 0.085f, 0.120f), false }, // stand-in staff figures, rebel gray-teal
 		{ TEXT("Memorial"),    FLinearColor(0.300f, 0.255f, 0.165f), FLinearColor(0.120f, 0.100f, 0.070f), true },  // pale gold - the wall (5.3.2)
 		{ TEXT("GlowStrip"),   FLinearColor(2.200f, 1.000f, 0.300f), FLinearColor(2.200f, 1.000f, 0.300f), false }, // sodium work-light emissive (global growth read)
+
+		// --- fit-out families (the four rooms, GDD 5.3 "each level visibly
+		// different: new machines, LIGHT, staff density") --------------------
+		// The four rooms each get their OWN light colour, and that is the part
+		// of 5.3 that is cheapest to skip and most expensive to miss: a room
+		// you can name from the doorway before you read a label is a place, a
+		// room you can only name from its tint is a menu entry with a floor.
+		{ TEXT("VaultPipe"),   FLinearColor(0.140f, 0.160f, 0.190f), FLinearColor(0.046f, 0.056f, 0.092f), true },  // conduit / racking / masts - cold steel, one step under the shell
+		{ TEXT("Bedding"),     FLinearColor(0.430f, 0.390f, 0.300f), FLinearColor(0.165f, 0.148f, 0.135f), false }, // canvas: mattresses and the laundry line (soft goods never block)
+		{ TEXT("HoloGlow"),    FLinearColor(2.600f, 0.360f, 0.180f), FLinearColor(2.600f, 0.360f, 0.180f), false }, // Command: the stolen table's plate, Dominion oxide made light
+		{ TEXT("EmberGlow"),   FLinearColor(2.300f, 0.780f, 0.150f), FLinearColor(2.300f, 0.780f, 0.150f), false }, // Barracks stove + the memorial votives + the geothermal grate
+		{ TEXT("WeldGlow"),    FLinearColor(2.400f, 2.200f, 1.900f), FLinearColor(2.400f, 2.200f, 1.900f), false }, // Workshop: the near-white arc, the brightest thing in the vault
+		{ TEXT("ScreenGlow"),  FLinearColor(0.220f, 1.400f, 2.400f), FLinearColor(0.220f, 1.400f, 2.400f), false }, // Intel: console readouts and the plot boards
 	};
 	const FVaultPaletteDef DefaultVaultPalette = { TEXT("VaultDefault"), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(0.12f, 0.12f, 0.16f), true };
 
@@ -111,14 +128,17 @@ namespace
 	 * rows. An unknown facility id (e.g. a Phase 3 Medbay in an old save)
 	 * renders the neutral blockout with no site marker - graceful (GDD 14.3.5).
 	 */
-	struct FFacilityPresentationDef { FName FacilityId; const TCHAR* PaletteLabel; const TCHAR* SiteTag; };
+	// The palette column is gone on purpose: a room is no longer ONE colour (see
+	// the fit-outs below), so a single label per facility could only have been a
+	// tint - and a tint is what made the four rooms interchangeable.
+	struct FFacilityPresentationDef { FName FacilityId; const TCHAR* SiteTag; };
 	const FFacilityPresentationDef* FindFacilityPresentation(FName FacilityId)
 	{
 		static const FFacilityPresentationDef Defs[] = {
-			{ EclipseBaseDefaults::CommandCenterFacilityId, TEXT("FacCommand"),  TEXT("Site_MapTable") },
-			{ FName(TEXT("Barracks")),                      TEXT("FacBarracks"), TEXT("Site_MusterBoard") },
-			{ FName(TEXT("Workshop")),                      TEXT("FacWorkshop"), TEXT("Site_Workbench") },
-			{ FName(TEXT("IntelligenceCenter")),            TEXT("FacIntel"),    TEXT("Site_IntelConsole") },
+			{ EclipseBaseDefaults::CommandCenterFacilityId, TEXT("Site_MapTable") },
+			{ FName(TEXT("Barracks")),                      TEXT("Site_MusterBoard") },
+			{ FName(TEXT("Workshop")),                      TEXT("Site_Workbench") },
+			{ FName(TEXT("IntelligenceCenter")),            TEXT("Site_IntelConsole") },
 		};
 		for (const FFacilityPresentationDef& Def : Defs)
 		{
@@ -128,6 +148,302 @@ namespace
 			}
 		}
 		return nullptr;
+	}
+
+	/**
+	 * The room fit-out sink. Fit-outs are authored in ROOM-LOCAL coordinates so
+	 * one number reads the same in a north chamber and a south one:
+	 *   U    along the Spine; 0 = the chamber's centre line, +/-450 = the side walls
+	 *   V    INTO the room from the door mouth; 0 = threshold, 900 = back wall
+	 *   Z    world up; the deck is 0 and the ceiling is CeilH
+	 *   Yaw  about Z in room space (the caller mirrors it for south chambers)
+	 * The caller owns the mirroring, so no fit-out below ever mentions a side.
+	 */
+	using FRoomBoxFn = TFunctionRef<void(const TCHAR* /*Label*/, float /*U*/, float /*V*/, float /*Z*/,
+		float /*SizeX*/, float /*SizeY*/, float /*SizeZ*/, float /*YawDeg*/)>;
+
+	/**
+	 * Two keep-clear rules every fit-out obeys, and they are load-bearing rather
+	 * than tidy:
+	 *  - THRESHOLD: the first 180 cm inside the mouth stays walkable across the
+	 *    door width, so entering a room can never be a collision problem. The
+	 *    walking round (Eclipse.Base.VaultWalkingRound) asserts on exactly this.
+	 *  - ANNEX DOOR: a chamber with an annex behind it keeps |U| < 190 clear for
+	 *    V > 700, or the fit-out walls in the memorial alcove / generator room.
+	 * Nothing here is placed to fill a corner (GDD 20.2). Every box is a thing
+	 * that is used: a surface worked at, a place slept in, stock, power, or the
+	 * light by which one of those happens.
+	 */
+	constexpr float RoomThresholdV = 180.0f;
+	constexpr float AnnexDoorHalfU = 190.0f;
+	constexpr float AnnexDoorV = 700.0f;
+
+	/**
+	 * COMMAND CENTER - 5.2's stolen Dominion map table.
+	 * The read from the doorway is ONE MASS IN THE MIDDLE that everything else
+	 * faces: the only room in the vault whose centre is occupied and whose walls
+	 * are comparatively bare. Light: a low red plate (Dominion oxide made light)
+	 * plus two lamps hung directly over it, so the brightness is at TABLE height.
+	 */
+	void FitOutCommandCenter(int32 Level, FRoomBoxFn Room)
+	{
+		// The table: low, wide, standing height - rebels stand at it, there are
+		// no chairs in Act 1 and that absence is the characterisation.
+		Room(TEXT("FacCommand"), 0.0f, 470.0f, 45.0f, 380.0f, 260.0f, 90.0f, 0.0f);
+		Room(TEXT("FacCommand"), 0.0f, 470.0f, 97.0f, 404.0f, 284.0f, 14.0f, 0.0f);   // overhanging top
+		Room(TEXT("HoloGlow"),   0.0f, 470.0f, 108.0f, 300.0f, 190.0f, 8.0f, 0.0f);   // the plate that is switched on
+
+		// Its two task lamps, directly over the table and nowhere else.
+		Room(TEXT("HoloGlow"), -140.0f, 470.0f, CeilH - 55.0f, 70.0f, 70.0f, 16.0f, 0.0f);
+		Room(TEXT("HoloGlow"),  140.0f, 470.0f, CeilH - 55.0f, 70.0f, 70.0f, 16.0f, 0.0f);
+
+		// The chart boards the table argues with, flat on both side walls.
+		for (const float WallSign : { -1.0f, 1.0f })
+		{
+			Room(TEXT("SurveyPost"), WallSign * 435.0f, 520.0f, 210.0f, 24.0f, 250.0f, 200.0f, 0.0f);
+		}
+
+		// The radio set: a map table without a way to send the order is a prop.
+		Room(TEXT("FacCommand"), -330.0f, 250.0f, 70.0f, 130.0f, 130.0f, 140.0f, 0.0f);
+		Room(TEXT("VaultPipe"),  -330.0f, 250.0f, 160.0f, 90.0f, 60.0f, 40.0f, 0.0f);
+		// and the cable spool it draws from, with the run to the wall.
+		Room(TEXT("VaultPipe"), 330.0f, 260.0f, 35.0f, 110.0f, 110.0f, 70.0f, 0.0f);
+		Room(TEXT("VaultPipe"), 330.0f, 440.0f, 5.0f, 40.0f, 300.0f, 10.0f, 0.0f);
+
+		if (Level >= 2)
+		{
+			// L2 = the map reaches further (5.3.1 gates map range on the CC), so
+			// the second plotting station and a second lit plate, not a bigger box.
+			Room(TEXT("FacCommand"), 300.0f, 640.0f, 45.0f, 220.0f, 180.0f, 90.0f, 20.0f);
+			Room(TEXT("HoloGlow"),   300.0f, 640.0f, 96.0f, 170.0f, 130.0f, 8.0f, 20.0f);
+			Room(TEXT("SurveyPost"), 0.0f, 880.0f, 230.0f, 420.0f, 20.0f, 240.0f, 0.0f);
+		}
+	}
+
+	/**
+	 * BARRACKS - where the eleven cages of 5.2 end up once they have a room.
+	 * The read is the exact inverse of Command: the middle is EMPTY (it is an
+	 * aisle) and both walls carry stacked horizontal mass at two heights. Light:
+	 * one warm ember point at the back, low - people sleep here.
+	 */
+	void FitOutBarracks(int32 Level, bool bAnnexBehind, FRoomBoxFn Room)
+	{
+		// Eleven bunks, counted (5.2 says eleven, so this places eleven): three
+		// two-tier stacks on one wall, two on the other, and one single.
+		auto Bunk = [&Room](float U, float V, float Z, bool bUpper)
+		{
+			Room(TEXT("FacBarracks"), U, V, Z, 92.0f, 200.0f, 12.0f, 0.0f);          // the frame
+			Room(TEXT("Bedding"),     U, V, Z + 19.0f, 82.0f, 186.0f, 24.0f, 0.0f);  // and what is on it
+			if (!bUpper)
+			{
+				return;
+			}
+			// Only the stack's uprights, and only once per stack (they are drawn
+			// with the upper tier so a single bunk does not grow a ladder).
+			for (const float PostV : { -92.0f, 92.0f })
+			{
+				Room(TEXT("FacBarracks"), U, V + PostV, 115.0f, 14.0f, 14.0f, 230.0f, 0.0f);
+			}
+		};
+
+		const float BunkU = 388.0f;
+		for (const float StackV : { 260.0f, 480.0f, 700.0f })
+		{
+			Bunk(-BunkU, StackV, 45.0f, /*bUpper*/ false);
+			Bunk(-BunkU, StackV, 175.0f, /*bUpper*/ true);
+		}
+		for (const float StackV : { 260.0f, 480.0f })
+		{
+			Bunk(BunkU, StackV, 45.0f, false);
+			Bunk(BunkU, StackV, 175.0f, true);
+		}
+		Bunk(BunkU, 700.0f, 45.0f, false); // the eleventh, single - the room ran out of frames
+
+		// A footlocker at the foot of every stack. Kit has to live somewhere and
+		// this is the only storage a soldier owns.
+		for (const float LockerV : { 260.0f, 480.0f, 700.0f })
+		{
+			Room(TEXT("VaultRubble"), -292.0f, LockerV, 24.0f, 76.0f, 76.0f, 48.0f, 0.0f);
+		}
+		for (const float LockerV : { 260.0f, 480.0f })
+		{
+			Room(TEXT("VaultRubble"), 292.0f, LockerV, 24.0f, 76.0f, 76.0f, 48.0f, 0.0f);
+		}
+
+		// The stove: heat, a kettle, and the only warm light in the room. Parked
+		// off-centre so the annex door behind stays walkable.
+		const float StoveU = bAnnexBehind ? -320.0f : -120.0f;
+		Room(TEXT("VaultBlast"), StoveU, 790.0f, 60.0f, 104.0f, 104.0f, 120.0f, 0.0f);
+		Room(TEXT("EmberGlow"),  StoveU, 790.0f, 124.0f, 64.0f, 64.0f, 14.0f, 0.0f);
+		Room(TEXT("VaultPipe"),  StoveU, 790.0f, 275.0f, 34.0f, 34.0f, 290.0f, 0.0f);   // the flue
+		Room(TEXT("VaultPipe"),  StoveU + 78.0f, 790.0f, 138.0f, 52.0f, 52.0f, 36.0f, 0.0f); // the kettle on it
+
+		// The laundry line across the aisle, well over head height. Eleven people
+		// living underground generate washing; this is where it goes.
+		Room(TEXT("Bedding"), 0.0f, 380.0f, 300.0f, 640.0f, 6.0f, 6.0f, 0.0f);
+		for (const float ClothU : { -160.0f, 0.0f, 150.0f })
+		{
+			Room(TEXT("Bedding"), ClothU, 380.0f, 258.0f, 72.0f, 8.0f, 80.0f, 0.0f);
+		}
+
+		if (Level >= 2)
+		{
+			// L2 = the room sleeps more, which is two more bunks and a second
+			// stove - staff density is the point of the upgrade (5.3).
+			Bunk(-BunkU, 700.0f, 305.0f, true);
+			Bunk(BunkU, 700.0f, 175.0f, true);
+			Room(TEXT("VaultBlast"), 300.0f, 790.0f, 60.0f, 104.0f, 104.0f, 120.0f, 0.0f);
+			Room(TEXT("EmberGlow"),  300.0f, 790.0f, 124.0f, 64.0f, 64.0f, 14.0f, 0.0f);
+		}
+	}
+
+	/**
+	 * WORKSHOP - benches, stock, and a way to lift what you cannot carry.
+	 * The read is the only room with MASS NEAR THE CEILING: a gantry beam and the
+	 * hoist block hanging off it sit in the upper third, where every other room
+	 * has nothing but air. Light: the near-white welding arc, the brightest and
+	 * coldest point in the vault.
+	 */
+	void FitOutWorkshop(int32 Level, bool bAnnexBehind, FRoomBoxFn Room)
+	{
+		// Bench runs against the back wall, split around the generator-room door.
+		// The split halves sit at U 325 and not 300: at 300 a 264-wide bench
+		// reaches to within 168 cm of the centre line, and the keep-clear rule
+		// wants 190. The builder's own guard caught that on the first run - which
+		// is the entire reason the guard logs instead of trusting the author.
+		for (const float BenchSign : { -1.0f, 1.0f })
+		{
+			Room(TEXT("FacWorkshop"), BenchSign * 325.0f, 800.0f, 47.0f, 230.0f, 94.0f, 94.0f, 0.0f);
+			Room(TEXT("VaultPipe"),   BenchSign * 325.0f, 842.0f, 212.0f, 230.0f, 16.0f, 130.0f, 0.0f); // the tool wall over it
+		}
+		if (!bAnnexBehind)
+		{
+			// No door behind: the bench run is continuous, which is what a
+			// workshop wants and what the annex costs slot C.
+			Room(TEXT("FacWorkshop"), 0.0f, 800.0f, 47.0f, 264.0f, 94.0f, 94.0f, 0.0f);
+			Room(TEXT("VaultPipe"),   0.0f, 842.0f, 212.0f, 264.0f, 16.0f, 130.0f, 0.0f);
+		}
+
+		// The parts rack: three loaded shelves and their uprights.
+		for (int32 Shelf = 0; Shelf < 3; ++Shelf)
+		{
+			Room(TEXT("FacWorkshop"), -392.0f, 470.0f, 62.0f + Shelf * 92.0f, 104.0f, 420.0f, 16.0f, 0.0f);
+		}
+		for (const float UprightV : { 265.0f, 675.0f })
+		{
+			Room(TEXT("VaultPipe"), -392.0f, UprightV, 150.0f, 104.0f, 14.0f, 300.0f, 0.0f);
+		}
+
+		// The gantry. This is the room's signature and it is functional: the
+		// hoist runs the length of the bay so an engine block reaches the bench.
+		Room(TEXT("VaultPipe"),   140.0f, 440.0f, CeilH - 62.0f, 62.0f, 480.0f, 58.0f, 0.0f);
+		Room(TEXT("VaultPipe"),   140.0f, 430.0f, 330.0f, 18.0f, 18.0f, 100.0f, 0.0f);   // the chain
+		Room(TEXT("FacWorkshop"), 140.0f, 430.0f, 245.0f, 94.0f, 94.0f, 118.0f, 0.0f);   // and the block on it
+
+		// The welding bay: bench, shield, and the arc.
+		Room(TEXT("FacWorkshop"), 300.0f, 260.0f, 45.0f, 184.0f, 184.0f, 90.0f, 0.0f);
+		Room(TEXT("WeldGlow"),    300.0f, 260.0f, 97.0f, 74.0f, 54.0f, 12.0f, 0.0f);
+		Room(TEXT("VaultPipe"),   300.0f, 352.0f, 175.0f, 194.0f, 14.0f, 170.0f, 0.0f);  // the spark shield
+
+		// What a bench produces: a swarf bin and stock ends leaning on the wall.
+		Room(TEXT("VaultRubble"), -150.0f, 260.0f, 36.0f, 92.0f, 92.0f, 72.0f, 0.0f);
+		Room(TEXT("VaultPipe"),    404.0f, 620.0f, 92.0f, 44.0f, 44.0f, 184.0f, 14.0f);
+		Room(TEXT("VaultPipe"),    386.0f, 640.0f, 86.0f, 40.0f, 40.0f, 172.0f, -11.0f);
+
+		if (Level >= 2)
+		{
+			// L2 = the fabricator (5.3.1's Workshop tier), a lit rack, and a
+			// second arc. New MACHINES, not a bigger version of the same one.
+			Room(TEXT("FacWorkshop"), -160.0f, 560.0f, 110.0f, 190.0f, 190.0f, 220.0f, 0.0f);
+			Room(TEXT("WeldGlow"),    -160.0f, 465.0f, 150.0f, 130.0f, 12.0f, 70.0f, 0.0f);
+			Room(TEXT("VaultPipe"),   -160.0f, 560.0f, 300.0f, 60.0f, 60.0f, 160.0f, 0.0f);  // its extraction duct
+			Room(TEXT("WeldGlow"),     300.0f, 690.0f, 236.0f, 150.0f, 30.0f, 12.0f, 0.0f);  // the bench light that came with it
+		}
+	}
+
+	/**
+	 * INTELLIGENCE CENTER - listening, which is a posture before it is a machine.
+	 * The read is the only CURVED arrangement in a vault of right angles: five
+	 * stations bowed toward one wall of plot boards, with a mast in the corner
+	 * and cable runs poured across the floor. Light: cyan, and all of it on the
+	 * far wall, so the room reads dark at the door and bright at the back.
+	 */
+	void FitOutIntelligenceCenter(int32 Level, FRoomBoxFn Room)
+	{
+		// The console bow. Centre of curvature sits at the door side, so the
+		// stations splay back toward you - a cockpit, not a row of desks.
+		const int32 Stations = Level >= 2 ? 7 : 5;
+		const float Spread = Level >= 2 ? 22.0f : 26.0f;
+		for (int32 Station = 0; Station < Stations; ++Station)
+		{
+			const float Angle = (Station - (Stations - 1) * 0.5f) * Spread;
+			const float Radians = FMath::DegreesToRadians(Angle);
+			const float U = FMath::Sin(Radians) * 300.0f;
+			const float V = 380.0f + FMath::Cos(Radians) * 300.0f;
+			Room(TEXT("FacIntel"),    U, V, 48.0f, 150.0f, 96.0f, 96.0f, Angle);
+			Room(TEXT("ScreenGlow"),  U, V + 4.0f, 119.0f, 122.0f, 16.0f, 46.0f, Angle);  // its readout
+			Room(TEXT("FacIntel"),    U * 0.78f, V - 96.0f, 22.0f, 48.0f, 48.0f, 44.0f, Angle); // the stool at it
+		}
+
+		// The wall they all face. Four plot boards, each with its lit band.
+		for (int32 Board = 0; Board < 4; ++Board)
+		{
+			const float U = -270.0f + Board * 180.0f;
+			Room(TEXT("VaultPipe"),  U, 882.0f, 250.0f, 164.0f, 16.0f, 124.0f, 0.0f);
+			Room(TEXT("ScreenGlow"), U, 866.0f, 250.0f, 142.0f, 10.0f, 104.0f, 0.0f);
+		}
+
+		// The mast the dish feed comes down, and the runs that carry it forward.
+		// Cables on the floor are the room's only floor decoration and they point
+		// at where the signal goes, which is the whole point of the place.
+		Room(TEXT("VaultPipe"), -392.0f, 810.0f, CeilH * 0.5f, 72.0f, 72.0f, CeilH, 0.0f);
+		Room(TEXT("FacIntel"),  -392.0f, 810.0f, 332.0f, 232.0f, 42.0f, 228.0f, 34.0f);   // the dish on it
+		for (int32 Run = 0; Run < 4; ++Run)
+		{
+			Room(TEXT("VaultPipe"), -330.0f + Run * 155.0f, 600.0f, 4.0f, 26.0f, 330.0f, 8.0f, 0.0f);
+		}
+
+		if (Level >= 2)
+		{
+			// L2 = a second feed (5.3.1 widens Intel's reach), so a second dish
+			// on the opposite corner and the run that ties it in.
+			Room(TEXT("VaultPipe"), 392.0f, 810.0f, CeilH * 0.5f, 72.0f, 72.0f, CeilH, 0.0f);
+			Room(TEXT("FacIntel"),  392.0f, 810.0f, 332.0f, 232.0f, 42.0f, 228.0f, -34.0f);
+			Room(TEXT("VaultPipe"), 392.0f, 560.0f, 4.0f, 26.0f, 420.0f, 8.0f, 0.0f);
+		}
+	}
+
+	/**
+	 * Dispatch. An unknown facility id (a Phase 3 Medbay in an old save) gets the
+	 * neutral operational blockout it always had - graceful, never a crash and
+	 * never a room that pretends to be something it has no fit-out for
+	 * (GDD 14.3.5).
+	 */
+	void EmitFacilityFitOut(FName FacilityId, int32 Level, bool bAnnexBehind, FRoomBoxFn Room)
+	{
+		if (FacilityId == EclipseBaseDefaults::CommandCenterFacilityId)
+		{
+			FitOutCommandCenter(Level, Room);
+		}
+		else if (FacilityId == FName(TEXT("Barracks")))
+		{
+			FitOutBarracks(Level, bAnnexBehind, Room);
+		}
+		else if (FacilityId == FName(TEXT("Workshop")))
+		{
+			FitOutWorkshop(Level, bAnnexBehind, Room);
+		}
+		else if (FacilityId == FName(TEXT("IntelligenceCenter")))
+		{
+			FitOutIntelligenceCenter(Level, Room);
+		}
+		else
+		{
+			// The pre-fit-out blockout, kept for exactly this case.
+			Room(TEXT("VaultDefault"), 0.0f, 450.0f, 55.0f, 300.0f, 200.0f, 110.0f, 0.0f);
+			Room(TEXT("VaultDefault"), 0.0f, 450.0f, 130.0f, 260.0f, 160.0f, 20.0f, 0.0f);
+			Room(TEXT("GlowStrip"), 0.0f, 450.0f, CeilH - 60.0f, 200.0f, 30.0f, 20.0f, 0.0f);
+		}
 	}
 
 	/** Fill the state-derived plan fields from one facility state row (null = empty slot). */
@@ -280,6 +596,20 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 	Anchor->Tags.Add(VaultTag);
 	Anchor->Tags.Add(VaultAnchorTag);
 
+	// ZICHTBAAR MAKEN, en dit is geen detail: ATargetPoint zet zichzelf in zijn
+	// constructor op hidden (het is een markeringsactor, niet iets om te tekenen),
+	// en een verborgen actor tekent zijn CHILD-componenten ook niet. Alle
+	// instanced meshes van de kluis hangen aan dit anker, dus de hele vault stond
+	// er wel - beloopbaar, met kloppende botsing en kloppende tags - en werd nooit
+	// één keer getekend.
+	//
+	// Waarom niemand het zag, en dat is precies de les van EXECUTION_PLAN §1b nog
+	// een keer: de pariteits-Gauntlet leest TAGS en TRANSFORMS, en die klopten
+	// allemaal. Het instrument beantwoordde "staat het er?" terwijl de vraag "zie
+	// je het?" was. Gevonden door er een camera in te zetten en te merken dat er
+	// lucht en zwart uit kwam - niet door een test.
+	Anchor->SetActorHiddenInGame(false);
+
 	if (Layout == nullptr)
 	{
 		// GDD 14.3.5 (and the SPEC-P2-03 integration rule): loud log, empty
@@ -337,6 +667,17 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 				Mid->SetVectorParameterValue(TEXT("ShadeColor"), Entry.Shade);
 				Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(VaultKeyLight.Vector(), 0.0f)));
 				Mid->SetScalarParameterValue(TEXT("EmissiveScale"), VaultToonEmissiveScale);
+				// GEEN AlbedoMix hier, en dat is een gemeten beslissing en geen
+				// vergeten regel. De eerste zichtbare frames lieten een grof
+				// dambordpatroon zien en dat leek een niet-gezette albedotextuur.
+				// Nagemeten in author_toon_material.py: AlbedoMix is standaard 0
+				// (`col *= lerp(1.0, varL, saturate(AlbedoMix))` doet dan niets),
+				// dus de textuur kan het niet zijn. Het patroon is de HATCH van de
+				// master zelf - `step(0.75, frac((x+y)/HatchScale))` met HatchScale
+				// 120 en HatchStrength 0.22 - de pennenstreken in de schaduwband.
+				// Het district zet die evenmin: dit IS de huisstijl, op precies
+				// dezelfde waarden. Er valt hier dus niets te repareren, en een
+				// expliciete 0 zetten zou een reparatie suggereren die er geen is.
 			}
 			else
 			{
@@ -349,13 +690,20 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 		return Ism;
 	};
 
-	// Axis-aligned box instance: local center (vault space) + full size in cm.
-	auto AddBox = [&](const TCHAR* Label, const FVector& LocalCenter, const FVector& Size)
+	// Box instance: local center (vault space) + full size in cm + yaw about Z.
+	// Yaw exists for exactly one reason: the Intelligence Center's console bow is
+	// the only curved arrangement in the vault, and a curve faked out of
+	// axis-aligned boxes reads as a staircase.
+	auto AddBoxYaw = [&](const TCHAR* Label, const FVector& LocalCenter, const FVector& Size, float YawDeg)
 	{
 		if (UInstancedStaticMeshComponent* Ism = IsmForLabel(Label))
 		{
-			Ism->AddInstance(FTransform(FQuat::Identity, VaultOrigin + LocalCenter, Size / 100.0f), /*bWorldSpace*/ true);
+			Ism->AddInstance(FTransform(FRotator(0.0f, YawDeg, 0.0f).Quaternion(), VaultOrigin + LocalCenter, Size / 100.0f), /*bWorldSpace*/ true);
 		}
+	};
+	auto AddBox = [&](const TCHAR* Label, const FVector& LocalCenter, const FVector& Size)
+	{
+		AddBoxYaw(Label, LocalCenter, Size, 0.0f);
 	};
 
 	auto AddMarker = [&](const FVector& LocalCenter, std::initializer_list<FName> InTags) -> ATargetPoint*
@@ -514,14 +862,38 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 				// The memorial wall: auto-grown, never a purchase (5.3.2). Name
 				// plaques are the dressing pass; the alcove itself stands now.
 				AddBox(TEXT("Memorial"), FVector(Local.X, AnnexBackY - S * (WallThk * 0.5f + 12.0f), 130.0f), FVector(AnnexW * 0.7f, 20.0f, 240.0f));
+				// A bench to sit on and three votives. That is the entire fit-out
+				// and it stays that way: this is the one room in Hollow Point
+				// that must never look like it was BOUGHT (5.3.2 - grief is never
+				// a purchase), so it gets a place to sit and a light, not a rack.
+				AddBox(TEXT("VaultRubble"), FVector(Local.X, AnnexMidY - S * 120.0f, 22.0f), FVector(AnnexW * 0.55f, 70.0f, 44.0f));
+				for (const float VotiveU : { -110.0f, 0.0f, 110.0f })
+				{
+					AddBox(TEXT("EmberGlow"), FVector(Local.X + VotiveU, AnnexBackY - S * (WallThk * 0.5f + 70.0f), 24.0f), FVector(34.0f, 34.0f, 48.0f));
+				}
 				AddMarker(FVector(Local.X, AnnexMidY, 0), { FName(TEXT("Site_Memorial")), Plan.SlotId });
 			}
 			if (Plan.bHasGeneratorAnnex)
 			{
-				// The coughing geothermal generator - ambient story, no Energy
-				// meter in Phase 2 (locked decision 5). PLACEHOLDER(GDD 6.2 Energy).
+				// The geothermal generator that coughs (5.2). No Energy meter in
+				// Phase 2 (locked decision 5) - PLACEHOLDER(GDD 6.2 Energy) - so
+				// everything here is ambient story, and it earns that by reading
+				// as plumbing under load rather than as a box with a light on it:
+				// a drum, the manifold you would actually turn, the risers that
+				// take the heat out, and the grate it draws from.
 				AddBox(TEXT("VaultBlast"), FVector(Local.X, AnnexMidY, 110.0f), FVector(320.0f, 260.0f, 220.0f));
-				AddBox(TEXT("GlowStrip"), FVector(Local.X, AnnexMidY, 240.0f), FVector(120.0f, 60.0f, 18.0f));
+				AddBox(TEXT("VaultBlast"), FVector(Local.X, AnnexMidY, 245.0f), FVector(232.0f, 190.0f, 60.0f));
+				AddBox(TEXT("GlowStrip"), FVector(Local.X, AnnexMidY, 288.0f), FVector(120.0f, 60.0f, 18.0f));
+				AddBox(TEXT("VaultPipe"), FVector(Local.X, AnnexMidY - S * 148.0f, 150.0f), FVector(300.0f, 42.0f, 42.0f));
+				for (const float WheelU : { -100.0f, 0.0f, 100.0f })
+				{
+					AddBox(TEXT("VaultPipe"), FVector(Local.X + WheelU, AnnexMidY - S * 178.0f, 150.0f), FVector(52.0f, 22.0f, 52.0f));
+				}
+				for (const float RiserU : { -192.0f, 192.0f })
+				{
+					AddBox(TEXT("VaultPipe"), FVector(Local.X + RiserU, AnnexMidY, (CeilH + 220.0f) * 0.5f), FVector(46.0f, 46.0f, CeilH - 220.0f));
+				}
+				AddBox(TEXT("EmberGlow"), FVector(Local.X, AnnexMidY + S * 195.0f, 6.0f), FVector(260.0f, 110.0f, 12.0f));
 				AddMarker(FVector(Local.X - 260.0f, AnnexMidY, 0), { FName(TEXT("Site_Generator")), Plan.SlotId });
 			}
 		}
@@ -536,8 +908,12 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 			++OrphanCount;
 		}
 
+		// Presentation now only supplies the interaction-point tag: the room's
+		// colours moved into the fit-outs, where each family can pick more than
+		// one (a Workshop is amber benches AND cold steel racking AND a white
+		// arc, and collapsing that to a single tint is how the four rooms became
+		// indistinguishable in the first place).
 		const FFacilityPresentationDef* Presentation = Plan.FacilityId.IsNone() ? nullptr : FindFacilityPresentation(Plan.FacilityId);
-		const TCHAR* FacilityPalette = Presentation != nullptr ? Presentation->PaletteLabel : DefaultVaultPalette.Label;
 
 		if (Plan.Visual == EEclipseVaultSlotVisual::Empty)
 		{
@@ -583,18 +959,38 @@ void BuildVault(UWorld& World, const UEclipseBaseLayoutAsset* Layout, const FEcl
 
 		if (Plan.Level >= 1)
 		{
-			// Operational facility blockout + its own light temperature (the
-			// light bar reuses the facility palette - unlit emissive makes it
-			// read as the room's key) + the interaction point marker.
-			AddBox(FacilityPalette, FVector(Local.X, MidY, 55.0f), FVector(300.0f, 200.0f, 110.0f));
-			AddBox(FacilityPalette, FVector(Local.X, MidY, 130.0f), FVector(260.0f, 160.0f, 20.0f));
-			AddBox(FacilityPalette, FVector(Local.X, MidY, CeilH - 60.0f), FVector(200.0f, 30.0f, 20.0f));
-			if (Plan.Level >= 2)
+			// The room fit-out. This is where a slot stops being a coloured box
+			// and becomes a place: the four Act 1 facilities each get their own
+			// furniture, their own silhouette and their own light colour, so the
+			// room can be named from the doorway before any label is read
+			// (GDD 5.3; the falsification is Eclipse.Base.VaultRoomsAreTellable).
+			//
+			// The mouth is the room's origin: V measures INTO the room, and the
+			// mirroring for a south chamber happens here and nowhere else, so no
+			// fit-out has to know which side of the Spine it woke up on.
+			const float MouthY = S * (SpineHalfW + WallThk);
+			auto RoomBox = [&](const TCHAR* Label, float U, float V, float Z, float SizeX, float SizeY, float SizeZ, float YawDeg)
 			{
-				// The Workshop L2 read: second workbench + powered rack (5.4).
-				AddBox(FacilityPalette, FVector(Local.X + 220.0f, MidY + S * 160.0f, 50.0f), FVector(200.0f, 140.0f, 100.0f));
-				AddBox(FacilityPalette, FVector(Local.X - 240.0f, MidY + S * 120.0f, 90.0f), FVector(80.0f, 160.0f, 180.0f));
-			}
+				// The two keep-clear rules, enforced instead of remembered. A
+				// fit-out that walls in its own doorway is a bug that only shows
+				// up as "the player got stuck", which is the most expensive way
+				// to find it (GDD 14.3.5: loud, never silent).
+				const bool bBlocksThreshold = V - SizeY * 0.5f < RoomThresholdV
+					&& FMath::Abs(U) - SizeX * 0.5f < DoorW * 0.5f
+					&& Z - SizeZ * 0.5f < 200.0f;
+				const bool bBlocksAnnexDoor = bAnnex
+					&& V + SizeY * 0.5f > AnnexDoorV
+					&& FMath::Abs(U) - SizeX * 0.5f < AnnexDoorHalfU
+					&& Z - SizeZ * 0.5f < 200.0f;
+				if (bBlocksThreshold || bBlocksAnnexDoor)
+				{
+					UE_LOG(LogEclipse, Error, TEXT("Vault fit-out %s in %s blocks the %s doorway (U %.0f V %.0f Z %.0f) — placed anyway so the frame shows it, but this is a defect."),
+						Label, *Plan.SlotId.ToString(), bBlocksThreshold ? TEXT("chamber") : TEXT("annex"), U, V, Z);
+				}
+				AddBoxYaw(Label, FVector(Local.X + U, MouthY + S * V, Z), FVector(SizeX, SizeY, SizeZ), S > 0.0f ? YawDeg : -YawDeg);
+			};
+			EmitFacilityFitOut(Plan.FacilityId, Plan.Level, bAnnex, RoomBox);
+
 			if (Presentation != nullptr)
 			{
 				AddMarker(FVector(Local.X, S * (SpineHalfW + WallThk + 120.0f), 0), { FName(Presentation->SiteTag), Plan.SlotId });
@@ -723,6 +1119,132 @@ TArray<FEclipseVaultSlotView> ReadSlotMarkers(UWorld& World)
 		return A.SlotId.LexicalLess(B.SlotId);
 	});
 	return Views;
+}
+
+TArray<FEclipseVaultPlacedBox> ReadPlacedBoxes(UWorld& World)
+{
+	TArray<FEclipseVaultPlacedBox> Boxes;
+	for (TActorIterator<ATargetPoint> It(&World); It; ++It)
+	{
+		if (!It->ActorHasTag(VaultAnchorTag))
+		{
+			continue;
+		}
+		TArray<UInstancedStaticMeshComponent*> Isms;
+		It->GetComponents<UInstancedStaticMeshComponent>(Isms);
+		for (const UInstancedStaticMeshComponent* Ism : Isms)
+		{
+			// The component name carries the palette family (VaultIsm_<Label>);
+			// that is the same string the material was keyed on, so the read-back
+			// cannot drift from what was placed.
+			FString Palette = Ism->GetName();
+			Palette.RemoveFromStart(TEXT("VaultIsm_"));
+			for (int32 Index = 0; Index < Ism->GetInstanceCount(); ++Index)
+			{
+				FEclipseVaultPlacedBox& Box = Boxes.AddDefaulted_GetRef();
+				Box.Palette = FName(*Palette);
+				Ism->GetInstanceTransform(Index, Box.Transform, /*bWorldSpace*/ true);
+			}
+		}
+	}
+	// Sorted on content, never on spawn order: two builds of the same state must
+	// hand back the same array (the determinism contract, one layer down).
+	Boxes.Sort([](const FEclipseVaultPlacedBox& A, const FEclipseVaultPlacedBox& B)
+	{
+		if (A.Palette != B.Palette)
+		{
+			return A.Palette.LexicalLess(B.Palette);
+		}
+		const FVector LA = A.Transform.GetLocation();
+		const FVector LB = B.Transform.GetLocation();
+		if (LA.X != LB.X) { return LA.X < LB.X; }
+		if (LA.Y != LB.Y) { return LA.Y < LB.Y; }
+		return LA.Z < LB.Z;
+	});
+	return Boxes;
+}
+
+int32 SetSurfaceFogSuppressed(UWorld& World, bool bSuppressed, float& InOutPreviousDensity)
+{
+	int32 Touched = 0;
+	for (TActorIterator<AExponentialHeightFog> It(&World); It; ++It)
+	{
+		UExponentialHeightFogComponent* Fog = It->GetComponent();
+		if (Fog == nullptr)
+		{
+			continue;
+		}
+		if (bSuppressed)
+		{
+			// Remember the FIRST one's density; the district spawns exactly one
+			// and the graybox builder sweeps strays, so one value is the truth.
+			if (Touched == 0)
+			{
+				InOutPreviousDensity = Fog->FogDensity;
+			}
+			Fog->SetFogDensity(0.0f);
+		}
+		else
+		{
+			Fog->SetFogDensity(InOutPreviousDensity);
+		}
+		++Touched;
+	}
+	UE_LOG(LogEclipse, Display, TEXT("Vault: surface fog %s on %d actor(s) (density %.4f) — the vault is 150 m under a surface-authored height fog; STOPGAP until it is its own level."),
+		bSuppressed ? TEXT("suppressed") : TEXT("restored"), Touched, InOutPreviousDensity);
+	return Touched;
+}
+
+bool FindVaultPoint(UWorld& World, FName Tag, FVector& OutLocation)
+{
+	for (TActorIterator<ATargetPoint> It(&World); It; ++It)
+	{
+		if (It->ActorHasTag(VaultTag) && It->ActorHasTag(Tag))
+		{
+			OutLocation = It->GetActorLocation();
+			return true;
+		}
+	}
+	return false;
+}
+
+FEclipseBaseState MakeReviewState(TConstArrayView<FEclipseBaseSlotDef> Slots)
+{
+	// Built through the SAME pure core the campaign uses (StartConstruction +
+	// ApplyRush), never by writing the struct fields by hand. A review state
+	// that could not have been reached by playing would show rooms the player
+	// can never stand in - which is the exact failure a review frame is for.
+	FEclipseBaseState State; // seeded with the pre-built Command Center at Slot_A
+	for (const FEclipseBaseSlotDef& Slot : Slots)
+	{
+		if (Slot.AllowedFacilityRows.Num() == 0)
+		{
+			continue;
+		}
+		const FName FacilityId = Slot.AllowedFacilityRows[0];
+		const FEclipseFacilityState* Existing = State.FindBySlot(Slot.SlotId);
+		if (Existing != nullptr && Existing->Level >= 1)
+		{
+			continue; // Slot_A is already operational
+		}
+		EclipseBaseLogic::StartConstruction(State, Slot.SlotId, FacilityId, /*BuildDays*/ 1);
+		if (FEclipseFacilityState* Started = State.FindBySlot(Slot.SlotId))
+		{
+			EclipseBaseLogic::ApplyRush(*Started);
+		}
+		// The Workshop is the only slice facility with an L2 (locked decision:
+		// no L2/L3 for anything else), so it is the only room that has to prove
+		// "each level visibly different" - and it does that here.
+		if (FacilityId == FName(TEXT("Workshop")))
+		{
+			EclipseBaseLogic::StartConstruction(State, Slot.SlotId, FacilityId, /*BuildDays*/ 1);
+			if (FEclipseFacilityState* Upgrading = State.FindBySlot(Slot.SlotId))
+			{
+				EclipseBaseLogic::ApplyRush(*Upgrading);
+			}
+		}
+	}
+	return State;
 }
 
 TArray<FString> ComputeVaultSignature(UWorld& World)

@@ -8,6 +8,14 @@
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
+#include "Characters/EclipseCharacter.h"
+#include "Components/InstancedStaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/StaticMesh.h"
+#include "EngineUtils.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "HAL/IConsoleManager.h"
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
@@ -38,6 +46,19 @@ void UEclipseBaseSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	}
 
 	RegisterConsoleCommands();
+
+#if !UE_BUILD_SHIPPING
+	// The review-frame rig, and only when explicitly asked for on the command
+	// line. It arms on the loaded map rather than here, because at Initialize
+	// there is no world, no pawn and nothing to photograph.
+	if (FParse::Param(FCommandLine::Get(), TEXT("EclipseVaultShot")))
+	{
+		VaultShotMapHandle = FCoreUObjectDelegates::PostLoadMapWithWorld.AddWeakLambda(this, [this](UWorld* World)
+		{
+			SetupVaultShotRig(World);
+		});
+	}
+#endif
 }
 
 void UEclipseBaseSubsystem::Deinitialize()
@@ -49,6 +70,16 @@ void UEclipseBaseSubsystem::Deinitialize()
 			Bus->Unsubscribe(BaseEventsHandle);
 		}
 	}
+
+#if !UE_BUILD_SHIPPING
+	// Unsubscribed for the same reason the game mode's shot-fired handle is:
+	// a leak you can see and leave is a choice, not an inheritance.
+	if (VaultShotMapHandle.IsValid())
+	{
+		FCoreUObjectDelegates::PostLoadMapWithWorld.Remove(VaultShotMapHandle);
+		VaultShotMapHandle.Reset();
+	}
+#endif
 
 	UnregisterConsoleCommands();
 	Super::Deinitialize();
@@ -451,6 +482,150 @@ void UEclipseBaseSubsystem::LogBaseReport() const
 	}
 }
 
+#if !UE_BUILD_SHIPPING
+void UEclipseBaseSubsystem::SetupVaultShotRig(UWorld* World)
+{
+	const UEclipseBaseLayoutAsset* Layout = ResolveLayout();
+	if (World == nullptr || Layout == nullptr)
+	{
+		UE_LOG(LogEclipse, Error, TEXT("VaultShot: no world or no DA_BaseLayout — no frames (GDD 14.3.5)."));
+		return;
+	}
+
+	// The review vault: all four Act 1 facilities operational, Workshop at L2.
+	const FEclipseBaseState Review = EclipseVault::MakeReviewState(Layout->Slots);
+	EclipseVault::RebuildVault(*World, Layout, Review);
+	EclipseVault::SetSurfaceFogSuppressed(*World, /*bSuppressed*/ true, SurfaceFogDensity);
+
+	// Eenmalige doorlichting van wat er ECHT hangt. "175 dozen geplaatst" en "175
+	// dozen getekend" zijn twee verschillende beweringen, en de eerste ronde
+	// leverde zes frames lucht op terwijl de eerste bewering klopte.
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (!It->ActorHasTag(FName(TEXT("HP_VaultAnchor"))))
+		{
+			continue;
+		}
+		TArray<UInstancedStaticMeshComponent*> Isms;
+		It->GetComponents<UInstancedStaticMeshComponent>(Isms);
+		UE_LOG(LogEclipse, Display, TEXT("VaultShot: anker '%s' verborgen=%d · %d ISM-componenten"),
+			*It->GetName(), It->IsHidden() ? 1 : 0, Isms.Num());
+		for (const UInstancedStaticMeshComponent* Ism : Isms)
+		{
+			UE_LOG(LogEclipse, Display, TEXT("VaultShot:   %s instances=%d geregistreerd=%d zichtbaar=%d verborgenInGame=%d straal=%.0f mesh=%s materiaal=%s"),
+				*Ism->GetName(), Ism->GetInstanceCount(), Ism->IsRegistered() ? 1 : 0,
+				Ism->GetVisibleFlag() ? 1 : 0, Ism->bHiddenInGame ? 1 : 0,
+				Ism->Bounds.SphereRadius, *GetNameSafe(Ism->GetStaticMesh()), *GetNameSafe(Ism->GetMaterial(0)));
+		}
+	}
+
+	const TArray<EclipseVault::FEclipseVaultSlotPlan> Plans = EclipseVault::PlanSlots(Layout->Slots, Review);
+	VaultShotEyes.Reset();
+	VaultShotRotations.Reset();
+	VaultShotLabels.Reset();
+
+	// One frame per chamber from its doorway - the pose a player has walking
+	// past - plus one down the Spine so the corridor that ties them together is
+	// on record too.
+	for (const EclipseVault::FEclipseVaultSlotPlan& Plan : Plans)
+	{
+		const float Side = Plan.bNorthSide ? 1.0f : -1.0f;
+		const float MouthY = Plan.ChamberCenter.Y - Side * EclipseVault::ChamberDepthCm * 0.5f;
+		const FVector Eye(Plan.ChamberCenter.X, MouthY - Side * 40.0f, Plan.ChamberCenter.Z + 170.0f);
+		const FVector Look(Plan.ChamberCenter.X, MouthY + Side * 600.0f, Plan.ChamberCenter.Z + 140.0f);
+		VaultShotEyes.Add(Eye);
+		VaultShotRotations.Add((Look - Eye).Rotation());
+		VaultShotLabels.Add(FString::Printf(TEXT("%s / %s"), *Plan.SlotId.ToString(), *Plan.FacilityId.ToString()));
+	}
+	if (Plans.Num() > 0)
+	{
+		const FVector SpineEye(Plans[0].ChamberCenter.X - 900.0f, 0.0f, Plans[0].ChamberCenter.Z + 175.0f);
+		VaultShotEyes.Add(SpineEye);
+		VaultShotRotations.Add(FRotator(-3.0f, 0.0f, 0.0f));
+		VaultShotLabels.Add(TEXT("de Spine — de gang die de vier verbindt"));
+	}
+
+	// Index 0 repeats the first camera as a sacrificial warm-up: the first
+	// capture of a session carries streaming/history artifacts (the district
+	// rig's lesson, and it cost a shot round before it was written down).
+	// Via een KOPIE: Insert met een element uit dezelfde array is in UE een
+	// harde assert (de array kan herallokeren terwijl hij het argument nog
+	// nodig heeft), en dat is precies wat de eerste rig-run deed.
+	if (VaultShotEyes.Num() > 0)
+	{
+		const FVector FirstEye = VaultShotEyes[0];
+		const FRotator FirstRotation = VaultShotRotations[0];
+		VaultShotEyes.Insert(FirstEye, 0);
+		VaultShotRotations.Insert(FirstRotation, 0);
+		VaultShotLabels.Insert(TEXT("warm-up (weggooien)"), 0);
+	}
+
+	World->GetTimerManager().SetTimer(VaultShotTimer, this, &UEclipseBaseSubsystem::AdvanceVaultShotRig,
+		2.0f, /*bLoop*/ true, /*FirstDelay*/ 6.0f);
+	UE_LOG(LogEclipse, Display, TEXT("VaultShot: armed — %d frames of the Hollow Point review vault."), VaultShotEyes.Num());
+}
+
+void UEclipseBaseSubsystem::AdvanceVaultShotRig()
+{
+	UWorld* World = GetVaultWorld();
+	APlayerController* Controller = World != nullptr ? World->GetFirstPlayerController() : nullptr;
+	APawn* Pawn = Controller != nullptr ? Controller->GetPawn() : nullptr;
+	if (Pawn == nullptr)
+	{
+		return;
+	}
+
+	const int32 ShotIndex = VaultShotStep / 2;
+	if (!VaultShotEyes.IsValidIndex(ShotIndex))
+	{
+		Controller->ConsoleCommand(TEXT("quit"));
+		return;
+	}
+
+	if ((VaultShotStep % 2) == 0)
+	{
+		Pawn->SetActorLocation(VaultShotEyes[ShotIndex], /*bSweep*/ false, nullptr, ETeleportType::TeleportPhysics);
+		Controller->SetControlRotation(VaultShotRotations[ShotIndex]);
+		if (AEclipseCharacter* Character = Cast<AEclipseCharacter>(Pawn))
+		{
+			// Flying + zeroed velocity, or a walking character drifts during the
+			// two-second settle and photographs a different room than the one
+			// the pose named.
+			Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+			Character->GetCharacterMovement()->StopMovementImmediately();
+			// EERSTE PERSOON, en dat is geen smaakkeuze. De derdepersoonsboom
+			// hangt 300 cm ACHTER het personage: een camera die in de deuropening
+			// hoort te staan, staat dan drie meter terug in de rots van de
+			// overkant. De pose die dit script uitrekent is een OOGpositie, dus
+			// het oog moet er ook echt staan - en de eerstepersoons-FOV (90) is
+			// precies de FOV waarmee de headless meting rekent, zodat het beeld
+			// en het getal naar hetzelfde kijken.
+			Character->SetFirstPerson(true);
+			if (USkeletalMeshComponent* Mesh = Character->GetMesh())
+			{
+				Mesh->SetVisibility(false);
+			}
+		}
+		UE_LOG(LogEclipse, Display, TEXT("VAULTSHOT %d: %s"), ShotIndex, *VaultShotLabels[ShotIndex]);
+	}
+	else
+	{
+		// MEET DE CAMERA, niet de bedoeling. De eerste ronde leverde zes frames
+		// met lucht en zwart op terwijl de pose-regel keurig "Slot_A" meldde: de
+		// pose die dit script ZET en de plek waar de lens dan STAAT zijn twee
+		// verschillende dingen, en alleen de tweede maakt een frame.
+		FVector ViewLocation;
+		FRotator ViewRotation;
+		Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+		UE_LOG(LogEclipse, Display, TEXT("VAULTSHOT %d camera: bedoeld %s · pawn %s · lens %s · vault aanwezig=%d · geplaatste dozen=%d"),
+			ShotIndex, *VaultShotEyes[ShotIndex].ToString(), *Pawn->GetActorLocation().ToString(), *ViewLocation.ToString(),
+			EclipseVault::IsVaultPresent(*World) ? 1 : 0, EclipseVault::ReadPlacedBoxes(*World).Num());
+		Controller->ConsoleCommand(TEXT("HighResShot 1920x1080"));
+	}
+	++VaultShotStep;
+}
+#endif
+
 void UEclipseBaseSubsystem::RegisterConsoleCommands()
 {
 #if !UE_BUILD_SHIPPING
@@ -477,6 +652,83 @@ void UEclipseBaseSubsystem::RegisterConsoleCommands()
 		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
 		{
 			EnsureVaultPresent();
+		}),
+		ECVF_Default));
+
+	ConsoleCommands.Add(Console.RegisterConsoleCommand(
+		TEXT("Eclipse.Base.Enter"),
+		TEXT("Render the vault and put the player inside it (SPEC-P2-03 §2d: the base is a place you stand in, not a menu)."),
+		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+		{
+			// The vault stood behind a console command that only BUILT it, and
+			// nothing ever moved the player to it - so a walkable base existed
+			// that nobody could reach on foot. That is the gap §2d names, and
+			// this is the smallest honest closing of it until the P1-08 menu-hub
+			// retirement lands a real level seam.
+			EnsureVaultPresent();
+			UWorld* World = GetVaultWorld();
+			APlayerController* Controller = World != nullptr ? World->GetFirstPlayerController() : nullptr;
+			APawn* Pawn = Controller != nullptr ? Controller->GetPawn() : nullptr;
+			if (Pawn == nullptr)
+			{
+				UE_LOG(LogEclipse, Error, TEXT("Base.Enter: no player pawn to move into the vault."));
+				return;
+			}
+			FVector Entry;
+			if (!EclipseVault::FindVaultPoint(*World, TEXT("Entry_Vault"), Entry))
+			{
+				UE_LOG(LogEclipse, Error, TEXT("Base.Enter: the vault has no Entry_Vault marker — is a DA_BaseLayout linked? (GDD 14.3.5)"));
+				return;
+			}
+			// Zonder dit sta je in bruine soep: zie SetSurfaceFogSuppressed.
+			EclipseVault::SetSurfaceFogSuppressed(*World, /*bSuppressed*/ true, SurfaceFogDensity);
+			Pawn->SetActorLocation(Entry + FVector(0.0f, 0.0f, 120.0f), /*bSweep*/ false, nullptr, ETeleportType::TeleportPhysics);
+			if (ACharacter* Character = Cast<ACharacter>(Pawn))
+			{
+				Character->GetCharacterMovement()->StopMovementImmediately();
+			}
+			// Facing the airlock, so the first thing on screen is the corridor in
+			// and not the rock behind you.
+			Controller->SetControlRotation(FRotator(0.0f, -90.0f, 0.0f));
+			UE_LOG(LogEclipse, Display, TEXT("Base.Enter: standing at the Hollow Point airlock (%s). Walk south down the Spine; the four chambers open off it. Eclipse.Base.Leave puts the district back."), *Entry.ToString());
+		}),
+		ECVF_Default));
+
+	ConsoleCommands.Add(Console.RegisterConsoleCommand(
+		TEXT("Eclipse.Base.Leave"),
+		TEXT("Back up to the district and restore its surface fog (the other half of Eclipse.Base.Enter)."),
+		FConsoleCommandDelegate::CreateWeakLambda(this, [this]()
+		{
+			// Enter without Leave would leave the district permanently fogless,
+			// and a debug entry point that quietly wrecks the look of the place
+			// you came from is worse than no entry point at all.
+			UWorld* World = GetVaultWorld();
+			if (World == nullptr)
+			{
+				return;
+			}
+			EclipseVault::SetSurfaceFogSuppressed(*World, /*bSuppressed*/ false, SurfaceFogDensity);
+			APlayerController* Controller = World->GetFirstPlayerController();
+			APawn* Pawn = Controller != nullptr ? Controller->GetPawn() : nullptr;
+			if (Pawn == nullptr)
+			{
+				return;
+			}
+			FVector Surface(0.0f, 0.0f, 200.0f);
+			for (TActorIterator<AActor> It(World); It; ++It)
+			{
+				if (It->ActorHasTag(FName(TEXT("Entry_Main"))))
+				{
+					Surface = It->GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+					break;
+				}
+			}
+			Pawn->SetActorLocation(Surface, /*bSweep*/ false, nullptr, ETeleportType::TeleportPhysics);
+			if (ACharacter* Character = Cast<ACharacter>(Pawn))
+			{
+				Character->GetCharacterMovement()->StopMovementImmediately();
+			}
+			UE_LOG(LogEclipse, Display, TEXT("Base.Leave: back on the surface at %s, fog restored."), *Surface.ToString());
 		}),
 		ECVF_Default));
 

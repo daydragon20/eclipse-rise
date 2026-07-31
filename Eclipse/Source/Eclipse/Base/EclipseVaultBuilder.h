@@ -29,6 +29,17 @@ class UWorld;
  */
 namespace EclipseVault
 {
+	/**
+	 * Chamber interior footprint (cm). Public because they are a geometry
+	 * CONTRACT and not a private detail: the room fit-outs are authored against
+	 * them and the room-reading probe places its cameras with them, and a
+	 * measurement that guesses the size of the room it is photographing is not a
+	 * measurement. Chunky, confident proportions (15.5): 9 x 9 m at 4.2 m.
+	 */
+	constexpr float ChamberWidthCm = 900.0f;
+	constexpr float ChamberDepthCm = 900.0f;
+	constexpr float CeilingHeightCm = 420.0f;
+
 	/** Non-slot node ids the slot-graph's AdjacentSlotIds may reference (SPEC-P2-03 slot-graph). */
 	inline const FName SpineNodeId(TEXT("Spine"));
 	inline const FName MemorialNodeId(TEXT("MemorialAlcove"));
@@ -107,6 +118,59 @@ namespace EclipseVault
 		int32 StaffCount = 0;
 		bool bOrphan = false;
 	};
+
+	/**
+	 * One physically placed box read back out of a world: which palette family
+	 * it belongs to, and exactly where it is. This is the probe the room-reading
+	 * falsification (Eclipse.Base.VaultRoomsAreTellable) projects into screen
+	 * space - it needs the GEOMETRY, not the plan, because the claim under test
+	 * is about what a camera in the doorway would see and not about what the
+	 * builder intended to place.
+	 */
+	struct FEclipseVaultPlacedBox
+	{
+		FName Palette;
+		FTransform Transform;
+	};
+
+	/** Every placed instance in the standing vault, sorted so the read is deterministic. */
+	ECLIPSE_API TArray<FEclipseVaultPlacedBox> ReadPlacedBoxes(UWorld& World);
+
+	/**
+	 * Hollow Point sits 150 m UNDER a district whose exponential height fog is
+	 * authored for the surface (density 0.006, falloff 0.2, inscatter 0.42/0.32/0.24
+	 * - Kessara's sodium smog). Height fog grows exponentially with depth, so at
+	 * -15000 it is opaque: the first review frames of the finished vault came back
+	 * as a flat brown rectangle in EXACTLY that inscatter colour, with the rooms
+	 * rendering perfectly behind it.
+	 *
+	 * That is not a screenshot problem. Anyone who walks in sees the same soup.
+	 * So the presentation paths (Eclipse.Base.Enter, -EclipseVaultShot) suppress
+	 * the surface fog while you are down there and put it back when you leave.
+	 *
+	 * It is a STOPGAP and named as one: the real fix is that the vault stops
+	 * being a basement of the district map and becomes its own level with its own
+	 * atmosphere, which is the P1-08 menu-hub retirement. Returns how many fog
+	 * actors were touched; OutPreviousDensity carries the value to restore.
+	 */
+	ECLIPSE_API int32 SetSurfaceFogSuppressed(UWorld& World, bool bSuppressed, float& InOutPreviousDensity);
+
+	/**
+	 * World location of a tagged point in the standing vault (Entry_Vault,
+	 * Site_MapTable, Site_Workbench, ...); false when nothing carries that tag.
+	 * The walking round routes on exactly these, so the route visits the points
+	 * the game itself considers the reason to be in the room.
+	 */
+	ECLIPSE_API bool FindVaultPoint(UWorld& World, FName Tag, FVector& OutLocation);
+
+	/**
+	 * The four Act 1 facilities operational, Workshop at L2 - the state the
+	 * review frames and the room-reading falsification both stand up. It is a
+	 * PRESENTATION state: it is never committed, never saved and never emitted
+	 * as a fact, so a camera rig can show the finished vault without a rig ever
+	 * being able to write to the campaign (GDD 12.2 rule 4).
+	 */
+	ECLIPSE_API FEclipseBaseState MakeReviewState(TConstArrayView<FEclipseBaseSlotDef> Slots);
 
 	/**
 	 * The pure placement decision (headless, deterministic - GDD 14.3.2 spirit):

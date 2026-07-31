@@ -109,6 +109,34 @@ private:
 	/** The world the vault lives in: the game instance's current world (null outside a world). */
 	UWorld* GetVaultWorld() const;
 
+#if !UE_BUILD_SHIPPING
+	/**
+	 * `-EclipseVaultShot`: stand the review vault up and photograph the four
+	 * chambers from the SAME doorway poses the headless room-reading probe uses
+	 * (Eclipse.Base.VaultRoomsAreTellable), so the picture and the measurement
+	 * are looking at the same thing. Without that the two can drift and the
+	 * frames become decoration next to a number nobody can check.
+	 *
+	 * It never touches the campaign: the vault is built from
+	 * EclipseVault::MakeReviewState, which is a presentation state that is
+	 * never committed, saved or emitted (GDD 12.2 rule 4). The flag name is
+	 * deliberately not a prefix of -EclipseShot; FParse::Param wants a word
+	 * boundary and that near-miss already cost an evening once (EXECUTION_PLAN §1b).
+	 */
+	void SetupVaultShotRig(UWorld* World);
+	void AdvanceVaultShotRig();
+
+	FTimerHandle VaultShotTimer;
+	int32 VaultShotStep = 0;
+	TArray<FVector> VaultShotEyes;
+	TArray<FRotator> VaultShotRotations;
+	TArray<FString> VaultShotLabels;
+	FDelegateHandle VaultShotMapHandle;
+
+	/** District fog density parked while the player is 150 m down (see SetSurfaceFogSuppressed). */
+	float SurfaceFogDensity = 0.006f;
+#endif
+
 	/** One-shot warning flags (GDD 14.3.5: degrade loudly, once). */
 	mutable bool bWarnedMissingLayout = false;
 	mutable bool bWarnedMissingFacilities = false;
