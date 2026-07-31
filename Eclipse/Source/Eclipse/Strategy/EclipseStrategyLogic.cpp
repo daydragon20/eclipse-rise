@@ -31,6 +31,47 @@ namespace
 	}
 }
 
+bool IsReachable(const FEclipseCampaignState& State, const TArray<FEclipseRegionDefinition>& Definitions,
+	FName StartRegionId, FName GoalRegionId, EEclipseTransitMode Mode, const FEclipseLaneTuning& Tuning)
+{
+	if (StartRegionId == GoalRegionId)
+	{
+		return FindDefinition(Definitions, StartRegionId) != nullptr;
+	}
+
+	// Plain BFS, deliberately not FindRoute: this exists to explain why FindRoute
+	// failed, and calling it from inside that failure path would be a loop.
+	TSet<FName> Seen;
+	TArray<FName> Frontier;
+	Seen.Add(StartRegionId);
+	Frontier.Add(StartRegionId);
+
+	while (!Frontier.IsEmpty())
+	{
+		const FName Current = Frontier.Pop();
+		const FEclipseRegionDefinition* Definition = FindDefinition(Definitions, Current);
+		if (Definition == nullptr)
+		{
+			continue;
+		}
+		for (const FEclipseLaneDefinition& Lane : Definition->Lanes)
+		{
+			if (Seen.Contains(Lane.NeighborRegionId)
+				|| !ResolveLaneTransit(State, Lane, Mode, Tuning).bPassable)
+			{
+				continue;
+			}
+			if (Lane.NeighborRegionId == GoalRegionId)
+			{
+				return true;
+			}
+			Seen.Add(Lane.NeighborRegionId);
+			Frontier.Add(Lane.NeighborRegionId);
+		}
+	}
+	return false;
+}
+
 FEclipseLaneTransit ResolveLaneTransit(const FEclipseCampaignState& State, const FEclipseLaneDefinition& Lane, EEclipseTransitMode Mode, const FEclipseLaneTuning& Tuning)
 {
 	FEclipseLaneTransit Transit;
@@ -439,10 +480,19 @@ FEclipseRoute FindRoute(const FEclipseCampaignState& State, const TArray<FEclips
 	const FNodeCost& GoalCost = Costs.FindChecked(Query.GoalRegionId);
 	if (GoalCost.Days == MAX_int32)
 	{
-		Route.FailureReason = Query.Mode == EEclipseTransitMode::Military
-			? FString::Printf(TEXT("No military route from '%s' to '%s' — every path is gated or smuggler-only (GDD 3.1 rule 2)"),
+		// WHICH wall, not just "no". "Shut to columns but open to smugglers" and
+		// "shut to everyone" are two different situations that ask the player for
+		// two different things — hire Kaya, or take a Spire — and a refusal that
+		// reads the same for both teaches neither (GDD 9.5: never silent, and a
+		// message that cannot distinguish is a quieter kind of silent).
+		const bool bSmugglersCouldGetThere =
+			Query.Mode == EEclipseTransitMode::Military
+			&& IsReachable(State, Definitions, Query.StartRegionId, Query.GoalRegionId, EEclipseTransitMode::Smuggler, Query.Tuning);
+
+		Route.FailureReason = bSmugglersCouldGetThere
+			? FString::Printf(TEXT("No military route from '%s' to '%s' — every path is gated or smuggler-only, but smugglers can reach it (GDD 3.1 rule 2)"),
 				*Query.StartRegionId.ToString(), *Query.GoalRegionId.ToString())
-			: FString::Printf(TEXT("No route at all from '%s' to '%s' — the graph is cut here (GDD 3.1 rule 1)"),
+			: FString::Printf(TEXT("No route at all from '%s' to '%s' — the graph is cut here, not gated (GDD 3.1 rule 1)"),
 				*Query.StartRegionId.ToString(), *Query.GoalRegionId.ToString());
 		return Route;
 	}

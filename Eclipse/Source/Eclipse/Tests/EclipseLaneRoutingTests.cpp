@@ -262,8 +262,19 @@ bool FEclipseLaneSmugglerIsAThirdOutcomeTest::RunTest(const FString& Parameters)
 	// "military: no", and they are NOT the same state of the world.
 	TestNotEqual(TEXT("THE POINT: B and C differ in smuggler reachability"),
 		VaultSmuggler.bValid, HermitSmuggler.bValid);
-	TestNotEqual(TEXT("...and the two refusals do not read the same"),
-		VaultMilitary.FailureReason, HermitMilitary.FailureReason);
+	/**
+	 * And the two refusals must not read the same — but "not the same STRING" is
+	 * not good enough, because the region name is in the message and would make
+	 * any two refusals differ. That version of this assert passed while both
+	 * sentences said "gated or smuggler-only", including for the island. So:
+	 * assert what each refusal CLAIMS, not that the two texts differ.
+	 */
+	TestTrue(TEXT("B's refusal points at the gate and says smugglers can"),
+		VaultMilitary.FailureReason.Contains(TEXT("smugglers can reach it")));
+	TestTrue(TEXT("C's refusal says the graph is cut, not gated"),
+		HermitMilitary.FailureReason.Contains(TEXT("cut here, not gated")));
+	TestFalse(TEXT("...and C never blames a Spire for an island"),
+		HermitMilitary.FailureReason.Contains(TEXT("smugglers can reach it")));
 	AddInfo(FString::Printf(TEXT("GEMETEN  B weigert met: %s"), *VaultMilitary.FailureReason));
 	AddInfo(FString::Printf(TEXT("GEMETEN  C weigert met: %s"), *HermitMilitary.FailureReason));
 
@@ -491,6 +502,128 @@ bool FEclipseResponseTierDerivationTest::RunTest(const FString& Parameters)
 	State.ResponseTier = EEclipseDominionResponseTier::Existential;
 	TestEqual(TEXT("An authored Existential survives derivation"),
 		EclipseStrategyLogic::DeriveResponseTier(State), EEclipseDominionResponseTier::Existential);
+
+	return true;
+}
+
+/**
+ * AUTHORED IS NOT SHIPPED.
+ *
+ * Every test above runs on a fixture built in C++, so all of them would stay
+ * green on a shipped board whose lanes were the migration's open unit-cost
+ * defaults — a board where GDD 3.1 rule 2 exists in the engine and nowhere in
+ * the game. This test asks the shipped asset directly.
+ *
+ * It deliberately asserts the SHAPE (a gate exists, a smuggler lane exists,
+ * costs are not all 1) rather than the exact numbers: the numbers are content
+ * and a designer must be able to retune them without going through C++. What
+ * may not silently change is that the three statuses are actually used.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseShippedBoardIsAuthoredTest,
+	"Eclipse.Strategy.Lanes.ShippedBoardActuallyUsesTheThreeStatuses",
+	EclipseLaneTest::TestFlags)
+
+bool FEclipseShippedBoardIsAuthoredTest::RunTest(const FString& Parameters)
+{
+	UEclipseRegionGraphAsset* Graph = LoadObject<UEclipseRegionGraphAsset>(
+		nullptr, TEXT("/Game/Data/DA_KessaraDistrictGraph.DA_KessaraDistrictGraph"));
+	if (!TestNotNull(TEXT("Shipped district graph loads"), Graph))
+	{
+		AddError(TEXT("Run Tools/create_phase1_content.py (which applies Tools/author_region_lanes.py)."));
+		return false;
+	}
+
+	TArray<FString> Errors;
+	TestTrue(TEXT("The shipped board validates clean"), EclipseStrategyLogic::ValidateGraph(Graph->Regions, Errors));
+	for (const FString& Error : Errors)
+	{
+		AddError(Error);
+	}
+
+	int32 Gated = 0;
+	int32 SmugglerOnly = 0;
+	int32 NonUnitCost = 0;
+	int32 CarriesRisk = 0;
+	for (const FEclipseRegionDefinition& Definition : Graph->Regions)
+	{
+		for (const FEclipseLaneDefinition& Lane : Definition.Lanes)
+		{
+			Gated += Lane.Status == EEclipseLaneStatus::SpireGated ? 1 : 0;
+			SmugglerOnly += Lane.Status == EEclipseLaneStatus::SmugglerOnly ? 1 : 0;
+			NonUnitCost += Lane.TravelDays > 1 ? 1 : 0;
+			CarriesRisk += Lane.Risk > 0 ? 1 : 0;
+		}
+	}
+	AddInfo(FString::Printf(TEXT("GEMETEN  verscheept bord: %d gated · %d smokkel-only · %d lanes >1 dag · %d met risico"),
+		Gated, SmugglerOnly, NonUnitCost, CarriesRisk));
+
+	TestTrue(TEXT("At least one lane is gated by a Spire (rule 2 exists on the board)"), Gated > 0);
+	TestTrue(TEXT("At least one lane is smuggler-only (the third status is used)"), SmugglerOnly > 0);
+	TestTrue(TEXT("Lanes have real distances, not the migration default (rule 4)"), NonUnitCost > 0);
+	TestTrue(TEXT("Lanes carry risk — otherwise nothing reads the field"), CarriesRisk > 0);
+
+	// And the gate does something ON THIS BOARD: same query, one flip.
+	FEclipseCampaignState State;
+	for (const FEclipseRegionDefinition& Definition : Graph->Regions)
+	{
+		FEclipseRegionState& Region = State.Regions.AddDefaulted_GetRef();
+		Region.RegionId = Definition.RegionId;
+		Region.Owner = Definition.StartingOwner;
+	}
+
+	// Find the authored gate rather than hardcoding which region it is — the
+	// designer may move the Spire; the property under test is that moving it
+	// still changes routing.
+	FName GateId;
+	FName GatedFrom;
+	FName GatedTo;
+	for (const FEclipseRegionDefinition& Definition : Graph->Regions)
+	{
+		for (const FEclipseLaneDefinition& Lane : Definition.Lanes)
+		{
+			if (Lane.Status == EEclipseLaneStatus::SpireGated && GateId.IsNone())
+			{
+				GateId = Lane.GateRegionId;
+				GatedFrom = Definition.RegionId;
+				GatedTo = Lane.NeighborRegionId;
+			}
+		}
+	}
+	if (!TestFalse(TEXT("A gate region was found"), GateId.IsNone()))
+	{
+		return false;
+	}
+
+	auto GateOwnerRef = [&State](FName Id) -> FEclipseRegionState&
+	{
+		FEclipseRegionState* Region = State.Regions.FindByPredicate(
+			[Id](const FEclipseRegionState& R) { return R.RegionId == Id; });
+		check(Region != nullptr);
+		return *Region;
+	};
+
+	const FEclipseRegionDefinition* FromDefinition = Graph->Regions.FindByPredicate(
+		[GatedFrom](const FEclipseRegionDefinition& D) { return D.RegionId == GatedFrom; });
+	const FEclipseLaneDefinition* GatedLane = FromDefinition != nullptr ? FromDefinition->FindLane(GatedTo) : nullptr;
+	if (!TestNotNull(TEXT("The gated lane resolves"), GatedLane))
+	{
+		return false;
+	}
+
+	GateOwnerRef(GateId).Owner = EEclipseRegionOwner::Dominion;
+	const bool bShutWhileHostile = !EclipseStrategyLogic::ResolveLaneTransit(
+		State, *GatedLane, EclipseStrategyLogic::EEclipseTransitMode::Military, Graph->LaneTuning).bPassable;
+
+	GateOwnerRef(GateId).Owner = EEclipseRegionOwner::Player;
+	const bool bOpenWhenTaken = EclipseStrategyLogic::ResolveLaneTransit(
+		State, *GatedLane, EclipseStrategyLogic::EEclipseTransitMode::Military, Graph->LaneTuning).bPassable;
+
+	AddInfo(FString::Printf(TEXT("GEMETEN  %s -> %s gepoort door %s: vijandig=%s · genomen=%s"),
+		*GatedFrom.ToString(), *GatedTo.ToString(), *GateId.ToString(),
+		bShutWhileHostile ? TEXT("DICHT") : TEXT("open"), bOpenWhenTaken ? TEXT("open") : TEXT("DICHT")));
+
+	TestTrue(TEXT("On the shipped board a hostile Spire shuts its lane"), bShutWhileHostile);
+	TestTrue(TEXT("...and taking it opens the lane"), bOpenWhenTaken);
 
 	return true;
 }

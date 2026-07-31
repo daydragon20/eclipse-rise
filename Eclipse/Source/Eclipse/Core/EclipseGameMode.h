@@ -317,7 +317,6 @@ private:
 
 	FEclipseEventSubscriptionHandle MissionEventsHandle;
 	FEclipseEventSubscriptionHandle ShotFiredHandle;
-	FEclipseEventSubscriptionHandle WorldImpactHandle;
 
 	/**
 	 * Hoe vaak een schot van de spelerskant een vijand in beweging zette.
@@ -332,8 +331,14 @@ private:
 	/** Een schot vertalen naar wie het hoort (26-07, punt 1). */
 	void OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
-	/** Het zichtbare spoor van een misser — hier en niet in het wapen; zie de commentaar bij de subscriptie. */
-	void OnWorldImpact(FGameplayTag EventTag, const FInstancedStruct& Payload);
+	// HIER STOND `OnWorldImpact` — DE TWEEDE BOUWER VAN HET INSLAGSPOOR, EN HIJ IS WEG.
+	//
+	// Hij zette op elke wereldtreffer een spoor neer bovenop het spoor dat
+	// `UEclipseHitscanWeaponComponent::SpawnImpactMark` er al had gezet: 22 objecten
+	// bij 11 treffers, exact samenvallend, met een ander materiaal en zonder rotatie.
+	// De toelichting waarom dit de verliezer van de twee is, staat bij de
+	// subscriptielijst in StartPlay. Het spoor woont nu op één plek:
+	// Combat/EclipseImpactMark.{h,cpp}.
 
 	/** Eén regel over het eerste gehoorde schot; daarna zwijgt het. */
 	bool bLoggedFirstShotAlert = false;

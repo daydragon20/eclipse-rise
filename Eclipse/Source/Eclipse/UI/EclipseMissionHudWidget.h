@@ -160,6 +160,25 @@ private:
 	/** De titel-veilige marge voor de huidige viewport (EclipseHudReadout::TitleSafeMarginPx). */
 	FVector2D CurrentTitleSafeMarginPx() const;
 
+	/**
+	 * De marge PER FRAME toepassen, niet bij de bouw.
+	 *
+	 * GEMETEN in drie opnamerondes op 31-07: slotwaarde 12 gaf 9 px op het frame,
+	 * 36 gaf 25 px, en 54 gaf 55 px. Eén DPI-schaal kan die drie niet verklaren —
+	 * de schaal die bij NativeOnInitialized geldt is nog niet de definitieve, want
+	 * de viewport heeft daar zijn maat nog niet. Een marge die op dat moment wordt
+	 * ingebakken, is dus een getal uit een keten die nog niet af was.
+	 *
+	 * Dezelfde klasse fout als RebuildWidget-vóór-NativeConstruct, en dezelfde
+	 * oplossing: niet één keer vroeg vastleggen, maar nakijken zolang het kan
+	 * veranderen. Het lost er meteen een echte speler-situatie mee op — venster
+	 * slepen en resolutie wisselen.
+	 */
+	void ApplySafeAreaLayout();
+
+	/** Laatst toegepaste marge, zodat een frame zonder verandering niets ongeldigt. */
+	FVector2D LastAppliedSafeMarginPx = FVector2D(-1.0, -1.0);
+
 	/** Trefferbevestiging in het schermmidden; gedoofd door de teller in NativeTick. */
 	void BuildHitMarker();
 
@@ -245,6 +264,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UImage> CrosshairCentre;
 
+	/** Donkere rand om het middenpunt; zonder die rand bestond het punt alleen in de code (GEZIEN 31-07). */
+	UPROPERTY()
+	TObjectPtr<class UImage> CrosshairCentreShadow;
+
 	/** Laatst gezette maten, zodat een frame zonder verandering geen layout ongeldigt. */
 	float LastCrosshairArmPx = -1.0f;
 	float LastCrosshairGapPx = -1.0f;
@@ -289,6 +312,13 @@ private:
 	 */
 	UPROPERTY(Transient)
 	TObjectPtr<class UTextBlock> ReloadReadout;
+
+	/** Inktrand en vlak achter de munitiehoek (REFERENTIE_HUD_BORDERLANDS.md §1/§4.2). */
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> AmmoPanelInk;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> AmmoPanelFill;
 
 	UPROPERTY(Transient)
 	TObjectPtr<class UImage> ReloadBarTrack;

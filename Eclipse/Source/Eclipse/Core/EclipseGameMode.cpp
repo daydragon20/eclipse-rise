@@ -1,4 +1,4 @@
-#include "Core/EclipseGameMode.h"
+﻿#include "Core/EclipseGameMode.h"
 
 #include "AI/EclipseEnemyController.h"
 #include "AI/EclipseSquadmateController.h"
@@ -100,101 +100,6 @@ void AEclipseGameMode::InitGame(const FString& MapName, const FString& Options, 
 	}
 }
 
-void AEclipseGameMode::OnWorldImpact(FGameplayTag EventTag, const FInstancedStruct& Payload)
-{
-	const FEclipseCombatEventPayload* Impact = Payload.GetPtr<FEclipseCombatEventPayload>();
-	UWorld* World = GetWorld();
-	if (Impact == nullptr || World == nullptr)
-	{
-		return;
-	}
-	UStaticMesh* Quad = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
-	if (Quad == nullptr)
-	{
-		return;
-	}
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	// De payload draagt de plek maar niet de normaal: een inslag op de grond ligt
-	// plat, en dat is verreweg het meeste. Komt de normaal er ooit bij, dan kan hij
-	// hier meteen de rotatie dragen.
-	AStaticMeshActor* Mark = World->SpawnActor<AStaticMeshActor>(
-		Impact->Origin + FVector(0.0f, 0.0f, 1.0f), FRotator::ZeroRotator, Params);
-	if (Mark == nullptr)
-	{
-		return;
-	}
-	Mark->SetMobility(EComponentMobility::Movable);
-	UStaticMeshComponent* Plate = Mark->GetStaticMeshComponent();
-	Plate->SetStaticMesh(Quad);
-	Mark->SetActorScale3D(FVector(0.09f, 0.09f, 0.004f));
-	Plate->SetCastShadow(false);
-	Plate->SetAffectDistanceFieldLighting(false);
-	Mark->SetActorEnableCollision(false);
-	if (UMaterialInterface* Toon = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Art/M_EclipseToon.M_EclipseToon")))
-	{
-		if (UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Toon, Mark))
-		{
-			const FLinearColor Spark(1.00f, 0.62f, 0.22f, 1.0f);
-			const FVector Zon = FRotator(-25.0f, 55.0f, 0.0f).Vector();
-			Mid->SetVectorParameterValue(TEXT("LitColor"), Spark);
-			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Spark * 0.45f);
-			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(Zon, 0.0f)));
-			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
-			Plate->SetMaterial(0, Mid);
-		}
-	}
-	Mark->SetLifeSpan(2.5f);
-	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
-	UE_LOG(LogEclipse, Verbose, TEXT("[SPAWNTIJD] inslagspoor op t=%.2f s."), World->GetTimeSeconds());
-
-	// ================================================================
-	// DE CONCLUSIE VAN 27-07, en hij is groter dan dit ene spoor.
-	//
-	// WERKT WEL:  een magenta kubus VASTGEMAAKT AAN HET PERSONAGE, op zijn positie.
-	//             Groot en helder in elk frame. Dat is de ENIGE proef die ooit iets
-	//             liet zien.
-	// (hieronder stond dat het aan de TIJD lag; vastmaken tijdens het spelen hielp
-	//  ook niet, dus dat patroon hield het geen half uur — de tweede keer vandaag.)
-	// WERKT NIET: hetzelfde blok, zelfde mesh, zelfde materiaal, zelfde maat, maar
-	//             neergezet TIJDENS HET SPELEN. Onzichtbaar — zowel vanuit het
-	//             wapencomponent als vanuit deze game mode via de bus, op 9, 50 en
-	//             90 cm, met en zonder RF_Transient, met en zonder levensduur, met
-	//             vier verschillende materialen, plat en massief.
-	//
-	// Alles wat een spoor van een blok kan onderscheiden is daarmee uitgesloten.
-	// Wat overblijft is WANNEER het ontstaat. Dat raakt niet alleen dit inslagspoor
-	// maar alles wat tijdens het spelen zichtbaar moet verschijnen: muzzle flash,
-	// kogelsporen, oppakbare dingen, elk effect.
-	//
-	// De sporen BESTAAN aantoonbaar: geregistreerd, zichtbaar, bolstraal 63,7, en
-	// met een dot-product gemeten VOOR de camera op 8,5 m. Ze worden niet getekend.
-	//
-	// Dit is geen gok meer maar een reproduceerbare vaststelling, en hij hoort in de
-	// editor bevestigd te worden voordat er nog iets aan dit spoor verandert. De
-	// code blijft staan: hij klopt zodra dat opgelost is.
-	//
-	// EEN TEGENSPRAAK GEZOCHT EN GEMETEN — en hij bleek er niet te zijn.
-	//
-	// De squadmates staan in elk frame en worden neergezet door SpawnMissionActors,
-	// dat via een BUS-CALLBACK loopt (Event.Mission.Started) — precies hetzelfde
-	// mechanisme als dit inslagspoor. Als zij ná het opstarten ontstonden, was mijn
-	// conclusie meteen weerlegd. GEMETEN: t = 0,00 s. Ze ontstaan bij het opstarten,
-	// net als alles wat wél rendert. Geen tegenspraak dus, en de vaststelling staat
-	// er sterker door: ik heb er actief naar gezocht.
-	//
-	// WAT NOG STEEDS OPEN IS, en wat de owner in een halve ronde weet.
-	// De opnameronde start de missie meteen bij het begin, dus daar valt die
-	// spawn op t=0. Start de owner een missie vanuit de HUB, dan loopt dezelfde
-	// functie midden in het spel — en verschijnen zijn squadmates dan gewoon, dan is
-	// het verschil niet "tijdens het spelen" maar iets smallers: AStaticMeshActor
-	// tegenover een pawn met een skeletale mesh.
-	//
-	// Ik zet het er zo bij omdat de owner dat in een halve speelronde weet en ik
-	// niet, en omdat een te brede conclusie de volgende sessie de verkeerde kant op
-	// stuurt.
-	// ================================================================
-}
 
 void AEclipseGameMode::OnShotFired(FGameplayTag EventTag, const FInstancedStruct& Payload)
 {
@@ -277,22 +182,37 @@ void AEclipseGameMode::StartPlay()
 			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnShotFired),
 			FEclipseCombatEventPayload::StaticStruct());
 
-		// HET ZICHTBARE INSLAGSPOOR KOMT NU HIERVANDAAN, en dat is twee dingen
-		// tegelijk: een proef en de juiste plek.
+		// HIER ZAT EEN TWEEDE INSLAGSPOOR OP Event.Combat.WorldImpact, EN DAT IS
+		// 31-07 WEGGEHAALD. Waarom het er stond, waarom het de verliezer werd, en
+		// waarom het weghalen niet optioneel was:
 		//
-		// DE PROEF: een blok dat de game mode neerzet is aantoonbaar zichtbaar; een
-		// identiek blok dat het wapencomponent tijdens het vuren neerzet is dat niet.
-		// Alles daarbuiten is uitgesloten. Dit verplaatst precies dat ene verschil.
+		// WAAROM HET ER STOND. Het was een PROEF: destijds leek een blok dat de game
+		// mode neerzet wél zichtbaar en een identiek blok uit het wapencomponent
+		// niet, dus dit verplaatste precies dat ene verschil. Die aanname is
+		// inmiddels weerlegd — beide sporen renderden gewoon, ze waren alleen 14
+		// pixels groot (§4.3). De proef heeft zijn antwoord gegeven en hoort dan op
+		// te houden een tweede exemplaar in verscheept gedrag te zijn.
 		//
-		// DE JUISTE PLEK: het feit reist al over de bus (Event.Combat.WorldImpact) en
-		// de audiolaag luistert er al op. Een tweede luisteraar voor het BEELD is
-		// dezelfde vorm, geen nieuw systeem, en het beantwoordt meteen de vraag waar
-		// visuele feedback hoort te leven: bij wie het feit hoort, niet bij wie het
-		// veroorzaakt.
-		WorldImpactHandle = Bus->Subscribe(
-			EclipseTags::Event_Combat_WorldImpact,
-			FEclipseEventNativeDelegate::CreateUObject(this, &AEclipseGameMode::OnWorldImpact),
-			FEclipseCombatEventPayload::StaticStruct());
+		// WAAROM DEZE DE VERLIEZER IS, en niet die in het wapen. FEclipseCombatEventPayload
+		// draagt wél de plek (`Origin`) maar géén oppervlaknormaal. Deze luisteraar
+		// legde zijn spoor dus altijd plat in wereld-Z: op de vloer toevallig goed, op
+		// een MUUR aantoonbaar fout — een vlak dat loodrecht door de muur heen steekt
+		// in plaats van erop te liggen. `SpawnImpactMark` krijgt de volle FHitResult en
+		// draait het spoor mee met de normaal. Dat is geen smaakverschil maar een
+		// gedragsverschil, en het beslist welke van de twee blijft.
+		//
+		// EN WAAROM HET DE DIAGNOSE SABOTEERDE. De meetmethode van §4.3 verbergt
+		// precies één object en telt de veranderde pixels. Bij twee exact
+		// samenvallende sporen vult de tweeling het gat en leest ELK differentieel
+		// nul — hoe groot of hoe fel het spoor ook wordt. Zolang deze regel er stond,
+		// was geen enkele maatwijziging meetbaar.
+		//
+		// De ARCHITECTUURgedachte hieronder blijft overigens juist en is bewust
+		// bewaard: visuele feedback hoort bij wie het FEIT bezit, niet bij wie het
+		// veroorzaakt. Wil iemand het spoor ooit hiernaartoe halen, dan is de weg
+		// bekend en kort — zet de oppervlaknormaal in de payload en roep
+		// EclipseImpactMark::Spawn aan. Dat is een payloadwijziging plus een regel in
+		// de EventCatalog, en die hoort in een eigen ronde met een eigen meting.
 	}
 
 	// A mission already running at boot (e.g. after a load) still populates.
@@ -314,6 +234,9 @@ void AEclipseGameMode::StartPlay()
 	if (GetWorld() != nullptr)
 	{
 		EclipseRenderProof::ArmGroundProof(*GetWorld());
+		// De maatladder: 8/10/15 m, verscheept spoor tegen de nulmeting. Doet niets
+		// zonder `-EclipseSpoorLadder` en raakt dus geen spelgedrag.
+		EclipseRenderProof::ArmMarkLadder(*GetWorld());
 	}
 	StartMissionFromCommandLine();
 #endif
@@ -2420,6 +2343,23 @@ void AEclipseGameMode::AdvanceShotRig()
 		// of the sightline (first 15.8 round blocked the patrol figure).
 		{ FVector(-8200.0f, -250.0f, 300.0f), FRotator(-4.0f, 185.0f, 0.0f) },
 		{ FVector(-4700.0f, -1500.0f, 280.0f), FRotator(-4.0f, 75.0f, 0.0f) },
+		// 20.2 fiction round, 31-07: THE PROPAGANDA POSTER HAD NO CAMERA.
+		// The Eye of Providence sat on six surfaces in this district for days
+		// and no fixed review frame ever showed it, because all three wall
+		// posters hang on north/south compound faces that every camera above
+		// sees within ~25 degrees of EDGE-ON. It was found by reading the
+		// generator, not by looking at a frame — which is the failure mode
+		// 15.9 exists to prevent, and a shot list with a blind spot is how a
+		// datable Earth mark survives an art review.
+		//
+		// The poster hangs on BldgA_N's OUTWARD face. That slab spans Y
+		// -1250..-1150, so its Y=-1150 side is the NORTH one, facing the
+		// public street — which is where propaganda belongs and which is
+		// precisely why no compound-side camera could ever see it. The first
+		// version of this camera stood at Y -1750, inside the compound, and
+		// photographed a blank wall: proof of the same trap the shot list
+		// itself fell into. Stand north of the wall, three-quarter on.
+		{ FVector(4250.0f, -420.0f, 300.0f), FRotator(-8.0f, -64.0f, 0.0f) },
 	};
 
 	APlayerController* Controller = GetWorld()->GetFirstPlayerController();
@@ -2465,14 +2405,16 @@ void AEclipseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
 	{
 		Bus->Unsubscribe(MissionEventsHandle);
-		// ALLE DRIE EN NIET ALLEEN DE EERSTE. Hier stond alleen de missie-handle;
+		// ALLEBEI EN NIET ALLEEN DE EERSTE. Hier stond alleen de missie-handle;
 		// het schot-abonnement werd nooit opgezegd. Dat is precies het lek dat de
 		// contracttest vanochtend bij MIJ ving in de audiolaag — daar telt hij de
 		// levende abonnementen, en kennelijk kijkt hij niet naar de game mode.
 		// Opgeruimd bij het toevoegen van de derde, want een lek dat je ziet en laat
 		// liggen is een keuze en geen erfenis.
+		//
+		// Het waren er drie: het WorldImpact-abonnement voor het tweede inslagspoor
+		// is 31-07 vervallen. Zie de toelichting in StartPlay.
 		Bus->Unsubscribe(ShotFiredHandle);
-		Bus->Unsubscribe(WorldImpactHandle);
 	}
 #if !UE_BUILD_SHIPPING
 	// De NOEMER van de reproductiemeting. Een ronde die haalt tot het eind moet

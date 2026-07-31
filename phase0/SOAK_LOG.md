@@ -170,3 +170,7 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-07-31 21:48 | `0f89026` | **ROOD** | 226 tests / 1 gefaald / 0 niet gedraaid | 0 | Eclipse.Strategy.Lanes.ShippedBoardActuallyUsesTheThreeStatuses |
 | 2026-07-31 21:54 | `0fa85fb` | **ROOD** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | validatie gaf geen uitslag |
 | 2026-07-31 21:54 | `0fa85fb` | **GROEN** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-31 21:57 | `cf7ef6b` | **GROEN** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-31 22:00 | `fa586ae` | **GROEN** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-31 22:02 | `eade7e1` | **GROEN** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | - |
+| 2026-07-31 22:04 | `eade7e1` | **GROEN** | 226 tests / 0 gefaald / 0 niet gedraaid | 0 | - |

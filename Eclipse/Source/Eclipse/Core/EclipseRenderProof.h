@@ -55,4 +55,25 @@ namespace EclipseRenderProof
 	 * staat. Zonder die vlag gebeurt er niets — dit mag nooit spelgedrag raken.
 	 */
 	void ArmGroundProof(UWorld& World);
+
+	/**
+	 * C. DE MAATLADDER — `ArmMarkLadder`, achter `-EclipseSpoorLadder`.
+	 *
+	 * Dossier 4.3 is met A en B beslecht: het spoor rendert, het staat goed, en het
+	 * is vanaf de spelercamera 14 pixels groot. De vraag die overblijft is een MAAT,
+	 * en die is met het harnas hierboven niet te beantwoorden — dat meet één spoor
+	 * op de afstand waar het toevallig landde. "Leest op 8 m maar weg op 15 m" is
+	 * dan onzichtbaar, en dat is geen oplossing maar een verplaatsing.
+	 *
+	 * Deze ladder zet hetzelfde VERSCHEEPTE spoor (EclipseImpactMark::Spawn, niet
+	 * een nabouw) op 8, 10 en 15 m van het echte oog van de speler en telt de
+	 * pixels met exact dezelfde differentiële methode.
+	 *
+	 * EN OP ELKE SPORT DRAAIT DE CONTROLEPROEF MEE: het OUDE spoor van 9 cm, uit
+	 * dezelfde code met andere getallen, vanuit dezelfde camerapositie in hetzelfde
+	 * venster. Een ladder waarop na de wijziging alles groen is, meet niets meer;
+	 * deze moet de nulmeting op elke sport nog steeds afkeuren. Dat de nulmeting
+	 * daarbij zijn eigen banked getal (14 px op ~10 m) terugvindt, ijkt de ladder.
+	 */
+	void ArmMarkLadder(UWorld& World);
 }

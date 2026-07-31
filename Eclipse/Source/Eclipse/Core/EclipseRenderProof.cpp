@@ -2,7 +2,9 @@
 
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
 #include "Combat/EclipseHitscanWeaponComponent.h"
+#include "Combat/EclipseImpactMark.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Containers/Ticker.h"
@@ -80,10 +82,22 @@ struct FDiff
 	int64 Total = 0;
 	bool bValid = false;
 
+	// HET KADER BINNEN HET VENSTER, en dat is een ander getal dan het kader over het
+	// hele frame. De maatladder heeft het nodig omdat de KLEINSTE AS de bindende eis
+	// is: een spoor van 40 pixels dat 40 breed en 1 hoog is, leest niet. Over het
+	// hele frame gemeten zou één veranderde pixel aan de andere kant van het beeld
+	// dat kader al onbruikbaar maken.
+	int32 RoiMinX = 0, RoiMinY = 0, RoiMaxX = -1, RoiMaxY = -1;
+
 	float Promille() const
 	{
 		return Total > 0 ? 1000.0f * static_cast<float>(Changed) / static_cast<float>(Total) : 0.0f;
 	}
+
+	int32 RoiWidth() const { return RoiMaxX >= RoiMinX ? RoiMaxX - RoiMinX + 1 : 0; }
+	int32 RoiHeight() const { return RoiMaxY >= RoiMinY ? RoiMaxY - RoiMinY + 1 : 0; }
+	/** De kleinste van de twee assen — het getal dat bepaalt of iets als vorm leest. */
+	int32 RoiMinorAxis() const { return FMath::Min(RoiWidth(), RoiHeight()); }
 };
 
 /**
@@ -108,6 +122,8 @@ FDiff Compare(const TArray<FColor>& A, const TArray<FColor>& B, const FIntVector
 	D.bValid = true;
 	D.MinX = Size.X;
 	D.MinY = Size.Y;
+	D.RoiMinX = Size.X;
+	D.RoiMinY = Size.Y;
 	for (int32 Y = 0; Y < Size.Y; ++Y)
 	{
 		for (int32 X = 0; X < Size.X; ++X)
@@ -132,6 +148,10 @@ FDiff Compare(const TArray<FColor>& A, const TArray<FColor>& B, const FIntVector
 				if (Roi.Contains(FIntPoint(X, Y)))
 				{
 					++D.ChangedInRoi;
+					D.RoiMinX = FMath::Min(D.RoiMinX, X);
+					D.RoiMaxX = FMath::Max(D.RoiMaxX, X);
+					D.RoiMinY = FMath::Min(D.RoiMinY, Y);
+					D.RoiMaxY = FMath::Max(D.RoiMaxY, Y);
 				}
 			}
 		}
@@ -171,6 +191,49 @@ void SavePng(const TArray<FColor>& Pixels, const FIntVector& Size, const FString
 	const FString Path = FPaths::ProjectSavedDir() / TEXT("Screenshots") / TEXT("GRONDPROEF")
 		/ (Name + TEXT(".png"));
 	const FImageView Image(Opaque.GetData(), Size.X, Size.Y);
+	FImageUtils::SaveImageByExtension(*Path, Image);
+}
+
+/**
+ * Een UITSNEDE rond het onderwerp, vergroot met nearest-neighbour.
+ *
+ * BEELDBEWIJS DAT NIEMAND KAN ZIEN IS GEEN BEWIJS. Een spoor van twintig pixels in
+ * een frame van 1280x720 is op een volledig beeld letterlijk niet aan te wijzen —
+ * en dan wordt "GEZIEN" een woord in een rapport in plaats van een waarneming.
+ * Nearest-neighbour en geen filtering, want een gladgestreken uitsnede laat een
+ * spoor er scherper uitzien dan het is.
+ */
+void SaveCrop(const TArray<FColor>& Pixels, const FIntVector& Size, const FIntPoint& Centre,
+	int32 HalfSize, int32 Zoom, const FString& Name)
+{
+	if (Pixels.Num() <= 0 || Size.X <= 0 || Size.Y <= 0 || HalfSize <= 0 || Zoom <= 0)
+	{
+		return;
+	}
+	const int32 X0 = FMath::Clamp(Centre.X - HalfSize, 0, FMath::Max(0, Size.X - 1));
+	const int32 Y0 = FMath::Clamp(Centre.Y - HalfSize, 0, FMath::Max(0, Size.Y - 1));
+	const int32 X1 = FMath::Clamp(Centre.X + HalfSize, 0, Size.X - 1);
+	const int32 Y1 = FMath::Clamp(Centre.Y + HalfSize, 0, Size.Y - 1);
+	const int32 W = X1 - X0 + 1;
+	const int32 H = Y1 - Y0 + 1;
+	if (W <= 1 || H <= 1)
+	{
+		return;
+	}
+	TArray<FColor> Out;
+	Out.SetNumUninitialized(W * Zoom * H * Zoom);
+	for (int32 Y = 0; Y < H * Zoom; ++Y)
+	{
+		for (int32 X = 0; X < W * Zoom; ++X)
+		{
+			FColor C = Pixels[(Y0 + Y / Zoom) * Size.X + (X0 + X / Zoom)];
+			C.A = 255;
+			Out[Y * W * Zoom + X] = C;
+		}
+	}
+	const FString Path = FPaths::ProjectSavedDir() / TEXT("Screenshots") / TEXT("SPOORLADDER")
+		/ (Name + TEXT(".png"));
+	const FImageView Image(Out.GetData(), W * Zoom, H * Zoom);
 	FImageUtils::SaveImageByExtension(*Path, Image);
 }
 
@@ -588,13 +651,30 @@ void BuildTopViewTrials(FGroundProof& S, UWorld& World)
 		return;
 	}
 	const FVector TargetLoc = TargetActor->GetActorLocation();
-	const FVector TargetScale = TargetActor->GetActorScale3D();
+	// DE MAAT UIT DE OMVANG EN NIET UIT DE ACTOR-SCHAAL.
+	//
+	// Hier stond `GetActorScale3D()`, en dat getal is sinds 31-07 misleidend: een
+	// inslagspoor is nu een SAMENGESTELD object (inktring, hete vulling, opstaande
+	// kern) waarvan de wortel bewust op schaal 1 blijft staan — anders zou de
+	// opstaande kern de dikte-factor 0,004 van de platte ring erven en tot een
+	// vliesje geknepen worden. De actor-schaal las daardoor 1,0 en de controleplaat
+	// van proef 3 zou 100 cm zijn geworden op een spoor van 24. De bounding box is
+	// wat de camera echt ziet en werkt voor beide vormen.
+	const FVector Omvang = TargetActor->GetComponentsBoundingBox(true).GetSize();
+	const FVector TargetScale(
+		FMath::Max(Omvang.X, 1.0) * 0.01, FMath::Max(Omvang.Y, 1.0) * 0.01, 0.004);
 	UMaterialInterface* OwnMaterial = nullptr;
-	if (const AStaticMeshActor* AsMesh = Cast<AStaticMeshActor>(TargetActor))
+	TArray<UStaticMeshComponent*> Delen;
+	TargetActor->GetComponents<UStaticMeshComponent>(Delen);
+	for (const UStaticMeshComponent* Comp : Delen)
 	{
-		if (const UStaticMeshComponent* Comp = AsMesh->GetStaticMeshComponent())
+		// Het EERSTE deel dat werkelijk een mesh draagt. De wortel van een spoor is
+		// een transformnaaf zonder mesh; zijn materiaal uitlezen zou nullptr geven en
+		// proef 5 stil in een proef-zonder-materiaal veranderen.
+		if (Comp != nullptr && Comp->GetStaticMesh() != nullptr && Comp->GetMaterial(0) != nullptr)
 		{
 			OwnMaterial = Comp->GetMaterial(0);
+			break;
 		}
 	}
 	FVector CamLoc = FVector::ZeroVector;
@@ -905,9 +985,11 @@ bool Tick(TSharedPtr<FGroundProof> State, float /*Delta*/)
 					continue;
 				}
 				// Groot en dichtbij wint: dat levert de meeste pixels en dus de
-				// scherpste meting. Schaal 1.0 = 100 cm.
-				const FVector Scale = Actor->GetActorScale3D();
-				const float Score = static_cast<float>(Scale.X * Scale.Y) / FMath::Max(1.0f, static_cast<float>(ToPlane.Size()));
+				// scherpste meting. Uit de OMVANG en niet uit de actor-schaal — zie
+				// de toelichting in BuildTopViewTrials; op een samengesteld spoor
+				// staat de actor-schaal op 1 en zouden alle kandidaten gelijk scoren.
+				const FVector Maat = Actor->GetComponentsBoundingBox(true).GetSize();
+				const float Score = static_cast<float>(Maat.X * Maat.Y) / FMath::Max(1.0f, static_cast<float>(ToPlane.Size()));
 				if (Score > BestScore)
 				{
 					BestScore = Score;
@@ -917,11 +999,12 @@ bool Tick(TSharedPtr<FGroundProof> State, float /*Delta*/)
 			S.Target = Best;
 			if (Best != nullptr)
 			{
+				const FVector BesteMaat = Best->GetComponentsBoundingBox(true).GetSize();
 				UE_LOG(LogEclipse, Display,
-					TEXT("[GRONDPROEF DOELVLAK] %s tag=%s op (%.0f,%.0f,%.0f) schaal=(%.2f,%.2f,%.3f), %.0f cm van de speler, vrij zicht."),
+					TEXT("[GRONDPROEF DOELVLAK] %s tag=%s op (%.0f,%.0f,%.0f) omvang=(%.1f,%.1f,%.1f) cm, %.0f cm van de speler, vrij zicht."),
 					*Best->GetName(), Best->Tags.Num() > 0 ? *Best->Tags[0].ToString() : TEXT("-"),
 					Best->GetActorLocation().X, Best->GetActorLocation().Y, Best->GetActorLocation().Z,
-					Best->GetActorScale3D().X, Best->GetActorScale3D().Y, Best->GetActorScale3D().Z,
+					BesteMaat.X, BesteMaat.Y, BesteMaat.Z,
 					FVector::Dist(CamLoc, Best->GetActorLocation()));
 			}
 			else
@@ -965,7 +1048,8 @@ bool Tick(TSharedPtr<FGroundProof> State, float /*Delta*/)
 		// lichtplek van 7 m, maar zet een inslagspoor van 9 cm op acht pixels — en
 		// dan meet je opnieuw niet wat je denkt te meten. Acht keer de breedte laat
 		// het onderwerp ongeveer een achtste van het beeld vullen.
-		const float Breedte = 100.0f * FMath::Max(Best->GetActorScale3D().X, Best->GetActorScale3D().Y);
+		const FVector BestOmvang = Best->GetComponentsBoundingBox(true).GetSize();
+		const float Breedte = static_cast<float>(FMath::Max3(BestOmvang.X, BestOmvang.Y, 1.0));
 		S.CamHeight = FMath::Clamp(Breedte * 8.0f, 60.0f, 700.0f);
 		const FVector CamLoc = Best->GetActorLocation() + FVector(0, 0, S.CamHeight);
 		ACameraActor* Cam = World->SpawnActor<ACameraActor>(CamLoc, FRotator(-90.0f, 0.0f, 0.0f));
@@ -1075,6 +1159,598 @@ void ArmGroundProof(UWorld& World)
 	UE_LOG(LogEclipse, Display,
 		TEXT("[GRONDPROEF] gewapend, spoormodus=%d. Dit is een MEETharnas voor DEBUG_DISCIPLINE 4.3 en repareert niets."),
 		State->bMarkMode ? 1 : 0);
+}
+
+// ============================================================================
+// C. DE MAATLADDER
+// ============================================================================
+
+namespace
+{
+
+/** De drie sporten. 8 m is dichtbij vechten, 15 m is de rand van het bruikbare bereik. */
+const float LadderAfstandenCm[] = { 800.0f, 1000.0f, 1500.0f };
+
+/**
+ * DE EIS PER SPORT, en hij staat hier VÓÓR de meting — dat is de hele bedoeling.
+ *
+ * Waar deze getallen vandaan komen staat uitgeschreven bij EclipseImpactMark::Verscheept().
+ * Kort: de bindende eis is de KLEINSTE AS, niet het aantal pixels. Een spoor dat 24
+ * pixels breed en 2 hoog is, is aliasing; onder ongeveer 4 pixels leest niets als een
+ * bedoelde vorm. Bij deze FOV is 4 px ongeveer 0,25 graad — ruim boven de scherpte
+ * van het oog (~1 boogminuut), en aan de ONDERkant van wat je nog terloops opmerkt
+ * terwijl je op iets anders richt. Uit die vloer volgen de oppervlakken.
+ */
+struct FLadderEis
+{
+	float AfstandCm;
+	int64 MinPixels;
+	int32 MinKleinsteAs;
+};
+const FLadderEis LadderEisen[] = {
+	{  800.0f, 150, 5 },
+	{ 1000.0f,  80, 4 },
+	{ 1500.0f,  30, 4 },
+};
+
+const FLadderEis& EisVoor(float AfstandCm)
+{
+	int32 Beste = 0;
+	float BesteVerschil = TNumericLimits<float>::Max();
+	for (int32 i = 0; i < UE_ARRAY_COUNT(LadderEisen); ++i)
+	{
+		const float Verschil = FMath::Abs(LadderEisen[i].AfstandCm - AfstandCm);
+		if (Verschil < BesteVerschil)
+		{
+			BesteVerschil = Verschil;
+			Beste = i;
+		}
+	}
+	return LadderEisen[Beste];
+}
+
+struct FSport
+{
+	float DoelAfstandCm = 0.0f;
+	FVector Grond = FVector::ZeroVector;
+	FVector Normaal = FVector::UpVector;
+	float EchteAfstandCm = 0.0f;
+	float YawOffset = 0.0f;
+	bool bVrijZicht = false;
+	FString Blokkeerder;
+	bool bGeldig = false;
+};
+
+struct FLadderMeting
+{
+	FString Recept;
+	float AfstandCm = 0.0f;
+	int64 Pixels = 0;
+	int64 HeelFrame = 0;
+	int32 Breedte = 0;
+	int32 Hoogte = 0;
+	int32 Sterkste = 0;
+	float OmvangCm = 0.0f;
+	bool bGemeten = false;
+};
+
+struct FMarkLadder : public TSharedFromThis<FMarkLadder>
+{
+	TWeakObjectPtr<UWorld> World;
+	TWeakObjectPtr<APlayerController> PC;
+	TWeakObjectPtr<ACameraActor> Cam;
+	TWeakObjectPtr<AActor> Mark;
+
+	double ArmedAt = 0.0;
+	int32 Stage = 0;
+	int32 Wait = 0;
+	int32 SportIndex = 0;
+	int32 ReceptIndex = 0;   // 0 = nulmeting (controleproef), 1 = verscheept
+	int32 Sub = 0;
+
+	FVector Oog = FVector::ZeroVector;
+	FRotator OogRotatie = FRotator::ZeroRotator;
+	float OogHoogteCm = 0.0f;
+	float FovGraden = 90.0f;
+	float PixelsPerRadiaal = 0.0f;
+	FIntVector Beeld = FIntVector::ZeroValue;
+
+	TArray<FSport> Sporten;
+	TArray<FLadderMeting> Metingen;
+
+	// De stiltepoort deelt zijn toestand met de grondproef niet, dus een eigen paar.
+	int32 GateSub = 0;
+	int32 GateStreak = 0;
+	int32 GateTries = 0;
+
+	TArray<FColor> ShotA;
+	TArray<FColor> ShotB;
+	FIntVector SizeA = FIntVector::ZeroValue;
+	FIntVector SizeB = FIntVector::ZeroValue;
+	FIntPoint Scherm = FIntPoint::ZeroValue;
+
+	FTSTicker::FDelegateHandle Handle;
+};
+
+/** Dezelfde stiltepoort als de grondproef, op een eigen toestand. */
+bool LadderQuietGate(FMarkLadder& S, const TCHAR* Label)
+{
+	if (S.GateSub == 0)
+	{
+		S.Wait = SettleFrames;
+		S.GateSub = 1;
+		return false;
+	}
+	if (S.GateSub == 1)
+	{
+		if (--S.Wait > 0)
+		{
+			return false;
+		}
+		CaptureWindow(S.ShotA, S.SizeA);
+		S.Wait = SettleFrames;
+		S.GateSub = 2;
+		return false;
+	}
+	if (--S.Wait > 0)
+	{
+		return false;
+	}
+	++S.GateTries;
+	int64 Changed = -1;
+	if (CaptureWindow(S.ShotB, S.SizeB) && S.SizeA == S.SizeB && S.SizeA.X > 0)
+	{
+		Changed = Compare(S.ShotA, S.ShotB, S.SizeA, FIntRect()).Changed;
+	}
+	if (Changed == 0)
+	{
+		++S.GateStreak;
+	}
+	else
+	{
+		S.GateStreak = 0;
+	}
+	S.GateSub = 0;
+	if (S.GateStreak >= 2)
+	{
+		S.GateStreak = 0;
+		S.GateTries = 0;
+		return true;
+	}
+	if (S.GateTries >= 40)
+	{
+		UE_LOG(LogEclipse, Error,
+			TEXT("[SPOORLADDER STILTEPOORT %s] NOOIT STIL na %d pogingen — alles hierna is besmet met beeldruis."),
+			Label, S.GateTries);
+		S.GateStreak = 0;
+		S.GateTries = 0;
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Zoekt op elke sport een plek op de grond die de camera ONBELEMMERD ziet.
+ *
+ * De pion wordt hier BEWUST NIET genegeerd. In de derde persoon staat je eigen
+ * lichaam tussen de camera en de grond, en een ladder die daar overheen kijkt zou
+ * pixels tellen die de speler niet krijgt. Blokkeert het lichaam, dan wijkt de
+ * zoektocht opzij — precies wat je in het spel doet als je op iets naast je richt —
+ * en de gebruikte yaw komt in het log, want een stille correctie is een leugen.
+ */
+void ZoekSporten(FMarkLadder& S)
+{
+	UWorld* World = S.World.Get();
+	APlayerController* PC = S.PC.Get();
+	if (World == nullptr || PC == nullptr)
+	{
+		return;
+	}
+	APawn* Pion = PC->GetPawn();
+	for (const float Afstand : LadderAfstandenCm)
+	{
+		FSport Sport;
+		Sport.DoelAfstandCm = Afstand;
+		for (const float Yaw : { 0.0f, -10.0f, 10.0f, -20.0f, 20.0f, -32.0f, 32.0f })
+		{
+			const FRotator Heen(0.0f, S.OogRotatie.Yaw + Yaw, 0.0f);
+			// Horizontaal uitzetten en dan omlaag traceren: de gevraagde afstand is de
+			// afstand van het OOG tot het spoor, en die volgt uit de schuine zijde. De
+			// horizontale component is dus iets korter dan de sport zelf.
+			const float Horizontaal = FMath::Sqrt(
+				FMath::Max(1.0f, Afstand * Afstand - S.OogHoogteCm * S.OogHoogteCm));
+			const FVector Boven = S.Oog + Heen.Vector() * Horizontaal;
+			FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseLadderGrond), false);
+			if (Pion != nullptr)
+			{
+				Params.AddIgnoredActor(Pion);
+			}
+			FHitResult Grond;
+			if (!World->LineTraceSingleByChannel(Grond, Boven + FVector(0, 0, 400.0f),
+				Boven - FVector(0, 0, 1200.0f), ECC_Visibility, Params))
+			{
+				continue;
+			}
+			// VRIJ ZICHT MET DE PION ERIN. Een korte trace naar het grondpunt, met een
+			// marge zodat het wegdek zelf niet als blokkeerder telt.
+			FCollisionQueryParams Zicht(SCENE_QUERY_STAT(EclipseLadderZicht), false);
+			Zicht.AddIgnoredActor(Grond.GetActor());
+			FHitResult Blok;
+			const FVector Naar = Grond.ImpactPoint + Grond.ImpactNormal * 8.0f;
+			const bool bVrij = !World->LineTraceSingleByChannel(Blok, S.Oog, Naar, ECC_Visibility, Zicht);
+			Sport.Grond = Grond.ImpactPoint;
+			Sport.Normaal = Grond.ImpactNormal;
+			Sport.EchteAfstandCm = static_cast<float>(FVector::Dist(S.Oog, Grond.ImpactPoint));
+			Sport.YawOffset = Yaw;
+			Sport.bVrijZicht = bVrij;
+			Sport.bGeldig = true;
+			if (!bVrij)
+			{
+				Sport.Blokkeerder = FString::Printf(TEXT("%s op %.0f cm"),
+					*GetNameSafe(Blok.GetActor()), FVector::Dist(S.Oog, Blok.ImpactPoint));
+				continue;   // probeer de volgende yaw
+			}
+			break;
+		}
+		UE_LOG(LogEclipse, Display,
+			TEXT("[SPOORLADDER SPORT] doel %.0f cm -> grond op %s, echt %.0f cm, yaw %+.0f graden, zicht %s%s"),
+			Sport.DoelAfstandCm, *Sport.Grond.ToCompactString(), Sport.EchteAfstandCm, Sport.YawOffset,
+			Sport.bVrijZicht ? TEXT("VRIJ") : TEXT("GEBLOKKEERD"),
+			Sport.bVrijZicht ? TEXT("") : *FString::Printf(TEXT(" door %s"), *Sport.Blokkeerder));
+		S.Sporten.Add(Sport);
+	}
+}
+
+const EclipseImpactMark::FRecipe& ReceptVoor(int32 Index)
+{
+	return Index == 0 ? EclipseImpactMark::Nulmeting() : EclipseImpactMark::Verscheept();
+}
+
+/** Wat de meetkunde voorspelt, zodat de redenering zelf ook falsifieerbaar is. */
+int64 Voorspelling(const FMarkLadder& S, const EclipseImpactMark::FRecipe& R, float D)
+{
+	if (D <= 1.0f || S.PixelsPerRadiaal <= 0.0f)
+	{
+		return 0;
+	}
+	const float k = S.PixelsPerRadiaal;
+	// Plat vlak: breedte k*S/D, hoogte k*S*h/D^2 (de scherende hoek knijpt de hoogte
+	// dicht). Ellips-oppervlak = pi/4 * b * h.
+	const float PlaatB = k * R.FootprintCm / D;
+	const float PlaatH = PlaatB * (S.OogHoogteCm / D);
+	float Opp = PI * 0.25f * PlaatB * PlaatH;
+	// Opstaande kern: geen cosinusverlies, dus hoogte k*H/D. De helft telt als
+	// overlap met de plaat eronder.
+	if (R.CoreCm > 0.0f && R.CoreRiseCm > 0.0f)
+	{
+		const float KernB = k * R.CoreCm / D;
+		const float KernH = k * R.CoreRiseCm / D;
+		Opp += 0.5f * PI * 0.25f * KernB * KernH * 2.0f;
+	}
+	return static_cast<int64>(Opp + 0.5f);
+}
+
+bool LadderTick(TSharedPtr<FMarkLadder> State, float /*Delta*/)
+{
+	FMarkLadder& S = *State;
+	UWorld* World = S.World.Get();
+	if (World == nullptr)
+	{
+		return false;
+	}
+
+	switch (S.Stage)
+	{
+	case 0:
+	{
+		if (FPlatformTime::Seconds() - S.ArmedAt < 12.0)
+		{
+			return true;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		if (PC == nullptr)
+		{
+			return true;
+		}
+		S.PC = PC;
+
+		// DE VERSCHEEPTE KIJKOMSTANDIGHEID, GEMETEN EN NIET AANGENOMEN. Ooghoogte en
+		// FOV bepalen samen alles wat hierna gebeurt: de scherende hoek volgt uit de
+		// hoogte, het aantal pixels per graad uit de FOV. Ze staan in het log omdat
+		// elke uitkomst van deze ladder eraan hangt.
+		PC->GetPlayerViewPoint(S.Oog, S.OogRotatie);
+		S.FovGraden = PC->PlayerCameraManager != nullptr
+			? PC->PlayerCameraManager->GetFOVAngle() : 90.0f;
+
+		FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseLadderOog), false);
+		if (APawn* Pion = PC->GetPawn())
+		{
+			Params.AddIgnoredActor(Pion);
+		}
+		FHitResult Onder;
+		S.OogHoogteCm = World->LineTraceSingleByChannel(Onder, S.Oog,
+			S.Oog - FVector(0, 0, 2000.0f), ECC_Visibility, Params)
+			? static_cast<float>(S.Oog.Z - Onder.ImpactPoint.Z) : 160.0f;
+
+		PC->ConsoleCommand(TEXT("r.AntiAliasingMethod 0"));
+		PC->ConsoleCommand(TEXT("r.MotionBlurQuality 0"));
+		PC->ConsoleCommand(TEXT("r.ScreenPercentage 100"));
+		PC->ConsoleCommand(TEXT("Eclipse.Guide.Overlay 0"));
+
+		ZoekSporten(S);
+		S.Stage = 1;
+		S.Wait = SettleFrames;
+		return true;
+	}
+
+	case 1:
+	{
+		if (--S.Wait > 0)
+		{
+			return true;
+		}
+		// De beeldmaat komt uit een ECHTE opname en niet uit de viewport-instelling:
+		// schermpercentage, vensterrand en DPI kunnen die twee uit elkaar laten lopen,
+		// en pixels-per-radiaal hangt aan wat er werkelijk is opgenomen.
+		if (!CaptureWindow(S.ShotA, S.SizeA))
+		{
+			return true;
+		}
+		S.Beeld = S.SizeA;
+		S.PixelsPerRadiaal = (0.5f * S.Beeld.X) / FMath::Tan(FMath::DegreesToRadians(S.FovGraden * 0.5f));
+		UE_LOG(LogEclipse, Display,
+			TEXT("[SPOORLADDER IJKING] beeld %dx%d, FOV %.1f graden -> %.0f pixels per radiaal. Oog op (%.0f,%.0f,%.0f), %.0f cm boven de grond."),
+			S.Beeld.X, S.Beeld.Y, S.FovGraden, S.PixelsPerRadiaal,
+			S.Oog.X, S.Oog.Y, S.Oog.Z, S.OogHoogteCm);
+		S.Stage = 2;
+		return true;
+	}
+
+	case 2:
+	{
+		// EEN CAMERA DIE DE SPORT AANKIJKT, vanaf het ECHTE oog van de speler. Niet de
+		// speler zelf draaien: in de derde persoon zwenkt de camera dan om het
+		// personage en verandert de afstand die we juist vasthouden.
+		if (!S.Sporten.IsValidIndex(S.SportIndex))
+		{
+			S.Stage = 6;
+			return true;
+		}
+		const FSport& Sport = S.Sporten[S.SportIndex];
+		if (!Sport.bGeldig)
+		{
+			++S.SportIndex;
+			return true;
+		}
+		ACameraActor* Cam = S.Cam.Get();
+		if (Cam == nullptr)
+		{
+			Cam = World->SpawnActor<ACameraActor>(S.Oog, S.OogRotatie);
+			if (Cam == nullptr)
+			{
+				S.Stage = 6;
+				return true;
+			}
+			if (UCameraComponent* Comp = Cam->GetCameraComponent())
+			{
+				Comp->SetFieldOfView(S.FovGraden);
+			}
+			S.Cam = Cam;
+		}
+		Cam->SetActorLocation(S.Oog);
+		Cam->SetActorRotation((Sport.Grond - S.Oog).Rotation());
+		UGameplayStatics::SetGamePaused(World, false);
+		S.PC->SetViewTarget(Cam);
+		S.Wait = SettleFrames * 3;
+		S.Stage = 3;
+		return true;
+	}
+
+	case 3:
+	{
+		if (--S.Wait > 0)
+		{
+			return true;
+		}
+		UGameplayStatics::SetGamePaused(World, true);
+		// EEN GEZETTE VIEW TARGET IS GEEN BEWIJS VAN EEN VERZETTE CAMERA — die les
+		// staat al in de grondproef en geldt hier net zo hard.
+		APlayerController* PC = S.PC.Get();
+		FVector Loc = FVector::ZeroVector;
+		FRotator Rot = FRotator::ZeroRotator;
+		PC->GetPlayerViewPoint(Loc, Rot);
+		if (FVector::Dist(Loc, S.Oog) > 50.0f)
+		{
+			UE_LOG(LogEclipse, Error,
+				TEXT("[SPOORLADDER] de camera staat %.0f cm van het oog — deze sport meet iets anders dan bedoeld en wordt overgeslagen."),
+				FVector::Dist(Loc, S.Oog));
+			++S.SportIndex;
+			S.ReceptIndex = 0;
+			S.Stage = 2;
+			return true;
+		}
+		S.Stage = 4;
+		return true;
+	}
+
+	case 4:
+		if (LadderQuietGate(S, TEXT("SPORT")))
+		{
+			S.Stage = 5;
+			S.Sub = 0;
+		}
+		return true;
+
+	case 5:
+	{
+		// EEN SPORT, TWEE RECEPTEN, ÉÉN CAMERA. De controleproef (het oude spoor van
+		// 9 cm) en het verscheepte spoor worden vanuit exact dezelfde camerapositie in
+		// exact hetzelfde venster gemeten. Dat maakt het een GEPAARDE vergelijking:
+		// elk verschil komt van het recept en van niets anders.
+		const FSport& Sport = S.Sporten[S.SportIndex];
+		const EclipseImpactMark::FRecipe& Recept = ReceptVoor(S.ReceptIndex);
+		APlayerController* PC = S.PC.Get();
+
+		switch (S.Sub)
+		{
+		case 0:
+		{
+			AStaticMeshActor* Nieuw = EclipseImpactMark::Spawn(*World, Sport.Grond, Sport.Normaal, Recept);
+			S.Mark = Nieuw;
+			if (Nieuw != nullptr)
+			{
+				// De levensduur eruit. Tussen zetten en opnemen zitten losgelaten
+				// frames voor de camera; een spoor dat in dat venster verloopt zou een
+				// nul opleveren die als "onzichtbaar" gelezen wordt. Dit is het enige
+				// verschil met het verscheepte object en het raakt geen enkele pixel.
+				Nieuw->SetLifeSpan(0.0f);
+			}
+			S.Wait = SettleFrames;
+			S.Sub = 1;
+			return true;
+		}
+		case 1:
+		{
+			if (--S.Wait > 0)
+			{
+				return true;
+			}
+			if (!CaptureWindow(S.ShotA, S.SizeA))
+			{
+				S.Sub = 3;
+				return true;
+			}
+			FVector2D Op = FVector2D::ZeroVector;
+			PC->ProjectWorldLocationToScreen(Sport.Grond, Op);
+			S.Scherm = FIntPoint(FMath::RoundToInt(Op.X), FMath::RoundToInt(Op.Y));
+			S.Sub = 2;
+			return true;
+		}
+		case 2:
+		{
+			// ZETTEN EN OPNEMEN ZIJN TWEE STAPPEN. Een renderstate-wijziging landt pas
+			// op het VOLGENDE getekende frame; fotograferen in hetzelfde frame levert
+			// een opname met het etiket van een toestand die nog niet getekend is. Dat
+			// kostte 31-07 een hele bewijsronde, vandaar SettleFrames ertussen.
+			if (AActor* M = S.Mark.Get())
+			{
+				M->SetActorHiddenInGame(true);
+			}
+			S.Wait = SettleFrames;
+			S.Sub = 3;
+			return true;
+		}
+		default:
+		{
+			if (--S.Wait > 0)
+			{
+				return true;
+			}
+			FLadderMeting Meting;
+			Meting.Recept = Recept.Naam;
+			Meting.AfstandCm = Sport.EchteAfstandCm;
+			if (AActor* M = S.Mark.Get())
+			{
+				Meting.OmvangCm = static_cast<float>(
+					M->GetComponentsBoundingBox(true).GetSize().GetMax());
+			}
+			// HET VENSTER is klein gehouden (120 px halve zijde). Ruim genoeg voor een
+			// spoor dat op 8 m ~30 px breed is, en krap genoeg dat een verandering
+			// elders in het frame niet als bewijs kan doorgaan.
+			const FIntRect Roi(S.Scherm.X - 120, S.Scherm.Y - 120, S.Scherm.X + 120, S.Scherm.Y + 120);
+			if (CaptureWindow(S.ShotB, S.SizeB) && S.SizeA == S.SizeB && S.SizeA.X > 0)
+			{
+				const FDiff D = Compare(S.ShotA, S.ShotB, S.SizeA, Roi);
+				Meting.Pixels = D.ChangedInRoi;
+				Meting.HeelFrame = D.Changed;
+				Meting.Breedte = D.RoiWidth();
+				Meting.Hoogte = D.RoiHeight();
+				Meting.Sterkste = D.Strongest;
+				Meting.bGemeten = true;
+
+				const FString Naam = FString::Printf(TEXT("%s_%.0fm"),
+					S.ReceptIndex == 0 ? TEXT("NULMETING") : TEXT("NIEUW"),
+					Sport.EchteAfstandCm / 100.0f);
+				// A = het spoor staat er, en dat is meteen het beeldbewijs vanaf de
+				// spelercamera. B = hetzelfde beeld zonder spoor, zodat een lezer de
+				// twee naast elkaar kan leggen in plaats van mij te moeten geloven.
+				SavePng(S.ShotA, S.SizeA, Naam + TEXT("_MET"));
+				SaveCrop(S.ShotA, S.SizeA, S.Scherm, 90, 4, Naam + TEXT("_MET_uitsnede"));
+				SaveCrop(S.ShotB, S.SizeB, S.Scherm, 90, 4, Naam + TEXT("_ZONDER_uitsnede"));
+
+				const FLadderEis& Eis = EisVoor(Sport.DoelAfstandCm);
+				const bool bHaalt = S.ReceptIndex != 0
+					&& D.ChangedInRoi >= Eis.MinPixels && D.RoiMinorAxis() >= Eis.MinKleinsteAs;
+				UE_LOG(LogEclipse, Display,
+					TEXT("[SPOORLADDER %s %.0f m] %lld px in venster (%lld heelframe), kader %dx%d px, kleinste as %d, sterkste %d/255, omvang %.0f cm | eis >=%lld px en >=%d px | voorspeld %lld px | %s"),
+					*Meting.Recept, Sport.EchteAfstandCm / 100.0f, D.ChangedInRoi, D.Changed,
+					D.RoiWidth(), D.RoiHeight(), D.RoiMinorAxis(), D.Strongest, Meting.OmvangCm,
+					Eis.MinPixels, Eis.MinKleinsteAs, Voorspelling(S, Recept, Sport.EchteAfstandCm),
+					S.ReceptIndex == 0
+						? (D.ChangedInRoi >= Eis.MinPixels ? TEXT("CONTROLEPROEF ONVERWACHT GESLAAGD") : TEXT("CONTROLEPROEF: te klein, zoals het hoort"))
+						: (bHaalt ? TEXT("HAALT DE EIS") : TEXT("HAALT DE EIS NIET")));
+			}
+			else
+			{
+				UE_LOG(LogEclipse, Warning,
+					TEXT("[SPOORLADDER %s %.0f m] opname mislukt — deze sport meet niets."),
+					*Meting.Recept, Sport.EchteAfstandCm / 100.0f);
+			}
+			S.Metingen.Add(Meting);
+			if (AActor* M = S.Mark.Get())
+			{
+				M->Destroy();
+			}
+			S.Mark = nullptr;
+			S.Sub = 0;
+			++S.ReceptIndex;
+			if (S.ReceptIndex > 1)
+			{
+				S.ReceptIndex = 0;
+				++S.SportIndex;
+				S.Stage = 2;
+			}
+			return true;
+		}
+		}
+	}
+
+	default:
+	{
+		UE_LOG(LogEclipse, Display, TEXT("[SPOORLADDER SAMENVATTING] %d metingen:"), S.Metingen.Num());
+		for (const FLadderMeting& M : S.Metingen)
+		{
+			UE_LOG(LogEclipse, Display,
+				TEXT("[SPOORLADDER SAMENVATTING]   %-20s %5.1f m  %5lld px  kader %3dx%-3d px"),
+				*M.Recept, M.AfstandCm / 100.0f, M.Pixels, M.Breedte, M.Hoogte);
+		}
+		UGameplayStatics::SetGamePaused(World, false);
+		UE_LOG(LogEclipse, Display, TEXT("[SPOORLADDER] klaar — beelden in Saved/Screenshots/SPOORLADDER."));
+		FPlatformMisc::RequestExit(false);
+		return false;
+	}
+	}
+}
+
+} // namespace
+
+void ArmMarkLadder(UWorld& World)
+{
+	// Strifind en niet FParse::Param — dezelfde reden als bij de grondproef: met
+	// twee Eclipse-vlaggen naast elkaar op de regel gaf FParse::Param er stil één
+	// van als false terug, en een proef die op een niet-geparste vlag stil niets
+	// doet is precies de meetfout waar dit dossier al twee keer op strandde.
+	if (FCString::Strifind(FCommandLine::Get(), TEXT("EclipseSpoorLadder")) == nullptr)
+	{
+		return;
+	}
+	TSharedPtr<FMarkLadder> State = MakeShared<FMarkLadder>();
+	State->World = &World;
+	State->ArmedAt = FPlatformTime::Seconds();
+	State->Handle = FTSTicker::GetCoreTicker().AddTicker(
+		FTickerDelegate::CreateLambda([State](float Delta) { return LadderTick(State, Delta); }), 0.0f);
+	UE_LOG(LogEclipse, Display,
+		TEXT("[SPOORLADDER] gewapend: 8/10/15 m, per sport het VERSCHEEPTE spoor en de nulmeting van 9 cm als controleproef."));
 }
 
 } // namespace EclipseRenderProof

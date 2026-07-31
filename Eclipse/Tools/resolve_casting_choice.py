@@ -82,23 +82,30 @@ def main() -> int:
     previous = {}
     if OUT.is_file():
         previous = json.loads(OUT.read_text("utf-8")).get("rollen", {})
+    # What matters is not that the list changed -- appending new candidates is
+    # harmless and must not raise an alarm, or the alarm stops being read. What
+    # matters is whether a pick now points at a DIFFERENT VOICE than when it was
+    # recorded. So compare per pick, by voice id.
     drifted = []
     for rid in picks:
-        if rid in catalog and rid in previous:
-            now = fingerprint(catalog[rid]["kandidaten"])
-            was = previous[rid].get("ordering_fingerprint")
-            if was and now != was:
-                drifted.append((rid, was, now, previous[rid]))
+        if rid not in catalog or rid not in previous:
+            continue
+        cur = catalog[rid]["kandidaten"]
+        moved = []
+        for f in previous[rid].get("finalisten", []):
+            i = f["keuze_index"]
+            now_id = cur[i - 1]["voice_id"] if i <= len(cur) else None
+            now_name = cur[i - 1]["stem"] if i <= len(cur) else "(out of range)"
+            if now_id != f["voice_id"]:
+                moved.append((i, f["stem"], now_name))
+        if moved:
+            drifted.append((rid, previous[rid], moved))
     if drifted:
-        print("REFUSING TO RE-RESOLVE - the shortlist moved under an existing pick.\n")
-        for rid, was, now, prev in drifted:
+        print("REFUSING TO RE-RESOLVE - a pick now points at a different voice.\n")
+        for rid, prev, moved in drifted:
             print(f"  {prev['label']}")
-            print(f"    fingerprint was {was}, is now {now}")
-            for f in prev.get("finalisten", []):
-                cur = catalog[rid]["kandidaten"]
-                i = f["keuze_index"]
-                new = cur[i - 1]["stem"] if i <= len(cur) else "(out of range)"
-                print(f"    pick #{i}: was '{f['stem']}' -> would now become '{new}'")
+            for i, was_name, now_name in moved:
+                print(f"    pick #{i}: was '{was_name}' -> would now become '{now_name}'")
         print("\nThe recorded casting in CASTING_RESOLVED.json is left untouched.")
         print("Decide deliberately: either restore the shortlist the owner actually")
         print("listened to, or have him re-pick against the new one. Do not let an")

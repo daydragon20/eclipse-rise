@@ -1,7 +1,8 @@
-#include "Combat/EclipseHitscanWeaponComponent.h"
+﻿#include "Combat/EclipseHitscanWeaponComponent.h"
 
 #include "Characters/EclipseCharacter.h"
 #include "Characters/EclipsePlayerController.h"
+#include "Combat/EclipseImpactMark.h"
 #include "Eclipse.h"
 #include "Components/SphereComponent.h"
 #include "Core/EclipseEventBusSubsystem.h"
@@ -24,222 +25,51 @@ UEclipseHitscanWeaponComponent::UEclipseHitscanWeaponComponent()
 
 void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitResult& Hit)
 {
-	// HET ZICHTBARE SPOOR — stap 3 van owner-punt 4, en de reden dat hij dacht dat
-	// er niets gebeurde als hij schoot: elke MIS was onzichtbaar, en missen doe je
-	// het vaakst.
+	// HET ZICHTBARE SPOOR — stap 3 van owner-punt 4, en de reden dat de owner dacht
+	// dat er niets gebeurde als hij schoot: elke MIS was onzichtbaar, en missen doe
+	// je het vaakst.
 	//
-	// WAAROM EEN QUAD EN GEEN DECAL. De wijk staat unlit, en een deferred decal
-	// heeft een G-buffer nodig die er dan niet is: hij rendert simpelweg niet. Dat
-	// is eerder in dit project vastgesteld en het is de reden dat ook de
-	// grondcues van de grayboxbouwer platte kubussen zijn en geen decals. Zelfde
-	// recept dus, alleen op de inslagplek in plaats van op de vloer.
+	// HET RECEPT STAAT NIET MEER HIER. Alles wat dit spoor VORM geeft — maat, ring,
+	// vulling, opstaande kern, materialen — woont sinds 31-07 in
+	// Combat/EclipseImpactMark.{h,cpp}. Dit component beslist alleen nog DAT er een
+	// spoor komt en WAAR.
 	//
-	// WAAROM HIER EN NIET IN EEN VFX-SUBSYSTEEM. De owner-opdracht is expliciet
-	// "geen nieuwe systemen". Een eigen verbruiker van de bus zou een nieuw
-	// subsysteem betekenen voor precies een gebruiker; dat mag terugkomen zodra er
-	// een TWEEDE visuele verbruiker is (muzzle flash staat al op de rol) — dan is
-	// het extraheren en niet vooruit bouwen.
-	// EERST MELDEN OF HET DING ER KOMT, en dat had hier vanaf het begin moeten staan.
+	// Twee redenen, en de tweede is de belangrijkste:
 	//
-	// Ik heb dit spoor drie keer proberen zichtbaar te maken en telkens iets anders
-	// uitgesloten: de maat (een proef op 90 cm), de plaats (7-9 m recht vooruit),
-	// de levensduur (2,5 s) en het materiaal. Wat ik NOOIT heb gecontroleerd is of
-	// de actor uberhaupt ontstaat — precies de fout waar ik vandaag vijf keer op
-	// heb gewezen bij anderen: aannemen dat de bron werkt en alleen aan de uitvoer
-	// meten. Een stille `return` bij een mislukte laadpoging is dezelfde vorm als de
-	// twee stille afwijzingen in dit bestand.
-	UStaticMesh* Quad = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
-	if (Quad == nullptr)
-	{
-		UE_LOG(LogEclipse, Warning,
-			TEXT("Inslagspoor: /Engine/BasicShapes/Cube.Cube laadde NIET — geen spoor mogelijk."));
-		return;
-	}
-
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	Params.ObjectFlags |= RF_Transient;   // een inslag hoort nooit in een save
-
-	// Een centimeter langs de normaal, anders vecht het vlak met het oppervlak
-	// waar het op ligt en flikkert het per frame.
-	const FVector Spot = Hit.ImpactPoint + Hit.ImpactNormal * 1.0f;
-	AStaticMeshActor* Mark = World.SpawnActor<AStaticMeshActor>(
-		Spot, FRotationMatrix::MakeFromZ(Hit.ImpactNormal).Rotator(), Params);
+	//   1. ER WAREN TWEE BOUWERS. `AEclipseGameMode::OnWorldImpact` zette op elke
+	//      wereldtreffer een tweede, exact samenvallend spoor neer met een ander
+	//      materiaal en zonder rotatie: 22 objecten bij 11 treffers. Die is weg; de
+	//      toelichting staat bij de subscriptie in de game mode.
+	//   2. HET MEETHARNAS MOET HETZELFDE DING METEN als het spel toont. Zolang het
+	//      recept in dit bestand stond, kon `EclipseRenderProof` het alleen NABOUWEN
+	//      — en een meting aan een nagebouwd object zegt niets over het verscheepte
+	//      (`meten-voor-je-concludeert`: authored is niet verscheept).
+	//
+	// De uitgebreide vaststellingen van 27-07 en 31-07 (twaalf uitgesloten oorzaken,
+	// de transform-meting, de differentiële pixeltelling) staan bewust NIET meer in
+	// dit bestand maar in phase0/DEBUG_DISCIPLINE.md §4.3. Een tweede exemplaar van
+	// een meting veroudert los van het origineel, en dit bestand had daar een blok
+	// van tachtig regels vol van.
+	AStaticMeshActor* Mark = EclipseImpactMark::Spawn(
+		World, Hit.ImpactPoint, Hit.ImpactNormal, EclipseImpactMark::Verscheept());
 	if (Mark == nullptr)
 	{
-		UE_LOG(LogEclipse, Warning, TEXT("Inslagspoor: SpawnActor gaf niets terug op %s."),
-			*Spot.ToCompactString());
+		// Spawn heeft zelf al gelogd WAAROM. Hier alleen de gevolgtrekking, want een
+		// stille return is precies de vorm waar dit dossier maanden op is blijven
+		// hangen: aannemen dat de bron werkt en alleen aan de uitvoer meten.
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Inslagspoor: er ontstond GEEN spoor voor de treffer op %s."),
+			*Hit.ImpactPoint.ToCompactString());
 		return;
 	}
-
-	Mark->SetMobility(EComponentMobility::Movable);
-	UStaticMeshComponent* Plate = Mark->GetStaticMeshComponent();
-	Plate->SetStaticMesh(Quad);
-	// 9 cm in het vierkant, 0,4 mm dik: groot genoeg om op 20 m te lezen, plat
-	// genoeg om als spoor te lezen en niet als blokje.
-	Mark->SetActorScale3D(FVector(0.09f, 0.09f, 0.004f));
-	Plate->SetCastShadow(false);
-	Plate->SetAffectDistanceFieldLighting(false);
-	Mark->SetActorEnableCollision(false);
-
-	// HET RECEPT VAN DE GRONDVLAKKEN DIE WEL RENDEREN — de laatste ongeteste
-	// verdachte, en de enige die ik over het hoofd had gezien.
-	//
-	// Ik heb dit spoor met M_EclipseToon geprobeerd, met het engine-standaard, en
-	// met EmissiveMeshMaterial: alle drie onzichtbaar. Maar de lichtplekken en
-	// contactschaduwen van de grayboxbouwer, die aantoonbaar WEL op deze vloer
-	// staan, gebruiken geen van die drie: zij nemen M_EclipseToonDecal MET EEN
-	// MASKER. Dat masker is daar niet optioneel — de bouwer weigert zelfs een vlak
-	// te maken als het ontbreekt, en dat is precies het soort hint waar ik
-	// overheen las omdat ik naar het materiaal keek en niet naar de VOORWAARDE.
-	//
-	// De blob is hier de juiste vorm: een zachte ronde vlek is wat een inslag op
-	// beton achterlaat, en hij bestaat al.
-	UTexture* Masker = LoadObject<UTexture>(nullptr, TEXT("/Game/Art/Decals/T_blob_mask.T_blob_mask"));
-	UMaterialInterface* DecalMaster = LoadObject<UMaterialInterface>(
-		nullptr, TEXT("/Game/Art/M_EclipseToonDecal.M_EclipseToonDecal"));
-	if (Masker == nullptr || DecalMaster == nullptr)
-	{
-		UE_LOG(LogEclipse, Warning,
-			TEXT("Inslagspoor: decal-master of masker ontbreekt (master %s, masker %s) — spoor blijft onzichtbaar."),
-			DecalMaster != nullptr ? TEXT("ok") : TEXT("weg"),
-			Masker != nullptr ? TEXT("ok") : TEXT("weg"));
-	}
-	if (UMaterialInterface* Toon = DecalMaster)
-	{
-		if (UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Toon, Mark))
-		{
-			// Warm en helder, want in een unlit wijk is een inslag die zijn
-			// helderheid van het licht moet halen geen inslag.
-			const FLinearColor Spark(1.00f, 0.62f, 0.22f, 1.0f);
-			Mid->SetVectorParameterValue(TEXT("LitColor"), Spark);
-			Mid->SetVectorParameterValue(TEXT("ShadeColor"), Spark * 0.45f);
-			// LIGHTDIR — de enige parameter die ik nooit had gezet, en elke andere
-			// gebruiker van dit master zet hem wel (de lichamen op regel 1035 van
-			// EclipseCharacter.cpp, met dezelfde zonrichting). Een toon-master mengt
-			// zijn licht- en schaduwkleur op N·L; met een LightDir van nul is die
-			// term nul en valt er niets te mengen. Dat past op alle bewijs tot nu toe:
-			// de spawn lukt, zichtbaar=1, hij staat aantoonbaar in het kader
-			// (scherm 589,499 — inbeeld=1, 8,6 m) en er komt niets uit de shader.
-			const FVector SunTravel = FRotator(-25.0f, 55.0f, 0.0f).Vector();
-			Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunTravel, 0.0f)));
-			Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
-			// UVMode EN een albedo, want zonder die twee bleef het spoor onzichtbaar.
-			// GEMETEN: met een proefspoor van 90 cm - tien keer de echte maat, op 7 tot
-			// 9 m voor de speler en dus vol in beeld - was er nog steeds niets te zien.
-			// Dat sluit maat en plaats uit en laat het materiaal over: elke andere
-			// gebruiker van dit master (de lichamen, de grayboxblokken) zet een textuur
-			// en een UV-modus, mijn spoor als enige niet. Een master die zijn kleur
-			// door een ontbrekende albedo vermenigvuldigt, levert zwart op zwart asfalt.
-			Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
-			// Het masker rijdt op MeshUV: een vlak van de engine-kubus spant 0..1.
-			Mid->SetTextureParameterValue(TEXT("MaskTex"), Masker);
-			Mid->SetScalarParameterValue(TEXT("OpacityScale"), 1.0f);
-			if (UTexture* White = LoadObject<UTexture>(nullptr, TEXT("/Engine/EngineResources/WhiteSquareTexture.WhiteSquareTexture")))
-			{
-				Mid->SetTextureParameterValue(TEXT("AlbedoTex"), White);
-			}
-			Plate->SetMaterial(0, Mid);
-		}
-	}
-
-	// Kort: dit is een treffer-bevestiging en geen kogelgat dat blijft liggen. Met
-	// SetLifeSpan ruimt de engine hem zelf op, dus er is geen pool en geen teller
-	// die kan blijven hangen — bij tien schoten per seconde leven er hooguit een
-	// stuk of acht tegelijk.
-	// 2,5 s en niet 0,8. De eerste keus was 0,8 en dat bleek om twee redenen te
-	// kort: op de opname van 12:56 stonden elf gemeten wereldtreffers en was er GEEN
-	// spoor te zien, want de opname valt na het vuurinterval en bij frames van 0,4 s
-	// is 0,8 s twee frames. En los daarvan: een kogelspoor dat binnen een seconde
-	// weg is, is precies de klacht die dit moet oplossen — je kijkt na een salvo naar
-	// de muur om te zien waar je zat.
-	// ==================================================================
-	// STAND 27-07: DIT SPOOR IS ONZICHTBAAR EN IK WEET NIET WAAROM.
-	//
-	// Alles hieronder is GEMETEN, niet beredeneerd, en sluit telkens een oorzaak
-	// uit. De regel [PLAYSHOT n SPOREN] in de opnameronde projecteert de levende
-	// sporen naar schermcoordinaten; die maakt van "ik zie het niet" een getal.
-	//
-	//   ontstaat de actor        JA  - 11 stuks, zichtbaar=1, niet verborgen
-	//   heeft hij een mesh       JA  - MESH Cube, bolstraal 6,4, geregistreerd=1
-	//   staat hij in het kader   JA  - scherm (589,502), inbeeld=1, op 8,4 m
-	//   ligt het aan de maat     NEE - 90 cm (~100 px breed) is even onzichtbaar
-	//   aan de levensduur        NEE - 2,5 s, en er leven er 11 op het opnamemoment
-	//   aan de kleur             NEE - knalwit met honderdvoudige emissie: niets
-	//   aan MIJN materiaal       NEE - ook met de engine-standaard: niets
-	//   aan de spawnwijze        NEE - identiek aan de districtblokken die WEL renderen
-	//   aan het MOMENT           NEE - een kanarie bij BeginPlay, op open weg, 90 cm,
-	//                                  geprojecteerd in beeld: even onzichtbaar
-	//   aan de dikte             NEE - ook op de Z-schaal 0,04 van de grondvlakken
-	//                                  van de bouwer (10x dikker dan mijn 0,004)
-	//   aan MIJN materiaalkeuze  NEE - ook met EmissiveMeshMaterial, dat niet van
-	//                                  licht afhangt en geen masker heeft
-	//   aan het decal-recept     NEE - ook met M_EclipseToonDecal + T_blob_mask +
-	//                                  OpacityScale, exact het recept van de
-	//                                  grondvlakken van de grayboxbouwer
-	//
-	// EN TOEN DE CONTROLEPROEF DIE ALLES OMDRAAIDE. Een magenta blok van 50 cm,
-	// VASTGEMAAKT AAN HET PERSONAGE en neergezet bij BeginPlay, staat groot en
-	// helder in elk frame. Spawnen, materiaal, toon-master en renderen werken dus
-	// gewoon — en dat had ik na twaalf uitsluitingen nog niet vastgesteld.
-	//
-	// Daarna hetzelfde blok als INSLAGSPOOR: zelfde mesh, zelfde materiaal, zelfde
-	// maat, geen levensduur, geen RF_Transient. Onzichtbaar. Ook zonder RF_Transient.
-	// De sporen staan aantoonbaar VOOR de camera (dot-product) op 8,5 m, met
-	// straal 63,7, geregistreerd en zichtbaar.
-	//
-	// HET ENIGE VERSCHIL DAT OVERBLIJFT IS WIE ZE NEERZET: dit component tijdens
-	// het vuren, tegen de game mode bij het starten. Dat is waar de volgende sessie
-	// hoort te beginnen — bijvoorbeeld door hetzelfde spoor vanuit de game mode op
-	// een timer neer te zetten. Niet meer gokken aan materiaal, maat of vorm: die
-	// zijn alle drie uitgesloten door een blok dat WEL verschijnt.
-	//
-	// TWEE VAN DIE UITSLUITINGEN ZIJN ZWAKKER DAN ZE LIJKEN, en dat hoort erbij:
-	// de kanarie-proeven leunden op "inbeeld=1", en dat zegt NIETS over wat er voor
-	// het vlak staat. De eerste kanarie bleek achter een pilaar te vallen; een
-	// poging om de grondvlakken van de bouwer te controleren viel achter een muur.
-	//
-	// EN DE AANNAME ERONDER IS NOOIT GETOETST: ik ging ervan uit dat de
-	// lichtplekken en contactschaduwen van de bouwer WEL renderen. Dat heb ik nooit
-	// gezien, alleen aangenomen omdat de wijk aangekleed oogt. Er staan er 38 in de
-	// wereld. Is die laag ook onzichtbaar, dan is dit geen defect van mijn spoor
-	// maar van alles wat plat op de grond ligt — en dat is een veel groter verhaal.
-	//
-	// DAT IS DE VRAAG WAARMEE DE VOLGENDE SESSIE HOORT TE BEGINNEN, en hij is in de
-	// editor in tien seconden te beantwoorden: zet de wijk stil en kijk of er onder
-	// een lantaarnpaal een lichtplek ligt.
-	//
-	// Wat dus overblijft ligt buiten wat dit harnas kan zien. Volgende stap is een
-	// ander gereedschap dan de opnameronde: in de editor kijken, of de renderlagen
-	// uitzetten tot hij verschijnt. NIET nog een parameter gokken - dat is vandaag
-	// zeven keer gedaan en heeft zeven keer niets opgeleverd.
-	//
-	// STAND 31-07 - DE PLEK IS UITGESLOTEN, MET EEN METING.
-	//
-	// Alles hierboven blijft staan als geschiedenis, maar twee regels erin zijn
-	// achterhaald. "HET ENIGE VERSCHIL DAT OVERBLIJFT IS WIE ZE NEERZET" is langs
-	// twee kanten weerlegd: de game mode zet er via OnWorldImpact al een TWEEDE neer
-	// met een ander materiaal en een andere rotatie, en die is even onzichtbaar. En
-	// de plek zelf is geen verdachte meer:
-	// Eclipse.Combat.ImpactMarkLandsOnTheHitAndNotOnTheShooter loopt twintig
-	// gevarieerde schoten headless na en vindt het spoor elke keer OP de inslagplek
-	// en nooit bij de schutter - met een controleproef die aantoont dat die meting
-	// ook rood kan worden.
-	//
-	// De getallen staan hier niet, en dat is opzet: ze staan in
-	// phase0/DEBUG_DISCIPLINE.md §4.3. Een tweede exemplaar van een meting veroudert
-	// los van het origineel, en dit bestand heeft daar al een blok vol van.
-	// ==================================================================
-	Mark->SetLifeSpan(2.5f);
-	Mark->Tags.Add(TEXT("Eclipse_ImpactMark"));
 	++ImpactMarksSpawned;
 
 	// DE DRIE GETALLEN DIE HIER NOOIT STONDEN, en zonder welke elke conclusie in
 	// §4.3 een gok blijft.
 	//
-	// De regel hieronder logde tot 31-07 alleen `Spot` — de plek waar ik het spoor
-	// NAARTOE stuurde. Waar het daarna werkelijk staat is in dit dossier nog nooit
-	// gemeten, en juist dat is de vraag: de controleproef die "transform-bug, geen
+	// De regel hieronder logde tot 31-07 alleen de bedoelde plek — de plek waar het
+	// spoor NAARTOE ging. Waar het daarna werkelijk staat was in dit dossier nooit
+	// gemeten, en juist dat was de vraag: de controleproef die "transform-bug, geen
 	// rendering-bug" moest dragen, was een blok dat PER CONSTRUCTIE aan het
 	// personage vastzat en daar dus per definitie stond. Zo'n proef kan over
 	// gespawnde sporen niets zeggen.
@@ -257,25 +87,28 @@ void UEclipseHitscanWeaponComponent::SpawnImpactMark(UWorld& World, const FHitRe
 	const AActor* ShooterActor = GetOwner();
 	const FVector ShooterSpot = ShooterActor != nullptr ? ShooterActor->GetActorLocation() : FVector::ZeroVector;
 	const FVector Landed = Mark->GetActorLocation();
+	const FVector Bedoeld = Hit.ImpactPoint + Hit.ImpactNormal.GetSafeNormal() * 1.0f;
 	UE_LOG(LogEclipse, Display,
 		TEXT("Inslagspoor %d PLEK: bedoeld %s, ECHT %s (verschil %.2f cm), inslagpunt %s (%.2f cm), schutter %s (%.1f cm, %s), geraakt %s."),
-		ImpactMarksSpawned, *Spot.ToCompactString(), *Landed.ToCompactString(),
-		FVector::Dist(Landed, Spot), *Hit.ImpactPoint.ToCompactString(),
+		ImpactMarksSpawned, *Bedoeld.ToCompactString(), *Landed.ToCompactString(),
+		FVector::Dist(Landed, Bedoeld), *Hit.ImpactPoint.ToCompactString(),
 		FVector::Dist(Landed, Hit.ImpactPoint), *ShooterSpot.ToCompactString(),
 		FVector::Dist(Landed, ShooterSpot), ShooterActor != nullptr ? TEXT("eigenaar bekend") : TEXT("GEEN eigenaar"),
 		*GetNameSafe(Hit.GetActor()));
 
+	// DE MAAT, en niet meer de mesh-omvang van één plaat.
+	//
+	// Hier stond de bolstraal van de enige component, en dat getal is met het
+	// samengestelde spoor misleidend geworden: het zou de grootste van de drie
+	// delen noemen en de andere twee verzwijgen. De bounding box van de hele actor
+	// is wat de camera ziet, en dat is precies het getal dat naast de pixeltelling
+	// van EclipseRenderProof hoort te liggen.
+	const FBox Omvang = Mark->GetComponentsBoundingBox(true);
+	const FVector Maat = Omvang.GetSize();
 	UE_LOG(LogEclipse, Display,
-		TEXT("Inslagspoor %d GESPAWND op %s (schaal %s, zichtbaar %d, materiaal %s, MESH %s, straal %.1f, geregistreerd %d, zichtbaar-in-spel %d)"),
-		ImpactMarksSpawned, *Spot.ToCompactString(), *Mark->GetActorScale3D().ToCompactString(),
-		Plate->IsVisible() ? 1 : 0, *GetNameSafe(Plate->GetMaterial(0)),
-		// DE MESH ZELF, en die had hier vanaf het begin moeten staan. Materiaal,
-		// maat, plaats, levensduur en kleur zijn allemaal uitgesloten met een
-		// meting; het enige dat ik nooit heb gecontroleerd is of er echt een mesh
-		// aan hangt en of hij een omvang heeft. Een bolstraal van nul betekent dat
-		// er niets te tekenen valt, hoe zichtbaar de component ook zegt te zijn.
-		*GetNameSafe(Plate->GetStaticMesh()), Plate->Bounds.SphereRadius,
-		Plate->IsRegistered() ? 1 : 0, Mark->IsHidden() ? 0 : 1);
+		TEXT("Inslagspoor %d GESPAWND op %s (omvang %.1f x %.1f x %.1f cm, %d delen, zichtbaar-in-spel %d)"),
+		ImpactMarksSpawned, *Landed.ToCompactString(), Maat.X, Maat.Y, Maat.Z,
+		Mark->GetComponents().Num(), Mark->IsHidden() ? 0 : 1);
 }
 
 void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row)

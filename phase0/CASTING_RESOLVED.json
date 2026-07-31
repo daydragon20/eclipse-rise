@@ -1,10 +1,47 @@
 {
  "bron": "phase0/CASTING_KEUZE.json",
  "toelichting": "Index = positie op progress_media/casting/CASTING.html (premade eerst, daarna Voice Library). Controleer ordering_fingerprint als de shortlist opnieuw is gebouwd.",
- "rollen_gekozen": 9,
- "finalisten_totaal": 17,
+ "rollen_gekozen": 17,
+ "finalisten_totaal": 33,
  "library_finalisten_zonder_licentiecheck": [],
- "conflicten_eerste_keuze": {},
+ "conflicten_eerste_keuze": {
+  "FGY2WhTYpPnrIDTdsKH5": [
+   [
+    "Voss \"Cinder\" (V)",
+    "Laura",
+    1
+   ],
+   [
+    "Kaya Renn (27)",
+    "Laura",
+    1
+   ]
+  ],
+  "Xb7hH8MSUJpSbSDYk0k2": [
+   [
+    "Dr. Elin Reyes (38)",
+    "Alice",
+    1
+   ],
+   [
+    "Grootmaarschalk Sera Kaine (49)",
+    "Alice",
+    1
+   ]
+  ],
+  "onwK4e9ZLuTAKqWW03F9": [
+   [
+    "Torren Vale (45)",
+    "Daniel",
+    1
+   ],
+   [
+    "AEGIS",
+    "Daniel",
+    1
+   ]
+  ]
+ },
  "conflicten_inclusief_reserves": {
   "TX3LPaxmHKxFdv7VOQHJ": [
    [
@@ -15,6 +52,30 @@
    [
     "Dex Callum (31)",
     "Liam",
+    1
+   ]
+  ],
+  "SAz9YHcvj6GT2YYXdXww": [
+   [
+    "Veil-operative A/B",
+    "River",
+    1
+   ],
+   [
+    "Whisper (stem-only tot Act 3)",
+    "River",
+    2
+   ]
+  ],
+  "cjVigY5qzO86Huf0OWal": [
+   [
+    "Veil-operative A/B",
+    "Eric",
+    2
+   ],
+   [
+    "Inquisiteur Dahl Threx (41)",
+    "Eric",
     1
    ]
   ],
@@ -44,6 +105,64 @@
    [
     "Mara Sovann (52)",
     "Matilda",
+    1
+   ],
+   [
+    "Kaya Renn (27)",
+    "Matilda",
+    2
+   ]
+  ],
+  "FGY2WhTYpPnrIDTdsKH5": [
+   [
+    "Voss \"Cinder\" (V)",
+    "Laura",
+    1
+   ],
+   [
+    "Kaya Renn (27)",
+    "Laura",
+    1
+   ]
+  ],
+  "Xb7hH8MSUJpSbSDYk0k2": [
+   [
+    "Dr. Elin Reyes (38)",
+    "Alice",
+    1
+   ],
+   [
+    "AEGIS",
+    "Alice",
+    2
+   ],
+   [
+    "Grootmaarschalk Sera Kaine (49)",
+    "Alice",
+    1
+   ]
+  ],
+  "hpp4J3VqNfWAUOO0d1Us": [
+   [
+    "Dr. Elin Reyes (38)",
+    "Bella",
+    2
+   ],
+   [
+    "Sela Vann (23)",
+    "Bella",
+    2
+   ]
+  ],
+  "onwK4e9ZLuTAKqWW03F9": [
+   [
+    "Torren Vale (45)",
+    "Daniel",
+    1
+   ],
+   [
+    "AEGIS",
+    "Daniel",
     1
    ]
   ]
@@ -269,8 +388,8 @@
    "label": "Dr. Elin Reyes (38)",
    "prio": 2,
    "tier": "Tier 4",
-   "aantal_kandidaten": 4,
-   "ordering_fingerprint": "721e3166bf2d8fc5",
+   "aantal_kandidaten": 12,
+   "ordering_fingerprint": "b7409b7ac4c9aad7",
    "finalisten": [
     {
      "stem": "Alice",
@@ -279,6 +398,222 @@
      "bestand": "progress_media/casting/reyes/reyes_kandidaat1_Alice.mp3",
      "eigenschappen": "female / middle_aged / british / professional",
      "keuze_index": 1,
+     "rang": 1
+    },
+    {
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "bron": "premade",
+     "bestand": "progress_media/casting/reyes/reyes_kandidaat2_Bella.mp3",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "keuze_index": 2,
+     "rang": 2
+    }
+   ]
+  },
+  "torren": {
+   "label": "Torren Vale (45)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "aantal_kandidaten": 17,
+   "ordering_fingerprint": "fe29186a66b37d46",
+   "finalisten": [
+    {
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "bron": "premade",
+     "bestand": "progress_media/casting/torren/torren_kandidaat2_Daniel.mp3",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "keuze_index": 2,
+     "rang": 1
+    },
+    {
+     "stem": "Onyx – Calm & Friendly Podcast Narrator",
+     "voice_id": "An7r4HL8TAw73K5uSMpy",
+     "bron": "professional",
+     "bestand": "progress_media/casting/stemmen_library/torren_lib_An7r4HL8.mp3",
+     "eigenschappen": "male / middle_aged / american / calm",
+     "keuze_index": 8,
+     "rang": 2
+    }
+   ]
+  },
+  "sela": {
+   "label": "Sela Vann (23)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "aantal_kandidaten": 12,
+   "ordering_fingerprint": "46715da87b3c2d3f",
+   "finalisten": [
+    {
+     "stem": "Dr. Kendall",
+     "voice_id": "BVA1oNX6xZt6o7QaUwxr",
+     "bron": "professional",
+     "bestand": "progress_media/casting/stemmen_library/sela_lib_BVA1oNX6.mp3",
+     "eigenschappen": "female / young / us southern / casual",
+     "keuze_index": 8,
+     "rang": 1
+    },
+    {
+     "stem": "Bella",
+     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
+     "bron": "premade",
+     "bestand": "progress_media/casting/sela/sela_kandidaat4_Bella.mp3",
+     "eigenschappen": "female / middle_aged / american / professional",
+     "keuze_index": 4,
+     "rang": 2
+    }
+   ]
+  },
+  "kaya": {
+   "label": "Kaya Renn (27)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "aantal_kandidaten": 12,
+   "ordering_fingerprint": "fa9c87387ff86833",
+   "finalisten": [
+    {
+     "stem": "Laura",
+     "voice_id": "FGY2WhTYpPnrIDTdsKH5",
+     "bron": "premade",
+     "bestand": "progress_media/casting/kaya/kaya_kandidaat1_Laura.mp3",
+     "eigenschappen": "female / young / american / sassy",
+     "keuze_index": 1,
+     "rang": 1
+    },
+    {
+     "stem": "Matilda",
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "bron": "premade",
+     "bestand": "progress_media/casting/kaya/kaya_kandidaat4_Matilda.mp3",
+     "eigenschappen": "female / middle_aged / american / upbeat",
+     "keuze_index": 4,
+     "rang": 2
+    }
+   ]
+  },
+  "whisper": {
+   "label": "Whisper (stem-only tot Act 3)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "aantal_kandidaten": 12,
+   "ordering_fingerprint": "7f8aba8d8fe374e0",
+   "finalisten": [
+    {
+     "stem": "Dylan Malc - Calm & Educational",
+     "voice_id": "PMWmvqAOXhLm54FLpmYS",
+     "bron": "professional",
+     "bestand": "progress_media/casting/stemmen_library/whisper_lib_PMWmvqAO.mp3",
+     "eigenschappen": "male / middle_aged / american / gentle",
+     "keuze_index": 7,
+     "rang": 1
+    },
+    {
+     "stem": "River",
+     "voice_id": "SAz9YHcvj6GT2YYXdXww",
+     "bron": "premade",
+     "bestand": "progress_media/casting/whisper/whisper_kandidaat1_River.mp3",
+     "eigenschappen": "neutral / middle_aged / american / calm",
+     "keuze_index": 1,
+     "rang": 2
+    }
+   ]
+  },
+  "threx": {
+   "label": "Inquisiteur Dahl Threx (41)",
+   "prio": 2,
+   "tier": "Tier 2",
+   "aantal_kandidaten": 12,
+   "ordering_fingerprint": "87c6c500af0ab811",
+   "finalisten": [
+    {
+     "stem": "Eric",
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "bron": "premade",
+     "bestand": "progress_media/casting/threx/threx_kandidaat2_Eric.mp3",
+     "eigenschappen": "male / middle_aged / american / classy",
+     "keuze_index": 2,
+     "rang": 1
+    },
+    {
+     "stem": "Chris",
+     "voice_id": "iP95p4xoKVk53GoZ742B",
+     "bron": "premade",
+     "bestand": "progress_media/casting/threx/threx_kandidaat3_Chris.mp3",
+     "eigenschappen": "male / middle_aged / american / casual",
+     "keuze_index": 3,
+     "rang": 2
+    }
+   ]
+  },
+  "aegis": {
+   "label": "AEGIS",
+   "prio": 2,
+   "tier": "Tier 2",
+   "aantal_kandidaten": 12,
+   "ordering_fingerprint": "ca9e87294dfe47ce",
+   "finalisten": [
+    {
+     "stem": "Daniel",
+     "voice_id": "onwK4e9ZLuTAKqWW03F9",
+     "bron": "premade",
+     "bestand": "progress_media/casting/aegis/aegis_kandidaat2_Daniel.mp3",
+     "eigenschappen": "male / middle_aged / british / formal",
+     "keuze_index": 2,
+     "rang": 1
+    },
+    {
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "bron": "premade",
+     "bestand": "progress_media/casting/aegis/aegis_kandidaat3_Alice.mp3",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "keuze_index": 3,
+     "rang": 2
+    }
+   ]
+  },
+  "vex": {
+   "label": "Hoog-Arbiter Malachar Vex (68)",
+   "prio": 3,
+   "tier": "Act 3-4",
+   "aantal_kandidaten": 17,
+   "ordering_fingerprint": "2ee56a7eec53c685",
+   "finalisten": [
+    {
+     "stem": "Bill",
+     "voice_id": "pqHfZKP75CvOlQylNhV4",
+     "bron": "premade",
+     "bestand": "progress_media/casting/vex/vex_kandidaat1_Bill.mp3",
+     "eigenschappen": "male / old / american / crisp",
+     "keuze_index": 1,
+     "rang": 1
+    },
+    {
+     "stem": "Victor - Deep, Dark Psychology",
+     "voice_id": "U1nBX3lzKSM937PaYYfk",
+     "bron": "professional",
+     "bestand": "progress_media/casting/stemmen_library/vex_lib_U1nBX3lz.mp3",
+     "eigenschappen": "male / old / british / deep",
+     "keuze_index": 5,
+     "rang": 2
+    }
+   ]
+  },
+  "kaine": {
+   "label": "Grootmaarschalk Sera Kaine (49)",
+   "prio": 3,
+   "tier": "Act 2-4",
+   "aantal_kandidaten": 17,
+   "ordering_fingerprint": "1bb2a282fa7cd741",
+   "finalisten": [
+    {
+     "stem": "Alice",
+     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+     "bron": "premade",
+     "bestand": "progress_media/casting/kaine/kaine_kandidaat2_Alice.mp3",
+     "eigenschappen": "female / middle_aged / british / professional",
+     "keuze_index": 2,
      "rang": 1
     }
    ]

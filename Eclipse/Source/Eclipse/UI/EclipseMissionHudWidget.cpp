@@ -225,11 +225,12 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 		SetVisibilityIfChanged(AmmoCapacity, false);
 		SetVisibilityIfChanged(WeaponReadout, false);
 		SetVisibilityIfChanged(ReloadReadout, false);
-		if (ReloadBarFill != nullptr)
-		{
-			SetVisibilityIfChanged(ReloadBarFill, false);
-			SetVisibilityIfChanged(ReloadBarTrack, false);
-		}
+		SetVisibilityIfChanged(ReloadBarFill, false);
+		SetVisibilityIfChanged(ReloadBarTrack, false);
+		// HET PANEEL GAAT MEE. Een leeg kader zonder cijfers erin is erger dan geen
+		// kader: het claimt schermruimte voor informatie die er niet is.
+		SetVisibilityIfChanged(AmmoPanelInk, false);
+		SetVisibilityIfChanged(AmmoPanelFill, false);
 		return;
 	}
 
@@ -237,6 +238,8 @@ void UEclipseMissionHudWidget::RefreshAmmoReadout()
 	// magazijngetal wordt hieronder niet meer aangeraakt door de herlaadtak.
 	AmmoReadout->SetVisibility(ESlateVisibility::HitTestInvisible);
 	AmmoReadout->SetText(FText::FromString(Readout.MagazineText));
+	SetVisibilityIfChanged(AmmoPanelInk, true);
+	SetVisibilityIfChanged(AmmoPanelFill, true);
 	SetVisibilityIfChanged(AmmoCapacity, true);
 	if (AmmoCapacity != nullptr)
 	{
@@ -353,6 +356,9 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 
 	// Alleen werk als er iets te doven valt. Deze widget tikt toch al voor Slate;
 	// een timer per treffer zou bij 6,67 schoten per seconde meer kosten dan dit.
+	// De marge eerst: hij hangt aan de viewportmaat, en die kan tussen twee frames
+	// veranderen (venster slepen, resolutiewissel).
+	ApplySafeAreaLayout();
 	RefreshAmmoReadout();
 	// Het kruis reageert op de spreiding, dus hij hoort per frame na te kijken —
 	// maar hij doet alleen werk als er iets veranderde (zie RefreshCrosshair).
@@ -417,14 +423,10 @@ void UEclipseMissionHudWidget::NativeOnInitialized()
 	{
 		RootSlot->SetAutoSize(true);
 		RootSlot->SetAnchors(FAnchors(0.0f, 0.0f));
-		// DEZELFDE MARGE ALS DE REST — defect 4. Hier stond 12 px, rechtsonder stond
-		// 48/32 px, en geen van beide was gekozen: GEMETEN op
-		// HUD_wapen_E_na_wissel.png begon de bovenste regel op beeldkolom 9 (0,7 %
-		// van de breedte) terwijl de wapenregel de laatste kolom raakte. Twee
-		// verschillende ad-hoc getallen in dezelfde HUD. Er is nu één bron, en die
-		// schaalt met de resolutie in plaats van met de toevallige testresolutie.
-		const FVector2D Margin = CurrentTitleSafeMarginPx();
-		RootSlot->SetPosition(Margin);
+		// De marge zelf wordt PER FRAME gezet (ApplySafeAreaLayout); hier staat alleen
+		// een plek zodat het slot bestaat. Zie ApplySafeAreaLayout voor waarom dat
+		// niet bij de bouw kan.
+		RootSlot->SetPosition(FVector2D::ZeroVector);
 	}
 
 	// ---------------------------------------------------------------------------
@@ -908,8 +910,6 @@ void UEclipseMissionHudWidget::BuildAmmoReadout()
 	// Vandaar een VAST KADER met een eigen breedte in plaats van AutoSize. Wat er
 	// ook in komt te staan, het blok kan zijn eigen rand niet meer uit — een langere
 	// wapennaam kan het probleem niet opnieuw maken.
-	const FVector2D Margin = CurrentTitleSafeMarginPx();
-
 	AmmoBlock = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("AmmoBlock"));
 	if (UCanvasPanelSlot* BlockSlot = Canvas->AddChildToCanvas(AmmoBlock))
 	{
@@ -917,9 +917,64 @@ void UEclipseMissionHudWidget::BuildAmmoReadout()
 		BlockSlot->SetAnchors(FAnchors(1.0f, 1.0f));
 		BlockSlot->SetAlignment(FVector2D(1.0f, 1.0f));
 		BlockSlot->SetSize(FVector2D(AmmoBlockWidthPx, AmmoBlockHeightPx));
-		BlockSlot->SetPosition(FVector2D(-Margin.X, -Margin.Y));
+		BlockSlot->SetPosition(FVector2D::ZeroVector); // per frame gezet, zie ApplySafeAreaLayout
 	}
 	AmmoBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	// HET PANEEL ERACHTER — de eerste stap van de Borderlands-vormtaal (O-8 = "vol",
+	// REFERENTIE_HUD_BORDERLANDS.md §1: "dikke inktranden om alles" en §4.2: "doe
+	// ÉÉN element helemaal af in die taal en pas het daarna pas op de rest toe").
+	//
+	// De munitieteller is met opzet dat ene element: hij is het grootste getal op het
+	// scherm en dus de plek waar een verkeerde richting het snelst zichtbaar is.
+	//
+	// EN HIJ DIENT EEN LEESBAARHEIDSDOEL, niet alleen een stijldoel — dat is de harde
+	// tegeneis uit §3. GEMETEN op de frames van vanavond: de teller staat rechtsonder
+	// pal boven de GELE WEGMARKERING (luminantie tot 195), en dat is precies de
+	// ondergrond waarop lichte tekst wegvalt. Een donker vlak eronder maakt het
+	// contrast onafhankelijk van waar de speler toevallig staat. Zou stijl en
+	// leesbaarheid hier botsen, dan wint leesbaarheid; hier wijzen ze dezelfde kant op.
+	//
+	// Vlakke kleuren, geen textuur: er ligt geen HUD-paneeltextuur in het project en
+	// er een verzinnen zou betekenen dat ik ga tekenen.
+	// LET OP DE KLEURRUIMTE — en dit is geen theorie maar een gemeten fout van
+	// vanavond. Eerste versie zette het vlak op FLinearColor(0.055, 0.058, 0.075).
+	// Dat LEEK donker en werd op het frame (60, 62, 71), terwijl de wereld eronder
+	// (45, 45, 56) was: het paneel maakte de hoek LICHTER in plaats van donkerder,
+	// precies het tegenovergestelde van waarvoor het er staat.
+	//
+	// Oorzaak: Slate behandelt een FLinearColor als LINEAIR en zet hem naar sRGB voor
+	// het scherm. Lineair 0,055 is sRGB 0,25 — dus 64 van de 255, niet 14.
+	// FromSRGBColor doet de omrekening in de goede richting, en dan staat er in de
+	// code het getal dat je op het frame terugmeet.
+	//
+	// Dezelfde klasse fout als de rest van dit dossier: een waarde in de
+	// administratie is niet de waarde op het scherm, en alleen nameten scheelt dat.
+	AmmoPanelInk = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("AmmoPanelInk"));
+	AmmoPanelInk->SetColorAndOpacity(FLinearColor::FromSRGBColor(FColor(5, 5, 7, 255)));
+	if (UCanvasPanelSlot* InkSlot = AmmoBlock->AddChildToCanvas(AmmoPanelInk))
+	{
+		InkSlot->SetAutoSize(false);
+		InkSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+		// De inktrand steekt aan alle kanten 3 px uit onder het vlak erop; dat IS de
+		// dikke lijn uit §15.5, alleen dan in Slate in plaats van als post-effect op
+		// 3D-geometrie (die haalt een widget per definitie nooit).
+		InkSlot->SetOffsets(FMargin(-3.0f, -3.0f, -3.0f, -3.0f));
+	}
+
+	AmmoPanelFill = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("AmmoPanelFill"));
+	// Niet zwart maar heel donker blauwgrijs met 82 % dekking: het paneel hoort de
+	// wereld te dempen, niet weg te snijden. Volle dekking leest als een gat in beeld.
+	// sRGB 18/19/24 ligt ver onder de donkerste ondergrond die hier gemeten is (26),
+	// dus het paneel is op ELKE plek in de wijk het donkerste vlak — ook boven de
+	// gele wegmarkering van 195 waar de teller anders wegvalt.
+	AmmoPanelFill->SetColorAndOpacity(FLinearColor::FromSRGBColor(FColor(18, 19, 24, 209)));
+	if (UCanvasPanelSlot* FillSlot = AmmoBlock->AddChildToCanvas(AmmoPanelFill))
+	{
+		FillSlot->SetAutoSize(false);
+		FillSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+		FillSlot->SetOffsets(FMargin(0.0f));
+	}
 
 	// Alles binnen het blok is RECHTS uitgelijnd op dezelfde lijn, zodat "7" en "30"
 	// op dezelfde plek eindigen. Een teller die verspringt terwijl je hem afleest is
@@ -1007,6 +1062,57 @@ void UEclipseMissionHudWidget::BuildAmmoReadout()
 	SetVisibilityIfChanged(ReloadReadout, false);
 	SetVisibilityIfChanged(ReloadBarTrack, false);
 	SetVisibilityIfChanged(ReloadBarFill, false);
+}
+
+void UEclipseMissionHudWidget::ApplySafeAreaLayout()
+{
+	// DE MARGE HOORT PER FRAME GEZET TE WORDEN EN NIET BIJ DE BOUW, en dat is een
+	// reparatie op mijn eigen eerste versie die ik alleen door NAMETEN gevonden heb.
+	//
+	// DE METING, in drie opnamerondes op 31-07:
+	//   slotwaarde 12 -> 9 px op het frame
+	//   slotwaarde 36 -> 25 px
+	//   slotwaarde 54 -> 55 px
+	// De eerste twee schalen met ~0,70; de derde met 1,02. Eén schaalfactor kan die
+	// drie niet verklaren, en dat betekende dat mijn model van de keten fout was —
+	// niet dat er een getal bijgesteld moest worden.
+	//
+	// WAT ER ECHT GEBEURT. Slot-posities staan in Slate-eenheden en worden met de
+	// DPI-schaal van de viewport vermenigvuldigd; op deze machine is dat 0,666
+	// (Windows staat op 150 %). Maar die schaal is bij NativeOnInitialized nog NIET
+	// de definitieve: de viewport heeft zijn maat dan nog niet. Ik bakte dus een
+	// getal in dat berekend was met een verkeerde schaal, en de fout verschilde per
+	// ronde omdat het moment verschilde.
+	//
+	// Dit is exact dezelfde klasse fout als waar deze hele laag op vastliep
+	// (RebuildWidget vóór NativeConstruct): iets vastleggen op een moment waarop de
+	// bron er nog niet is. De oplossing is dezelfde vorm — niet één keer vroeg, maar
+	// nakijken zolang het kan veranderen. Bovendien MOET dat: een speler die zijn
+	// venster sleept of van resolutie wisselt, hoort zijn marge mee te zien gaan.
+	//
+	// Gratis als er niets veranderde, dus dit kost geen frame (12.4).
+	const FVector2D Margin = CurrentTitleSafeMarginPx();
+	if (Margin.Equals(LastAppliedSafeMarginPx, 0.5))
+	{
+		return;
+	}
+	LastAppliedSafeMarginPx = Margin;
+
+	if (Root != nullptr)
+	{
+		if (UCanvasPanelSlot* RootSlot = Cast<UCanvasPanelSlot>(Root->Slot))
+		{
+			RootSlot->SetPosition(Margin);
+		}
+	}
+	if (AmmoBlock != nullptr)
+	{
+		if (UCanvasPanelSlot* BlockSlot = Cast<UCanvasPanelSlot>(AmmoBlock->Slot))
+		{
+			BlockSlot->SetPosition(FVector2D(-Margin.X, -Margin.Y));
+		}
+	}
+	UE_LOG(LogEclipse, Verbose, TEXT("HUD: titel-veilige marge gezet op %.1f slot-eenheden."), Margin.X);
 }
 
 FVector2D UEclipseMissionHudWidget::CurrentTitleSafeMarginPx() const
@@ -1147,10 +1253,23 @@ void UEclipseMissionHudWidget::BuildCrosshair()
 		CrosshairArms.Add(Bar);
 	}
 
-	// EN EEN PUNT IN HET MIDDEN. Klein en gedimd: hij markeert het exacte richtpunt
-	// dat de vier balken juist vrijlaten, zonder het doelwit te bedekken.
+	// EN EEN PUNT IN HET MIDDEN — met een eigen donkere rand, want zonder die rand
+	// bestond hij alleen in de code.
+	//
+	// GEZIEN op HUD_kruis_ondergrond_1.png (31-07 21:5x), op 5x uitvergroot: van het
+	// middenpunt was GEEN pixel te vinden. Hij stond op 2x2 px met alfa 0,55 — op een
+	// lichte ondergrond is dat per constructie niets. En juist bij heupvuur staan de
+	// vier balken 29 px uit elkaar, dus dan is het middenpunt het ENIGE dat het
+	// richtpunt nog aanwijst.
+	//
+	// Dat het punt "gedimd" moest zijn was een aanname van mij en geen eis: hij mag
+	// het doelwit niet BEDEKKEN, en dat regel je met MAAT (3 px), niet met alfa.
+	CrosshairCentreShadow = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("CrosshairCentreShadow"));
+	CrosshairCentreShadow->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.9f));
+	CrosshairRoot->AddChildToCanvas(CrosshairCentreShadow);
+
 	CrosshairCentre = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("CrosshairCentre"));
-	CrosshairCentre->SetColorAndOpacity(FLinearColor(0.90f, 0.95f, 1.0f, 0.55f));
+	CrosshairCentre->SetColorAndOpacity(FLinearColor(0.90f, 0.95f, 1.0f, 1.0f));
 	CrosshairRoot->AddChildToCanvas(CrosshairCentre);
 
 	RefreshCrosshair();
@@ -1185,11 +1304,28 @@ void UEclipseMissionHudWidget::RefreshCrosshair()
 		Owner->GetViewportSize(ViewportX, ViewportY);
 	}
 
-	// De spreiding die NU geldt, uit dezelfde bron waar het schot hem vandaan haalt
-	// — anders belooft het kruis iets wat de kogel niet doet.
+	// DE SPREIDING DIE NU GELDT, uit dezelfde functie waar het SCHOT hem vandaan
+	// haalt. Niet uit het profiel.
+	//
+	// Hier stond `bAiming ? GetAimSpreadDegrees() : GetHipSpreadDegrees()`, en dat
+	// was fout op precies de manier waar ik in de header van GetCurrentSpreadDegrees
+	// tegen waarschuwde: ik had de formule aan de wapenkant netjes op één plek gezet
+	// en hem hier alsnog nagebouwd. GEZIEN op de frames van 31-07 22:0x: in derde
+	// persoon (mikkend) stond het kruis 32 px wijd en in eerste persoon (heup) 58 px,
+	// terwijl er in geen van beide standen geschoten werd — het kruis toonde dus de
+	// spreiding die je ZOU krijgen als je aan het vuren was, niet die van je volgende
+	// schot. Dat volgende schot is per "eerste schot is zuiver" juist zuiver.
+	//
+	// Met GetCurrentSpreadDegrees trekt het kruis dicht zodra je de trekker een halve
+	// seconde loslaat, en dat is geen cosmetiek: dat IS de terugkoppeling waar de
+	// zuiver-eerste-schot-regel om vraagt. Zonder die terugkoppeling is de regel
+	// onzichtbaar en dus onbespeelbaar.
 	const bool bAiming = Body != nullptr && Body->IsA<AEclipseCharacter>()
 		&& Cast<AEclipseCharacter>(Body)->IsAiming();
-	const float Spread = bAiming ? Weapon->GetAimSpreadDegrees() : Weapon->GetHipSpreadDegrees();
+	const float Spread = Weapon->GetCurrentSpreadDegrees();
+	// De FOV bepaalt alleen de PROJECTIE van die hoek op pixels; mikken zoomt in, dus
+	// dezelfde hoek dekt dan meer beeld. Dat is de enige reden dat bAiming hier nog
+	// staat.
 	const float Fov = bAiming ? 64.0f : 80.0f;
 
 	EclipseHudReadout::FEclipseCrosshairLayout Layout = EclipseHudReadout::ComposeCrosshair(
@@ -1258,18 +1394,27 @@ void UEclipseMissionHudWidget::RefreshCrosshair()
 		Place(CrosshairArms[Arm], Size, Position, bArmVisible);
 	}
 
-	if (CrosshairCentre != nullptr)
+	// Het middenpunt schaalt mee met de dikte van de balken, zodat hij op een groot
+	// scherm niet terugvalt naar de onvindbare maat waar dit dossier over ging.
+	const float CentrePx = FMath::Max(3.0f, Layout.ThicknessPx);
+	auto PlaceCentre = [this](UImage* Image, float SizePx)
 	{
-		if (UCanvasPanelSlot* CentreSlot = Cast<UCanvasPanelSlot>(CrosshairCentre->Slot))
+		if (Image == nullptr)
+		{
+			return;
+		}
+		if (UCanvasPanelSlot* CentreSlot = Cast<UCanvasPanelSlot>(Image->Slot))
 		{
 			CentreSlot->SetAutoSize(false);
 			CentreSlot->SetAnchors(FAnchors(0.5f, 0.5f));
 			CentreSlot->SetAlignment(FVector2D(0.5f, 0.5f));
-			CentreSlot->SetSize(FVector2D(2.0f, 2.0f));
+			CentreSlot->SetSize(FVector2D(SizePx, SizePx));
 			CentreSlot->SetPosition(FVector2D::ZeroVector);
 		}
-		SetVisibilityIfChanged(CrosshairCentre, true);
-	}
+		SetVisibilityIfChanged(Image, true);
+	};
+	PlaceCentre(CrosshairCentreShadow, CentrePx + 2.0f);
+	PlaceCentre(CrosshairCentre, CentrePx);
 }
 
 void UEclipseMissionHudWidget::ApplyLegibilityOutline(UTextBlock& Text, int32 OutlineSizePx)

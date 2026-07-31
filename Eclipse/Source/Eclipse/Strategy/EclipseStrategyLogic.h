@@ -137,6 +137,15 @@ namespace EclipseStrategyLogic
 	ECLIPSE_API FEclipseLaneTransit ResolveLaneTransit(const FEclipseCampaignState& State, const FEclipseLaneDefinition& Lane, EEclipseTransitMode Mode, const FEclipseLaneTuning& Tuning);
 
 	/**
+	 * Can this mode get there at all, ignoring cost? Breadth-first, so it stays
+	 * cheap enough to answer "why did the route fail" — which is its job: a
+	 * military refusal reads differently when smugglers CAN reach the goal
+	 * (take a Spire, or hire Kaya) than when the graph is simply cut (neither
+	 * will help).
+	 */
+	ECLIPSE_API bool IsReachable(const FEclipseCampaignState& State, const TArray<FEclipseRegionDefinition>& Definitions, FName StartRegionId, FName GoalRegionId, EEclipseTransitMode Mode, const FEclipseLaneTuning& Tuning);
+
+	/**
 	 * Cheapest route by travel days, ties broken by total risk and then by
 	 * region id, so the same board always yields the same path (tests and UI
 	 * both depend on that). Dijkstra over the lane costs; a leg that

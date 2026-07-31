@@ -84,7 +84,19 @@ def hard_edge(distance, width):
 # door twee lage harmonischen plus ruis. Een perfecte cirkel leest als een
 # vectorvorm en breekt de stijl (§20.5 patroonbreuk) — en drie identieke perfecte
 # cirkels naast elkaar op de weg leest als een sjabloon, niet als inslagen.
-RING_IN, RING_OUT = 0.58, 0.96
+#
+# DE BAND IS DUN, EN DAT IS EEN GEMETEN CORRECTIE. De eerste versie liep van 0,58
+# tot 0,96 — een band van 38% van de straal. Op papier chunky en Borderlands-achtig;
+# in de meting kostte hij alles. Onder een scherende hoek wordt een PLATTE ring in
+# hoogte samengeknepen, en dan zijn de bovenste en onderste banden van de ring
+# SUBPIXEL: er blijven alleen de linker- en rechterflank over. Een holle ring is
+# daarmee precies de verkeerde vorm voor deze kijkhoek — hij betaalt volle breedte
+# en levert een paar pixels. Gemeten op 8 m: kader 19x8 px, maar slechts 45 van die
+# 152 pixels veranderden. Het gat in het midden was letterlijk een gat.
+#
+# De ring blijft, want van dichtbij en van bovenaf is hij de inktlijn die de stijlwet
+# vraagt. Hij is nu alleen nog een LIJN om een vulling heen, en niet de vulling zelf.
+RING_IN, RING_OUT = 0.76, 0.96
 ring_rng = random.Random(781)
 ring_noise = value_noise(S, 11, ring_rng).load()
 _ring_phase = [ring_rng.uniform(0.0, math.tau) for _ in range(4)]
@@ -117,14 +129,23 @@ for y in range(S):
 save(ring, "T_impact_ring_mask.png")
 
 # --- De hete vulling --------------------------------------------------------
-# Vol tot 0,54 — net binnen de binnenrand van de ring (0,58), zodat de twee
-# elkaar raken zonder over elkaar heen te vallen. Twee doorschijnende vlakken die
-# elkaar overlappen sorteren onvoorspelbaar; elkaar raken is stabiel.
+# Vol tot 0,88 van de ingeschreven schijf.
+#
+# HIER STOND 0,54 EN DAT WAS DE HOOFDFOUT VAN DE EERSTE RONDE. Een masker dat tot
+# r = 0,54 dekt, levert op een vlak van B cm een hete schijf van 0,54 * B — dus een
+# "vulling van 15 cm" was in werkelijkheid 8 cm breed. De binnenrand van de ring lag
+# op 14 cm. Daartussen zat NIETS: een doorzichtige donut van 6 cm rond een klein
+# vlekje, en dat is precies wat er op de opname van 8 m te zien was.
+#
+# De les is algemener dan dit spoor: een maat in centimeters op een quad is niet de
+# maat van wat je ziet, want het masker bepaalt hoeveel van die quad dekt. Twee
+# getallen die allebei "de maat" heten en niet hetzelfde meten — de vorm van fout
+# waar dit project een dossier vol van heeft.
 #
 # De rand is gerafeld met een HOGERE frequentie dan de ring, want spat en roet
 # hebben een fijnere korrel dan de brandrand eromheen. Zelfde regel: alleen
-# indrukken.
-CORE_OUT = 0.54
+# indrukken, dus de dekking bereikt de vlakrand nooit.
+CORE_OUT = 0.88
 core_rng = random.Random(782)
 core_noise = value_noise(S, 26, core_rng).load()
 _core_phase = [core_rng.uniform(0.0, math.tau) for _ in range(3)]
