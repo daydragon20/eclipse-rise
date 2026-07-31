@@ -80,14 +80,14 @@ words:        112                     # filled by tooling, used for credit forec
 lines:
   - id:      M1.1.S03.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara                     # role key from the casting table (§19.3)
     tags:    [quietly]
     text:    "Thirteen."
     shot:    "CU Mara. Hand on his shoulder. She is not looking at him."
 
   - id:      M1.1.S03.020
     speaker: VOSS
-    voice:   voss                     # resolved per player gender at build
+    voice:   voss                     # resolved to voss_m / voss_f per player gender at build
     text:    "That's not enough."
     variants:
       pragmatist: "That's four of them if I don't miss."
@@ -95,11 +95,13 @@ lines:
 
   - id:      M1.1.S03.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "It was enough for the ones who had six."
     shot:    "She moves off. Camera stays on Voss."
 ```
+
+> **Note on this example.** `"Thirteen."` is one word inside a band written as "10–25". That is deliberate and it is legal: **bands are ceilings, not ranges** (§4). A validator that fails this line is a broken validator, not a broken line.
 
 ---
 
@@ -134,23 +136,126 @@ lines:
 | `cutscene` | 20–60 |
 | `oration` | up to 120 — **max four in the entire game** |
 
-`dialogue-critic` checks every line against its scene's band mechanically. This is why `type` is required.
+#### Bands are ceilings — RULING L1-R1 (story-architect, 2026-07-31)
+
+Read §18.3's own justifications: *"anything longer is not heard"*, *"must land inside the reaction window"*, *"player may walk away mid-line"*, *"keep one idea per line"*, *"camera is holding"*. **Every one of them argues an upper limit. Not one explains why a line may not be shorter.** And `21_quality_mandate.md` §21.4 is explicit: *"Kort per regel. Gul in aantal."*
+
+So the lower number is **the register the scene should reach somewhere**, never a per-line minimum:
+
+| Check | Applies | Fails when |
+|---|---|---|
+| **Ceiling** | every line | word count **above** the band's upper number |
+| **Register** | scenes of **≥6 lines** | **no** line in the scene reaches the band's lower number — i.e. the scene never uses the room its delivery context gives it |
+| **Spread** | scenes of ≥6 lines | longest ÷ shortest **< 3×** (§18.3's variance rule) |
+
+Scenes under six lines are exempt from register and spread: a four-line scene has no meaningful distribution, and compression is the point of a short scene.
+
+**Why the old reading was arithmetically impossible.** Treating bands as ranges caps in-scene variance at 2.5× for `in-mission-radio` and 2.9× for `hub`, while §18.3 demands ≥3×. The two rules could not both be satisfied. With the floor lifted, ≥3× is easy to hit and still catches exactly the failure it was invented for — every turn the same length, the loudest tell that a machine wrote it (§18.9 D). Measured on the calibration mission: `M1.1.S03` scores 9×, `M1.1.S05` scores 15×.
+
+#### Per-line band override — `band:`
+
+A radio scene that contains a firefight needs callout-length lines inside it. That is most combat scenes in the game, so it gets a field rather than a convention:
+
+```yaml
+  - id:      M1.1.S04.070
+    speaker: MARA
+    voice:   mara
+    band:    callout          # overrides the scene's type-derived band for THIS line
+    text:    "Take it."
+```
+
+Lines carrying `band:` are checked against the override and are **excluded from the register check** (they are not trying to use the scene's register). They still count toward spread.
+
+`dialogue-critic` and `validate_script.py` check all three rules mechanically. This is why `type` is required.
 
 ### Line fields
 
 | Field | Required | Notes |
 |---|---|---|
 | `id` | ✅ | Permanent. Tens. Never reused, never renumbered. |
-| `speaker` | ✅ | UPPERCASE canon name from `00_INDEX.md` glossary |
-| `voice` | ✅ | Key into the §19.3 casting table — **not** a raw ElevenLabs ID. Indirection means a re-cast is one table edit. |
+| `speaker` | ✅ | UPPERCASE canon name from `00_INDEX.md` glossary, **or** a role speaker (below) |
+| `voice` | ✅ | Role key from the casting table — **not** a raw ElevenLabs ID (below) |
 | `text` | ✅ | The line. One breath. No stage directions inside the text. |
 | `tags` | ○ | From the approved set (§19.4). Max two. |
+| `band` | ○ | Overrides this line's length band. Use for combat callouts inside a radio scene. |
 | `shot` | ○ | Camera/staging note. **Never voiced.** Read by the cinematic pass. |
-| `condition` | ○ | Flag expression, e.g. `story.brick_recruited == true` |
+| `condition` | ○ | State expression — see grammar below |
+| `choice` | ○ | Marks this line as a player option — see below |
 | `variants` | ○ | Voss personality-axis variants: `pragmatist`/`idealist`/`personal`/`strategic` |
 | `interrupts` | ○ | `true` if this line cuts off the previous one (previous line must end `--`) |
 | `direct_beat` | ○ | `true` marks one of the ~30 rationed lines allowed to state emotion outright (§18.9 A). Requires a one-line justification in `note`. |
 | `note` | ○ | Writer's note to the critic. Never voiced, never shipped. |
+
+### `voice` — the role-key namespace — RULING L1-R5
+
+Three namespaces were in circulation: this document's `mara_sovann`, the live casting file's `mara`, and keys writers invented when neither fit (`dex_callum`, `elin_reyes`). **The casting file wins**, because its keys are the ones already bound to real ElevenLabs voice IDs and to the tier plan (`progress_media/casting/casting_stage1.json`).
+
+| Use | Key |
+|---|---|
+| Named characters | `mara` `dex` `reyes` `brick` `sela` `torren` `kaya` `whisper` `threx` `aegis` `vex` `kaine` `callis` |
+| Voss | **`voss`** — a logical key, resolved to `voss_m` / `voss_f` per player gender at build |
+| Role pools | `eclipse_fighter_a`…`_d` · `dominion_conscript_a`…`_c` · `veil_operative_a` `_b` |
+| Not yet cast | `petra` · `iron_chorus_emissary` · `dominion_officer` · `civilian_kessara_a` `_b` — **owner questions Q-3/Q-4/Q-5, blocking for Tier 2** |
+
+**Renaming a `voice` key costs nothing, and this was measured, not assumed.** `EclipseGenerateVoicesCommandlet.cpp:325` builds the cache key from `Voice->ElevenLabsVoiceId`, not from the script-side key:
+
+```cpp
+const FString Key = UEclipseDialogueVoiceSubsystem::MakeCacheKey(
+    Voice->ElevenLabsVoiceId, Voice->ModelId, Line.Emotion, Line.Text);
+```
+
+The indirection this document promised is real. The actual risk is not cache invalidation — it is a key that resolves to **nothing**, which either fails generation or silently falls back. Hence the validator check in §6.
+
+### `speaker` — role speakers — RULING L1-R6
+
+A pure glossary check can never pass, because `ACT1_OVERVIEW.md` AR-1 and AR-10 deliberately keep Ember's rank and file nameless. Speaker is valid if it is a glossary name **or** matches `^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER)_[A-Z]$`. Anything else fails — including a near-miss on a canon name, which is the failure the check exists to catch.
+
+### `condition` and the two state namespaces — RULING L1-R3 / L1-R4
+
+```yaml
+condition: 'story.brick_recruited == true'            # persisted campaign state
+condition: 'story.m11_conscript_choice == "bound"'    # persisted, multi-value
+condition: 'run.zero_casualty == true'                # this mission run only
+```
+
+| Namespace | Lives in | Survives the mission | Example |
+|---|---|---|---|
+| `story.` | `FEclipseCampaignState.StoryFlags` | yes | `story.char_maradead` |
+| `run.` | `FEclipseMissionOutcome` | **no** | `run.zero_casualty`, `run.alarm_raised`, `run.ghost` |
+
+**Run facts are not story flags.** A debrief scene asking "did anybody go down" is asking about the run, and persisting that as campaign state would grow the save with transient data for every mission in the game. `run.zero_casualty` reads the existing downed-soldier latch (SPEC-P2-04 amendment); it needs no new state at all.
+
+**Multi-value story flags use gameplay-tag leaves.** `StoryFlags` is a `TArray<FGameplayTag>` with no values, so a three-way choice is three mutually exclusive leaf tags under one parent:
+
+```
+story.m11_conscript_choice == "bound"   ⇄   Story.Choice.M11_Conscript.Bound
+story.brick_recruited      == true      ⇄   Story.Beat.BrickRecruited   (presence)
+```
+
+Zero schema change, and the parent tag stays queryable as "has this choice been made at all". `script_to_seed.py` performs the mapping; writers only ever use the lowercase form. **Any choice with more than two outcomes uses this shape** — collapsing three outcomes into a boolean is story loss disguised as simplification.
+
+### `choice` — player options — RULING L1-R2
+
+Forty-two missions of branching had no way to say "these lines are the player's options". It has one now:
+
+```yaml
+  - id:      M1.1.S05.160
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m11_conscript                              # options sharing a group are one prompt
+      set:   'story.m11_conscript_choice = "bound"'     # same grammar as condition
+      label: "Dress it."                                # optional wheel text — NOT the spoken line
+    text:    "Dressing. Above the hip."
+```
+
+| Subfield | Required | Notes |
+|---|---|---|
+| `group` | ✅ | Options with the same `group` form one prompt. Order-independent; lines need not be contiguous. |
+| `set` | ✅ | One or more assignments, `story.` or `run.` |
+| `label` | ○ | Short wheel/summary text. **Never voiced.** Omit and the UI truncates `text`. |
+
+`label` exists from day one on purpose: the wheel text and the spoken line are different pieces of writing in every game that has both, and retrofitting that distinction after twenty missions is how a script acquires a thousand mismatches.
 
 ---
 
@@ -186,7 +291,7 @@ variants:
 **Rules:**
 - `trigger` must be a real event from `Eclipse/Docs/EventCatalog.md`. A bark set pointing at a non-existent event fails the critic. If the event does not exist yet, that is a systems task, not a writing task — escalate, do not invent.
 - **6–12 variants** per set (§18.5).
-- `{name}` is the roster-name slot. Where the roster is fixed (named companions), generate per-name; where it is procedural, the slot is spoken by a separate name-clip. `voice-director` decides which and records it.
+- **`{name}` is the roster-name slot, and it is not bark-only — RULING L1-R8.** It is legal in any `text:`, in scenes as well as bark sets. `ACT1_OVERVIEW.md` AR-10 requires it in mission context: the fighter Threx names in M1.7.S04 is the fighter who dies in M1.8.S07, and that name comes from the live roster. Both uses obey the same two constraints: **the surrounding line must be pronoun-free** (no "he", no "her" — the roster decides gender at runtime), and the slot must refer to a roster member the player has met. Where the roster is fixed (named companions), generate per-name; where it is procedural, the slot is spoken by a separate name-clip. `voice-director` decides which and records it.
 - Every set needs **all three faction vocabularies** where the trigger can fire for all three. Same trigger, different words.
 
 ---
@@ -200,13 +305,19 @@ variants:
 | Schema | Missing required field, unknown field |
 | ID uniqueness | Duplicate ID anywhere in `Content/Script/` |
 | ID monotonicity | Line IDs out of order within a scene |
-| Speaker canon | Speaker not in the `00_INDEX.md` glossary |
-| Voice key | `voice` not in the §19.3 casting table |
+| Speaker canon | Speaker not in the `00_INDEX.md` glossary **and** not a role speaker (§4, L1-R6) |
+| **Voice resolves** | `voice` does not resolve to a row in the casting table. **This is the one that matters** — an unresolvable key fails generation or silently falls back to a default voice. A key *rename* is harmless (§4, L1-R5). |
+| **Length ceiling** | Line **above** its band's upper number. Never fails a line for being short. |
+| **Register** | Scene of ≥6 lines where no non-`band:`-overridden line reaches the band's lower number |
+| **Spread** | Scene of ≥6 lines whose longest ÷ shortest line is < 3× (§18.3) |
 | Tag set | Tag outside the §19.4 approved set without a `note` |
-| Length band | Line outside its `type` band (§18.3) |
+| **Choice integrity** | A `choice.group` with fewer than two options; a `set` naming a flag no other scene or system reads; two options in one group setting different flags |
+| **Condition resolves** | A `condition` naming a `story.`/`run.` fact that nothing ever sets |
 | Trigger | Bark `trigger` not in `EventCatalog.md` |
-| Location | `location` not in `03_world_design.md` |
+| Location | `location` not in the act's location registry (`phase0/beats/ACT1_OVERVIEW.md` §7 — see finding C-1; **not** `03_world_design.md`, which has no district names) |
 | Generation guard | `status: generated` on a scene whose `critic` is not `GO` |
+
+**The two dangling-reference checks are worth more than they look.** A `condition` on a flag nothing sets is a line that never plays, and a `set` on a flag nothing reads is a choice with no consequence. Both are invisible in review and both are certain to happen across 42 missions.
 
 **The generation guard is the money-saver.** It is the mechanical reason a bad line cannot reach the API.
 

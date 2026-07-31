@@ -15,7 +15,7 @@ turn:         "Voss produces a badge number he has been carrying since the ratio
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        393
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      DEX, MARA, VOSS, REYES
@@ -36,4 +36,202 @@ words:        0
 # player:    the prep decision (spend 5 Intel or go blind) hangs off this scene - 11.1
 # writer:    nobody explains what intel is or how the Veil works (18.8).
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+#
+# *** C-2 ESCALATION - READ BEFORE GENERATING ***
+# The badge is WRITTEN, not smuggled. It is the scene's turn and the stub forbids me to
+# change the turn, so writing around it was not an option. But it still has no cause:
+# RECAP_CARDS_M1.md ships six cards and none of them is the ration-line Enforcer. Card 1's
+# still IS a ration line, so the setting is established - the memorised plate is not.
+# Q-2 green (card 3 added) => this scene plays as written, no edit.
+# Q-2 red                  => lines .090 through .200 are the ONLY affected block. They are
+#                             written as one contiguous run on purpose so the fallback
+#                             ("Dex has a name in the ledger") is a surgical eleven-line
+#                             patch, not a rewrite. I have NOT written that fallback:
+#                             BEATS_M1.2 section 5 says escalate first. Escalated.
+# The plate number "two-six-one" is invented by me. Digits are not glossary names, but
+# M1.3.S05 shows this Enforcer alive and answering the tower - that writer must use the
+# same number. Flagged so it gets registered rather than re-invented.
+#
+# band:      type is `cutscene` (20-60 per 18.3). Most lines sit well under 20. Same
+#            escalation as M1.1.S01: 18.3's variance rule (>=3x) and a 20-word FLOOR cannot
+#            both hold. Read the band as a CEILING, per 18.3's own note and 21_quality_mandate.
+#            Ceiling respected: longest line 19 w. Variance 1 w to 19 w = 19x.
+# ar-5:      Mara says "you" ZERO times in this scene, and "I" never. Checked line by line.
+#            Her imperatives address without the word - that is the mechanism.
+# triads:    exactly one, and it is the shipped canon string at .280. Mine were removed.
+# names:     one name-address in 28 turns (.220 "Reyes").
+# choice:    .250 / .260 are the prep decision PLAYED, not explained (11.1's honesty loop).
+#            SCRIPT_FORMAT still has no player-choice construct - same gap M1.1's writer
+#            reported. Marked by note only; no flag invented.
+# variants:  .110 only. The scene branches on exactly one axis (offhand vs calculated), so
+#            per C-6 option (b) that is the only line that pays for four variants.
+# words:     393 = 310 spoken base + 83 in the four .110 variants. Variants are generated,
+#            so they are counted. (M1.1.S01 appears to count base only - flagged upstream.)
+
+lines:
+  - id:      M1.2.S01.010
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Block Nine. Block Twelve. Two drops, both still good, and a rotation I can't read."
+    shot:    "Map table. Dex has a scanner open on its back with the housing off."
+
+  - id:      M1.2.S01.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Nine hours on the warden band tonight. All I have to show for it is a cracked filter."
+
+  - id:      M1.2.S01.030
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Their rotation runs on a closed loop. I can't buy it and I can't lift it."
+    note:    "18.4 Dex: fragments, hardware nouns. He states the want in equipment terms and never once says he is worried."
+
+  - id:      M1.2.S01.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Then we count it ourselves. Four nights, two people on the stair."
+
+  - id:      M1.2.S01.050
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Four nights of two people standing in a Mid-Works stairwell. Nobody's ever noticed that before."
+    note:    "Dex carries the sarcasm in this mission. Mara never does (18.4)."
+
+  - id:      M1.2.S01.060
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Four nights on a wet gallery. Am I preparing for exposure, or for a patrol that found them?"
+    note:    "18.4 Reyes: a question instead of an objection. No contractions - she is stressed. One line, this scene."
+
+  - id:      M1.2.S01.070
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Both, in the end."
+
+  - id:      M1.2.S01.080
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "And one of the drops is paper. Paper does not keep."
+
+  - id:      M1.2.S01.090
+    speaker: VOSS
+    voice:   voss
+    text:    "Two-six-one."
+    shot:    "He has not moved from the edge of the table. Nobody was talking to him."
+    note:    "THE TURN. 01_game_vision 1.7 moment 1, paid. First line of the C-2 block (.090-.200)."
+
+  - id:      M1.2.S01.100
+    speaker: DEX
+    voice:   dex_callum
+    text:    "What?"
+
+  - id:      M1.2.S01.110
+    speaker: VOSS
+    voice:   voss
+    text:    "Enforcer plate, two-six-one. Foundry District ration line, third shift."
+    variants:
+      pragmatist: "Enforcer plate, two-six-one. Foundry District ration line, third shift. It was the only thing in that queue worth taking home."
+      idealist:   "Enforcer plate, two-six-one. He pulled a man out of the ration line over a permit, and I read his sleeve while he did it."
+      personal:   "Two-six-one. Foundry District ration line. He was there every third day, and I stood close enough to read him every third day."
+      strategic:  "Enforcer plate, two-six-one. Third shift, Foundry District ration line, and he was never once off the rotation."
+    note:    "The one axis this scene branches on: offhand or calculated. Four variants, per BEATS section 10.7."
+
+  - id:      M1.2.S01.120
+    speaker: DEX
+    voice:   dex_callum
+    text:    "You memorized a plate. For a month. In a ration queue, with nothing to write on and nothing to--"
+
+  - id:      M1.2.S01.130
+    speaker: VOSS
+    voice:   voss
+    interrupts: true
+    text:    "It was on his sleeve."
+
+  - id:      M1.2.S01.140
+    speaker: VOSS
+    voice:   voss
+    text:    "Anyone in that line could have read it."
+    note:    "18.4 Voss fixed trait: never claims credit in front of the people who did the work. Kept neutral across axes on purpose."
+
+  - id:      M1.2.S01.150
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Run it."
+
+  - id:      M1.2.S01.160
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Give me a minute. And nobody stand behind me."
+    shot:    "He drags warden roster sheets off a crate and lays them edge to edge across the map."
+
+  - id:      M1.2.S01.170
+    speaker: DEX
+    voice:   dex_callum
+    text:    "...that's a Mid-Works roster block. Which means he rotates. Which means the row rotates with him."
+    note:    "18.9 B articulacy: he starts mid-thought. He is not narrating for us, he is working."
+
+  - id:      M1.2.S01.180
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Eleven days. It's an eleven-day loop, and on the ninth, Block Nine gets one walker and no van."
+
+  - id:      M1.2.S01.190
+    speaker: DEX
+    voice:   dex_callum
+    text:    "The ninth is tonight."
+
+  - id:      M1.2.S01.200
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Nine hours I gave that band. Nine. And the answer's been eating our bread all week."
+    note:    "Beat 4: surprised, and resents it. No feeling is named. Last line of the C-2 block."
+
+  - id:      M1.2.S01.210
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Tonight, then."
+    shot:    "She does not look at Voss. She turns the map."
+    note:    "Beat 5. She never says it was clever. She changes the plan, which is the larger compliment. The same move closes S99."
+
+  - id:      M1.2.S01.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Two teams becomes one. Reyes stays up. The rest sleep until the second horn."
+
+  - id:      M1.2.S01.230
+    speaker: DEX
+    voice:   dex_callum
+    text:    "One thing. The drops."
+
+  - id:      M1.2.S01.240
+    speaker: DEX
+    voice:   dex_callum
+    text:    "I can have the exact stairwells inside the hour. Costs five. Or we walk two blocks and a guess."
+    note:    "Nobody says what five is. 18.8."
+
+  - id:      M1.2.S01.250
+    speaker: VOSS
+    voice:   voss
+    text:    "Pay the five. I'd rather buy the stairwell than stand in it looking for it."
+    note:    "PLAYER OPTION 1 of 2 (prep spend). No axis variants - the choice is the branch, not the tone."
+
+  - id:      M1.2.S01.260
+    speaker: VOSS
+    voice:   voss
+    text:    "Keep the five. Two blocks and a guess is still a night's work."
+    note:    "PLAYER OPTION 2 of 2 (prep spend)."
+
+  - id:      M1.2.S01.270
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Whichever it is, we are out before the second horn."
+    note:    "Answers either option. Written so no prep flag is required."
+
+  - id:      M1.2.S01.280
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "Two caches, two blocks, and a patrol that never learned our faces. Keep it that way."
+    shot:    "Dex is already pulling the scanner housing back on. Nobody says goodnight."
+    note:    "Shipped briefing string, DT_StoryMissions MT_M12, verbatim. The scene's one permitted triad."

@@ -103,7 +103,44 @@ magenta-container en de vloer-omkering op stukliepen.
 
 ## 4. Wat de editor nodig heeft (werklijst, mechanisch zodra het slot vrij is)
 
-Dit zijn de échte curatiecriteria en geen ervan is leesbaar zonder de editor:
+Dit zijn de échte curatiecriteria — en criterium 0 is er op 31-07 bij gekomen omdat
+zijn afwezigheid aantoonbaar schade heeft aangericht.
+
+### 0. PAST DE FICTIE? — deze gaat vóór alle technische criteria
+
+**Waarom dit criterium bestaat.** Deze lijst had er vijf, en alle vijf waren
+**technisch**. `ASSET_CURATION.md` §8 oordeelde op **toon**. En `Art/Textures/SOURCES.md`
+documenteerde alleen **herkomst** — dat is helemaal geen poort. Drie curatie-ingangen,
+en **geen enkele** vroeg of een object in deze wereld kán bestaan.
+
+Wat daar doorheen kwam, gemeten op 31-07:
+- Zeven "waarschuwingsborden" waarvan er **drie letterlijke verkeersborden** waren, uit
+  een pack met **gefotografeerde echte borden**. Toon keurde ze goed — een foto van een
+  aards bord haalt een toonfilter moeiteloos.
+- Een **Oog van de Voorzienigheid** (driehoek met oog) als propagandaposter, zes
+  plaatsingen, het helderste element in het wijdste shot. Dat kwam via de
+  SOURCES.md-baan binnen, die geen poort is.
+- Gele **wegmarkeringen** die de grammatica van het Weens Verdrag coderen: doorlopende
+  kantlijn plus onderbroken aslijn. Een bord zegt "pas op"; deze markering codeert een
+  verkeersregel.
+
+**De toets, vóór je iets meet:** kan dit object bestaan in een wereld die Origin
+zeshonderd jaar geleden verliet? Geen aardse instituut-iconografie (klaverbladen,
+doodshoofden, ogen-in-driehoeken), geen Weens-Verdrag-vormtaal, geen Latijns schrift,
+geen herkenbare hedendaagse voertuigen of huisraad. Zie `20_world_dressing_standard.md`
+§20.2.
+
+**Beoordeel het asset, niet zijn naam.** Bij de zeven borden waren juist de drie die op
+naam onschuldig leken (`labor`, `route`, `reactor`) letterlijke verkeersborden — `labor`
+was het men-at-work-wegwerkpictogram. Exporteer en kíjk.
+
+**Een pack faalt criterium 0 per familie, niet per asset.** Bevat een pack een
+tekstmateriaal, een decal-sheet of een bordenfamilie, dan is die familie afgekeurd ook
+als de meshes prima zijn. Anders komt de fictiebreuk mee met het goede werk.
+
+---
+
+De vijf technische criteria, geen ervan leesbaar zonder de editor:
 
 1. **Tri-counts per kandidaat-mesh** (12.4-budget). Bestandsgrootte is geen proxy.
 2. **Materiaal-slots per mesh** — bepaalt of een mesh door de toon-master kan; een

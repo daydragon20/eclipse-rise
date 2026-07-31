@@ -20,7 +20,12 @@ words:        0
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, the emissary, BRICK, MARA; the shift boss
 # flags-in:  none
-# flags-out: Story.Choice.M15_ShiftBossSpared  (NEW TAG - systems task)
+# flags-out: Story.Choice.M15_ShiftBoss.Killed | .Prevented | .Warned   (NEW TAGS)
+#            THREE outcomes, three mutually exclusive leaf tags under one parent - ruling
+#            L1-R3. Do NOT collapse them into a boolean: "warned and vanished" is a
+#            different moral position from "prevented", and Sela judges them differently in
+#            M1.6.S06. Write the choice with the `choice:` field (SCRIPT_FORMAT 4, L1-R2),
+#            group: m15_shiftboss.
 # beats:     1) the house; the man; his kitchen. Not brave, not monstrous
 #            2) the emissary lays out what he supplies. Factual, verifiable
 #            3) the shift boss gets TWO LINES AT MOST. He denies nothing

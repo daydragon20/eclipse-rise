@@ -15,7 +15,7 @@ turn:         "Recovery of a stolen custodian key-token outranks cell suppressio
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        211
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      VOSS (at the terminal), DEX (radio), MARA (on watch)

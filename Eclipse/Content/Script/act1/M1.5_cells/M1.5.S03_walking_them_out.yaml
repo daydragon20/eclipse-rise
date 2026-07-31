@@ -15,7 +15,7 @@ turn:         "He tells Voss something about Mara's earlier refusals that Mara d
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        226
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, Iron Chorus emissary, BRICK, MARA (rear)
@@ -35,4 +35,189 @@ words:        0
 # writer:    the emissary is never menacing. He is somebody who has already buried the
 #            version of himself that would have liked Ember.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      walk-and-talk (10-25). Read as ceiling per the M1.1 precedent; longest 20 w.
+# variance:  1 w (.010 / .210) to 20 w (.140) = 20x.
+# mara:      one word (.010), then she is gone from the scene. She is forty metres back and
+#            she does not hear any of this. That is the whole point of the staging.
+#
+# *** BRICK'S EIGHT WORDS, .230. ESCALATION - READ THIS. ***
+# The stub asks Brick to NAME somebody the emissary recognises. There is no such name in
+# canon and I am not allowed to invent one, so I have written the beat WITHOUT a proper
+# noun and it loses nothing: Brick names an Iron Chorus man by his cell number and by what
+# he cost. M1.4.S03's stub establishes three cells in the Foundry Row holding block, two of
+# them empty; Brick was in one of them for three months. He is telling the emissary what
+# happened to a man the Iron Chorus never got back. He never lies, so "first" stays in -
+# the man did break, eventually, and Brick will not round it off.
+# If Q-4 lands and the Iron Chorus is given names, this line can take one at zero cost.
+# EXACTLY EIGHT WORDS. Counted.
+#
+# lucky:     .240 puts the word "lucky" in the emissary's mouth attached to a man who was
+#            not. He says it again in S05.170 about the Veil sweep (P4-b), and by then the
+#            player knows what he thinks of the word. That rhyme is the whole reason P4-b
+#            is carried by the rival and not by Ember.
+# gift:      .250-.270. He gives back tactically (the yard wall, paid at S05.150) and then
+#            gives Voss a secret about Mara that Mara does not have. That is what makes the
+#            walk a transaction and not a courtesy.
+# voss:      no axis variants in this scene - it does not branch. C-6 option (b).
+#            .080 is 18.4 Voss: he refuses the credit before it is offered.
+# omitted:   a reply to .120. Voss has no answer to what Ember is without Mara and the
+#            scene does not give him one. See report.
+
+lines:
+  - id:      M1.5.S03.010
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Spacing."
+    shot:    "From the rear, to nobody in particular. She stays back there for the whole scene."
+
+  - id:      M1.5.S03.020
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Nobody in the windows. Yours, or theirs?"
+
+  - id:      M1.5.S03.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Neither. The wardens run this row at the fourth horn and everyone here can count."
+
+  - id:      M1.5.S03.040
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Mm."
+
+  - id:        M1.5.S03.050
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms == "accepted"'
+    text:      "Your commander agreed fast. That is either discipline or it is nothing at all."
+
+  - id:        M1.5.S03.060
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms != "accepted"'
+    text:      "You didn't hand me the door down there. Good. Nobody should."
+
+  - id:      M1.5.S03.070
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Why do they trust you?"
+
+  - id:      M1.5.S03.080
+    speaker: VOSS
+    voice:   voss
+    text:    "They don't. They trust her, and she puts me in front of things."
+    note:    "18.4 Voss: never claims credit in front of the people who did the work. He hands it back before it is given."
+
+  - id:      M1.5.S03.090
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "And when she stops putting you in front of things?"
+
+  - id:      M1.5.S03.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Then somebody else stands where I'm standing."
+
+  - id:      M1.5.S03.110
+    speaker: IRON_CHORUS_B
+    voice:   iron_chorus_fighter_b
+    tags:    [quietly]
+    text:    "Light on the corner. Wardens."
+    shot:    "The whole column steps into a doorway without anybody giving an order. Ember is half a beat slower."
+
+  - id:      M1.5.S03.120
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "What happens to Ember when she is gone?"
+    shot:    "Voss does not answer. Three doorways go by."
+    note:    "SEEDS M1.8. Nobody in the game has asked this out loud yet, and the man who asks it is not a friend."
+
+  - id:      M1.5.S03.130
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Nobody has asked you that."
+
+  - id:      M1.5.S03.140
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "She came to us three years ago. Walked the lanes on her own. Stood outside a door for six hours."
+
+  - id:      M1.5.S03.150
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "We told her no. Eleven people is not a cell. It's a list somebody hasn't filed yet."
+    note:    "Rhymes forward into the doctrine of S02 and backward into M1.5.S01.090. Cruel, and true, and he does not soften it."
+
+  - id:      M1.5.S03.160
+    speaker: VOSS
+    voice:   voss
+    text:    "She told the room she asked twice."
+
+  - id:      M1.5.S03.170
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "She did ask twice. She didn't tell them she stood in the rain for the second one."
+    note:    "THE TURN. True, small, and it makes her larger rather than smaller. Kessaraan rain is canon (03.3, warm grey)."
+
+  - id:      M1.5.S03.180
+    speaker: VOSS
+    voice:   voss
+    text:    "Six hours."
+
+  - id:      M1.5.S03.190
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Six hours. And we watched her do it."
+
+  - id:      M1.5.S03.200
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Foundry Row. The holding block. How many cells?"
+    note:    "He is fishing and he is not subtle about it. He has people he never got back."
+
+  - id:      M1.5.S03.210
+    speaker: VOSS
+    voice:   voss
+    text:    "Three."
+
+  - id:      M1.5.S03.220
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Three."
+
+  - id:      M1.5.S03.230
+    speaker: BRICK
+    voice:   brick
+    text:    "Cell two. He gave you eleven days first."
+    shot:    "The emissary stops walking. His two fighters go four paces before they notice he is not with them."
+    note:    "*** BRICK'S EIGHT WORDS. *** See the L2 escalation above. He answers a question nobody put to him, with the only currency he has, and it is worth more than everything said in the gallery."
+
+  - id:      M1.5.S03.240
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Eleven."
+
+  - id:      M1.5.S03.250
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    tags:    [quietly]
+    text:    "We came out of that quarter on the twelfth day. We thought we'd been lucky."
+    note:    "*** The word 'lucky' is planted here, on a man who was not. He spends it again at S05.170. ***"
+
+  - id:      M1.5.S03.260
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "The house tonight. Two doors and a yard wall. Take the wall."
+    note:    "Paid at S05.150. The first thing the Iron Chorus gives Ember without being asked."
+
+  - id:      M1.5.S03.270
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "She still doesn't know we watched."
+
+  - id:      M1.5.S03.280
+    speaker: VOSS
+    voice:   voss
+    text:    "The yard wall backs onto the storm cut."
+    shot:    "He says it to the street. He is already reading the block the way he read the map."

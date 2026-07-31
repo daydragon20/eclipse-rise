@@ -20,7 +20,11 @@ words:        0
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, SELA, BRICK
 # flags-in:  Story.Choice.M15_IronChorusPact
-# flags-out: Story.Choice.M16_TrainRun  (NEW TAG - systems task)
+# flags-out: Story.Choice.M16_Train.Run | .Emptied | .Split   (NEW TAGS)
+#            THREE outcomes, three mutually exclusive leaf tags under one parent - ruling
+#            L1-R3. Write them with the `choice:` field (SCRIPT_FORMAT 4, L1-R2),
+#            group: m16_train. The .Split option only exists with the Iron Chorus pact, so
+#            it also carries condition: story.choice_m15_ironchoruspact == true.
 #
 # THE CHOICE (2.7 archetype "The Cost of Speed"):
 #   run    - drive on to the Underworks spur. Slower, everybody comes, the train is a

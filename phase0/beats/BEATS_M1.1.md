@@ -120,7 +120,7 @@ Beweging I, eerste stap. De cel is op zijn kleinst en het meest onzichtbaar. De 
 - **obstacle** — They are carrying more than they came with and one of them is slow.
 - **turn** — Dex talks them through a route he has never walked, and is right, and cannot take the compliment.
 
-**Beats:** (1) Wat ze meenemen (kratten, magazijnen — het *waarom* van de hele missie). (2) De respons komt, en hij is dun. (3) Dex' route. (4) Iemand bedankt Dex; hij deflecteert met hardware (§18.4). (5) Weg.
+**Beats:** (1) Wat ze meenemen (kratten, magazijnen — het *waarom* van de hele missie). (2) De respons komt, en hij is dun. (3) Dex' route. (4) Iemand bedankt Dex; hij **redirect vlak naar het werk** — géén grap hier (L1-R7: deze scène grenst aan de nasleep). Dat hij de opening laat liggen, is de karakterbeat. (5) Weg.
 **T4-plant, licht:** één regel van een vechter over hoe weinig er kwam. Nog geen mysterie — opluchting.
 
 ### S99 — *What Thirteen Bought* · debrief
@@ -180,7 +180,7 @@ Beweging I, eerste stap. De cel is op zijn kleinst en het meest onzichtbaar. De 
 2. **Raak S03 nauwelijks aan.** Drie regels staan er al en ze zijn goed. Voeg hooguit één beat toe ná `.030`. Niets vóór `.010`.
 3. **De variantieregel bijt hier het hardst** (§18.3): binnen elke scène minstens factor 3 verschil in regellengte. S04 is bijna helemaal callout-band; zorg dat S01 en S99 dat compenseren.
 4. **Mara zegt nooit "ik" over de zaak** en zegt in deze hele missie geen enkele keer "jij" tegen Voss over de zaak (AR-5 — dat woord is gereserveerd voor M1.8.S08). Ze mag wel "jij" zeggen over praktische dingen ("hou je links"). Het verbod geldt de zaak, niet de grammatica.
-5. **Dex maakt precies drie grappen** in deze missie, en de bangste is de eerste. Vier is te veel; §18.6 zegt ongeveer één komische beat per zes regels in downtime en **nul** in nasleep. S99 is nasleep als er iemand gewond is.
+5. **Dex' grappen — gecorrigeerd, ruling L1-R7.** Dit punt sprak §5 tegen (samen één te veel) en de schrijver van de ijkmissie ving dat. Vastgesteld: **S01, S02, en S99 — de derde alleen in de schone run.** Ligt er iemand gewond, dan is S99 nasleep en zijn het er twee (§18.6: nul komische beats in nasleep). **S06 is een vlakke redirect, geen grap** — hij grenst aan de nasleep. De bangste grap blijft de eerste.
 6. **Geen enkel personage benoemt een gevoel** (§18.9 A). Er is één rantsoen van ~30 `direct_beat`-regels in het hele spel; **M1.1 krijgt er nul.** De eerste geef ik uit in M1.8.
 7. **De conscript in S05 praat procedureel, niet zielig.** Hij noemt zijn eenheidsnummer omdat hij dat geleerd heeft. Dat is erger dan smeken en het is §18.5 regel 5.
 8. **Voss-varianten:** S03 heeft ze al (pragmatist/idealist in het voorbeeld). Verder alleen op S05 (de keuze) en S99 (het doorgeven van krediet). Elders één neutrale Voss-regel — zie C-6/Q-7, het budget hangt hieraan.

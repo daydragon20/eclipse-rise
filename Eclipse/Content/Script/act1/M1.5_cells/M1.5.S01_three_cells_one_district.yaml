@@ -15,7 +15,7 @@ turn:         "She admits the third invitation was not hers — it was theirs, a
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        241
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      MARA, VOSS, DEX, BRICK, REYES
@@ -36,4 +36,171 @@ words:        0
 #
 # writer:    Brick never speaks first in a group (18.4) - his question comes late.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      type is `cutscene` (20-60 per 18.3). MOST LINES SIT BELOW 20, read as a
+#            CEILING - same escalation M1.1 filed and for the same reason: the 3x variance
+#            rule and a 20-word floor cannot both hold, and a 20-word floor deletes Brick
+#            from the game. Ceiling respected: longest line 19 w.
+# variance:  1 w (.180) to 19 w (.010 / .210) = 19x.
+# ar-5:      Mara says neither "I" nor "you" anywhere in this mission. Checked line by line.
+# link:      .150 IS the M1.3.S06 link and it is the ONLY one. Dex states a fact and drops
+#            it. NOBODY ANSWERS IT. The next line changes subject. The player makes the
+#            connection or he does not; no character makes it for him. Written without the
+#            name itself so that whoever writes M1.3.S06 is free to choose it - this line
+#            stays valid whatever name lands there.
+# fear:      Mara's turn is at .160 and she never names a feeling (18.9 A). Her fear is
+#            written as PROCEDURE instead: she benches the medic (.190) and takes the cell
+#            off the air (.210) - she is copying the discipline Dex just admired at .040.
+# dex:       one joke (.220), and it is the smallest one he has. This is not a downtime
+#            scene; 18.6's ratio is not owed here.
+# brick:     six words in this scene, both lines late, neither of them first (18.4).
+# reyes:     no contractions anywhere. She is stressed and her training reasserts (18.4).
+# omitted:   any line explaining what the Iron Chorus IS. Reputation only - three scraps
+#            from three people, no dossier. See report.
+
+lines:
+  - id:      M1.5.S01.010
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Second shift tomorrow. The pump gallery under block nine. Three of us go down, three of them come up."
+    shot:    "Map table. She sets a chip on the gallery and leaves her hand over it."
+
+  - id:      M1.5.S01.020
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "The Chorus."
+
+  - id:      M1.5.S01.030
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Four years on this rock and nobody has put a face to one of them. Four years."
+
+  - id:      M1.5.S01.040
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Their net's cleaner than ours. Two keys and gone. No hold, no carrier, nothing to walk in on."
+    note:    "18.4 Dex: fragments, technical nouns. Admiration, not envy - he is describing a machine he wishes he had built."
+
+  - id:      M1.5.S01.050
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "How many of them have you counted on the air?"
+
+  - id:      M1.5.S01.060
+    speaker: DEX
+    voice:   dex_callum
+    text:    "None. That's the point. That's the whole point."
+
+  - id:      M1.5.S01.070
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We asked them in the spring. We asked again when the winter list came out. Both times, no."
+    note:    "Beat 3. She raises the refusals herself, unprompted, in front of the room. 18.4: Mara does not lie, least of all upward."
+
+  - id:      M1.5.S01.080
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "For the same reason both times?"
+
+  - id:      M1.5.S01.090
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Both times they said Ember was a rumour with eleven people in it."
+    note:    "AR-1. The eleven. Said flat, by the woman it was said about."
+
+  - id:      M1.5.S01.100
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "And they'll come onto ground we hold?"
+
+  - id:      M1.5.S01.110
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Since the mast it is ground we hold."
+    note:    "M1.3 Foothold, paid in four words. This is why the meeting is fictionally possible."
+
+  - id:      M1.5.S01.120
+    speaker: VOSS
+    voice:   voss
+    text:    "The gallery runs three ways. Two stairs and the overflow into the storm cut."
+    shot:    "He has turned the chip over to see what is printed underneath it."
+
+  - id:      M1.5.S01.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Pumps cycle on the half-hour. For two minutes nobody down there hears anything, including us."
+    note:    "18.4 Voss: names the mechanism. Paid at M1.5.S02.050 - the emissary simply waits the pumps out, because he has stood in rooms like this longer than Ember has existed."
+
+  - id:      M1.5.S01.140
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "That's why it's the room."
+
+  - id:      M1.5.S01.150
+    speaker: DEX
+    voice:   dex_callum
+    tags:    [quietly]
+    text:    "That channel off the mast. The name he kept saying — theirs."
+    shot:    "Nobody picks it up. Mara moves the chip an inch and the room follows her hand."
+    note:    "*** THE M1.3.S06 LINK. ONE LINE. NOBODY ANSWERS IT. *** Do not add a second. The name is deliberately not spoken here so M1.3's writer keeps the choice."
+
+  - id:      M1.5.S01.160
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "This time the asking came the other way."
+    note:    "The turn. She does not say what that does to her. 18.9 A."
+
+  - id:      M1.5.S01.170
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "How many of us go down?"
+
+  - id:      M1.5.S01.180
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Three."
+
+  - id:      M1.5.S01.190
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Reyes stays up here. We are not walking a medic into a conversation."
+    note:    "Fear as procedure. She is preparing for the conversation to stop being one."
+
+  - id:      M1.5.S01.200
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Then I will set for three."
+    note:    "Deliberate echo of M1.1.S01.090. Same woman, same arithmetic, one more name."
+
+  - id:      M1.5.S01.210
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Dex. Nothing on the air from the moment we are in the street. Not a key, not a carrier."
+    note:    "She is running their discipline, not ours. Nobody remarks on it."
+
+  - id:      M1.5.S01.220
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Dead air. My favourite instrument."
+
+  - id:      M1.5.S01.230
+    speaker: BRICK
+    voice:   brick
+    text:    "Who walks them out?"
+    shot:    "He has been against the pillar the whole scene. Everyone turns."
+    note:    "18.4 Brick: never speaks first in a group. Four words, and it is the only question in the room about what happens AFTER the talking. It is also the mission's second half."
+
+  - id:      M1.5.S01.240
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Voss. And whoever he takes."
+
+  - id:      M1.5.S01.250
+    speaker: BRICK
+    voice:   brick
+    text:    "Then me."
+
+  - id:      M1.5.S01.260
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Second shift. We're early."

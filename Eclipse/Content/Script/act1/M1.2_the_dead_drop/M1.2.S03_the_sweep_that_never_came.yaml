@@ -15,7 +15,7 @@ turn:         "Mara names it as the third time this has happened, decides it is 
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        206
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      MARA, VOSS, DEX (radio)
@@ -40,4 +40,153 @@ words:        0
 #            6) they move
 # writer:    sixty seconds. It is the most important minute in the act for act 4.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# p4-a:      how this is built to CONVINCE rather than announce.
+#            1. The absence is EVIDENCE, not atmosphere. Three concrete negatives, all from
+#               Dex, all checkable: the mark is eight days old, the stair seal is unbroken,
+#               and a sweep is six hours of forty men on one channel and cannot be missed.
+#               The player is given a fact, not a mood.
+#            2. Mara does not wonder. She does ARITHMETIC (.130-.150), which is exactly how
+#               she solved M1.1's ammunition count. The explanation convinces because it is
+#               her established method, not because it is argued.
+#            3. She then converts the anomaly into an ADVANTAGE (.200): a marked block is a
+#               block nobody looks at twice. A character who profits from a thing has
+#               stopped examining it. That is the whole trick, and it is why act 4 hurts.
+#            4. Dex CORROBORATES (.160) before he jokes. One source is a claim; two is a
+#               fact. The player leaves this scene with a fact.
+#            Nobody says strange, odd, wrong, or that does not add up. Checked word by word.
+# thread:    .180 opens the sub-thread the overview registers as "Voss suspects the Dominion
+#            is under-reacting", closed (waved away, unresolved) in M1.8.S09. He offers a
+#            COMPETING HYPOTHESIS, not a shiver - and in act 4 it turns out to be correct.
+# no flag:   deliberate. The scene is mandatory, so "the player saw it" is always true.
+# band:      in-mission-radio (10-25). Ceiling honoured: longest 17 w. Variance 1 to 17.
+# triads:    exactly one (.070 "no detainments, no cordon, no van").
+# ar-5:      Mara: zero "you". Zero "I".
+# names:     nobody is addressed by name.
+
+lines:
+  - id:      M1.2.S03.010
+    speaker: VOSS
+    voice:   voss
+    text:    "There's a mark on the doorpost. Chalk over paint, and it's been rained on."
+    shot:    "Stairwell mouth, Block Twelve. He is crouched, not touching it. Water beading on the render around the chalk."
+
+  - id:      M1.2.S03.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Describe it."
+
+  - id:      M1.2.S03.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Two bars and a hook, about knee--"
+
+  - id:      M1.2.S03.040
+    speaker: DEX
+    voice:   dex_callum
+    interrupts: true
+    text:    "Don't touch it."
+
+  - id:      M1.2.S03.050
+    speaker: DEX
+    voice:   dex_callum
+    text:    "That's a sweep mark. I logged it. Eighth of the month, sweep due inside forty-eight hours."
+
+  - id:      M1.2.S03.060
+    speaker: VOSS
+    voice:   voss
+    text:    "The stair door is still sealed. Same wire, same crimp."
+    note:    "Evidence 1. Technician detail; he is not asking anyone to find it meaningful."
+
+  - id:      M1.2.S03.070
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Eight days ago. Nothing on the band since. No detainments, no cordon, no van."
+    note:    "Evidence 2. The scene's one permitted triad."
+
+  - id:      M1.2.S03.080
+    speaker: DEX
+    voice:   dex_callum
+    text:    "A sweep is six hours of forty men on one channel. Can't miss it."
+    note:    "Evidence 3, and it is the one that makes the absence a fact rather than a feeling."
+
+  - id:      M1.2.S03.090
+    speaker: VOSS
+    voice:   voss
+    text:    "Eight days is a long time to leave a mark up and not come back for it."
+    shot:    "He has a hand flat on the door frame and he is not moving. Mara comes up level with him."
+    note:    "Beat 3, the hesitation. Written as a stop, not as a question. He is allowed to hesitate; Mara is not allowed to wonder."
+
+  - id:      M1.2.S03.100
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "That is the third."
+
+  - id:      M1.2.S03.110
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Third what?"
+
+  - id:      M1.2.S03.120
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Third block they marked and never came back for. The pump gallery. The weighbridge before that."
+    note:    "Both places are already canon: the pump gallery is in the act-1 location register, the weighbridge is spoken in M1.1.S01."
+
+  - id:      M1.2.S03.130
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Marking a block costs one man and an hour."
+
+  - id:      M1.2.S03.140
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Sweeping one costs forty and a night they do not have."
+
+  - id:      M1.2.S03.150
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "They mark everything. They come back for what is worth the night."
+    note:    "The explanation, delivered as arithmetic. Same method as her ammunition count in M1.1 - that is what makes it land as competence instead of as a cover story."
+
+  - id:      M1.2.S03.160
+    speaker: DEX
+    voice:   dex_callum
+    text:    "For what it's worth, they run one channel across nine districts. Most of it's dead air."
+    note:    "Corroboration from a second source, and it is the technical kind. One source is a claim."
+
+  - id:      M1.2.S03.170
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Comforting. We're not worth the overtime."
+    note:    "18.4 Dex: deflects the beat instead of sitting in it. The joke is also the theme."
+
+  - id:      M1.2.S03.180
+    speaker: VOSS
+    voice:   voss
+    text:    "Or they're spending it somewhere else."
+    note:    "Opens the sub-thread closed in M1.8.S09. A hypothesis, not a shiver. In act 4 he was right."
+
+  - id:      M1.2.S03.190
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Then we take this one while it is cheap."
+
+  - id:      M1.2.S03.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "A marked block is a block nobody looks at twice."
+    note:    "She turns the anomaly into an advantage. This is why she never investigates it, and it is the same blind spot that carries her into K-77."
+
+  - id:      M1.2.S03.210
+    speaker: VOSS
+    voice:   voss
+    tags:    [pause]
+    text:    "Copy."
+    shot:    "He takes his hand off the frame. He looks back at the chalk once on the way in."
+    note:    "Beat 6: and Voss lets her. The look is the whole of his objection and it is silent."
+
+  - id:      M1.2.S03.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Second pillar, behind the meter run. Move."

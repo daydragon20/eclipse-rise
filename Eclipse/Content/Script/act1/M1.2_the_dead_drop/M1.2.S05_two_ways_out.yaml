@@ -23,9 +23,14 @@ words:        0
 # flags-out: Story.Choice.M12_Ghost  (NEW TAG - set on the quiet branch)
 #
 # TWO FULL BRANCHES. Not one branch with a condition bolted on.
-# condition: story.m12_alarm == false   -> ghost block
-# condition: story.m12_alarm == true    -> alarmed block
+# condition: run.alarm_raised == false   -> ghost block
+# condition: run.alarm_raised == true    -> alarmed block
 # 21_quality_mandate 21.2: rather two branches of twelve lines than one of six.
+#
+# CORRECTED 2026-07-31 by ruling L1-R4: the first version of this stub said
+# story.m12_alarm. Whether the alarm went off is a RUN fact, not campaign state - it lives
+# in FEclipseMissionOutcome and does not survive the mission. Story.Choice.M12_Ghost is
+# still a story flag, because act 1 Veil alertness reads it later. See SCRIPT_FORMAT 4.
 #
 # ghost beats:   1) out along the galleries
 #                2) somebody opens a door that should have been shut

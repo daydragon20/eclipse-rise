@@ -211,11 +211,11 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Char.MaraDead` | M1.8.S08 | **alles daarna** — geen enkele regel van Mara mag hierna live afspelen |
 | `Story.Char.PetraRescued` | M1.8.S04 | hub, act 2 Siege |
 | `Story.Char.CinderNamed` | M1.8.S99 | barks (callsign-gebruik), act 2+ |
-| `Story.Choice.M11_ConscriptSpared` | M1.1.S05 | T5-telling |
+| `Story.Choice.M11_Conscript.{Finished,Left,Bound}` | M1.1.S05 | T5-telling — **`.Bound` telt als genade** |
 | `Story.Choice.M12_Ghost` | M1.2 debrief | Veil-alertheid act 1 |
-| `Story.Choice.M15_ShiftBossSpared` | M1.5.S04 | M1.6.S06, Sela-reputatie |
+| `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` | M1.5.S04 | M1.6.S06, Sela-reputatie |
 | `Story.Choice.M15_IronChorusPact` | M1.5.S99 | M1.8.S99 stemming, act 2 |
-| `Story.Choice.M16_TrainRun` | M1.6.S04 | wervingsinstroom, onrust |
+| `Story.Choice.M16_Train.{Run,Emptied,Split}` | M1.6.S04 | wervingsinstroom, onrust |
 | `Story.Choice.M16_LettersAllowed` | M1.6.S06 | draad *Conscript Letters* → act 4 |
 | `Story.Flag.IntakeUnvetted` | M1.6.S06, stil | **act 3, twist 3** |
 | `Story.Clue.BlightBroadcast` | M1.3.S02 | act 3, twist 1 |
@@ -230,6 +230,12 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Thread.WallOpen` | M1.8.S90 | act 2–4 |
 
 **Regel:** een `Story.Clue.*` verandert nooit gameplay in act 1. Hij bestaat om act 3 en 4 te laten weten wat de speler heeft gezien, zodat de betaling zich naar hem voegt. Dat is de mechanische kant van "geen wending zonder plant".
+
+### Meerwaardige keuzes — ruling L1-R3
+`StoryFlags` is een `TArray<FGameplayTag>` zónder waarden, dus een keuze met drie uitkomsten wordt **drie elkaar uitsluitende bladeren onder één ouder**. De ouder blijft opvraagbaar als "is deze keuze gemaakt". Geen schemawijziging. **`Story.Choice.M11_ConscriptSpared` uit de eerste versie van dit document is ingetrokken** — één waarheid, één opslagplek.
+
+### Run-feiten zijn géén story-flags — ruling L1-R4
+`run.zero_casualty`, `run.alarm_raised`, `run.ghost` leven in `FEclipseMissionOutcome` en overleven de missie niet. Debriefscènes lezen ze; de save slaat ze niet op. **`story.m12_alarm` uit de eerste versie van de M1.2.S05-stub is dus fout en is `run.alarm_raised`.** Grammatica en volledige toelichting: `SCRIPT_FORMAT` §4.
 
 ---
 
@@ -274,6 +280,7 @@ Beslissingen die ik neem omdat de bedoeling al vastligt en alleen de invulling o
 | **AR-3** | Blacksite K-77 ligt **onder de Spire Levels**, bereikt via een servicelift vanaf Foundry Row. | De glossary noemt K-77 zonder plaats; act 1 speelt op Kessara; 03.3 geeft Kessara een laagjestaart. Thematisch: het schone licht staat bovenop de cellen. Productie: een eigen klein level, zoals 03.2 voorschrijft voor extra verhaalmissies. |
 | **AR-4** | **Foundry Row ⊂ Foundry District.** Het district is de Mid-Works-wijk waar Voss geboren is en waar de checkpoint, de overpass, de mast en het arsenaal in liggen. | `SCRIPT_FORMAT` §3 gebruikt letterlijk `Kessara / Foundry District / Overpass`; de regiograaf gebruikt `FoundryRow` en `TransitCheckpoint`. Dit is de enige lezing waarin beide waar zijn zonder iets te hernoemen. |
 | **AR-5** | **Mara zegt "wij" het hele spel en zegt precies één keer "jij": in M1.8.S08.** Geen enkele schrijver mag dat woord eerder uitgeven. | §18.4 geeft haar "we where anyone else would say I" als fingerprint. Eén breuk in dat patroon, op het moment dat ze het commando overdraagt, is een karakterbeat die de criticus mechanisch kan controleren en die geen enkele regel emotie hoeft te benoemen (§18.9 A). |
+| **AR-5b** | **Mara's gezagsoverdracht is een ladder van twee grammaticale bewegingen.** In M1.1 draagt ze *tactisch* gezag over in de **derde persoon**, aan de squad: *"His mark."* In M1.8.S08 draagt ze het *commando* over in de **tweede persoon**, aan hem. | Voorgesteld door de schrijver van de ijkmissie en beter dan wat ik had. Het botst niet met AR-5 (derde persoon spendeert de "jij" niet) en het maakt van één woordkeuze een opbouw over acht missies. Geen enkele schrijver mag Mara vóór M1.8 tactisch gezag in de tweede persoon laten overdragen — dan stort de ladder in. |
 | **AR-6** | **Threx' nadering gaat per medium, in vier treden**: propaganda (M1.3.S02-omgeving) → een vreemde voornaam op een Veil-kanaal (M1.3.S06) → een Ember-naam (M1.7.S04) → Voss' naam, in persoon (M1.8.S05/S06). Geen trede overslaan, geen trede verdubbelen. | §18.4 maakt voornamen zijn wapen. De ladder maakt van "de vijand komt dichterbij" een *hoorbare* structuur in plaats van een gevoel. |
 | **AR-7** | **Act 1 verbruikt geen oration.** Er zijn er vier in het hele spel (§18.3); die zijn voor act 3 (Sela, oprichting Concord) en act 4 (Vex, Voss, en één reserve). Sela's M1.6-moment blijft binnen de hub-band. | Een oration in uur 15 verbrandt een van de vier schaarste-momenten van het spel op een personage die de speler net heeft ontmoet. |
 | **AR-8** | Kaine, Torren, Kaya, Whisper en Callis spreken **niet** in act 1. Vex alleen als opname, AEGIS alleen als omroep. | §2.9: Kaine neemt aan het eind van act 2 het commando; Whisper wordt in act 2 gecontacteerd; Torren en Kaya horen bij act-2-planeten. |

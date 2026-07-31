@@ -20,7 +20,15 @@ words:        239
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      VOSS, MARA, one wounded Dominion conscript, one Ember fighter
 # flags-in:  none
-# flags-out: Story.Choice.M11_ConscriptSpared   (NEW TAG - systems task, see ACT1_OVERVIEW section 6)
+# flags-out: Story.Choice.M11_Conscript.Finished | .Left | .Bound   (NEW TAGS)
+#            RULED 2026-07-31, L1-R3 - THE WRITER'S ESCALATION WAS UPHELD. The stub
+#            originally asked for one boolean, Story.Choice.M11_ConscriptSpared. It was
+#            wrong: three outcomes do not fit in a boolean, and collapsing "left to bleed"
+#            into "finished" loses a moral position the twist-5 tally needs. That tag is
+#            WITHDRAWN. Three mutually exclusive leaves under one parent, no schema change.
+#            The .Bound leaf is what the T5 tally counts as mercy.
+#            The writer's script-side spelling story.m11_conscript_choice == "bound" is
+#            correct and maps to the leaf mechanically (SCRIPT_FORMAT 4).
 # plants:    P5-a  first entry in the mercy tally that gates twist 5 (Kaine's conscience, act 4).
 #            MANDATORY carrier - this plant may never move to an optional objective.
 # beats:     1) the conscript is alive, young, and procedural because that is his training -

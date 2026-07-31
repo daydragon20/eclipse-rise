@@ -15,7 +15,7 @@ turn:         "He offers an alliance on one condition, and the condition is a na
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        613
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, MARA, BRICK · Iron Chorus emissary + two Iron Chorus fighters
@@ -45,4 +45,386 @@ words:        0
 #            interruptions in. Let somebody dodge a question and never come back to it.
 #            Full Voss variant coverage on both axes.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      type is `hub` (12-35). READ AS A CEILING, not a floor - the same escalation
+#            M1.1 filed. A 12-word floor would delete Brick's one word from the scene that
+#            the whole twist-3 chain hangs on, and would make 18.3's 3x variance rule
+#            unsatisfiable. Ceiling respected: longest line 20 w.
+# variance:  1 w (.190 "Nobody.") to 20 w (.210 / .460) = 20x.
+#
+# EMISSARY FINGERPRINT (proposed - 18.4 has no row for him; see report and C-4/Q-4):
+#   syntax  clipped declaratives; counts instead of adjectives; states a number where
+#           anyone else would state an opinion
+#   tic     repeats the other person's last word back at them, flat (.030 .200 .230 .370)
+#   never   NEVER USES A PERSON'S NAME. Not Mara's, not Voss's, not Brick's, not his own,
+#           not his fighters'. "She", "the big one", "your commander". A cell that does not
+#           give its names away does not spend anyone else's either. This is mechanically
+#           checkable and it is what makes Mara's use of "Voss" in S99 land.
+#   right   he is correct at .170, at .300 and at .400, and the player must feel all three.
+#
+# P3-b:     lands at .150-.230 and it is the spine of the mission. It is played as a RIVAL
+#           SCORING A POINT OFF THE NEWEST MAN AT THE TABLE. Ember's reaction is offence,
+#           not unease. .220 - his own fighter correcting the count upward - is what stops
+#           it being a boast and makes it a cost. Nothing in the scene marks it as
+#           important. Nobody returns to it.
+# dodge:    .090 asks who tipped Ember on the armoury. .100 answers a question nobody
+#           asked. IT IS NEVER RETURNED TO, here or anywhere in M1.5.
+# ember-hit: .410. Voss works out that this meeting may itself be the small false thing,
+#           and the emissary says yes. It is the only unguarded word he gives Ember, and it
+#           is the moment the negotiation actually starts.
+# options:  .490-.520, four outcomes that are not four flavours of yes. NO PLAYER-CHOICE
+#           CONSTRUCT EXISTS IN SCRIPT_FORMAT (escalated by M1.1's writer; escalated again).
+#           Marked by note only. Downstream state: story.m15_terms =
+#           accepted | conditional | refused | counter. Read by S03.010 and S99.
+#           Every branch still reaches S04 - the emissary walks Ember to the house either
+#           way, and refusing the condition is not refusing the walk.
+# triads:   exactly one (.430), and it is his offer. Nowhere else.
+# em-dash:  two in fifty-four lines (.070 rhetorical, .130 interruption).
+# omitted:  a menacing line. He never threatens once. See report.
+
+lines:
+  - id:      M1.5.S02.010
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "She said three. There are three."
+    shot:    "Standing water. Three mouths to the gallery, one of them dark. Nobody has taken a hand off anything."
+
+  - id:      M1.5.S02.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Three ways out of this gallery. You came in by two of them."
+
+  - id:      M1.5.S02.030
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "We did."
+
+  - id:      M1.5.S02.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "There are crates against the wall."
+
+  - id:      M1.5.S02.050
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "We'll stand."
+    shot:    "The pumps come up under the floor. Two minutes of noise. He waits them out without moving his eyes."
+    note:    "Pays M1.5.S01.130. Ember chose this room for the two minutes of cover. He has been in rooms like this since before Ember existed and simply waits."
+
+  - id:      M1.5.S02.060
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Forty rifles out of Foundry Row. Sealed crates, and the door was not burned."
+
+  - id:      M1.5.S02.070
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Forty rifles is forty pairs of hands. So which is it — forty of you, or thirty strangers?"
+    note:    "His want, stated as arithmetic. Cell or crowd."
+
+  - id:      M1.5.S02.080
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We took what was there."
+
+  - id:      M1.5.S02.090
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Who told you it would be there?"
+
+  - id:      M1.5.S02.100
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "The gallery runs dry at the fourth horn. Nobody should still be in it."
+    note:    "*** THE DODGE. *** She answers a question nobody asked. It is never returned to in this mission by anybody."
+
+  - id:      M1.5.S02.110
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    tags:    [beat]
+    text:    "Mm."
+    shot:    "He files it. He does not chase it, and that is worse."
+
+  - id:      M1.5.S02.120
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "The big one. Four days on your roster."
+
+  - id:      M1.5.S02.130
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "He came out of a cell that we--"
+
+  - id:         M1.5.S02.140
+    speaker:    EMISSARY
+    voice:      iron_chorus_emissary
+    interrupts: true
+    text:       "I know what he came out of."
+
+  - id:      M1.5.S02.150
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "How do you check the people you take in?"
+    note:    "P3-b OPENS HERE."
+
+  - id:      M1.5.S02.160
+    speaker: VOSS
+    voice:   voss
+    text:    "We know where they come from."
+
+  - id:      M1.5.S02.170
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "That's not checking. That's recognising."
+    note:    "He is right, and it is the cheapest correction in the game. Nobody in Ember has an answer to it."
+
+  - id:      M1.5.S02.180
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Who checked you?"
+    shot:    "He has turned to Brick. He has not raised his voice and he is not smiling."
+
+  - id:      M1.5.S02.190
+    speaker: BRICK
+    voice:   brick
+    text:    "Nobody."
+    shot:    "The pumps are off. Nobody fills it."
+    note:    "*** P3-b, THE PLANT ITSELF. *** 18.4: Brick never lies, and the man who cannot lie is the man who hands the rival his point. One word. Nothing marks it. Do not mark it."
+
+  - id:      M1.5.S02.200
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    tags:    [laughs]
+    text:    "Nobody."
+
+  - id:      M1.5.S02.210
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "We hold a man three months before he carries anything heavier than a message. Three months. We still lost two."
+
+  - id:      M1.5.S02.220
+    speaker: IRON_CHORUS_A
+    voice:   iron_chorus_fighter_a
+    text:    "Three."
+    note:    "His own fighter corrects the count upward. It stops the boast being a boast and turns it into a bill. Written so the player hears what three months of discipline still costs."
+
+  - id:      M1.5.S02.230
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Three."
+
+  - id:      M1.5.S02.240
+    speaker: VOSS
+    voice:   voss
+    text:    "After three months, what tells you?"
+    note:    "18.4 Voss: he wants the mechanism, not the verdict."
+
+  - id:      M1.5.S02.250
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Nothing tells you. You hand him something small and false, and you watch where it comes out."
+
+  - id:      M1.5.S02.260
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "We are not going to feed our own people lies."
+
+  - id:      M1.5.S02.270
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "No. You'll do what we did."
+    note:    "The whole Iron Chorus thread in six words: we were you, and this is the road. Act 2-4 fusion/schism/tragedy (2.11) starts here."
+
+  - id:      M1.5.S02.280
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "The mast on the checkpoint road. That was Ember."
+
+  - id:      M1.5.S02.290
+    speaker: VOSS
+    voice:   voss
+    text:    "That was us."
+    note:    "18.4 Voss: he does not say 'that was me' in front of the people who carried the charges."
+
+  - id:      M1.5.S02.300
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "The district shouted for one night. The Tithe ran the next morning at the usual hour."
+    note:    "He deflates Ember's largest victory with a fact, and the fact is true. This is the scene's obligation: the rival is RIGHT."
+
+  - id:      M1.5.S02.310
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "People stood in the street."
+
+  - id:      M1.5.S02.320
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "They did. Then they went to work."
+
+  - id:      M1.5.S02.330
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "The Tithe doesn't run on soldiers. It runs on a sheet of who was not at their bench."
+
+  - id:      M1.5.S02.340
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Shift bosses file the sheet. No sheet, no quota. No quota, no transport."
+    note:    "2.7 rule 2 - the doctrine, defensible in one sentence, no rhetoric attached."
+
+  - id:      M1.5.S02.350
+    speaker: VOSS
+    voice:   voss
+    text:    "How many file for the Foundry District?"
+
+  - id:      M1.5.S02.360
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Nine. Five have stopped."
+
+  - id:      M1.5.S02.370
+    speaker: VOSS
+    voice:   voss
+    text:    "Stopped."
+
+  - id:      M1.5.S02.380
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Two of them moved up to the Spire side. Yes. Stopped."
+    note:    "He confirms three killings without saying a word that could be quoted. He is not hiding it; he is declining to dress it."
+
+  - id:      M1.5.S02.390
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "And the quota?"
+
+  - id:      M1.5.S02.400
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Down a fifth since the winter."
+    shot:    "Mara does not answer. She has nothing to put next to that number and everyone in the gallery watches her not have it."
+    note:    "IT WORKED. The hardest line in the mission to write and the reason act 3 can afford this cell."
+
+  - id:      M1.5.S02.410
+    speaker: VOSS
+    voice:   voss
+    text:    "Something small and false. Is that what tonight is?"
+
+  - id:      M1.5.S02.420
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Yes."
+    note:    "The one unguarded word he gives Ember. It is also the most respect anybody shows anybody in this scene."
+
+  - id:      M1.5.S02.430
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Our operation. Our timing. Your ground."
+    note:    "The only triad in the scene (18.9 B). It is his offer, so it is allowed to sound rehearsed."
+
+  - id:      M1.5.S02.440
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "After that we plan together and your people learn what a check looks like."
+
+  - id:      M1.5.S02.450
+    speaker: VOSS
+    voice:   voss
+    text:    "And tonight?"
+
+  - id:      M1.5.S02.460
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Tonight there's a name on our list four streets from here, and Ember stands in the room while it closes."
+
+  - id:      M1.5.S02.470
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Watch."
+
+  - id:      M1.5.S02.480
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Anybody can shake a hand. I want to see what a cell does with its face."
+    shot:    "One of his fighters has already moved to the dark stair mouth. She was there before he finished."
+
+  - id:      M1.5.S02.490
+    speaker: VOSS
+    voice:   voss
+    text:    "We'll be at the door."
+    note:    "PLAYER OPTION 1 of 4 - accept the terms as offered. Sets story.m15_terms = accepted."
+    variants:
+      pragmatist: "One name against forty rifles' worth of cover. We'll be at the door."
+      idealist:   "We'll be at the door. And we'll be looking at what happens on the other side of it."
+      personal:   "We'll be at the door. Somebody should be."
+      strategic:  "We'll be at the door. The one after that goes on our map, not yours."
+
+  - id:      M1.5.S02.500
+    speaker: VOSS
+    voice:   voss
+    text:    "We walk with you. What happens at the door, I call there."
+    note:    "PLAYER OPTION 2 of 4 - come, commit to nothing. Sets story.m15_terms = conditional."
+    variants:
+      pragmatist: "We walk with you. Nothing is agreed until I have seen the house."
+      idealist:   "We'll walk with you. Nobody here is promising what he does at the end of it."
+      personal:   "We walk with you. I decide at the door and not before."
+      strategic:  "We walk with you. The rest holds until I know who else is on that list."
+
+  - id:      M1.5.S02.510
+    speaker: VOSS
+    voice:   voss
+    text:    "Our ground and our guns. Not a name."
+    note:    "PLAYER OPTION 3 of 4 - refuse the condition outright. Sets story.m15_terms = refused. He still walks them out; refusing the condition is not refusing the escort."
+    variants:
+      pragmatist: "Ground and guns. The list isn't ours to sell."
+      idealist:   "Everything we have is on that floor except a man's name."
+      personal:   "Not a name. Not out of me."
+      strategic:  "A name buys you one night. Ground buys you a district."
+
+  - id:      M1.5.S02.520
+    speaker: VOSS
+    voice:   voss
+    text:    "Whose list are we on?"
+    note:    "PLAYER OPTION 4 of 4 - turn the test around. Sets story.m15_terms = counter. Gains information, commits nothing, and costs goodwill."
+    variants:
+      pragmatist: "Before any of that. Who has us on a sheet?"
+      idealist:   "You want a name off us. Say whose list has ours on it first."
+      personal:   "Somebody files for us as well. Who?"
+      strategic:  "Nine file for this district. Which of them files for Ember?"
+
+  - id:        M1.5.S02.530
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms == "accepted"'
+    text:      "Then walk behind us, and let nobody in that house hear an Ember voice."
+
+  - id:        M1.5.S02.540
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms == "conditional"'
+    text:      "Decide at the door. That's where everyone finds out."
+
+  - id:        M1.5.S02.550
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms == "refused"'
+    text:      "Come anyway. Look at the bill before deciding not to pay it."
+
+  - id:        M1.5.S02.560
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms == "counter"'
+    text:      "Ember is. Since the mast."
+    note:      "The act's spine, handed over as a jab: every victory made them more visible. He does not explain it and Ember does not ask."
+
+  - id:        M1.5.S02.570
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    condition: 'story.m15_terms == "counter"'
+    text:      "Come and see the other end of a sheet."
+
+  - id:      M1.5.S02.580
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Second stair. We go up first."

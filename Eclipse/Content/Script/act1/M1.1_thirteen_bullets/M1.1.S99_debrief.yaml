@@ -19,7 +19,11 @@ words:        279
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
-# flags-in:  Story.Choice.M11_ConscriptSpared
+# flags-in:  story.m11_conscript_choice ("finished" | "left" | "bound")  - L1-R3
+#            run.zero_casualty  - L1-R4. The extra Reyes line and Dex's third joke hang off
+#            this. It is a RUN fact, not a story flag: it reads the existing downed-soldier
+#            latch from the SPEC-P2-04 amendment and needs no new state, only access.
+#            The escalation asked for story.m11_zero_casualty; that flag should not exist.
 # flags-out: Story.Beat.M11_ThirteenBullets  (exists in EclipseGameplayTags.cpp)
 # commit:    +25 M / +50 C, day +1, optional zero-casualty +20 M, no region flip
 # beats:     1) the count again - this time going up
