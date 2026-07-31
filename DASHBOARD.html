@@ -134,7 +134,26 @@ h3{font-size:17px;margin:0 0 8px}
 .msg .tx{font-size:13.5px;white-space:pre-wrap;word-break:break-word}
 
 /* beslissingen met knoppen */
-.vraag{border-left:3px solid var(--bad)}
+.stat.klik{cursor:pointer;transition:border-color .15s}
+.stat.klik:hover{border-color:var(--acc)}
+.vraag{border-left:3px solid var(--dim2)}
+.vraag.p-nu{border-left-color:var(--bad)}
+.vraag.p-gauw{border-left-color:var(--warn)}
+.uitklap{
+  background:transparent;border:1px solid var(--line);color:var(--acc2);
+  border-radius:8px;padding:8px 14px;margin:13px 0 0;cursor:pointer;font:13px inherit;
+}
+.uitklap:hover{border-color:var(--acc)}
+.meerinfo{
+  margin:12px 0 0;padding:14px 16px;background:#00000038;
+  border:1px solid var(--line);border-radius:9px;font-size:13.5px;
+}
+.meerinfo p:first-child{margin-top:0}
+.audio{margin:14px 0 0;font-size:13px;color:var(--dim)}
+.audio b{color:var(--tx)}
+.clip{display:flex;align-items:center;gap:12px;margin:8px 0 0;flex-wrap:wrap}
+.clip span{min-width:170px;font-size:12.5px;color:var(--dim2)}
+.clip audio{height:34px;flex:1;min-width:220px}
 .vraag h3{font-size:16px;line-height:1.35}
 .vraag .waarom{font-size:13.5px;color:var(--dim);margin:10px 0 0}
 .vraag .stappen{margin:12px 0 0;font-size:13px;color:var(--dim)}
@@ -258,7 +277,7 @@ function vNu(){
     <div class="stat"><div class="n" style="color:var(--acc)">${(D.hero&&D.hero.pct)||0}%</div><div class="l">Hele game</div><div class="s">${esc((D.hero&&D.hero.label)||"")}</div></div>
     <div class="stat"><div class="n" style="color:var(--${bar||"dim"})">${t.ok||0}/${t.total||0}</div><div class="l">Tests groen</div><div class="s">${esc(t.age||"—")}</div></div>
     <div class="stat"><div class="n">${(g.commits||[]).length?esc(g.commits[0].date):"—"}</div><div class="l">Laatste commit</div><div class="s">${g.dirty?g.dirty+" bestanden open":"werkboom schoon"}</div></div>
-    <div class="stat"><div class="n" style="color:${acties.length?"var(--bad)":"var(--ok)"}">${acties.length}</div><div class="l">Wacht op jou</div><div class="s">${acties.length?"actie nodig":"niets te doen"}</div></div>
+    <div class="stat klik" onclick="naarBeslissingen()"><div class="n" style="color:${acties.length?"var(--bad)":"var(--ok)"}">${acties.length}</div><div class="l">Wacht op jou</div><div class="s">${acties.length?"klik om te zien →":"niets te doen"}</div></div>
   </div>
 
   ${(()=>{
@@ -268,12 +287,22 @@ function vNu(){
     return `
     <h2>Beslissingen — druk op een knop${open.length?` · ${open.length} open`:""}</h2>
     ${open.map(q=>`
-      <div class="card vraag" id="q-${esc(q.id)}">
-        <div class="ow-h"><span class="tag bad">${esc(q.id)}</span>
+      <div class="card vraag p-${esc(q.prio||"gauw")}" id="q-${esc(q.id)}">
+        <div class="ow-h">
+          <span class="tag ${q.prio==="nu"?"bad":q.prio==="later"?"":"warn"}">${esc(q.id)}</span>
+          <span class="tag ${q.prio==="nu"?"bad":q.prio==="later"?"":"warn"}">${esc(q.prio||"gauw")}</span>
           <h3 style="margin:0">${esc(q.vraag)}</h3></div>
         ${q.waarom?`<p class="waarom">${esc(q.waarom)}</p>`:""}
         ${(q.stappen&&q.stappen.length)?`
           <div class="stappen"><b>Wat je doet:</b><ol>${q.stappen.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>`:""}
+        ${q.meer_info?`
+          <button class="uitklap" onclick="klapUit('mi-${esc(q.id)}',this)">Hoe doe ik dit precies? ▾</button>
+          <div class="md meerinfo" id="mi-${esc(q.id)}" style="display:none">${md(q.meer_info)}</div>`:""}
+        ${(q.audio&&q.audio.length)?`
+          <div class="audio"><b>Luister hier:</b>
+            ${q.audio.map(a=>`<div class="clip"><span>${esc(a.naam)}</span>
+              <audio controls preload="none" src="${a.url}"></audio></div>`).join("")}
+          </div>`:(q.audio_map?`<div class="note">Zodra de fragmenten gegenereerd zijn, verschijnen ze hier als afspeelknopjes. Nu is er nog niets.</div>`:"")}
         <div class="knoppen">
           ${(q.opties||[]).map(o=>`
             <button class="kb" onclick="antwoord('${esc(q.id)}','${esc(o.waarde)}',this)"
@@ -613,6 +642,20 @@ function openImg(u,n){
   document.getElementById("ov-t").textContent=n;
   document.getElementById("ov-b").innerHTML='<img src="'+u+'">';
   ov.classList.add("on");
+}
+
+/* ---------- uitklappen & navigeren ---------- */
+function klapUit(id,btn){
+  const el=document.getElementById(id); if(!el)return;
+  const open=el.style.display!=="none";
+  el.style.display=open?"none":"block";
+  btn.textContent=open?"Hoe doe ik dit precies? ▾":"Verberg uitleg ▴";
+}
+function naarBeslissingen(){
+  const el=document.querySelector(".vraag");
+  if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+  else{const h=[...document.querySelectorAll("#v-nu h2")].find(x=>/wacht op jou/i.test(x.textContent));
+       if(h)h.scrollIntoView({behavior:"smooth",block:"start"});}
 }
 
 /* ---------- antwoord doorgeven ---------- */

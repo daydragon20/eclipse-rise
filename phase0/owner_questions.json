@@ -12,9 +12,97 @@
     "  stappen   wat hij CONCREET moet doen om te kunnen antwoorden (mag leeg)",
     "  opties    de knoppen. label = op de knop, gevolg = wat er dan gebeurt",
     "  advies    jouw aanbeveling, of null",
-    "  vrijtekst true = hij mag ook zelf iets typen"
+    "  vrijtekst true = hij mag ook zelf iets typen",
+    "  meer_info  uitklapbare uitleg: WAAR staat het, HOE open je het, waar let je op",
+    "  audio_map  repo-relatieve map met audio - speelt hij af IN het dashboard",
+    "  prio       nu | gauw | later",
+    "VOEG NOOIT EEN ONBEANTWOORDE VRAAG WEG. Op 31-07 vielen O-5 en O-6 stil weg",
+    "bij een herformattering. Beantwoorde vragen zakken vanzelf naar de sectie",
+    "Beantwoord zodra ze in OWNER_ANSWERS.md staan."
   ],
   "vragen": [
+    {
+      "id": "O-6",
+      "prio": "nu",
+      "vraag": "Blijft de gestileerde look, of wil je echt fotorealisme?",
+      "waarom": "Je zei dat de wereld 'realistisch geloofwaardig' moet zijn. Dat kan twee dingen betekenen en het verschil is weken werk. Je klacht ging over verkeersborden en random opvulling — dat zijn compositieproblemen die in elke stijl bestaan.",
+      "stappen": [
+        "Ga naar het tabblad Beeld en kijk naar de laatste screenshots",
+        "Vraag jezelf af: stoort de STIJL me, of stoort het dat er dingen willekeurig staan?",
+        "Is het dat tweede, dan is A het antwoord"
+      ],
+      "meer_info": "**Wat er al vastligt, ongeacht je keuze** (doc 20):\n\n- Geen verkeersborden of andere aardse voorwerpen — de mensheid verliet de Aarde 600 jaar geleden\n- Geen enkel object wordt geplaatst om leegte te vullen; elk object verantwoordt zich in een zin\n- Nooit een licht: key, fill, rim, praktische lampen, bounce\n- Elk district krijgt meerdere graphic points\n\n**Wat B betekent:** de art-lock uit 15.5 vervalt, elk materiaal opnieuw, de toon-master vervalt, en alle gestileerde assets die binnen zijn moeten opnieuw beoordeeld. Reken op weken.\n\n**Waarom ik A adviseer:** Borderlands is gestileerd en volstrekt geloofwaardig. Geloofwaardigheid komt van compositie, slijtage en schaal — niet van fotorealisme.",
+      "opties": [
+        {
+          "label": "A — gestileerd blijft",
+          "waarde": "A",
+          "gevolg": "Geen herwerk. De regels uit doc 20 lossen je klacht op."
+        },
+        {
+          "label": "B — echt fotorealisme",
+          "waarde": "B",
+          "gevolg": "Art-lock vervalt, elk materiaal opnieuw. Weken werk."
+        }
+      ],
+      "advies": "A — je klacht ging over willekeurige opvulling, niet over de stijl zelf.",
+      "vrijtekst": true
+    },
+    {
+      "id": "O-5",
+      "prio": "nu",
+      "vraag": "Het wapen: goedkope zichtbaarheidsfix nu, of volledig uit de mesh halen?",
+      "waarom": "Er hangt wel een wapen, maar het zit in de karaktermesh in plaats van als los object. Daarom is er geen attachment, doet de wapenwissel visueel niets, en valt het weg in het silhouet.",
+      "stappen": [
+        "Je hoeft hier niets voor te bekijken",
+        "Kies of je nu snel wilt zien wat je vasthoudt, of meteen de goede oplossing"
+      ],
+      "meer_info": "**Wat volledig inhoudt** — vier toetsbare stappen:\n\n1. Het wapen isoleren uit de skeletal mesh\n2. Een los mesh-asset per wapenfamilie\n3. Een socket op hand_r\n4. De bestaande wisselogica eraan koppelen — die code bestaat al, er was alleen nooit iets om te wisselen\n\n**Bij de goedkope stap:** een eigen tint lost 'ik zie mijn wapen niet' op, maar de wapenwissel blijft visueel niets doen. Dat is een bewuste volgorde: eerst zien, dan pas beslissen of de wissel je stoort.",
+      "opties": [
+        {
+          "label": "Goedkoop — eigen tint",
+          "waarde": "goedkoop",
+          "gevolg": "Uren werk. Je ziet je wapen. De wapenwissel werkt nog niet."
+        },
+        {
+          "label": "Volledig — uit de mesh halen",
+          "waarde": "volledig",
+          "gevolg": "Dagen werk. Lost zichtbaarheid en wapenwissel op."
+        }
+      ],
+      "advies": "Goedkoop. Of die wapenwissel je stoort weet je pas na je eerste speelronde.",
+      "vrijtekst": true
+    },
+    {
+      "id": "O-8",
+      "prio": "nu",
+      "vraag": "HUD-uiterlijk: hoe Borderlands mag het worden?",
+      "waarom": "Je vindt de gegevens rond de speler nog niet mooi genoeg en wilt Borderlands als inspiratie. Terecht — maar dat kan twee kanten op, en dat bepaalt hoeveel werk het is en hoe leesbaar het blijft.",
+      "stappen": [
+        "Zoek afbeeldingen van de Borderlands-HUD (Google Afbeeldingen: 'Borderlands 3 HUD')",
+        "Kijk vooral naar het schuine kader rond de munitie, de dikke inktranden, de hoekige vormen",
+        "Kies hieronder hoever we daarin gaan"
+      ],
+      "meer_info": "**Wat de Borderlands-HUD kenmerkt:**\n\n- Dikke inktranden om elk element, net als de wereld zelf\n- Schuine, hoekige kaders — bijna niets is recht of rond\n- Grote, vette cijfers voor munitie en schild\n- Handgetekende textuur in de vlakken, geen platte kleur\n- Elementen in de hoeken; het midden blijft vrij\n\n**De valkuil:** een HUD die mooi is maar traag leest, kost je levens. Munitie moet je in een oogopslag zien tijdens een vuurgevecht. Vorm mag alles, zolang je het getal binnen een halve seconde vindt.\n\n**Waarom dit misschien nog niet af is:** de HUD-laag is vandaag pas als prioriteit 1 opgepakt en zit in de eerste bouwstap. Wat je nu ziet is bewust functie-eerst; de stijl komt in de stap erna. Je bent dus niet te opdringerig — je kijkt naar iets halfaf.",
+      "opties": [
+        {
+          "label": "Vol Borderlands",
+          "waarde": "vol",
+          "gevolg": "Inktranden, schuine kaders, handgetekende textuur, vette cijfers. Meest werk, sterkste identiteit."
+        },
+        {
+          "label": "Borderlands-licht",
+          "waarde": "licht",
+          "gevolg": "Hoekige vormen en vette cijfers, maar rustiger — leesbaarheid eerst."
+        },
+        {
+          "label": "Eerst laten werken, stijl later",
+          "waarde": "later",
+          "gevolg": "De HUD wordt eerst compleet en leesbaar; de stijlronde komt als alles er staat."
+        }
+      ],
+      "advies": "Vol Borderlands — maar pas nadat alle elementen er functioneel staan. Stijl op een incomplete HUD is werk dat je twee keer doet.",
+      "vrijtekst": true
+    },
     {
       "id": "O-7",
       "vraag": "GPU-crash: naar SM6 tillen, of de zware paden uitzetten?",
@@ -41,7 +129,8 @@
         }
       ],
       "advies": "Kies gerust 'kies jij'. De crash is nu herleid tot de SkyAtmosphere-LUT-pass en dat spoor loopt door zonder jou. Jouw keuze hieronder gaat over de STRUCTUUR — SM5 met zware paden aan is nog steeds het slechtste van twee werelden — maar hij is niet langer de fix voor deze crash.",
-      "vrijtekst": true
+      "vrijtekst": true,
+      "prio": "gauw"
     },
     {
       "id": "T-11",
@@ -66,7 +155,8 @@
         }
       ],
       "advies": null,
-      "vrijtekst": true
+      "vrijtekst": true,
+      "prio": "gauw"
     },
     {
       "id": "T-10",
@@ -90,7 +180,8 @@
         }
       ],
       "advies": "Twee minuten werk voor 30 GB. Even doen.",
-      "vrijtekst": false
+      "vrijtekst": false,
+      "prio": "gauw"
     },
     {
       "id": "T-8",
@@ -114,7 +205,8 @@
         }
       ],
       "advies": "Ongeveer 5 minuten.",
-      "vrijtekst": false
+      "vrijtekst": false,
+      "prio": "gauw"
     },
     {
       "id": "T-2",
@@ -138,6 +230,147 @@
         }
       ],
       "advies": "Ongeveer 10 minuten.",
+      "vrijtekst": false,
+      "prio": "gauw"
+    },
+    {
+      "id": "O-3",
+      "prio": "gauw",
+      "vraag": "Welke stem hoort bij welk personage?",
+      "waarom": "Je krijgt per personage twee finalisten te horen. Jouw keuze is permanent: de cache-sleutel bevat de stem-ID, dus later omcasten maakt elke regel van dat personage ongeldig en herbetaalt alles.",
+      "stappen": [
+        "NOG NIET AAN DE BEURT - de castingfragmenten bestaan nog niet",
+        "voice-director maakt eerst een gratis shortlist uit de Voice Library",
+        "Zodra de fragmenten er zijn verschijnen ze hieronder als afspeelknopjes en krijg je bericht"
+      ],
+      "meer_info": "**Waar de audio staat en hoe je hem hoort**\n\nDe fragmenten komen in Eclipse/Content/Audio/Generated/. Zodra ze er zijn verschijnen ze **hier op deze kaart** als afspeelknopjes — je hoeft de Unreal Editor niet te openen en geen mappen te zoeken.\n\n**Per stem hoor je drie fragmenten, niet een:**\n\n1. De signature-regel — klinkt dit als het personage?\n2. Een emotioneel uiterste — Mara in haar laatste scène, Vex die dreigt, Kaya in paniek\n3. Een korte gevechtsregel — hoor je hem nog over geweervuur heen?\n\n**Waar je op let:**\n\n- Een stem die een rustige zin prachtig draagt maar instort bij het uiterste is de verkeerde stem, hoe mooi die eerste zin ook was\n- Personages die samen scenes hebben krijg je naast elkaar te horen. Vervagen ze in elkaar? Zeg het — dan ruilen we er een nu, niet na 90.000 credits\n- Twijfel je? Zeg dat. Twijfel bij de auditie wordt zekerheid dat het fout is na duizend regels\n\n**Doe er gerust lang over.** De screening was gratis; deze fragmenten zijn al betaald tegen de tijd dat jij luistert.",
+      "audio_map": "Eclipse/Content/Audio/Casting",
+      "opties": [
+        {
+          "label": "Ik heb gekozen — zie tekstveld",
+          "waarde": "gekozen",
+          "gevolg": "voice-director lockt de castingtabel en begint te genereren in tier-volgorde."
+        },
+        {
+          "label": "Nog geen audio te horen",
+          "waarde": "wacht",
+          "gevolg": "De agent meldt zich zodra de fragmenten klaarstaan."
+        }
+      ],
+      "advies": null,
+      "vrijtekst": true
+    },
+    {
+      "id": "O-4",
+      "prio": "gauw",
+      "vraag": "IJkmissie M1.1: klinkt het zoals het moet?",
+      "waarom": "M1.1 gaat als eerste helemaal door de pijplijn — beats, dialoog, kwaliteitspoort, stem, in de game. Een missie volledig af voor er 41 andere gemaakt worden. Pas na jouw akkoord start de massaproductie.",
+      "stappen": [
+        "NOG NIET AAN DE BEURT — M1.1 is pas rond 7 augustus speelbaar",
+        "Start dan de game via '1 - SPEEL ECLIPSE' op je bureaublad",
+        "Speel M1.1 (Thirteen Bullets) van begin tot eind en let op de dialoog"
+      ],
+      "meer_info": "**Waarom dit de belangrijkste knop van het project is**\n\nAls de schrijfstandaard fout is, wil je dat weten bij missie 1 — niet bij missie 34.\n\n**Waar je op let (jouw oordeel, niet dat van een test):**\n\n- Zijn de personages van elkaar te onderscheiden zonder dat je de naam ziet?\n- Legt iemand iets uit wat je al begreep? Dat is de meest voorkomende fout\n- Is er een zin waarvan je denkt: dat zegt niemand?\n- Praat iemand over het geweervuur heen?\n- Zit er humor in, en komt die van het personage of van de schrijver?\n\n**Bij nee gebeurt er iets nuttigs:** de standaard wordt bijgesteld en M1.1 gaat er nog eens doorheen. Dat kost dagen. Hetzelfde probleem ontdekken na 42 missies kost de maand. Zeg dus gerust nee.",
+      "opties": [
+        {
+          "label": "Ja — zo moet het klinken",
+          "waarde": "akkoord",
+          "gevolg": "Massaproductie start: 4-6 schrijvers parallel op de rest."
+        },
+        {
+          "label": "Nee — zie tekstveld",
+          "waarde": "afgekeurd",
+          "gevolg": "Standaard bijgesteld op jouw punten; M1.1 gaat er nog eens doorheen."
+        },
+        {
+          "label": "Nog niet klaar",
+          "waarde": "wacht",
+          "gevolg": "De agent meldt zich als M1.1 speelbaar is."
+        }
+      ],
+      "advies": null,
+      "vrijtekst": true
+    },
+    {
+      "id": "T-1",
+      "prio": "gauw",
+      "vraag": "Speel je een tweede ronde vrijwillig?",
+      "waarom": "De eerlijke gate-vraag uit het roadmapdocument. Niet 'is het af', maar: wil je uit jezelf nog een keer? Bij nee investeren we niet verder in mooier maken maar in de loop zelf.",
+      "stappen": [
+        "Speel een sessie van ongeveer 30 minuten",
+        "Stop wanneer je wilt",
+        "Vraag jezelf daarna eerlijk af of je zin had in nog een ronde"
+      ],
+      "meer_info": "**Waarom deze vraag zo bot gesteld wordt**\n\nDit is de belangrijkste kwaliteitsvraag in het project en hij is expres oncomfortabel. Een game kan technisch perfect zijn en toch niet leuk. Is het antwoord nee, dan is elk uur in graphics weggegooid tot de loop klopt.\n\n**Eerlijk antwoorden is het nuttigst.** Je hoeft niemand te sparen — een nee stuurt het werk beter dan een beleefd ja.\n\n**Bij nee:** het fidelity-werk bevriest en er wordt eerst aan de loop gewerkt. Dat is geen ramp, dat is waarvoor deze gate bestaat.\n\n**Voorwaarde die jij zelf stelde:** je speelt pas als de schermlaag op niveau is. Deze vraag mag dus wachten — hij staat hier zodat hij niet vergeten wordt.",
+      "opties": [
+        {
+          "label": "Ja — ik wil verder spelen",
+          "waarde": "ja",
+          "gevolg": "De loop is bewezen; fidelity-investering is verantwoord."
+        },
+        {
+          "label": "Nee — nog niet leuk genoeg",
+          "waarde": "nee",
+          "gevolg": "Fidelity bevriest. Eerst de loop, met jouw redenen als richting."
+        },
+        {
+          "label": "Nog niet gespeeld",
+          "waarde": "wacht",
+          "gevolg": "Blijft staan tot de HUD op niveau is."
+        }
+      ],
+      "advies": null,
+      "vrijtekst": true
+    },
+    {
+      "id": "T-7",
+      "prio": "later",
+      "vraag": "Ken je iemand die de game koud wil spelen?",
+      "waarom": "Voor de gate aan het eind van deze fase is een frisse speler nodig — iemand die niets van het project weet. Jij en de agents zijn allebei te bekend met het ontwerp om nog te zien wat verwarrend is.",
+      "stappen": [
+        "Denk aan een vriend, klasgenoot of familielid die games speelt",
+        "Ze hoeven niets van gamedesign te weten — juist niet",
+        "Nog niets vragen; het gaat erom of je iemand weet"
+      ],
+      "meer_info": "**Wanneer dit nodig is:** zodra de eerste twee missies speelbaar zijn, dus halverwege deze fase — niet aan het eind. Een koude speler halverwege is meteen een test; aan het eind is het een oordeel waar je niets meer mee kunt.\n\n**Wat ze doen:** ongeveer drie uur koud spelen zonder uitleg vooraf. De vraag achteraf is niet 'vond je het leuk' maar **wil je de rest van deze game spelen?**\n\n**Waarom jij dit niet zelf kunt:** je weet hoe alles bedoeld is, dus je ziet niet wat een ander niet snapt. Dat is onvermijdelijk bij iedereen die aan iets bouwt.",
+      "opties": [
+        {
+          "label": "Ja, ik weet iemand",
+          "waarde": "ja",
+          "gevolg": "Het punt gaat op scherp; de agent meldt wanneer het speelbaar genoeg is."
+        },
+        {
+          "label": "Nee, nog niemand",
+          "waarde": "nee",
+          "gevolg": "Blijft staan; blokkeert pas aan het eind van de fase."
+        }
+      ],
+      "advies": null,
+      "vrijtekst": true
+    },
+    {
+      "id": "T-5",
+      "prio": "later",
+      "vraag": "Mixamo-animaties ophalen als de animatiepass start?",
+      "waarom": "Voor betere loop-, dek- en reactieanimaties zijn extra takes nodig. Mixamo is gratis maar vraagt handmatige downloads. Het alternatief is de CC0-bibliotheek die de agent zelf kan ophalen.",
+      "stappen": [
+        "Nu niets doen — dit komt pas bij de animatiepass",
+        "Kies alleen of je bereid bent dat klikwerk te doen"
+      ],
+      "meer_info": "**Kwaliteitsverschil:** Mixamo-animaties zijn soepeler en talrijker dan de CC0-set. Voor een third-person game waar de loop constant in beeld is, scheelt dat merkbaar.\n\n**Werkverschil voor jou:** Mixamo vraagt per animatie een klik en een download; bij een animatiepass gaat dat om tientallen bestanden. De CC0-route kost jou nul minuten.\n\n**Geen haast:** de animatiepass staat nog niet op de rol. Dit staat er zodat de agent weet welke route hij moet plannen.",
+      "opties": [
+        {
+          "label": "Ja, ik doe die kliks",
+          "waarde": "mixamo",
+          "gevolg": "De agent maakt een kliklijst klaar tegen de animatiepass."
+        },
+        {
+          "label": "Nee, gebruik CC0",
+          "waarde": "cc0",
+          "gevolg": "De agent gebruikt de Quaternius-bibliotheek en haalt alles zelf op."
+        }
+      ],
+      "advies": "CC0 tenzij de loop je later echt stoort. Je tijd is nu meer waard dan de laatste 10% animatiekwaliteit.",
       "vrijtekst": false
     }
   ]

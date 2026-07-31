@@ -765,9 +765,30 @@ def scan_questions() -> list[dict]:
     out = []
     for q in data.get("vragen", []):
         qid = str(q.get("id", "")).upper()
-        out.append({**q, "id": qid, "antwoord": answers.get(qid)})
-    # onbeantwoorde eerst
-    out.sort(key=lambda q: q["antwoord"] is not None)
+        item = {**q, "id": qid, "antwoord": answers.get(qid)}
+
+        # Audio die bij deze vraag hoort, zodat hij het IN het dashboard
+        # kan afspelen in plaats van mappen te moeten zoeken.
+        item["audio"] = []
+        rel = q.get("audio_map")
+        if rel:
+            folder = (REPO / rel)
+            if folder.is_dir():
+                clips = [
+                    p for p in sorted(folder.rglob("*"))
+                    if p.is_file() and p.suffix.lower() in {".wav", ".mp3", ".ogg", ".flac"}
+                ]
+                for p in clips[:40]:
+                    item["audio"].append({
+                        "naam": p.stem,
+                        "url": "/audio/" + urllib.parse.quote(
+                            str(p.relative_to(REPO)).replace("\\", "/")
+                        ),
+                    })
+        out.append(item)
+
+    orde = {"nu": 0, "gauw": 1, "later": 2}
+    out.sort(key=lambda q: (q["antwoord"] is not None, orde.get(q.get("prio"), 1)))
     return out
 
 
@@ -938,6 +959,17 @@ class Handler(BaseHTTPRequestHandler):
         if path.startswith("/shots/"):
             name = Path(path[len("/shots/"):]).name
             return self._serve_file(SHOTS_DIR / name, None, cache=True)
+
+        if path.startswith("/audio/"):
+            rel = path[len("/audio/"):]
+            target = (REPO / rel).resolve()
+            try:
+                target.relative_to(REPO)
+            except ValueError:
+                return self._send(403, b"verboden", "text/plain; charset=utf-8")
+            if target.suffix.lower() not in {".wav", ".mp3", ".ogg", ".flac"}:
+                return self._send(403, b"geen audiobestand", "text/plain; charset=utf-8")
+            return self._serve_file(target, None, cache=True)
 
         # statische bestanden uit de repo-root
         candidate = (REPO / path.lstrip("/")).resolve()
