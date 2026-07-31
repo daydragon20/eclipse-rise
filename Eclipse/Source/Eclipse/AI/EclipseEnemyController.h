@@ -38,6 +38,25 @@ public:
 	 */
 	void NotifyGunshotHeard(const FVector& ShotOrigin);
 
+	/**
+	 * Heeft deze vijand onze kant OOIT gezien? (SPEC-P2-02 Stage B.)
+	 *
+	 * Dit is het feit waar de stealth-stance en de sync strike op draaien: zolang
+	 * niemand ons heeft opgemerkt is stil blijven iets waard, en daarna niet meer.
+	 * Een eigen veld en niet `bLoggedFirstContact`, hoe verleidelijk ook — dat is
+	 * een LOGVLAG, en gedrag ophangen aan een logvlag betekent dat het gedrag
+	 * verdwijnt zodra iemand het loggen opruimt.
+	 */
+	bool HasSeenPlayerSide() const { return bHasSeenPlayerSide; }
+
+	/**
+	 * Ziet deze vijand dit lichaam NU? Dezelfde regel als SenseAndAct gebruikt
+	 * (waarnemingsstraal uit het archetype + zichtlijn) — één waarnemingsdefinitie,
+	 * want twee zouden betekenen dat een soldaat "ongezien" is voor de sync strike
+	 * terwijl de vijand al op hem schiet.
+	 */
+	bool CanSeeBody(const AActor* Body) const;
+
 private:
 	/** One perception/attack beat; cadence = archetype fire interval (timer, never tick — GDD 14.2). */
 	void SenseAndAct();
@@ -52,6 +71,9 @@ private:
 
 	/** Idem voor het eerste moment dat hij iemand ziet. */
 	bool bLoggedFirstContact = false;
+
+	/** Het FEIT achter die logregel: hij heeft onze kant gezien. Zie HasSeenPlayerSide. */
+	bool bHasSeenPlayerSide = false;
 
 	/** Laatst gehoorde schot; wordt gewist zodra hij er is of iemand ziet. */
 	FVector InvestigateLocation = FVector::ZeroVector;

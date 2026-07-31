@@ -26,6 +26,8 @@ class ECLIPSE_API UEclipseBaseHubWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	/** De boom, vóór RebuildWidget hem pakt — zie de toelichting in de implementatie. */
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 

@@ -13,6 +13,8 @@
 #include "Navigation/PathFollowingComponent.h" // EPathFollowingRequestResult (AIController.h only forward-declares it)
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "Squad/EclipseBreachPoint.h"
+#include "Squad/EclipseCommandModeTuning.h"
 #include "Squad/EclipseSquadSubsystem.h"
 #include "Squad/EclipseSquadTypes.h"
 
@@ -43,7 +45,153 @@ EclipseSquadOrderLogic::FEclipseOrderWorldFacts AEclipseSquadmateController::Gat
 		Facts.bTargetVisible = Facts.bTargetValid && LineOfSightTo(Target);
 	}
 
+	// ---- SPEC-P2-02 Stage B ------------------------------------------------
+	// Elk feit wordt alleen verzameld voor de order die hem NODIG heeft. Dat is
+	// geen zuinigheid maar correctheid: een navmesh-zoektocht voor een order die
+	// niet loopt, kost tijd en kan een weigering opleveren die nergens over gaat.
+
+	UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+	const AEclipseCharacter* SelfBody = Cast<AEclipseCharacter>(GetPawn());
+
+	if (Order == EEclipseSquadOrder::Suppress)
+	{
+		// Zicht op het GEBIED, niet op een persoon: onderdrukken werkt op een plek.
+		// Traceren vanaf de ooghoogte naar het gebied, en een treffer onderweg
+		// betekent dat er iets tussen staat.
+		Facts.bHasLineToArea = false;
+		if (SelfBody != nullptr && GetWorld() != nullptr)
+		{
+			FHitResult Hit;
+			FCollisionQueryParams Params(SCENE_QUERY_STAT(EclipseSuppressLine), /*bTraceComplex*/ false);
+			Params.AddIgnoredActor(SelfBody);
+			const FVector Origin = SelfBody->GetPawnViewLocation();
+			Facts.bHasLineToArea = !GetWorld()->LineTraceSingleByChannel(
+				Hit, Origin, TargetLocation + FVector(0.0f, 0.0f, 50.0f), ECC_Visibility, Params);
+		}
+	}
+
+	if (Order == EEclipseSquadOrder::Flank)
+	{
+		// Er moet iets te flankeren ZIJN, en er moet omheen te komen zijn. Het
+		// tweede feit rijdt op bHasPathToTarget mee — dezelfde vraag als bij een
+		// MoveTo, alleen naar het flankpunt in plaats van naar het doel.
+		const AEclipseCharacter* Target = Cast<AEclipseCharacter>(TargetActor);
+		Facts.bTargetValid = Target != nullptr && !Target->IsDowned() && !Target->IsPlayerSide();
+		FVector Unused;
+		Facts.bHasPathToTarget = Facts.bTargetValid && ComputeFlankPoint(Target->GetActorLocation(), Unused);
+	}
+
+	if (Order == EEclipseSquadOrder::Breach)
+	{
+		const UEclipseCommandModeTuningAsset* Command = Squad != nullptr ? Squad->ResolveCommandTuning() : nullptr;
+		const float RangeCm = Command != nullptr ? Command->BreachPointRangeCm : 1200.0f;
+		const AEclipseBreachPoint* Point = AEclipseBreachPoint::FindNearest(GetWorld(), TargetLocation, RangeCm);
+		Facts.bHasBreachPointInRange = Point != nullptr;
+
+		Facts.bHasPathToTarget = false;
+		if (Point != nullptr && SelfBody != nullptr && Squad != nullptr)
+		{
+			// De route naar de STAPELPLEK, niet naar de deur: dat is waar hij
+			// heen gaat, dus dat is wat bereikbaar moet zijn.
+			const int32 Slot = FMath::Max(0, Squad->GetSquadmateSlot(SelfBody->GetSoldierId()));
+			const FVector Stack = Point->GetStackLocation(Slot, FMath::Max(1, Squad->GetSquadmateCount()));
+			if (const UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
+			{
+				const UNavigationPath* Path = UNavigationSystemV1::FindPathToLocationSynchronously(
+					GetWorld(), SelfBody->GetActorLocation(), Stack, const_cast<AEclipseCharacter*>(SelfBody));
+				Facts.bHasPathToTarget = Path != nullptr && Path->IsValid() && !Path->IsPartial();
+			}
+		}
+	}
+
+	if (Order == EEclipseSquadOrder::UseAbility)
+	{
+		// "Heeft dit verb hier iets te doen" is per klasse een andere vraag, en
+		// het antwoord komt uit DATA — nooit uit een is-dit-een-Medic-tak.
+		Facts.bAbilityContextValid = false;
+		if (ClassKit.bAutoTriage && ClassKit.StabilizeWindowSeconds > 0.0f)
+		{
+			// Stabilize: ligt er iemand? (Precies het spec-voorbeeld van een
+			// ongeldige context: "Stabilize with nobody down".)
+			for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
+			{
+				const AEclipseCharacter* Candidate = *It;
+				if (Candidate != nullptr && Candidate != SelfBody && Candidate->IsPlayerSide() && Candidate->IsDowned())
+				{
+					Facts.bAbilityContextValid = true;
+					break;
+				}
+			}
+		}
+		else if (ClassKit.KillzoneRangeCm > 0.0f || ClassKit.OrderPushDistanceCm > 0.0f)
+		{
+			// Killzone en Momentum hebben allebei een vijand nodig om iets tegen
+			// te betekenen; zonder tegenstander is het verb een pose.
+			Facts.bAbilityContextValid = FindHostileInRange() != nullptr;
+		}
+		// Klassenloos (geen verb in data) blijft false: "ik heb daar niets voor".
+	}
+
+	if (Order == EEclipseSquadOrder::SyncStrike)
+	{
+		Facts.MarkedTargetCount = Squad != nullptr ? Squad->GetSyncStrikeMarkCount() : 0;
+		Facts.bAllAssignedConcealed = Squad != nullptr && Squad->IsBodyConcealed(SelfBody);
+	}
+
 	return Facts;
+}
+
+bool AEclipseSquadmateController::ComputeFlankPoint(const FVector& TargetLocation, FVector& OutPoint) const
+{
+	const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	UWorld* World = GetWorld();
+	if (Body == nullptr || World == nullptr)
+	{
+		return false;
+	}
+
+	const UEclipseSquadSubsystem* Squad = World->GetSubsystem<UEclipseSquadSubsystem>();
+	const UEclipseCommandModeTuningAsset* Command = Squad != nullptr ? Squad->ResolveCommandTuning() : nullptr;
+	const float OffsetCm = Command != nullptr ? Command->FlankOffsetCm : 900.0f;
+
+	const FVector Origin = Body->GetActorLocation();
+	const FVector Along = (TargetLocation - Origin).GetSafeNormal2D();
+	if (Along.IsNearlyZero())
+	{
+		return false; // op het doel staan is niet te flankeren
+	}
+	const FVector Side = FVector::CrossProduct(Along, FVector::UpVector).GetSafeNormal2D();
+
+	const UNavigationSystemV1* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
+	if (Nav == nullptr)
+	{
+		return false;
+	}
+
+	// BEIDE KANTEN PROBEREN, en de eerste die een heel pad geeft wint. Één kant
+	// proberen zou de helft van de gevechten een NoRoute opleveren op een muur
+	// die toevallig links stond — een weigering die klopt over de code en niet
+	// over de situatie.
+	for (const float Sign : { 1.0f, -1.0f })
+	{
+		// Halverwege langs de as en dan opzij: dat is een omtrekkende beweging en
+		// geen zijstap. Een echte EQS-flankquery is contentpas-werk (12.1).
+		const FVector Candidate = Origin + Along * (FVector::Dist2D(Origin, TargetLocation) * 0.5f) + Side * (Sign * OffsetCm);
+
+		FNavLocation Projected;
+		if (!Nav->ProjectPointToNavigation(Candidate, Projected, FVector(OffsetCm * 0.5f, OffsetCm * 0.5f, 300.0f)))
+		{
+			continue;
+		}
+		const UNavigationPath* Path = UNavigationSystemV1::FindPathToLocationSynchronously(
+			World, Origin, Projected.Location, const_cast<AEclipseCharacter*>(Body));
+		if (Path != nullptr && Path->IsValid() && !Path->IsPartial())
+		{
+			OutPoint = Projected.Location;
+			return true;
+		}
+	}
+	return false;
 }
 
 const UEclipseSquadTuningAsset* AEclipseSquadmateController::ResolveTuning() const
@@ -59,6 +207,16 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 	if (!Decision.bAccepted)
 	{
 		return Decision;
+	}
+
+	// EEN NIEUWE ORDER ZET DE VORIGE STIL. Zonder deze regel blijft een Suppress-
+	// lus doorvuren terwijl je hem net ergens heen stuurde, en dan is de order
+	// die je gaf niet de order die hij uitvoert — precies wat 8.4 verbiedt.
+	if (Order != EEclipseSquadOrder::Flank)
+	{
+		// Flank slaat zijn eigen opruiming over: het TWEEDE Flank-commando is de
+		// goedkeuring van het eerste, en die mag het voorstel niet wissen.
+		ClearStageBOrders();
 	}
 
 	CurrentOrder = Order;
@@ -133,11 +291,390 @@ EclipseSquadOrderLogic::FEclipseOrderDecision AEclipseSquadmateController::Execu
 		ContinueFocusFire();
 		break;
 	}
+
+	// ---- SPEC-P2-02 Stage B ------------------------------------------------
+
+	case EEclipseSquadOrder::Suppress:
+	{
+		const UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+		const UEclipseCommandModeTuningAsset* Command = Squad != nullptr ? Squad->ResolveCommandTuning() : nullptr;
+		SuppressLocation = TargetLocation;
+		SuppressRadiusCm = Command != nullptr ? Command->SuppressRadiusCm : 400.0f;
+		SuppressUntilSeconds = (GetWorld() != nullptr ? GetWorld()->GetTimeSeconds() : 0.0)
+			+ (Command != nullptr ? Command->SuppressBurstSeconds : 5.0f);
+		ContinueSuppression();
+		break;
+	}
+
+	case EEclipseSquadOrder::Flank:
+	{
+		// TWEE STAPPEN OP EEN VERB, en dat is met opzet geen tweede knop: het
+		// eerste commando stelt een route voor, het tweede keurt hem goed. Beide
+		// lopen over ditzelfde ordercontract, dus beide krijgen een bevestiging of
+		// een gesproken weigering — er is geen "goedkeurpad" dat de belofte omzeilt.
+		UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+		const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+		const FGuid SoldierId = Body != nullptr ? Body->GetSoldierId() : FGuid();
+		const double NowWall = EclipseSquadOrderLogic::NowWallSeconds();
+		const double Timeout = ResolveFlankTimeoutSeconds();
+
+		if (EclipseSquadOrderLogic::IsFlankWindowOpen(FlankApproval, NowWall, Timeout))
+		{
+			FlankApproval = EclipseSquadOrderLogic::ApplyFlankSignal(
+				FlankApproval, EclipseSquadOrderLogic::EEclipseFlankSignal::Approve, NowWall, Timeout);
+			GetWorldTimerManager().ClearTimer(FlankTimer);
+
+			if (FlankApproval.State == EclipseSquadOrderLogic::EEclipseFlankState::Approved
+				&& MoveToLocation(FlankPoint, /*AcceptanceRadius*/ 120.0f) == EPathFollowingRequestResult::RequestSuccessful)
+			{
+				++FlankMoves;
+				if (Squad != nullptr)
+				{
+					Squad->BroadcastOrderQueued(SoldierId, TEXT("Flank.Approved"),
+						Squad->ResolveQueuedBark(TEXT("FlankApproved"), SoldierId, /*Salt*/ 951u));
+				}
+			}
+			break;
+		}
+
+		// Nieuw voorstel. De route is al berekend als wereldfeit (GatherFacts liet
+		// de order anders niet toe), dus hier hoeft alleen het punt opgeslagen.
+		if (!ComputeFlankPoint(TargetActor != nullptr ? TargetActor->GetActorLocation() : TargetLocation, FlankPoint))
+		{
+			// Kan alleen als de wereld tussen feit en uitvoering veranderde:
+			// downgrade naar een gesproken weigering, nooit een stille accept.
+			CurrentOrder = EEclipseSquadOrder::Hold;
+			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;
+			Refusal.Reason = EEclipseOrderRefusalReason::NoRoute;
+			return Refusal;
+		}
+		FlankApproval = EclipseSquadOrderLogic::ApplyFlankSignal(
+			FlankApproval, EclipseSquadOrderLogic::EEclipseFlankSignal::Propose, NowWall, Timeout);
+		if (Squad != nullptr)
+		{
+			Squad->BroadcastOrderQueued(SoldierId, TEXT("Flank.Proposed"),
+				Squad->ResolveQueuedBark(TEXT("FlankProposed"), SoldierId, /*Salt*/ 950u));
+		}
+		// De vervalklok. Op een timer omdat het venster óók moet aflopen als de
+		// speler helemaal niets meer doet — dat is precies het geval dat anders
+		// stil zou blijven (9.5: nietsdoen is geen weigering, maar wel een feit).
+		GetWorldTimerManager().SetTimer(FlankTimer, this,
+			&AEclipseSquadmateController::TickFlankWindow, 0.25f, /*bLoop*/ true);
+		break;
+	}
+
+	case EEclipseSquadOrder::Breach:
+	{
+		UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+		const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+		const UEclipseCommandModeTuningAsset* Command = Squad != nullptr ? Squad->ResolveCommandTuning() : nullptr;
+		AEclipseBreachPoint* Point = AEclipseBreachPoint::FindNearest(
+			GetWorld(), TargetLocation, Command != nullptr ? Command->BreachPointRangeCm : 1200.0f);
+		if (Point == nullptr || Squad == nullptr || Body == nullptr)
+		{
+			CurrentOrder = EEclipseSquadOrder::Hold;
+			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;
+			Refusal.Reason = EEclipseOrderRefusalReason::NoBreachPoint;
+			return Refusal;
+		}
+
+		BreachPoint = Point;
+		bBreachStacked = false;
+		const int32 Slot = FMath::Max(0, Squad->GetSquadmateSlot(Body->GetSoldierId()));
+		const FVector Stack = Point->GetStackLocation(Slot, FMath::Max(1, Squad->GetSquadmateCount()));
+
+		FAIMoveRequest Request(Stack);
+		Request.SetAcceptanceRadius(80.0f);
+		Request.SetUsePathfinding(true);
+		const FPathFollowingRequestResult Result = MoveTo(Request);
+		if (Result.Code == EPathFollowingRequestResult::Failed)
+		{
+			BreachPoint = nullptr;
+			CurrentOrder = EEclipseSquadOrder::Hold;
+			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;
+			Refusal.Reason = EEclipseOrderRefusalReason::NoRoute;
+			return Refusal;
+		}
+		BreachMoveId = Result.MoveId;
+		if (Result.Code == EPathFollowingRequestResult::AlreadyAtGoal)
+		{
+			// AlreadyAtGoal vuurt geen OnMoveCompleted voor een nieuwe id — hij
+			// staat er al, dus meteen melden (zelfde patroon als BeginTriage).
+			bBreachStacked = true;
+			Squad->BroadcastOrderQueued(Body->GetSoldierId(), TEXT("Breach.Stacked"), FString());
+			Squad->NotifyBreachStacked(this);
+		}
+		break;
+	}
+
+	case EEclipseSquadOrder::UseAbility:
+		if (!ExecuteClassAbility())
+		{
+			// GatherFacts zei dat er context was en bij het uitvoeren blijkt van
+			// niet — de wereld veranderde ertussen. Een weigering met reden is
+			// het enige eerlijke antwoord; een stille accept zou een verb tonen
+			// dat niets deed (8.4).
+			CurrentOrder = EEclipseSquadOrder::Hold;
+			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;
+			Refusal.Reason = EEclipseOrderRefusalReason::InvalidTarget;
+			return Refusal;
+		}
+		break;
+
+	case EEclipseSquadOrder::SyncStrike:
+		if (ExecuteSyncStrike() <= 0)
+		{
+			CurrentOrder = EEclipseSquadOrder::Hold;
+			EclipseSquadOrderLogic::FEclipseOrderDecision Refusal;
+			// Geen markering die aan MIJ was toebedeeld. Dat is geen "niets
+			// gemarkeerd" — er staan er alleen meer soldaten dan doelen, en dan
+			// hoort deze man te zeggen dat er voor hem niets over is.
+			Refusal.Reason = EEclipseOrderRefusalReason::NoTargetsMarked;
+			return Refusal;
+		}
+		break;
+
 	default:
 		break;
 	}
 
 	return Decision;
+}
+
+void AEclipseSquadmateController::ClearStageBOrders()
+{
+	GetWorldTimerManager().ClearTimer(SuppressTimer);
+	GetWorldTimerManager().ClearTimer(FlankTimer);
+	SuppressUntilSeconds = -1.0;
+
+	// Een lopend voorstel dat door een andere order wordt ingehaald, is
+	// GEANNULEERD en niet verlopen. Het verschil telt: verlopen is jouw
+	// besluiteloosheid, geannuleerd is jouw nieuwe besluit.
+	if (FlankApproval.State == EclipseSquadOrderLogic::EEclipseFlankState::Proposed)
+	{
+		FlankApproval = EclipseSquadOrderLogic::ApplyFlankSignal(
+			FlankApproval, EclipseSquadOrderLogic::EEclipseFlankSignal::Cancel,
+			EclipseSquadOrderLogic::NowWallSeconds(), ResolveFlankTimeoutSeconds());
+
+		UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+		const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+		if (Squad != nullptr)
+		{
+			Squad->BroadcastOrderQueued(Body != nullptr ? Body->GetSoldierId() : FGuid(),
+				TEXT("Flank.Cancelled"), FString());
+		}
+	}
+
+	BreachPoint = nullptr;
+	bBreachStacked = false;
+}
+
+double AEclipseSquadmateController::ResolveFlankTimeoutSeconds() const
+{
+	const UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+	const UEclipseCommandModeTuningAsset* Command = Squad != nullptr ? Squad->ResolveCommandTuning() : nullptr;
+	return Command != nullptr ? Command->FlankApprovalTimeoutSeconds : 6.0f;
+}
+
+const TCHAR* AEclipseSquadmateController::GetFlankStateLabel() const
+{
+	switch (FlankApproval.State)
+	{
+	case EclipseSquadOrderLogic::EEclipseFlankState::Proposed:  return TEXT("proposed");
+	case EclipseSquadOrderLogic::EEclipseFlankState::Approved:  return TEXT("approved");
+	case EclipseSquadOrderLogic::EEclipseFlankState::Expired:   return TEXT("expired");
+	case EclipseSquadOrderLogic::EEclipseFlankState::Cancelled: return TEXT("cancelled");
+	default:                                                    return TEXT("-");
+	}
+}
+
+void AEclipseSquadmateController::TickFlankWindow()
+{
+	const double NowWall = EclipseSquadOrderLogic::NowWallSeconds();
+	const double Timeout = ResolveFlankTimeoutSeconds();
+	const EclipseSquadOrderLogic::FEclipseFlankApproval Before = FlankApproval;
+	FlankApproval = EclipseSquadOrderLogic::ApplyFlankSignal(
+		FlankApproval, EclipseSquadOrderLogic::EEclipseFlankSignal::Tick, NowWall, Timeout);
+
+	if (Before.State == FlankApproval.State)
+	{
+		return;
+	}
+	GetWorldTimerManager().ClearTimer(FlankTimer);
+
+	if (FlankApproval.State == EclipseSquadOrderLogic::EEclipseFlankState::Expired)
+	{
+		// "WINDOW'S GONE." Nietsdoen van de speler is geen weigering — er is niets
+		// om te weigeren — maar het is wél een verandering, en die hoort hoorbaar
+		// te zijn. Dit is de reden dat de negatieve overgang op dezelfde tag rijdt
+		// als het voorstel: wie de routelijn tekende, wist hem uit dezelfde stroom.
+		UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+		const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+		const FGuid SoldierId = Body != nullptr ? Body->GetSoldierId() : FGuid();
+		if (Squad != nullptr)
+		{
+			Squad->BroadcastOrderQueued(SoldierId, TEXT("Flank.Expired"),
+				Squad->ResolveQueuedBark(TEXT("FlankExpired"), SoldierId, /*Salt*/ 952u));
+		}
+	}
+}
+
+void AEclipseSquadmateController::ContinueSuppression()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	UWorld* World = GetWorld();
+	if (Body == nullptr || World == nullptr || Body->IsDowned()
+		|| CurrentOrder != EEclipseSquadOrder::Suppress
+		|| World->GetTimeSeconds() > SuppressUntilSeconds)
+	{
+		GetWorldTimerManager().ClearTimer(SuppressTimer);
+		return;
+	}
+
+	UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	if (Weapon != nullptr)
+	{
+		// SPREIDEN OVER HET GEBIED en niet één punt beschieten: onderdrukken is
+		// "houd je hoofd naar beneden", en dat is een oppervlak. Het schot gaat
+		// door de gewone Fire() — dus mét lawaai, mét het ShotFired-feit dat
+		// vijanden alarmeert. Onderdrukking die de vijand niet hoort, bestaat niet.
+		const FVector2D Offset = FMath::RandPointInCircle(SuppressRadiusCm);
+		const FVector Aim = SuppressLocation + FVector(Offset.X, Offset.Y, 0.0f);
+		const FVector Origin = Body->GetPawnViewLocation();
+		if (Weapon->Fire(Origin, Aim - Origin, TEXT("SquadSuppress")))
+		{
+			++SuppressShots;
+		}
+	}
+
+	const float Interval = Weapon != nullptr ? FMath::Max(Weapon->GetFireInterval(), 0.05f) : 0.15f;
+	GetWorldTimerManager().SetTimer(SuppressTimer, this,
+		&AEclipseSquadmateController::ContinueSuppression, Interval, /*bLoop*/ false);
+}
+
+void AEclipseSquadmateController::ExecuteBreachEntry()
+{
+	const AEclipseBreachPoint* Point = BreachPoint.Get();
+	if (Point == nullptr)
+	{
+		return;
+	}
+	if (MoveToLocation(Point->GetEntryLocation(), /*AcceptanceRadius*/ 100.0f) == EPathFollowingRequestResult::RequestSuccessful)
+	{
+		++BreachEntries;
+	}
+	// Het punt loslaten: de entry is gegeven, en een tweede Breach-order hoort
+	// opnieuw te stapelen in plaats van meteen naar binnen te springen.
+	BreachPoint = nullptr;
+	bBreachStacked = false;
+}
+
+bool AEclipseSquadmateController::ExecuteClassAbility()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	if (Body == nullptr || GetWorld() == nullptr)
+	{
+		return false;
+	}
+
+	// DATA BESLIST WELK VERB, net als bij de autonome laag (SPEC-P2-01, 14.2).
+	// Er staat nergens "als dit een Medic is"; er staat "als zijn kit triage kan".
+	if (ClassKit.bAutoTriage && ClassKit.StabilizeWindowSeconds > 0.0f)
+	{
+		AEclipseCharacter* Nearest = nullptr;
+		float NearestDistanceSquared = TNumericLimits<float>::Max();
+		for (TActorIterator<AEclipseCharacter> It(GetWorld()); It; ++It)
+		{
+			AEclipseCharacter* Candidate = *It;
+			if (Candidate == nullptr || Candidate == Body || !Candidate->IsPlayerSide() || !Candidate->IsDowned())
+			{
+				continue;
+			}
+			const float DistanceSquared = FVector::DistSquared(Candidate->GetActorLocation(), Body->GetActorLocation());
+			if (DistanceSquared < NearestDistanceSquared)
+			{
+				NearestDistanceSquared = DistanceSquared;
+				Nearest = Candidate;
+			}
+		}
+		// BeginTriage doet de rest: dezelfde weg als de automatische dispatch, dus
+		// het bevolen verb en het autonome verb komen op precies één plek uit.
+		if (Nearest != nullptr && BeginTriage(Nearest))
+		{
+			NoteVerbUsed();
+			return true;
+		}
+		return false;
+	}
+
+	AEclipseCharacter* Hostile = FindHostileInRange();
+	if (Hostile == nullptr)
+	{
+		return false;
+	}
+
+	if (ClassKit.KillzoneRangeCm > 0.0f)
+	{
+		// KILLZONE op commando: de lange laan is zijn verb, en die hoort bij
+		// stilstaan en ver kijken — dus zet de order hem in Overwatch en laat de
+		// bestaande doelselectie zijn bereik gebruiken.
+		StopMovement();
+		CurrentStance = EEclipseSquadStance::Overwatch;
+		UpdateEngagement();
+		NoteVerbUsed();
+		return true;
+	}
+
+	if (ClassKit.OrderPushDistanceCm > 0.0f)
+	{
+		// MOMENTUM op commando: sluit af op wie er staat, precies zoals hij dat
+		// onder Aggressive uit zichzelf doet (26-07 laag 5).
+		const FVector Toward = (Hostile->GetActorLocation() - Body->GetActorLocation()).GetSafeNormal2D();
+		const FVector PushTo = Body->GetActorLocation() + Toward * ClassKit.OrderPushDistanceCm;
+		if (MoveToLocation(PushTo, /*AcceptanceRadius*/ 100.0f) == EPathFollowingRequestResult::RequestSuccessful)
+		{
+			NoteVerbUsed();
+			return true;
+		}
+	}
+	return false;
+}
+
+int32 AEclipseSquadmateController::ExecuteSyncStrike()
+{
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+	UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+	if (Body == nullptr || Squad == nullptr)
+	{
+		return 0;
+	}
+
+	int32 Struck = 0;
+	for (AActor* Target : Squad->GetAssignedSyncStrikeTargets(Body->GetSoldierId()))
+	{
+		AEclipseCharacter* Victim = Cast<AEclipseCharacter>(Target);
+		if (Victim == nullptr || !Squad->IsSyncStrikeTargetStillValid(Victim))
+		{
+			continue;
+		}
+		// STIL, en dat is het hele verb (8.4: "simultaneous silenced takedowns",
+		// de stealth-apex). Bewust NIET via het wapen: Fire() zendt
+		// Event.Combat.ShotFired, en dat alarmeert elke vijand binnen de
+		// geluidsradius — dan zou de sync strike zichzelf verraden op het moment
+		// dat hij slaagt. Schade direct op het lichaam maakt geen geluid.
+		Victim->ApplyDamage(TNumericLimits<float>::Max(), Body, TEXT("SyncStrike"));
+		++SyncStrikeKills;
+		++Struck;
+	}
+
+	if (Struck > 0)
+	{
+		// De markeringen zijn OP. Ze laten staan zou betekenen dat een tweede
+		// sync strike op lijken slaat en "geslaagd" meldt.
+		Squad->ClearSyncStrikeMarks();
+		NoteVerbUsed();
+	}
+	return Struck;
 }
 
 void AEclipseSquadmateController::ContinueFocusFire()
@@ -341,7 +878,12 @@ void AEclipseSquadmateController::SetDoctrine(EEclipseSquadStance Stance)
 	// drie tot vier af — gemeten 4 schoten, goed voor 16 gealarmeerde vijanden.
 	// Voor een kader dat je gebruikt OM te sluipen is een halve seconde naschot
 	// precies het verschil tussen wel en niet gezien worden.
-	if (Stance == EEclipseSquadStance::Recon)
+	//
+	// STEALTH HOORT ER MET DEZELFDE REDEN BIJ (SPEC-P2-02 Stage B), en hij is er
+	// zelfs gevoeliger voor: op stealth schakel je juist over vlak vóór het punt
+	// waarop je gezien kunt worden. Een halve seconde naschot zou dan het alarm
+	// zijn dat de doctrine moest voorkomen.
+	if (Stance == EEclipseSquadStance::Recon || Stance == EEclipseSquadStance::Stealth)
 	{
 		GetWorldTimerManager().ClearTimer(AutoFireTimer);
 		AutoTarget = nullptr;
@@ -374,15 +916,33 @@ void AEclipseSquadmateController::UpdateEngagement()
 		return;
 	}
 
-	// RECON ZWIJGT tot er op hem geschoten wordt. Dat is geen "vuren uit" maar
-	// "vuur pas als het toch al te laat is om stil te blijven" — precies wat de
-	// Recon-ROE in Ghost Recon doet, en wat sluipen bruikbaar maakt sinds een
-	// schot je verraadt (26-07 punt 1).
-	if (CurrentStance == EEclipseSquadStance::Recon)
+	// VUURDISCIPLINE UIT DE DOCTRINE — één poort, en de pure tabel beslist welke.
+	//
+	// Hier stond de Recon-tak los: "zwijg tot er op je geschoten wordt". Die regel
+	// klopt nog steeds en staat nu in StanceAllowsAutonomousFire, náást die van
+	// Stealth, zodat het verschil tussen de twee te lezen is in plaats van
+	// verspreid over ifs die apart uit elkaar groeien.
+	//
+	// Recon  : vuren zodra er op HEM geschoten is.
+	// Stealth: vuren zodra je het beveelt óf zodra de vijand ons überhaupt door
+	//          heeft — vanaf dat moment koopt zwijgen niets meer.
 	{
 		const UWorld* World = GetWorld();
 		const double Now = World != nullptr ? World->GetTimeSeconds() : 0.0;
-		if (Now > WeaponsFreeUntil)
+
+		EclipseSquadOrderLogic::FEclipseFireDisciplineFacts Discipline;
+		Discipline.bTakenFire = Now <= WeaponsFreeUntil;
+		Discipline.bOrderedToFire = bHasStandingOrder
+			&& (CurrentOrder == EEclipseSquadOrder::FocusTarget || CurrentOrder == EEclipseSquadOrder::Suppress);
+		if (CurrentStance == EEclipseSquadStance::Stealth)
+		{
+			// Alleen voor Stealth uitvragen: het is een scan over de vijanden, en
+			// de andere doctrines hebben het antwoord niet nodig (12.4).
+			const UEclipseSquadSubsystem* Squad = World != nullptr ? World->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+			Discipline.bEnemyAware = Squad != nullptr && Squad->IsEnemyAwareOfSquad();
+		}
+
+		if (!EclipseSquadOrderLogic::StanceAllowsAutonomousFire(CurrentStance, Discipline))
 		{
 			AutoTarget = nullptr;
 			GetWorldTimerManager().ClearTimer(AutoFireTimer);
@@ -575,6 +1135,12 @@ void AEclipseSquadmateController::HandlePawnDowned()
 	StopMovement();
 	SetFocus(nullptr);
 	CurrentOrder = EEclipseSquadOrder::Hold;
+
+	// Wie neerligt, onderdrukt niets meer en staat op geen enkel breekpunt te
+	// wachten. Zonder deze regel bleef zijn Suppress-lus vuren vanaf de grond, en
+	// bleef de rest van de squad op hem wachten voor een gezamenlijke entry die
+	// nooit kwam — een order die stil blijft hangen is precies wat 8.4 verbiedt.
+	ClearStageBOrders();
 }
 
 FVector AEclipseSquadmateController::SelectCoverPointNear(const FVector& OrderedLocation) const
@@ -721,6 +1287,37 @@ bool AEclipseSquadmateController::BeginTriage(AEclipseCharacter* DownedBody)
 void AEclipseSquadmateController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
+
+	// STAPELEN OP EEN BREEKPUNT (SPEC-P2-02 Stage B). Op de aankomst en niet op
+	// een klok: "iedereen staat" is een gebeurtenis, en erop pollen zou vier
+	// afstandsmetingen per tel kosten voor iets wat de engine al meldt (12.4).
+	if (BreachPoint.IsValid() && RequestID == BreachMoveId && !bBreachStacked)
+	{
+		if (!Result.IsSuccess())
+		{
+			// De route stierf onderweg. De order is dan niet stil mislukt: hij
+			// meldt zich, en de squad wacht niet eeuwig op iemand die nooit komt.
+			UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr;
+			const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+			if (Squad != nullptr)
+			{
+				Squad->BroadcastOrderQueued(Body != nullptr ? Body->GetSoldierId() : FGuid(),
+					TEXT("Breach.Aborted"), Squad->ResolveQueuedBark(TEXT("BreachAborted"),
+						Body != nullptr ? Body->GetSoldierId() : FGuid(), /*Salt*/ 941u));
+			}
+			BreachPoint = nullptr;
+			return;
+		}
+
+		bBreachStacked = true;
+		if (UEclipseSquadSubsystem* Squad = GetWorld() != nullptr ? GetWorld()->GetSubsystem<UEclipseSquadSubsystem>() : nullptr)
+		{
+			const AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
+			Squad->BroadcastOrderQueued(Body != nullptr ? Body->GetSoldierId() : FGuid(), TEXT("Breach.Stacked"), FString());
+			Squad->NotifyBreachStacked(this);
+		}
+		return;
+	}
 
 	if (!TriageTarget.IsValid() || RequestID != TriageMoveId)
 	{

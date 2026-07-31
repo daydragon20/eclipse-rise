@@ -126,6 +126,12 @@ Write-Step "CATALOGUS"
 python "$Root\Tools\check_event_catalog.py"
 if ($LASTEXITCODE -ne 0) { $Failures += "event-catalogus klopt niet" }
 
+# De creditmeter: generatie mag NOOIT kunnen slagen zonder gemeten spend.
+# Stond een tijd lang stil kapot (401 op user_read werd geslikt), en de ledger
+# las dan als waarheid terwijl er niets gemeten was.
+python "$Root\Tools\test_credit_meter.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "creditmeter kan blind genereren" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"

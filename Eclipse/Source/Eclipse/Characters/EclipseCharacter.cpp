@@ -8,7 +8,11 @@
 #include "Characters/EclipseAnimInstance.h"
 #include "Characters/EclipseCharacterMovementComponent.h"
 #include "Characters/EclipseCharacterTypes.h"
+#include "Combat/EclipseHitscanWeaponComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
+#include "Rendering/SkeletalMeshRenderData.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Engine/GameInstance.h"
@@ -50,6 +54,37 @@ namespace
 			}
 		}
 		return Fallback;
+	}
+
+	/**
+	 * GUNMETAL — de wapentint, als ÉÉN formule.
+	 *
+	 * Owner-beslissing 27-07, letterlijk: "geef het wapen GEEN eigen kleur. Geef
+	 * het een eigen WAARDE. Gunmetal — sterk ontzadigd, duidelijk donkerder dan
+	 * elk lichaam waar het tegenaan ligt. Het wapen wordt leesbaar doordat het een
+	 * gat in het silhouet slaat, niet doordat er een nieuwe kleur bij komt."
+	 *
+	 * DE FACTOR IS GEMETEN EN NIET GEKOZEN. Op HighresScreenshot00980: lichaam
+	 * mediaan 50,9 van 255, donkerste 5% van het frame onder 11,1. Twee gebankte
+	 * waardestappen (x0,72 — dezelfde stap die de floor- en CoverB-hiërarchie in
+	 * het district gebruikt) brengen 51 naar ~26: ruim onder het lichaam, en ruim
+	 * boven de schaduw waarin het zou wegvallen.
+	 *
+	 * HIER EN NIET TWEE KEER. Sinds 31-07 heeft het wapen twee verschijningen —
+	 * de ingebouwde mesh-sectie en het losse asset aan de hand — en die horen per
+	 * definitie dezelfde waarde te hebben. Twee kopieën van deze formule zouden
+	 * betekenen dat een meting aan de ene niets zegt over de andere; dat is exact
+	 * de fout die de OneShotEnvelope-samenvoeging op 31-07 opruimde.
+	 */
+	FLinearColor ToGunmetal(const FLinearColor& In)
+	{
+		constexpr float GunmetalStep = 0.72f * 0.72f;
+		const float Grey = In.GetLuminance();
+		// 0,85 richting grijs: ontzadigd, maar niet volledig neutraal — een wapen
+		// dat exact grijs is leest als een gat in het beeld in plaats van als een
+		// voorwerp.
+		const FLinearColor Desaturated = FMath::Lerp(In, FLinearColor(Grey, Grey, Grey, In.A), 0.85f);
+		return Desaturated * GunmetalStep;
 	}
 }
 
@@ -171,6 +206,32 @@ AEclipseCharacter::AEclipseCharacter(const FObjectInitializer& ObjectInitializer
 	// genereren. De schotlijn wordt er in code tegenaan gerekend.
 	HeadHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HeadHitbox->SetGenerateOverlapEvents(false);
+
+	// HET LOSSE WAPEN (owner-besluit O-5 "volledig", 31-07).
+	//
+	// Aan de MESH en niet aan de capsule, want het hoort aan een hand te hangen en
+	// een capsule heeft er geen. Welk bot dat is en waar precies, komt uit
+	// DT_BodyDefs (WeaponGripBone/WeaponGripOffset) en wordt gezet zodra er een
+	// lichaam gedragen wordt; hier staat alleen dat hij bestaat en niets doet.
+	//
+	// Zonder mesh en onzichtbaar tot RefreshWeaponVisual er een in stopt. Een
+	// lege component die zichtbaar staat is een onzichtbaar niets, en dat is een
+	// toestand waarin een fout niet opvalt.
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMesh->SetupAttachment(GetMesh());
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMesh->SetGenerateOverlapEvents(false);
+	WeaponMesh->SetCastShadow(true);
+	WeaponMesh->SetVisibility(false);
+	// GEEN TICK-VOLGORDE-PROBLEEM, en dat is geen aanname maar een bekende
+	// UE-valkuil die vooraf is opgezocht (DEBUG_DISCIPLINE.md §4.1): een
+	// gesocketd wapen loopt 0,5-1,5 frame achter op de animatie als het TICKT.
+	// Een USceneComponent-kind van de mesh tickt hier helemaal niet — hij erft de
+	// bot-transform via de attachment, dus er is geen tweede tick die te vroeg
+	// kan draaien. Daarom staat dit hier expliciet uit in plaats van dat het
+	// toevallig zo is.
+	WeaponMesh->PrimaryComponentTick.bCanEverTick = false;
+	WeaponMesh->SetComponentTickEnabled(false);
 }
 
 void AEclipseCharacter::PlaceHeadHitboxOnCapsule()
@@ -1030,6 +1091,41 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 
 	ApplyBodyDefAnimation(BodyDef, BodyMesh, *MeshComponent);
 
+	// ---- WELKE SLOTS ZIJN HET INGEBOUWDE WAPEN (O-5 "volledig", 31-07) --------
+	//
+	// EEN scan, en de restyle hieronder leest hem — niet twee plekken die
+	// allebei op naam zoeken. Dat is dezelfde samenvoeging als de
+	// OneShotEnvelope van 31-07: zolang dezelfde vraag op twee plekken werd
+	// beantwoord, bewees een meting aan de ene helft niets over de andere.
+	//
+	// VÓÓR de restyle, want die vervangt elk slot door een MaterialInstanceDynamic
+	// en dan is de packnaam weg. Hij loopt ook als bToonRestyle uit staat: welke
+	// geometrie het wapen is, is een eigenschap van de MESH en niet van de tint.
+	BuiltInWeaponSlots.Reset();
+	if (!BodyDef.BuiltInWeaponSlotMatch.IsNone())
+	{
+		const FString Match = BodyDef.BuiltInWeaponSlotMatch.ToString();
+		for (int32 SlotIndex = 0; SlotIndex < MeshComponent->GetNumMaterials(); ++SlotIndex)
+		{
+			const UMaterialInterface* SlotMaterial = MeshComponent->GetMaterial(SlotIndex);
+			if (SlotMaterial != nullptr && SlotMaterial->GetName().Contains(Match))
+			{
+				BuiltInWeaponSlots.Add(SlotIndex);
+			}
+		}
+	}
+	// De GREEPGEGEVENS onthouden. Ze horen bij het lichaam dat nu gedragen wordt,
+	// en het wapen kan later gewisseld worden zonder dat het lichaam verandert.
+	WeaponGripBone = BodyDef.WeaponGripBone;
+	WeaponGripLocal = FTransform(BodyDef.WeaponGripRotation, BodyDef.WeaponGripOffset,
+		FVector(BodyDef.WeaponGripScale));
+	bHideBuiltInWeaponWanted = BodyDef.bHideBuiltInWeapon;
+	LastBodyTintLit = BodyDef.TintLit;
+	LastBodyTintShade = BodyDef.TintShade;
+	// De mesh is net vervangen, dus de oude aanhechting wijst naar een skelet dat
+	// er niet meer is. Opnieuw ophangen naar wat de wapencomponent nu draagt.
+	RefreshWeaponVisual();
+
 	// Toon restyle (15.5 asset policy): every slot re-dressed with the cel
 	// master; the pack's own base texture stays as luminance detail, the
 	// faction palette supplies the hue. This also puts bodies on the same
@@ -1088,29 +1184,19 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 			//
 			// OP NAAM EN NIET OP INDEX: slotvolgorde is een eigenschap van het
 			// asset, en een hardgecodeerde 4 breekt stil zodra er een lichaam met
-			// een andere indeling bijkomt.
+			// een andere indeling bijkomt. Sinds 31-07 staat die naamzoektocht
+			// hierboven in BuiltInWeaponSlots en leest deze lus hem alleen nog;
+			// de formule zelf staat in ToGunmetal() bovenaan dit bestand, want het
+			// LOSSE wapen moet exact dezelfde waarde krijgen.
 			FLinearColor SlotLit = BodyDef.TintLit;
 			FLinearColor SlotShade = BodyDef.TintShade;
-			if (const UMaterialInterface* SourceMaterial = MeshComponent->GetMaterial(SlotIndex))
+			if (BuiltInWeaponSlots.Contains(SlotIndex))
 			{
-				if (SourceMaterial->GetName().Contains(TEXT("Gun")))
-				{
-					constexpr float GunmetalStep = 0.72f * 0.72f;
-					auto ToGunmetal = [](const FLinearColor& In)
-					{
-						const float Grey = In.GetLuminance();
-						// 0,85 richting grijs: ontzadigd, maar niet volledig neutraal —
-						// een wapen dat exact grijs is leest als een gat in het beeld
-						// in plaats van als een voorwerp.
-						const FLinearColor Desaturated = FMath::Lerp(In, FLinearColor(Grey, Grey, Grey, In.A), 0.85f);
-						return Desaturated * GunmetalStep;
-					};
-					SlotLit = ToGunmetal(BodyDef.TintLit);
-					SlotShade = ToGunmetal(BodyDef.TintShade);
-					UE_LOG(LogEclipse, Display,
-						TEXT("%s: slot %d ('%s') krijgt gunmetal — twee waardestappen onder de factietint"),
-						*GetName(), SlotIndex, *SourceMaterial->GetName());
-				}
+				SlotLit = ToGunmetal(BodyDef.TintLit);
+				SlotShade = ToGunmetal(BodyDef.TintShade);
+				UE_LOG(LogEclipse, Display,
+					TEXT("%s: slot %d krijgt gunmetal — twee waardestappen onder de factietint"),
+					*GetName(), SlotIndex);
 			}
 
 			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaster, this);
@@ -1131,6 +1217,296 @@ void AEclipseCharacter::ApplyBodyDef(const FEclipseBodyDefRow& BodyDef)
 			MeshComponent->SetMaterial(SlotIndex, Mid);
 		}
 	}
+}
+
+// ===========================================================================
+//  HET WAPEN ALS LOS OBJECT — owner-besluit O-5 "volledig", 31-07
+// ===========================================================================
+//
+// De maatstaf staat in phase0/REFERENTIE_TPS.md hoofdstuk 4 en die eist per
+// claim een label: GEZIEN of niet visueel bevestigd. Dat hoofdstuk bestaat
+// omdat een eerdere codeconclusie ("er hangt geen wapen") het van een frame
+// verloor. Elke functie hieronder levert daarom een GETAL af waar een frame
+// naast kan liggen; geen enkele claimt iets op grond van zijn eigen bestaan.
+
+int32 AEclipseCharacter::ApplySectionVisibility(const TArray<int32>& Slots, bool bVisible, bool bInvert)
+{
+	USkeletalMeshComponent* MeshComponent = GetMesh();
+	const USkeletalMesh* BodyMesh = MeshComponent != nullptr
+		? Cast<USkeletalMesh>(MeshComponent->GetSkinnedAsset()) : nullptr;
+	if (BodyMesh == nullptr)
+	{
+		return 0;
+	}
+	const FSkeletalMeshRenderData* RenderData = BodyMesh->GetResourceForRendering();
+	if (RenderData == nullptr)
+	{
+		return 0;
+	}
+
+	// PER LOD EN PER SECTIE, en niet één aanroep op LOD 0.
+	//
+	// `ShowMaterialSection` schrijft in `LODInfo[LOD].HiddenMaterials`, dus een
+	// mesh met vier LODs heeft vier tabellen. Alleen LOD 0 zetten geeft een wapen
+	// dat op tien meter terugkomt — een fout die je in een stilstaande review-shot
+	// per definitie niet ziet, en dat is precies de klasse fout die dit dossier
+	// steeds oplevert.
+	//
+	// De sectie->materiaal-afbeelding loopt via LODMaterialMap, want een LOD mag
+	// zijn secties anders nummeren dan LOD 0. Die tabel lezen in plaats van de
+	// index aannemen is het verschil tussen "het wapen is weg" en "er is een
+	// willekeurig lichaamsdeel weg".
+	int32 TrianglesTouched = 0;
+	for (int32 LODIndex = 0; LODIndex < RenderData->LODRenderData.Num(); ++LODIndex)
+	{
+		const FSkeletalMeshLODRenderData& LOD = RenderData->LODRenderData[LODIndex];
+		const FSkeletalMeshLODInfo* LODInfo = BodyMesh->GetLODInfo(LODIndex);
+		for (int32 SectionIndex = 0; SectionIndex < LOD.RenderSections.Num(); ++SectionIndex)
+		{
+			int32 MaterialIndex = LOD.RenderSections[SectionIndex].MaterialIndex;
+			if (LODInfo != nullptr && LODInfo->LODMaterialMap.IsValidIndex(SectionIndex)
+				&& LODInfo->LODMaterialMap[SectionIndex] != INDEX_NONE)
+			{
+				MaterialIndex = LODInfo->LODMaterialMap[SectionIndex];
+			}
+			const bool bIsWeapon = Slots.Contains(MaterialIndex);
+			const bool bShouldShow = bInvert ? (bIsWeapon ? bVisible : !bVisible)
+				: (bIsWeapon ? bVisible : true);
+			if (!bInvert && !bIsWeapon)
+			{
+				continue; // niet-wapensecties blijven onaangeroerd in de gewone stand
+			}
+			MeshComponent->ShowMaterialSection(MaterialIndex, SectionIndex, bShouldShow, LODIndex);
+			if (LODIndex == 0 && bIsWeapon)
+			{
+				TrianglesTouched += LOD.RenderSections[SectionIndex].NumTriangles;
+			}
+		}
+	}
+	return TrianglesTouched;
+}
+
+int32 AEclipseCharacter::SetBuiltInWeaponVisible(bool bVisible)
+{
+	if (BuiltInWeaponSlots.Num() == 0)
+	{
+		return 0;
+	}
+	return ApplySectionVisibility(BuiltInWeaponSlots, bVisible, /*bInvert*/ false);
+}
+
+void AEclipseCharacter::SetOnlyBuiltInWeaponVisible(bool bOnlyWeapon)
+{
+	if (BuiltInWeaponSlots.Num() == 0)
+	{
+		return;
+	}
+	if (bOnlyWeapon)
+	{
+		ApplySectionVisibility(BuiltInWeaponSlots, /*bVisible*/ true, /*bInvert*/ true);
+	}
+	else if (USkeletalMeshComponent* MeshComponent = GetMesh())
+	{
+		const USkeletalMesh* BodyMesh = Cast<USkeletalMesh>(MeshComponent->GetSkinnedAsset());
+		const FSkeletalMeshRenderData* RenderData = BodyMesh != nullptr ? BodyMesh->GetResourceForRendering() : nullptr;
+		for (int32 LODIndex = 0; RenderData != nullptr && LODIndex < RenderData->LODRenderData.Num(); ++LODIndex)
+		{
+			MeshComponent->ShowAllMaterialSections(LODIndex);
+		}
+	}
+}
+
+void AEclipseCharacter::SetAttachedWeaponVisible(bool bVisible)
+{
+	if (WeaponMesh != nullptr && WeaponMesh->GetStaticMesh() != nullptr)
+	{
+		WeaponMesh->SetVisibility(bVisible);
+	}
+}
+
+void AEclipseCharacter::AttachWeaponMesh(UStaticMesh* WeaponAsset, FName RowName)
+{
+	if (WeaponMesh == nullptr)
+	{
+		return;
+	}
+	WeaponMesh->SetStaticMesh(WeaponAsset);
+	AttachedWeaponRow = WeaponAsset != nullptr ? RowName : NAME_None;
+	if (WeaponAsset == nullptr)
+	{
+		WeaponMesh->SetVisibility(false);
+		return;
+	}
+
+	// AAN HET BOT, EN LUID ALS DAT BOT ER NIET IS.
+	//
+	// De opdracht zei het al: `hand_r` bestaat op dit Paragon-rig, "controleer dat
+	// en neem het niet aan". Bestaat hij niet, dan hangt er GEEN wapen in plaats
+	// van een geweer midden in de borst — een stille aanhechting aan de wortel is
+	// erger dan niets, want die ziet er plausibel genoeg uit om te blijven staan.
+	USkeletalMeshComponent* Body = GetMesh();
+	const bool bBoneExists = Body != nullptr && !WeaponGripBone.IsNone()
+		&& Body->GetBoneIndex(WeaponGripBone) != INDEX_NONE;
+	if (!bBoneExists)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("%s: greepbot '%s' bestaat niet op dit skelet — er hangt GEEN los wapen (14.3.5)."),
+			*GetName(), *WeaponGripBone.ToString());
+		WeaponMesh->SetVisibility(false);
+		AttachedWeaponRow = NAME_None;
+		return;
+	}
+
+	WeaponMesh->AttachToComponent(Body,
+		FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponGripBone);
+	WeaponMesh->SetRelativeTransform(WeaponGripLocal);
+	WeaponMesh->SetVisibility(true);
+
+	// DOOR DE TOON-MASTER (15.5), met dezelfde gunmetal-waarde als de ingebouwde
+	// sectie. Dat is niet netheid maar de HELE reden dat het wapen leesbaar is:
+	// de factietint maakte het onzichtbaar in het silhouet, en een los asset dat
+	// zijn eigen packmateriaal houdt zou in een unlit district juist te fel staan.
+	//
+	// Het wapen kent geen factie — het hangt aan een lichaam dat er wel een heeft.
+	// De tint komt dus uit het LICHAAM en niet uit een eigen kleur, precies zoals
+	// de owner het formuleerde: een eigen WAARDE, geen eigen kleur.
+	UMaterialInterface* ToonMaster = LoadObject<UMaterialInterface>(nullptr,
+		TEXT("/Game/Art/M_EclipseToon.M_EclipseToon"));
+	if (ToonMaster == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("%s: M_EclipseToon ontbreekt — het losse wapen houdt zijn importmateriaal (14.3.5)."), *GetName());
+		return;
+	}
+	const FVector SunTravel = FRotator(-25.0f, 55.0f, 0.0f).Vector();
+	const FLinearColor Lit = ToGunmetal(LastBodyTintLit);
+	const FLinearColor Shade = ToGunmetal(LastBodyTintShade);
+	for (int32 SlotIndex = 0; SlotIndex < WeaponMesh->GetNumMaterials(); ++SlotIndex)
+	{
+		UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ToonMaster, this);
+		Mid->SetVectorParameterValue(TEXT("LitColor"), Lit);
+		Mid->SetVectorParameterValue(TEXT("ShadeColor"), Shade);
+		Mid->SetVectorParameterValue(TEXT("LightDir"), FLinearColor(FVector4(SunTravel, 0.0f)));
+		Mid->SetScalarParameterValue(TEXT("EmissiveScale"), 10.0f);
+		Mid->SetScalarParameterValue(TEXT("UVMode"), 1.0f);
+		WeaponMesh->SetMaterial(SlotIndex, Mid);
+	}
+}
+
+void AEclipseCharacter::RefreshWeaponVisual()
+{
+	if (WeaponMesh == nullptr)
+	{
+		return;
+	}
+
+	const UEclipseHitscanWeaponComponent* Weapon = FindComponentByClass<UEclipseHitscanWeaponComponent>();
+	const FName RowName = Weapon != nullptr ? Weapon->GetActiveWeaponName() : NAME_None;
+
+	UStaticMesh* Resolved = nullptr;
+	const TCHAR* Route = TEXT("geen");
+	if (Weapon != nullptr)
+	{
+		// EERST DE DATA. Het veld hoort in DT_Weapons en dat is waar een ontwerper
+		// hem verwacht.
+		const TSoftObjectPtr<UStaticMesh>& FromRow = Weapon->GetActiveWeaponMesh();
+		if (!FromRow.IsNull())
+		{
+			Resolved = FromRow.LoadSynchronous();
+			Route = TEXT("DT_Weapons");
+		}
+		// DAN DE NAAM. DT_Weapons wordt door een commandlet gevuld en die rijen
+		// bestaan al zonder dit veld; zonder terugval blijft een wapen dat gewoon
+		// op schijf staat stil onzichtbaar tot iemand de tabel opnieuw genereert.
+		// De route staat in het log, want een terugval die je niet ziet is een
+		// aanname die je niet kunt weerleggen.
+		if (Resolved == nullptr && !RowName.IsNone())
+		{
+			const FString Path = FString::Printf(
+				TEXT("/Game/Art/Weapons/SM_Weapon_%s.SM_Weapon_%s"), *RowName.ToString(), *RowName.ToString());
+			Resolved = LoadObject<UStaticMesh>(nullptr, *Path);
+			Route = TEXT("naamconventie");
+		}
+	}
+
+	if (Resolved == nullptr)
+	{
+		// GEEN WAPEN-ASSET: dan blijft de INGEBOUWDE sectie staan. Verbergen en
+		// aanhechten zijn hetzelfde feit, niet twee schakelaars — een lichaam met
+		// lege handen is zichtbaar slechter dan wat er vandaag staat.
+		SetBuiltInWeaponVisible(true);
+		AttachWeaponMesh(nullptr, NAME_None);
+		if (!RowName.IsNone())
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("%s: geen wapenmesh voor rij '%s' — de ingebouwde wapensectie blijft staan (14.3.5)."),
+				*GetName(), *RowName.ToString());
+		}
+		return;
+	}
+
+	AttachWeaponMesh(Resolved, RowName);
+	const int32 Triangles = bHideBuiltInWeaponWanted && AttachedWeaponRow != NAME_None
+		? SetBuiltInWeaponVisible(false) : SetBuiltInWeaponVisible(true);
+	const FBox Bounds = Resolved->GetBoundingBox();
+	UE_LOG(LogEclipse, Display,
+		TEXT("%s: wapen '%s' -> %s (via %s), %.1f x %.1f x %.1f cm; ingebouwde sectie %s (%d driehoeken)"),
+		*GetName(), *RowName.ToString(), *Resolved->GetName(), Route,
+		Bounds.GetSize().X, Bounds.GetSize().Y, Bounds.GetSize().Z,
+		bHideBuiltInWeaponWanted ? TEXT("verborgen") : TEXT("blijft staan"), Triangles);
+}
+
+FEclipseWeaponVisualReport AEclipseCharacter::SampleWeaponVisual() const
+{
+	FEclipseWeaponVisualReport Report;
+	const USkeletalMeshComponent* MeshComponent = GetMesh();
+	const USkeletalMesh* BodyMesh = MeshComponent != nullptr
+		? Cast<USkeletalMesh>(MeshComponent->GetSkinnedAsset()) : nullptr;
+	const FSkeletalMeshRenderData* RenderData = BodyMesh != nullptr ? BodyMesh->GetResourceForRendering() : nullptr;
+
+	if (RenderData != nullptr && RenderData->LODRenderData.Num() > 0)
+	{
+		const FSkeletalMeshLODRenderData& LOD0 = RenderData->LODRenderData[0];
+		for (const FSkelMeshRenderSection& Section : LOD0.RenderSections)
+		{
+			Report.BodyTriangles += Section.NumTriangles;
+			if (BuiltInWeaponSlots.Contains(Section.MaterialIndex))
+			{
+				Report.BuiltInTriangles += Section.NumTriangles;
+			}
+		}
+	}
+	if (BuiltInWeaponSlots.Num() > 0 && MeshComponent != nullptr)
+	{
+		Report.BuiltInSlot = BuiltInWeaponSlots[0];
+		if (const UMaterialInterface* SlotMaterial = MeshComponent->GetMaterial(Report.BuiltInSlot))
+		{
+			Report.BuiltInSlotName = FName(*SlotMaterial->GetName());
+		}
+		// IsMaterialSectionShown wil een niet-const component; de vraag is
+		// "staat hij verborgen", en dat is een leesactie op LODInfo.
+		Report.bBuiltInHidden = !const_cast<USkeletalMeshComponent*>(MeshComponent)
+			->IsMaterialSectionShown(Report.BuiltInSlot, 0);
+	}
+
+	Report.GripBone = WeaponGripBone;
+	Report.bGripBoneExists = MeshComponent != nullptr && !WeaponGripBone.IsNone()
+		&& MeshComponent->GetBoneIndex(WeaponGripBone) != INDEX_NONE;
+	if (Report.bGripBoneExists)
+	{
+		Report.GripBoneWorld = MeshComponent->GetBoneLocation(WeaponGripBone, EBoneSpaces::WorldSpace);
+	}
+
+	Report.AttachedWeaponRow = AttachedWeaponRow;
+	if (WeaponMesh != nullptr && WeaponMesh->GetStaticMesh() != nullptr)
+	{
+		Report.AttachedMeshName = WeaponMesh->GetStaticMesh()->GetName();
+		Report.AttachedExtentCm = WeaponMesh->GetStaticMesh()->GetBoundingBox().GetSize();
+		Report.bAttached = WeaponMesh->IsVisible()
+			&& WeaponMesh->GetAttachParent() == MeshComponent;
+		Report.WeaponWorld = WeaponMesh->GetComponentLocation();
+	}
+	return Report;
 }
 
 void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef, const USkeletalMesh* BodyMesh, USkeletalMeshComponent& MeshComponent)

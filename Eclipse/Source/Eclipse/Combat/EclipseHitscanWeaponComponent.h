@@ -6,6 +6,7 @@
 #include "EclipseHitscanWeaponComponent.generated.h"
 
 class AEclipseCharacter;
+class UStaticMesh;
 
 /**
  * Minimal hitscan weapon (SPEC-P1-05: "minimal hitscan"; GDD 8.2 hybrid model —
@@ -48,6 +49,15 @@ public:
 	 * een vuurgevecht.
 	 */
 	FName GetActiveWeaponName() const { return SlotNames.IsValidIndex(ActiveSlot) ? SlotNames[ActiveSlot] : NAME_None; }
+	/**
+	 * Het zichtbare mesh van het wapen in je handen (O-5 "volledig", 31-07).
+	 *
+	 * Uit de ACTIEVE rij en niet uit een eigen veld: het wapen dat je vasthoudt is
+	 * één ding, en zijn getallen en zijn vorm horen dus uit dezelfde rij te komen.
+	 * Twee bronnen zouden betekenen dat een wissel het magazijn kan veranderen
+	 * zonder de vorm — en precies die ontkoppeling is de bug die dit repareert.
+	 */
+	const TSoftObjectPtr<UStaticMesh>& GetActiveWeaponMesh() const { return Weapon.Mesh; }
 	/** Klaar om te vuren? Vlak na een wissel niet — dat is de handling-tijd. */
 	bool IsReady() const;
 
@@ -113,6 +123,9 @@ public:
 	float GetRecoilRecoveryDegreesPerSecond() const { return Weapon.RecoilRecoveryDegreesPerSecond; }
 
 private:
+	/** Het zichtbare wapen bijwerken naar de actieve rij. Zie de toelichting in de .cpp. */
+	void NotifyActiveWeaponChanged();
+
 	int32 ShotsFired = 0;
 
 	/** Zie GetWorldHits(): de missers, die tot 27-07 helemaal niets achterlieten. */

@@ -418,9 +418,21 @@ void AEclipsePlayerController::EnterMissionMode()
 		CommonInput->AddOrRemoveInputTypeLock(
 			TEXT("EclipseBaseHub"), ECommonInputType::MouseAndKeyboard, /*bAddLock*/ false);
 	}
-	// A -EclipseShot review round gets NO debug HUD at all (15.8/15.9): the whole
-	// widget is skipped here, not just hidden, so no fact can put text in a still.
-	if (MissionHud == nullptr && UEclipseMissionHudWidget::IsDebugHudAllowed() && HasGameViewport())
+	// DE WIDGET WORDT ALTIJD GEMAAKT, en dat is de tweede helft van de
+	// laag-splitsing (31-07).
+	//
+	// Hier stond `&& IsDebugHudAllowed()`, met als toelichting dat een
+	// -EclipseShot-ronde "geen debug-HUD" hoort te krijgen. Dat klopte voor de
+	// DEBUGLAAG en sloeg per ongeluk ook de SPELERLAAG over: in een reviewronde
+	// bestond het richtkruis niet, en dus was er per constructie geen beeld waarop
+	// de owner kon zien of hij ergens op richt. GEMETEN op 31-07 met
+	// `-EclipseShot -EclipseShotPlay`: het log zei "suppressed by -EclipseShot" en
+	// het frame was leeg — mét de gesplitste widget, die dus nooit aan bod kwam.
+	//
+	// De poort hoort ÍN de widget (UEclipseMissionHudWidget::NativeOnInitialized):
+	// daar weet hij het verschil tussen een richtkruis en een debugregel. Hier
+	// weten we dat niet, dus hier hoort geen poort te staan.
+	if (MissionHud == nullptr && HasGameViewport())
 	{
 		MissionHud = CreateWidget<UEclipseMissionHudWidget>(this, UEclipseMissionHudWidget::StaticClass());
 	}
@@ -452,14 +464,19 @@ void AEclipsePlayerController::EnterMissionMode()
 		UE_LOG(LogEclipse, Warning, TEXT("Input: geen UInputDeviceSubsystem — apparaatdetectie onbeschikbaar."));
 	}
 
-	UE_LOG(LogEclipse, Display, TEXT("Mission mode: debug HUD %s (F2 controls, F3 OF G test guide, F9 feel-dump, H playtest)."),
+	// TWEE FEITEN OP EEN REGEL, want ze zijn sinds de laag-splitsing niet meer
+	// hetzelfde: staat de HUD er (spelerlaag), en staat de DEBUGLAAG erin? Eén woord
+	// voor allebei zou de vraag "waarom zie ik geen kruis" weer onbeantwoordbaar
+	// maken, en dat is precies waar deze regel voor bestaat (14.3.5).
+	UE_LOG(LogEclipse, Display, TEXT("Mission mode: HUD %s · debuglaag %s (F2 controls, F3 OF G test guide, F9 feel-dump, H playtest)."),
 		MissionHud == nullptr
-			? (!UEclipseMissionHudWidget::IsDebugHudAllowed()
-				? TEXT("suppressed by -EclipseShot, as designed")
-				: (!HasGameViewport()
-					? TEXT("skipped — no game viewport (headless run), as designed")
-					: TEXT("NOT CREATED — widget construction failed")))
-			: (MissionHud->IsInViewport() ? TEXT("mounted") : TEXT("created but NOT in the viewport")));
+			? (!HasGameViewport()
+				? TEXT("skipped — no game viewport (headless run), as designed")
+				: TEXT("NOT CREATED — widget construction failed"))
+			: (MissionHud->IsInViewport() ? TEXT("mounted") : TEXT("created but NOT in the viewport")),
+		UEclipseMissionHudWidget::IsDebugHudAllowed()
+			? TEXT("aan")
+			: TEXT("onderdrukt door -EclipseShot, zoals bedoeld"));
 
 	// Kan de squad überhaupt ergens heen? Zonder navmesh weigert elke MoveTo met
 	// NoRoute, en dat ziet er voor de speler uit als een squad die niets doet.

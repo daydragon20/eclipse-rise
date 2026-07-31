@@ -85,6 +85,46 @@ private:
 	void SetupPlayShotRound();
 	void AdvancePlayShotRound();
 
+	/**
+	 * SKY-CHURN: de reproductie voor het GPU-crashdossier (DEBUG_DISCIPLINE 4.5).
+	 *
+	 * `-EclipseSkyChurn=<N>` sloopt-en-herbouwt de SkyAtmosphere N keer per frame
+	 * TIJDENS het spelen, via exact het pad dat de bouwer gebruikt
+	 * (EclipseGraybox::RebuildDistrictSky). De hypothese die dit toetst: de
+	 * renderthread houdt een SkyAtmosphere-proxy of LUT vast die de gamethread
+	 * net heeft vrijgegeven, en de LUT-compute-pass leest vrijgegeven geheugen.
+	 *
+	 * De richting is met opzet OMGEKEERD aan een fix-test: dit probeert de crash
+	 * VAKER te laten gebeuren. Bij een grondkans van ~11% per ronde is "één ronde
+	 * zonder X crashte niet" waardeloos bewijs; "crasht bij churn veel vaker dan
+	 * zonder" is wel een meting, en levert meteen het vehikel om later een fix
+	 * mee te bewijzen.
+	 *
+	 * Zonder de vlag verandert er niets: geen timer, geen extra werk, geen tak in
+	 * de normale ronde.
+	 */
+	void SetupSkyChurn();
+	void DriveSkyChurn();
+	FTimerHandle SkyChurnTimer;
+	int32 SkyChurnPerFrame = 0;
+	int32 SkyChurnFrames = 0;
+	int32 SkyChurnRebuilds = 0;
+	uint32 SkyChurnLastFrame = 0;
+
+	/**
+	 * Eén frame MET de UI-laag erop, via het Slate-vensterpad.
+	 *
+	 * De drie bestaande opnamewegen tekenen alleen de 3D-scene of leveren niets op
+	 * (zie de meting in de implementatie). Zonder deze functie is er per
+	 * constructie geen beeldbewijs mogelijk van welk UI-element dan ook, en dan is
+	 * de owner-eis "controleer het op een screenshot voordat je het af noemt" voor
+	 * de hele schermlaag onvervulbaar.
+	 *
+	 * Schrijft naar Saved/Screenshots/HUD/HUD_<Label>.png en zegt in het log of het
+	 * lukte — een opnamemethode die stil faalt is hoe deze laag onzichtbaar bleef.
+	 */
+	bool CaptureHudFrame(const FString& Label);
+
 	FTimerHandle PlayShotTimer;
 	FTimerHandle PlayShotDriveTimer;
 	int32 PlayShotStep = 0;
@@ -180,6 +220,83 @@ private:
 
 	/** De aankleedfiguren zijn geen EclipseCharacter; zonder deze meting blijven ze buiten beeld van elke controle. */
 	void MeasureDressingFigures(int32 ShotIndex);
+
+	/**
+	 * WAT ER VAN HET WAPEN IN BEELD STAAT — de meting die naast elk frame hoort
+	 * te liggen (O-5 "volledig", 31-07).
+	 *
+	 * De maatstaf (REFERENTIE_TPS.md hfst. 4) eist per claim GEZIEN of "niet
+	 * visueel bevestigd", en dat hoofdstuk bestaat omdat een codeconclusie het van
+	 * een frame verloor. Deze regel is de andere helft van dat paar: het frame
+	 * zegt WAT je ziet, deze meting zegt WELKE geometrie dat hoort te zijn en waar
+	 * hij staat. Zonder allebei is een leeg frame niet te onderscheiden van een
+	 * wapen dat net buiten beeld hangt.
+	 */
+	void MeasureWeaponVisual(const TCHAR* Label);
+
+	/**
+	 * WAAROM ER IN EERSTE PERSOON NIETS TE ZIEN IS.
+	 *
+	 * [GEZIEN — Saved/Screenshots/HUD_spelerlaag/HUD_1e_persoon.png]: het
+	 * 1e-persoonsbeeld is volledig leeg op het richtkruis en de HERLADEN-melding
+	 * na. Geen loop, geen handen, niets. En [GEZIEN —
+	 * HUD_wissel_midden.png]: MIDDEN in de wissel staat er wél lichaam en wapen
+	 * in beeld, van binnenuit gezien.
+	 *
+	 * Twee frames die samen een DIAGNOSE afdwingen in plaats van toelaten: de
+	 * geometrie bestaat en wordt getekend, dus tussen "midden in de blend" en
+	 * "eindstand" verdwijnt hij door de camera en niet door zichtbaarheid. Deze
+	 * meting scheidt de drie kandidaten die dat kunnen doen — het wapen staat
+	 * ACHTER de camera, hij staat ervoor maar binnen het near-clipvlak, of hij
+	 * staat er ruim voor en dan is het géén cameraprobleem.
+	 *
+	 * Meten vóór repareren, want dit is exact de vorm van de twee trillingsfixes
+	 * die zijn teruggedraaid (DEBUG_DISCIPLINE.md §0).
+	 */
+	void MeasureFirstPersonView(const TCHAR* Label);
+
+	/**
+	 * De vier stappen van O-5, elk als een eigen FRAME.
+	 *
+	 * Vijf toestanden achter elkaar op dezelfde camera, want een enkele eindstand
+	 * bewijst niets over welke stap hem opleverde:
+	 *   A  zoals verscheept        — ingebouwde wapensectie zichtbaar
+	 *   C  ALLEEN de wapensectie   — overhouden i.p.v. weglaten: wat hier staat, ÍS het wapen
+	 *   B  zonder die sectie       — het lichaam intact, het geweer weg
+	 *   D  met het LOSSE wapen     — stap 2 en 3 samen
+	 *   E  na een wapenwissel      — stap 4, de echte proef op de som
+	 *
+	 * A min B hoort C te zijn. Dat is de falsificatie van stap 1, en hij kan niet
+	 * per ongeluk slagen: verdwijnt er bij B méér dan C toont, dan is er een stuk
+	 * lichaam weggehaald en niet het wapen.
+	 */
+	void AdvanceWeaponProof();
+	FTimerHandle WeaponProofTimer;
+	int32 WeaponProofStep = 0;
+
+	// ---- LOOPT HET WAPEN ACHTER OP DE HAND? (DEBUG_DISCIPLINE.md §4.1) --------
+	//
+	// Bekend UE-gedrag: een gesocketd object leest de pose van de VORIGE frame als
+	// het tickt vóórdat de skeletal mesh zijn nieuwe pose heeft geëvalueerd. Die
+	// conditie kon tot vandaag niet bestaan — het geweer wás de mesh — en ontstaat
+	// precies nu het een los object wordt.
+	//
+	// NIET PREVENTIEF REPAREREN. Deze velden meten of het symptoom er is; pas als
+	// het er is, hoort er een tick-prerequisite te komen. Een fix die je inbouwt
+	// vóór het symptoom bestaat, is niet te falsifiëren.
+	//
+	// DE CONTROLE ZIT ERIN, en dat is het deel dat vaker vergeten wordt dan de
+	// meting zelf: een afstand die nooit verandert kan "geen naijlen" betekenen én
+	// "de hand bewoog niet". Daarom telt WeaponLagBoneTravel hoe ver het handbot
+	// in dezelfde reeks daadwerkelijk aflegde. Zonder dat getal kan deze meting
+	// niet rood worden, en dan meet ze niets.
+	float WeaponLagMinCm = TNumericLimits<float>::Max();
+	float WeaponLagMaxCm = 0.0f;
+	float WeaponLagBoneTravelCm = 0.0f;
+	int32 WeaponLagSamples = 0;
+	FVector WeaponLagLastBone = FVector::ZeroVector;
+	/** Sampelt één frame van die reeks; aangeroepen vanuit de invoerduw. */
+	void SampleWeaponLag();
 
 	/** Staat er na het lopen nog iemand van je squad in beeld? Wereldruimte bewijst dat niet. */
 	void ReportSquadInFrame(int32 ShotIndex, int32 DrawnNearby);

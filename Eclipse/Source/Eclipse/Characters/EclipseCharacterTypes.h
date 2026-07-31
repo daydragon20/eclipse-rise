@@ -8,6 +8,7 @@
 
 class UAnimSequence;
 class USkeletalMesh;
+class UStaticMesh;
 
 /**
  * Character data (SPEC-P1-05). The movement numbers are the LOCKED graybox feel
@@ -648,6 +649,99 @@ struct FEclipseBodyDefRow : public FTableRowBase
 	/** UE humanoid meshes face +Y; -90 turns them to the capsule's forward. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body")
 	float MeshYaw = -90.0f;
+
+	// ---- HET WAPEN ALS LOS OBJECT (owner-besluit O-5 "volledig", 31-07) --------
+	//
+	// De maatstaf (phase0/REFERENTIE_TPS.md, hoofdstuk 4) stelde vast dat er WEL
+	// een wapen in beeld hangt maar dat het GEEN los object is: het zit in de
+	// karaktermesh. Belica draagt het als materiaalslot 4, 'M_Belica_Guns'
+	// [GEMETEN uit het log van 31-07, niet afgeleid]. Dat verklaart drie
+	// waarnemingen met één oorzaak — geen attachment, wél een wapen, en een
+	// wapenwissel die visueel niets doet.
+	//
+	// Deze vier velden zijn de RIG-kant van de reparatie. Ze staan per lichaam en
+	// niet per wapen, want ze beschrijven de HAND en niet het geweer: de
+	// wapen-assets presenteren allemaal hun greep op hun eigen oorsprong
+	// (Tools/blender/gen_weapons.py), dus wat er per rig verschilt is uitsluitend
+	// hoe die hand staat.
+
+	/**
+	 * Materiaalslot-namen waarvan de geometrie het INGEBOUWDE wapen is. Bevat-match,
+	 * niet gelijk-aan: de packs noemen het 'M_Belica_Guns', 'MI_Rifle_A' enzovoort.
+	 *
+	 * OP NAAM EN NIET OP INDEX, om dezelfde reden als de gunmetal-tint hierboven:
+	 * slotvolgorde is een eigenschap van het asset, en een hardgecodeerde 4 breekt
+	 * stil zodra er een lichaam met een andere indeling bijkomt.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body|Wapen")
+	FName BuiltInWeaponSlotMatch = TEXT("Gun");
+
+	/**
+	 * De ingebouwde wapensectie verbergen zodra er een LOS wapen aan de hand hangt.
+	 *
+	 * Niet onvoorwaardelijk: een lichaam zonder los wapen-asset zou dan met lege
+	 * handen staan, en dat is zichtbaar slechter dan wat er nu is. De code verbergt
+	 * pas als het losse mesh geladen IS — verbergen en aanhechten zijn hetzelfde
+	 * feit, niet twee schakelaars (owner-regel "basis en kader, geen schakelaars").
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body|Wapen")
+	bool bHideBuiltInWeapon = true;
+
+	/**
+	 * Het bot waar het wapen aan hangt. Op het Paragon-rig van de speler heet dat
+	 * `hand_r`; de SciFi-packs draaien op het UE4-mannequin en gebruiken dezelfde
+	 * naam. Bestaat hij niet, dan zegt de code dat luid en hangt er geen wapen —
+	 * stil aan de wortel hechten zou een geweer midden in de borst zetten.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body|Wapen")
+	FName WeaponGripBone = TEXT("hand_r");
+
+	/**
+	 * De greepcorrectie: waar de greep van het wapen ligt ten opzichte van het
+	 * handbot, in BOT-ruimte.
+	 *
+	 * De standaard is niet nul en dat is met opzet — het botcentrum van een hand
+	 * ligt in de pols, niet in de palm. Deze getallen zijn de eerste stand en
+	 * horen op een frame bijgesteld te worden, niet op een redenering.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body|Wapen")
+	FVector WeaponGripOffset = FVector(-2.0f, 4.0f, 0.0f);
+
+	/**
+	 * DE 180 GRADEN ZIJN GEMETEN, EN DE MEETUITSLAG SLOOT ÉÉN VAN TWEE OORZAKEN UIT.
+	 *
+	 * Owner-waarneming (SHOT_FINDINGS.md): *"het wapen wordt omgekeerd
+	 * vastgehouden"*. Daar zijn twee kandidaten voor, en ze vragen tegengestelde
+	 * reparaties — die verwarren kost een avond:
+	 *
+	 *   1. de GREEPROTATIE hier klopt niet  -> repareren in deze data
+	 *   2. de forward-as van de MESH klopt niet -> repareren in gen_weapons.py,
+	 *      en alle vier de wapens opnieuw exporteren
+	 *
+	 * Kandidaat 2 is UITGESLOTEN met een meting die er al lag voordat de
+	 * waarneming binnenkwam. De import drukt de bounding box af per as
+	 * (Tools/import_blender_weapons.py) en die zei: langste as = **X**, 94,9 cm
+	 * tegen 7,2 (Y) en 35,4 (Z), met de doos lopend van X=-24,3 (kolf) tot
+	 * X=+70,6 (loop). Unreal verwacht +X als voorwaarts, en dat is precies wat er
+	 * staat. De mesh-as is dus goed, en hem "omdraaien" in Blender zou de
+	 * UE-conventie juist breken voor elk volgend wapen.
+	 *
+	 * Wat er dan overblijft is kandidaat 1, en die is ook rechtstreeks gemeten:
+	 * `[WAPEN * STAP3 GREEP]` drukt per opname de correctie af die de loop langs
+	 * de kijkrichting van het lichaam legt, en die kwam uit op een YAW van -158
+	 * tot -180 graden. Een halve slag, en dat is exact hoe "omgekeerd
+	 * vastgehouden" er in getallen uitziet.
+	 *
+	 * Vandaar 180 en niet een gefit getal: de pitch en roll in die meting
+	 * VARIËREN met de armpose (P=-6 tot -28, R=+5 tot +18) omdat de hand meedraait
+	 * met de animatie, en dat hoort ook — het wapen moet stijf in de hand zitten en
+	 * de arm draagt hem. Alleen de halve slag is de constante fout.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body|Wapen")
+	FRotator WeaponGripRotation = FRotator(0.0f, 180.0f, 0.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Body|Wapen", meta = (ClampMin = 0.1))
+	float WeaponGripScale = 1.0f;
 };
 
 /**
@@ -950,4 +1044,22 @@ struct FEclipseWeaponRow : public FTableRowBase
 	/** Locational damage stub (GDD 8.2): headshot multiplier. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon", meta = (ClampMin = 1))
 	float HeadshotMultiplier = 2.5f;
+
+	/**
+	 * HET ZICHTBARE WAPEN (owner-besluit O-5 "volledig", 31-07).
+	 *
+	 * Zelf geauthord in Blender (Tools/blender/gen_weapons.py), één per rij in deze
+	 * tabel, Borderlands-verhoudingen en door de toon-master (15.5). De conventie
+	 * die het asset draagt en die de code dus NIET hoeft te raden:
+	 *   oorsprong = de greep, +X = de loop, +Z = boven.
+	 *
+	 * TERUGVAL OP NAAM als dit veld leeg is: /Game/Art/Weapons/SM_Weapon_<rijnaam>.
+	 * Dat is er niet voor de sier — DT_Weapons wordt door een commandlet gevuld en
+	 * die rijen bestaan al zonder dit veld. Zonder terugval zou een wapen dat
+	 * gewoon op schijf staat stil onzichtbaar blijven tot iemand de tabel opnieuw
+	 * genereert, en dat is precies de klasse fout die dit hele dossier is
+	 * (14.3.5: luid degraderen). De code LOGT welke van de twee wegen hij nam.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Weapon")
+	TSoftObjectPtr<UStaticMesh> Mesh;
 };

@@ -41,6 +41,8 @@ class ECLIPSE_API UEclipseStrategyMapWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	/** De wortel, vóór RebuildWidget hem pakt — zie de toelichting in de implementatie. */
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 

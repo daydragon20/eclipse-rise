@@ -18,7 +18,7 @@ Three consequences follow, and all three are load-bearing:
 
 1. **Every generated line is final.** There is no "we'll re-record it properly later" safety net. The line that gets generated is the line that ships. This raises the bar on §18.9 — a scene that fails the anti-slop gate must never reach the generator.
 2. **Voice casting is permanent.** The cache key is `hash(voiceId + text + emotion + modelId)`. Changing a character's voice ID **invalidates every line that character has ever spoken** and re-costs all of it. Casting is locked once, before bulk generation, in §19.3.
-3. **Commercial rights must be confirmed.** ElevenLabs paid tiers grant commercial usage of generated audio, but the exact terms depend on the plan and on whether a voice comes from the shared Voice Library (some library voices carry their own terms). **Owner action, before any bulk spend: confirm commercial use rights on the current plan and note it in this document.** This is a shipping blocker, not a detail.
+3. **Commercial rights — CONFIRMED 2026-07-31, this blocker is closed.** The owner checked and reported: the subscription carries commercial rights, *and* whether an individual Voice Library voice carries them is visible on the voice card. Both halves matter, because they gate different things: the plan gates generating at all, the voice card gates which voices may be cast. The standing policy that follows is in §19.3 — `voice-director` rejects any library voice without a commercial licence during stage 1, before it can ever reach a paid stage-2 test.
 
 **Backlog #29 in `phase0/EXECUTION_PLAN.md` ("VO-opname + implementatie", Phase 5) is hereby narrowed** to "VO quality pass on AI voices" — no recording contracts.
 
@@ -69,7 +69,7 @@ That gives insurance for the risky middle of the sprint *and* zero waste at the 
 - **Nothing is generated that has not passed `dialogue-critic` with GO.** No exceptions, no "we'll check it after". A failed line that gets generated is money burned permanently.
 - **Batch, never drip.** Generate per scene or per trigger-set, never line by line — batching is where mistakes get caught before they multiply.
 - **Log every batch.** `voice-director` appends actual credit spend to `phase0/VOICE_LEDGER.md` after each run. The ladder above is a plan; the ledger is the truth.
-- **Stop at 290,000.** The last 20,000 is reserve. If a tier is not reached, it is not reached — it waits for next month's writing, which will be better anyway.
+- **Do not allocate the last 20,000 to a tier before 17 August** — it is insurance, not savings. On 17 August, release whatever remains of it into the next tier. Target on 19 August is **310,000 spent, 0 remaining** (see the reserve rule above). An earlier draft of this line said "stop at 290,000", which contradicted that rule and would have thrown away 20,000 credits at expiry.
 
 **What happens to Acts 2–4?** They get *written* this month (writing costs nothing) and sit as text with complete script files. The moment credits exist again, they generate with one command and zero further authoring. That is the whole point of the layer discipline: the expensive-to-change work is done, and the cheap-to-defer work is deferred.
 
@@ -101,7 +101,46 @@ The Voice Library is browsable for free: every voice carries **metadata** (age, 
 
 So: shortlist **6–8 candidates** per companion/villain and 3–4 per bark register **entirely from library metadata and free previews**. Match on age, register, accent-neutrality — and check the **commercial licence on the voice card** while you are there, so a non-commercial voice never reaches stage 2. Cut to **two finalists** per role. **Zero credits spent.**
 
-**Stage 2 — deep test on the finalists only (~12k credits).**
+> **Stage 1 is DONE — 2026-07-31, 0 credits.** 18 roles, 80 candidate slots, in
+> `progress_media/casting/` — open **`CASTING.html`** to listen, grouped per character.
+> Machine-readable: `casting_stage1.json`. Nothing was generated; these are the voices'
+> own free preview samples.
+>
+> **The pool was deliberately limited to ElevenLabs' 21 premade voices.** They are
+> ElevenLabs-owned (`sharing: null`), so they carry no third-party terms and are safe
+> under any outcome of O-2. Voice Library voices were *not* shortlisted, because the
+> licence check cannot be automated (see the Licence row below) and O-2 is not settled
+> in a source this agent can point at.
+>
+> **Three gaps the premade pool left, all now closed by the library pass below:**
+> 1. **No older female voice exists.** Mara is 52; the oldest premade female reads well
+>    under 45. Kaine (49) had the same problem.
+> 2. **Exactly one `old` voice in total** (Bill) — top candidate for Vex (68) *and* for
+>    older readings of Torren and Callis, and it can only be cast once.
+> 3. **20 of the 21 voices appear on more than one shortlist** (Alice, Daniel and Matilda
+>    on six each). 21 voices cannot fill 18 roles with independent shortlists.
+
+> **Stage 1 extension — Voice Library, 2026-07-31, also 0 credits.** O-2 confirmed, so
+> the library opened. **24 extra candidates** for exactly the five roles above:
+> Mara (6), Kaine (5), Vex (5), Callis (4), Torren (4). Total now **104 candidates**.
+>
+> **Two gates were applied automatically; one cannot be.**
+> - **Automated:** creator status `professional`/`high_quality`, accent-neutral, and a
+>   **withdrawal notice period ≥ 365 days** — a creator who can pull their voice next
+>   week is unusable for a game that ships for years. This rejected real candidates:
+>   a strong Kaine voice had `notice_period: 0`.
+> - **Not automatable — the commercial licence.** Measured, not assumed:
+>   `/v1/shared-voices` exposes `free_users_allowed`, `rate`, `fiat_rate` and
+>   `notice_period`, but **no licence field**, and a `commercial=true` filter returns
+>   byte-identical results to a nonsense parameter — unknown params are ignored.
+>   So every library candidate carries `licentie.status = NIET_GEVERIFIEERD` plus a
+>   direct card URL, and **the card must be opened and read before that voice enters
+>   stage 2.** Premade voices need none of this: they are ElevenLabs' own.
+
+**Stage 2 — deep test on the finalists only (~12k credits). FROZEN until two things are true.**
+It does not start until (a) **O-2 is answered** and (b) **the owner has picked a top 2 per role**
+from stage 1. Running it earlier means paying to audition voices that may not be the finalists —
+the exact waste stage 1 exists to prevent.
 This is where credits are unavoidable, and why they are worth it: the library preview is *generic content*. It cannot tell you whether this voice survives Mara's death scene, whether it holds up at 5 words over gunfire, or whether it responds to the audio tags this character needs. Only your own lines answer that.
 Each finalist speaks **three** lines, not one:
 
@@ -113,7 +152,7 @@ Each finalist speaks **three** lines, not one:
 
 | Check | Why it kills a candidate |
 |---|---|
-| **Licence** | Voice Library voices carry their own terms. Non-commercial or attribution-required = rejected, however good it sounds. The owner confirmed this is visible on the voice card. |
+| **Licence** | Voice Library voices carry their own terms. Non-commercial or attribution-required = rejected, however good it sounds. **This check is manual, in the web app.** Measured 2026-07-31: `/v1/shared-voices` returns `free_users_allowed`, `rate` and `notice_period` but **no commercial-licence field** — the API cannot answer this question, so it cannot be automated. For the licence status of the plan itself see O-2 in `phase0/SCRIPT_PRODUCTION_PLAN.md`; do not restate it here as fact. |
 | **Tag range** (§19.4) | Does the voice support the tags this character needs? A voice cast for shouting will not whisper. If the character needs both extremes, that decides the casting. |
 | **In context, not in silence** | Audition over real game audio, not in a quiet browser tab. A voice that is gorgeous in silence can vanish in a firefight. |
 | **Pairing** | Audition characters who share scenes **together**, never separately. Mara + Reyes, Dex + Kaya, Vex + Kaine. If two voices blur when heard back to back, one of them is recast now — not after 90k credits. |
@@ -229,8 +268,8 @@ Before Tier 1 bulk generation, `voice-director` runs the **full pipeline on a si
 - [ ] Bark library live: 16 triggers × 3 faction vocabularies, playing in-game
 - [ ] Act 1 fully voiced: prologue + M1.1–M1.8
 - [ ] Adaptive music never-silent floor running (§16.7)
-- [ ] `phase0/VOICE_LEDGER.md` reconciles to within 5% of 290,000 spent
-- [ ] ≥20,000 credits unspent at month end **or** spent deliberately with the owner's say-so
+- [ ] `phase0/VOICE_LEDGER.md` reconciles to within 5% of **310,000** spent
+- [ ] The 20,000 reserve stayed unallocated until 17 August, then went into the next tier — **0 credits left unused at expiry**
 - [ ] Every generated line traceable to a script file that passed `dialogue-critic`
 - [ ] Acts 2–4 written and script-complete, awaiting credits only
 

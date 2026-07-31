@@ -17,6 +17,7 @@
 #include "Engine/DataTable.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
+#include "Engine/GameViewportClient.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerInput.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -43,6 +44,7 @@
 #include "Strategy/EclipseCampaignSetupAsset.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
 #include "Strategy/EclipseStrategySubsystem.h"
+#include "UI/EclipseMissionHudWidget.h"
 
 namespace
 {
@@ -304,6 +306,7 @@ void AEclipseGameMode::StartPlay()
 #if !UE_BUILD_SHIPPING
 	SetupShotRig();
 	SetupPlayShotRound();
+	SetupSkyChurn();
 	StartMissionFromCommandLine();
 #endif
 }
@@ -372,6 +375,136 @@ void AEclipseGameMode::SetupPlayShotRound()
 	UE_LOG(LogEclipse, Display, TEXT("PlayShot: armed — opnames vanuit de speler tijdens het spelen."));
 }
 
+void AEclipseGameMode::SetupSkyChurn()
+{
+	int32 PerFrame = 0;
+	if (!FParse::Value(FCommandLine::Get(), TEXT("EclipseSkyChurn="), PerFrame) || PerFrame <= 0)
+	{
+		return;
+	}
+	SkyChurnPerFrame = FMath::Clamp(PerFrame, 1, 64);
+
+	// Rate 0,005 s met een frame-slot erachter, precies zoals de invoerduw: de
+	// timermanager mag zo vaak vuren als hij wil, maar de sloop gebeurt hoogstens
+	// een keer per SPELframe. Meer dan dat meten is meten wat de gamethread niet
+	// kan doen, en het venster dat we zoeken zit juist TUSSEN twee spelframes:
+	// daar rendert de renderthread het vorige beeld terwijl de gamethread al aan
+	// het volgende werkt.
+	GetWorldTimerManager().SetTimer(SkyChurnTimer, this, &AEclipseGameMode::DriveSkyChurn,
+		0.005f, /*bLoop*/ true);
+	UE_LOG(LogEclipse, Display,
+		TEXT("[SKYCHURN] gewapend: %d sloop-en-herbouw per frame, tijdens het spelen. Dit is een REPRODUCTIEharnas voor de GPU-crash (DEBUG_DISCIPLINE 4.5), geen spelgedrag."),
+		SkyChurnPerFrame);
+}
+
+void AEclipseGameMode::DriveSkyChurn()
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr || SkyChurnPerFrame <= 0)
+	{
+		return;
+	}
+	if (SkyChurnLastFrame == GFrameNumber)
+	{
+		return;
+	}
+	SkyChurnLastFrame = GFrameNumber;
+	++SkyChurnFrames;
+
+	for (int32 Index = 0; Index < SkyChurnPerFrame; ++Index)
+	{
+		EclipseGraybox::RebuildDistrictSky(*World);
+		++SkyChurnRebuilds;
+	}
+
+	// Elke 100 spelframes een levensteken. Zonder dit is er bij een crash geen
+	// manier om te zien HOEVER de churn gekomen was, en dan is "hij crashte" weer
+	// een anekdote in plaats van een meting met een noemer.
+	if ((SkyChurnFrames % 100) == 0)
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[SKYCHURN] %d spelframes, %d herbouwen, t=%.1fs, renderframe=%llu"),
+			SkyChurnFrames, SkyChurnRebuilds, World->GetTimeSeconds(),
+			static_cast<uint64>(GFrameCounterRenderThread));
+	}
+}
+
+bool AEclipseGameMode::CaptureHudFrame(const FString& Label)
+{
+	// EEN OPNAME DIE DE UI-LAAG WEL MEENEEMT, en dat is geen luxe maar de blokkade
+	// die drie eerdere pogingen niet doorbrak.
+	//
+	// GEMETEN op 31-07, en dit is de reden dat dit bestaat:
+	//   - `HighResShot` tekent de 3D-scene en niets anders; dat stond al in het
+	//     commentaar en klopt.
+	//   - `FScreenshotRequest::RequestScreenshot(..., bShowUI=true)` levert HELEMAAL
+	//     GEEN bestand op in deze ronde — PlayShot_MetUI.png bestaat niet op schijf.
+	//     Verklaarbaar: het verzoek is één globale static, en het `Shot showui`
+	//     hieronder overschreef hem in dezelfde frame.
+	//   - `Shot showui` levert wél een bestand (ScreenShot0000N.png), maar op 1:1
+	//     pixels, vier keer uitvergroot, staat er geen kruis in het midden en geen
+	//     munitieteller rechtsonder. GEZIEN, niet beredeneerd.
+	//
+	// Wat er wél moet gebeuren staat in UGameViewportClient::ProcessScreenShots:
+	// bij bShowUI gaat het beeld via FSlateApplication::TakeScreenshot van het
+	// VENSTER, niet via de render target van de viewport. Dat pad roepen we hier
+	// rechtstreeks aan — met een eigen bestandsnaam, en met een regel in het log
+	// die zegt of het lukte. Een opnamemethode die stil faalt is precies hoe deze
+	// laag twee dagen onzichtbaar kon blijven.
+	if (!FSlateApplication::IsInitialized())
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("[HUDSHOT %s] geen Slate-applicatie (headless) — de UI-laag is hier niet te fotograferen."), *Label);
+		return false;
+	}
+
+	UGameViewportClient* ViewportClient = GEngine != nullptr ? GEngine->GameViewport : nullptr;
+	TSharedPtr<SWindow> Window = ViewportClient != nullptr ? ViewportClient->GetWindow() : nullptr;
+	if (!Window.IsValid())
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("[HUDSHOT %s] geen spelvenster (viewportclient=%d) — geen UI-opname."),
+			*Label, ViewportClient != nullptr ? 1 : 0);
+		return false;
+	}
+
+	TArray<FColor> Pixels;
+	FIntVector Size(0, 0, 0);
+	if (!FSlateApplication::Get().TakeScreenshot(Window.ToSharedRef(), Pixels, Size))
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("[HUDSHOT %s] TakeScreenshot gaf niets terug (%dx%d, %d pixels)."),
+			*Label, Size.X, Size.Y, Pixels.Num());
+		return false;
+	}
+
+	// Volle dekking: het venster kan doorzichtige randen hebben en een PNG met
+	// alfa-nul leest als een leeg beeld — dan zou de meting weer over de methode
+	// gaan in plaats van over de HUD.
+	for (FColor& Pixel : Pixels)
+	{
+		Pixel.A = 255;
+	}
+
+	// DE MAP ZEGT WELKE LAAG ERIN ZAT. Twee rondes met en zonder -EclipseShot
+	// schreven eerst naar dezelfde map, en dan is het bewijs van de laag-splitsing
+	// alleen te bewaren door met de hand te hernoemen — precies het soort stap dat
+	// je één keer vergeet en waarna twee beelden onbedoeld hetzelfde heten.
+	const TCHAR* LaagMap = UEclipseMissionHudWidget::IsDebugHudAllowed()
+		? TEXT("HUD_volledig") : TEXT("HUD_spelerlaag");
+	const FString Path = FPaths::ProjectSavedDir() / TEXT("Screenshots") / LaagMap
+		/ FString::Printf(TEXT("HUD_%s.png"), *Label);
+	const FImageView Image(Pixels.GetData(), Size.X, Size.Y);
+	if (!FImageUtils::SaveImageByExtension(*Path, Image))
+	{
+		UE_LOG(LogEclipse, Warning, TEXT("[HUDSHOT %s] kon %s niet wegschrijven."), *Label, *Path);
+		return false;
+	}
+
+	UE_LOG(LogEclipse, Display, TEXT("[HUDSHOT %s] %dx%d weggeschreven naar %s"), *Label, Size.X, Size.Y, *Path);
+	return true;
+}
+
 void AEclipseGameMode::DrivePlayShotInput()
 {
 	// EEN DUW PER FRAME, en dat is de reparatie van de 3-cm-val.
@@ -401,6 +534,14 @@ void AEclipseGameMode::DrivePlayShotInput()
 	{
 		return;
 	}
+
+	// HET WAPEN-NAIJLEN MEEBEMONSTEREN (DEBUG_DISCIPLINE.md §4.1). Hier en niet in
+	// de wapenproef zelf: die draait pas als het personage al stilstaat, en een
+	// naijl-meting op een stilstaande arm is precies de meting die niet rood kan
+	// worden. Deze lus draait op 50 Hz dwars door het lopen, vuren en draaien heen
+	// — dat is waar de hand het hardst beweegt en naijlen dus het grootst is.
+	SampleWeaponLag();
+
 	// DE HOOGSTE SNELHEID VAN HET INTERVAL, en niet die van het meetmoment.
 	//
 	// De eerste diagnostiek bij de 3-cm-val mat de snelheid op het opnamemoment en
@@ -1255,6 +1396,407 @@ void AEclipseGameMode::MeasureDressingFigures(int32 ShotIndex)
 	}
 }
 
+void AEclipseGameMode::SampleWeaponLag()
+{
+	const APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	const AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
+	const UStaticMeshComponent* Weapon = Body != nullptr ? Body->GetWeaponMeshComponent() : nullptr;
+	if (Body == nullptr || Weapon == nullptr || Weapon->GetStaticMesh() == nullptr || !Weapon->IsVisible())
+	{
+		return;
+	}
+	const FEclipseWeaponVisualReport R = Body->SampleWeaponVisual();
+	if (!R.bAttached || !R.bGripBoneExists)
+	{
+		return;
+	}
+
+	// DE AFSTAND WAPEN->HANDBOT, per frame.
+	//
+	// Hangt het wapen star aan het bot, dan is deze afstand een CONSTANTE — precies
+	// de lengte van de greepcorrectie — hoe hard de arm ook beweegt. Loopt hij
+	// achter, dan groeit hij mee met de snelheid van de hand, want het wapen staat
+	// dan waar de hand vorige frame stond. Dat is het onderscheid dat §4.1 vraagt,
+	// en het is een getal en geen indruk.
+	const float Distance = static_cast<float>(FVector::Dist(R.WeaponWorld, R.GripBoneWorld));
+	WeaponLagMinCm = FMath::Min(WeaponLagMinCm, Distance);
+	WeaponLagMaxCm = FMath::Max(WeaponLagMaxCm, Distance);
+	if (!WeaponLagLastBone.IsZero())
+	{
+		WeaponLagBoneTravelCm += static_cast<float>(FVector::Dist(R.GripBoneWorld, WeaponLagLastBone));
+	}
+	WeaponLagLastBone = R.GripBoneWorld;
+	++WeaponLagSamples;
+}
+
+void AEclipseGameMode::MeasureWeaponVisual(const TCHAR* Label)
+{
+	const APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	const AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
+	if (Body == nullptr)
+	{
+		return;
+	}
+	const FEclipseWeaponVisualReport R = Body->SampleWeaponVisual();
+
+	// STAP 1 — de ingebouwde wapensectie. Het GETAL is de driehoeken, niet "wel of
+	// geen sectie": een slot dat bestaat maar nul geometrie draagt zou anders als
+	// bewijs tellen dat er een wapen in de mesh zat.
+	if (R.BuiltInSlot == INDEX_NONE)
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s STAP1] dit lichaam heeft GEEN ingebouwde wapensectie — niets te verbergen."), Label);
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s STAP1] ingebouwd: slot %d '%s', %d van %d driehoeken (%.1f%%), nu %s"),
+			Label, R.BuiltInSlot, *R.BuiltInSlotName.ToString(), R.BuiltInTriangles, R.BodyTriangles,
+			R.BodyTriangles > 0 ? 100.0f * R.BuiltInTriangles / R.BodyTriangles : 0.0f,
+			R.bBuiltInHidden ? TEXT("VERBORGEN") : TEXT("zichtbaar"));
+	}
+
+	// STAP 2 — het losse asset. De MAAT is de falsificatie: "het asset bestaat" is
+	// geen bewijs, want een leeg asset bestaat ook. Een geweer is in de orde van
+	// 60-130 cm lang; alles daarbuiten is een importfout en geen wapen.
+	if (R.AttachedMeshName.IsEmpty())
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("[WAPEN %s STAP2] GEEN los wapenmesh in de hand — stap 2 is hier niet gehaald."), Label);
+	}
+	else
+	{
+		const float Longest = R.AttachedExtentCm.GetMax();
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s STAP2] los asset '%s' voor rij '%s': %.1f x %.1f x %.1f cm, langste as %.1f cm %s"),
+			Label, *R.AttachedMeshName, *R.AttachedWeaponRow.ToString(),
+			R.AttachedExtentCm.X, R.AttachedExtentCm.Y, R.AttachedExtentCm.Z, Longest,
+			(Longest >= 20.0f && Longest <= 160.0f) ? TEXT("(in de orde van een wapen)")
+				: TEXT("(BUITEN de orde van een wapen — importschaal nakijken)"));
+	}
+
+	// STAP 3 — de greep. Twee wereldposities die moeten samenvallen: als het wapen
+	// echt aan de hand hangt, is de afstand tot dat bot constant en klein. Een
+	// wapen dat aan de WORTEL hing zou hier een afstand van tientallen centimeters
+	// geven die met elke pose meebeweegt.
+	const float GripDistance = R.bAttached && R.bGripBoneExists
+		? static_cast<float>(FVector::Dist(R.WeaponWorld, R.GripBoneWorld)) : -1.0f;
+	UE_LOG(LogEclipse, Display,
+		TEXT("[WAPEN %s STAP3] greepbot '%s' bestaat=%d, aangehecht=%d, afstand wapen->bot %.1f cm"),
+		Label, *R.GripBone.ToString(), R.bGripBoneExists ? 1 : 0, R.bAttached ? 1 : 0, GripDistance);
+	if (!R.bGripBoneExists)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("[WAPEN %s STAP3 FOUT] greepbot '%s' bestaat NIET op dit skelet."), Label, *R.GripBone.ToString());
+		return;
+	}
+
+	// WELKE GREEPROTATIE HOORT ER TE STAAN — gemeten in plaats van gegokt.
+	//
+	// De asconventie van het asset staat vast (+X is de loop, GEMETEN bij de
+	// import: langste as X, 94,9 cm). Wat NIET vaststaat is hoe het handbot van
+	// dit rig georiënteerd is; dat verschilt per pack en is het klassieke
+	// "probeer een rotatie, kijk, probeer opnieuw".
+	//
+	// Deze regel maakt er één meting van. De rotatie die het wapen-+X langs de
+	// kijkrichting van het LICHAAM legt is precies (bot^-1 * actor), en die is hier
+	// gewoon uit te rekenen uit twee transforms die er al zijn. De uitkomst hoort
+	// in DT_BodyDefs::WeaponGripRotation — dan staat er een gemeten getal in de
+	// data in plaats van een geslaagde gok in de code.
+	//
+	// WAT DIT NIET DOET: de linkerhand op de voorgreep zetten. Dat is hand-IK en
+	// een eigen klus (DEBUG_DISCIPLINE.md §4.1 noemt hem als de standaardoplossing
+	// voor tweehandige wapens). Het hoort hier genoemd te worden omdat een frame
+	// waarop de linkerhand naast het wapen zweeft anders als "de rotatie klopt
+	// niet" gelezen wordt, en dat is een andere reparatie.
+	const USkeletalMeshComponent* Mesh = Body->GetMesh();
+	if (Mesh != nullptr)
+	{
+		const FTransform BoneWorld = Mesh->GetSocketTransform(R.GripBone, RTS_World);
+		const FTransform ActorWorld = Body->GetActorTransform();
+		const FRotator Correction = (BoneWorld.GetRotation().Inverse() * ActorWorld.GetRotation()).Rotator();
+		const FVector BoneLocal = BoneWorld.InverseTransformPosition(R.WeaponWorld);
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s STAP3 GREEP] gemeten correctie voor WeaponGripRotation = (P=%.1f Y=%.1f R=%.1f); "
+				 "wapen staat nu op (%.1f,%.1f,%.1f) in botruimte"),
+			Label, Correction.Pitch, Correction.Yaw, Correction.Roll, BoneLocal.X, BoneLocal.Y, BoneLocal.Z);
+	}
+
+	// NAIJLEN — de meting uit DEBUG_DISCIPLINE.md §4.1, mét zijn controle.
+	//
+	// De vorm die het dossier voorschrijft is "60 frames, 60/60 afwijking". Hier
+	// staan drie getallen naast elkaar, en pas samen zeggen ze iets:
+	//   spreiding  = max - min van de afstand wapen->handbot over de hele ronde
+	//   reisweg    = hoe ver dat handbot in diezelfde reeks daadwerkelijk aflegde
+	//   monsters   = hoeveel frames er in zitten
+	//
+	// Een spreiding van bijna nul is alleen bewijs als de reisweg GROOT is. Bij
+	// reisweg ~0 bewijst dezelfde nul precies niets — dan stond de arm stil en had
+	// de meting nooit rood kunnen worden. Dat is de fout die dit project op 27-07
+	// nog maakte met `scherm=(500,525)`, negen keer identiek.
+	if (WeaponLagSamples > 0)
+	{
+		const float Spread = WeaponLagMaxCm - WeaponLagMinCm;
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s NAIJLEN] afstand wapen->handbot %.2f..%.2f cm (spreiding %.2f) over %d frames; "
+				 "het handbot legde in die reeks %.1f cm af — %s"),
+			Label, WeaponLagMinCm, WeaponLagMaxCm, Spread, WeaponLagSamples, WeaponLagBoneTravelCm,
+			WeaponLagBoneTravelCm < 5.0f
+				? TEXT("REISWEG TE KLEIN: deze meting kan geen naijlen aantonen of uitsluiten")
+				: (Spread < 0.5f ? TEXT("star aan de hand — GEEN naijlen")
+					: TEXT("de afstand VARIEERT terwijl de aanhechting star hoort te zijn — §4.1 nakijken")));
+	}
+	else
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN %s NAIJLEN] geen monsters — er hing geen zichtbaar wapen tijdens de looproutine."), Label);
+	}
+}
+
+void AEclipseGameMode::MeasureFirstPersonView(const TCHAR* Label)
+{
+	const APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	const AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
+	if (Body == nullptr)
+	{
+		return;
+	}
+
+	FVector CamLocation = FVector::ZeroVector;
+	FRotator CamRotation = FRotator::ZeroRotator;
+	Controller->GetPlayerViewPoint(CamLocation, CamRotation);
+	const FVector Forward = CamRotation.Vector();
+
+	const FEclipseWeaponVisualReport R = Body->SampleWeaponVisual();
+	const USkeletalMeshComponent* Mesh = Body->GetMesh();
+
+	// DE DRIE KANDIDATEN UIT ELKAAR TREKKEN, en dat is het hele punt van deze
+	// meting. Een leeg 1e-persoonsbeeld kan drie dingen betekenen en ze vragen om
+	// drie verschillende reparaties:
+	//   voor < 0        het wapen staat ACHTER de camera
+	//   0 < voor < near het staat ervoor maar binnen het near-clipvlak
+	//   voor > near     het staat er ruim voor — dan is het GEEN cameraprobleem
+	//                   en moet ik verderop kijken (zichtbaarheid, culling)
+	// Zonder dit onderscheid is elke fix een gok, en gokken die de test halen zijn
+	// erger dan mislukkingen (DEBUG_DISCIPLINE.md §1 stap 4).
+	auto Along = [&CamLocation, &Forward](const FVector& Point)
+	{
+		return static_cast<float>(FVector::DotProduct(Point - CamLocation, Forward));
+	};
+
+	const float WeaponAhead = R.bAttached ? Along(R.WeaponWorld) : TNumericLimits<float>::Lowest();
+	const float GripAhead = R.bGripBoneExists ? Along(R.GripBoneWorld) : TNumericLimits<float>::Lowest();
+	// De engine-standaard voor het near-clipvlak (r.SetNearClipPlane). Als
+	// CONSTANTE en niet uit een global gelezen, en dat is hier verdedigbaar: de
+	// diagnose scheidt de drie gevallen op TEKEN en op een orde van grootte
+	// (achter de camera / binnen ~10 cm / tientallen cm ervoor). Een afwijking van
+	// een paar centimeter in dit getal kan het antwoord dus niet omdraaien. Draait
+	// het project ooit een ander vlak, dan verschuift alleen de middelste grens.
+	constexpr float NearClip = 10.0f;
+
+	UE_LOG(LogEclipse, Display,
+		TEXT("[1EPERSOON %s] camera (%.0f,%.0f,%.0f) kijkt (%.2f,%.2f,%.2f); near-clip %.1f cm"),
+		Label, CamLocation.X, CamLocation.Y, CamLocation.Z, Forward.X, Forward.Y, Forward.Z, NearClip);
+	UE_LOG(LogEclipse, Display,
+		TEXT("[1EPERSOON %s] greepbot %.1f cm vóór de camera; los wapen %.1f cm vóór de camera; mesh zichtbaar=%d"),
+		Label, GripAhead, WeaponAhead, Mesh != nullptr && Mesh->IsVisible() ? 1 : 0);
+
+	const TCHAR* Verdict = TEXT("onbepaald");
+	if (!R.bAttached)
+	{
+		Verdict = TEXT("er hangt geen los wapen — deze meting kan er niets over zeggen");
+	}
+	else if (WeaponAhead < 0.0f)
+	{
+		Verdict = TEXT("ACHTER de camera — de camera staat vóór het wapen");
+	}
+	else if (WeaponAhead < NearClip)
+	{
+		Verdict = TEXT("BINNEN het near-clipvlak — weggeknipt door de projectie");
+	}
+	else
+	{
+		Verdict = TEXT("ruim vóór de camera — dit is GEEN cameraprobleem");
+	}
+	UE_LOG(LogEclipse, Display, TEXT("[1EPERSOON %s DIAGNOSE] %s"), Label, Verdict);
+
+	// EN DE VRAAG DIE DE VORIGE RONDE OPEN LIET: staat hij in het BEELD?
+	//
+	// De eerste meting (31-07 20:17) sloot twee oorzaken uit — het wapen stond
+	// 18,0 cm vóór de camera, ruim buiten het near-clipvlak van 10, en de mesh
+	// stond op zichtbaar. En tóch was het frame leeg [GEZIEN —
+	// HUD_wapen_F_eerste_persoon.png]. "Vóór de camera" is dus niet hetzelfde als
+	// "in beeld": een wapen op 18 cm afstand hoeft maar 9 cm onder de ooglijn te
+	// hangen om onder de onderrand te vallen, want zó smal is de kegel daar.
+	//
+	// Deze regel meet dat rechtstreeks in SCHERMruimte, en dat is het verschil
+	// tussen een diagnose en nog een hypothese. Dezelfde les als hoofdstuk 1 van
+	// REFERENTIE_TPS.md: de klacht ging over POSITIE en elke bestaande meting ging
+	// over afstand.
+	if (R.bAttached)
+	{
+		FVector2D Screen = FVector2D::ZeroVector;
+		const bool bOnScreen = Controller->ProjectWorldLocationToScreen(R.WeaponWorld, Screen);
+		int32 SizeX = 0;
+		int32 SizeY = 0;
+		Controller->GetViewportSize(SizeX, SizeY);
+		const bool bInsideRect = bOnScreen && Screen.X >= 0.0 && Screen.X <= SizeX
+			&& Screen.Y >= 0.0 && Screen.Y <= SizeY;
+		UE_LOG(LogEclipse, Display,
+			TEXT("[1EPERSOON %s SCHERM] wapen projecteert op (%.0f, %.0f) in een beeld van %dx%d — %s"),
+			Label, Screen.X, Screen.Y, SizeX, SizeY,
+			!bOnScreen ? TEXT("projecteert NIET (achter de camera)")
+				: (bInsideRect ? TEXT("BINNEN het beeld — dan is het geen kaderprobleem en moet ik naar zichtbaarheid kijken")
+					: TEXT("BUITEN het beeld — het wapen hangt naast/onder de kijkkegel, en DAT is waarom 1e persoon leeg is")));
+	}
+}
+
+void AEclipseGameMode::AdvanceWeaponProof()
+{
+	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
+	AEclipseCharacter* Body = Controller != nullptr ? Cast<AEclipseCharacter>(Controller->GetPawn()) : nullptr;
+	if (Body == nullptr)
+	{
+		return;
+	}
+
+	// TOESTAND ZETTEN EN OPNEMEN IN DEZELFDE STAP, en dat mag hier wel — anders
+	// dan bij de camera. Een materiaalsectie aan- of uitzetten is een
+	// renderstate-wijziging zonder blend: het volgende getekende frame heeft hem
+	// al. De camerablends in de hoofdronde hebben die stap-ertussen wél nodig, en
+	// dat verschil hoort benoemd te zijn in plaats van gekopieerd.
+	switch (WeaponProofStep)
+	{
+	case 0:
+		// EERST STILZETTEN, EN DAT IS GEEN NETHEID MAAR DE MEETOPSTELLING.
+		//
+		// De eerste proefronde (31-07 20:17) liep hier onderuit en het is leerzaam
+		// genoeg om te bewaren: het personage LIEP door tijdens de vijf toestanden,
+		// dus A, G en D zijn op verschillende plekken en in verschillende poses
+		// opgenomen. Daarmee is "A min B" niet uit te rekenen en is "ik zie er één"
+		// niet te vergelijken met "ik zie er twee" — de frames verschillen sowieso.
+		//
+		// Een reeks die bedoeld is om ÉÉN variabele te isoleren, moet alle andere
+		// vasthouden. Dat is precies de fout die dit project al eerder maakte met
+		// de speler-weglaten-proef: twee frames verschilden altijd, dus het
+		// verschil bewees niets.
+		GetWorldTimerManager().ClearTimer(PlayShotDriveTimer);
+		bPlayShotWalking = false;
+		bPlayShotFiring = false;
+		bPlayShotTurning = false;
+		if (UCharacterMovementComponent* Move = Body->GetCharacterMovement())
+		{
+			Move->StopMovementImmediately();
+		}
+		// A — ZOALS VERSCHEEPT. De nulmeting: ingebouwde sectie zichtbaar, geen
+		// los wapen. Dit is de toestand die de owner op HighresScreenshot00915 zag.
+		Body->SetOnlyBuiltInWeaponVisible(false);
+		Body->SetBuiltInWeaponVisible(true);
+		Body->SetAttachedWeaponVisible(false);
+		MeasureWeaponVisual(TEXT("A"));
+		CaptureHudFrame(TEXT("wapen_A_ingebouwd"));
+		break;
+	case 1:
+		// C — ALLEEN de wapensectie. Overhouden in plaats van weglaten, dezelfde
+		// truc als opname 5 van de hoofdronde: wat hier staat, ÍS de wapensectie.
+		// Eerst geprobeerd als het omgekeerde (weglaten en het verschil zoeken) —
+		// dat werkt niet, want dan bewijst een verschil alleen dát er iets weg is.
+		Body->SetOnlyBuiltInWeaponVisible(true);
+		Body->SetAttachedWeaponVisible(false);
+		CaptureHudFrame(TEXT("wapen_C_alleen_wapensectie"));
+		break;
+	case 2:
+		// B — het lichaam zonder de wapensectie. A min B hoort C te zijn.
+		Body->SetOnlyBuiltInWeaponVisible(false);
+		Body->SetBuiltInWeaponVisible(false);
+		Body->SetAttachedWeaponVisible(false);
+		MeasureWeaponVisual(TEXT("B"));
+		CaptureHudFrame(TEXT("wapen_B_zonder_wapensectie"));
+		break;
+	case 3:
+		// G — DE TWEE-GEWEREN-TOESTAND, met opzet opgezocht.
+		//
+		// Dit is de tegenproef en hij is het scherpste frame van de hele reeks.
+		// Zonder hem is "ik zie er één op frame D" net zo goed te verklaren
+		// doordat het NIEUWE mesh helemaal niet gerenderd wordt — dan telt het
+		// oude geweer als bewijs voor het nieuwe. Dat is exact de vorm van fout
+		// die dit project blijft opleveren: een uitkomst die twee verklaringen
+		// niet scheidt.
+		//
+		// Staan er op G TWEE geweren en op D ÉÉN, dan is bewezen dat (a) het losse
+		// mesh echt getekend wordt en (b) stap 1 echt werk doet. Elk van beide
+		// alleen bewijst niets.
+		Body->SetBuiltInWeaponVisible(true);
+		Body->SetAttachedWeaponVisible(true);
+		MeasureWeaponVisual(TEXT("G"));
+		CaptureHudFrame(TEXT("wapen_G_BEIDE_tegenproef"));
+		break;
+	case 4:
+		// D — stap 2 en 3 samen, en stap 1 erbij: precies ÉÉN geweer.
+		Body->SetBuiltInWeaponVisible(false);
+		Body->SetAttachedWeaponVisible(true);
+		MeasureWeaponVisual(TEXT("D"));
+		CaptureHudFrame(TEXT("wapen_D_los_aan_hand"));
+		break;
+	case 5:
+	{
+		// E — STAP 4, de echte proef op de som. Dit is wat vandaag visueel niets
+		// doet, en de reden dat dit hele dossier bestaat.
+		//
+		// Via de wapencomponent en niet via een eigen mesh-wissel: het moet door
+		// dezelfde SwapWeapon die de RB-knop gebruikt, anders toetst deze ronde een
+		// pad dat niemand speelt.
+		UEclipseHitscanWeaponComponent* Weapon = Body->FindComponentByClass<UEclipseHitscanWeaponComponent>();
+		const FName Before = Weapon != nullptr ? Weapon->GetActiveWeaponName() : NAME_None;
+		const FEclipseWeaponVisualReport R0 = Body->SampleWeaponVisual();
+		const bool bSwapped = Weapon != nullptr && Weapon->SwapWeapon();
+		const FEclipseWeaponVisualReport R1 = Body->SampleWeaponVisual();
+		const FName After = Weapon != nullptr ? Weapon->GetActiveWeaponName() : NAME_None;
+
+		// DE UITSLAG IS HET VERSCHIL IN GEOMETRIE, niet het feit dat SwapWeapon
+		// true gaf. Dat laatste was op 27-07 al waar terwijl er visueel niets
+		// gebeurde; een teller die twee verklaringen niet scheidt is geen meting.
+		const bool bMeshChanged = R0.AttachedMeshName != R1.AttachedMeshName;
+		UE_LOG(LogEclipse, Display,
+			TEXT("[WAPEN E STAP4] wissel %d: rij '%s' -> '%s', mesh '%s' -> '%s', langste as %.1f -> %.1f cm — ZICHTBAAR VERSCHIL: %s"),
+			bSwapped ? 1 : 0, *Before.ToString(), *After.ToString(),
+			R0.AttachedMeshName.IsEmpty() ? TEXT("(geen)") : *R0.AttachedMeshName,
+			R1.AttachedMeshName.IsEmpty() ? TEXT("(geen)") : *R1.AttachedMeshName,
+			R0.AttachedExtentCm.GetMax(), R1.AttachedExtentCm.GetMax(),
+			bMeshChanged ? TEXT("JA") : TEXT("NEE"));
+		if (bSwapped && !bMeshChanged)
+		{
+			UE_LOG(LogEclipse, Warning,
+				TEXT("[WAPEN E STAP4 FOUT] de wissel lukte maar het zichtbare mesh veranderde NIET — dat is precies de klacht van owner-punt 5."));
+		}
+		MeasureWeaponVisual(TEXT("E"));
+		CaptureHudFrame(TEXT("wapen_E_na_wissel"));
+		break;
+	}
+	case 6:
+		// EN NU IN EERSTE PERSOON. Het scherpste stuk van de owner-eis: een wapen
+		// dat in 3e persoon klopt en in 1e door het scherm steekt, is niet af.
+		// [GEZIEN — HUD_1e_persoon.png van 31-07: daar staat HELEMAAL niets, geen
+		// loop en geen handen.] Dat is de nulmeting waartegen dit frame afsteekt.
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Pressed, 1.0, false));
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Released, 1.0, false));
+		break;
+	case 7:
+		MeasureWeaponVisual(TEXT("1E"));
+		MeasureFirstPersonView(TEXT("met_los_wapen"));
+		CaptureHudFrame(TEXT("wapen_F_eerste_persoon"));
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Pressed, 1.0, false));
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Released, 1.0, false));
+		break;
+	default:
+		UE_LOG(LogEclipse, Display, TEXT("[WAPEN] proefronde klaar."));
+		GetWorldTimerManager().ClearTimer(WeaponProofTimer);
+		Controller->ConsoleCommand(TEXT("quit"));
+		return;
+	}
+	++WeaponProofStep;
+}
+
 void AEclipseGameMode::AdvancePlayShotRound()
 {
 	APlayerController* Controller = GetWorld() != nullptr ? GetWorld()->GetFirstPlayerController() : nullptr;
@@ -1363,6 +1905,26 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		}
 		break;
 	case 8:
+		// MET DE UI EROP — VIERDE PAD, en het eerste dat werkt.
+		//
+		// Drie eerdere pogingen staan hier in de geschiedenis en zijn alle drie
+		// GEMETEN en afgeschreven: HighResShot tekent alleen de 3D-scene;
+		// FScreenshotRequest("PlayShot_MetUI", bShowUI) leverde geen enkel bestand op
+		// (het `Shot showui` erna overschreef hetzelfde globale verzoek in dezelfde
+		// frame); en `Shot showui` zelf leverde wél een bestand maar zonder kruis en
+		// zonder teller — nagekeken op 1:1 pixels, vier keer uitvergroot.
+		//
+		// CaptureHudFrame roept het Slate-vensterpad rechtstreeks aan, schrijft naar
+		// een naam die je terugvindt, en meldt in het log of het lukte.
+		//
+		// VÓÓR HET HERLADEN, en dat is geen kosmetiek. De opname tekent het venster
+		// een tweede keer binnen dezelfde frame; verandert er in dat frame tekst,
+		// dan staan de oude en de nieuwe letters over elkaar heen op het beeld.
+		// GEZIEN: "AR_Foundry 19 / 30" en "HERLADEN" door elkaar, precies op de stap
+		// waar StartReload wordt aangeroepen. Een meetmoment dat samenvalt met de
+		// gebeurtenis die het meet, meet de overgang in plaats van de toestand.
+		CaptureHudFrame(TEXT("3e_persoon"));
+
 		// DE HERLAADPOSE OP BEELD. Belica heeft er zelf geen; deze is geleend uit
 		// SciFiCharacter via compatibele skeletten. Dat de take RESOLVET is
 		// gemeten, maar dat is niet hetzelfde als dat hij er goed uitziet: dit is
@@ -1393,37 +1955,6 @@ void AEclipseGameMode::AdvancePlayShotRound()
 				}
 			}
 		}
-		// MET DE UI EROP. HighResShot tekent alleen de 3D-scene; de HUD is een
-		// UMG-widget en valt er buiten. Op de eerste zes beelden stond dus geen
-		// munitieteller, en ik had dat bijna als ontbrekende HUD gerapporteerd —
-		// een bevinding die niet over de game ging maar over mijn meetmethode.
-		//
-		// FScreenshotRequest met bShowUI neemt de widgets wel mee, dus dit beeld
-		// beantwoordt de vraag in plaats van hem open te laten.
-		FScreenshotRequest::RequestScreenshot(TEXT("PlayShot_MetUI"), /*bShowUI*/ true, /*bAddFilenameSuffix*/ false);
-		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 8] zelfde beeld MET de HUD erop"));
-
-		// DIE BELOFTE HIERBOVEN KLOPT NIET, en dat is op 27-07 met eigen ogen
-		// vastgesteld: op PlayShot_MetUI.png staat GEEN HUD. Geen munitieteller,
-		// geen richtkruis, niets. De comment beweerde het tegendeel, en dat is
-		// precies de vorm waar dit project telkens op valt — een belofte in een
-		// commentaar die niemand tegen de uitkomst hield.
-		//
-		// Zolang dit niet werkt is de owner-eis "controleer het op een screenshot
-		// voordat je het af noemt" voor GEEN ENKEL UI-element te vervullen, en dan
-		// is elk punt van zijn lijst onbewijsbaar. Dat maakt dit geen detail maar
-		// de blokkade.
-		//
-		// DERDE PAD, en het eerste dat niet via FScreenshotRequest loopt: het
-		// engine-eigen consolecommando. Dat gaat door
-		// UGameViewportClient::HandleScreenshotCommand en zet zijn vlag ná de
-		// Slate-tekening in plaats van ervoor — een andere volgorde, en dus een
-		// echte tweede kans in plaats van dezelfde poging met een andere naam.
-		// De bestandsnaam wordt door de engine genummerd; de ronde drukt alle
-		// nieuwe bestanden af, dus hij is terug te vinden.
-		Controller->ConsoleCommand(TEXT("Shot showui"));
-		UE_LOG(LogEclipse, Display,
-			TEXT("[PLAYSHOT 8] tweede poging met de UI, via het consolecommando 'Shot showui' — kijk of dit beeld de HUD wel draagt"));
 		// De liberation-dump meedraaien in de ronde. Niet omdat hij bij een
 		// SCREENSHOT hoort, maar omdat dit de enige plek is waar een echte
 		// campagne draait met een console eronder — en een debug-commando dat
@@ -1468,6 +1999,80 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		// slots — precies de gezonde nulmeting waartegen een lege kaart afsteekt.
 		Controller->ConsoleCommand(TEXT("Eclipse.Save.Report"));
 		break;
+	case 9:
+		// DE WISSEL NAAR EERSTE PERSOON, en die is geen bijzaak: de scherpste eis van
+		// de owner is dat alles róndom het vizier in BEIDE perspectieven leesbaar
+		// is. Een kruis dat in de derde persoon werkt en in de eerste half achter het
+		// wapen verdwijnt, is niet af — en dat verschil zie je alleen op twee beelden
+		// naast elkaar.
+		//
+		// Via InputKey en niet via SetFirstPerson(): dit moet door dezelfde
+		// Enhanced-Input-keten als de C van de speler, anders test de ronde een pad
+		// dat niemand gebruikt.
+		if (AEclipseCharacter* ViewBody = Cast<AEclipseCharacter>(Controller->GetPawn()))
+		{
+			// Mikken uit, zodat het 1e-persoonsbeeld de neutrale heupstand toont en
+			// niet de mikcamera — anders vergelijk je twee verschillende toestanden.
+			ViewBody->SetAiming(false);
+		}
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Pressed, 1.0, false));
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Released, 1.0, false));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT WISSEL] C geduwd — 3e -> 1e persoon"));
+		// MIDDEN IN DE OVERGANG, 0,10 s na de druk terwijl de blend van 0,20 s loopt.
+		// De overgang telt mee voor de feel: knippert de HUD, springt hij, of blijft
+		// er iets hangen? Dat is per definitie niet te zien op een beeld ervoor of
+		// erna, dus valt hier een eigen opname.
+		{
+			FTimerHandle MidBlend;
+			GetWorldTimerManager().SetTimer(MidBlend, FTimerDelegate::CreateWeakLambda(this, [this]()
+			{
+				CaptureHudFrame(TEXT("wissel_midden"));
+			}), 0.10f, /*bLoop*/ false);
+		}
+		break;
+	case 10:
+		CaptureHudFrame(TEXT("1e_persoon"));
+		if (const AEclipseCharacter* ViewCheck = Cast<AEclipseCharacter>(Controller->GetPawn()))
+		{
+			// Het beeld zegt WAT je ziet, deze regel zegt WELKE stand dat hoort te
+			// zijn. Zonder die tweede helft is een beeld dat er derde-persoons uitziet
+			// niet te onderscheiden van een wissel die niet aankwam.
+			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT 1E PERSOON] IsFirstPerson=%d"),
+				ViewCheck->IsFirstPerson() ? 1 : 0);
+		}
+		Controller->ConsoleCommand(TEXT("Eclipse.UI.Report"));
+		// En terug, want een wissel die één kant op werkt is een halve wissel.
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Pressed, 1.0, false));
+		Controller->InputKey(FInputKeyParams(EKeys::C, IE_Released, 1.0, false));
+		UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT WISSEL] C geduwd — 1e -> 3e persoon"));
+		break;
+	case 11:
+		CaptureHudFrame(TEXT("3e_persoon_terug"));
+		if (const AEclipseCharacter* BackCheck = Cast<AEclipseCharacter>(Controller->GetPawn()))
+		{
+			UE_LOG(LogEclipse, Display, TEXT("[PLAYSHOT TERUG] IsFirstPerson=%d (hoort 0 te zijn)"),
+				BackCheck->IsFirstPerson() ? 1 : 0);
+		}
+		Controller->ConsoleCommand(TEXT("Eclipse.UI.Report"));
+		break;
+	case 12:
+		// DE WAPENPROEF (O-5 "volledig", 31-07) — hier en niet in een eigen ronde.
+		//
+		// Op dit punt is de speler het ENIGE zichtbare lichaam (opname 4 verborg de
+		// squad en de aankleedfiguren) en staat hij weer in de derde persoon. Dat
+		// is precies de opstelling die deze proef nodig heeft, en hem hier ophangen
+		// scheelt een tweede ronde met een tweede kans om af te wijken.
+		//
+		// Eigen timer op 0,7 s: een materiaalsectie aan- of uitzetten heeft geen
+		// blend nodig, dus de 2,0 s van de hoofdronde zou zeven keer voor niets
+		// gewacht worden. De PERSPECTIEFwissel in stap 5/6 heeft die tijd wel
+		// nodig, en 0,7 s dekt de blend van 0,20 s ruim.
+		GetWorldTimerManager().ClearTimer(PlayShotTimer);
+		WeaponProofStep = 0;
+		GetWorldTimerManager().SetTimer(WeaponProofTimer, this, &AEclipseGameMode::AdvanceWeaponProof,
+			0.7f, /*bLoop*/ true, /*FirstDelay*/ 0.3f);
+		UE_LOG(LogEclipse, Display, TEXT("[WAPEN] proefronde start — A/C/B/D/E plus eerste persoon."));
+		return;
 	default:
 		UE_LOG(LogEclipse, Display, TEXT("PlayShot: ronde klaar."));
 		Controller->ConsoleCommand(TEXT("quit"));
@@ -1480,6 +2085,23 @@ void AEclipseGameMode::SetupShotRig()
 {
 	if (!FParse::Param(FCommandLine::Get(), TEXT("EclipseShot")))
 	{
+		return;
+	}
+
+	// TWEE RIGS TEGELIJK IS GEEN RONDE. Vraagt de startregel om allebei, dan stapt
+	// de vaste-camera-ronde opzij: die teleporteert de pawn naar overzichtspunten
+	// en de speelronde wil hem juist laten lopen — samen leveren ze een beeld op
+	// waar geen van beide iets over zegt.
+	//
+	// De combinatie is bewust bruikbaar en niet verboden:
+	// `-EclipseShot -EclipseShotPlay` is de SPEELronde met de debuglaag
+	// onderdrukt, en dat is precies de configuratie waarin een review-still de
+	// spelerlaag laat zien zonder debugtekst. Zonder deze uitgang was er geen
+	// enkele draai waarin die twee eisen tegelijk te fotograferen zijn.
+	if (FParse::Param(FCommandLine::Get(), TEXT("EclipseShotPlay")))
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("ShotRig: -EclipseShotPlay staat er ook — de vaste-camera-ronde stapt opzij; dit is de speelronde met de debuglaag onderdrukt."));
 		return;
 	}
 
@@ -1644,6 +2266,17 @@ void AEclipseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		Bus->Unsubscribe(ShotFiredHandle);
 		Bus->Unsubscribe(WorldImpactHandle);
 	}
+#if !UE_BUILD_SHIPPING
+	// De NOEMER van de reproductiemeting. Een ronde die haalt tot het eind moet
+	// zelf zeggen hoeveel sloop-en-herbouwen hij overleefd heeft; anders is de
+	// enige aflezing "geen crash" en dat is geen getal.
+	if (SkyChurnPerFrame > 0)
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[SKYCHURN EINDE] %d spelframes gechurnd, %d herbouwen totaal, %d per frame — ronde gehaald."),
+			SkyChurnFrames, SkyChurnRebuilds, SkyChurnPerFrame);
+	}
+#endif
 	Super::EndPlay(EndPlayReason);
 }
 

@@ -294,6 +294,22 @@ void UEclipseHitscanWeaponComponent::ApplyWeaponRow(const FEclipseWeaponRow& Row
 	SlotNames = { NAME_None };
 	ActiveSlot = 0;
 	ReadyAtSeconds = -1.0;
+	NotifyActiveWeaponChanged();
+}
+
+void UEclipseHitscanWeaponComponent::NotifyActiveWeaponChanged()
+{
+	// AAN HET FEIT, NIET AAN DE KNOP (owner-regel "hang gedrag aan het feit").
+	//
+	// Dit is de reparatie van owner-punt 5, en de vorm ervan telt: het zichtbare
+	// wapen hangt aan "het actieve wapen is veranderd" en niet aan de RB-binding.
+	// Daardoor verandert ELK pad dat het wapen wisselt ook wat je ziet — de
+	// speler, ApplyLoadout bij de missiestart, een debugcommando, en straks de AI.
+	// Een pad-tabel is incompleet zodra er een pad bij komt; dit feit niet.
+	if (AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwner()))
+	{
+		Body->RefreshWeaponVisual();
+	}
 }
 
 void UEclipseHitscanWeaponComponent::ApplyLoadout(const FEclipseWeaponRow& Primary, FName PrimaryName,
@@ -304,6 +320,10 @@ void UEclipseHitscanWeaponComponent::ApplyLoadout(const FEclipseWeaponRow& Prima
 	SlotRows.Add(Sidearm);
 	SlotAmmo.Add(Sidearm.MagazineSize);
 	SlotNames.Add(SidearmName);
+	// ApplyWeaponRow hierboven riep dit al aan, maar toen heette slot 0 nog
+	// NAME_None — en zonder rijnaam is er geen mesh te vinden. Opnieuw, nu de
+	// namen er zijn.
+	NotifyActiveWeaponChanged();
 }
 
 bool UEclipseHitscanWeaponComponent::IsReady() const
@@ -344,6 +364,14 @@ bool UEclipseHitscanWeaponComponent::SwapWeapon()
 	// de DMR pas na 0,8 s, en dat is het verschil tussen een noodwapen en een keuze.
 	ReadyAtSeconds = World->GetTimeSeconds() + Weapon.ReadySeconds;
 	ConsecutiveShots = 0; // vers wapen, verse reeks: het eerste schot is weer zuiver
+
+	// EN NU VERANDERT ER OOK IETS AAN WAT JE ZIET (O-5 "volledig", 31-07).
+	//
+	// Dit is de stap waar het hele dossier op uitkomt. De wapenlaag was als DATA
+	// al compleet — twee slots, elk met een eigen magazijn — maar de wissel deed
+	// visueel NIETS, want er was niets om te wisselen zolang het wapen deel van de
+	// karaktermesh was. Deze regel is de proef op de som.
+	NotifyActiveWeaponChanged();
 
 	if (UGameInstance* GameInstance = World->GetGameInstance())
 	{

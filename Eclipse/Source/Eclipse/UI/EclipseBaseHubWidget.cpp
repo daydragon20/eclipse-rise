@@ -38,6 +38,19 @@ namespace
 	}
 }
 
+void UEclipseBaseHubWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	// DE BOOM HOORT HIER, niet in NativeConstruct. UUserWidget::RebuildWidget maakt
+	// de Slate-boom uit WidgetTree->RootWidget en roept NativeConstruct pas daarna
+	// aan; een wortel die in NativeConstruct wordt gezet, komt dus altijd één stap
+	// te laat en de basis-hub bleef een lege SSpacer. Zelfde oorzaak en zelfde
+	// reparatie als in UEclipseMissionHudWidget — zie de uitleg daar; dit is de
+	// hoogte "Base" van dezelfde schermlaag.
+	BuildLayout();
+}
+
 void UEclipseBaseHubWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -51,7 +64,6 @@ void UEclipseBaseHubWidget::NativeConstruct()
 			FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseBaseHubWidget::OnAnyFact));
 	}
 
-	BuildLayout();
 	RefreshAll();
 }
 

@@ -49,6 +49,18 @@ namespace EclipseTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_ClassAbilityUsed)
 
 	/**
+	 * Een order STAAT KLAAR maar is nog niet uitgevoerd (SPEC-P2-02 Stage B).
+	 *
+	 * Twee dingen dragen hierop: het flankvoorstel dat op jouw goedkeuring wacht,
+	 * en de markeringen van een sync strike. Ook de NEGATIEVE overgangen rijden
+	 * mee — verlopen, geannuleerd, markering weggevallen — want de debug-UI die de
+	 * routelijn en de pips uit deze stroom TEKENT, moet ze uit dezelfde stroom
+	 * kunnen wissen. Een voorstel dat stil verdwijnt is precies de stilte die 9.5
+	 * verbiedt, ook al is niets-doen van de speler geen weigering.
+	 */
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Squad_OrderQueued)
+
+	/**
 	 * Een soldaat doet uit zichzelf iets dat de speler RAAKT: vuur openen, dekking
 	 * zoeken onder vuur, herladen. Reason draagt welk van de drie ("Contact",
 	 * "TakingFire", "Reloading").

@@ -81,6 +81,23 @@ AEclipseCharacter* AEclipseEnemyController::FindNearestVisibleHostile() const
 	return Nearest;
 }
 
+bool AEclipseEnemyController::CanSeeBody(const AActor* Body) const
+{
+	const AActor* Self = GetPawn();
+	if (Body == nullptr || Self == nullptr)
+	{
+		return false;
+	}
+	// Exact de toets uit FindNearestVisibleHostile: straal uit het archetype,
+	// daarna de zichtlijn. Wie hier een eigen getal zou zetten, maakt "ongezien"
+	// voor de sync strike iets anders dan "ongezien" voor de vijand die schiet.
+	if (FVector::DistSquared(Body->GetActorLocation(), Self->GetActorLocation()) > FMath::Square(Archetype.PerceptionRadius))
+	{
+		return false;
+	}
+	return LineOfSightTo(Body);
+}
+
 void AEclipseEnemyController::SenseAndAct()
 {
 	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetPawn());
@@ -124,6 +141,11 @@ void AEclipseEnemyController::SenseAndAct()
 
 	// Zien wint van horen: wie je ziet, hoeft niet meer te zoeken.
 	bHasInvestigateLocation = false;
+
+	// HET FEIT, los van de logregel eronder (SPEC-P2-02 Stage B). De stealth-
+	// doctrine en de sync strike lezen dit: zolang niemand ons heeft gezien is
+	// zwijgen iets waard, daarna niet meer.
+	bHasSeenPlayerSide = true;
 
 	SetFocus(Target);
 	// De uitkomstcode meelezen, want AAIController::MoveTo houdt zijn faalreden

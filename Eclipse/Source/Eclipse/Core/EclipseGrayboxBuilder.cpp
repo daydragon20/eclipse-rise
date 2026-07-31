@@ -1,4 +1,4 @@
-#include "Core/EclipseGrayboxBuilder.h"
+﻿#include "Core/EclipseGrayboxBuilder.h"
 
 #include "Components/AudioComponent.h"
 #include "Components/DirectionalLightComponent.h"
@@ -441,6 +441,182 @@ bool IsDistrictPresent(UWorld& World)
 	}
 	return false;
 }
+
+void RebuildDistrictSky(UWorld& World)
+{
+	// APART VAN BuildDistrict OMDAT DE LEVENSDUUR ZELF ONDERZOCHT WORDT.
+	//
+	// Dit blok stond woordelijk midden in BuildDistrict. Het staat hier niet om
+	// netter te zijn maar omdat het GPU-crashdossier (DEBUG_DISCIPLINE 4.5) een
+	// page fault aanwijst in de SkyAtmosphere-LUT compute-pass, en de enige plek
+	// in dit project die een ASkyAtmosphere VERNIETIGT en meteen een nieuwe
+	// SPAWNT, is precies dit blok. Om te kunnen METEN of dat het mechanisme is,
+	// moet een diagnose exact dit pad kunnen aanroepen -- niet iets wat er op
+	// lijkt. Een reproductie die een andere code draait dan de verdachte bewijst
+	// niets over de verdachte.
+	//
+	// Gedrag is ongewijzigd: BuildDistrict roept dit op dezelfde plek in dezelfde
+	// volgorde aan als voorheen.
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	const bool bFullFidelity = World.GetFeatureLevel() >= ERHIFeatureLevel::SM6;
+
+	// WANNEER draait deze herbouw, ten opzichte van het RENDEREN. Dat is de eerste
+	// vraag van het dossier en hij mag niet afgeleid worden uit "InitGame klinkt
+	// vroeg": GFrameCounterRenderThread telt de frames die de RENDERthread heeft
+	// afgemaakt, dus > 0 betekent letterlijk "er is al beeld geweest".
+	static int32 SkyRebuildCount = 0;
+	++SkyRebuildCount;
+	int32 StaleSun = 0, StaleSkyLight = 0, StaleAtmosphere = 0, StaleFog = 0;
+	for (TActorIterator<ADirectionalLight> It(&World); It; ++It) { ++StaleSun; }
+	for (TActorIterator<ASkyLight> It(&World); It; ++It) { ++StaleSkyLight; }
+	for (TActorIterator<ASkyAtmosphere> It(&World); It; ++It) { ++StaleAtmosphere; }
+	for (TActorIterator<AExponentialHeightFog> It(&World); It; ++It) { ++StaleFog; }
+	if (SkyRebuildCount <= 8 || (SkyRebuildCount % 200) == 0)
+	{
+		UE_LOG(LogEclipse, Display,
+			TEXT("[SKYBOUW %d] t=%.2fs spelframe=%llu renderframe=%llu speelt=%d | sloopt %d zon / %d skylight / %d atmosphere / %d mist"),
+			SkyRebuildCount, World.GetTimeSeconds(),
+			static_cast<uint64>(GFrameCounter), static_cast<uint64>(GFrameCounterRenderThread),
+			World.HasBegunPlay() ? 1 : 0, StaleSun, StaleSkyLight, StaleAtmosphere, StaleFog);
+	}
+
+	// One authoritative mood: purge the host map's own sun/sky/fog first. Entry
+	// ships a horizon-level sun that paints facades warm but leaves every
+	// horizontal surface black — with two suns the district's look is luck.
+	{
+		TArray<AActor*> Stale;
+		for (TActorIterator<ADirectionalLight> It(&World); It; ++It) { Stale.Add(*It); }
+		for (TActorIterator<ASkyLight> It(&World); It; ++It) { Stale.Add(*It); }
+		for (TActorIterator<ASkyAtmosphere> It(&World); It; ++It) { Stale.Add(*It); }
+		for (TActorIterator<AExponentialHeightFog> It(&World); It; ++It) { Stale.Add(*It); }
+		for (AActor* Actor : Stale)
+		{
+			Actor->Destroy();
+		}
+	}
+
+	// Low industrial sun; drives the SkyAtmosphere so the horizon carries the mood.
+	// Mid-afternoon sun: warm but high enough that shade sides stay readable —
+	// the stylized look wants soft, lifted shadows, not noir silhouettes.
+	if (ADirectionalLight* Sun = World.SpawnActor<ADirectionalLight>(FVector(0, 0, 5000), SunRotation, Params))
+	{
+		if (UDirectionalLightComponent* SunComponent = Cast<UDirectionalLightComponent>(Sun->GetLightComponent()))
+		{
+			// ADirectionalLight ships static-mobility; a runtime spawn keeps the
+			// default horizontal direction unless made movable and re-rotated —
+			// which lit facades and left every floor black (pass-8 forensics).
+			// SunRotation is shared with the toon material's LightDir (see above).
+			SunComponent->SetMobility(EComponentMobility::Movable);
+			Sun->SetActorRotation(SunRotation);
+			// Legacy intensity 8 pairs with the toon emissive x10 range under auto
+			// exposure. Atmosphere re-linked: the old decouple protected LIT ground
+			// from transmittance loss (pass-15) — the district is unlit now, so the
+			// sun may power a real dusk sky and only lights pawns.
+			SunComponent->SetIntensity(8.0f);
+			SunComponent->SetLightColor(FLinearColor(1.0f, 0.87f, 0.70f));
+			SunComponent->SetAtmosphereSunLight(true);
+			SunComponent->SetVolumetricScatteringIntensity(2.0f);
+			// WELKE ZON DE ZON IS, met zoveel woorden. Het district heeft twee
+			// directionele lampen (deze en de fill hieronder), en dan moet de
+			// forward-shading weten welke de leidende is. Zonder die keuze pakt
+			// de engine er zelf een "op algehele helderheid" en zet daar een
+			// GELE WAARSCHUWING OVER HET SCHERM — gevonden op het eerste beeld
+			// dat de UI meenam, en dus iets wat de owner tijdens het spelen
+			// gewoon over zijn scherm zou zien lopen.
+			//
+			// De fallback koos hier waarschijnlijk goed, maar "waarschijnlijk
+			// goed omdat hij toevallig helderder is" is geen keuze. Zodra iemand
+			// de fill-intensiteit aanpast kantelt het beeld zonder dat iemand
+			// iets aan de belichting deed.
+			SunComponent->ForwardShadingPriority = 10;
+			// SM5 laptop: the CSM path blankets the 200x-scaled ground slab in
+			// shadow no matter the caster set (passes 5-16 forensics) — sun ships
+			// shadowless there. SM6: VSM shadows return; the unlit district cannot
+			// darken (emissive ignores shadowing), but the volumetric smog CAN —
+			// buildings now cut real light shafts through the haze (15.5 revision).
+			SunComponent->SetCastShadows(bFullFidelity);
+			// Alleen de eerste paar herbouwen loggen. Onder de churn-reproductie
+			// loopt dit blok duizenden keren, en een logregel per keer verandert de
+			// framestijd -- dan meet de reproductie voor een deel het loggen.
+			if (SkyRebuildCount <= 8)
+			{
+				UE_LOG(LogEclipse, Display, TEXT("Graybox: sun direction %s (movable)."), *SunComponent->GetDirection().ToString());
+			}
+		}
+	}
+
+	World.SpawnActor<ASkyAtmosphere>(FVector::ZeroVector, FRotator::ZeroRotator, Params);
+
+	// SM6 only: the real captured skylight the fill light stands in for on SM5
+	// (the laptop's realtime capture fed horizontal glare + a black zenith,
+	// passes 3-14). Lights pawns/props; the unlit district ignores it.
+	if (bFullFidelity)
+	{
+		if (ASkyLight* Sky = World.SpawnActor<ASkyLight>(FVector(0, 0, 400), FRotator::ZeroRotator, Params))
+		{
+			if (USkyLightComponent* SkyComponent = Sky->GetLightComponent())
+			{
+				SkyComponent->SetMobility(EComponentMobility::Movable);
+				SkyComponent->SetRealTimeCaptureEnabled(true);
+				// 2.2: lit PBR character bodies (step-2 pipeline) read at dusk;
+				// the unlit district ignores this entirely, so the district
+				// grade is untouched (first body-showcase round: near-black).
+				SkyComponent->SetIntensity(2.2f);
+			}
+		}
+	}
+
+	// Fill light instead of a captured skylight: on this box's SM5 fallback the
+	// realtime sky capture feeds horizontal glare and a black zenith (floors go
+	// dark, facades blow out — passes 3-14 forensics). A soft cool shadowless
+	// counter-sun gives the flat, readable stylized shade the direction wants;
+	// the strong PC swaps this for a real captured skylight + Lumen bounce.
+	if (ADirectionalLight* Fill = World.SpawnActor<ADirectionalLight>(FVector(0, 0, 5000), FRotator(-35.0f, 235.0f, 0), Params))
+	{
+		if (UDirectionalLightComponent* FillComponent = Cast<UDirectionalLightComponent>(Fill->GetLightComponent()))
+		{
+			FillComponent->SetMobility(EComponentMobility::Movable);
+			Fill->SetActorRotation(FRotator(-35.0f, 235.0f, 0));
+			FillComponent->SetIntensity(2.5f); // pawn fill in the banked pass-19 units; the unlit district ignores it
+			FillComponent->SetLightColor(FLinearColor(0.55f, 0.65f, 0.85f));
+			FillComponent->SetCastShadows(false);
+			FillComponent->SetAtmosphereSunLight(false);
+			// Nadrukkelijk lager dan de zon: dit is tegenlicht, geen tweede zon.
+			FillComponent->ForwardShadingPriority = 0;
+		}
+	}
+
+	// Kessara smog: warm sodium haze with volumetrics so the sun shafts read.
+	if (AExponentialHeightFog* Fog = World.SpawnActor<AExponentialHeightFog>(FVector(0, 0, -50), FRotator::ZeroRotator, Params))
+	{
+		if (UExponentialHeightFogComponent* FogComponent = Fog->GetComponent())
+		{
+			// Haze, not soup: the district must read across its full 200 m at
+			// command distance (15.5); the smog hugs the ground via the falloff.
+			// Dressing-iteratie 3 note — density 0.02 was TRIED here and REVERTED
+			// (2026-07-25). It was aimed at a "ground brightens toward the horizon"
+			// defect that turned out to be a measurement error: a probe rect at the
+			// horizon band contained clipped non-floor pixels. A clean depth scan on
+			// cam 4 (Tools/measure_frame_values.py, five rects from near to far)
+			// reads 0.0489 / 0.0495 / 0.0553 / 0.0536 / 0.0523 linear — flat within
+			// ~7%, not the 2x I had derived. Raising the density changed the
+			// near-to-far ratio by 0.02x, i.e. nothing. The floor's aerial
+			// perspective is therefore NOT fog-limited at this density, and the
+			// value stays where it was measured to belong.
+			FogComponent->SetFogDensity(0.006f);
+			FogComponent->SetFogHeightFalloff(0.2f);
+			FogComponent->SetFogInscatteringColor(FLinearColor(0.42f, 0.32f, 0.24f));
+			// SM5 laptop: volumetric fog receives no sun on the fallback path and
+			// extinguishes the whole ground plane to black — plain exponential
+			// haze there. SM6: real volumetric smog, so the shadowed sun draws
+			// shafts through the crane-and-compound silhouettes (Kessara identity
+			// 03.3: amber smog; 15.5 revision: more atmosphere within the style).
+			FogComponent->SetVolumetricFog(bFullFidelity);
+		}
+	}
+}
+
 
 void BuildDistrict(UWorld& World)
 {
@@ -1404,49 +1580,82 @@ void BuildDistrict(UWorld& World)
 		}
 	}
 
-	// PLACEHOLDER(15.8): warning-sign placards — FD_WarningSigns_V1 (Fab free
-	// pack, machine-local) restyled through the toon pipeline like the car
-	// wrecks: the sign's own albedo as AlbedoTex (UVMode 1) over amber/red cel
-	// tints. The pack ships decal cutouts over green-screen photo backing
-	// (headless audit 2026-07-23), so these ride the background-cleaned
-	// placards from Tools/prepare_warning_signs.py (import via
-	// Tools/import_warning_signs.py); gains are the measured 1/linear-mean per
-	// placard — the car-block 3.2 assumes a full-frame albedo, these are
-	// bright marks on a dark plate (poster-decal recipe). No collision;
-	// missing textures = skipped (GDD 14.3.5).
+	// Dominion signage family (20.2 fiction pass, 2026-07-31). These placards
+	// USED to be FD_WarningSigns_V1 — photographs of real-world Earth signs.
+	// STOP in Latin capitals, the ISO-361 radiation trefoil, a skull-and-
+	// crossbones over the word TOXIC; all three confirmed in frame on
+	// Saved/Screenshots/HUD_spelerlaag/HUD_3e_persoon.png. §20.2 is categorical:
+	// "Er zijn geen verkeersborden in de Vantara Expanse." The old curation
+	// (ASSET_CURATION.md §8) rejected 53 of 60 signs but filtered on TONE
+	// ("reads suburban"), never on FICTION — so all seven survivors were Earth
+	// signage wearing a toon tint.
+	//
+	// Replaced, not removed (§20.2: "Borden en decals worden vervangen, niet
+	// geplaatst"), by an authored Dominion signage system —
+	// Tools/generate_dominion_signs.py, import via
+	// Tools/import_generated_decals.py. The grammar is documented in that file:
+	// the Radiance sun is the root glyph, hazard is the light being wrong,
+	// carrier shape encodes who is talking, numbers are tallies not digits, and
+	// every plate ends in the same code strip (filled mark = state authority,
+	// hollow = works). Seven distinct silhouettes, one civilization.
+	//
+	// Placements, scales and the red/amber split are UNCHANGED — those were
+	// composed against the architecture and re-tuned in the 15.8 art-fix round;
+	// only the fiction moved. Gains are the measured 1/linear-mean per placard
+	// (generator output), same discipline as before, and the family now sits in
+	// a tighter band (6.3-12.3 vs the pack's 5.9-14.8) because the plates share
+	// one authored exposure. No collision; missing textures = skipped (14.3.5).
 	{
 		struct FSignDef { const TCHAR* TexPath; float TexGain; FLinearColor Lit; FLinearColor Shade; FVector Location; FVector Scale; };
 		// 15.8 art-fix (review shots 00008/00012/00013): the placards read as
-		// near-black plates. Value-normalized albedos (prepare_warning_signs.py
-		// NORM_TARGET pass) + re-measured gains, and the tints step up toward —
-		// never onto — the sodium strips' emissive budget: lit x1.4, shade to
-		// ~0.6x lit. Signs are man-made reflective placards, so their lit/shade
-		// gap is deliberately shallower than the architecture's; hue unchanged
-		// (15.5: the palette keeps hue authority, this is luminance-only).
+		// near-black plates. The fix was value-normalized albedos + re-measured
+		// gains, and tints that step up toward — never onto — the sodium strips'
+		// emissive budget: lit x1.4, shade to ~0.6x lit. Signs are man-made
+		// reflective placards, so their lit/shade gap is deliberately shallower
+		// than the architecture's; hue unchanged (15.5: the palette keeps hue
+		// authority, this is luminance-only).
+		//
+		// These tints SURVIVE the 20.2 fiction pass unchanged. The authored
+		// placards are luminance-only by construction (generate_dominion_signs.py
+		// draws greyscale), so the palette still owns the hue and the red/amber
+		// split across the district is exactly the balance the 15.8 round tuned.
 		const FLinearColor SignRedLit(0.420f, 0.084f, 0.070f), SignRedShade(0.250f, 0.050f, 0.042f);      // checkpoint red (stencil family)
 		const FLinearColor SignAmberLit(0.420f, 0.280f, 0.042f), SignAmberShade(0.250f, 0.167f, 0.025f);  // hazard amber (pad family)
 		const FSignDef Signs[] = {
-			// Gains: measured 1/linear-mean per normalized placard (tool output
-			// 2026-07-23 fix round; ASSET_CURATION.md §8 table updated).
-			// STOP hung under the gate portal's west beam, facing the Entry_Main approach.
-			{ TEXT("/Game/Art/Decals/T_sign_stop_diff.T_sign_stop_diff"), 8.9f, SignRedLit, SignRedShade, FVector(-8850, 0, 320), FVector(0.04f, 1.0f, 1.0f) },
-			// Radiation placard on the crossing lamp pole (artery x cross-street).
-			{ TEXT("/Game/Art/Decals/T_sign_radiation_diff.T_sign_radiation_diff"), 10.2f, SignAmberLit, SignAmberShade, FVector(-4650, -675, 230), FVector(0.9f, 0.04f, 0.9f) },
-			// TOXIC on the west wall inner face — the Dominion answer to the rebel stencil across the Entry_Main gap.
-			{ TEXT("/Game/Art/Decals/T_sign_toxic_diff.T_sign_toxic_diff"), 5.9f, SignAmberLit, SignAmberShade, FVector(-9944, -350, 260), FVector(0.04f, 1.4f, 1.4f) },
-			// Curation pass 2026-07-23, the four new placards (ASSET_CURATION.md §8):
-			// ROUTE arrow on the second crossing lamp — the artery choke's checkpoint
-			// routing, paired face-on with the radiation placard (review camera 6).
-			{ TEXT("/Game/Art/Decals/T_sign_route_diff.T_sign_route_diff"), 12.7f, SignRedLit, SignRedShade, FVector(-4230, -675, 240), FVector(0.9f, 0.04f, 0.9f) },
-			// LABOR beside the warehouse yard's east gate gap (Underworks labor
-			// stories, art bible §2.2) — on BldgB_E's east face, toward Spawn_Yard.
-			{ TEXT("/Game/Art/Decals/T_sign_labor_diff.T_sign_labor_diff"), 6.4f, SignAmberLit, SignAmberShade, FVector(-3146, 3250, 260), FVector(0.04f, 1.0f, 1.0f) },
-			// BLAST on the Dominion post's west face — munitions fence warning on
-			// the checkpoint approach (amber pops on the oxide-red facade).
-			{ TEXT("/Game/Art/Decals/T_sign_blast_diff.T_sign_blast_diff"), 7.0f, SignAmberLit, SignAmberShade, FVector(4146, -2400, 250), FVector(0.04f, 0.9f, 0.9f) },
-			// REACTOR exclusion triangle on the west perimeter wall north of the
-			// gate — Dominion exclusion zone stacked over the rebel stencil story.
-			{ TEXT("/Game/Art/Decals/T_sign_reactor_diff.T_sign_reactor_diff"), 14.8f, SignRedLit, SignRedShade, FVector(-9944, 700, 270), FVector(0.04f, 1.2f, 1.2f) },
+			// Gains: measured 1/linear-mean per authored placard
+			// (Tools/generate_dominion_signs.py output, 2026-07-31 fiction pass).
+			//
+			// THE CHECKPOINT SEAL — was STOP, an Earth traffic sign in Latin
+			// capitals (seen in frame, HUD_3e_persoon.png). Same function, said in
+			// Dominion: a closed ring around the Radiance sun with the authority
+			// bar struck across it. The approach is shut; present your tithe-card.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_seal_diff.T_sign_dom_seal_diff"), 6.4f, SignRedLit, SignRedShade, FVector(-8850, 0, 320), FVector(0.04f, 1.0f, 1.0f) },
+			// UNSHIELDED EMISSION — was the ISO-361 trefoil, which is a datable
+			// Earth institution (1946). A sun-state states this hazard as the light
+			// being WRONG: three unshielded spears, the rest of the rays stubs.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_flare_diff.T_sign_dom_flare_diff"), 9.2f, SignAmberLit, SignAmberShade, FVector(-4650, -675, 230), FVector(0.9f, 0.04f, 0.9f) },
+			// SEALED ATMOSPHERE — was skull-and-crossbones over the word TOXIC
+			// (seen in frame). Kessara is an industrial world: the danger is the
+			// air. The sun seen through smog, vapour falling, scrubber louvres.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_scrubber_diff.T_sign_dom_scrubber_diff"), 11.2f, SignAmberLit, SignAmberShade, FVector(-9944, -350, 260), FVector(0.04f, 1.4f, 1.4f) },
+			// LANE CODE — was a route arrow. §20.2 names the replacement outright:
+			// "Lane-codes en sectornummers, niet straatnamen." A forking spine,
+			// each run-out carrying its own tally. Pairs face-on with the flare
+			// placard (review camera 6), as the route arrow did.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_lane_diff.T_sign_dom_lane_diff"), 12.3f, SignRedLit, SignRedShade, FVector(-4230, -675, 240), FVector(0.9f, 0.04f, 0.9f) },
+			// SHIFT ROSTER — was LABOR, an English word on an Earth placard. Now a
+			// called-lot board (§20.2: tithe-lotnummers, ploegcodes): filled cells
+			// are the lots on shift, the arc above is where the sun stands in the
+			// cycle. This is the sign that says people WORK here.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_shift_diff.T_sign_dom_shift_diff"), 8.9f, SignAmberLit, SignAmberShade, FVector(-3146, 3250, 260), FVector(0.04f, 1.0f, 1.0f) },
+			// CHARGE STORE — was BLAST. A contained burst inside the bracket that
+			// means works containment; the jambs are the blast-door returns.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_charge_diff.T_sign_dom_charge_diff"), 7.6f, SignAmberLit, SignAmberShade, FVector(4146, -2400, 250), FVector(0.04f, 0.9f, 0.9f) },
+			// CORE EXCLUSION — was a SECOND radiation triangle, which also tripped
+			// §20.7 check 7 (the same read twice in one district). The grammar now
+			// inverts: where the flare EMITS, this is SEALED — standoff rings, an
+			// unbroken core, corner ticks, and the exclusion bar across the plate.
+			{ TEXT("/Game/Art/Decals/T_sign_dom_core_diff.T_sign_dom_core_diff"), 6.3f, SignRedLit, SignRedShade, FVector(-9944, 700, 270), FVector(0.04f, 1.2f, 1.2f) },
 		};
 
 		// Sign placards follow the -EclipseLitToon master choice like the decals
@@ -1457,7 +1666,7 @@ void BuildDistrict(UWorld& World)
 			UTexture* Tex = LoadObject<UTexture>(nullptr, Sign.TexPath);
 			if (Tex == nullptr || SignMaster == nullptr)
 			{
-				UE_LOG(LogEclipse, Warning, TEXT("Graybox: sign %s missing — skipped (run Tools/import_warning_signs.py chain)."), Sign.TexPath);
+				UE_LOG(LogEclipse, Warning, TEXT("Graybox: sign %s missing — skipped (run Tools/generate_dominion_signs.py, then Tools/import_generated_decals.py)."), Sign.TexPath);
 				continue;
 			}
 			UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(SignMaster, &World);
@@ -2448,17 +2657,16 @@ void BuildDistrict(UWorld& World)
 	// Everything below rides standard UE features behind scalability (15.10); the
 	// authored art pass on target hardware replaces these numbers wholesale.
 
-	// One authoritative mood: purge the host map's own sun/sky/fog first. Entry
-	// ships a horizon-level sun that paints facades warm but leaves every
-	// horizontal surface black — with two suns the district's look is luck.
+	// De sky/zon/mist-herbouw (zie RebuildDistrictSky voor waarom hij apart staat).
+	RebuildDistrictSky(World);
+
+	// Tag-scoped so authored ambient audio from a later art map survives; a
+	// mid-play rebuild must not stack a second never-silent bed (review fix).
+	// Blijft HIER en gaat niet mee in RebuildDistrictSky: het bed wordt vlak
+	// hieronder gespawnd, en een sky-herbouw die het bed sloopt zonder het terug
+	// te zetten zou een stil district opleveren en dus iets anders meten.
 	{
 		TArray<AActor*> Stale;
-		for (TActorIterator<ADirectionalLight> It(&World); It; ++It) { Stale.Add(*It); }
-		for (TActorIterator<ASkyLight> It(&World); It; ++It) { Stale.Add(*It); }
-		for (TActorIterator<ASkyAtmosphere> It(&World); It; ++It) { Stale.Add(*It); }
-		for (TActorIterator<AExponentialHeightFog> It(&World); It; ++It) { Stale.Add(*It); }
-		// Tag-scoped so authored ambient audio from a later art map survives; a
-		// mid-play rebuild must not stack a second never-silent bed (review fix).
 		for (TActorIterator<AAmbientSound> It(&World); It; ++It)
 		{
 			if (It->ActorHasTag(TEXT("Audio_AmbientBed"))) { Stale.Add(*It); }
@@ -2466,120 +2674,6 @@ void BuildDistrict(UWorld& World)
 		for (AActor* Actor : Stale)
 		{
 			Actor->Destroy();
-		}
-	}
-
-	// Low industrial sun; drives the SkyAtmosphere so the horizon carries the mood.
-	// Mid-afternoon sun: warm but high enough that shade sides stay readable —
-	// the stylized look wants soft, lifted shadows, not noir silhouettes.
-	if (ADirectionalLight* Sun = World.SpawnActor<ADirectionalLight>(FVector(0, 0, 5000), SunRotation, Params))
-	{
-		if (UDirectionalLightComponent* SunComponent = Cast<UDirectionalLightComponent>(Sun->GetLightComponent()))
-		{
-			// ADirectionalLight ships static-mobility; a runtime spawn keeps the
-			// default horizontal direction unless made movable and re-rotated —
-			// which lit facades and left every floor black (pass-8 forensics).
-			// SunRotation is shared with the toon material's LightDir (see above).
-			SunComponent->SetMobility(EComponentMobility::Movable);
-			Sun->SetActorRotation(SunRotation);
-			// Legacy intensity 8 pairs with the toon emissive x10 range under auto
-			// exposure. Atmosphere re-linked: the old decouple protected LIT ground
-			// from transmittance loss (pass-15) — the district is unlit now, so the
-			// sun may power a real dusk sky and only lights pawns.
-			SunComponent->SetIntensity(8.0f);
-			SunComponent->SetLightColor(FLinearColor(1.0f, 0.87f, 0.70f));
-			SunComponent->SetAtmosphereSunLight(true);
-			SunComponent->SetVolumetricScatteringIntensity(2.0f);
-			// WELKE ZON DE ZON IS, met zoveel woorden. Het district heeft twee
-			// directionele lampen (deze en de fill hieronder), en dan moet de
-			// forward-shading weten welke de leidende is. Zonder die keuze pakt
-			// de engine er zelf een "op algehele helderheid" en zet daar een
-			// GELE WAARSCHUWING OVER HET SCHERM — gevonden op het eerste beeld
-			// dat de UI meenam, en dus iets wat de owner tijdens het spelen
-			// gewoon over zijn scherm zou zien lopen.
-			//
-			// De fallback koos hier waarschijnlijk goed, maar "waarschijnlijk
-			// goed omdat hij toevallig helderder is" is geen keuze. Zodra iemand
-			// de fill-intensiteit aanpast kantelt het beeld zonder dat iemand
-			// iets aan de belichting deed.
-			SunComponent->ForwardShadingPriority = 10;
-			// SM5 laptop: the CSM path blankets the 200x-scaled ground slab in
-			// shadow no matter the caster set (passes 5-16 forensics) — sun ships
-			// shadowless there. SM6: VSM shadows return; the unlit district cannot
-			// darken (emissive ignores shadowing), but the volumetric smog CAN —
-			// buildings now cut real light shafts through the haze (15.5 revision).
-			SunComponent->SetCastShadows(bFullFidelity);
-			UE_LOG(LogEclipse, Display, TEXT("Graybox: sun direction %s (movable)."), *SunComponent->GetDirection().ToString());
-		}
-	}
-
-	World.SpawnActor<ASkyAtmosphere>(FVector::ZeroVector, FRotator::ZeroRotator, Params);
-
-	// SM6 only: the real captured skylight the fill light stands in for on SM5
-	// (the laptop's realtime capture fed horizontal glare + a black zenith,
-	// passes 3-14). Lights pawns/props; the unlit district ignores it.
-	if (bFullFidelity)
-	{
-		if (ASkyLight* Sky = World.SpawnActor<ASkyLight>(FVector(0, 0, 400), FRotator::ZeroRotator, Params))
-		{
-			if (USkyLightComponent* SkyComponent = Sky->GetLightComponent())
-			{
-				SkyComponent->SetMobility(EComponentMobility::Movable);
-				SkyComponent->SetRealTimeCaptureEnabled(true);
-				// 2.2: lit PBR character bodies (step-2 pipeline) read at dusk;
-				// the unlit district ignores this entirely, so the district
-				// grade is untouched (first body-showcase round: near-black).
-				SkyComponent->SetIntensity(2.2f);
-			}
-		}
-	}
-
-	// Fill light instead of a captured skylight: on this box's SM5 fallback the
-	// realtime sky capture feeds horizontal glare and a black zenith (floors go
-	// dark, facades blow out — passes 3-14 forensics). A soft cool shadowless
-	// counter-sun gives the flat, readable stylized shade the direction wants;
-	// the strong PC swaps this for a real captured skylight + Lumen bounce.
-	if (ADirectionalLight* Fill = World.SpawnActor<ADirectionalLight>(FVector(0, 0, 5000), FRotator(-35.0f, 235.0f, 0), Params))
-	{
-		if (UDirectionalLightComponent* FillComponent = Cast<UDirectionalLightComponent>(Fill->GetLightComponent()))
-		{
-			FillComponent->SetMobility(EComponentMobility::Movable);
-			Fill->SetActorRotation(FRotator(-35.0f, 235.0f, 0));
-			FillComponent->SetIntensity(2.5f); // pawn fill in the banked pass-19 units; the unlit district ignores it
-			FillComponent->SetLightColor(FLinearColor(0.55f, 0.65f, 0.85f));
-			FillComponent->SetCastShadows(false);
-			FillComponent->SetAtmosphereSunLight(false);
-			// Nadrukkelijk lager dan de zon: dit is tegenlicht, geen tweede zon.
-			FillComponent->ForwardShadingPriority = 0;
-		}
-	}
-
-	// Kessara smog: warm sodium haze with volumetrics so the sun shafts read.
-	if (AExponentialHeightFog* Fog = World.SpawnActor<AExponentialHeightFog>(FVector(0, 0, -50), FRotator::ZeroRotator, Params))
-	{
-		if (UExponentialHeightFogComponent* FogComponent = Fog->GetComponent())
-		{
-			// Haze, not soup: the district must read across its full 200 m at
-			// command distance (15.5); the smog hugs the ground via the falloff.
-			// Dressing-iteratie 3 note — density 0.02 was TRIED here and REVERTED
-			// (2026-07-25). It was aimed at a "ground brightens toward the horizon"
-			// defect that turned out to be a measurement error: a probe rect at the
-			// horizon band contained clipped non-floor pixels. A clean depth scan on
-			// cam 4 (Tools/measure_frame_values.py, five rects from near to far)
-			// reads 0.0489 / 0.0495 / 0.0553 / 0.0536 / 0.0523 linear — flat within
-			// ~7%, not the 2x I had derived. Raising the density changed the
-			// near-to-far ratio by 0.02x, i.e. nothing. The floor's aerial
-			// perspective is therefore NOT fog-limited at this density, and the
-			// value stays where it was measured to belong.
-			FogComponent->SetFogDensity(0.006f);
-			FogComponent->SetFogHeightFalloff(0.2f);
-			FogComponent->SetFogInscatteringColor(FLinearColor(0.42f, 0.32f, 0.24f));
-			// SM5 laptop: volumetric fog receives no sun on the fallback path and
-			// extinguishes the whole ground plane to black — plain exponential
-			// haze there. SM6: real volumetric smog, so the shadowed sun draws
-			// shafts through the crane-and-compound silhouettes (Kessara identity
-			// 03.3: amber smog; 15.5 revision: more atmosphere within the style).
-			FogComponent->SetVolumetricFog(bFullFidelity);
 		}
 	}
 

@@ -57,25 +57,69 @@ public:
 	float SoldierSelectMaxRangeCm = 10000.0f;
 
 	/**
-	 * De drie Stage B-getallen: SyncStrike, Flank en Suppress. **NIET GELEZEN —
-	 * die drie orders bestaan niet.**
-	 *
-	 * Ze staan in data omdat de spec ze vastlegt en het schema dan niet halverwege
-	 * een fase hoeft te veranderen. Dat is een prima reden om ze te hebben en geen
-	 * reden om te doen alsof ze iets doen: er is geen SyncStrike-order, geen
-	 * flank-goedkeuring en geen onderdrukkingsgebied.
-	 *
-	 * Zodra die orders er komen zijn dit hun knoppen. Tot dan zijn het drie
-	 * getallen die niemand kan verdraaien met gevolg.
+	 * Hoeveel doelen je tegelijk kunt markeren voor een sync strike (8.4: "up to
+	 * 4 marked"). **GELEZEN sinds Stage B** — dit is de cap in
+	 * `UEclipseSquadSubsystem::ToggleSyncStrikeMark`; verlagen naar 2 betekent
+	 * echt dat de derde markering wordt geweigerd.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 1))
 	int32 MaxSyncStrikeMarks = 4;
 
-	/** Stage B (Flank) goedkeuringsvenster. **NIET GELEZEN**, zie MaxSyncStrikeMarks. */
+	/**
+	 * Hoe lang een flank-voorstel op je goedkeuring wacht. **GELEZEN sinds Stage B.**
+	 *
+	 * Op de WANDKLOK, net als `ResponseTimeoutSeconds` en om dezelfde reden
+	 * (locked decision 2): Command Mode vertraagt de wereld naar 0,30, dus een
+	 * venster op speltijd zou voor de speler 3,3x langer duren dan het getal
+	 * belooft — en de hele bedoeling van dit venster is dat je moet BESLISSEN.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.5))
 	float FlankApprovalTimeoutSeconds = 6.0f;
 
-	/** Stage B (Suppress) straal. **NIET GELEZEN**, zie MaxSyncStrikeMarks. */
+	/** Straal van het gebied dat een Suppress-order onder vuur legt. **GELEZEN sinds Stage B.** */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 50.0))
 	float SuppressRadiusCm = 400.0f;
+
+	/**
+	 * Hoe lang een soldaat een gebied onder vuur houdt voor de order uitdooft.
+	 *
+	 * Suppress heeft een EINDE nodig: een order die eeuwig doorloopt is geen
+	 * onderdrukking maar een soldaat die zijn magazijn leegschiet op een muur en
+	 * daarna nooit meer iets anders doet. Zonder dit getal zou de duur uit de
+	 * lucht komen, en 14.2 verbiedt precies dat.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 0.5))
+	float SuppressBurstSeconds = 5.0f;
+
+	/**
+	 * Hoe ver naast de rechte lijn een flankroute uitzwenkt.
+	 *
+	 * De flank is geen tweede padzoeker maar een PUNT opzij van de as
+	 * soldaat→doel; is er geen route naartoe, dan weigert de order met NoRoute en
+	 * zegt hij dat. Dat is de goedkope helft die aantoonbaar werkt; een echte
+	 * omtrekkende beweging is EQS-werk in de AI-contentpas (12.1).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 100.0))
+	float FlankOffsetCm = 900.0f;
+
+	/**
+	 * Hoe dicht een geauthord breekpunt bij je aangewezen plek moet liggen om te
+	 * tellen. Geen punt binnen deze straal = de refusal `NoBreachPoint`, gesproken.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Command", meta = (ClampMin = 100.0))
+	float BreachPointRangeCm = 1200.0f;
 };
+
+namespace EclipseCommandMode
+{
+	/**
+	 * Waar DA_CommandModeTuning staat — EEN pad, twee lezers.
+	 *
+	 * De component (`UEclipseCommandModeComponent`, Characters/) leest hem voor de
+	 * tijdvertraging; de squad-subsystem leest hem voor de Stage B-getallen. Twee
+	 * losse letterlijke paden zouden precies één keer uit elkaar lopen en dan
+	 * onvindbaar zijn: de mode zou op het ene asset afstellen en de orders op het
+	 * andere. `Eclipse.Command.StageB.TuningHasOneSource` valt om zodra dat gebeurt.
+	 */
+	inline const TCHAR* DefaultTuningPath = TEXT("/Game/Data/DA_CommandModeTuning.DA_CommandModeTuning");
+}

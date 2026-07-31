@@ -16,6 +16,42 @@ class UEclipseHealthAttributeSet;
 class USkeletalMesh;
 class USkeletalMeshComponent;
 class USpringArmComponent;
+class UStaticMesh;
+class UStaticMeshComponent;
+
+/**
+ * Wat er van het WAPEN in beeld staat, als meting en niet als vermoeden.
+ *
+ * Bestaat omdat dit dossier ontstond uit een codeconclusie die het van een frame
+ * verloor: "er hangt geen wapen" was uit `AttachToComponent` afgeleid en de owner
+ * weerlegde het met vier van mijn eigen opnames. Elk veld hier is dus opvraagbaar
+ * tijdens een speelronde, zodat een claim over zichtbaarheid een GETAL naast het
+ * frame krijgt in plaats van een redenering.
+ */
+struct FEclipseWeaponVisualReport
+{
+	/** Materiaalslot van de INGEBOUWDE wapengeometrie; INDEX_NONE = dit lichaam heeft er geen. */
+	int32 BuiltInSlot = INDEX_NONE;
+	FName BuiltInSlotName;
+	/** Driehoeken in die sectie op LOD 0, en het totaal van de mesh ernaast. */
+	int32 BuiltInTriangles = 0;
+	int32 BodyTriangles = 0;
+	/** Staat die sectie NU verborgen? */
+	bool bBuiltInHidden = false;
+
+	/** Het losse asset dat in de hand hangt. */
+	FName AttachedWeaponRow;
+	FString AttachedMeshName;
+	/** Lengte, breedte, hoogte van dat asset in cm — de maat waaraan "dit is een geweer" te toetsen is. */
+	FVector AttachedExtentCm = FVector::ZeroVector;
+	/** Het bot waar het aan hangt, en of dat bot echt bestaat op dit skelet. */
+	FName GripBone;
+	bool bGripBoneExists = false;
+	bool bAttached = false;
+	/** Wereldpositie van het wapen en van het greepbot — twee getallen die moeten meebewegen. */
+	FVector WeaponWorld = FVector::ZeroVector;
+	FVector GripBoneWorld = FVector::ZeroVector;
+};
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEclipseCharacterDownedDelegate, AEclipseCharacter* /*Character*/, FName /*Cause*/);
 
@@ -157,6 +193,56 @@ public:
 	 * silently-but-logged (GDD 14.3.5).
 	 */
 	void ApplyBodyDef(const struct FEclipseBodyDefRow& BodyDef);
+
+	// ---- HET WAPEN ALS LOS OBJECT (owner-besluit O-5 "volledig", 31-07) --------
+	//
+	// De vier stappen uit REFERENTIE_TPS.md hoofdstuk 4, elk met zijn eigen
+	// falsificatie. De functies hieronder zijn precies die vier, en ze zijn
+	// bewust afzonderlijk aan te roepen: de opnameronde zet ze om de beurt aan om
+	// van elke stap een BEELD te maken in plaats van één eindstand die alles
+	// tegelijk claimt.
+
+	/**
+	 * Stap 1 — de ingebouwde wapensectie verbergen of tonen.
+	 *
+	 * Via `ShowMaterialSection` per LOD en per sectie, en niet via `HideBoneByName`:
+	 * het geweer is in deze mesh aan de HANDBOTTEN geskind, dus dat bot verbergen
+	 * zou de hand meenemen. Het materiaalslot is wél alleen van het wapen.
+	 *
+	 * @return het aantal driehoeken dat hierdoor van de LOD-0-mesh verdween.
+	 */
+	int32 SetBuiltInWeaponVisible(bool bVisible);
+
+	/**
+	 * ALLEEN de wapensectie laten staan — het omgekeerde isolement.
+	 *
+	 * Dit is de proef die "de geometrie die het geweer toonde is weg" van "er is
+	 * iets weg" onderscheidt, en het is dezelfde truc die de opnameronde al
+	 * gebruikt voor de speler tussen vier lichamen: OVERHOUDEN in plaats van
+	 * weglaten. Wat op dat frame staat, ís de wapensectie; daar valt niets meer
+	 * aan te interpreteren.
+	 */
+	void SetOnlyBuiltInWeaponVisible(bool bOnlyWeapon);
+
+	/**
+	 * Stap 2/3/4 — het losse wapen opnieuw ophangen naar de ACTIEVE rij van de
+	 * wapencomponent.
+	 *
+	 * Hangt aan het FEIT "het actieve wapen is veranderd" en niet aan een knop:
+	 * de wapencomponent roept dit aan vanuit ApplyWeaponRow, ApplyLoadout én
+	 * SwapWeapon, dus elk pad dat het wapen wisselt — speler, debugcommando,
+	 * later de AI — verandert ook wat je ziet. Een pad-tabel is incompleet zodra
+	 * er een pad bij komt.
+	 */
+	void RefreshWeaponVisual();
+
+	/** Het losse wapen tonen of verbergen zonder de aanhechting te verliezen. */
+	void SetAttachedWeaponVisible(bool bVisible);
+
+	/** De meting waar elke claim over het wapen aan opgehangen wordt. */
+	FEclipseWeaponVisualReport SampleWeaponVisual() const;
+
+	const UStaticMeshComponent* GetWeaponMeshComponent() const { return WeaponMesh; }
 
 	/**
 	 * The clips this body resolved, for its anim instance to pull on init. The
@@ -376,6 +462,31 @@ private:
 	/** Kopschot-volume op de hoofd-socket (26-07, punt 2). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Combat")
 	TObjectPtr<USphereComponent> HeadHitbox;
+
+	/** Het LOSSE wapen. Hangt aan het greepbot van de mesh, niet aan de wortel. */
+	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Combat")
+	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+
+	/** De materiaalslots waarvan de geometrie het INGEBOUWDE wapen is (op naam gevonden). */
+	TArray<int32> BuiltInWeaponSlots;
+
+	/** De greepgegevens van het lichaam dat nu gedragen wordt — bewaard voor het aanhechten. */
+	FName WeaponGripBone;
+	FTransform WeaponGripLocal = FTransform::Identity;
+	bool bHideBuiltInWeaponWanted = true;
+
+	/** De rijnaam van het wapen dat NU aan de hand hangt; leeg = geen los wapen. */
+	FName AttachedWeaponRow;
+
+	/** De factietint van het lichaam dat gedragen wordt — het wapen leidt zijn waarde eruit af. */
+	FLinearColor LastBodyTintLit = FLinearColor(0.20f, 0.20f, 0.22f, 1.0f);
+	FLinearColor LastBodyTintShade = FLinearColor(0.07f, 0.07f, 0.09f, 1.0f);
+
+	/** De wapensectie aan- of uitzetten op elke LOD; geeft de LOD-0-driehoeken terug. */
+	int32 ApplySectionVisibility(const TArray<int32>& Slots, bool bVisible, bool bInvert);
+
+	/** Het losse wapen aan het greepbot hangen en door de toon-master halen. */
+	void AttachWeaponMesh(UStaticMesh* WeaponAsset, FName RowName);
 
 	/** Zit hij op een echte hoofd-socket? Zo niet, dan telt dit lichaam geen kopschoten. */
 	bool bHeadHitboxAttached = false;

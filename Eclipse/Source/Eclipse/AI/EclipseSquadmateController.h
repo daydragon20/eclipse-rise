@@ -56,6 +56,36 @@ public:
 	/** Diagnostiek: hoe vaak het klasse-verb uit zichzelf iets deed (laag 5). */
 	int32 GetVerbUses() const { return VerbUses; }
 
+	// ---- SPEC-P2-02 Stage B ---------------------------------------------
+	// Vier tellers en drie standen. Ze bestaan om dezelfde reden als de vier
+	// hierboven: een verb dat "gebouwd" heet moet te METEN zijn, en een test die
+	// alleen kan zien dát er een order geaccepteerd is, bewijst niet dat er iets
+	// gebeurde. Dit is het verschil tussen een gezet doel en een effect.
+
+	/** Schoten die uit een Suppress-order kwamen (niet uit vuren op een persoon). */
+	int32 GetSuppressShots() const { return SuppressShots; }
+
+	/** Verplaatsingen die uit een GOEDGEKEURDE flank kwamen — nooit uit het voorstel zelf. */
+	int32 GetFlankMoves() const { return FlankMoves; }
+
+	/** Hoe vaak deze soldaat na het stapelen ook echt naar binnen ging. */
+	int32 GetBreachEntries() const { return BreachEntries; }
+
+	/** Stil uitgeschakelde doelen uit een sync strike. */
+	int32 GetSyncStrikeKills() const { return SyncStrikeKills; }
+
+	EclipseSquadOrderLogic::EEclipseFlankState GetFlankState() const { return FlankApproval.State; }
+	const TCHAR* GetFlankStateLabel() const;
+
+	/** Het breekpunt waar deze soldaat op beval te breken, of null. */
+	class AEclipseBreachPoint* GetBreachPoint() const { return BreachPoint.Get(); }
+
+	/** Staat hij al op zijn stapelplek? (De squad-subsystem wacht hierop voor de gezamenlijke entry.) */
+	bool IsBreachStacked() const { return bBreachStacked; }
+
+	/** Nu naar binnen. Wordt door de subsystem aangeroepen zodra IEDEREEN op dit punt staat. */
+	void ExecuteBreachEntry();
+
 	/** Start de basislaag: meelopen. Aangeroepen zodra de soldaat een lichaam heeft. */
 	void BeginFollowing(float FollowDistanceCm, float CoverSearchRadiusCm);
 
@@ -221,6 +251,52 @@ private:
 
 	/** De speler, of null. Meelopen heeft een leider nodig om achter te lopen. */
 	APawn* GetLeaderPawn() const;
+
+	// ---- SPEC-P2-02 Stage B: de staat onder de vijf nieuwe verbs -----------
+
+	/** SUPPRESS: welk gebied, tot wanneer, en hoeveel er al ingegaan is. */
+	FVector SuppressLocation = FVector::ZeroVector;
+	double SuppressUntilSeconds = -1.0;
+	float SuppressRadiusCm = 0.0f;
+	FTimerHandle SuppressTimer;
+	int32 SuppressShots = 0;
+	void ContinueSuppression();
+
+	/**
+	 * FLANK: het voorstel en de route die erbij hoort.
+	 *
+	 * De staat staat HIER en niet in de subsystem, want de route hoort bij deze
+	 * soldaat: hij heeft hem berekend, hij loopt hem, en hij is degene die zwijgt
+	 * als het venster verloopt. De subsystem doet het FEIT naar buiten (één
+	 * emitter), deze controller houdt de stand bij.
+	 */
+	EclipseSquadOrderLogic::FEclipseFlankApproval FlankApproval;
+	FVector FlankPoint = FVector::ZeroVector;
+	FTimerHandle FlankTimer;
+	int32 FlankMoves = 0;
+	void TickFlankWindow();
+	double ResolveFlankTimeoutSeconds() const;
+
+	/** Het punt opzij van de as soldaat→doel waar een flank naartoe zou gaan; false = geen route. */
+	bool ComputeFlankPoint(const FVector& TargetLocation, FVector& OutPoint) const;
+
+	/** BREACH: het punt, of hij al staat, en welke verplaatsing hem er brengt. */
+	TWeakObjectPtr<class AEclipseBreachPoint> BreachPoint;
+	bool bBreachStacked = false;
+	FAIRequestID BreachMoveId;
+	int32 BreachEntries = 0;
+
+	/** SYNC STRIKE: stil uitgeschakelde doelen. */
+	int32 SyncStrikeKills = 0;
+
+	/** Voert het signatuurverb van de klasse uit; false = er viel niets te doen. */
+	bool ExecuteClassAbility();
+
+	/** Slaat de aan deze soldaat toebedeelde markeringen neer; geeft het aantal. */
+	int32 ExecuteSyncStrike();
+
+	/** Elke lopende Stage B-order stilzetten — één plek, zodat een nieuwe order nooit twee lussen laat draaien. */
+	void ClearStageBOrders();
 
 	/** Last move stance (SPEC-P1-06 stub; no behavior split yet — PLACEHOLDER in the enum). */
 	EEclipseSquadStance CurrentStance = EEclipseSquadStance::Ready;

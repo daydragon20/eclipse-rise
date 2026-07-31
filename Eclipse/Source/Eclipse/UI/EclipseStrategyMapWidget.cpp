@@ -24,6 +24,19 @@ void UEclipseStrategyOfferButton::HandleClicked()
 	}
 }
 
+void UEclipseStrategyMapWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	// DE WORTEL HOORT HIER. Rebuild() maakte hem lui aan, maar Rebuild() draait
+	// vanuit NativeConstruct en dat is ná UUserWidget::RebuildWidget — die pakt dan
+	// een lege WidgetTree->RootWidget en maakt er een SSpacer van. De kaart stond
+	// dus nooit op het scherm, hoeveel rijen Rebuild() er ook in hing. Zelfde
+	// oorzaak en reparatie als in UEclipseMissionHudWidget; dit is de hoogte "Map".
+	RootBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MapRoot"));
+	WidgetTree->RootWidget = RootBox;
+}
+
 void UEclipseStrategyMapWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -69,10 +82,15 @@ void UEclipseStrategyMapWidget::OnBoardChanged(FGameplayTag EventTag, const FIns
 
 void UEclipseStrategyMapWidget::Rebuild()
 {
+	// De wortel komt uit NativeOnInitialized. Hem hier alsnog aanmaken zou de fout
+	// terugzetten die daar beschreven staat: een wortel die ná RebuildWidget ontstaat
+	// bereikt de Slate-boom nooit meer. Ontbreekt hij, dan is er iets fundamenteel
+	// mis met de levenscyclus en moet dat luid zijn, niet stil gerepareerd (14.3.5).
 	if (RootBox == nullptr)
 	{
-		RootBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MapRoot"));
-		WidgetTree->RootWidget = RootBox;
+		UE_LOG(LogEclipse, Warning,
+			TEXT("Strategiekaart: geen wortel bij Rebuild — NativeOnInitialized is niet gedraaid; het bord blijft leeg."));
+		return;
 	}
 	RootBox->ClearChildren();
 

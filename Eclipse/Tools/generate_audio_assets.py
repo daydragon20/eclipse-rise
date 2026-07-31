@@ -195,19 +195,58 @@ def api_request(key, method, path, body=None, timeout=120):
         return 0, b"", scrub(str(e), key)[:400]
 
 
+class UnmeasurableSpendError(RuntimeError):
+    """The credit meter cannot read the account. Never generate blind."""
+
+
 def get_usage(key):
-    """Subscription credit counters (never contains the key)."""
-    status, payload, _ = api_request(key, "GET", "/v1/user/subscription")
+    """Subscription credit counters (never contains the key).
+
+    Returns (usage_dict, error_string). Exactly one of the two is truthy.
+
+    This used to return a bare None on every failure, which main() then
+    silently swallowed: on a scoped key the run generated audio, spent real
+    credits, and wrote no usage_credits at all. A meter that is broken and
+    does not say so is worse than no meter, because VOICE_LEDGER.md then
+    reads as truth while nothing was measured. So failures are now typed and
+    loud -- see require_usage_measurement().
+    """
+    status, payload, err = api_request(key, "GET", "/v1/user/subscription")
     if status == 200:
         try:
             d = json.loads(payload)
             return {
                 "character_count": d.get("character_count"),
                 "character_limit": d.get("character_limit"),
-            }
-        except Exception:
-            pass
-    return None
+            }, ""
+        except Exception as e:
+            return None, f"subscription payload unparsable: {e}"
+    if status == 401:
+        scope = "user_read"
+        if "permission" in err and "user_read" not in err:
+            scope = err.split("permission", 1)[1].strip().split()[0]
+        return None, (f"HTTP 401 - the API key lacks the '{scope}' scope. "
+                      f"Grant it in the ElevenLabs dashboard, or spend is unmeasurable.")
+    return None, f"HTTP {status} on /v1/user/subscription: {err[:180]}"
+
+
+def require_usage_measurement(key, what="this run"):
+    """Pre-flight gate: refuse to spend credits we cannot measure.
+
+    Called BEFORE the first generating request. Raises instead of returning a
+    falsy value, so no caller can accidentally continue on an empty result.
+    """
+    usage, err = get_usage(key)
+    if usage is None:
+        raise UnmeasurableSpendError(
+            f"REFUSING TO GENERATE - credit spend cannot be measured for {what}.\n"
+            f"  reason: {err}\n"
+            f"  why this is fatal: every generated credit is spent permanently and\n"
+            f"  phase0/VOICE_LEDGER.md is the project's record of truth. Generating\n"
+            f"  without a before/after reading would put an unverifiable number in it.\n"
+            f"  fix: give the key the scopes user_read + speech_history_read\n"
+            f"       (ElevenLabs dashboard -> API keys), then re-run.")
+    return usage
 
 
 # ---------------------------------------------------------------------------
@@ -389,9 +428,30 @@ def main():
               "Eclipse/Config/UserSecrets.ini [ElevenLabs] ApiKey).")
         return 1
     print(f"key source: {source} (value never printed)")
+    return main_with_key(key, args)
+
+
+def main_with_key(key, args=None):
+    """Everything after key resolution. Split out so test_credit_meter.py can
+    drive a full run with a stub key and assert that nothing generates when
+    spend cannot be measured."""
+    if args is None:
+        args = argparse.Namespace(only=None, force=None)
+
+    plan = [("SFX", "SFX", ["/v1/sound-generation"], s) for s in SFX_SPECS] + \
+           [("Music", "Music", ["/v1/music", "/v1/music/compose"], s) for s in MUSIC_SPECS]
 
     manifest = load_manifest()
-    usage_before = get_usage(key)
+
+    # Pre-flight: no generation happens until spend can be measured (16.15 r7 +
+    # 19.2 "log every batch"). Raises UnmeasurableSpendError on a scoped key.
+    try:
+        usage_before = require_usage_measurement(key, "the SFX/music batch")
+    except UnmeasurableSpendError as e:
+        print(e)
+        return 3
+    print(f"credit meter OK: {usage_before['character_count']}"
+          f"/{usage_before['character_limit']} used before this run")
 
     ok = True
     for cat, sub, eps, s in plan:
@@ -411,18 +471,33 @@ def main():
             ok &= process(key, manifest, cat, sub, eps, s,
                           s["music_length_ms"] / 1000.0, body, force=force)
 
-    usage_after = get_usage(key)
-    if usage_before and usage_after:
-        delta = (usage_after["character_count"] or 0) - (usage_before["character_count"] or 0)
+    usage_after, after_err = get_usage(key)
+    if usage_after is None:
+        # Credits are already gone at this point, so this cannot be a silent skip:
+        # record the hole in the manifest and fail the run.
         manifest["usage_credits"] = {
-            "last_run_delta": delta,
-            "account_used": usage_after["character_count"],
-            "account_limit": usage_after["character_limit"],
+            "last_run_delta": None,
+            "measurement_failed": after_err,
             "measured_at": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+            "WARNING": "Credits were spent but the after-reading failed. The spend "
+                       "for this run is UNMEASURED - do not copy a number into "
+                       "phase0/VOICE_LEDGER.md as if it were measured.",
         }
         save_manifest(manifest)
-        print(f"credits: this run {delta}, account "
-              f"{usage_after['character_count']}/{usage_after['character_limit']}")
+        print(f"\nSPEND UNMEASURED after generating: {after_err}")
+        print("  phase0/VOICE_LEDGER.md must record this run as an ESTIMATE.")
+        return 4
+
+    delta = (usage_after["character_count"] or 0) - (usage_before["character_count"] or 0)
+    manifest["usage_credits"] = {
+        "last_run_delta": delta,
+        "account_used": usage_after["character_count"],
+        "account_limit": usage_after["character_limit"],
+        "measured_at": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+    }
+    save_manifest(manifest)
+    print(f"credits: this run {delta}, account "
+          f"{usage_after['character_count']}/{usage_after['character_limit']}")
     return 0 if ok else 2
 
 

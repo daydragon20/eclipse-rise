@@ -19,4 +19,14 @@ namespace EclipseGraybox
 
 	/** Spawn the full graybox layout: geometry, sites (tagged), triggers, entries, lights. */
 	ECLIPSE_API void BuildDistrict(UWorld& World);
+
+	/**
+	 * Alleen de sfeerlaag: sloopt zon/skylight/atmosphere/mist en zet ze terug.
+	 * BuildDistrict roept dit aan; het staat apart omdat het GPU-crashdossier
+	 * (phase0/DEBUG_DISCIPLINE.md 4.5) een page fault aanwijst in de
+	 * SkyAtmosphere-LUT compute-pass, en dit de enige code in het project is die
+	 * een ASkyAtmosphere vernietigt en meteen opnieuw spawnt. Een reproductie
+	 * moet EXACT dit pad kunnen aanroepen; iets wat er op lijkt bewijst niets.
+	 */
+	ECLIPSE_API void RebuildDistrictSky(UWorld& World);
 }

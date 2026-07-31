@@ -38,6 +38,18 @@ class ECLIPSE_API UEclipseMissionHudWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	/**
+	 * De widget-BOOM wordt hier gebouwd, niet in NativeConstruct.
+	 *
+	 * UUserWidget::RebuildWidget maakt de Slate-boom uit WidgetTree->RootWidget en
+	 * roept NativeConstruct pas DAARNA aan. Wie zijn wortel in NativeConstruct zet,
+	 * is per definitie te laat: de Slate-kant is dan al een lege SSpacer en blijft
+	 * dat. Zie de toelichting in de implementatie — dit is de oorzaak waar het
+	 * ontbrekende richtkruis, de onzichtbare munitieteller en "F3 doet niets"
+	 * alledrie op terugkomen.
+	 */
+	virtual void NativeOnInitialized() override;
+
 	virtual void NativeConstruct() override;
 
 	/**
@@ -52,10 +64,18 @@ public:
 	virtual void NativeDestruct() override;
 
 	/**
-	 * May the debug HUD render at all? False during a -EclipseShot review round:
-	 * screenshots judge the art, and debug text in the frame has been mistaken for
-	 * shipped UI in review rounds (15.8/15.9). Checked at the mount site AND here,
-	 * so no creation path can leak it into a still.
+	 * Mag de DEBUGLAAG renderen? False tijdens een -EclipseShot review-ronde:
+	 * screenshots beoordelen de kunst, en debugtekst in het frame is in eerdere
+	 * reviewrondes voor verscheepte UI aangezien (15.8/15.9).
+	 *
+	 * LET OP WAT DIT NIET IS: het is geen schakelaar op de HUD als geheel. De
+	 * SPELERLAAG (BuildPlayerLayer) staat er altijd, ook in een opnameronde —
+	 * anders is er per constructie geen beeldbewijs mogelijk van het enige deel van
+	 * de HUD dat de speler ooit te zien krijgt.
+	 *
+	 * Merk ook op dat -EclipseShotPlay hier NIET onder valt: FParse::Param eist dat
+	 * de vlag op een woordgrens eindigt, dus de speelronde met opnames draait met
+	 * de volle HUD. Alleen de vaste-camera-reviewronde onderdrukt de debuglaag.
 	 */
 	static bool IsDebugHudAllowed();
 
@@ -106,12 +126,52 @@ private:
 	void BuildStaticPanels();
 
 	/**
-	 * Het richtkruis, apart en VÓÓR de debug-poort. Zie de toelichting in
-	 * BuildStaticPanels: een kruis is spelbesturing en geen debugtekst, dus het
-	 * hoort ook op een review-frame te staan — anders is "richt dit ergens op"
-	 * niet te beoordelen.
+	 * DE SPELERLAAG: richtkruis, trefteken, munitieteller, richtingsindicator.
+	 *
+	 * Alles hierin is SPELBESTURING en geen debugtekst, dus het staat VÓÓR de
+	 * debug-poort en bestaat dus ook in een opnameronde. De poort eronder is er om
+	 * debugtekst uit review-stills te houden — rijen, panelen, de gauntlet-teller —
+	 * en niet om de speler zijn eigen HUD af te nemen.
+	 *
+	 * VIER DINGEN HOREN BIJ ELKAAR per element, en dat is waar een eerdere poging
+	 * op strandde: constructie, ABONNEMENT, refresh en opruiming. Een munitieteller
+	 * die je naar boven verplaatst zonder zijn bron toont eeuwig "30 / 30", en dat
+	 * is erger dan geen teller. Zie SubscribePlayerEvents voor de abonnementen,
+	 * NativeTick voor de refresh en NativeDestruct voor de opruiming.
 	 */
+	void BuildPlayerLayer();
+
+	/** Het richtkruis: het enige element dat altijd staat en nooit ververst wordt. */
 	void BuildCrosshair();
+
+	/** Trefferbevestiging in het schermmidden; gedoofd door de teller in NativeTick. */
+	void BuildHitMarker();
+
+	/** De munitieteller rechtsonder; gevoed door RefreshAmmoReadout per tick. */
+	void BuildAmmoReadout();
+
+	/**
+	 * De richtingsindicator uit Screen_Damage_Indicator.
+	 *
+	 * Stond tot 31-07 MIDDEN IN NativeTick, in de tak die het trefteken dooft: hij
+	 * werd dus pas aangemaakt nadat je zelf iets geraakt had, en tot dat moment
+	 * viel elke ShowDamageFrom stil op een null-pointer. Constructie hoort bij de
+	 * constructie.
+	 */
+	void BuildDamageIndicator();
+
+	/** Het ENIGE abonnement van de spelerlaag: treffers (marker + richting van de klap). */
+	void SubscribePlayerEvents();
+
+	/**
+	 * Donkere rand rond een lichte glyph, zodat hij op ELKE ondergrond leesbaar is.
+	 *
+	 * De eis "in eerste én derde persoon écht leesbaar" gaat niet over de camera
+	 * maar over waar het teken toevallig overheen valt: dezelfde lichte '+' staat op
+	 * een donkere muur prima en op een gele wegmarkering niet. Eén functie, zodat
+	 * kruis, trefteken en teller nooit uit elkaar lopen.
+	 */
+	static void ApplyLegibilityOutline(class UTextBlock& Text);
 
 	/** In-place refresh of the gauntlet rows; wall-clock throttled, and free when the panel is hidden. */
 	void RefreshGauntletRows(bool bForce);
@@ -152,7 +212,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> HitMarker;
 
-	/** Het richtkruis: staat altijd, midden in beeld. Zie BuildStaticPanels. */
+	/** Het richtkruis: staat altijd, midden in beeld. Zie BuildPlayerLayer. */
 	UPROPERTY()
 	TObjectPtr<class UTextBlock> Crosshair;
 

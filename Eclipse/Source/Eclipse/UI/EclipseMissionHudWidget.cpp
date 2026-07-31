@@ -235,35 +235,6 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 		if (HitMarkerSecondsLeft <= 0.0f && HitMarker != nullptr)
 		{
 			HitMarker->SetVisibility(ESlateVisibility::Hidden);
-
-	// De richtingsindicator komt uit een pack die al in het project ligt en die
-	// niemand aanriep (`Screen_Damage_Indicator`, gevonden 26-07). Een
-	// Blueprint-widget, dus laden via zijn gegenereerde klasse.
-	//
-	// Ontbreekt hij, dan blijft de rest van de HUD gewoon werken en zegt hij dat
-	// één keer — dit is decoratie die je mist, geen systeem dat stukgaat (14.3.5).
-	if (UClass* IndicatorClass = LoadClass<UUserWidget>(nullptr,
-			TEXT("/Game/Screen_Damage_Indicator/UI/WBP_DamageIndicator.WBP_DamageIndicator_C")))
-	{
-		DamageIndicator = CreateWidget<UUserWidget>(GetOwningPlayer(), IndicatorClass);
-		if (DamageIndicator != nullptr)
-		{
-			if (UCanvasPanelSlot* IndicatorSlot = Canvas->AddChildToCanvas(DamageIndicator))
-			{
-				// Vult het hele scherm en draait om zijn midden: de pack tekent zijn
-				// eigen pijl/rand, wij bepalen alleen de hoek.
-				IndicatorSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
-				IndicatorSlot->SetOffsets(FMargin(0.0f));
-			}
-			DamageIndicator->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
-			DamageIndicator->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-	else
-	{
-		UE_LOG(LogEclipse, Warning,
-			TEXT("HUD: WBP_DamageIndicator niet gevonden — je ziet niet uit welke richting je geraakt wordt (14.3.5)."));
-	}
 		}
 	}
 
@@ -277,18 +248,37 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 	}
 }
 
-void UEclipseMissionHudWidget::NativeConstruct()
+void UEclipseMissionHudWidget::NativeOnInitialized()
 {
-	using namespace EclipseGauntletOverlay;
+	Super::NativeOnInitialized();
 
-	Super::NativeConstruct();
+	// DE HELE BOOM STAAT HIER EN NIET IN NativeConstruct, en dat is de reparatie
+	// van de oorzaak waar deze laag twee dagen op is vastgelopen.
+	//
+	// GEMETEN op 31-07 in de engine-bron (UserWidget.cpp): UUserWidget::RebuildWidget
+	// pakt `WidgetTree->RootWidget` en maakt daar de Slate-boom van; is die leeg,
+	// dan wordt het een SSpacer — een lege doos. PAS DAARNA roept OnWidgetRebuilt
+	// NativePreConstruct en NativeConstruct aan. Deze widget zette zijn canvas als
+	// RootWidget IN NativeConstruct, dus altijd één stap te laat: de Slate-boom was
+	// op dat moment al genomen en bleef die lege doos. Alles wat er daarna in kwam —
+	// richtkruis, munitieteller, trefteken, de F3-gids, de objectiveregels — werd
+	// nooit getekend.
+	//
+	// Dat verklaart in één klap het rijtje meldingen dat als losse bugs is behandeld:
+	// "ik kan niet zien waar ik richt", "F3 doet niets", "de HUD is niet te
+	// fotograferen". En het verklaart waarom de logregels het tegendeel zeiden:
+	// IsInViewport() en GetVisibility() lezen de UMG-administratie, niet het scherm.
+	// Een instrument dat de vraag niet kan beantwoorden, antwoordde toch — precies
+	// de vorm van fout waar de owner-regel "meten voor je concludeert" over gaat.
+	//
+	// NativeOnInitialized draait vanuit Initialize(), en dat gebeurt in CreateWidget
+	// — dus vóór RebuildWidget. Bovendien precies één keer per instantie, wat past
+	// bij een boom die niet per montage opnieuw hoeft.
 
 	// CANVAS als wortel, met de bestaande tekstlijst linksboven erin (26-07).
 	//
-	// De HUD was een verticale doos tekstregels en verder niets — er is zelfs geen
-	// richtkruis-widget; het kruis dat je ziet is de muiscursor. Voor
-	// trefferfeedback moet er iets in het MIDDEN van het scherm kunnen staan, en
-	// dat kan een verticale doos niet. Een canvas kan het wel en verandert niets
+	// Voor trefferfeedback moet er iets in het MIDDEN van het scherm kunnen staan,
+	// en dat kan een verticale doos niet. Een canvas kan het wel en verandert niets
 	// aan de tekstregels: die krijgen gewoon hun eigen slot linksboven.
 	Canvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("MissionHudCanvas"));
 	WidgetTree->RootWidget = Canvas;
@@ -301,67 +291,62 @@ void UEclipseMissionHudWidget::NativeConstruct()
 		RootSlot->SetPosition(FVector2D(12.0f, 12.0f));
 	}
 
-	// HET RICHTKRUIS STAAT VÓÓR DE DEBUG-POORT, en dat is de correctie op mijn
-	// eigen fout van een uur eerder.
+	// ---------------------------------------------------------------------------
+	// DE SPELERLAAG — altijd, ook onder -EclipseShot.
+	// ---------------------------------------------------------------------------
 	//
-	// Ik bouwde het kruis onder de vroege uitstap hieronder, dus in ELKE
-	// opnameronde bestond het niet — en toen noemde ik het "klaar en getest" op
-	// grond van een groene suite. Het beeldbewijs kón er per constructie niet
-	// zijn. De owner moest dat weerleggen door te spelen, en dat is precies de
-	// gang van zaken waar hij vandaag een streep door heeft gezet.
+	// Het richtkruis stond al vóór de poort, en dat was de correctie op een eerdere
+	// fout: het kruis werd ONDER de uitstap gebouwd, bestond dus in geen enkele
+	// opnameronde, en werd desondanks "klaar en getest" genoemd op grond van een
+	// groene suite. Het beeldbewijs kón er per constructie niet zijn.
 	//
-	// De poort hieronder is er om DEBUGTEKST uit review-stills te houden — rijen,
-	// panelen, de gauntlet-teller. Een richtkruis is geen debugtekst maar
-	// spelbesturing: het hoort net zo goed op een review-frame als het personage
-	// zelf. Sterker nog, zonder kruis in beeld is de vraag "richt dit ergens op"
-	// helemaal niet te beoordelen.
-	BuildCrosshair();
+	// Diezelfde redenering gold altijd al voor het trefteken, de munitieteller en
+	// de richtingsindicator, en die stonden er wél achter. De poort is er om
+	// DEBUGTEKST uit review-stills te houden — rijen, panelen, de gauntlet-teller.
+	// Wat de speler tijdens het spelen afleest is spelbesturing en hoort net zo goed
+	// op een reviewframe als het personage zelf.
+	//
+	// EN DE ABONNEMENTEN GAAN MEE (SubscribePlayerEvents, in NativeConstruct), want
+	// dat is waar de vorige poging op strandde: de uitstap sloeg niet alleen de
+	// constructie over maar ook Subscribe(). Een munitieteller zonder bron toont
+	// eeuwig "30 / 30" en liegt dus harder dan een leeg scherm.
+	BuildPlayerLayer();
 
 	if (!IsDebugHudAllowed())
 	{
-		// Shot round: no rows, no subscriptions, no console command — the widget
-		// exists but is inert, so nothing can appear in a review still. Het kruis
-		// hierboven is de bewuste uitzondering.
 		return;
 	}
+
+	// ---------------------------------------------------------------------------
+	// DE DEBUGLAAG — alleen als de poort open staat.
+	// ---------------------------------------------------------------------------
 
 	LiveBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	Root->AddChildToVerticalBox(LiveBox);
 
+	BuildStaticPanels();
+}
 
-	// De hitmarker: één tekstblok in het midden, onzichtbaar tot er iets geraakt
-	// wordt. Tekst en geen afbeelding, en dat is een bewuste beperking — er ligt
-	// geen hitmarker-textuur in het project, en er een verzinnen zou betekenen dat
-	// ik iets teken. Een '+' die kort oplicht doet precies wat een hitmarker moet
-	// doen: bevestigen DAT je raakte, zonder je blik van het doel te halen.
-	HitMarker = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("HitMarker"));
-	if (UCanvasPanelSlot* MarkerSlot = Canvas->AddChildToCanvas(HitMarker))
-	{
-		MarkerSlot->SetAutoSize(true);
-		// Anker in het midden van het scherm; de offset centreert het teken zelf.
-		MarkerSlot->SetAnchors(FAnchors(0.5f, 0.5f));
-		MarkerSlot->SetAlignment(FVector2D(0.5f, 0.5f));
-		MarkerSlot->SetPosition(FVector2D::ZeroVector);
-	}
-	FSlateFontInfo MarkerFont = HitMarker->GetFont();
-	MarkerFont.Size = 28;
-	HitMarker->SetFont(MarkerFont);
-	HitMarker->SetVisibility(ESlateVisibility::Hidden);
+void UEclipseMissionHudWidget::NativeConstruct()
+{
+	using namespace EclipseGauntletOverlay;
 
-	// De munitieteller. Rechtsonder verankerd, uitgelijnd op zijn eigen
-	// rechteronderhoek, zodat "30 / 30" en "7 / 30" op dezelfde plek eindigen —
-	// een teller die verspringt terwijl je hem afleest is erger dan geen teller.
-	AmmoReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("AmmoReadout"));
-	if (UCanvasPanelSlot* AmmoSlot = Canvas->AddChildToCanvas(AmmoReadout))
+	Super::NativeConstruct();
+
+	// De BOOM staat in NativeOnInitialized (zie daar waarom). Hier staat alleen wat
+	// per montage opnieuw moet: abonnementen, per-run-tellers en de eerste vulling.
+	SubscribePlayerEvents();
+	// Meteen één keer vullen. NativeTick doet het daarna elke frame, maar de eerste
+	// frame ná het monteren is precies het frame dat een opnameronde vastlegt.
+	RefreshAmmoReadout();
+
+	if (!IsDebugHudAllowed())
 	{
-		AmmoSlot->SetAutoSize(true);
-		AmmoSlot->SetAnchors(FAnchors(1.0f, 1.0f));
-		AmmoSlot->SetAlignment(FVector2D(1.0f, 1.0f));
-		AmmoSlot->SetPosition(FVector2D(-48.0f, -32.0f));
+		// Review round: no rows, no panels, no console command — the DEBUG layer is
+		// inert, so no debug text can appear in a review still. De spelerlaag
+		// hierboven staat er wel, en dat is het hele punt van de splitsing.
+		return;
 	}
-	FSlateFontInfo AmmoFont = AmmoReadout->GetFont();
-	AmmoFont.Size = 22;
-	AmmoReadout->SetFont(AmmoFont);
 
 	// A mount is a fresh run: the widget is cached by the controller and
 	// re-constructed per mission, exactly like the two automatic tallies reset per
@@ -380,8 +365,6 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	bGuideSummaryEmitted = false;
 	bGuideVisible = CVarEclipseGuideOverlay.GetValueOnGameThread() > 0;
 
-	BuildStaticPanels();
-
 	if (UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr)
 	{
 		// Three families, not the whole Event root: this HUD draws mission, squad
@@ -393,14 +376,6 @@ void UEclipseMissionHudWidget::NativeConstruct()
 				FGameplayTag::RequestGameplayTag(Family),
 				FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnAnyFact)));
 		}
-
-		// De treffer krijgt een EIGEN abonnement en niet de familie-route, want hij
-		// mag geen volledige herbouw van de tekstlijst veroorzaken: er wordt tot
-		// 6,67 keer per seconde geraakt, en OnAnyFact tekent alles opnieuw.
-		EventHandles.Add(Bus->Subscribe(
-			EclipseTags::Event_Combat_HitLanded,
-			FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnHitLanded),
-			FEclipseCombatEventPayload::StaticStruct()));
 	}
 
 	// The gauntlet block on demand, so a session where the panel stayed closed can
@@ -711,6 +686,126 @@ void UEclipseMissionHudWidget::Rebuild()
 	}
 }
 
+void UEclipseMissionHudWidget::BuildPlayerLayer()
+{
+	// VOLGORDE IS TEKENVOLGORDE op een canvas: wat later wordt toegevoegd, ligt
+	// erbovenop. Kruis onderop, trefteken erover (anders verdwijnt de bevestiging
+	// ín het kruis), teller rechtsonder, richtingsindicator als volvlaks laag
+	// bovenop — die is verborgen tot je geraakt wordt en neemt dus niets weg.
+	BuildCrosshair();
+	BuildHitMarker();
+	BuildAmmoReadout();
+	BuildDamageIndicator();
+}
+
+void UEclipseMissionHudWidget::SubscribePlayerEvents()
+{
+	UEclipseEventBusSubsystem* Bus = GetGameInstance() != nullptr
+		? GetGameInstance()->GetSubsystem<UEclipseEventBusSubsystem>() : nullptr;
+	if (Bus == nullptr)
+	{
+		// Luid, want dit is precies de stille fout die een verplaatst element
+		// waardeloos maakt: het widget staat er, de bron niet, en het scherm toont
+		// eeuwig de beginstand (14.3.5).
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: geen event-bus — het trefteken en de richtingsindicator krijgen nooit een feit te zien."));
+		return;
+	}
+
+	// De treffer krijgt een EIGEN abonnement en niet de familie-route, want hij mag
+	// geen volledige herbouw van de tekstlijst veroorzaken: er wordt tot 6,67 keer
+	// per seconde geraakt, en OnAnyFact tekent alles opnieuw.
+	//
+	// Hetzelfde feit draagt schutter én slachtoffer, dus dit ene abonnement voedt
+	// zowel het trefteken als de richtingsindicator (zie OnHitLanded).
+	EventHandles.Add(Bus->Subscribe(
+		EclipseTags::Event_Combat_HitLanded,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnHitLanded),
+		FEclipseCombatEventPayload::StaticStruct()));
+}
+
+void UEclipseMissionHudWidget::BuildHitMarker()
+{
+	// De hitmarker: één tekstblok in het midden, onzichtbaar tot er iets geraakt
+	// wordt. Tekst en geen afbeelding, en dat is een bewuste beperking — er ligt
+	// geen hitmarker-textuur in het project, en er een verzinnen zou betekenen dat
+	// ik iets teken. Een '+' die kort oplicht doet precies wat een hitmarker moet
+	// doen: bevestigen DAT je raakte, zonder je blik van het doel te halen.
+	HitMarker = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("HitMarker"));
+	if (UCanvasPanelSlot* MarkerSlot = Canvas->AddChildToCanvas(HitMarker))
+	{
+		MarkerSlot->SetAutoSize(true);
+		// Anker in het midden van het scherm; de offset centreert het teken zelf.
+		MarkerSlot->SetAnchors(FAnchors(0.5f, 0.5f));
+		MarkerSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+		MarkerSlot->SetPosition(FVector2D::ZeroVector);
+	}
+	FSlateFontInfo MarkerFont = HitMarker->GetFont();
+	MarkerFont.Size = 28;
+	HitMarker->SetFont(MarkerFont);
+	// Zelfde donkere rand als het kruis: een bevestiging die je op een lichte muur
+	// niet ziet, bevestigt niets.
+	ApplyLegibilityOutline(*HitMarker);
+	HitMarker->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UEclipseMissionHudWidget::BuildAmmoReadout()
+{
+	// De munitieteller. Rechtsonder verankerd, uitgelijnd op zijn eigen
+	// rechteronderhoek, zodat "30 / 30" en "7 / 30" op dezelfde plek eindigen —
+	// een teller die verspringt terwijl je hem afleest is erger dan geen teller.
+	AmmoReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("AmmoReadout"));
+	if (UCanvasPanelSlot* AmmoSlot = Canvas->AddChildToCanvas(AmmoReadout))
+	{
+		AmmoSlot->SetAutoSize(true);
+		AmmoSlot->SetAnchors(FAnchors(1.0f, 1.0f));
+		AmmoSlot->SetAlignment(FVector2D(1.0f, 1.0f));
+		AmmoSlot->SetPosition(FVector2D(-48.0f, -32.0f));
+	}
+	FSlateFontInfo AmmoFont = AmmoReadout->GetFont();
+	AmmoFont.Size = 22;
+	AmmoReadout->SetFont(AmmoFont);
+	// De teller staat rechtsonder, waar in dit district juist de lichte wegmarkering
+	// ligt — zonder rand is dat de eerste plek waar hij wegvalt.
+	ApplyLegibilityOutline(*AmmoReadout);
+}
+
+void UEclipseMissionHudWidget::BuildDamageIndicator()
+{
+	// De richtingsindicator komt uit een pack die al in het project ligt en die
+	// niemand aanriep (`Screen_Damage_Indicator`, gevonden 26-07). Een
+	// Blueprint-widget, dus laden via zijn gegenereerde klasse.
+	//
+	// Ontbreekt hij, dan blijft de rest van de HUD gewoon werken en zegt hij dat
+	// één keer — dit is decoratie die je mist, geen systeem dat stukgaat (14.3.5).
+	UClass* IndicatorClass = LoadClass<UUserWidget>(nullptr,
+		TEXT("/Game/Screen_Damage_Indicator/UI/WBP_DamageIndicator.WBP_DamageIndicator_C"));
+	if (IndicatorClass == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: WBP_DamageIndicator niet gevonden — je ziet niet uit welke richting je geraakt wordt (14.3.5)."));
+		return;
+	}
+
+	DamageIndicator = CreateWidget<UUserWidget>(GetOwningPlayer(), IndicatorClass);
+	if (DamageIndicator == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: WBP_DamageIndicator kon niet worden aangemaakt (geen eigenaar-controller?)."));
+		return;
+	}
+
+	if (UCanvasPanelSlot* IndicatorSlot = Canvas->AddChildToCanvas(DamageIndicator))
+	{
+		// Vult het hele scherm en draait om zijn midden: de pack tekent zijn
+		// eigen pijl/rand, wij bepalen alleen de hoek.
+		IndicatorSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+		IndicatorSlot->SetOffsets(FMargin(0.0f));
+	}
+	DamageIndicator->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+	DamageIndicator->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UEclipseMissionHudWidget::BuildCrosshair()
 {
 	// HET RICHTKRUIS. Owner-melding 27-07: "ik kan niet zien waar ik richt."
@@ -745,11 +840,43 @@ void UEclipseMissionHudWidget::BuildCrosshair()
 	Crosshair->SetText(FText::FromString(TEXT("+")));
 	// Niet wit: tegen de oranje horizon en het lichte asfalt van het district
 	// verdwijnt zuiver wit. Een lichte koele tint met volle dekking blijft op
-	// beide leesbaar, en de zwarte contourlijnen van de toon-stijl geven hem
-	// vanzelf rand.
+	// beide leesbaar.
 	Crosshair->SetColorAndOpacity(FSlateColor(FLinearColor(0.85f, 0.92f, 1.0f, 1.0f)));
+	// EN EEN DONKERE RAND, en dat is de correctie op de regel die hier stond.
+	//
+	// Er stond: "de zwarte contourlijnen van de toon-stijl geven hem vanzelf rand".
+	// Dat klopt niet en kon ook nooit kloppen: de inktlijn is een post-effect op
+	// 3D-GEOMETRIE, en dit kruis is een Slate-glyph die er bovenop wordt getekend —
+	// die krijgt van dat effect nooit één pixel. GEMETEN op het eerste frame waar de
+	// HUD überhaupt zichtbaar was (31-07): een glyph van 9x9 px, lichte tint, zonder
+	// enige donkere pixel eromheen. Op de donkere muur leesbaar, op de gele
+	// wegmarkering ernaast per constructie niet.
+	//
+	// Een schaduw is geen versiering maar de standaardoplossing: één donkere pixel
+	// rondom garandeert contrast tegen élke ondergrond, en dat is precies de eis
+	// "in beide perspectieven écht leesbaar" — die gaat over de ondergrond, niet
+	// over de camera.
+	ApplyLegibilityOutline(*Crosshair);
 	// HitTestInvisible en niet Visible: het kruis mag nooit een klik opvangen.
 	Crosshair->SetVisibility(ESlateVisibility::HitTestInvisible);
+}
+
+void UEclipseMissionHudWidget::ApplyLegibilityOutline(UTextBlock& Text)
+{
+	// EEN ECHTE RAND RONDOM, en niet de slagschaduw waar ik mee begon.
+	//
+	// De schaduw was één verschoven kopie: op het uitvergrote beeld liep de donkere
+	// rand alleen langs de onder- en rechterkant, en dan blijft de linkerbovenhoek
+	// licht-op-licht. Half opgelost is hier niet opgelost — de eis is dat het teken
+	// op ELKE ondergrond staat, niet op de helft ervan.
+	//
+	// FFontOutlineSettings tekent de rand aan alle kanten, in de font-rasterisatie
+	// zelf. Eén pixel: genoeg om te scheiden, klein genoeg om een kruis van 9 px
+	// niet in een blok te veranderen.
+	FSlateFontInfo Font = Text.GetFont();
+	Font.OutlineSettings.OutlineSize = 1;
+	Font.OutlineSettings.OutlineColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	Text.SetFont(Font);
 }
 
 void UEclipseMissionHudWidget::BuildStaticPanels()
