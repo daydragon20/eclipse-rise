@@ -7,18 +7,25 @@
 
 ## Het overzicht
 
+*Bijgewerkt 01-08 middag. **O-13 is geen los puntje meer**: er bleken zes stembotsingen in
+plaats van drie, en twee ervan zitten in de ijkmissie. Samen met O-3 is dat nu één blokkade,
+en het is de enige die iets tegenhoudt.*
+
 | Wanneer | Wat | Hoe lang | Blokkeert |
 |---|---|---|---|
-| **Nu — dit houdt de bar rood** | **O-3** Twee stemmen voor `eclipse_fighter` C en D, plus Petra | 15 min | acht regels die anders als **stilte** gegenereerd worden |
+| **NU — dit is de enige echte rem** | **O-3 + O-13 samen**: zes stemmen staan op twee rollen, en twee `eclipse_fighter`-slots zijn leeg | 15 min | **alle audio.** Er wordt geen seconde ingesproken tot dit weg is |
 | **Nu — het gaat over geld** | **O-14** Act 1 kost ~97.000 van je 125.612 credits | 10 min | hoe act 1 klinkt |
 | **Nu** | **O-12** 2.475 credits gingen naar het verkeerde model — opnieuw of niet? | 5 min | niets, maar het loopt op |
-| **Nu** | **O-13** Drie stemmen zijn twee keer gekozen | 10 min | niets |
 | **Als je zin hebt** | **O-15** Kijk naar de vier vault-kamers: is dit Hollow Point? | 5 min | niets |
 | **Wacht op mij** | **O-4** IJkmissie beluisteren | — | — |
 
-**Niets hiervan houdt het bouwen tegen** — de agents werken door aan de schermlaag, de
-kaartlaag en het schrijfwerk terwijl jij dit doet. Maar **O-3 wél voor audio**: zolang twee
-`eclipse_fighter`-slots leeg zijn, verdwijnen acht regels zonder foutmelding.
+**Er komt een voorstel aan waar je in één keer ja op kunt zeggen.** Zoals het er nu staat
+zou je elf losse keuzes moeten maken; dat is drie kwartier. Een agent zoekt nu per botsing
+een verse stem uit, met één regel waarom, zodat het één akkoord wordt met de mogelijkheid
+er twee uit te pikken.
+
+**Niets hiervan houdt het bouwen tegen** — de schermlaag, de kaartlaag en het schrijfwerk
+lopen door terwijl jij dit doet.
 
 ## ~~API-scopes~~ · *afgehandeld — dit was de rem, en hij is weg*
 
@@ -35,46 +42,36 @@ dashboard.
 
 ---
 
-## O-3 · Stemmen kiezen *(staat klaar, 30–45 minuten)*
+## O-3 + O-13 · de castingblokkade *(15 minuten, en het houdt alles tegen)*
 
-**104 kandidaten over 18 rollen, en het kostte nul credits.** Dat is jouw eigen verdienste:
-je wees erop dat je voor het kiezen van een stem niet hoeft te betalen omdat de Voice
-Library gratis doorzoekbaar is. Er lag een script klaar om er 2.842 credits doorheen te
-jagen; dat is niet gedraaid.
+**Wat er mis is.** Drie stem-ID's staan op **twee rollen tegelijk**, en dat is niet
+"lijkt op elkaar" — het is dezelfde ID, dus dezelfde cachesleutel, dus **letterlijk
+dezelfde stem**:
 
-**Open:** http://127.0.0.1:8377/progress_media/casting/CASTING.html — één pagina, per
-personage gegroepeerd, speelt direct af.
+| stem | rol 1 | rol 2 |
+|---|---|---|
+| Matilda | **Mara** (328 regels) | een Eclipse-schutter (52) |
+| Liam | **Dex** (267 regels) | een Dominion-dienstplichtige (9) |
+| Eric | Threx (28) | een Veil-operative (8) |
 
-**Wat je hoort, en dit stuurt je verwachting:** de **gratis previews** met algemene
-voorbeeldtekst, **geen ECLIPSE-dialoog**. Je beoordeelt dus timbre, leeftijd, accent en
-register — geen acteerwerk. Dat is de prijs van nul credits, en precies waarom er een
-tweede ronde bestaat.
+Mara zou dus klinken als een willekeurige schutter, en Dex als een tegenstander in
+hetzelfde vuurgevecht. Daarnaast staan Laura, Alice en Daniel elk op twee personages, en
+zijn er **twee `eclipse_fighter`-slots leeg** — acht regels die zonder foutmelding als
+**stilte** gegenereerd zouden worden.
 
-**Geef per rol een TOP 2, geen winnaar.** Die twee finalisten krijgen daarna je échte tekst
-te spreken — de signature-regel, een emotioneel uiterste dat het personage echt haalt, en
-een korte gevechtsregel — en pas dán wordt er gelockt.
+**Waarom het nu niet kan wachten.** Casting is **permanent**: de stem-ID zit in de
+cachesleutel, dus wie later wisselt **herbetaalt elke regel van dat personage**. Bij de
+ijkmissie hing daardoor **66% van de kosten** aan stemmen die nog konden bewegen. Daarom is
+die generatie afgeblazen met **nul credits uitgegeven** — dat was de juiste uitkomst, en
+mijn opdracht om te generen was fout.
 
-**Waar je op let:**
+**Dit had ik moeten zien.** Ik meldde "alle acht stemmen resolven" en dat wás waar. Maar
+*resolven* is niet *uniek* resolven, en die controle bestond niet. Hij bestaat nu wel.
 
-1. **Klinkt dit als het personage?** Vingerafdrukken staan in `18_writing_standard.md`
-   §18.4. Brick zegt bijna niets; Kaya praat te snel; Vex verheft nooit zijn stem.
-2. **Houdt hij stand bij het uiterste?** Een stem die een rustige zin prachtig draagt maar
-   instort bij Mara's doodsscène is de verkeerde stem, hoe mooi die eerste zin ook was.
-3. **Hoor je hem nog over geweervuur heen?**
-4. **Klinken twee personages die samen scènes hebben niet hetzelfde?**
-
-> **Casting is permanent.** De cache-sleutel bevat de stem-ID, dus een personage later
-> omcasten maakt élke regel van dat personage ongeldig en herbetaalt alles. Neem de tijd —
-> je luistert er een jaar naar.
-
-**Eén eerlijke kanttekening.** Bij de bibliotheekstemmen kon één poort níét geautomatiseerd
-worden: of een stem commerciële rechten draagt staat niet in de API — dat veld bestaat niet,
-en een verzonnen parameter geeft byte-identieke resultaten. Wat wél automatisch ging is
-toegepast: alleen makers met status *professional* of *high_quality*, accent-neutraal, en een
-opzegtermijn van minstens 365 dagen. Die laatste poort verdiende zich meteen terug — een
-sterke Kaine-kandidaat had opzegtermijn 0, dus die stem kan van de ene op de andere dag
-verdwijnen. Elke bibliotheekstem draagt daarom `NIET_GEVERIFIEERD` plus een link naar zijn
-kaart: **één klik per finalist, niet per kandidaat.**
+**Wat jij doet:** één voorstel goedkeuren. Het advies dat eronder ligt is om bij elke
+botsing het **personage** te laten staan en de **bark-rol** een verse stem te geven — dat is
+de kant met 52, 9 en 8 regels tegen 328, 267 en 28, en dus veruit de goedkoopste kant om
+later nog te kunnen bewegen.
 
 ---
 
