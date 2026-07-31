@@ -397,31 +397,75 @@ def agent_messages(agent_id: str, limit: int = 60) -> list[dict]:
 # ------------------------------------------------------------ scriptlaag --
 
 def scan_script() -> dict:
-    """Voortgang van de schrijflaag: .yaml-scènes per status."""
+    """Voortgang van de schrijflaag, per missie: skelet, dialoog, stem."""
     root = REPO / "Eclipse" / "Content" / "Script"
     counts = {"draft": 0, "critic-pass": 0, "generated": 0, "onbekend": 0}
     words = 0
-    scenes: list[dict] = []
+    per_missie: dict[str, dict] = {}
+
     if root.is_dir():
         for yf in root.rglob("*.yaml"):
             try:
-                head = yf.read_text(encoding="utf-8", errors="replace")[:4000]
+                text = yf.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
+            head = text[:4000]
+
             m = re.search(r"^status:\s*([\w-]+)", head, re.M)
             status = m.group(1) if m else "onbekend"
             counts[status] = counts.get(status, 0) + 1
+
             w = re.search(r"^words:\s*(\d+)", head, re.M)
-            if w:
-                words += int(w.group(1))
-            t = re.search(r'^title:\s*"?([^"\n]+)"?', head, re.M)
-            scenes.append({
-                "file": str(yf.relative_to(REPO)).replace("\\", "/"),
+            scene_words = int(w.group(1)) if w else 0
+            words += scene_words
+
+            t = re.search(r'^title:\s*"?([^"\n]+?)"?\s*$', head, re.M)
+            mm = re.search(r"^mission:\s*(\S+)", head, re.M)
+            missie = mm.group(1) if mm else (yf.parent.name or "overig")
+
+            # aantal dialoogregels = aantal '- id:' onder lines:
+            regels = len(re.findall(r"^\s+-\s+id:", text, re.M))
+
+            groep = per_missie.setdefault(missie, {
+                "missie": missie, "scenes": [], "regels": 0, "woorden": 0,
+            })
+            groep["scenes"].append({
                 "title": (t.group(1).strip() if t else yf.stem),
                 "status": status,
+                "regels": regels,
+                "file": str(yf.relative_to(REPO)).replace("\\", "/"),
             })
+            groep["regels"] += regels
+            groep["woorden"] += scene_words
+
+    missies = sorted(per_missie.values(), key=lambda g: g["missie"])
+
+    # beat-sheets = laag L1 (het skelet waar de dialoog aan hangt)
+    beats_dir = REPO / "phase0" / "beats"
+    beats = []
+    if beats_dir.is_dir():
+        for bf in sorted(beats_dir.glob("*.md")):
+            try:
+                st = bf.stat()
+            except OSError:
+                continue
+            beats.append({
+                "naam": bf.stem,
+                "path": str(bf.relative_to(REPO)).replace("\\", "/"),
+                "kb": round(st.st_size / 1024, 1),
+            })
+
     total = sum(counts.values())
-    return {"counts": counts, "total": total, "words": words, "scenes": scenes[:60]}
+    met_regels = sum(1 for g in missies for s in g["scenes"] if s["regels"] > 0)
+    return {
+        "counts": counts,
+        "total": total,
+        "words": words,
+        "regels": sum(g["regels"] for g in missies),
+        "scenesMetDialoog": met_regels,
+        "missies": missies,
+        "beats": beats,
+    }
 
 
 # --------------------------------------------------------------- credits --
@@ -734,6 +778,16 @@ def scan_owner_actions() -> list[dict]:
             cur["klaar"] = cur["klaar"] or row["klaar"]
             if label not in cur["bron"]:
                 cur["bron"] += " + " + label
+
+    # Een punt dat Nathan via een knop heeft beantwoord is klaar, ook als de
+    # tabel in het document nog niet is bijgewerkt. Anders blijft T-10 als
+    # "open" staan terwijl hij er al op geklikt heeft.
+    answers = read_answers()
+    for rid, row in merged.items():
+        ans = answers.get(rid)
+        if ans and ans.get("waarde") not in ("wacht", "later"):
+            row["klaar"] = True
+            row["beantwoord"] = ans.get("waarde", "")
 
     out = list(merged.values())
     out.sort(key=lambda r: (r["klaar"], r["id"][0], int(r["id"].split("-")[1])))

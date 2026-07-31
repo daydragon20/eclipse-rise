@@ -216,6 +216,36 @@
       ],
       "advies": "CC0 tenzij de loop je later echt stoort. Je tijd is nu meer waard dan de laatste 10% animatiekwaliteit.",
       "vrijtekst": false
+    },
+    {
+      "id": "T-6",
+      "prio": "later",
+      "vraag": "Een vaste testmachine (CI-runner) goedkeuren?",
+      "waarom": "Nu draaien alle tests lokaal op jouw PC, handmatig. Een vaste runner draait ze bij elke wijziging automatisch, zodat een fout binnen minuten opvalt in plaats van pas als iemand kijkt.",
+      "stappen": [
+        "Je hoeft nu niets te doen - dit is een ja/nee/later",
+        "Bij ja legt de agent eerst uit wat hij installeert en wat het kost, voor er iets gebeurt"
+      ],
+      "meer_info": "**Wat het praktisch is:** een programmaatje dat bij elke commit de build en de tests draait.\n\n**Waarom het niet dringend is:** de tests draaien nu ook, alleen handmatig. Het risico is dat een fout een dag blijft liggen - vervelend, niet fataal.\n\n**Waarom het toch op de lijst staat:** naarmate er meer parallelle agents werken, groeit de kans dat twee wijzigingen elkaar breken zonder dat iemand het merkt.\n\n**Let op:** dit valt onder de installatie-afspraak. Er wordt niets geinstalleerd zonder dat je vooraf hoort wat en waarom - en je hebt geen beheerdersrechten, dus als het die vraagt gaat het sowieso niet door.",
+      "opties": [
+        {
+          "label": "Ja, leg maar uit",
+          "waarde": "ja",
+          "gevolg": "De agent komt met een voorstel: wat, waar, hoeveel schijf, en of het beheerdersrechten vraagt."
+        },
+        {
+          "label": "Nee, lokaal is prima",
+          "waarde": "nee",
+          "gevolg": "Punt van de lijst. Tests blijven lokaal."
+        },
+        {
+          "label": "Later nog eens vragen",
+          "waarde": "later",
+          "gevolg": "Komt terug wanneer er meer parallel werk is."
+        }
+      ],
+      "advies": "Later. Het lokale draaien is nu niet het knelpunt.",
+      "vrijtekst": false
     }
   ]
 }

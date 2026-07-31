@@ -181,6 +181,16 @@ h3{font-size:17px;margin:0 0 8px}
 }
 .vt:focus{outline:0;border-color:var(--acc)}
 
+/* lagen-overzicht schrijflaag */
+.laag{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--dim2)}
+.laag:last-of-type{border:0}
+.laag b{color:var(--dim2);min-width:190px}
+.laag .m{margin-left:auto;white-space:nowrap}
+.laag.bezig{color:var(--tx)}
+.laag.bezig b{color:var(--warn)}
+.laag.klaar{color:var(--tx)}
+.laag.klaar b{color:var(--ok)}
+
 /* owner-blokkades */
 .ow{padding:11px 0;border-bottom:1px solid var(--line)}
 .ow:last-child{border:0;padding-bottom:0}
@@ -325,44 +335,22 @@ function vNu(){
   })()}
 
   ${(()=>{
-    const ow=(S.owner||[]).filter(r=>!r.klaar);
-    const bucket=r=>{const w=((r.wanneer||r.duur||"")+" "+(r.id||"")).toLowerCase();
-      if(/\bnu\b|staande|bovenaan/.test(w))return 0;
-      if(/gauw|zodra|rond|augustus|\bbij\b/.test(w))return 1;
-      return 2;};
-    const groepen=[
-      {n:0,t:"Nu — dit houdt werk tegen",k:"bad"},
-      {n:1,t:"Gauw",k:"warn"},
-      {n:2,t:"Later / staand",k:""}
-    ];
-    if(!ow.length)return '<h2>Wacht op jou</h2><div class="card"><div class="empty">Niets openstaand.</div></div>';
-    return `<h2>Wacht op jou — ${ow.length} open</h2>` + groepen.map(g=>{
-      const rows=ow.filter(r=>bucket(r)===g.n);
-      if(!rows.length)return "";
-      return `<div class="card">
-        <h3>${esc(g.t)} <span class="tag ${g.k}">${rows.length}</span></h3>
-        ${rows.map(r=>`
-          <div class="ow">
-            <div class="ow-h">
-              <span class="tag ${g.k}">${esc(r.id)}</span>
-              <strong>${esc(r.actie||"")}</strong>
-            </div>
-            <div class="ow-m">
-              ${r.blokkeert&&r.blokkeert!=="—"?`<span><b>blokkeert:</b> ${esc(r.blokkeert)}</span>`:""}
-              ${r.wanneer||r.duur?`<span><b>wanneer:</b> ${esc(r.wanneer||r.duur)}</span>`:""}
-              <span class="src">${esc(r.bron||"")}</span>
-            </div>
-          </div>`).join("")}
-      </div>`;}).join("");
+    // Alles wat een kaart heeft, staat hierboven al. Hier alleen wat NOG
+    // GEEN kaart heeft — zodat er nooit een blokkade stil verdwijnt.
+    const kaartIds=new Set((S.vragen||[]).map(q=>q.id));
+    const rest=(S.owner||[]).filter(r=>!r.klaar&&!kaartIds.has(r.id));
+    if(!rest.length)return "";
+    return `<h2>Nog zonder keuzekaart <span class="tag">${rest.length}</span></h2>
+    <div class="card">
+      <div class="note" style="margin:0 0 10px">Deze punten staan wel in de documenten maar hebben nog geen knop. De agent hoort ze als vraag in <code>owner_questions.json</code> te zetten.</div>
+      ${rest.map(r=>`<div class="ow">
+        <div class="ow-h"><span class="tag">${esc(r.id)}</span><strong>${esc(r.actie||"")}</strong></div>
+        <div class="ow-m">
+          ${r.blokkeert&&r.blokkeert!=="—"?`<span><b>blokkeert:</b> ${esc(r.blokkeert)}</span>`:""}
+          <span class="src">${esc(r.bron||"")}</span>
+        </div></div>`).join("")}
+    </div>`;
   })()}
-
-  ${acties.length?`<h2>Uitgewerkt — met stappen</h2>
-  <div class="card">${acties.map(a=>`
-    <div class="item ${esc(a.prio||"later")}">
-      <h4>${esc(a.titel||"")} <span class="tag ${a.prio==="nu"?"bad":a.prio==="gauw"?"warn":""}">${esc(a.prio||"")}</span></h4>
-      ${a.waarom?`<p>${esc(a.waarom).slice(0,700)}</p>`:""}
-      ${a.stappen?`<ul>${a.stappen.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
-    </div>`).join("")}</div>`:""}
 
   ${(()=>{const ab=(D.abTests||[]).filter(t=>t.status!=="beslist");
     if(!ab.length)return "";
@@ -502,24 +490,71 @@ function vTaken(){
 }
 
 function vSchrijf(){
-  const sc=S.script||{}, v=S.voice||{};
+  const sc=S.script||{}, v=S.voice||{}, miss=sc.missies||[], beats=sc.beats||[];
+  const c=sc.counts||{};
+  const metDial=sc.scenesMetDialoog||0, tot=sc.total||0;
+  const pctDial=tot?Math.round(metDial/tot*100):0;
+
   return `<h2>Schrijflaag & stem</h2>
-  <div class="grid g3" style="margin-bottom:14px">
-    <div class="stat"><div class="n">${sc.total||0}</div><div class="l">Scènes</div></div>
-    <div class="stat"><div class="n">${(sc.words||0).toLocaleString("nl")}</div><div class="l">Woorden geschreven</div></div>
+
+  <div class="card">
+    <h3>Waar we staan in de lagen</h3>
+    <div class="laag ${beats.length?"klaar":""}">
+      <b>L1 · Skelet</b> — beat-sheets: wie zegt wat tegen wie, en waarom
+      <span class="m">${beats.length?`${beats.length} bestanden · act 1 compleet`:"nog niet begonnen"}</span>
+    </div>
+    <div class="laag ${tot?"bezig":""}">
+      <b>L2 · Scènes opgezet</b> — elke scène heeft want/obstacle/turn en schrijfinstructies
+      <span class="m">${tot} scènes</span>
+    </div>
+    <div class="laag ${metDial?"bezig":""}">
+      <b>L3 · Dialoog geschreven</b> — de letterlijke regels die iemand uitspreekt
+      <span class="m">${metDial} van ${tot} scènes (${pctDial}%)</span>
+    </div>
+    <div class="bar"><i style="width:${pctDial}%"></i></div>
+    <div class="laag ${c["critic-pass"]?"bezig":""}">
+      <b>L4 · Goedgekeurd</b> — door de kwaliteitspoort
+      <span class="m">${c["critic-pass"]||0} scènes</span>
+    </div>
+    <div class="laag ${c.generated?"klaar":""}">
+      <b>L5 · Ingesproken</b> — audio bestaat
+      <span class="m">${c.generated||0} scènes</span>
+    </div>
+    ${!metDial&&tot?`<div class="note">De 71 scènes bestaan al als <strong>skelet</strong>: locatie, personages, wat er moet gebeuren en instructies voor de schrijver. Er staat nog <strong>geen enkele uitgesproken zin</strong> in. Dat is laag L2 en die start na de ijkmissie.</div>`:""}
+  </div>
+
+  <div class="grid g4" style="margin:14px 0">
+    <div class="stat"><div class="n">${tot}</div><div class="l">Scènes opgezet</div></div>
+    <div class="stat"><div class="n">${(sc.regels||0).toLocaleString("nl")}</div><div class="l">Dialoogregels</div></div>
+    <div class="stat"><div class="n">${(sc.words||0).toLocaleString("nl")}</div><div class="l">Woorden</div></div>
     <div class="stat"><div class="n">${(v.remaining||0).toLocaleString("nl")}</div><div class="l">Credits over</div></div>
   </div>
-  <div class="card"><h3>Scènes</h3>
-    ${(sc.scenes||[]).length?(sc.scenes||[]).map(s=>`<div class="row">
-      <span class="t">${esc(s.title)}</span>
-      <span class="m"><span class="tag ${s.status==="generated"?"ok":s.status==="critic-pass"?"info":""}">${esc(s.status)}</span></span>
-    </div>`).join(""):'<div class="empty">Nog geen scriptbestanden. Ze komen in Eclipse/Content/Script/.</div>'}
-  </div>
-  <div class="card"><h3>Credit-ledger</h3>
+
+  <h2>Per missie</h2>
+  ${miss.length?miss.map(g=>{
+    const klaar=g.scenes.filter(s=>s.regels>0).length;
+    return `<div class="card">
+      <h3>${esc(g.missie)}
+        <span class="tag ${klaar===g.scenes.length?"ok":klaar?"warn":""}">${klaar}/${g.scenes.length} geschreven</span>
+        ${g.regels?`<span class="tag info">${g.regels} regels</span>`:""}</h3>
+      ${g.scenes.map(s=>`<div class="row">
+        <span class="t">${s.regels?"✍ ":"○ "}${esc(s.title)}</span>
+        <span class="m">${s.regels?s.regels+" regels · ":""}<span class="tag ${s.status==="generated"?"ok":s.status==="critic-pass"?"info":""}">${esc(s.status)}</span></span>
+      </div>`).join("")}
+    </div>`;}).join(""):'<div class="card"><div class="empty">Nog geen scènes. Ze komen in Eclipse/Content/Script/.</div></div>'}
+
+  ${beats.length?`<h2>Beat-sheets — het skelet</h2>
+  <div class="card"><div class="doclist">${beats.map(b=>`
+    <div class="doc" onclick="openDoc('${esc(b.path)}')"><span>${esc(b.naam)}</span><span class="meta">${b.kb} KB</span></div>`).join("")}</div>
+    <div class="note">Hierin staat per missie wat er gebeurt, welke wending waar geplant wordt, en welke instructies de schrijvers krijgen. Nog geen dialoog.</div>
+  </div>`:""}
+
+  <h2>Credit-ledger</h2>
+  <div class="card">
     ${(v.rows||[]).length?(v.rows||[]).map(r=>`<div class="row">
       <span class="t">${esc(r.scope)} <span class="tag">tier ${esc(r.tier)}</span></span>
       <span class="m">${r.credits.toLocaleString("nl")} · ${esc(r.datum)}</span></div>`).join(""):
-      '<div class="empty">Nog niets uitgegeven. phase0/VOICE_LEDGER.md is leeg.</div>'}
+      '<div class="empty">Nog niets uitgegeven — er is nog geen enkele credit gebruikt van de 310.000.</div>'}
   </div>`;
 }
 
