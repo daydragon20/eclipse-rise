@@ -30,12 +30,10 @@ De owner-stop op nieuwe features is **opgeheven** (31-07). Er geldt nog één vo
 
 Spoor A raakt de build niet aan en kan dus altijd doorlopen.
 
-## ⚠️ ÉÉN TEST STAAT ROOD — en hij is NIET van de wijzigingen van 31-07 avond
+## ✅ DE RODE TEST IS OPGELOST (31-07, `8e9bf53`)
 
-`Eclipse.Feel.Input.DocumentedConsoleCommandsExist` faalt. **Drie keer gedraaid, drie
-keer rood, óók nadat de enige codewijziging van die avond was teruggedraaid** — dus
-hij is niet veroorzaakt door dat werk. Bar verder: 185 tests, 1 gefaald, ValidateData
-0 fouten.
+`Eclipse.Feel.Input.DocumentedConsoleCommandsExist` stond drie rondes rood. Hij is
+groen; de bar staat weer vol.
 
 **OORZAAK GEVONDEN 31-07 (gemeten uit het testrapport, niet geredeneerd).** De
 melding staat gewoon in `Eclipse/Saved/TestReport/index.json`:
@@ -112,6 +110,7 @@ Volledig in `21_quality_mandate.md` — lees dat één keer, het is kort.
 - **Bugs:** volg `phase0/DEBUG_DISCIPLINE.md`. Drie iteraties zonder diagnose = escaleren, niet doorgaan.
 - **Geen `/loop`, geen ScheduleWakeup** — die vuren niet betrouwbaar bij onderbreking.
 - **Nooit `PROGRESS.html` of `progress_auto.js` bewerken.** Data gaat in `progress_data.js`.
+- **Nooit een dicht markdown-document schrijven dat voor Nathan bedoeld is.** Hij leest één scherm: het dashboard. Owner-informatie hoort in `progress_data.js` (`ownerActies`, met stappen) én in de owner-tabel van `STATUS.md` of `JOUW_ACTIES.md` — die leest de dashboardserver uit. Heeft het echt een eigen document nodig, dan als **HTML gekoppeld aan het dashboard**, niet als losse `.md`. Vuistregel: kan hij het niet in 30 seconden scannen, dan is het niet voor hem geschreven. (`EXECUTION_PLAN.md` is het voorbeeld van hoe het níét moet — dat is een agent-document.)
 
 ## Het dashboard
 

@@ -457,12 +457,23 @@ def scan_voice() -> dict:
 
 # ------------------------------------------------------------------ docs --
 
+# Documenten die voor NATHAN geschreven zijn. Alles daarbuiten is voor de
+# agents en hoeft hij nooit te openen — de dichtheid daarvan is met opzet
+# hoog. Deze splitsing bestaat omdat hij anders tussen 90 agent-documenten
+# moet zoeken naar de drie die hem aangaan.
+OWNER_DOCS = {"JOUW_ACTIES.md", "STATUS.md", "BESTURING.md"}
+
 DOC_GROUPS = [
+    ("Voor jou", lambda p: p.name in OWNER_DOCS and len(p.parts) == 1),
     ("Game Design Bible", lambda p: re.match(r"^\d\d_", p.name)),
     ("Werkdocumenten (phase0)", lambda p: p.parts[0] == "phase0" if p.parts else False),
     ("Specs", lambda p: "specs" in p.parts),
     ("Archief", lambda p: "archief" in [x.lower() for x in p.parts]),
 ]
+
+# Volgorde waarin de groepen op het dashboard komen
+DOC_GROUP_ORDER = ["Voor jou", "Game Design Bible", "Werkdocumenten (phase0)",
+                   "Specs", "Overig", "Archief"]
 
 
 def scan_docs() -> dict:
@@ -498,7 +509,15 @@ def scan_docs() -> dict:
 
     for lst in groups.values():
         lst.sort(key=lambda e: e["path"])
-    return groups
+
+    # In vaste volgorde teruggeven: "Voor jou" hoort bovenaan, niet ergens
+    # tussen negentig agent-documenten.
+    ordered: dict[str, list] = {}
+    for label in DOC_GROUP_ORDER:
+        if groups.get(label):
+            ordered[label] = groups.pop(label)
+    ordered.update(groups)
+    return ordered
 
 
 # ----------------------------------------------------------- screenshots --

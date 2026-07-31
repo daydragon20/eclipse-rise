@@ -142,9 +142,32 @@ HARDE REGELS
   taken-statussen, ownerActies; afgehandelde punten naar jijGedaan).
   Bewerk NOOIT PROGRESS.html, progress_auto.js of DASHBOARD.html.
 
+- SCHRIJF NOOIT EEN DICHT MARKDOWN-DOCUMENT VOOR MIJ. Ik lees maar één
+  scherm: het dashboard. Een lange .md met tabellen en secties is prima
+  voor jullie agents, maar voor mij onleesbaar - EXECUTION_PLAN.md is
+  daar het voorbeeld van.
+  Moet ik iets weten of beslissen, dan hoort het:
+    1. in progress_data.js (ownerActies) met korte stappen, EN
+    2. in de owner-tabel van STATUS.md of JOUW_ACTIES.md (die twee leest
+       de dashboardserver uit en toont hij onder "Wacht op jou"),
+    3. en als het echt een eigen document nodig heeft: als HTML, en
+       gekoppeld aan het dashboard - niet als losse .md.
+  Vuistregel: kan ik het niet in 30 seconden scannen, dan is het niet
+  voor mij geschreven.
+
 - GEEN /loop en GEEN ScheduleWakeup — die vuren niet betrouwbaar als de
   sessie onderbroken wordt. Werk in één doorlopende sessie. Tegen een
   limiet aan? Draai push-all.bat, werk STATUS.md bij, en zeg het me.
+
+  ## Wat de volgende chat als eerste moet weten
+Er staat één test rood, en die is niet van vanavond. DocumentedConsoleCommandsExist faalt drie keer op drie — óók nadat ik mijn enige codewijziging had teruggedraaid. Hij faalt zonder assertiemelding, wat past bij een vroege uitgang: de test start eerst een harnas en geeft bij een mislukte start false terug zonder ooit een commando te controleren. Alle acht commando's hebben een registratieplek. Zoek dus waarom het harnas niet start, niet welk commando ontbreekt.
+
+Wat vanavond landde: de zes ingesproken zinnen (gegenereerd én bedraad, met jouw rem van 2 s), additieve terugslag uit een take die al in je Belica-pack lag, de HUD-nulmeting, en je lijst van 22 → 4.
+
+Wat niet lukte: de spelergerichte HUD vóór de debug-poort krijgen. Teruggedraaid — maar dát is wel de eerste bouwstap, want de schermlaag staat nu per constructie niet op een opname en is dus voor mij niet te controleren. Dat is precies waarom jij zegt "ik speel pas als de HUD er is".
+
+Eén ding om mee te nemen: mijn sessiecontext was van 27-07 terwijl de repo op 31-07 stond. Daardoor heb ik aan dossiers gewerkt die in DEBUG_DISCIPLINE.md al gediagnosticeerd waren. Een verse chat leest STATUS.md eerst en heeft dat probleem niet.
+
 
 --------------------------------------------------------------------
 WAT OP MIJ WACHT (staat ook in STATUS.md)

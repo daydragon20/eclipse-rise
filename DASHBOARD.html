@@ -450,16 +450,37 @@ function vBeeld(){
   <div class="card" style="margin-top:14px"><div class="note">Er worden er automatisch maar 50 bewaard — de dashboardserver ruimt de rest zelf op, zodat de map niet weer naar 1,9 GB groeit.</div></div>`;
 }
 
+const DOC_UITLEG={
+  "JOUW_ACTIES.md":"Wat jij moet doen, wanneer, en hoe. Begin hier.",
+  "STATUS.md":"Waar het project staat — de korte versie.",
+  "BESTURING.md":"Het knoppenschema van de game.",
+};
+
 function vDocs(){
   const g=S.docs||{};
   const keys=Object.keys(g);
   if(!keys.length)return '<h2>Documenten</h2><div class="card"><div class="empty">Scannen…</div></div>';
-  return `<h2>Documenten — klik om te lezen</h2>`+keys.map(k=>`
+
+  const mijn=g["Voor jou"]||[];
+  const rest=keys.filter(k=>k!=="Voor jou");
+
+  return `
+  ${mijn.length?`<h2>Voor jou</h2>
+  <div class="grid g3" style="margin-bottom:22px">${mijn.map(d=>`
+    <div class="card" style="margin:0;cursor:pointer" onclick="openDoc('${esc(d.path)}')">
+      <h3 style="color:var(--acc2)">${esc(d.name.replace(/\.md$/,"").replace(/_/g," "))}</h3>
+      <p style="font-size:13px;color:var(--dim);margin:6px 0 0">${esc(DOC_UITLEG[d.name]||"")}</p>
+      <div class="note">${d.kb} KB · ${esc(d.modified)}</div>
+    </div>`).join("")}</div>`:""}
+
+  <h2>Voor de agents</h2>
+  <div class="card"><div class="note" style="margin:0">Deze documenten zijn geschreven om door agents gelezen te worden — daarom zijn ze dicht en technisch. Je hoeft ze nooit te openen; alles wat jou aangaat staat hierboven en op het tabblad <strong>Nu</strong>.</div></div>
+  ${rest.map(k=>`
     <div class="card"><h3>${esc(k)} <span class="tag">${g[k].length}</span></h3>
     <div class="doclist">${g[k].map(d=>`
       <div class="doc" onclick="openDoc('${esc(d.path)}')">
         <span>${esc(d.name)}</span><span class="meta">${d.kb} KB · ${esc(d.modified)}</span>
-      </div>`).join("")}</div></div>`).join("");
+      </div>`).join("")}</div></div>`).join("")}`;
 }
 
 function vHistorie(){
