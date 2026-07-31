@@ -198,6 +198,41 @@
    ],
    "advies": null,
    "vrijtekst": true
+  },
+  {
+   "id": "O-15",
+   "prio": "gauw",
+   "vraag": "De vault is beloopbaar — vier kamers, en de vraag is of dit Hollow Point is",
+   "waarom": "Je basis was tot vannacht vier keer dezelfde drie dozen in een andere tint. Nu zegt elke kamer wat er gebeurt: de commandopost heeft de gestolen Dominion-kaarttafel, de barakken hebben elf bunks langs beide wanden met footlockers en een waslijn, de werkplaats heeft een loopkat met hijsblok, en de inlichtingenkamer heeft de enige kromme lijn in de hele vault. Plus de generator die hoest en de gedenkalkoof — een bank en drie kaarsen, en verder bewust niets, want die mag er nooit gekocht uitzien.\n\nEr is ook iets groters opgelost: DE VAULT WERD NOOIT GETEKEND. Het anker verbergt zichzelf, en een verborgen actor tekent zijn onderdelen niet — 175 blokken stonden er onzichtbaar. Rondlopen werkte, botsingen werkten, de tests waren groen. Alleen een camera vond het, en die was er nooit geweest.\n\nWAT IK AL WEET EN NIET AAN JOU VRAAG: het licht deugt niet, en dat is gemeten en geen gevoel. Het plafond rendert als absoluut zwart (nul over 144.000 pixels), dus een kamer 150 meter onder de grond leest als open naar de nacht. En de lampen zijn donkerder dan de vloer die ze verlichten — in de commandopost is de kaarttafel twintig keer helderder dan de lamp erboven. Dat repareer ik, daar hoef je niets over te vinden.\n\nWAT IK WEL AAN JOU VRAAG is het enige dat een meting niet kan: LEZEN DEZE VIER RUIMTES ALS JOUW BASIS? Mijn instrument zegt dat ze met 12% marge van elkaar te onderscheiden zijn. Het kan niet zeggen of ze aanvoelen als de plek waar elf mensen wonen die nee blijven zeggen.",
+   "stappen": [
+    "Open de vier frames (klikbaar): http://127.0.0.1:8377/Eclipse/Saved/Screenshots/WindowsEditor/HighresScreenshot00033.png",
+    "En 00034 (barakken), 00035 (werkplaats), 00036 (inlichtingen) — zelfde pad, laatste twee cijfers anders",
+    "Kijk niet naar het licht, dat weet ik al. Kijk of je gelooft dat hier iemand woont."
+   ],
+   "opties": [
+    {
+     "label": "Ja, dit is het — ga door",
+     "waarde": "ja",
+     "gevolg": "Ik repareer het licht en ga verder met de informatielaag erbovenop: slots, ETA's, bemanning."
+    },
+    {
+     "label": "De vorm klopt, de sfeer nog niet",
+     "waarde": "sfeer",
+     "gevolg": "Dan wordt de vault een eigen level met eigen atmosfeer. Dat haalt meteen het noodverband weg dat er nu in zit: hij ligt onder een mist die aan de oppervlakte geauthord is en op 150 m diepte ondoorzichtig is."
+    },
+    {
+     "label": "Een kamer klopt niet — zie tekstveld",
+     "waarde": "kamer",
+     "gevolg": "Zeg welke en wat je mist; die kamer krijgt een eigen ronde."
+    },
+    {
+     "label": "Nog niet gekeken",
+     "waarde": "later",
+     "gevolg": "Blijft staan. Het licht repareer ik ondertussen."
+    }
+   ],
+   "advies": "Kijk eerst naar de barakken (00034). Dat is de kamer waar de elf bunks staan, en als één frame moet bewijzen dat dit een thuis is en geen menu, is het die.",
+   "vrijtekst": true
   }
  ]
 }
