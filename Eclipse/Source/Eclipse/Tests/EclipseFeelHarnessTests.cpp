@@ -1072,19 +1072,37 @@ bool FEclipseDocumentedConsoleCommandsExistTest::RunTest(const FString& Paramete
 			//
 			// Tabs en regeleindes horen er wel te zijn; alles daaronder niet.
 			//
-			// ALLE DRIE de owner-bestanden, niet alleen dit document: de fout sloeg
+			// ALLE owner-bestanden, niet alleen dit document: de fout sloeg
 			// het eerst toe in HANDOFF.md (het startcommando van de nachtprompt) en
 			// pas daarna hier. Een bewaker die alleen dekt waar je hem toevallig
 			// schreef, dekt de volgende keer weer niet.
 			//
 			// De startbat staat er met de meeste reden bij: daar wordt een kapot
 			// teken niet gelezen maar UITGEVOERD.
-			for (const TCHAR* OwnerFile : { TEXT("BESTURING.md"), TEXT("HANDOFF.md"), TEXT("SPEEL_ECLIPSE.bat") })
+			//
+			// 31-07: DEZE LIJST IS ZELF VEROUDERD GERAAKT, en dat kostte een avond.
+			// HANDOFF.md verhuisde naar archief/ toen STATUS.md hem verving. De test
+			// bleef in de root zoeken, vond niets, en viel om op "is leesbaar" — een
+			// melding die niets zei over een PAD, dus werd hij gelezen als "het
+			// harnas start niet" en ging de zoektocht een halve dag de verkeerde
+			// kant op. Twee dingen daaruit geleerd, allebei hieronder verwerkt:
+			//   1. De bewaker dekt nu ook STATUS.md en NIEUWE_CHAT_PROMPT.txt. Dat
+			//      zijn de bestanden die HANDOFF.md hebben OVERGENOMEN als eerste
+			//      wat een verse sessie leest, en juist die stonden onbewaakt. De
+			//      prompt is de gevaarlijkste van de twee: die wordt letterlijk
+			//      geplakt, dus een stuurteken reist mee naar binnen.
+			//   2. De melding noemt het PAD dat geprobeerd is. Een verhuisd bestand
+			//      diagnosticeert zichzelf dan, in plaats van als harnasfout te
+			//      worden gelezen.
+			for (const TCHAR* OwnerFile : { TEXT("BESTURING.md"), TEXT("STATUS.md"),
+					TEXT("NIEUWE_CHAT_PROMPT.txt"), TEXT("archief/HANDOFF.md"),
+					TEXT("SPEEL_ECLIPSE.bat") })
 			{
 				const FString FilePath = FPaths::ConvertRelativePathToFull(
 					FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), OwnerFile));
 				FString Contents;
-				if (!TestTrue(*FString::Printf(TEXT("stuurtekens: %s is leesbaar"), OwnerFile),
+				if (!TestTrue(*FString::Printf(TEXT("stuurtekens: %s is leesbaar (gezocht op '%s' — verhuisd of hernoemd?)"),
+							OwnerFile, *FilePath),
 						FFileHelper::LoadFileToString(Contents, *FilePath)))
 				{
 					continue;

@@ -31,14 +31,27 @@ keer rood, óók nadat de enige codewijziging van die avond was teruggedraaid** 
 hij is niet veroorzaakt door dat werk. Bar verder: 185 tests, 1 gefaald, ValidateData
 0 fouten.
 
-De test faalt **zonder assertiemelding** (`BeginEvents` leeg). Dat past bij een
-vroege uitgang: hij start eerst een `FHarness`, en als dat mislukt geeft hij `false`
-terug zonder ooit een commando te controleren. **Zoek dus eerst waarom het harnas
-niet start, niet welk commando ontbreekt** — alle acht commando's zijn nagelopen en
-hebben een registratieplek in de code.
+**OORZAAK GEVONDEN 31-07 (gemeten uit het testrapport, niet geredeneerd).** De
+melding staat gewoon in `Eclipse/Saved/TestReport/index.json`:
 
-Volg `DEBUG_DISCIPLINE.md`: minimaal reproduceren, dán observeren. Niet nog een
-hypothese.
+    Error | Expected 'stuurtekens: HANDOFF.md is leesbaar' to be true.
+
+De test controleert de owner-bestanden op stuurtekens en leest `HANDOFF.md` **uit de
+repo-root**. Dat bestand is op 31-07 naar `archief/HANDOFF.md` verhuisd toen
+STATUS.md het verving. De test bleef in de root zoeken, vond niets, en viel om.
+
+**De eerdere diagnose hierboven was fout en is weerlegd.** Er stond dat het harnas
+niet startte. Het harnas start prima — dat staat letterlijk in hetzelfde rapport:
+`harnas: lokaal=1 · staat=Playing · op-de-grond=1 · wereld-begonnen=1`. De conclusie
+"vroege uitgang" was afgeleid uit een *afwezige* melding terwijl de melding er wel
+was; niemand had het rapport geopend. Precies de vorm die `DEBUG_DISCIPLINE.md`
+beschrijft: observeren met de tools, niet redeneren over code.
+
+**Fix:** de bewaker dekt nu ook `STATUS.md` en `NIEUWE_CHAT_PROMPT.txt` — de twee
+bestanden die HANDOFF.md hebben overgenomen als eerste wat een verse sessie leest, en
+die stonden onbewaakt. En de faalmelding noemt voortaan het **pad** dat geprobeerd
+is, zodat een verhuisd bestand zichzelf diagnosticeert in plaats van als harnasfout
+gelezen te worden.
 
 ## Open dossiers (spoor B)
 
