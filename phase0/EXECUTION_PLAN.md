@@ -91,6 +91,42 @@ niet door het harnas te controleren is.
 Wie hier begint, begint dus met die poort: een echte HUD-laag hoort zichtbaar te zijn
 in het spel én meetbaar in de ronde, en die twee sluiten elkaar nu uit.
 
+## 1c. NULMETING VAN DE ANDERE TWEE HOOGTES — base en map
+
+*Gemeten 31-07 uit `EclipseBaseHubWidget.cpp` (442 regels) en `EclipseStrategyMapWidget.cpp`
+(129 regels). §1b hierboven meet **boots**; deze meet de twee hoogtes die nog nooit
+gemeten waren. Pijler 2 is "One War, Three Altitudes" — een nulmeting van één hoogte
+is dus per definitie incompleet.*
+
+### Bevinding 1 — de debug-poort speelt hier GEEN rol
+
+**Nul treffers op `IsDebugHudAllowed()` in beide bestanden.** Het probleem dat boots
+heeft — de schermlaag staat per constructie niet op een opname, zie §1b — geldt hier
+niet. Base en map zijn wél op een frame te controleren. De eerste bouwstap van §1b is
+hier dus niet nodig, en dat scheelt.
+
+### Bevinding 2 — het zijn allebei kale tekstlijsten
+
+| Hoogte | Wat er staat | Wat de scope vraagt en er niet is |
+|---|---|---|
+| **MAP** | Eén `UVerticalBox` met `UTextBlock`-regels. Kop `DISTRICT BOARD — Day %d`, daaronder per regio `regionId — PLAYER\|CONTESTED\|DOMINION \| garrison %d \| unrest %d`. Enige visuele codering is regelkleur (groen/geel/rood per eigenaar) — het commentaar noemt dat zelf eerlijk *"debug-grade, still readable"*. | Er is **geen kaart**: geen regio-vormen, geen posities, geen jump-lanes, geen Dominion Response Tier, geen missie-aanbod als aanbod. Een lijst regels is geen strategische laag. |
+| **BASE** | Meer structuur: een `UWidgetSwitcher` met tabs Command / Workshop / Barracks / Memorial. Maar de inhoud is dezelfde vorm — tekstregels in een verticale doos, met de kop als één lange `printf` inclusief `walking is disabled here`. | Geen faciliteitenpanelen, geen bouw-ETA's als voortgang, geen crew-kaarten, geen voorraadmeters, geen strategische klok. |
+
+### Wat daaruit volgt voor de volgorde
+
+**Base en map zijn functioneel bedraad en visueel nog niet begonnen.** Dat is een
+*ander* probleem dan bij boots, en het vraagt dus een andere eerste stap:
+
+- **Boots** had een poort nodig — de data was er, hij was alleen onzichtbaar.
+- **Base en map** hebben een **maatstaf** nodig vóór er code komt (owner-regel 27-07,
+  `phase0/REFERENTIE_TPS.md`). Er ligt nu geen referentie voor hoe de strategische
+  laag en de basis eruit horen te zien. Zonder die maatstaf wordt dit twintig props
+  in een lege hoek, precies wat `20_world_dressing_standard.md` verbiedt.
+
+**Volgende stap is dus niet bouwen maar de referentie vaststellen** — en dat raakt
+owner-punt O-6 (de stijlvraag), want een gestileerde strategische kaart en een
+fotorealistische zijn twee verschillende opdrachten.
+
 ## 2. Sprintbord — lopend + eerstvolgend (bijgewerkt 2026-07-24 ~17:35, sync na cyclus 2)
 
 DoD-basis (14.4): *spec gerefereerd + code + data + tests + EventCatalog/docs bijgewerkt + CI/lokale groene bar (build -NoUba ✓, tests ✓, validatie ✓, catalog ✓) + door een mens/reviewende agent gezien.*
