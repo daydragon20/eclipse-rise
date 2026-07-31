@@ -178,7 +178,17 @@ namespace EclipseGauntletOverlay
 		using EMode = EEclipseControlMode;
 		return {
 			// TE VOET
-			{ EMode::OnFoot, TEXT("Lopen"),          TEXT("WASD"),           TEXT("linkerstick") },
+			// WANDELEN STAAT ER ALLEEN OP DE PAD, en dat hoort hier te staan en niet
+			// in een losse lijst. Owner 27-07: "een extra toets is een bindingskeuze
+			// die pas zin heeft als het knoppenschema als data bestaat — voeg het
+			// daar toe, niet als losse binding."
+			//
+			// Op de stick is de snelheid analoog: zacht duwen IS wandelen, en de
+			// animatie blendt mee. WASD is aan/uit, dus op toetsenbord bestaat er
+			// geen tempo tussen stilstaan en lopen. Zolang dat zo is, hoort het
+			// schema dat te ZEGGEN — een tabel die "WASD" en "linkerstick" naast
+			// elkaar zet, suggereert dat ze hetzelfde kunnen.
+			{ EMode::OnFoot, TEXT("Lopen"),          TEXT("WASD (aan/uit)"), TEXT("linkerstick (zacht = wandelen)") },
 			{ EMode::OnFoot, TEXT("Rondkijken"),     TEXT("muis"),           TEXT("rechterstick") },
 			{ EMode::OnFoot, TEXT("Vuren"),          TEXT("LMB"),            TEXT("RT") },
 			{ EMode::OnFoot, TEXT("Mikken"),         TEXT("RMB"),            TEXT("LT") },
@@ -216,7 +226,7 @@ namespace EclipseGauntletOverlay
 		// Mirrors AEclipsePlayerController::SetupInputComponent one-for-one
 		// (SPEC-P2-02 provisional debug bindings; the context stack is P2-07).
 		return {
-			{ TEXT("Lopen"),        TEXT("WASD"),              TEXT("linkerstick") },
+			{ TEXT("Lopen"),        TEXT("WASD (aan/uit)"),    TEXT("linkerstick (zacht = wandelen)") },
 			{ TEXT("Rondkijken"),   TEXT("muis"),              TEXT("rechterstick") },
 			{ TEXT("Vuren"),        TEXT("LMB"),               TEXT("RT") },
 			{ TEXT("Sprint"),       TEXT("Shift (vasthouden)"), TEXT("L3 (togglen)") },
