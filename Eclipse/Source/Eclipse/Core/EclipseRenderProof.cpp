@@ -1538,7 +1538,23 @@ bool LadderTick(TSharedPtr<FMarkLadder> State, float /*Delta*/)
 			S.Cam = Cam;
 		}
 		Cam->SetActorLocation(S.Oog);
-		Cam->SetActorRotation((Sport.Grond - S.Oog).Rotation());
+		// HET VIZIER STAAT ERBOVENOP, EN DAT IS OP EEN OPNAME GEZIEN.
+		//
+		// De camera kijkt de sport recht aan, dus het spoor landt in het midden van
+		// het beeld — precies waar de HUD zijn kruis tekent. Op de uitsnede van 8 m
+		// uit ronde 1 lag dat kruis over het spoor heen. Voor de TELLING maakt het
+		// weinig uit (het kruis staat in opname A en B identiek en verandert dus
+		// niet), maar het BEDEKT wel pixels die anders zouden meetellen, en dan meet
+		// de ladder de HUD in plaats van het spoor.
+		//
+		// Dus kantelt de camera een paar graden omhoog: het spoor komt onder het
+		// midden te liggen, ongeveer waar een inslag in het spel na terugslag ook
+		// terechtkomt. Vrij zicht blijft vrij zicht; alleen het kader schuift.
+		const FRotator NaarSpoor = (Sport.Grond - S.Oog).Rotation();
+		const float PixelsOmlaag = 110.0f;
+		const float KantelGraden = S.PixelsPerRadiaal > 0.0f
+			? FMath::RadiansToDegrees(FMath::Atan(PixelsOmlaag / S.PixelsPerRadiaal)) : 8.0f;
+		Cam->SetActorRotation(NaarSpoor + FRotator(KantelGraden, 0.0f, 0.0f));
 		UGameplayStatics::SetGamePaused(World, false);
 		S.PC->SetViewTarget(Cam);
 		S.Wait = SettleFrames * 3;
