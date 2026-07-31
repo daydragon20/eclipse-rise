@@ -634,6 +634,68 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 		// lichaam te raken. Zodra er een additieve take komt die alleen het bovenlijf
 		// mag bewegen, is dit de plek — maar dan met een meting die het aantoont en
 		// niet met deze poging.
+		// EEN MESH-SPACE-ADDITIEF LAAT ZICH NIET MASKEREN DOOR DE BRON LEEG TE MAKEN.
+		//
+		// Eerste poging zette de additieve bijdrage onder de ruggengraat op
+		// identiteit, en dat hielp niet (voet-omklappen 21 tegen 2). De reden is de
+		// ruimte: een mesh-space-additief wordt NA de blend in meshruimte opgeteld,
+		// dus een lege lokale transform betekent daar niet "geen bijdrage".
+		//
+		// Wat wel kan: het additief op een KOPIE toepassen en die kopie er per bot in
+		// mengen. Bovenlijf krijgt de versie mét terugslag, benen houden de gangpose.
+		// Dat is dezelfde weging als bij de volledige pose, alleen een stap later.
+		if (bOneShotUpperBodyOnly)
+		{
+			const FBoneContainer& Bones = Output.Pose.GetBoneContainer();
+			static const FName Ruggengraat[] = { TEXT("spine_01"), TEXT("Spine"), TEXT("spine"),
+				TEXT("Spine1"), TEXT("spine_1"), TEXT("Bip01_Spine") };
+			FCompactPoseBoneIndex Wortel(INDEX_NONE);
+			for (const FName& Naam : Ruggengraat)
+			{
+				const int32 PoseIndex = Bones.GetPoseBoneIndexForBoneName(Naam);
+				if (PoseIndex != INDEX_NONE)
+				{
+					Wortel = Bones.MakeCompactPoseIndex(FMeshPoseBoneIndex(PoseIndex));
+					break;
+				}
+			}
+			if (Wortel.GetInt() != INDEX_NONE)
+			{
+				FCompactPose MetTerugslag;
+				MetTerugslag.CopyBonesFrom(Output.Pose);
+				FBlendedCurve TerugslagCurve;
+				TerugslagCurve.CopyFrom(Output.Curve);
+				UE::Anim::FStackAttributeContainer TerugslagAttr;
+				FAnimationPoseData MetTerugslagData = { MetTerugslag, TerugslagCurve, TerugslagAttr };
+				FAnimationRuntime::AccumulateAdditivePose(MetTerugslagData, AdditivePoseData,
+					OneShotWeight, OneShot->GetAdditiveAnimType());
+
+				TArray<float> BotGewichten;
+				BotGewichten.SetNumZeroed(Output.Pose.GetNumBones());
+				for (FCompactPoseBoneIndex Bot : Output.Pose.ForEachBoneIndex())
+				{
+					FCompactPoseBoneIndex Loop = Bot;
+					while (Loop.GetInt() != INDEX_NONE)
+					{
+						if (Loop == Wortel) { BotGewichten[Bot.GetInt()] = 1.0f; break; }
+						Loop = Output.Pose.GetParentBoneIndex(Loop);
+					}
+				}
+
+				FCompactPose Resultaat;
+				Resultaat.SetBoneContainer(&Output.Pose.GetBoneContainer());
+				FBlendedCurve ResultaatCurve;
+				ResultaatCurve.InitFrom(Output.Curve);
+				UE::Anim::FStackAttributeContainer ResultaatAttr;
+				FAnimationPoseData ResultaatData = { Resultaat, ResultaatCurve, ResultaatAttr };
+				FAnimationRuntime::BlendTwoPosesTogetherPerBone(
+					OutputPoseData, MetTerugslagData, BotGewichten, ResultaatData);
+				OutputPoseData.GetPose() = Resultaat;
+				OutputPoseData.GetCurve() = ResultaatCurve;
+				return true;
+			}
+		}
+
 		FAnimationPoseData OutputForAdd(Output);
 		FAnimationRuntime::AccumulateAdditivePose(OutputForAdd, AdditivePoseData, OneShotWeight,
 			OneShot->GetAdditiveAnimType());

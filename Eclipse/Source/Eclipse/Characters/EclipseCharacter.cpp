@@ -1246,27 +1246,43 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"), /*bAllowAdditive=*/true);
-	// DE ADDITIEVE SCHIETTAKE BESTAAT WÉL — en is gemeten SLECHTER. Niet gebruikt.
+	// DE ADDITIEVE SCHIETTAKE, en die lag al in het pack.
 	//
-	// GEVONDEN 27-07: Primary_Fire_Med_MSA staat in hetzelfde pack als de volledige
-	// Primary_Fire_Med die we spelen, en is aantoonbaar ADDITIEF (1,00 s). MSA is de
-	// Paragon-conventie voor mesh space additive. Hoofdstuk 6 van REFERENTIE_TPS.md
-	// noemt een additieve terugslag als de Fortnite/Borderlands-vorm, dus dit leek de
-	// ontbrekende schakel — en gratis, want hij lag er al.
+	// Primary_Fire_Med_MSA staat naast de volledige Primary_Fire_Med die we tot
+	// vanavond speelden, en is aantoonbaar ADDITIEF (1,00 s; MSA is de
+	// Paragon-conventie voor mesh space additive). Hoofdstuk 6 van
+	// REFERENTIE_TPS.md noemt een additieve terugslag als de Fortnite/Borderlands-
+	// vorm: een schokje BOVENOP je houding, geen pose die je houding vervangt.
 	//
-	// GEMETEN, en daar hield het op. Voet-omklappen in het vuurinterval:
-	//     volledige pose op het BOVENLICHAAM (wat er staat)   2
-	//     additieve take, ongemaskeerd                       14
-	//     additieve take, met hetzelfde bovenlichaamsmasker   21
-	// De maskering die op het volledige pad wél werkt, doet op het additieve pad
-	// niets zichtbaars — vermoedelijk omdat een mesh-space-additieve bijdrage niet
-	// verdwijnt door de lokale transform op identiteit te zetten. Dat is te
-	// achterhalen, maar niet vanavond en niet op gevoel.
+	// EERSTE POGING FAALDE EN DAT WAS LEERZAAM. Aangesloten zonder meer gaf 14
+	// voet-omklappen in het vuurinterval (tegen 2), en met een masker op de BRON
+	// zelfs 21. De reden is de ruimte: een mesh-space-additief wordt NA de blend in
+	// meshruimte opgeteld, dus de lokale transform leegmaken betekent daar niet
+	// "geen bijdrage". De take was nooit het probleem.
 	//
-	// DUS: niet aangesloten. Een wijziging die zijn eigen meting niet haalt hoort
-	// niet in het spel, ook niet als hij op papier de juiste vorm heeft. Dit staat
-	// hier zodat de volgende sessie niet opnieuw ontdekt dat de take bestaat en denkt
-	// dat hij alleen aangesloten hoeft te worden.
+	// TWEEDE POGING WERKT: het additief op een KOPIE toepassen en die er per bot in
+	// mengen (EclipseAnimInstance.cpp). Gemeten voet-omklappen: 2 — gelijk aan de
+	// volledige pose op het bovenlichaam.
+	//
+	// WAT IK NIET KAN METEN, en dat hoort erbij: of dit BETER is dan wat er stond.
+	// Op de benen is het gelijk. Het verschil zit in de armen — een volledige pose
+	// vervangt daar je loop- en mikhouding per schot, een additief legt de terugslag
+	// erbovenop — en dat onderscheid ziet mijn omklap-teller niet. Ik sluit hem aan
+	// omdat de referentie deze vorm noemt en hij op alles wat ik WEL kan meten
+	// gelijk scoort, niet omdat ik een verbetering heb aangetoond.
+	//
+	// IN CODE EN NIET IN DE DATA: de juiste plek is DT_BodyDefs (ShootAnim), maar dat
+	// is een uasset en vraagt de editor van de owner. Verdwijnt de MSA-take, dan valt
+	// dit vanzelf terug op wat de data zegt. Zodra de rij verwijst naar de MSA-take
+	// kan dit blok weg.
+	if (UAnimSequence* AdditiveShoot = LoadObject<UAnimSequence>(nullptr,
+			TEXT("/Game/ParagonLtBelica/Characters/Heroes/Belica/Animations/Primary_Fire_Med_MSA.Primary_Fire_Med_MSA")))
+	{
+		if (AdditiveShoot->IsValidAdditive())
+		{
+			LocomotionSet.Shoot = AdditiveShoot;
+		}
+	}
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"), /*bAllowAdditive=*/true);
 	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"), /*bAllowAdditive=*/true);
 	bBodyDefApplied = true;
