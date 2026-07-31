@@ -260,6 +260,31 @@ story.brick_recruited      == true      ⇄   Story.Beat.BrickRecruited   (prese
 
 Zero schema change, and the parent tag stays queryable as "has this choice been made at all". `script_to_seed.py` performs the mapping; writers only ever use the lowercase form. **Any choice with more than two outcomes uses this shape** — collapsing three outcomes into a boolean is story loss disguised as simplification.
 
+### The band floors are not too high — measured 01-08
+
+`REGISTER` (a scene of ≥6 lines that never reaches its band's lower number) reports six
+scenes, and the obvious suspicion is that the floors are wrong for a script this terse.
+**Counted instead of assumed, across act 1:**
+
+| type | scenes ≥6 lines | reach the floor |
+|---|---|---|
+| `cutscene` (floor 20) | 27 | **21** |
+| `in-mission-radio` (floor 10) | 22 | 21 |
+| `hub` (floor 12) | 13 | 13 |
+| `walk-and-talk` (floor 10) | 6 | 6 |
+| `ambient` (floor 6) | 1 | 1 |
+
+So the majority of scenes do use their room, and the check discriminates rather than
+complains. The six are genuine outliers — and **three of them miss by exactly one word**
+(M1.2.S01, M1.4.S01, M1.4.S99, all longest 19 against 20). The remedy is per scene
+(is this really a `cutscene`? does the beat want one longer line?), **not** a lower floor.
+
+> **A measurement that caught its own instrument.** A first sweep also flagged the prologue
+> `P0.S01` as missing by eight. It does not: all sixteen of its lines carry a `band:`
+> override, so there is no un-overridden line for the floor to apply to, and the validator
+> is right to stay silent. The sweep counted overridden lines; the tool does not. When a
+> measurement surprises you, suspect your own filter first.
+
 ### `silence` — a branch that deliberately plays nothing (01-08)
 
 `BRANCH` asks: N leaves set, N leaves handled. That is the right question, and it caught
