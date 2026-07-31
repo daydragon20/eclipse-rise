@@ -7,9 +7,15 @@
 ## Waar we staan
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
-Bar: build groen · **184/185 tests — één rood, zie hieronder** · validatie 0 fouten · EventCatalog in sync.
+Bar: build groen (`-NoUba`) · **185/185 tests, 0 gefaald, 0 niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog in sync. *(Gemeten 31-07 19:00; de laatste rode test is opgelost, zie hieronder.)*
 
-> Let op: `progress_auto.js` is van 26-07 en meldt nog 110 tests. Dat cijfer is verouderd — het dashboard toont er eerlijk "5 dagen geleden" bij. Draai `Tools/update_progress.ps1` om het te verversen.
+> **De testteller op het dashboard was stuk, niet verouderd — gerepareerd 31-07.**
+> Hier stond "draai `Tools/update_progress.ps1` om het te verversen". Dat kón niet
+> werken: dat script las `Eclipse/Saved/Automation/index.json`, terwijl elke echte
+> testronde via `verify.ps1` naar `Eclipse/Saved/TestReport/` schrijft. Gemeten stond
+> het eerste pad vijf dagen bevroren op 110 tests naast 185 in het tweede. Het script
+> kiest nu het **nieuwste** van de bekende rapportpaden (bewust een vaste lijst, zodat
+> een falsificatieronde van één test nooit het dashboardcijfer wordt) en meldt 185/185.
 
 De owner-stop op nieuwe features is **opgeheven** (31-07). Er geldt nog één voorwaarde: Nathan speelt pas als de **schermlaag (HUD)** op niveau is — dat is nu spoor-B-prioriteit 1.
 

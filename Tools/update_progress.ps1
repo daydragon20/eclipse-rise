@@ -44,10 +44,30 @@ function Update-Once([string]$Root) {
         }
     } catch {}
 
-    # --- testrapport: Saved/Automation/index.json van de laatste run ---
+    # --- testrapport: het NIEUWSTE van de bekende rapportpaden ---
+    #
+    # Hier stond alleen Saved\Automation\index.json. Dat pad was op 31-07 vijf
+    # dagen bevroren op 110 tests terwijl de suite er 185 draaide -- want
+    # Eclipse\Tools\verify.ps1 schrijft met -ReportExportPath naar
+    # Saved\TestReport, niet naar Saved\Automation. Het dashboard las dus een
+    # bestand dat door geen enkele testronde nog werd aangeraakt, en STATUS.md
+    # adviseerde "draai update_progress.ps1 om het te verversen" -- wat per
+    # constructie niet kon werken.
+    #
+    # Een teller die stilstaat en dat niet zegt, is erger dan geen teller. Dus:
+    # kijk naar alle bekende paden en neem de nieuwste. reportAge blijft erbij,
+    # zodat een oud getal zichzelf nog steeds aangeeft.
+    #
+    # BEWUST een vaste lijst en geen wildcard: ad-hoc rapporten van een enkele
+    # test (TestReportSingle, TestReportFalsify) mogen NOOIT het dashboardcijfer
+    # worden. Een falsificatieronde van 1 test is geen bar.
     try {
-        $report = Join-Path $Root "Eclipse\Saved\Automation\index.json"
-        if (Test-Path $report) {
+        $candidates = @("Eclipse\Saved\TestReport\index.json", "Eclipse\Saved\Automation\index.json") |
+            ForEach-Object { Join-Path $Root $_ } |
+            Where-Object { Test-Path $_ } |
+            Sort-Object { (Get-Item $_).LastWriteTime } -Descending
+        $report = @($candidates)[0]
+        if ($report) {
             $r = Get-Content $report -Raw | ConvertFrom-Json
             $auto.tests = [ordered]@{
                 ok        = [int]$r.succeeded + [int]$r.succeededWithWarnings
