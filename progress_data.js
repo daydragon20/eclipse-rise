@@ -9,7 +9,7 @@ window.PROGRESS_DATA = {
 
   // Grove tijdsinschattingen — bewust ruw; door de dev-sessie per milestone bijgesteld o.b.v. tempo + resterende backlog.
   eta: {
-    fase1: "~vrijwel af (97%) — resteert alleen jouw 30-min playtest (13.2)",
+    fase1: "FASE 0 EN 1 AFGESLOTEN (31-07, owner-besluit). De 13.2-playtest is bewust NIET afgewacht: Nathan speelt pas als de basis staat, en die gate hield alleen nog zichzelf tegen.",
     slice: "Vertical Slice (Fase 2): grove schatting 2-3 weken — vandaag landden P2-01, P2-02 Stage A en P2-03 stap 1-2 in één dag; de grote onbekenden zijn jouw R3-verdict (stuurt Stage B) en de fidelity-ronde (P2-08)",
     totaal: "Hele game: grove schatting maanden — sterk afhankelijk van scope-keuzes en jouw playtests",
     toelichting: "Ruwe inschatting, geen belofte: gebaseerd op het huidige commit-tempo en de resterende backlog per fase. Wordt elke milestone bijgesteld.",
