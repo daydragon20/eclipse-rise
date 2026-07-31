@@ -58,6 +58,28 @@ Elke laag is **compleet en gelockt** voordat de volgende begint. Een laag is gel
 
 ---
 
+## 2b. SCHRIJVEN WACHT NERGENS OP — correctie 31-07
+
+**Er zat een valse afhankelijkheid in dit plan en die kostte dagen.**
+
+De keten was: massaproductie wacht op de ijkmissie-gate → de gate wacht tot Nathan M1.1 *hoort* → horen wacht op stemgeneratie → generatie wacht op de ElevenLabs-scopes. Gevolg: één ontbrekend vinkje in een API-instelling hield **al het schrijfwerk** tegen, terwijl schrijven geen enkele credit en geen enkele API-aanroep kost.
+
+**Zo hoort het:**
+
+| Stap | Wacht op | Kan nu? |
+|---|---|---|
+| Beats (L1) | niets | ✅ act 1 klaar |
+| **Dialoog schrijven (L2)** | **de beats** | ✅ **NU — voor heel act 1** |
+| **Critic-gate** | de dialoog | ✅ **NU** |
+| Stem genereren (L3) | de scopes | ⛔ geblokkeerd |
+| Owner hoort de ijkmissie | de stem | ⛔ geblokkeerd |
+
+**De regel:** de ijkmissie-gate bewaakt of de **schrijfstandaard** klopt. Dat oordeel kan Nathan grotendeels op **tekst** vellen — hij hoeft M1.1 niet te horen om te zien of de personages klinken als personages. Laat hem het script van M1.1 lezen zodra de critic GO geeft, en behandel de gesproken versie als bevestiging achteraf.
+
+**Dus: schrijf door.** Act 1 mag volledig geschreven en gekeurd worden terwijl de scopes openstaan. Alleen de audio wacht. Als de scopes morgen aangaan, staat er dan een hele act klaar in plaats van niets.
+
+---
+
 ## 3. De correctie: de ijkmissie (L0)
 
 Dit is het enige punt waar ik van de opgegeven volgorde afwijk, en het is de reden dat de rest kan slagen.
