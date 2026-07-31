@@ -14,7 +14,6 @@
     "  advies    jouw aanbeveling, of null",
     "  vrijtekst true = hij mag ook zelf iets typen"
   ],
-
   "vragen": [
     {
       "id": "O-7",
@@ -25,42 +24,23 @@
         "Kies alleen welke richting het structureel op moet"
       ],
       "opties": [
-        { "label": "Naar SM6 — Nanite echt aan", "waarde": "SM6", "gevolg": "Je kaart ondersteunt shader model 6.7, dus dit kan. Nanite gaat écht werken en de zware instellingen krijgen betekenis. Wel: een 1080 Ti is Pascal, dus hardware-raytracing blijft uit en er moet opnieuw geprofileerd worden." },
-        { "label": "Op SM5 blijven — zware paden uit", "waarde": "SM5", "gevolg": "Lumen en Nanite-cvars uit, TSR terug naar 100. Stabiel en snel, maar de fidelity-doelen uit doc 15 schuiven naar een sterkere machine." },
-        { "label": "Weet ik niet — kies jij", "waarde": "agent-kiest", "gevolg": "De agent meet eerst beide varianten en komt met een aanbeveling plus cijfers terug." }
+        {
+          "label": "Naar SM6 — Nanite echt aan",
+          "waarde": "SM6",
+          "gevolg": "Je kaart ondersteunt shader model 6.7, dus dit kan. Nanite gaat écht werken en de zware instellingen krijgen betekenis. Wel: een 1080 Ti is Pascal, dus hardware-raytracing blijft uit en er moet opnieuw geprofileerd worden."
+        },
+        {
+          "label": "Op SM5 blijven — zware paden uit",
+          "waarde": "SM5",
+          "gevolg": "Lumen en Nanite-cvars uit, TSR terug naar 100. Stabiel en snel, maar de fidelity-doelen uit doc 15 schuiven naar een sterkere machine."
+        },
+        {
+          "label": "Weet ik niet — kies jij",
+          "waarde": "agent-kiest",
+          "gevolg": "De agent meet eerst beide varianten en komt met een aanbeveling plus cijfers terug."
+        }
       ],
       "advies": "Eerst de falsificatietest laten draaien. Daarna beslissen met echte framecijfers in plaats van op gevoel.",
-      "vrijtekst": true
-    },
-    {
-      "id": "O-6",
-      "vraag": "Blijft de gestileerde look, of wil je echt fotorealisme?",
-      "waarom": "Je zei dat de wereld 'realistisch geloofwaardig' moet zijn. Dat kan twee dingen betekenen en het verschil is weken werk. Je klacht ging over verkeersborden en random opvulling — dat zijn compositieproblemen die in élke stijl bestaan.",
-      "stappen": [
-        "Kijk naar de laatste screenshots op het tabblad Beeld",
-        "Vraag jezelf af: stoort de STIJL me, of stoort het dat er dingen willekeurig staan?",
-        "Is het dat tweede, dan is A het antwoord"
-      ],
-      "opties": [
-        { "label": "A — gestileerd blijft", "waarde": "A", "gevolg": "Geen herwerk. De Borderlands-lock blijft; de compositie- en fictieregels uit doc 20 lossen je klacht op." },
-        { "label": "B — echt fotorealisme", "waarde": "B", "gevolg": "De art-lock uit 15.5 vervalt, elk materiaal moet opnieuw, de toon-master vervalt, en alle gestileerde assets die binnen zijn moeten opnieuw beoordeeld. Weken werk." }
-      ],
-      "advies": "A — je klacht ging over willekeurige opvulling, niet over de stijl zelf.",
-      "vrijtekst": true
-    },
-    {
-      "id": "O-5",
-      "vraag": "Het wapen: goedkope zichtbaarheidsfix nu, of het volledig uit de mesh halen?",
-      "waarom": "Er hángt wel een wapen, maar het zit ín de karaktermesh in plaats van als los object. Daarom is er geen attachment, doet de wapenwissel visueel niets, en valt het weg in het silhouet — het heeft dezelfde factietint als het lichaam ernaast.",
-      "stappen": [
-        "Je hoeft hier niets voor te doen of te bekijken",
-        "Kies alleen of je nu snel wilt zien wat je vasthoudt, of meteen de goede oplossing"
-      ],
-      "opties": [
-        { "label": "Goedkoop — eigen tint", "waarde": "goedkoop", "gevolg": "Uren werk. Je ziet je wapen. De zichtbare wapenwissel werkt nog steeds niet." },
-        { "label": "Volledig — uit de mesh halen", "waarde": "volledig", "gevolg": "Dagen werk: wapen isoleren, los mesh-asset per wapenfamilie, socket op hand_r, wisselogica eraan. Lost alles op." }
-      ],
-      "advies": "Goedkoop. Of die zichtbare wapenwissel je stoort weet je pas ná je eerste speelronde — dan pas is de dure variant het waard.",
       "vrijtekst": true
     },
     {
@@ -74,8 +54,16 @@
         "Let op: kun je in die vertraagde tijd RUSTIG nadenken, of wordt het chaos?"
       ],
       "opties": [
-        { "label": "Voelt goed — bouw door", "waarde": "true", "gevolg": "Stage B start: de volledige 8.4-ordertabel, vijf nieuwe orders, stealth-stance." },
-        { "label": "Voelt niet goed", "waarde": "false", "gevolg": "Geen polish. Eerst het ontwerp aanpassen volgens de terugvalopties in de spec." }
+        {
+          "label": "Voelt goed — bouw door",
+          "waarde": "true",
+          "gevolg": "Stage B start: de volledige 8.4-ordertabel, vijf nieuwe orders, stealth-stance."
+        },
+        {
+          "label": "Voelt niet goed",
+          "waarde": "false",
+          "gevolg": "Geen polish. Eerst het ontwerp aanpassen volgens de terugvalopties in de spec."
+        }
       ],
       "advies": null,
       "vrijtekst": true
@@ -90,8 +78,16 @@
         "LAAT STAAN: Photogrammetry Snow, Plant Models Vol 60, Perfect Fire VFX"
       ],
       "opties": [
-        { "label": "Gedaan", "waarde": "gedaan", "gevolg": "Punt gaat van de lijst; ~30 GB vrij." },
-        { "label": "Doe ik later", "waarde": "later", "gevolg": "Blijft staan, blokkeert niets." }
+        {
+          "label": "Gedaan",
+          "waarde": "gedaan",
+          "gevolg": "Punt gaat van de lijst; ~30 GB vrij."
+        },
+        {
+          "label": "Doe ik later",
+          "waarde": "later",
+          "gevolg": "Blijft staan, blokkeert niets."
+        }
       ],
       "advies": "Twee minuten werk voor 30 GB. Even doen.",
       "vrijtekst": false
@@ -106,8 +102,16 @@
         "Klaar? Druk hieronder op de knop"
       ],
       "opties": [
-        { "label": "Staan erin", "waarde": "gedaan", "gevolg": "De agent pikt ze op en gaat verder met de curatie." },
-        { "label": "Doe ik later", "waarde": "later", "gevolg": "De curatie loopt intussen door op wat al binnen is." }
+        {
+          "label": "Staan erin",
+          "waarde": "gedaan",
+          "gevolg": "De agent pikt ze op en gaat verder met de curatie."
+        },
+        {
+          "label": "Doe ik later",
+          "waarde": "later",
+          "gevolg": "De curatie loopt intussen door op wat al binnen is."
+        }
       ],
       "advies": "Ongeveer 5 minuten.",
       "vrijtekst": false
@@ -122,8 +126,16 @@
         "Plus één gestileerd civilian/worker-pack (4-6 bodies, Mannequin-rig) — dat is het enige gat in de personages"
       ],
       "opties": [
-        { "label": "Staan erin", "waarde": "gedaan", "gevolg": "De monitor pikt ze automatisch op en de kit-pass kan starten." },
-        { "label": "Doe ik later", "waarde": "later", "gevolg": "De kit-pass blijft wachten; de agent werkt ondertussen aan andere dingen." }
+        {
+          "label": "Staan erin",
+          "waarde": "gedaan",
+          "gevolg": "De monitor pikt ze automatisch op en de kit-pass kan starten."
+        },
+        {
+          "label": "Doe ik later",
+          "waarde": "later",
+          "gevolg": "De kit-pass blijft wachten; de agent werkt ondertussen aan andere dingen."
+        }
       ],
       "advies": "Ongeveer 10 minuten.",
       "vrijtekst": false

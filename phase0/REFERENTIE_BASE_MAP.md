@@ -165,18 +165,18 @@ precies waar een basisscherm voor bestaat.
 
 ## 3. Wat dit document NIET beslist
 
-**[OPEN — owner-punt O-6]** De **visuele behandeling** staat hier bewust niet in.
-Alles hierboven gaat over *welke informatie* op het scherm hoort en waarom — dat ligt
-vast in de bijbel en is dus van mij. Hóé het eruitziet hangt aan de stijlvraag:
+**[BESLIST — O-6 beantwoord 31-07: A]** De stijlvraag stond hier als open punt. Dat
+is hij niet meer: **de Borderlands-lock blijft**, `15_visual_quality_charter.md` §15.5
+wordt niet herzien, en er is geen herwerk.
 
-- **Lezing A (Borderlands-lock blijft):** de kaart wordt een gestileerde graaf met
-  inktlijnen, de basis een gestileerde doorsnede.
-- **Lezing B (fotorealisme):** beide worden een ander soort scherm, en `15.5` moet
-  eerst herzien.
+**Gevolg voor dit document:** de vormgeving is niet langer geblokkeerd. Base en map
+worden **gestileerd** uitgevoerd — de kaart als graaf met inktlijnen en cel-shading,
+de basis als gestileerde doorsnede, in dezelfde toon-master als de rest van de wereld.
+Geen fotorealistische kaart, geen aparte visuele taal voor de schermlaag.
 
-**Dit document is in beide lezingen geldig.** De informatie-eisen veranderen niet van
-de stijl; alleen de vormgeving. Daarom kan de datalaag eronder nú gebouwd worden
-zonder op O-6 te wachten — en daarom moet de vormgeving er wél op wachten.
+De informatie-eisen hierboven veranderen daar niet van; die golden in beide lezingen.
+Wat verandert is dat stap 3 in §4 (*"dan pas beeld, en dat wacht op O-6"*) nu **open
+staat** en samen met de datalaag opgepakt kan worden.
 
 **[OPEN]** Ook niet beslist: of base en map dezelfde interactiegrammatica krijgen als
 boots (Command Mode is hold-to-enter). Dat is een ontwerpvraag die pas zinvol is als

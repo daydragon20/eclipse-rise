@@ -161,9 +161,19 @@ De formulering *"realistisch geloofwaardig"* brengt hem terug. Twee mogelijke be
 | **A — geloofwaardig binnen de stijl** *(aanname)* | De toon-stijl blijft; het probleem is compositie en fictiebreuk. Dit document lost het op. | Geen herwerk. Alles hierboven geldt, stijl blijft gelockt. |
 | **B — echt fotorealisme** | De Borderlands-lock vervalt. | Her-lock van §15.5, elk materiaal opnieuw, de toon-master vervalt, en de gestileerde assets die al binnen zijn moeten opnieuw beoordeeld. Weken werk. |
 
-**Dit document neemt lezing A aan** — omdat de klacht ging over verkeersborden en opvulling, en dat zijn compositieproblemen die in elke stijl bestaan. Een gestileerde wereld kan volstrekt geloofwaardig zijn; Borderlands zelf is dat.
+## ✅ BESLIST — 2026-07-31: **A**. De eigenaar heeft gekozen.
 
-**Wil de eigenaar lezing B, dan is dat een expliciete her-lock-beslissing** en geen stille koerswijziging. Zeg het, dan wordt §15.5 herzien vóór er nog één asset landt.
+> **"O-6: A"** — Nathan, 31-07-2026.
+
+**De Borderlands-lock uit `15_visual_quality_charter.md` §15.5 blijft staan.** Cel/toon-shading, inktlijnen, hoge detaildichtheid. Er wordt **niets** her-gelockt, geen materiaal opnieuw gedaan, en de toon-master blijft gelden. Alle gestileerde assets die al binnen zijn, blijven binnen.
+
+**Wat "realistisch geloofwaardig" dus betekent, definitief:** geloofwaardig *binnen* de stijl. De klacht ging over verkeersborden en opvulling, en dat zijn **compositieproblemen die in elke stijl bestaan** — dit document lost ze op. Een gestileerde wereld kan volstrekt geloofwaardig zijn; Borderlands zelf is dat.
+
+**Voor iedereen die hierna iets bouwt:** deze vraag is gesloten. Kom er niet op terug met "maar zou fotorealisme niet…" — dat is een her-lock-beslissing die alleen de eigenaar kan nemen, en hij heeft hem net genomen. Dit deblokkeert bovendien de vormgeving van de schermlaag: `phase0/REFERENTIE_BASE_MAP.md` §3 wachtte op precies dit antwoord, en base en map worden dus **gestileerd** uitgevoerd — een graaf met inktlijnen, geen fotorealistische kaart.
+
+---
+
+*Historisch, voor wie de afweging wil teruglezen:* het `OWNER_MANDATE` vroeg ooit om "realistische materialen, natuurlijke kleuren", en dat conflict werd toen ook al in het voordeel van de stilering opgelost. De vraag is nu twee keer dezelfde kant op beslist.
 
 ---
 

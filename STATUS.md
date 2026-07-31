@@ -98,8 +98,8 @@ Zijn antwoord komt in **`phase0/OWNER_ANSWERS.md`** — **lees dat elke sessie**
 | ~~O-2~~ | ~~Commerciële rechten~~ — **✓ BEANTWOORD door Nathan zelf, 31-07 in de chat.** Verbatim: *"ja in mijn abonnement zitten auteursrechten en je kunt dat ook zien in de voice library of die voice rechten heeft."* Dus: plan ✓ én per stem zichtbaar. Beleid blijft: `voice-director` weigert elke Voice-Library-stem zonder commerciële licentie.<br>**Let op voor agents:** dit is één keer ten onrechte teruggedraaid met "Nathan heeft alleen O-1 beantwoord". Dat klopte niet — het antwoord viel in een chatsessie die niet in de repo staat. Draai dit niet nog eens terug; het citaat hierboven ís de bron. | — |
 | O-3 | Stemmen kiezen uit de kandidaten (smaak, niet techniek) | alles wat gesproken wordt |
 | O-4 | IJkmissie M1.1 beluisteren en goed-/afkeuren | de massaproductie |
-| O-5 | **Wapen** — er hángt een wapen; het is alleen geen los object. Herweging, geen inkoop. Zie `phase0/REFERENTIE_TPS.md` §WIJ NU | wapenwerk spoor B |
-| O-6 | **Stijlvraag**: blijft de Borderlands-lock, of wil je fotorealisme? | `20_world_dressing_standard.md` §20.8 |
+| ~~O-5~~ | ~~Wapen~~ — **✓ BESLIST 31-07: "volledig".** Nathan kiest de grote variant: het wapen écht uit de karaktermesh, niet de goedkope tint-tussenstap. Vier falsificeerbare stappen (isoleren → los mesh per wapenfamilie → socket op `hand_r` → wisselogica eraan). Loopt bij een element-builder. Mijn advies was de goedkope stap eerst; hij koos anders en dat is zijn keuze. | — |
+| ~~O-6~~ | ~~Stijlvraag~~ — **✓ BESLIST 31-07: "A".** De Borderlands-lock uit §15.5 **blijft**. Geen her-lock, geen materiaal opnieuw, toon-master blijft gelden. "Realistisch geloofwaardig" = geloofwaardig *binnen* de stijl; de klacht ging over compositie en dat bestaat in elke stijl. Deblokkeert de vormgeving van base en map — die worden gestileerd (`phase0/REFERENTIE_BASE_MAP.md` §3). | — |
 
 ## De staande kwaliteitsopdracht
 
