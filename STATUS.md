@@ -10,12 +10,12 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (gemeten 01-08 ~02:20): build groen `-NoUba` · **226 tests, 0 gefaald, 0 niet
-gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog
-**39/39** · creditmeter-poort groen.
+Bar (zelf nagedraaid 01-08 ~07:20): build groen `-NoUba` · **235 tests, 0 gefaald, 0
+niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** ·
+EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 
-> ⚠ **De BAR is ROOD, en op méér punten dan gisteren — dat is winst.** Build en
-> `EclipseValidateData` staan groen; drie poorten melden iets:
+> ⚠ **De BAR is ROOD op twee punten, en allebei liggen ze buiten de build.** Dat de
+> suite groen staat is dus geen groene bar — de bar meet met opzet meer:
 >
 > 1. **`check_voice_resolves.py`** — `eclipse_fighter` heeft **vier slots** in de
 >    scripts en **twee gekozen stemmen**, dus C en D hangen aan niets. Acht regels
@@ -23,14 +23,15 @@ gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · Ev
 >    op Display gelogd en overgeslagen. **Owner-actie (O-3), bewust géén fallback** —
 >    terugvallen op stem A maakt de bar groen terwijl die acht regels nog steeds geen
 >    gekozen stem hebben.
-> 2. **`validate_script.py`** (nieuw, 01-08) — **13** bevindingen, waarvan twee de hele
+> 2. **`validate_script.py`** (nieuw, 01-08) — **9** bevindingen, waarvan twee de hele
 >    tool waard zijn: `M1.1.S99` vertakt op drie uitkomsten en handelt er **twee** af
 >    (`left` ontbreekt), `M1.6.S05` mist `split`. Plus vijf condities die door niemand
 >    gezet worden. Die bevindingen bestonden allemaal al; er kon alleen niets naar
 >    kijken. Zijn **zelftest draait ervóór** in de bar: zakt het bewijs dat de controles
 >    rood kúnnen worden, dan is het oordeel over het script waardeloos.
-> 3. **Vier suite-tests** (`Eclipse.Base.Vault*`) — in-flight werk van de vault-agent,
->    niet gecommit. Daar geen conclusie aan verbinden tot die klaar is.
+>
+> De vier `Eclipse.Base.Vault*`-tests die hier eerder als derde punt stonden zijn **groen**:
+> dat was in-flight werk en het is geland (`f3e5c0b`).
 
 **Act 1 kost ~100.000 credits, niet 65.015.** Dat oude bedrag telde zes van de acht
 missies: M1.7, M1.8 en de twaalf hub-gesprekken waren lege stubs en telden als nul, en
