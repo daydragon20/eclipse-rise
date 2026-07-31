@@ -56,13 +56,24 @@ words:        139
 #           hears his childhood through a wall. Neither hears a word of it, and that is
 #           the plant working (P1-a) - the player will remember the voice, not the speech.
 #
-# *** ESCALATION 2 - BAND. ***
+# *** ESCALATION 2 - BAND. OPGELOST 01-08 met de mechaniek die de schrijver zelf vroeg. ***
 # `type: ambient` is 6-16 words. Vex's three lines are 26-29. There is no way to write
 # "longest sentences in the game" inside a sixteen-word cap, and the stub itself says the
 # lines may sit in the "ambient/cutscene band". I did NOT edit the header - changing `type`
 # is L1's call, not mine. Two clean fixes, story-architect picks:
 #   (a) `type: cutscene` on this file (the plaza IS a staged set-piece), or
 #   (b) a per-line band override field in SCRIPT_FORMAT for recordings and broadcasts.
+#
+# GEKOZEN: (b) MET DE BAND VAN (a). Optie (b) bestond nog niet toen dit geschreven werd;
+# L1-R1 heeft het `band:`-veld daarna gebouwd. De keuzeruimte is daarmee tot EEN
+# teruggebracht en dit is dus uitvoering en geen smaak:
+#   - (b) boven (a), want retypen van de hele scene verandert ook de band van elke
+#     NIET-Vex-regel, en die zitten juist netjes binnen 6-16. Een override raakt alleen
+#     de drie regels die het probleem zijn.
+#   - binnen (b) is `oration` (plafond 120) uitgesloten door AR-7: act 1 verbruikt geen
+#     oration, er zijn er vier in het hele spel en die zijn voor act 3 en 4. Blijft over:
+#     `cutscene` (20-60), en 26-29 past. `in-mission-radio` (plafond 25) is te kort.
+# Een architect die (a) alsnog wil, haalt drie regels weg en zet een woord in de kop om.
 # Every non-Vex line in this scene is inside 6-16 except the two deliberate one-word
 # beats (.040, .100), which are the same ceiling-not-floor reading as M1.1.
 #
@@ -105,6 +116,7 @@ lines:
   - id:      M1.3.S02.050
     speaker: VEX
     voice:   malachar_vex
+    band:    cutscene
     tags:    [quietly]
     text:    "One is not asked to grieve tonight, only to remember, and to remember correctly, because the hunger came before the order and not because of it."
     shot:    "Nobody in the plaza looks up at the speakers. Looking up is the same mistake as walking away."
@@ -119,6 +131,7 @@ lines:
   - id:      M1.3.S02.070
     speaker: VEX
     voice:   malachar_vex
+    band:    cutscene
     text:    "In the last year before the Compact, four hundred thousand died on Krad-9 of a shortage that three neighbouring worlds had the grain to end and no reason to."
     note:    "Vex line 2 of 3. His tic: a pre-Dominion casualty statistic offered as comfort."
 
@@ -130,6 +143,7 @@ lines:
   - id:      M1.3.S02.090
     speaker: VEX
     voice:   malachar_vex
+    band:    cutscene
     tags:    [quietly]
     text:    "Order is not found; it is bought, at a price already paid, in a ledger no one in this district will ever be asked to read."
     shot:    "Hold on the speaker crowns. The rain is coming off them in threads."
