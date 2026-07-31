@@ -133,6 +133,15 @@ h3{font-size:17px;margin:0 0 8px}
 .msg.assistant .who{color:var(--acc)}
 .msg .tx{font-size:13.5px;white-space:pre-wrap;word-break:break-word}
 
+/* owner-blokkades */
+.ow{padding:11px 0;border-bottom:1px solid var(--line)}
+.ow:last-child{border:0;padding-bottom:0}
+.ow-h{display:flex;gap:10px;align-items:baseline}
+.ow-h strong{font-size:14px;font-weight:600;line-height:1.4}
+.ow-m{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 0 46px;font-size:12px;color:var(--dim)}
+.ow-m b{color:var(--dim2);font-weight:600}
+.ow-m .src{color:var(--dim2);opacity:.6;margin-left:auto;font-size:11px}
+
 .empty{color:var(--dim2);font-size:13.5px;padding:14px 0;font-style:italic}
 .note{font-size:12.5px;color:var(--dim2);margin-top:9px}
 </style>
@@ -226,14 +235,45 @@ function vNu(){
     <div class="stat"><div class="n" style="color:${acties.length?"var(--bad)":"var(--ok)"}">${acties.length}</div><div class="l">Wacht op jou</div><div class="s">${acties.length?"actie nodig":"niets te doen"}</div></div>
   </div>
 
-  <h2>Wacht op jou</h2>
-  <div class="card">${acties.length?acties.map(a=>`
+  ${(()=>{
+    const ow=(S.owner||[]).filter(r=>!r.klaar);
+    const bucket=r=>{const w=((r.wanneer||r.duur||"")+" "+(r.id||"")).toLowerCase();
+      if(/\bnu\b|staande|bovenaan/.test(w))return 0;
+      if(/gauw|zodra|rond|augustus|\bbij\b/.test(w))return 1;
+      return 2;};
+    const groepen=[
+      {n:0,t:"Nu — dit houdt werk tegen",k:"bad"},
+      {n:1,t:"Gauw",k:"warn"},
+      {n:2,t:"Later / staand",k:""}
+    ];
+    if(!ow.length)return '<h2>Wacht op jou</h2><div class="card"><div class="empty">Niets openstaand.</div></div>';
+    return `<h2>Wacht op jou — ${ow.length} open</h2>` + groepen.map(g=>{
+      const rows=ow.filter(r=>bucket(r)===g.n);
+      if(!rows.length)return "";
+      return `<div class="card">
+        <h3>${esc(g.t)} <span class="tag ${g.k}">${rows.length}</span></h3>
+        ${rows.map(r=>`
+          <div class="ow">
+            <div class="ow-h">
+              <span class="tag ${g.k}">${esc(r.id)}</span>
+              <strong>${esc(r.actie||"")}</strong>
+            </div>
+            <div class="ow-m">
+              ${r.blokkeert&&r.blokkeert!=="—"?`<span><b>blokkeert:</b> ${esc(r.blokkeert)}</span>`:""}
+              ${r.wanneer||r.duur?`<span><b>wanneer:</b> ${esc(r.wanneer||r.duur)}</span>`:""}
+              <span class="src">${esc(r.bron||"")}</span>
+            </div>
+          </div>`).join("")}
+      </div>`;}).join("");
+  })()}
+
+  ${acties.length?`<h2>Uitgewerkt — met stappen</h2>
+  <div class="card">${acties.map(a=>`
     <div class="item ${esc(a.prio||"later")}">
       <h4>${esc(a.titel||"")} <span class="tag ${a.prio==="nu"?"bad":a.prio==="gauw"?"warn":""}">${esc(a.prio||"")}</span></h4>
       ${a.waarom?`<p>${esc(a.waarom).slice(0,700)}</p>`:""}
       ${a.stappen?`<ul>${a.stappen.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
-    </div>`).join(""):'<div class="empty">Niets — de agent heeft alles wat hij nodig heeft.</div>'}
-  </div>
+    </div>`).join("")}</div>`:""}
 
   ${(()=>{const ab=(D.abTests||[]).filter(t=>t.status!=="beslist");
     if(!ab.length)return "";

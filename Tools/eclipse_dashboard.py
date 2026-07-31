@@ -570,6 +570,141 @@ def housekeep_shots(keep: int = 50) -> int:
     return removed
 
 
+# ------------------------------------------------------- owner-blokkades --
+
+# Waar owner-acties in de repo staan. Elk document heeft zijn eigen tabelvorm,
+# dus de parser gaat op KOLOMNAMEN af en niet op kolomvolgorde.
+OWNER_SOURCES = [
+    ("STATUS.md", "STATUS"),
+    ("JOUW_ACTIES.md", "JOUW_ACTIES"),
+    ("phase0/EXECUTION_PLAN.md", "EXECUTION_PLAN §4"),
+    ("phase0/SCRIPT_PRODUCTION_PLAN.md", "SCRIPT_PLAN §7"),
+]
+
+_ID_RE = re.compile(r"^~*\s*([OT]-\d+)\s*~*$", re.I)
+
+# Welke kolomkop betekent wat
+_COL_HINTS = {
+    "actie": "actie", "wat": "actie", "item": "actie",
+    "blokkeert": "blokkeert", "waarvoor": "blokkeert",
+    "waarvoor / blokkeert": "blokkeert", "blokkeert wat": "blokkeert",
+    "wanneer": "wanneer", "hoe lang": "duur", "duur": "duur",
+}
+
+
+def _clean_cell(text: str) -> str:
+    """Markdown-opmaak eruit, zodat het dashboard leesbare tekst krijgt."""
+    t = re.sub(r"<br\s*/?>", " · ", text)
+    t = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", t)   # links
+    t = re.sub(r"[*_`~]", "", t)                      # nadruk
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def cols_index(cols: dict, key: str, fallback: int, cells: list) -> int:
+    """Index van de kolom met betekenis `key`; anders een veilige terugval."""
+    for idx, k in cols.items():
+        if k == key and idx < len(cells):
+            return idx
+    nxt = fallback + 1
+    return nxt if 0 <= nxt < len(cells) else max(0, min(fallback, len(cells) - 1))
+
+
+def _parse_owner_table(text: str, bron: str) -> list[dict]:
+    """Haalt O-/T-rijen uit elke markdown-tabel in een document."""
+    found: list[dict] = []
+    lines = text.splitlines()
+    cols: dict[int, str] = {}
+
+    for i, raw in enumerate(lines):
+        line = raw.strip()
+        if not line.startswith("|"):
+            cols = {}
+            continue
+
+        cells = [c.strip() for c in line.split("|")[1:-1]]
+        if not cells:
+            continue
+
+        # scheidingsregel -> de regel erboven was de kop
+        if all(re.fullmatch(r":?-{2,}:?", c) for c in cells if c):
+            header = [c.strip().lower() for c in lines[i - 1].split("|")[1:-1]] if i else []
+            cols = {}
+            for idx, h in enumerate(header):
+                for hint, key in _COL_HINTS.items():
+                    if hint in h:
+                        cols[idx] = key
+                        break
+            continue
+
+        # Het ID staat niet altijd in kolom 0 — in JOUW_ACTIES.md is kolom 0
+        # "Wanneer" en zit het ID in "Wat". Zoek dus in elke cel.
+        rid = None
+        id_idx = -1
+        for idx, cell in enumerate(cells):
+            m = _ID_RE.match(cell) or re.match(r"^\**([OT]-\d+)\**\b", cell)
+            if m:
+                rid = m.group(1).upper()
+                id_idx = idx
+                break
+        if not rid:
+            continue
+
+        row = {"id": rid, "bron": bron, "actie": "", "blokkeert": "", "wanneer": "", "duur": ""}
+        for idx, cell in enumerate(cells):
+            key = cols.get(idx)
+            if key and not row[key]:
+                row[key] = _clean_cell(cell)
+        if not row["actie"]:
+            # val terug op de cel waar het ID in stond, of de cel erna
+            cand = cells[id_idx] if id_idx >= 0 else ""
+            if _ID_RE.match(cand) and len(cells) > id_idx + 1:
+                cand = cells[id_idx + 1]
+            row["actie"] = _clean_cell(cand)
+
+        # Afgerond = DOORGESTREEPT (~~) in de ruwe cel. Let op: _clean_cell
+        # strípt de tildes, dus deze test moet op de ruwe tekst. Een losse ✓
+        # midden in de zin telt NIET — T-2 zegt "login ✓ ... resterend zijn de
+        # env-pack-pulls" en staat dus juist nog open.
+        raw_id_cell = cells[id_idx] if id_idx >= 0 else ""
+        raw_actie = cells[cols_index(cols, "actie", id_idx, cells)]
+        row["klaar"] = bool(
+            raw_id_cell.startswith("~~")
+            or raw_actie.startswith("~~")
+            or "afgerond" in raw_actie[:60].lower()
+        )
+        found.append(row)
+    return found
+
+
+def scan_owner_actions() -> list[dict]:
+    """Alle owner-blokkades uit alle documenten, ontdubbeld op ID."""
+    merged: dict[str, dict] = {}
+    for rel, label in OWNER_SOURCES:
+        p = REPO / rel
+        if not p.is_file():
+            continue
+        try:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for row in _parse_owner_table(text, label):
+            cur = merged.get(row["id"])
+            if cur is None:
+                merged[row["id"]] = row
+                continue
+            # rijker record wint per veld; "klaar" is besmettelijk
+            for k in ("actie", "blokkeert", "wanneer", "duur"):
+                if len(row.get(k, "")) > len(cur.get(k, "")):
+                    cur[k] = row[k]
+            cur["klaar"] = cur["klaar"] or row["klaar"]
+            if label not in cur["bron"]:
+                cur["bron"] += " + " + label
+
+    out = list(merged.values())
+    out.sort(key=lambda r: (r["klaar"], r["id"][0], int(r["id"].split("-")[1])))
+    return out
+
+
 def disk_info() -> dict:
     def size_of(p: Path) -> float:
         total = 0
@@ -626,6 +761,7 @@ def scanner_loop() -> None:
                 housekeep_shots(50)      # oude screenshots opruimen
                 cached_docs = scan_docs()
                 cached_disk = disk_info()
+            fresh["owner"] = scan_owner_actions()
             fresh["docs"] = cached_docs
             fresh["disk"] = cached_disk
             slow_counter += 1
