@@ -63,6 +63,21 @@ NAME_SUFFIX = "_Cue"
 # hash-genoemd en wordt via het manifest gevonden, niet bij naam.
 SKIP_DIRS = ("Generated",)
 
+# BEWUST ONGEBRUIKT — door de owner beoordeeld, niet vergeten.
+#
+# Deze sweep vindt terecht dat niemand ze aanroept, maar een melding die elke keer
+# terugkomt terwijl het antwoord al gegeven is, leert je de sweep te negeren. Dat is
+# precies hoe de drie dode geluiden van 26-07 zo lang onopgemerkt bleven.
+#
+# De reden staat erbij, want een lijst met alleen namen wordt over een maand een
+# lijst met vraagtekens.
+BEWUST_ONGEBRUIKT = {
+    "Audio/SFX/Cue_SFX_Foot_Metal_01":
+        "Owner 27-07: LATEN LIGGEN. Vervangen door Footsteps_Volume_02 (zes varianten "
+        "in plaats van een), dus niets roept hem nog aan. Het is betaalde audio, hij "
+        "kost niets waar hij ligt, en weggooien is onomkeerbaar.",
+}
+
 
 def main() -> int:
     if not CONTENT.is_dir():
@@ -80,6 +95,7 @@ def main() -> int:
     blob = "\n".join(haystack)
 
     dead = []
+    parked = []
     checked = 0
     for asset in sorted(CONTENT.rglob("*.uasset")):
         relative = asset.relative_to(CONTENT)
@@ -96,9 +112,21 @@ def main() -> int:
         # sweep maakt of breekt.
         game_path = "/Game/" + relative.with_suffix("").as_posix()
         if game_path not in blob:
-            dead.append(relative.as_posix())
+            key = relative.with_suffix("").as_posix()
+            if key in BEWUST_ONGEBRUIKT:
+                parked.append((key, BEWUST_ONGEBRUIKT[key]))
+            else:
+                dead.append(relative.as_posix())
 
     print(f"{checked} audiocues gecontroleerd.")
+    if parked:
+        # Wel TONEN, niet meetellen: onzichtbaar maken is hoe een beslissing na een
+        # half jaar weer een open vraag wordt.
+        print("")
+        print(f"{len(parked)} bewust ongebruikt (door de owner beoordeeld):")
+        for key, reason in parked:
+            print(f"  {key}")
+            print(f"      {reason}")
     if not dead:
         print("Geen dode assets — elk /Game-pad hier wordt ergens geladen.")
         return 0
