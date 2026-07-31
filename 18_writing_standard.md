@@ -10,6 +10,34 @@
 
 ---
 
+## 18.0 THE SCRIPT IS WRITTEN IN ENGLISH
+
+**Every line a character speaks is written in English. Without exception.**
+
+This is not a preference and it is not open for interpretation. Three things fix it:
+
+1. **The roadmap says so.** `13_roadmap.md` line 45 specifies localisation as *"EN VO; FIGS+NL+PL+BR+RU+ZH text"*. English is the **voiced source**; Dutch is one of the *target* languages for translated text, alongside French, Italian, German, Spanish, Polish, Portuguese, Russian and Chinese. A Dutch source line makes English a translation of a translation.
+2. **Casting is English.** Every voice is filtered on `language: en` and auditioned on English signature lines (§19.3). A Dutch line handed to an English-cast voice produces an accent nobody chose.
+3. **The scenes already are.** All 71 Act-1 scene files are English: *"Mara needs eleven frightened people to spend their last ammunition on a supply patrol instead of hoarding it."*
+
+### Where Dutch does belong
+
+Dutch is the language of **working with Nathan** — nothing else:
+
+| Dutch | English |
+|---|---|
+| The chat, the dashboard, `STATUS.md`, `JOUW_ACTIES.md` | Every `text:` field in every scene file |
+| Writer notes, `note:`, commit messages | Every bark, every callout, every line of UI |
+| Owner questions and answers | Scene `title:`, `want:`, `obstacle:`, `turn:` |
+
+### This has already caused one defect
+
+On 2026-07-31 the HUD shipped `NSLOCTEXT("Eclipse", "Reloading", "HERLADEN")` — a Dutch string sitting in the slot reserved for the **English source text**. On screen it read `HERLADEN` next to `MISSION ACTIVE` and `Spring the ambush`. Not a style slip: it puts Dutch into the string table that every other language is translated *from*, so every future translation would have been made from Dutch.
+
+**The rule for every agent:** if a player can see or hear it, it is English. If only Nathan sees it, it is Dutch. When unsure, ask which of those two it is — that question always has an answer.
+
+---
+
 ## 18.1 Scale Reality — what we are actually committing to
 
 Real shipped scripts, for calibration:

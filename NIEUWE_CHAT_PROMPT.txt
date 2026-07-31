@@ -151,6 +151,16 @@ de hoek leeg was: precies wat er nu mis is (zie 20_world_dressing_standard.md).
 --------------------------------------------------------------------
 HARDE REGELS
 --------------------------------------------------------------------
+- ALLES WAT DE SPELER ZIET OF HOORT IS ENGELS. Elke dialoogregel, elke
+  bark, elke tekst op het scherm. Nederlands is alleen de taal waarin
+  jij en ik praten: de chat, het dashboard, STATUS.md, JOUW_ACTIES.md,
+  commit-berichten en schrijversnotities.
+  De brontaal is Engels omdat 13_roadmap r45 NL juist als DOELtaal van
+  de lokalisatie noemt - een Nederlandse bronregel maakt Engels een
+  vertaling van een vertaling. Dit is al een keer misgegaan: er stond
+  NSLOCTEXT("Eclipse","Reloading","HERLADEN") in de HUD, waardoor
+  Nederlands in de string-tabel belandde waaruit alle andere talen
+  vertaald worden. Zie 18_writing_standard.md 18.0.
 - Bouw UE altijd met -NoUba. Elke iteratie eindigt GROEN: build, tests,
   EclipseValidateData (0 fouten), EventCatalog in sync — vóór elke commit.
 - Bouwvolgorde per spec = 14.5 (dataschema -> pure-logic core + tests ->
