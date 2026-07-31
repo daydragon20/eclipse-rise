@@ -171,12 +171,13 @@
   },
   {
    "id": "O-4",
-   "prio": "later",
-   "vraag": "IJkmissie M1.1 — nog niet te beluisteren, en dat is mijn fout",
-   "waarom": "Deze kaart stond op 'gauw' en vroeg je de ijkmissie te beluisteren. **Er is nog geen seconde audio van M1.1.** Ik heb dat niet gecontroleerd toen ik de kaart schreef.\n\nDe reden is op zichzelf goed nieuws: de critic-reparaties van vannacht hebben vijf M1.1-scènes aangepast, en een aangepaste scène gaat terug naar draft. Alle zeven staan nu op `critic: null`, en niets gaat naar de generator zonder GO van de critic — die poort is er juist om te voorkomen dat er credits naar een scène gaan die nog verandert.\n\nDe volgorde is dus: critic beoordeelt M1.1 opnieuw → GO → ik genereer de ijkmissie → **dan** komen hier afspeelknopjes en is deze vraag echt aan jou. Je hoeft nu niets te doen; de kaart springt vanzelf terug naar 'nu' zodra er iets te horen is.",
+   "prio": "gauw",
+   "vraag": "IJkmissie M1.1 — hij wordt NU ingesproken",
+   "waarom": "STAND VERANDERD VANNACHT. Deze kaart stond op 'wacht op mij'. Dat klopt niet meer: M1.1 is door de kwaliteitspoort. Alle zeven scènes staan op GO na DRIE rondes — de eerste vond zeven defecten, de tweede vier, en de derde tekende af.\n\nTwee voorbeelden van wat die poort tegenhield, zodat je weet waar hij voor betaalt. In de debrief zei Mara 'ze zullen zes vermiste mannen tellen', terwijl er in twee van de drie takken víjf doden zijn en één man leeft — en dat is niet te repareren nadat het ingesproken is. En de arts sprak over 'één gewonde' terwijl de conditie op elke neergegane squadgenoot vuurt: bij twee gewonden had ze het over de verkeerde.\n\nOOK GEMETEN: alle acht stemmen die deze missie nodig heeft resolven — Mara, Voss (mannelijk én vrouwelijk), Dex, Reyes en de vier bark-slots die jij hebt gekozen. Er is geen enkele lege sleutel in M1.1.\n\nHij wordt nu ingesproken: ongeveer 9.332 credits van je 125.612, alleen deze missie, met de opdracht te stoppen als de gemeten uitgave meer dan een kwart van mijn schatting afwijkt. Zodra het klaar is verschijnen hier afspeelknopjes en is de vraag echt aan jou.\n\nWAAROM DIT VÓÓR O-14 GAAT: je kunt niet zinnig beslissen hoe act 1 binnen het budget moet als je nooit gehoord hebt hoe act 1 klinkt.",
    "stappen": [
-    "Niets — deze kaart wacht op mij, niet op jou",
-    "Hij komt vanzelf terug zodra de eerste missie ingesproken is"
+    "Nog even niets — de generatie loopt",
+    "Zodra er audio is: luister of de stemmen NÁÁST elkaar werken, niet alleen los",
+    "Één ding zeggen: 'zo moet het klinken' of 'nee, want…' — bij nee gaat de standaard bij en gaat M1.1 er nog een keer doorheen"
    ],
    "meer_info": "**Waarom dit de belangrijkste knop van het project is**\n\nAls de schrijfstandaard fout is, wil je dat weten bij missie 1 — niet bij missie 34.\n\n**Waar je op let (jouw oordeel, niet dat van een test):**\n\n- Zijn de personages van elkaar te onderscheiden zonder dat je de naam ziet?\n- Legt iemand iets uit wat je al begreep? Dat is de meest voorkomende fout\n- Is er een zin waarvan je denkt: dat zegt niemand?\n- Praat iemand over het geweervuur heen?\n- Zit er humor in, en komt die van het personage of van de schrijver?\n\n**Bij nee gebeurt er iets nuttigs:** de standaard wordt bijgesteld en M1.1 gaat er nog eens doorheen. Dat kost dagen. Hetzelfde probleem ontdekken na 42 missies kost de maand. Zeg dus gerust nee.",
    "opties": [
