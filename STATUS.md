@@ -80,9 +80,40 @@ gelezen te worden.
 - **HUD-nulmeting** staat in `phase0/EXECUTION_PLAN.md §1b`.
 - Owner-lijst van **22 naar 4**; zijn vier beslissingen uitgevoerd.
 
-**Wat NIET is gelukt:** de spelergerichte HUD vóór `IsDebugHudAllowed()` zetten zodat
-de opnameronde hem kan zien. Teruggedraaid; zie §1b voor waarom die poort de eerste
-bouwstap is.
+~~**Wat NIET is gelukt:** de spelergerichte HUD vóór `IsDebugHudAllowed()` zetten.~~
+**→ DAT IS ALSNOG GELUKT, later op 31-07. Zie hieronder.**
+
+## Wat er 31-07 's LATE avond landde
+
+**De HUD-poort werkt — en dat is met eigen ogen op frames gecontroleerd, niet uit een
+rapport overgenomen.** `Saved/Screenshots/HUD_spelerlaag/` toont in beide perspectieven
+het richtkruis plus `AR_Foundry 19 / 30` (wapennaam én munitie, allebei ontbrekend bij de
+nulmeting) en in 1e persoon een `HERLADEN`-indicator — **zonder één regel debugtekst**.
+`HUD_volledig/` toont daarbovenop objectives, squad-orders en de commandoregel. De
+spelerlaag staat in allebei. Daarmee is de blokkade uit §1b weg.
+
+**Vier metingen die diagnoses omgooiden:**
+
+1. **De rode test** was een verhuisd bestand, geen harnasfout (`8e9bf53`).
+2. **Het inslagspoor is géén transform-bug** (`ac09980`) — 20/20 binnen 1 cm, 0,000 cm
+   afwijking, mét controleproef. Terug naar de renderkant.
+3. **Het trillen** komt van een envelope die per schot herstart, niet van vechtende
+   blend-nodes; de speler draait geen AnimBP (`bc881f4`).
+4. **De GPU-crash is een page fault, geen TDR-timeout**, en de breadcrumbs wijzen
+   **SkyAtmosphere** aan — Lumen, TSR en SSR stonden alle drie op "Niet gestart"
+   (`3d143e2`). Crashkans gemeten op 1-op-9, dus één schone proefrun bewijst niets.
+
+**Ook geland:** de vitals-datalaag op de event-bus (`Event.Player.VitalsChanged`) — daarvóór
+was het énige gezondheidsfeit dat de speler uitzond "dood", geraakt worden was volledig
+stil. Act 1 volledig uitgetekend: 9 beat-sheets, 71 scène-stubs, 10 canon-conflicten.
+Casting fase 1: 104 kandidaten voor **nul credits**. De testteller op het dashboard bleek
+stuk in plaats van verouderd (verkeerd rapportpad).
+
+**Twee dingen die alleen een frame liet zien:** er staat een **STOP-verkeersbord** in het
+district (`EclipseGrayboxBuilder.cpp:1432`) terwijl `20_world_dressing_standard.md` §20.2
+dat expliciet verbiedt — het document is 31-07 geschreven, de code nooit aangepast. En de
+squad-lijst toont `45434C53` in plaats van namen: dat is de ASCII-kop "ECLS" van de GUID
+uit `EclipseRosterLogic.cpp:15`, dus per constructie voor iedere soldaat gelijk.
 
 ## De drie documenten van Nathan — houd ze vers
 
