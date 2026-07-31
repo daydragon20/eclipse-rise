@@ -1246,6 +1246,27 @@ void AEclipseCharacter::ApplyBodyDefAnimation(const FEclipseBodyDefRow& BodyDef,
 
 	LocomotionSet.Death = ResolveClip(BodyDef.DeathAnim, TEXT("death"));
 	LocomotionSet.Shoot = ResolveClip(BodyDef.ShootAnim, TEXT("shoot"), /*bAllowAdditive=*/true);
+	// DE ADDITIEVE SCHIETTAKE BESTAAT WÉL — en is gemeten SLECHTER. Niet gebruikt.
+	//
+	// GEVONDEN 27-07: Primary_Fire_Med_MSA staat in hetzelfde pack als de volledige
+	// Primary_Fire_Med die we spelen, en is aantoonbaar ADDITIEF (1,00 s). MSA is de
+	// Paragon-conventie voor mesh space additive. Hoofdstuk 6 van REFERENTIE_TPS.md
+	// noemt een additieve terugslag als de Fortnite/Borderlands-vorm, dus dit leek de
+	// ontbrekende schakel — en gratis, want hij lag er al.
+	//
+	// GEMETEN, en daar hield het op. Voet-omklappen in het vuurinterval:
+	//     volledige pose op het BOVENLICHAAM (wat er staat)   2
+	//     additieve take, ongemaskeerd                       14
+	//     additieve take, met hetzelfde bovenlichaamsmasker   21
+	// De maskering die op het volledige pad wél werkt, doet op het additieve pad
+	// niets zichtbaars — vermoedelijk omdat een mesh-space-additieve bijdrage niet
+	// verdwijnt door de lokale transform op identiteit te zetten. Dat is te
+	// achterhalen, maar niet vanavond en niet op gevoel.
+	//
+	// DUS: niet aangesloten. Een wijziging die zijn eigen meting niet haalt hoort
+	// niet in het spel, ook niet als hij op papier de juiste vorm heeft. Dit staat
+	// hier zodat de volgende sessie niet opnieuw ontdekt dat de take bestaat en denkt
+	// dat hij alleen aangesloten hoeft te worden.
 	LocomotionSet.HitReact = ResolveClip(BodyDef.HitReactAnim, TEXT("hit-react"), /*bAllowAdditive=*/true);
 	LocomotionSet.Reload = ResolveClip(BodyDef.ReloadAnim, TEXT("herladen"), /*bAllowAdditive=*/true);
 	bBodyDefApplied = true;

@@ -622,6 +622,18 @@ bool FEclipseLocomotionProxy::Evaluate(FPoseContext& Output)
 			OneShot, 1.0f, FMath::Min(OneShotTime, OneShot->GetPlayLength()), false };
 		SampleInto(AdditiveSample, AdditivePoseData);
 
+		// EEN ADDITIEVE OVERLAY GAAT HIER OVER HET HELE LICHAAM, en dat is bewust
+		// zo gelaten. Ik heb geprobeerd hem net als de volledige pose op het
+		// bovenlichaam te maskeren (de bijdrage onder de ruggengraat op identiteit),
+		// en GEMETEN dat dat niets oplost: voet-omklappen in het vuurinterval gingen
+		// van 14 ongemaskeerd naar 21 gemaskeerd, tegen 2 met de volledige pose op
+		// het bovenlichaam. Een mesh-space-additieve bijdrage verdwijnt kennelijk
+		// niet door de lokale transform leeg te maken.
+		//
+		// Onze enige additieve gebruiker is nu de hit-react, en die HOORT het hele
+		// lichaam te raken. Zodra er een additieve take komt die alleen het bovenlijf
+		// mag bewegen, is dit de plek — maar dan met een meting die het aantoont en
+		// niet met deze poging.
 		FAnimationPoseData OutputForAdd(Output);
 		FAnimationRuntime::AccumulateAdditivePose(OutputForAdd, AdditivePoseData, OneShotWeight,
 			OneShot->GetAdditiveAnimType());
