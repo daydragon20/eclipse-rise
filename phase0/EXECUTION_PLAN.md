@@ -65,6 +65,32 @@
 
 ---
 
+## 1b. HUD-NULMETING — wat er op 31-07 ECHT op het scherm staat
+
+*Gemeten uit `EclipseMissionHudWidget`, niet uit herinnering. Spoor B prioriteit 1 is
+de schermlaag; dit is het vertrekpunt zodat de bouwer met feiten begint.*
+
+| Element uit de hud-builder-scope | Staat er nu | Opmerking |
+|---|---|---|
+| Vizier / crosshair | **ja** | `Crosshair`, een `+` in het midden. Geen spread, geen doelwit-info. |
+| Hit-marker | **ja** | `HitMarker` + `HitMarkerSecondsLeft`; kop en romp worden onderscheiden. |
+| Munitie | **deels** | `AmmoReadout` + `RefreshAmmoReadout()`: kogels in het magazijn. Geen magazijnen-over, geen herlaad-voortgang, geen leeg-staat. |
+| Wapenstatus | **nee** | Geen actief wapen, vuurmodus of wisselindicatie. |
+| Squad | **deels** | Rijen bestaan in de live-box (objectives + orders + Command Mode), maar niet als per-soldaat kaart met klasse/HP/status. |
+| Gezondheid & stance | **nee** | Geen speler-HP, geen dekking/hurken/sprint op het scherm. |
+| Minimap | **nee** | Bestaat niet. |
+| Objective-marker | **deels** | Objectives staan als tekstregels, niet als richtingaanwijzer in de wereld. |
+
+**DE BELANGRIJKSTE BEVINDING, en die bepaalt de eerste bouwstap:** alles behalve het
+richtkruis zit achter `IsDebugHudAllowed()`. In de opnameronde is de widget bewust
+inert — "no rows, no subscriptions, no console command" — met het kruis als enige
+uitzondering. Dat is verdedigbaar voor reviewbeelden, maar het betekent ook dat de
+schermlaag die de owner wil zien **per constructie niet op een opname staat**, en dus
+niet door het harnas te controleren is.
+
+Wie hier begint, begint dus met die poort: een echte HUD-laag hoort zichtbaar te zijn
+in het spel én meetbaar in de ronde, en die twee sluiten elkaar nu uit.
+
 ## 2. Sprintbord — lopend + eerstvolgend (bijgewerkt 2026-07-24 ~17:35, sync na cyclus 2)
 
 DoD-basis (14.4): *spec gerefereerd + code + data + tests + EventCatalog/docs bijgewerkt + CI/lokale groene bar (build -NoUba ✓, tests ✓, validatie ✓, catalog ✓) + door een mens/reviewende agent gezien.*
