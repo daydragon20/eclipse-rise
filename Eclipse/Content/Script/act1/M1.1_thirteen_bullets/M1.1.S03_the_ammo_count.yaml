@@ -15,7 +15,7 @@ turn:         "She hands him the number back as a promise instead of a limit."
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        27
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS
@@ -40,4 +40,50 @@ words:        0
 #
 # writer:    three lines carry this scene. Everything you add takes it down.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# The three seed lines are kept VERBATIM on their reserved ids, exactly as advised.
+# I took ONE of the permitted post-.030 beats and not two: .040, Voss reusing the count
+# as a plan. Nothing added before .010. Nothing renumbered.
+#
+# I deliberately did NOT add a Mara acknowledgement after .040. The scene ends on Voss
+# alone with the number, which is the whole point of it, and a fourth speaker turn
+# softens the exit. This is the one place in M1.1 where 21_quality_mandate's "generous
+# in count" is spent elsewhere on purpose - the surplus went into S01, S04, S05, S99.
+#
+# band:     type is `in-mission-radio` (10-25). ALL FOUR LINES ARE BELOW 10 WORDS,
+#           including the three that phase0/SCRIPT_FORMAT.md ships as its own example.
+#           The canonical example fails a mechanical floor check. It should not be
+#           changed; the check should be a ceiling. ESCALATED - see report.
+# variance: 1 w to 9 w = 9x.
+# no interruption in this scene: it is two people and three reserved lines. 18.7's
+#           "one interruption per multi-character scene" is waived here by the reserve.
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [quietly]
+    text:    "Thirteen."
+    shot:    "CU Mara. Hand on his shoulder. She is not looking at him."
+
+  - id:      M1.1.S03.020
+    speaker: VOSS
+    voice:   voss
+    text:    "That's not enough."
+    variants:
+      pragmatist: "That's four of them if I don't miss."
+      idealist:   "That's not enough."
+
+  - id:      M1.1.S03.030
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "It was enough for the ones who had six."
+    shot:    "She moves off. Camera stays on Voss."
+
+  - id:      M1.1.S03.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Six of them. Thirteen of us."
+    shot:    "He thumbs the last round back into the magazine. He is talking to nobody."
+    note:    "The permitted post-.030 beat: the number stops being what he has and becomes what he can spend. This is the axis change BEATS section 8 asks for, said once, to no one."

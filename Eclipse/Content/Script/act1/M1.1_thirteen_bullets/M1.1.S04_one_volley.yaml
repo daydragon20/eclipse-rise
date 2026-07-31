@@ -15,7 +15,7 @@ turn:         "Voss re-solves the ambush out loud, and Mara follows his call ins
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        150
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      VOSS, MARA, two Ember fighters, Dominion conscripts (bark vocabulary)
@@ -36,4 +36,190 @@ words:        0
 #            This scene carries the SCRIPT_PRODUCTION_PLAN section 3 test: do they talk
 #            over the shooting?
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      pre-contact lines use the radio band (ceiling 25; longest here is 13).
+#            From .200 onward everything is CALLOUT (2-6), per the stub. Nothing under
+#            fire runs past 5 words. The SCRIPT_PRODUCTION_PLAN section 3 test - "do they
+#            talk over the shooting?" - is answered by the shape of the scene: after the
+#            volley there are eleven lines and they total 27 words.
+# variance:  1 w to 13 w = 13x.
+# the fix:   Voss's solve is the S01 plant cashed. It works because the CONSCRIPTS are
+#            procedural (18.5 rule 5) - the enemy's own drill moves the leader into the
+#            kill box. The player solved the puzzle by listening to the enemy at .080-.100.
+# follow:    Mara states her plan at .070 and abandons it at .150. Her permission is two
+#            words and it is addressed to the SQUAD, not to Voss - "His mark." That keeps
+#            AR-5 intact (no "you" to Voss) and it is the whole of 2.4's "people follow
+#            them" with no speech attached.
+# handoff:   CONSCRIPT_A is the man the player will find alive in S05. He is given three
+#            lines of ordinary work first, on purpose.
+
+lines:
+  - id:      M1.1.S04.010
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    tags:    [whispering]
+    text:    "Rain's in. Plates are quiet now."
+
+  - id:      M1.1.S04.020
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [quietly]
+    text:    "Breathe out before, not after."
+
+  - id:      M1.1.S04.030
+    speaker: VOSS
+    voice:   voss
+    text:    "Six of them. Two crates on a hand hoist. Rifles slung."
+
+  - id:      M1.1.S04.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Leader?"
+
+  - id:      M1.1.S04.050
+    speaker: VOSS
+    voice:   voss
+    text:    "Last man. He's the one carrying the set."
+
+  - id:      M1.1.S04.060
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Then the volley doesn't reach him."
+
+  - id:      M1.1.S04.070
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Volley on the crates. Everybody onto the last man after."
+    note:    "Her plan. It is workable and it is worse than his. She will drop it at .150."
+
+  - id:      M1.1.S04.080
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    text:    "Hoist is binding. Second time this span."
+
+  - id:      M1.1.S04.090
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    text:    "Log it at the gate. Keep walking."
+
+  - id:      M1.1.S04.100
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    text:    "It's the drum. Nobody greases the drum."
+
+  - id:      M1.1.S04.110
+    speaker: VOSS
+    voice:   voss
+    text:    "Hold. Fourth horn is in about forty seconds."
+
+  - id:      M1.1.S04.120
+    speaker: VOSS
+    voice:   voss
+    text:    "When the lamps drop they close up, and he walks to the front."
+
+  - id:      M1.1.S04.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Procedure. Senior man takes point when the light goes."
+
+  - id:      M1.1.S04.140
+    speaker: VOSS
+    voice:   voss
+    text:    "Take the volley on the dark."
+
+  - id:      M1.1.S04.150
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "His mark."
+    shot:    "She says it to the line, not to him. Two of them look at Voss for the first time."
+
+  - id:      M1.1.S04.160
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Copy."
+
+  - id:      M1.1.S04.170
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "On the new one. Right."
+    note:    "18.9 D: somebody is allowed to be petty and unhappy about it. He complies anyway."
+
+  - id:      M1.1.S04.180
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    text:    "That's fourth horn. Close it up."
+    note:    "The enemy announces the mechanism that kills him. Nobody on the deck reacts."
+
+  - id:      M1.1.S04.190
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [quietly]
+    text:    "Lamps."
+
+  - id:      M1.1.S04.200
+    speaker: VOSS
+    voice:   voss
+    text:    "Now."
+
+  - id:      M1.1.S04.210
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    tags:    [shouting]
+    text:    "Contact, left rail!"
+
+  - id:      M1.1.S04.220
+    speaker: CONSCRIPT_B
+    voice:   dominion_conscript_b
+    tags:    [shouting]
+    text:    "Above us! Above the--"
+
+  - id:      M1.1.S04.230
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Two down."
+    shot:    "The interruption is the volley. Nine seconds of dark, four muzzle flashes, no lamps."
+
+  - id:      M1.1.S04.240
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Leader's on the deck."
+
+  - id:      M1.1.S04.250
+    speaker: CONSCRIPT_A
+    voice:   dominion_conscript_a
+    tags:    [shouting]
+    text:    "Man down at the hoist!"
+
+  - id:      M1.1.S04.260
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "That's me dry."
+
+  - id:      M1.1.S04.270
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Count."
+
+  - id:      M1.1.S04.280
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Two."
+
+  - id:      M1.1.S04.290
+    speaker: VOSS
+    voice:   voss
+    text:    "Three."
+
+  - id:      M1.1.S04.300
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Five between us."
+    note:    "The mission's arithmetic, audible: thirteen became five and bought a patrol."
+
+  - id:      M1.1.S04.310
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "One's still moving."
+    shot:    "Nobody moves toward the sound. The lamps come back up the row, one span at a time."

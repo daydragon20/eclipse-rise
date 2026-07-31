@@ -15,7 +15,7 @@ turn:         "She gives the night's credit to Voss in front of everyone, and he
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        279
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
@@ -35,4 +35,181 @@ words:        0
 #            Voss variants required here (the credit hand-off reads differently on the
 #            personal/strategic axis).
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# ESCALATION: this scene needs a run-quality flag that does not exist. The stub promises
+# "one extra Reyes line" on the zero-casualty optional and "Dex's third joke only in the
+# clean-run variant". I have written those against story.m11_zero_casualty (bool). Same
+# class of systems ask as Story.Choice.M11_ConscriptSpared. Named, not invented around.
+#
+# aftermath: 18.6 says ZERO comic beats in aftermath. Dex's third joke therefore exists
+#            ONLY on story.m11_zero_casualty == true. If anybody is hurt, .130 does not
+#            play and the scene has no laugh in it at all. That is the point.
+# credit:    .170 is the first time 18.4's "never claims credit in front of the people who
+#            did the work" is visible. Mara refuses the refusal at .180 - she writes it
+#            down over his objection, which is what building a leader looks like.
+# t4:        .230 is the mission's zichtbaarheid beat. Six men missing, filed as theft.
+#            In act 1 that is safety. In act 4 it is a decision somebody made.
+# p5-a:      .190 and .200 point back at S05 with no verdict, from two different mouths.
+#            The stub asked for the spared case only; I wrote the counterpart as well,
+#            because a choice that echoes on one side and is silent on the other reads as
+#            approval. Both are facts about the inventory. Neither judges.
+# name-slot: .170 personal variant uses {name}, pronoun-free (18.5 rule 6, AR-10).
+# variance:  1 w (".240 Theft.") to 21 w (.190) = 21x.
+
+lines:
+  - id:      M1.1.S99.010
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Fourteen. Sealed, all of them."
+    shot:    "Map table. The crates are open on it where the four piles were."
+
+  - id:      M1.1.S99.020
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Thirty a piece."
+
+  - id:      M1.1.S99.030
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Say the number."
+
+  - id:      M1.1.S99.040
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Four hundred and twenty."
+
+  - id:      M1.1.S99.050
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Again."
+
+  - id:      M1.1.S99.060
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Four hundred and twenty."
+
+  - id:      M1.1.S99.070
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Thirteen. We went up there with thirteen and we came back with--"
+
+  - id:      M1.1.S99.080
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Put them in the rack before anybody says a number out loud again."
+    note:    "The want, enacted: she stops the celebration before it starts. The obstacle is that nobody in the room can stop counting."
+
+  - id:        M1.1.S99.090
+    speaker:   REYES
+    voice:     elin_reyes
+    condition: story.m11_zero_casualty == false
+    text:      "One through the meat above the knee. He keeps the leg. He does not keep the week."
+    note:      "Her first complete clinical sentence in the game. No contractions."
+
+  - id:        M1.1.S99.100
+    speaker:   REYES
+    voice:     elin_reyes
+    condition: story.m11_zero_casualty == true
+    text:      "I opened nothing tonight. Four units of plasma. Still four."
+    note:      "Pays off S01.100 exactly. The optional objective is rewarded with an inventory line, not a compliment."
+
+  - id:      M1.1.S99.110
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "That is the whole report."
+
+  - id:      M1.1.S99.120
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Crate two is ration tabs and a spool of comm wire."
+
+  - id:        M1.1.S99.130
+    speaker:   DEX
+    voice:     dex_callum
+    condition: story.m11_zero_casualty == true
+    tags:      [amused]
+    text:      "Four hundred rounds in that crate and the wire is the part I'll dream about."
+    note:      "Dex joke 3 of 3. Clean run only - 18.6 allows zero comic beats in aftermath."
+
+  - id:      M1.1.S99.140
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "The volley went on his mark."
+
+  - id:      M1.1.S99.150
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Their leader walked last. He walked first, and he never learned why."
+
+  - id:      M1.1.S99.160
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Lamps went out and he came straight up the column. Like he was told to."
+    shot:    "It is the man who said On the new one, right. He is not saying it that way now."
+
+  - id:      M1.1.S99.170
+    speaker: VOSS
+    voice:   voss
+    text:    "Two of them went down the low rail with five rounds between them."
+    shot:    "He is looking at the two, not at Mara."
+    note:    "The turn. He hands the credit to the people who did the work before anybody can finish giving it to him."
+    variants:
+      pragmatist: "It was a lighting circuit. It would have dropped without me."
+      idealist:   "Two went down the low rail with five rounds. Start there."
+      personal:   "{name} took the low rail first. Nobody asked for that."
+      strategic:  "The circuit did it. Anybody standing where I stood sees it."
+
+  - id:      M1.1.S99.180
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Write it in the book anyway."
+
+  - id:        M1.1.S99.190
+    speaker:   REYES
+    voice:     elin_reyes
+    condition: story.m11_conscript_spared == true
+    text:      "Somebody used a pressure dressing tonight. It is not in the bag and it is not on anyone in this room."
+    shot:      "Nobody answers her. She writes something down and does not ask twice."
+    note:      "P5-a echo, spared branch. A fact about the inventory. No verdict, and she does not guess out loud."
+
+  - id:        M1.1.S99.200
+    speaker:   DEX
+    voice:     dex_callum
+    condition: 'story.m11_conscript_choice == "finished"'
+    text:      "Count says one round short. Somebody spent one on the way out."
+    shot:      "He goes back to the wire. Nobody takes it up."
+    note:      "P5-a echo, finished branch. The ledger does not balance and nobody explains it."
+
+  - id:      M1.1.S99.210
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "The crates are the smallest thing we took."
+
+  - id:      M1.1.S99.220
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "What's bigger than four hundred rounds?"
+
+  - id:      M1.1.S99.230
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "They'll count six men missing and write it up as theft."
+    note:    "Visibility 1/8. The Dominion under-reacts and a human being explains it away as good luck - the P4 pattern this mission lays the first stone of."
+
+  - id:      M1.1.S99.240
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Theft."
+
+  - id:      M1.1.S99.250
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Nobody down there has said our name yet. That's worth more than the wire."
+
+  - id:      M1.1.S99.260
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [exhausted]
+    text:    "Count it into the book. Then sleep."
+    shot:    "She leaves first. Voss stays at the table with the open crate and does not touch it."

@@ -15,7 +15,7 @@ turn:         "Dex talks them down a route he has never walked, is right, and ca
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        185
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, two Ember fighters, DEX (radio)
@@ -32,4 +32,150 @@ words:        0
 # writer:    Dex never finishes a sentimental sentence. The thank-you must land on him
 #            and bounce off in the same breath.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# p4-a:      .100 and .110. Two vehicles for six dead men, and the only reaction is
+#            relief - "I'll take it". Nobody wonders. In act 4 this is allocation; here
+#            it is a good night. Not a mystery, exactly as the stub demands.
+# dex:       .230 is the deflection, and it is NOT one of his three jokes. The thank-you
+#            lands and bounces inside one breath: he gives the credit to a dead surveyor
+#            and hands out a maintenance task in the same line. .240 is his fear coming
+#            back out as procedure.
+# slow one:  the obstacle is the load, not a wound. That keeps the scene identical in the
+#            zero-casualty run, where nobody should be limping.
+# variance:  1 w (".250 Go.") to 16 w (.230) = 16x.
+# jokes:     none in this scene. See S01 (1), S02 (2), S99 (3, clean run only).
+
+lines:
+  - id:      M1.1.S06.010
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Two crates. Both sealed."
+
+  - id:      M1.1.S06.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Open the light one."
+
+  - id:      M1.1.S06.030
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Magazines. Sealed. Fourteen of them."
+    shot:    "He does not shout it. He holds the lid open and lets the others come and look."
+    note:    "The why of the whole mission, in four words and a lid. Counted again in S99."
+
+  - id:      M1.1.S06.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Both crates come with us."
+
+  - id:      M1.1.S06.050
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "The hoist won't clear the stair."
+
+  - id:      M1.1.S06.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Take the drum off the frame and sling it on the strap."
+
+  - id:      M1.1.S06.070
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    tags:    [exhausted]
+    text:    "Twenty kilos and a stair. I can manage one of those."
+
+  - id:      M1.1.S06.080
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Lights at the north gate."
+
+  - id:      M1.1.S06.090
+    speaker: VOSS
+    voice:   voss
+    text:    "Count them."
+
+  - id:      M1.1.S06.100
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Two vehicles. That's all of it. Two."
+
+  - id:      M1.1.S06.110
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Two. For six of theirs. I'll take it."
+    note:    "P4-a, light. Relief, not suspicion. Nobody explains it and nobody asks."
+
+  - id:      M1.1.S06.120
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Then we're not going that way."
+
+  - id:      M1.1.S06.130
+    speaker: VOSS
+    voice:   voss
+    text:    "Dex. The maintenance runs under the checkpoint. Do they still reach the coolant stair?"
+
+  - id:      M1.1.S06.140
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Hold. Pre-Dominion survey. Paper. Half of it's water damage."
+
+  - id:      M1.1.S06.150
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Drain gallery under the weighbridge. Runs east. Comes out behind the smelter, in the scrap."
+
+  - id:      M1.1.S06.160
+    speaker: DEX
+    voice:   dex_callum
+    tags:    [nervous]
+    text:    "Nobody's walked it. Not since the survey, so if the roof's come in--"
+
+  - id:      M1.1.S06.170
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Is it there or is it not?"
+
+  - id:      M1.1.S06.180
+    speaker: DEX
+    voice:   dex_callum
+    text:    "It's on the paper."
+    note:    "18.4 Reyes never guesses out loud; Dex does the opposite - he tells you exactly how thin his certainty is, and is right anyway."
+
+  - id:      M1.1.S06.190
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Take the gallery."
+
+  - id:      M1.1.S06.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Extraction through the scrap yard. Four of us, two crates."
+
+  - id:      M1.1.S06.210
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Grate's here. He had it."
+
+  - id:      M1.1.S06.220
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Dex. That was clean."
+
+  - id:      M1.1.S06.230
+    speaker: DEX
+    voice:   dex_callum
+    text:    "That's the survey, not me. And check the housing when you're in. The set's been clipping."
+    note:    "The thank-you lands and bounces in one breath. He never finishes a sentimental sentence - he does not start one."
+
+  - id:      M1.1.S06.240
+    speaker: DEX
+    voice:   dex_callum
+    text:    "And label the crates before they hit the floor. Please."
+
+  - id:      M1.1.S06.250
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Go."
+    shot:    "The grate closes. Sodium light on wet scrap, and then nothing on the deck but a hoist."

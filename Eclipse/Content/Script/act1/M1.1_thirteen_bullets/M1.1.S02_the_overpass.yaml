@@ -15,7 +15,7 @@ turn:         "She tells him what she actually expects to lose tonight, and it i
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        167
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, two Ember fighters, DEX (radio only)
@@ -33,4 +33,139 @@ words:        0
 #            practical things ("stay left") but NEVER about the cause - that word is
 #            reserved for M1.8.S08 and is architect ruling AR-5.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      walk-and-talk = 10-25 (18.3). Read as CEILING; ceiling respected (longest 19).
+#            Lines below 10 are deliberate - see the band escalation in S01's notes.
+# variance:  1 w ("Ours.") to 19 w (.120) = 19x.
+# ar-5:      no "you" and no "I" from Mara in this scene. Her deflections are route (.110)
+#            and rain (.120), per the obstacle.
+# name-slot: .080 uses the {name} roster slot (18.5 rule 6, AR-10). It is a LIVING cell
+#            member who did not come out tonight, so it cannot break on a dead roster
+#            entry, and it is pronoun-free so it cannot break on gender. This is the
+#            "a name the player does not know yet" beat without inventing canon.
+# jokes:     Dex joke 2 of 3 is .050 (the transmitter). See S01 (1) and S99 (3).
+# omitted:   Enforcer unit-marking plant. Q-2 is still open, so it is not written.
+#            BEATS section 7 permits it "only if Q-2 is green". It is not.
+
+lines:
+  - id:      M1.1.S02.010
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Rain's warm. Stacks are running somewhere."
+
+  - id:      M1.1.S02.020
+    speaker: VOSS
+    voice:   voss
+    text:    "Three stacks lit. That's a night pour."
+    shot:    "Wide. The overpass rail, the crane forest, amber smog going orange under the sodium."
+
+  - id:      M1.1.S02.030
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Spire Levels are up. White as a clean shirt."
+
+  - id:      M1.1.S02.040
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Keep off the joint plates. They ring."
+
+  - id:      M1.1.S02.050
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Check, check. If that comes through like a man in a pipe, that's the housing, not the range."
+    note:    "Dex joke 2 of 3. Hardware humour, and he is telling them in advance which failure to expect."
+
+  - id:      M1.1.S02.060
+    speaker: VOSS
+    voice:   voss
+    text:    "Reads clear."
+
+  - id:      M1.1.S02.070
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Don't say that. It hasn't done a full hour yet."
+
+  - id:      M1.1.S02.080
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Whose call was the span in the end? Yours, or {name}'s?"
+
+  - id:      M1.1.S02.090
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Ours."
+    shot:    "She keeps walking. Voss is half a step behind her and hears it land on him too."
+    note:    "18.4 Mara: plural where anyone else says I. One word answers a name question."
+
+  - id:      M1.1.S02.100
+    speaker: VOSS
+    voice:   voss
+    text:    "If the volley doesn't reach the leader, what's the way off the deck?"
+    note:    "The want: he asks about failure through logistics so he does not have to ask it out loud."
+
+  - id:      M1.1.S02.110
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "North pier. Two flights down to the weighbridge."
+
+  - id:      M1.1.S02.120
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Rain'll be in by then. Warm rain keeps the plates tacky. Good for the boots, bad for the sound."
+
+  - id:      M1.1.S02.130
+    speaker: VOSS
+    voice:   voss
+    text:    "And if the pier is held--"
+
+  - id:      M1.1.S02.140
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Nobody holds a pier for a supply run. They hold gates."
+
+  - id:      M1.1.S02.150
+    speaker: VOSS
+    voice:   voss
+    text:    "And if it's held."
+    shot:    "He is not looking at her. He is thumbing rounds out of the magazine and back in."
+    note:    "No question mark. He does not drop it, and he does not raise his voice to keep it."
+
+  - id:      M1.1.S02.160
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "One."
+
+  - id:      M1.1.S02.170
+    speaker: VOSS
+    voice:   voss
+    text:    "One."
+
+  - id:      M1.1.S02.180
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "That's the planning number. Four go up. Three come down."
+    note:    "The turn. Smaller than he feared, worse than he wanted. No explanation follows - that is the crack in her, and one is all she gets (BEATS section 8)."
+
+  - id:      M1.1.S02.190
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Say again? You're breaking on the low end."
+
+  - id:      M1.1.S02.200
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Nothing on the air."
+
+  - id:      M1.1.S02.210
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Two minutes to the horn."
+
+  - id:      M1.1.S02.220
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Positions. Nobody sits on the plates."
+    shot:    "They spread out along the rail. Voss stays where he is, magazine open in his hand."
+    note:    "Hands directly into S03: he is already counting when she reaches him."

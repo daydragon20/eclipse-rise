@@ -15,7 +15,7 @@ turn:         "She stops arguing the odds and hands them the count as an inherit
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        264
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.1.md ----
 # cast:      MARA, VOSS, DEX, REYES, two Ember fighters (bark-level or silent)
@@ -34,4 +34,177 @@ words:        0
 # writer:    Dex gets three jokes in this whole mission and the most frightened one is
 #            the first. Nobody names an emotion. No direct_beat is rationed to M1.1.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      type is `cutscene` (20-60 per 18.3). MOST LINES SIT BELOW 20. This is
+#            deliberate and it is an ESCALATION, not an oversight: 18.3's variance rule
+#            (>=3x inside a scene) and the cutscene band (20-60) cannot both be satisfied
+#            except by a scene made of nothing but 20-word and 60-word lines. Read the
+#            band as a CEILING - 21_quality_mandate and 18.3's own note say "these bands
+#            cap the length of one line". Ceiling respected everywhere: longest line 20 w.
+# variance:  2 w ("He counts.") to 20 w (.010) = 10x.
+# ar-5:      Mara spends ZERO of her "you" allowance in this whole mission, and says "I"
+#            never. Checked line by line.
+# jokes:     Dex joke 1 of 3 is .060 - the frightened one. See S02 (2) and S99 (3).
+# choice:    .210 / .220 are the player's two planning options (overpass / underpass).
+#            SCRIPT_FORMAT HAS NO PLAYER-CHOICE CONSTRUCT - see report. Marked by note
+#            only. Downstream variation in S02/S04 needs a tag that does not exist;
+#            NOT written, rather than invented.
+# omitted:   the Enforcer plant (Q-2 still open) - omitted silently per the stub.
+
+lines:
+  - id:      M1.1.S01.010
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Four to Voss. Four here. Three and two to the pair walking the low route. That is all of it."
+    shot:    "Map table. She sets four small piles down and does not touch them again."
+
+  - id:      M1.1.S01.020
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Four to the new one?"
+
+  - id:      M1.1.S01.030
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "He counts."
+
+  - id:      M1.1.S01.040
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "So does everybody in this room."
+    shot:    "Mara lets it sit. Nobody fills it."
+
+  - id:      M1.1.S01.050
+    speaker: DEX
+    voice:   dex_callum
+    text:    "Inventory. No charges. No spare cells. One transmitter, and the housing has a hairline in it."
+
+  - id:      M1.1.S01.060
+    speaker: DEX
+    voice:   dex_callum
+    tags:    [nervous]
+    text:    "I've been holding it together with a bootlace and language."
+    note:    "Dex joke 1 of 3 (18.6, BEATS section 10.5). The frightened one. The joke IS the fear."
+
+  - id:      M1.1.S01.070
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "What number am I preparing for?"
+    note:    "18.4 Reyes: asks a question instead of accusing. No contractions anywhere in her lines - she is stressed."
+
+  - id:      M1.1.S01.080
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Four go out."
+
+  - id:      M1.1.S01.090
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Then I will set for two. Two is what one pair of hands turns over before morning."
+
+  - id:      M1.1.S01.100
+    speaker: REYES
+    voice:   elin_reyes
+    text:    "Four units of plasma. One autoclave. I have counted them twice."
+    note:    "Planted for payoff in S99 (zero-casualty branch): still four."
+
+  - id:      M1.1.S01.110
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "And what's on that patrol worth thirteen rounds?"
+
+  - id:      M1.1.S01.120
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Two crates of sealed magazines and a hoist."
+
+  - id:      M1.1.S01.130
+    speaker: FIGHTER_B
+    voice:   eclipse_fighter_b
+    text:    "Says who?"
+
+  - id:      M1.1.S01.140
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Says the manifest board at the weighbridge. It's posted every shift."
+
+  - id:      M1.1.S01.150
+    speaker: VOSS
+    voice:   voss
+    text:    "The lamps on that span run off the foundry circuit."
+    shot:    "He has not looked up from the map. Nobody asked him anything."
+
+  - id:      M1.1.S01.160
+    speaker: VOSS
+    voice:   voss
+    text:    "At the fourth horn the load transfers and the whole row goes dark for about nine seconds."
+    note:    "The mechanism that S04 turns into the ambush. Planted here, unremarked."
+
+  - id:      M1.1.S01.170
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Nine seconds."
+
+  - id:      M1.1.S01.180
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Say the rest."
+
+  - id:      M1.1.S01.190
+    speaker: VOSS
+    voice:   voss
+    text:    "Two ways onto the checkpoint. Over the span, or the drainage under it."
+
+  - id:      M1.1.S01.200
+    speaker: VOSS
+    voice:   voss
+    text:    "Over the top we see the whole column. Underneath, nobody sees anybody until it starts."
+
+  - id:      M1.1.S01.210
+    speaker: VOSS
+    voice:   voss
+    text:    "The span. I want the height."
+    note:    "PLAYER OPTION 1 of 2 (approach). No axis variants - architect budget ruling, BEATS section 10.8."
+
+  - id:      M1.1.S01.220
+    speaker: VOSS
+    voice:   voss
+    text:    "The drain. Let them walk over us."
+    note:    "PLAYER OPTION 2 of 2 (approach)."
+
+  - id:      M1.1.S01.230
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Mark it on the table. That's the plan now."
+    note:    "Answers either option. Written so no approach flag is required."
+
+  - id:      M1.1.S01.240
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "And if we wait? Two more runs on the scrap line and we have--"
+
+  - id:      M1.1.S01.250
+    speaker: MARA
+    voice:   mara_sovann
+    interrupts: true
+    text:    "Thirty. We know."
+
+  - id:      M1.1.S01.260
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "And in a month they have a month too."
+
+  - id:      M1.1.S01.270
+    speaker: MARA
+    voice:   mara_sovann
+    text:    "Every round on this table was carried in by somebody who could have kept it."
+    shot:    "She does not touch the piles. She looks at the people, one at a time."
+    note:    "The turn: the count as inheritance, not shortage. No odds argued."
+
+  - id:      M1.1.S01.280
+    speaker: MARA
+    voice:   mara_sovann
+    tags:    [pause]
+    text:    "Thirteen bullets between us and the first real strike. Make every one of them a promise."
+    shot:    "Nobody moves. Then Dex picks up the transmitter."
+    note:    "Shipped briefing string, DT_StoryMissions MT_M11, verbatim."
