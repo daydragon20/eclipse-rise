@@ -147,6 +147,12 @@ Dit is de moeilijkste, want hij moet **retroactief kloppen met wat de speler in 
 
 **Deze groep is het fundament van twist 4 en hij mag niet verwateren.** P4-d is bovendien het antwoord op een ontwerpprobleem dat anders in M1.8 zou bijten: waarom overleeft iemand een val die de hele cel had moeten kosten? Omdat hij daarvoor bedoeld was.
 
+> **RULING L1-R17 — de wegverklaringen zijn vlak, niet gevat.** De eerste twee zijn allebei citeerbaar geschreven: *"Police always come afterwards."* (P4-a) en *"Freight yards get freight guards."* (P4-b). Allebei goede regels, en precies daarom een probleem. Een aforisme is wat een speler onthoudt en teruggaat bekijken. **Vier daarvan maakt de vórm de tell:** de speler leert dat een net spreekwoordje betekent dat het spel iets verbergt, en lost twist 4 op door proza te herkennen in plaats van doordat act 4 het verdient. Twee is toeval; vier is een systeem.
+>
+> **P4-c en P4-d zijn dus vlak.** Saai en waar, niemand polijst ze, geen ritme, geen symmetrie, geen slotbeat. P4-d is bovendien de zwakste van de vier by design — Mara herhaalt zichzelf onder druk, en een gepolijst epigram is het tegendeel van een vrouw wier verklaringen opraken. **Als het goed op een poster zou staan, herschrijf het.**
+>
+> Gevonden door de criticus over twee missies heen. Dit is precies het soort fout dat één schrijver nooit ziet, want in zijn eigen missie is het gewoon een goede regel.
+
 ### T5 — Kaine's geweten *(betaald: act 4, voorwaardelijk)*
 
 Kaine komt niet voor in act 1. Wat wél in act 1 begint, is de **telling** waar haar breuk op rust: burgerslachtoffers laag én conscripten gespaard.
@@ -213,7 +219,7 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Char.CinderNamed` | M1.8.S99 | barks (callsign-gebruik), act 2+ |
 | `Story.Choice.M11_Conscript.{Finished,Left,Bound}` | M1.1.S05 | T5-telling — **`.Bound` telt als genade** |
 | `Story.Choice.M12_Ghost` | M1.2 debrief | Veil-alertheid act 1 |
-| `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` | M1.5.S04 | M1.6.S06, Sela-reputatie |
+| `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` | M1.5.S04 | **M1.6.S06 (.250/.260/.270 — drie takken, verplicht)** · M1.8.S99 (alleen `.Warned`: P3-d-verwisseling) · Sela-reputatie |
 | `Story.Choice.M15_IronChorusPact` | M1.5.S99 | M1.8.S99 stemming, act 2 |
 | `Story.Choice.M16_Train.{Run,Emptied,Split}` | M1.6.S04 | wervingsinstroom, onrust |
 | `Story.Choice.M16_LettersAllowed` | M1.6.S06 | draad *Conscript Letters* → act 4 |
@@ -230,6 +236,10 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Thread.WallOpen` | M1.8.S90 | act 2–4 |
 
 **Regel:** een `Story.Clue.*` verandert nooit gameplay in act 1. Hij bestaat om act 3 en 4 te laten weten wat de speler heeft gezien, zodat de betaling zich naar hem voegt. Dat is de mechanische kant van "geen wending zonder plant".
+
+> **De kolom "gelezen door" is niet documentatie — hij is de veiligheidscontrole, en ik heb hem één keer niet gebruikt (L1-R12).** Toen L1-R3 de shift-baas-vlag van boolean naar drie bladeren omzette, patchte ik de zetter en dit register, en niet de lezer — die in een andere missie staat, bij een andere schrijver. Eén op de drie spelers zou de verkeerde sluitscène hebben gekregen.
+>
+> **Regel: een vlagvormwijziging is pas doorgevoerd als elke cel in "gelezen door" is nagelopen en gepatcht.** Een lege of vage cel in die kolom is zelf een bevinding: een vlag die niemand leest is een keuze zonder gevolg, en een lezer die hier niet staat is een breuk die niemand ziet tot na generatie.
 
 ### Meerwaardige keuzes — ruling L1-R3
 `StoryFlags` is een `TArray<FGameplayTag>` zónder waarden, dus een keuze met drie uitkomsten wordt **drie elkaar uitsluitende bladeren onder één ouder**. De ouder blijft opvraagbaar als "is deze keuze gemaakt". Geen schemawijziging. **`Story.Choice.M11_ConscriptSpared` uit de eerste versie van dit document is ingetrokken** — één waarheid, één opslagplek.

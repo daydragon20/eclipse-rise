@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 CASTING = ROOT / "progress_media" / "casting"
 CHOICE = ROOT / "phase0" / "CASTING_KEUZE.json"
 OUT = ROOT / "phase0" / "CASTING_RESOLVED.json"
+KEYMAP = ROOT / "Eclipse" / "Content" / "Audio" / "VoiceKeyMap.json"
 
 
 def ordered_candidates():
@@ -146,6 +147,36 @@ def main() -> int:
             "finalisten": finalists,
         }
 
+    # ---- pool roles: bind each script slot to an actual voice ---------------
+    # A bark register is not one character. The scripts address eclipse_fighter_a
+    # .. _d as four separate people, and §18.5 wants that: one voice for every
+    # Ember fighter turns four people into one man. So a pool role needs as many
+    # distinct voices as it has slots, and each slot must end up bound to a
+    # voice_id. Binding is by the owner's own ranking: slot A = pick 1, B = 2...
+    keymap = json.loads(KEYMAP.read_text("utf-8"))["map"] if KEYMAP.is_file() else {}
+    slots_needed = {}
+    for key, e in keymap.items():
+        if "slot" in e:
+            slots_needed.setdefault(e["role"], set()).add(e["slot"])
+    unbound = []
+    for rid, need in sorted(slots_needed.items()):
+        r = resolved.get(rid)
+        if r is None:
+            continue
+        fin = sorted(r["finalisten"], key=lambda f: f["rang"])
+        binding, missing = {}, []
+        for i, slot in enumerate(sorted(need)):
+            if i < len(fin):
+                binding[slot] = {"voice_id": fin[i]["voice_id"],
+                                 "stem": fin[i]["stem"]}
+            else:
+                missing.append(slot)
+        r["slot_binding"] = binding
+        r["slots_needed"] = sorted(need)
+        r["slots_unbound"] = missing
+        if missing:
+            unbound.append((rid, r["label"], sorted(need), len(fin), missing))
+
     lic = [(rid, f["stem"]) for rid, r in resolved.items()
            for f in r["finalisten"] if f["bron"] == "voice_library"]
 
@@ -205,6 +236,13 @@ def main() -> int:
         for v, rs in reserve_only.items():
             print(f"  {rs[0][1]}: " + ", ".join(f"{r[0]} (keus {r[2]})" for r in rs))
 
+    if unbound:
+        print("\nPOOLROLLEN MET ONBEZETTE SLOTS — deze regels worden STIL overgeslagen:")
+        for rid, label, need, have, missing in unbound:
+            print(f"  {label}: de scripts gebruiken {len(need)} sprekers "
+                  f"({', '.join(need)}), er zijn {have} stemmen gekozen.")
+            print(f"    onbezet: {', '.join(missing)} — kies er nog "
+                  f"{len(missing)} voor deze rol.")
     for p in problems:
         print("PROBLEEM:", p)
     print(f"\ngeschreven: {OUT.relative_to(ROOT)}")

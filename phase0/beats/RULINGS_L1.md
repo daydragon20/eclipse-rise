@@ -263,4 +263,105 @@ De lasbeat in M1.8.S90 houdt dus zijn opzet. Dunner, niet stuk.
 
 **Wat wél verandert: de schrijfvolgorde.** De twaalf hubgesprekken concurreren deze maand niet meer om credits, dus ze gaan naar achteren — ná de beat-sheets van acts 2–4. **Met één uitzondering: `HUB.A1.mara_letters` wordt nu geschreven**, want act 2's Mara-opnames worden deze week tegen die scène aan geschreven en ze moeten in dezelfde stem staan.
 
-**Openstaande vraag voor `voice-director`, met het rekenwerk erbij.** Bevinding C-6 stond al open: act 1's verhaaldialoog is ~17.200 te genereren woorden (12.800 script + Voss' gender-verdubbeling + as-varianten) ≈ **~103.000 credits**, tegen een tier 2 dat toen 90.000 was. Bij een totaal van 131.000 kan tier 2 die 103.000 vrijwel zeker niet meer dragen naast tier 1's barks. **De knop is Q-7, het Voss-variantbeleid — niet het aantal scènes.** Varianten zijn de enige post in act 1 die je kunt halveren zonder een beat te verliezen; scènes schrappen kost plant-dragers, en AR-9 zegt dat die verplicht zijn. Ik heb de nieuwe tierverdeling niet gezien, dus dit is een vraag en geen ruling.
+**Openstaande vraag voor `voice-director`, met het rekenwerk erbij (zie ook L1-R15).** Bevinding C-6 stond al open: act 1's verhaaldialoog is ~17.200 te genereren woorden (12.800 script + Voss' gender-verdubbeling + as-varianten) ≈ **~103.000 credits**, tegen een tier 2 dat toen 90.000 was. Bij een totaal van 131.000 kan tier 2 die 103.000 vrijwel zeker niet meer dragen naast tier 1's barks. **De knop is Q-7, het Voss-variantbeleid — niet het aantal scènes.** Varianten zijn de enige post in act 1 die je kunt halveren zonder een beat te verliezen; scènes schrappen kost plant-dragers, en AR-9 zegt dat die verplicht zijn. Ik heb de nieuwe tierverdeling niet gezien, dus dit is een vraag en geen ruling.
+
+---
+
+## Ronde 3 — 2026-07-31, uit de critic-doorloop van M1.5 (GO) en M1.6 (4× NO-GO)
+
+### L1-R12 — De vlagbreuk tussen M1.5.S04 en M1.6.S06 was van mij
+
+**Dit is mijn fout en het is de duurste van de twee missies.** Ruling L1-R3 maakte van de shift-baas-keuze drie bladeren. Ik heb dat doorgevoerd naar de **zetter** (M1.5.S04) en naar het vlaggenregister — en niet naar de **lezer**, die in een andere missie staat, bij een andere schrijver. M1.6.S06 las nog `story.choice_m15_shiftbossspared`, een boolean die niets zet en die de derde uitkomst niet kán uitdrukken.
+
+Wat de speler die **waarschuwde** zou hebben gekregen: hij zei tegen de man *"be gone by the second horn"*, hoorde *"He's running. Wonder who to."* — en kreeg in de scène die de draad **sluit** ofwel een gebeurtenis die zijn eigen keuze tegenspreekt, ofwel de gedode tak. Eén op de drie spelers, op het sluitmoment, en M1.8 mag het niet heropenen.
+
+**De les, en die is generaliseerbaar:** als een vlag van vorm verandert, breekt het bij de **lezer**, en de lezer staat per definitie in een andere missie dan de zetter. Ik heb bij L1-R3 de setter-kant gepatcht omdat die zichtbaar was in het bestand dat ik aan het bewerken was. Vanaf nu: **een vlagvormwijziging is pas doorgevoerd als de lezers geteld en gepatcht zijn**, en het vlaggenregister in `ACT1_OVERVIEW.md` §6 krijgt daarom per vlag een *gelezen door*-kolom die niet leeg mag zijn.
+
+En: **mijn eigen `SCRIPT_FORMAT` §6-controle "condition resolves" had dit gevangen.** Ik heb hem gespecificeerd en hij bestaat nog niet in code. Dat is het argument om `validate_script.py` vóór act 2 te bouwen en niet erna — hij vangt de fouten van de architect net zo goed als die van de schrijvers.
+
+De drie takken en de eisen voor de nieuwe `.270` staan in de stub. De regel zelf schrijft de schrijver; ik heb er één eis aan toegevoegd die de criticus niet kon zien: **de warned-tak is waar Sela het minst zeker is**, want dat is de tak waarin Voss slim was in plaats van principieel, en haar arc gaat over wat slim kost.
+
+**Continuïteit die de warned-tak opent, en dus meteen sluit:** een gewaarschuwde shift-baas die wegloopt, kent de gezichten van twee cellen. Dat is een levend los eind. Opgelost in M1.8.S99: in die tak wordt één van P3-d's drie verklaringen *"de man die we lieten lopen"* **in plaats van** een van de andere. Drie blijft drie. Nooit vier — een vierde maakt van P3-d een opsomming en dan is het geen wond meer.
+
+---
+
+### L1-R13 — `split` is pact-gated, en de limited-tak krijgt géén vervangende derde optie
+
+De escalatie van de M1.5.S99-schrijver was juist. Drie redenen, op volgorde van gewicht:
+
+1. **Fictie.** Je draagt geen wagon met mensen over aan een cel waarmee je geen werkafspraak hebt. Er ís geen mechanisme om ze aan over te dragen — het pact *is* dat mechanisme. In de limited-tak is de Iron Chorus een bondgenoot van gelegenheid in dezelfde straat, geen partij die custody overneemt. Dit is geen beperking om de netheid; het is de afwezigheid van iets dat nooit gebouwd is.
+2. **Structuur.** §2.11 vraagt van act 2 fusie, schisma óf tragedie, en dat kan alleen als de twee act-1-takken onderscheidbaar blijven. Met `split` in beide takken convergeren ze op identiek act-2-bewijs. Precies het argument van de schrijver.
+3. **Karakter.** In de limited-tak zei Voss: *"We fight beside them. We don't take names off a list."* Een spel dat hem één missie later de namen-van-een-lijst-optie aanbiedt, heeft van die zin decoratie gemaakt.
+
+**En de limited-tak krijgt twee opties, wat compleet is — niet later "repareren" met een verzonnen derde.** Run/empty ís het §2.7-archetype *The Cost of Speed*, op zichzelf heel. Dat het pact een donkerdere derde optie ontgrendelt, is de juiste beloningsvorm: je alliantie koopt meer ruimte én meer touw.
+
+---
+
+### L1-R14 — Elf is het getal van Ember Cell en van niets anders
+
+De melding noemde vier banen voor het getal elf. **Ik heb geteld in plaats van aangenomen, en het zijn er negentien, over minstens acht betekenissen:** mensen, kooien, minuten, meters, geweren, patrouilledagen, verhoordagen, transportdagen.
+
+Dat is geen botsing meer, dat is **verzadiging** — en het is de §18.9 D-fout in zijn zuiverste vorm: vijf schrijvers grepen onafhankelijk naar hetzelfde getal omdat de cel elf is en het aanvoelde als het getal van de act, en niemand kon het totaal zien. Precies waarom L1 boven L2 zit.
+
+**Regel: elf betekent de omvang van Ember Cell.** Bunks tellen mee — het aantal kooien ís het aantal mensen, en dat is een goed motief. De elf opnames in M1.8.S91 blijven; ze spiegelen de cel bewust en zijn het beste gebruik in de act.
+
+**Elk gebruik waarin elf iets anders meet, wijkt.** Niet in paniek — bij de eerstvolgende keer dat die missie toch open is.
+
+Twee uitzonderingen op het tempo, en allebei om kosten:
+
+| Geval | Besluit |
+|---|---|
+| **Brick, M1.6.S03 — *"Krad-9. Eleven days."*** | **Wijkt nu.** Drie scènes eerder betekent "eleven days" hoe lang een man een verhoor doorstond; Bricks regel landt daardoor als verhoor in plaats van transport, precies op het moment dat AR-11 betaalt. AR-11 heeft de **beat** nodig, niet het getal — elke duur die te lang aanvoelt in een kist doet hetzelfde werk voor nul kosten. M1.6 gaat toch terug. |
+| **De verhoorduur, M1.5.S03** | **Blijft staan.** M1.5 is GO en wordt niet heropend voor een getal. Op de lijst voor de act-1-continuïteitsdoorloop; als een latere missie elf nodig heeft voor de cel, wijkt deze dan. |
+
+De incidentele gevallen (meters, geweren, minuten, de dag-loop) wijken bij aanraking. Dat is een veegbeurt, geen noodgeval.
+
+---
+
+### L1-R15 — Drie woordtellingen, want één telt het verkeerde
+
+Overgenomen en uitgebreid. `words` alleen straft precies de scènes die `21_quality_mandate.md` vraagt: M1.5 meet 1.865 geschreven woorden tegen een norm van ~1.600 en lijkt opgeblazen; haal de ~50 variantregels eruit en een speelbeurt hoort ~1.250. **De scène was niet te lang, hij was goed vertakt, en de meter zei het omgekeerde van de waarheid.**
+
+Maar geen van beide getallen is het getal dat geld kost. Daarom drie, en het derde is nieuw:
+
+| Vraag | Veld |
+|---|---|
+| Heeft de schrijver genoeg werk geleverd? | `words` |
+| Is de scène de juiste lengte om te spelen? | `words_heard` |
+| **Wat kost dit om te genereren?** | **`words_generated`** |
+
+Een Voss-beat met vier assen kost **vier** generaties, acht met gender, en levert één regel aan `words_heard`. Act 1 begroten op `words` onderschat de uitgave; begroten op `words_heard` onderschat hem ernstig. **`words_generated` is de invoer voor Q-7** en het enige van de drie dat in een budget thuishoort. Staat in `SCRIPT_FORMAT` §4.
+
+---
+
+### L1-R16 — §18.9 B's fingerprint-check verwijst naar C1
+
+Juist gezien. B zakt letterlijk zodra één regel verplaatsbaar is, en dan zakt elke scène ooit geschreven — *"Move."* en *"Nine minutes."* horen bij niemand in het bijzonder en dat is goed. De fout is een **scène** waarvan de regels breed uitwisselbaar zijn, en de maat daarvoor is C1's striptest met 80%. §18.9 B is aangepast: scèneniveau, gescoord op C1's lat.
+
+---
+
+### L1-R17 — De wegverklaringen van twist 4 zijn vlak, niet gevat
+
+De scherpste vondst van deze ronde, en er was een criticus over twee missies heen voor nodig. De twee bestaande T4-wegverklaringen zijn allebei citeerbaar geschreven — *"Police always come afterwards."* en *"Freight yards get freight guards."* Allebei goede regels, en dát is het probleem.
+
+Een aforisme is precies wat een speler onthoudt en teruggaat bekijken. **Vier daarvan maakt de vórm de tell:** de speler leert dat een net spreekwoordje betekent dat het spel iets verbergt, en lost twist 4 op door proza te herkennen in plaats van doordat act 4 het verdient. Twee is toeval; vier is een systeem.
+
+**P4-c en P4-d zijn dus vlak.** Saai en waar, ongepolijst, geen ritme, geen slotbeat. P4-d is bovendien de zwakste van de vier by design — Mara herhaalt zichzelf onder druk, en een gepolijst epigram is het tegendeel van een vrouw wier verklaringen opraken. **Zou het goed op een poster staan, dan herschrijf je het.** Doorgevoerd in de stubs van M1.7.S03 en M1.8.S03 en in de plant/payoff-tabel.
+
+---
+
+### L1-R6b — `EMISSARY` toegevoegd aan de sprekertokens
+
+De M1.5-schrijver had gelijk: L1-R6's patroon rechtvaardigde zichzelf op AR-1/AR-10, en die gaan over Embers **gelederen** — dat dekte nooit de tweede hoofdrol van een dialoogmissie. Hem in `FIGHTER_C` begraven zou zestig regels onleesbaar maken voor de striptest, en dat is precies de test waar die scène voor bestaat.
+
+**En zijn §18.4-rij is opgenomen zoals bij Petra**, verbatim van de schrijver, want hij is beter dan de meeste bestaande rijen:
+
+| | |
+|---|---|
+| **Syntax** | Korte mededelende zinnen. **Telt waar een ander een bijvoeglijk naamwoord zou pakken.** |
+| **Tic** | Herhaalt het laatste woord van de ander vlak terug |
+| **Nooit** | **Gebruikt nooit iemands naam** — niet die van Mara, niet die van Voss, niet die van zichzelf. Dreigt nooit. |
+
+Dat "nooit" is het personage, geen tic: hij hoort bij een cel wier veiligheid haar trots is, en een man die geen namen afgeeft ís die leer, hoorbaar gemaakt. Het is bovendien met een regex te toetsen, en dat is waar §18.4 voor bestaat. Hij telt omdat hij Kessaraan is (ronde 1), maar hij telt **andere dingen** dan Ember: zij tellen wat ze hebben, hij telt wat dingen kosten.
+
+Dit maakt Q-4 minder dringend: een personage dat zelf geen namen gebruikt, heeft er zelf ook minder één nodig.

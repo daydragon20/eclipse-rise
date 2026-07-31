@@ -13,33 +13,89 @@
   "`variants` means one script key ships in several cast voices -- Voss is written",
   "once and voiced per player gender, so those lines cost double."
  ],
-
  "map": {
-  "mara_sovann":          {"role": "mara"},
-  "mara":                 {"role": "mara",   "alias_of": "mara_sovann"},
-  "dex_callum":           {"role": "dex"},
-  "dex":                  {"role": "dex",    "alias_of": "dex_callum"},
-  "elin_reyes":           {"role": "reyes"},
-  "reyes":                {"role": "reyes",  "alias_of": "elin_reyes"},
-  "brick":                {"role": "brick"},
-  "sela_vann":            {"role": "sela"},
-  "sela":                 {"role": "sela",   "alias_of": "sela_vann"},
-  "dahl_threx":           {"role": "threx"},
-  "malachar_vex":         {"role": "vex"},
-  "aegis":                {"role": "aegis"},
-
-  "voss":                 {"variants": ["voss_m", "voss_f"]},
-
-  "eclipse_fighter_a":    {"role": "eclipse_fighter",    "slot": "A"},
-  "eclipse_fighter_b":    {"role": "eclipse_fighter",    "slot": "B"},
-  "eclipse_fighter_c":    {"role": "eclipse_fighter",    "slot": "C"},
-  "eclipse_fighter_d":    {"role": "eclipse_fighter",    "slot": "D"},
-  "dominion_conscript_a": {"role": "dominion_conscript", "slot": "A"},
-  "dominion_conscript_b": {"role": "dominion_conscript", "slot": "B"},
-  "veil_operative_a":     {"role": "veil_operative",     "slot": "A"},
-  "veil_operative_b":     {"role": "veil_operative",     "slot": "B"}
+  "mara_sovann": {
+   "role": "mara"
+  },
+  "mara": {
+   "role": "mara",
+   "alias_of": "mara_sovann"
+  },
+  "dex_callum": {
+   "role": "dex"
+  },
+  "dex": {
+   "role": "dex",
+   "alias_of": "dex_callum"
+  },
+  "elin_reyes": {
+   "role": "reyes"
+  },
+  "reyes": {
+   "role": "reyes",
+   "alias_of": "elin_reyes"
+  },
+  "brick": {
+   "role": "brick"
+  },
+  "sela_vann": {
+   "role": "sela"
+  },
+  "sela": {
+   "role": "sela",
+   "alias_of": "sela_vann"
+  },
+  "dahl_threx": {
+   "role": "threx"
+  },
+  "malachar_vex": {
+   "role": "vex"
+  },
+  "aegis": {
+   "role": "aegis"
+  },
+  "iron_chorus_emissary": {
+   "role": "iron_chorus_emissary"
+  },
+  "voss": {
+   "variants": [
+    "voss_m",
+    "voss_f"
+   ]
+  },
+  "eclipse_fighter_a": {
+   "role": "eclipse_fighter",
+   "slot": "A"
+  },
+  "eclipse_fighter_b": {
+   "role": "eclipse_fighter",
+   "slot": "B"
+  },
+  "eclipse_fighter_c": {
+   "role": "eclipse_fighter",
+   "slot": "C"
+  },
+  "eclipse_fighter_d": {
+   "role": "eclipse_fighter",
+   "slot": "D"
+  },
+  "dominion_conscript_a": {
+   "role": "dominion_conscript",
+   "slot": "A"
+  },
+  "dominion_conscript_b": {
+   "role": "dominion_conscript",
+   "slot": "B"
+  },
+  "veil_operative_a": {
+   "role": "veil_operative",
+   "slot": "A"
+  },
+  "veil_operative_b": {
+   "role": "veil_operative",
+   "slot": "B"
+  }
  },
-
  "uncast": {
   "_readme": [
    "Speakers the scripts use that have NO role in 19_voice_production.md §19.3.",
@@ -47,10 +103,9 @@
    "the checker can report them as 'known and undecided' instead of failing every",
    "run, but they still cannot be generated until the owner casts them."
   ],
-  "iron_chorus_emissary": "63 lines. The largest uncast speaking part in Act 1.",
-  "dominion_officer":     "8 lines. Could reuse the Veil/Dominion register.",
-  "civilian_kessara_a":   "6 lines. Ambient Kessaran civilian.",
-  "civilian_kessara_b":   "5 lines. Ambient Kessaran civilian.",
-  "civilian_kessara_c":   "3 lines. Ambient Kessaran civilian."
+  "dominion_officer": "8 lines. Could reuse the Veil/Dominion register.",
+  "civilian_kessara_a": "6 lines. Ambient Kessaran civilian.",
+  "civilian_kessara_b": "5 lines. Ambient Kessaran civilian.",
+  "civilian_kessara_c": "3 lines. Ambient Kessaran civilian."
  }
 }

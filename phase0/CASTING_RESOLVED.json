@@ -193,7 +193,22 @@
      "keuze_index": 2,
      "rang": 2
     }
-   ]
+   ],
+   "slot_binding": {
+    "A": {
+     "voice_id": "SOYHLrjzK2X1ezoPC6cr",
+     "stem": "Harry"
+    },
+    "B": {
+     "voice_id": "TX3LPaxmHKxFdv7VOQHJ",
+     "stem": "Liam"
+    }
+   },
+   "slots_needed": [
+    "A",
+    "B"
+   ],
+   "slots_unbound": []
   },
   "veil_operative": {
    "label": "Veil-operative A/B",
@@ -220,7 +235,22 @@
      "keuze_index": 2,
      "rang": 2
     }
-   ]
+   ],
+   "slot_binding": {
+    "A": {
+     "voice_id": "SAz9YHcvj6GT2YYXdXww",
+     "stem": "River"
+    },
+    "B": {
+     "voice_id": "cjVigY5qzO86Huf0OWal",
+     "stem": "Eric"
+    }
+   },
+   "slots_needed": [
+    "A",
+    "B"
+   ],
+   "slots_unbound": []
   },
   "eclipse_fighter": {
    "label": "Eclipse-fighter A/B/C/D",
@@ -247,6 +277,26 @@
      "keuze_index": 2,
      "rang": 2
     }
+   ],
+   "slot_binding": {
+    "A": {
+     "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+     "stem": "Roger"
+    },
+    "B": {
+     "voice_id": "XrExE9yKIg1WjnnlVkGX",
+     "stem": "Matilda"
+    }
+   },
+   "slots_needed": [
+    "A",
+    "B",
+    "C",
+    "D"
+   ],
+   "slots_unbound": [
+    "C",
+    "D"
    ]
   },
   "voss_m": {

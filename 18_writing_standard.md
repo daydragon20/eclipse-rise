@@ -123,6 +123,11 @@ Not squad members, but they speak across acts and therefore need fingerprints. A
 | Character | Syntax fingerprint | Tic | Never |
 |---|---|---|---|
 | **Petra Voss** (55, the aunt) | **Imperatives with the pronoun elided.** Household and kitchen nouns where everyone around her uses operational ones. Second-shortest lines in the game. | Answers a question she will not answer by assigning a task | **Never says "you" or "your".** Never accepts thanks. Never names what was done to her. |
+| **The Iron Chorus emissary** (unnamed) | Clipped declaratives. **Counts where anyone else would reach for an adjective.** | Repeats the other person's last word back at them, flat | **Never uses a person's name** — not Mara's, not Voss's, not his own. Never threatens. |
+
+**The emissary's "never" is the point of the character, not a quirk.** He carries the second lead of a whole dialogue mission and belongs to a cell whose security is the thing it is proudest of; a man who does not hand over names is that doctrine made audible. It is also the rare fingerprint rule a validator can check with a regex, which is what §18.4 is for. Written by the M1.5 dialogue-writer and adopted verbatim — it is stronger than most rows above it.
+
+He counts because he is Kessaran (see `phase0/beats/RULINGS_L1.md`, ronde 1) — but he counts *different things* than Ember does: they count what they have, he counts what things cost.
 
 **Petra vs. Brick — the two laconic characters must not blur.** Both are terse, so §18.9 C1's strip test needs a mechanical difference: **Brick hands you a noun, Petra hands you a verb.** He answers with a name; she answers with a job. Two short lines side by side should be reassignable on that alone.
 
@@ -229,7 +234,7 @@ Never ship a line containing:
 | **Em-dash rate** | More than one dash-interrupted line per five lines |
 | **Explaining** | Any line whose sole function is to convey information the codex could carry |
 | **Articulacy** | Every character speaks in complete, grammatical sentences — nobody stumbles, repeats, or trails off |
-| **Fingerprint** | A line could be moved to another character without editing (§18.4 violation) |
+| **Fingerprint** | **Scene-level, scored by C1's 80% bar — not per line.** Taken literally per line this check fails every scene ever written, because "Move." and "Nine minutes." belong to nobody in particular and should. The failure is a *scene* whose lines are broadly interchangeable; the measure is C1's strip test. |
 | **Breath** | Any line that cannot be read aloud in one breath (§18.2 law 5) |
 
 ### C. The three tests

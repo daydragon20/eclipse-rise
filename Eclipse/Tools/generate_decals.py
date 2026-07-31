@@ -482,3 +482,93 @@ for _y in range(BLOB):
         r *= 1.0 + 0.14 * (_blob_edge[_x, _y] / 255.0)
         _blobpx[_x, _y] = int(_smoothstep((1.0 - r) / 0.55) * 255.0 + 0.5)
 save(blob, "T_blob_mask.png")
+
+# --- The junction seal: the Dominion signs its own crossing (20.2, O-11) -----
+#
+# WHY THIS EXISTS. The district's road markings were Earth traffic law, not
+# "yellow paint": two CONTINUOUS longitudinal edge lines plus a BROKEN centre
+# line is Vienna Convention annex 8 (continuous = edge of carriageway, broken =
+# lane divider, overtaking permitted), and yellow-on-grey is the North American
+# code for separating opposing traffic. A sign says "careful"; that markup
+# encodes a TRAFFIC RULE, which makes it the most specific piece of Earth
+# legislation anywhere in Kessara. §20.2 names the replacement itself:
+# "Lane-codes en sectornummers, niet straatnamen."
+#
+# The crossing is where the old grammar was loudest — two continuous lines
+# meeting two more — so it is where the new grammar has to be loudest back.
+# This is the state signing the junction it controls, in the signage family's
+# own words (Tools/generate_dominion_signs.py):
+#   rule 1  the Radiance is the root glyph: disc + rays.
+#   rule 3  the RING is the carrier that means "the state, non-negotiable".
+#   rule 4+5 the code strip beneath it: a FILLED leading mark = Dominion state
+#           authority, then tally groups (2, 5). Those two numbers are not
+#           decoration - T_sign_dom_lane_diff, already on the pole at the
+#           second crossing lamp, says "lane two peels off, lane five runs on".
+#           The ground now names the same two lanes the sign names. That is the
+#           whole "one civilization" claim made checkable.
+#
+# A MASK, not a luminance plate — for the same reason the rebel stencil is one.
+# Road paint that arrives as an opaque quad brings its own rectangle with it,
+# and a rectangle of ground paint on asphalt is the carpet-tile failure with a
+# seal printed on it. Coverage IS the paint, so the asphalt's own grain and
+# staining run straight through the worn patches.
+#
+# §20.5, and here it does structural work: this is a DRIVEN crossing (the
+# builder's own oil/rust staining is biased toward it). So the paint is eaten
+# by two wheel tracks, flaked at the edges, and thinnest where the traffic
+# actually runs — the wear tells you where the vehicles go, which is the
+# circulation cue the removed centre line used to carry.
+SEAL = 512
+_seal_rng = random.Random(776)
+_seal_flake = _value_noise(SEAL, 11, _seal_rng).load()
+_seal_grain = _value_noise(SEAL, 29, _seal_rng).load()
+_seal_edge = _wobble(_seal_rng, 4)
+
+seal_paint = Image.new("L", (SEAL, SEAL), 255)
+_sd2 = ImageDraw.Draw(seal_paint)
+# Everything is drawn as COVERAGE on a white sheet, then cut out below.
+_shape = Image.new("L", (SEAL, SEAL), 0)
+_sh = ImageDraw.Draw(_shape)
+SCXG, SCYG, SRG = 256, 214, 168
+_sh.ellipse([SCXG - SRG, SCYG - SRG, SCXG + SRG, SCYG + SRG], outline=255, width=21)   # rule 3
+for _i in range(12):                                                                   # rule 1
+    _ang = math.radians(15.0 + _i * 30.0)
+    _sh.line([SCXG + math.cos(_ang) * 78, SCYG + math.sin(_ang) * 78,
+              SCXG + math.cos(_ang) * 138, SCYG + math.sin(_ang) * 138], fill=255, width=13)
+_sh.ellipse([SCXG - 58, SCYG - 58, SCXG + 58, SCYG + 58], fill=255)
+# rules 4 + 5: the shared code strip, filled mark = state, then tallies (2, 5).
+_gw, _gg, _gs, _gh, _gy = 15, 19, 46, 46, 424
+_ggroups = (2, 5)
+_gtotal = sum(_g * (_gw + _gg) - _gg for _g in _ggroups) + _gs * (len(_ggroups) - 1)
+_gx = SCXG - (_gtotal + 84) // 2
+_sh.rectangle([_gx, _gy, _gx + 40, _gy + _gh], fill=255)
+_gx += 84
+for _g in _ggroups:
+    for _ in range(_g):
+        _sh.rectangle([_gx, _gy, _gx + _gw, _gy + _gh], fill=255)
+        _gx += _gw + _gg
+    _gx += _gs - _gg
+
+_spx = _shape.load()
+_seal = Image.new("L", (SEAL, SEAL), 0)
+_sealpx = _seal.load()
+for _y in range(SEAL):
+    for _x in range(SEAL):
+        _m = _spx[_x, _y] / 255.0
+        if _m <= 0.0:
+            continue
+        # Two wheel tracks eat the paint where the traffic actually runs.
+        for _tx in (168.0, 344.0):
+            _d = abs(_x - _tx)
+            if _d < 54.0:
+                _m *= 0.16 + 0.84 * _smoothstep(_d / 54.0)
+        # Flaking and grain: road paint is never a solid film.
+        _m *= 0.62 + 0.38 * (_seal_flake[_x, _y] / 255.0)
+        _m *= 0.80 + 0.20 * (_seal_grain[_x, _y] / 255.0)
+        _m += _seal_rng.uniform(-0.14, 0.14)
+        # And the quad edge reaches 0, the same discipline as every mask here.
+        _e = min(_x, _y, SEAL - 1 - _x, SEAL - 1 - _y)
+        if _e < 26:
+            _m *= _smoothstep(_e / 26.0)
+        _sealpx[_x, _y] = int(max(0.0, min(1.0, _m)) * 255.0 + 0.5)
+save(_seal, "T_ground_seal_mask.png")

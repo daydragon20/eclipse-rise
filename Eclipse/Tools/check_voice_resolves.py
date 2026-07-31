@@ -48,13 +48,36 @@ def main() -> int:
     if RESOLVED.is_file():
         cast_roles = set(json.loads(RESOLVED.read_text("utf-8"))["rollen"])
 
-    unmapped, mapped_uncast, ready, known_uncast = [], [], [], []
+    # Slot bindings, per role: {"eclipse_fighter": {"A": {...}, "B": {...}}}
+    bindings, unbound_slots = {}, {}
+    if RESOLVED.is_file():
+        _r = json.loads(RESOLVED.read_text("utf-8"))["rollen"]
+        bindings = {rid: r.get("slot_binding", {}) for rid, r in _r.items()}
+        unbound_slots = {rid: r.get("slots_unbound", []) for rid, r in _r.items()}
+
+    unmapped, mapped_uncast, ready, known_uncast, unbound = [], [], [], [], []
     for key, n in usage.most_common():
         if key in mapping:
             entry = mapping[key]
             roles = entry.get("variants") or [entry["role"]]
             missing = [r for r in roles if r not in cast_roles]
-            (mapped_uncast if missing else ready).append((key, n, roles, missing))
+            if missing:
+                mapped_uncast.append((key, n, roles, missing))
+                continue
+            # A role having finalists is NOT the same as this speaker having a
+            # voice. eclipse_fighter_a..._d are four people sharing one role, and
+            # a slot with no bound voice_id generates nothing -- silently. This
+            # check reported such keys as "ready" once; that was the bug.
+            slot = entry.get("slot")
+            if slot:
+                bound = bindings.get(entry["role"], {}).get(slot)
+                if not bound or not bound.get("voice_id"):
+                    unbound.append((key, n, entry["role"], slot))
+                    continue
+                ready.append((key, n, [f"{entry['role']}:{slot}="
+                                       f"{bound['stem']}"], []))
+            else:
+                ready.append((key, n, roles, []))
         elif key in uncast:
             known_uncast.append((key, n))
         else:
@@ -80,6 +103,18 @@ def main() -> int:
         for key, n in known_uncast:
             print(f"  {key:<24} {n:>4} lines   {uncast[key]}")
 
+    if unbound:
+        print(f"\nFAIL - {len(unbound)} speaker(s) map to a role but their SLOT has "
+              f"no voice ({sum(x[1] for x in unbound)} lines). The role is cast; "
+              f"these particular speakers are not:")
+        for key, n, role, slot in unbound:
+            need = unbound_slots.get(role, [])
+            print(f"  {key:<24} {n:>4} lines -> {role} slot {slot} (unbound: "
+                  f"{', '.join(need) or '?'})")
+        print("\n  A bark register is not one character: the scripts address these "
+              "as\n  separate people, and §18.5 wants them to sound like separate "
+              "people.\n  Fix: the owner picks one more voice per unbound slot.")
+
     if unmapped:
         print(f"\nFAIL - {len(unmapped)} speaker(s) resolve to NOTHING. These would "
               f"generate silently as zero lines:")
@@ -88,6 +123,8 @@ def main() -> int:
         print("\nFix: add them to Eclipse/Content/Audio/VoiceKeyMap.json - under "
               "'map' if they have a casting role, under 'uncast' if they still "
               "need one from the owner.")
+
+    if unmapped or unbound:
         return 1
 
     print("\nOK: every speaker resolves to a role or is a declared uncast speaker.")

@@ -22,6 +22,70 @@
   ],
   "vragen": [
     {
+      "id": "O-13",
+      "prio": "nu",
+      "vraag": "Drie stemmen zijn twee keer gekozen — welke verhuist?",
+      "waarom": "Een stem kan geen twee rollen spelen: de cache-sleutel bevat de stem-ID, dus twee personages met dezelfde stem klinken letterlijk identiek. Je eerste keuze botst op drie plekken, en een ervan is pijnlijk: LAURA staat bij Voss (vrouwelijk) en bij Kaya. ALICE staat bij Reyes en bij Kaine — je companion-medic en de Grand Marshal van de Dominion, die elkaar in akte 3 tegenkomen. DANIEL staat bij Torren en bij AEGIS, dus een mens en een machine. Je hebt per rol een reserve gekozen, dus voor elke botsing hoeft er maar EEN te verhuizen naar nummer twee. Zeg per botsing welke van de twee rollen de reserve krijgt; heb je geen voorkeur, dan kies ik en leg ik uit waarom.",
+      "stappen": [
+        "Open de castingpagina; de botsende rollen staan gemarkeerd",
+        "Zeg per botsing wie de reservestem krijgt",
+        "Of laat het aan mij — dan verhuist de rol met de minste regels, want daar is omcasten later het goedkoopst"
+      ],
+      "opties": [
+        {
+          "label": "Ik kies zelf — ik zeg het erbij",
+          "waarde": "zelf",
+          "gevolg": "Noem per botsing welke rol naar de reserve gaat. Dan lock ik de tabel en is casting definitief voor die zes rollen."
+        },
+        {
+          "label": "Kies jij, met uitleg",
+          "waarde": "agent",
+          "gevolg": "Ik verhuis per botsing de rol met de minste regels naar zijn reserve en schrijf op waarom. Je kunt het altijd terugdraaien zolang er niet gegenereerd is."
+        },
+        {
+          "label": "Laat maar even — ik kies eerst de rest af",
+          "waarde": "later",
+          "gevolg": "Prima, maar dan blijft casting open en kan Tier 1 niet starten. De botsingen moeten voor generatie weg."
+        }
+      ],
+      "advies": "Alice bij Reyes houden en Kaine de reserve geven ligt voor de hand — een medic die je 25 uur hoort weegt zwaarder dan een schurk in akte 3. Maar het is jouw oor.",
+      "vrijtekst": true
+    },
+    {
+      "id": "O-14",
+      "prio": "nu",
+      "vraag": "Act 1 past niet in het budget: Voss alleen is 71% van de dialoogpot",
+      "waarom": "Nu er echt geteld is in plaats van geschat, klopt de begroting niet. Act 1 kost 65.015 credits tegen een Tier 2-pot van 45.000 — 20.015 te kort. En de oorzaak zit op een plek: VOSS ALLEEN KOST 32.014, oftewel 71% van die pot. Dat komt door twee vermenigvuldigingen die op elkaar stapelen. Ten eerste spreekt Voss in twee stemmen (mannelijk en vrouwelijk, want de speler kiest), dus elke regel wordt twee keer gegenereerd. Ten tweede heeft hij 126 persoonlijkheidsvarianten — vier assen waarop hij anders reageert — en die verdubbelen ook. 201 regels worden zo ruim 650 generaties. Je saldo van 125.612 kan het dragen, maar dan gaat het ergens anders vanaf: dit is een keuze over WAT DE SPELER HOORT, geen boekhoudkundige. Er staan vier doorgerekende opties in de ledger.",
+      "stappen": [
+        "Lees de vier opties in phase0/VOICE_LEDGER.md (kort, met bedragen)",
+        "Of kies hieronder de richting en laat mij het uitwerken"
+      ],
+      "opties": [
+        {
+          "label": "Varianten halveren",
+          "waarde": "varianten",
+          "gevolg": "De vier persoonlijkheidsassen terugbrengen naar twee op de scenes waar het minst verschil hoorbaar is. Bespaart het meest per verloren beat, en de scenes zelf blijven allemaal bestaan. Dit is de hefboom die story-architect aanwijst."
+        },
+        {
+          "label": "Een Voss-stem deze maand",
+          "waarde": "een-stem",
+          "gevolg": "Alleen mannelijk of alleen vrouwelijk genereren nu, de andere na 21 augustus via de Starter-route. Halveert Voss in een klap, maar tot die tijd hoort de helft van de spelers zichzelf niet."
+        },
+        {
+          "label": "Meer uit de reserve halen",
+          "waarde": "reserve",
+          "gevolg": "Tier 2 ophogen ten koste van muziek en SFX. Het saldo kan het, maar dan is de never-silent-vloer uit doc 16 dit jaar niet te halen."
+        },
+        {
+          "label": "Kies jij, met cijfers erbij",
+          "waarde": "agent",
+          "gevolg": "Ik kies de combinatie met de minste hoorbare schade en leg per beat uit wat er sneuvelt. Niets wordt gegenereerd tot jij het gezien hebt."
+        }
+      ],
+      "advies": "Varianten halveren. Een variant is een andere KLEUR van dezelfde beat; een geschrapte scene is een gat. En het is de enige post die je kunt halveren zonder een verplichte plant-drager te verliezen.",
+      "vrijtekst": true
+    },
+    {
       "id": "O-12",
       "prio": "nu",
       "vraag": "2.475 credits zijn op het verkeerde model gegaan — opnieuw doen, en hoeveel?",

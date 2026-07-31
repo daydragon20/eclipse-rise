@@ -266,6 +266,41 @@ Before Tier 1 bulk generation, `voice-director` runs the **full pipeline on a si
 
 ---
 
+## 19.5b Name slots — the ruling is: do not splice
+
+`{name}` slots (§18.5 rule 6) look like a concatenation problem. They are not, because
+the numbers are small. **Measured 2026-07-31: exactly two lines in the whole script use
+`{name}`.**
+
+| Line | Text | Position | Difficulty |
+|---|---|---|---|
+| `M1.1.S02.080` | *"Whose call was the span in the end? Yours, or {name}'s?"* | line-final, **possessive**, under a **question contour** | the worst case there is |
+| `M1.1.S99.170` | *"{name} took the low rail first. Nobody asked for that."* | line-initial, nominative | clean |
+
+**Ruling: generate the full line once per roster name. Never splice a name into an
+authored line.** `.080` is final, possessive *and* interrogative — three things a spliced
+clip cannot carry, because the question's intonation peak lands on the inserted word and
+the `'s` has to attach to it. A naive concatenation is audibly broken exactly there.
+
+**This is affordable, which is why it is the ruling.** The two lines are ~109 characters
+combined, so the whole feature costs `109 × roster size` — under 900 credits for an
+eight-name roster, well below 1% of the budget. Splicing would save a few hundred credits
+and cost the single most character-revealing line in M1.1.
+
+**The rule for lines written later:**
+
+- A `{name}` slot that is **line-final, possessive, or carries the sentence's intonation
+  peak** → full-line generation, no exceptions.
+- Splicing is permitted **only** for line-initial nominative slots **and only** where the
+  roster is genuinely dynamic (procedural squads), because there full-line generation is
+  impossible, not merely expensive.
+- **Enumerate the roster before generating.** A `{name}` line generated against an open
+  roster gets paid for again every time a name is added. Both current slots are already
+  written pronoun-free and restricted to living cell members, so the list is finite and
+  short — it just has to be written down first.
+
+---
+
 ## 19.6 Definition of Done — the sprint succeeded if
 
 - [ ] Casting table complete, every row locked, owner-approved

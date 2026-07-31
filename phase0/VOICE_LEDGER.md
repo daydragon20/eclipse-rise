@@ -108,6 +108,41 @@ gegenereerd. Bewaakt door `Eclipse/Tools/test_credit_meter.py` (7 tests), die in
 `Eclipse/Tools/verify.ps1` als gate draait. Controleproef gedaan: die test wordt
 **rood** tegen de oude code, dus hij kan echt falen.
 
+### ⚠ Act 1 past niet in tier 2 — gemeten, niet geschat (31-07)
+
+Ik heb de scriptbestanden geteld in plaats van aangenomen: elke `text:` plus elke
+`variants:`-tekst, per spreker.
+
+| Spreker | Regels | Tekens | Credits | |
+|---|---|---|---|---|
+| **voss** | 201 | 16.007 | **32.014** | ×2 — elke regel wordt in M én V ingesproken |
+| dex | 194 | 9.459 | 9.459 | |
+| mara | 252 | 8.261 | 8.261 | |
+| iron_chorus_emissary | 71 | 3.284 | 3.284 | shortlist klaar, nog niet gekozen |
+| reyes | 43 | 2.387 | 2.387 | |
+| overige sprekers | — | — | ~9.610 | |
+| | | | **65.015** | **tier 2 is begroot op 45.000** |
+
+**Tekort: 20.015 credits.** Er is 125.612 over, dus het is oplosbaar — maar niet
+zonder een keuze, en de keuze is niet van mij.
+
+**Waarom Voss zo duur is.** Twee dingen stapelen. `SCRIPT_FORMAT` §4 regel 196 zegt
+dat `voss` een *logische* sleutel is die "resolved to `voss_m` / `voss_f` per player
+gender at build" — dus elke Voss-regel wordt twee keer ingesproken. Daarbovenop
+dragen 32 regels persoonlijkheidsvarianten (126 varianttoksten, 7.396 tekens), en
+die tellen ook dubbel. Samen is Voss **71% van het hele tier-2-budget**.
+
+**Opties, met gemeten bedragen — dit is een owner-keuze:**
+
+| Optie | Bespaart | Wat je inlevert |
+|---|---|---|
+| Eén Voss-geslacht deze maand inspreken | 16.007 | De andere helft van de spelers hoort zijn eigen personage niet |
+| Alleen de basistekst, geen persoonlijkheidsvarianten | 14.792 | De as idealist/pragmatist wordt tekst zonder stem |
+| Beide bovenstaande | 22.399 | Past ruim, maar Voss wordt één stem zonder varianten |
+| Niets inleveren, 20.015 uit reserve + andere tiers halen | 0 | Muziek of SFX schuift naar volgende maand |
+
+**Niet stil oplossen.** Elke optie hierboven verandert wat de speler hoort.
+
 ### ✅ De drie scopes zijn er (31-07) — en wat ze meteen opleverden
 
 Alle drie staan nu op de sleutel. Gemeten, niet aangenomen: `/v1/user/subscription`,

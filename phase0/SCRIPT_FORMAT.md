@@ -121,7 +121,23 @@ lines:
 | `want` / `obstacle` / `turn` | ✅ | One sentence each. **A scene without all three is not written.** |
 | `status` | ✅ | `draft` → `critic-pass` → `generated` |
 | `critic` | ✅ | Verdict string. Only `GO` scenes may be generated. |
-| `words` | auto | Tooling fills; drives credit forecasting |
+| `words` | auto | Written words — everything in the file. A workload figure. |
+| `words_heard` | auto | What **one playthrough** hears: base lines, one variant per branch point. The pacing and quality figure. |
+| `words_generated` | auto | What TTS must actually produce: every variant, ×2 for Voss gender lines. **This is the credit figure.** |
+
+### Why three word counts — RULING L1-R15
+
+A single `words` field punishes exactly the scenes `21_quality_mandate.md` asks for. M1.5 measures 1,865 written words against a §18.1 norm of ~1,600 and looks bloated; strip the ~50 variant lines and a playthrough hears ~1,250. **The scene was not over-long, it was well-branched, and the metric said the opposite of the truth.**
+
+And neither number is the one that costs money. Credits are spent per *generated* line, so a four-axis Voss beat costs four generations — eight with gender — while contributing one line to `words_heard`. Forecasting Act 1 against `words` underestimates the spend; forecasting against `words_heard` underestimates it badly.
+
+| Question | Field |
+|---|---|
+| Did the writer do enough work? | `words` |
+| Is the scene the right length to play? | `words_heard` |
+| What will this cost to generate? | **`words_generated`** |
+
+`words_generated` is the input to the Q-7 variant-policy decision, and it is the only one of the three that belongs in a budget.
 
 ### `type` values — these set the enforced line-length band
 
@@ -208,7 +224,15 @@ The indirection this document promised is real. The actual risk is not cache inv
 
 ### `speaker` — role speakers — RULING L1-R6
 
-A pure glossary check can never pass, because `ACT1_OVERVIEW.md` AR-1 and AR-10 deliberately keep Ember's rank and file nameless. Speaker is valid if it is a glossary name **or** matches `^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER)_[A-Z]$`. Anything else fails — including a near-miss on a canon name, which is the failure the check exists to catch.
+A pure glossary check can never pass, because `ACT1_OVERVIEW.md` AR-1 and AR-10 deliberately keep Ember's rank and file nameless. Speaker is valid if it is a glossary name, **or** matches `^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER)_[A-Z]$`, **or** is a named-role token from this list:
+
+| Role token | Who |
+|---|---|
+| `EMISSARY` | the Iron Chorus emissary (§18.4 row; owner question Q-4 may still give him a proper name) |
+
+**Amended 2026-07-31 (L1-R6b), on a correct escalation from the M1.5 writer.** The original pattern justified itself on AR-1/AR-10, which are about Ember's *rank and file* — that reasoning never covered the second lead of a dialogue mission. Burying him in `FIGHTER_C` would have made sixty lines unreadable for the strip test, which is the one test that scene exists to pass. A named unnamed character is not a contradiction: he has a role, and his refusal to give names is his §18.4 "never".
+
+Anything else fails — including a near-miss on a canon name, which is the failure the check exists to catch.
 
 ### `condition` and the two state namespaces — RULING L1-R3 / L1-R4
 
