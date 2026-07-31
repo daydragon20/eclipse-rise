@@ -10,9 +10,21 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (gemeten 01-08 ~01:00): build groen `-NoUba` · **226 tests, 0 gefaald, 0 niet
+Bar (gemeten 01-08 ~02:20): build groen `-NoUba` · **226 tests, 0 gefaald, 0 niet
 gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog
 **39/39** · creditmeter-poort groen.
+
+> ⚠️ **De BAR is desondanks ROOD, op één punt** — en dat onderscheid is de hele reden dat
+> `verify.ps1` meer doet dan build+tests. `check_voice_resolves.py` faalt: `eclipse_fighter`
+> heeft **vier slots** in de scripts (`_a`…`_d`) en **twee gekozen stemmen**, dus slot C en D
+> hangen aan niets. Dat zou géén foutmelding geven maar **stilte** — een lege
+> `ElevenLabsVoiceId` wordt op Display gelogd en overgeslagen, dus die regels bestaan
+> simpelweg niet in een run die er gezond uitziet.
+>
+> Het is een **owner-actie** (twee stemmen kiezen, staat als O-3) en er is bewust **geen
+> fallback** ingebouwd: een terugval op stem A zou de bar groen maken terwijl acht regels
+> nog steeds geen gekozen stem hebben. `phase0/SOAK_LOG.md` schrijft die rode regels
+> netjes weg — 22:11 en 22:20.
 
 > **Spoor A staat verder dan spoor B.** Act 1 is **geschreven**: 40 scènes, ~9.400 woorden,
 > M1.1 t/m M1.6 plus de proloog. De critic-poort is voor 13 van de 20 beoordeelde scènes
