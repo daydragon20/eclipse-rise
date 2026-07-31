@@ -15,7 +15,7 @@ turn:         "Voss recognises a shoulder plate in the response line and keeps m
 # ---- state ----
 status:       draft
 critic:       null
-words:        105
+words:        110
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      VOSS, MARA, DEX, fighters; Enforcer response (barks)
@@ -131,6 +131,12 @@ lines:
     voice:   eclipse_fighter_b
     text:    "Shutters. All the way down the row."
     shot:    "Every shopfront on the row rolling down at once. Somebody hauls a child in by the wrist and the shutter comes down behind them."
+
+  - id:      M1.3.S05.125
+    speaker: FIGHTER_A
+    voice:   eclipse_fighter_a
+    text:    "Third shutter. That's my mother's."
+    note:    "18.5 rule 5: Eclipse fighters sound improvised and personal where the Dominion sounds procedural. It also makes .130 an order given over somebody's family, and nobody answers it."
 
   - id:      M1.3.S05.130
     speaker: VOSS

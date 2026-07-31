@@ -15,7 +15,7 @@ turn:         "He chooses, and Sela prices the choice before he has finished mak
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        318
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, SELA, BRICK
@@ -44,4 +44,173 @@ words:        0
 # writer:    all three branches fully written. Every branch hurts (2.7 rule 2).
 #            Full Voss variant coverage on both axes.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `cutscene`. Ceiling 60, respected (longest 20 w at .020). Register reached at
+#            .020. Spread 2 w (.050 "Say it.") to 20 w = 10x. Sela held to the HUB band
+#            per AR-7; her longest is 16 w.
+# ar-5:      THE HARDEST CONSTRAINT IN THIS MISSION. Mara has to hand one decision to one
+#            man without the word "you". She does it by taking her hand off the brake
+#            standard and saying two words to the air (.040-.050). No second person of any
+#            kind survives in her lines. The gesture is louder than the sentence would have
+#            been, which is why AR-5 is worth keeping.
+# handoff:   third time in the act (M1.1.S05, M1.5.S04, here). Nothing in the scene remarks
+#            on it. The shot on .050 is the only marker and it is silent.
+# sela:      .070 is written as an INTERRUPTION of Voss mid-sentence. That is the stub's turn
+#            staged literally - she prices the choice before he has finished making it - and
+#            it is the first beat of the one relationship in the game that never gets
+#            comfortable. Her pricing is a matched pair, not a triad (18.9 B).
+# branches:  ALL THREE hurt and none of them is the correct one. `run` kills people in the
+#            open; `emptied` leaves the slowest on the yard floor to be counted again;
+#            `split` hands people to a cell that left two guards face down in S02.160 and
+#            does not write names down.
+# split:     reachable only with the pact. No Iron Chorus voice is used - Q-4 leaves the
+#            emissary uncast. The Chorus takes the car in a SHOT.
+# brick:     .130 is his one line in this scene (stub beat 5) and his last of the mission.
+#            Three words, and they are the whole of what a man does who has spent eleven days
+#            in a car with the doors shut. He does not mention Krad-9 and nobody connects it
+#            for him.
+# p5-d:      the choice itself is the plant, and .070 is its mandatory spoken carrier (AR-9):
+#            civilian risk is priced out loud, by a person, before the player picks.
+
+lines:
+  - id:      M1.6.S04.010
+    speaker: MARA
+    voice:   mara
+    text:    "Four minutes to the switch."
+    shot:    "The brake standard is between the two of them. Nobody has a hand on it."
+
+  - id:      M1.6.S04.020
+    speaker: VOSS
+    voice:   voss
+    text:    "The spur runs under the Mid-Works. Six hundred metres of it, and nothing above ground can see us in there."
+
+  - id:      M1.6.S04.030
+    speaker: VOSS
+    voice:   voss
+    text:    "The yard is the other way. Lit, walled, and it's where they were being taken anyway."
+
+  - id:      M1.6.S04.040
+    speaker: MARA
+    voice:   mara
+    text:    "One lever. Four minutes."
+
+  - id:      M1.6.S04.050
+    speaker: MARA
+    voice:   mara
+    tags:    [pause]
+    text:    "Say it."
+    shot:    "She takes her hand off the standard and puts it in her coat. She does not step away and she does not look anywhere else."
+    note:    "THE HANDOFF, third time in the act. Not one second person in it - AR-5 holds."
+
+  - id:      M1.6.S04.060
+    speaker: VOSS
+    voice:   voss
+    text:    "That switch--"
+
+  - id:         M1.6.S04.070
+    speaker:    SELA
+    voice:      sela
+    interrupts: true
+    text:       "Riding on costs the ones who can't run. Stopping here costs the ones who can't walk."
+    note:       "P5-d's mandatory spoken carrier (AR-9). She prices the choice before he finishes the sentence. Matched pair, not a triad."
+
+  - id:        M1.6.S04.080
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.choice_m15_ironchoruspact == true'
+    text:      "Splitting costs the ones who go with people none of us can name."
+
+  - id:      M1.6.S04.090
+    speaker: SELA
+    voice:   sela
+    text:    "Whichever it is, say it out loud where the cars can hear it."
+
+  - id:      M1.6.S04.100
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m16_train
+      set:   'story.m16_train_choice = "run"'
+      label: "Ride it through to the spur."
+    text:    "Lever stays straight. The whole train goes down the spur."
+    note:    "OPTION 1 of 3. Everybody comes; S05 is the harder fight and people can die in the open."
+    variants:
+      pragmatist: "Out here we're a target with a timetable. Straight through."
+      idealist:   "Nobody gets off this train twice tonight. Straight through."
+      personal:   "Everyone who came on stays on. Hold it straight."
+      strategic:  "A full train under the Mid-Works is ground we can hold. An empty yard is nothing."
+
+  - id:      M1.6.S04.110
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m16_train
+      set:   'story.m16_train_choice = "emptied"'
+      label: "Stop it and empty it."
+    text:    "Throw it. Everybody off before the yard, over the wall, on foot."
+    note:    "OPTION 2 of 3. Shorter fight; the slowest do not make the wall and are counted again."
+    variants:
+      pragmatist: "Sixty on foot beats sixty in a box somebody else can steer."
+      idealist:   "The train is what they want. Let them keep the train."
+      personal:   "Off. We walk them out the way we came in."
+      strategic:  "A train is a line on a map. People aren't."
+
+  - id:        M1.6.S04.120
+    speaker:   VOSS
+    voice:     voss
+    condition: 'story.choice_m15_ironchoruspact == true'
+    choice:
+      group: m16_train
+      set:   'story.m16_train_choice = "split"'
+      label: "Give the second car to the Chorus."
+    text:      "Second car goes with the Chorus. The first one comes with us."
+    note:      "OPTION 3 of 3, pact only. Ember never learns where those people went."
+    variants:
+      pragmatist: "Two small problems instead of one big one. Second car is theirs."
+      idealist:   "Ask the second car first. If they say yes, they go."
+      personal:   "I want a name off whoever takes them. One name."
+      strategic:  "Nobody chases two. Split the count at the switch."
+
+  - id:      M1.6.S04.130
+    speaker: BRICK
+    voice:   brick
+    text:    "Doors stay open."
+    shot:    "He wedges the first one with a coupling pin and walks away without checking that it holds."
+    note:    "His one line in this scene and his last in the mission. AR-11 carried without a syllable about Krad-9."
+
+  - id:        M1.6.S04.140
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m16_train_choice == "run"'
+    text:      "Everyone off the roofs and inside. Ore cars only."
+
+  - id:        M1.6.S04.150
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_train_choice == "run"'
+    text:      "Down on the floor and stay down. Heads below the grates."
+
+  - id:        M1.6.S04.160
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m16_train_choice == "emptied"'
+    text:      "Charges on the couplings. Let it go on without us."
+
+  - id:        M1.6.S04.170
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_train_choice == "emptied"'
+    text:      "Two lines at the wall. Slowest at the front."
+
+  - id:        M1.6.S04.180
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m16_train_choice == "split"'
+    text:      "Their car, their route. We count ours at the wall."
+    shot:      "The second car goes with four of the Chorus riding it and it is out of the light inside a minute."
+
+  - id:        M1.6.S04.190
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_train_choice == "split"'
+    text:      "Somebody should be able to say afterwards who got into that car."

@@ -103,5 +103,11 @@ def main():
     print("Authored %d lane halves (%d undirected lanes) on %s." % (written, len(LANES), GRAPH_NAME))
 
 
-if __name__ == "__main__":
+# NOT `if __name__ == "__main__"`. UE's pythonscript commandlet does not run a
+# -script= file under that name, so the usual guard silently does nothing and the
+# run reports "executed successfully" having authored zero lanes - measured, on
+# this script, on 31-07. Inverting it is the robust form: main() runs unless we
+# were imported as a module (which is exactly what create_phase1_content.py does,
+# and that caller applies the lanes itself at the right moment).
+if __name__ != "author_region_lanes":
     main()

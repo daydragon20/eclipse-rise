@@ -15,7 +15,7 @@ turn:         "Voss tells him, and Dex works faster and worse, and it holds anyw
 # ---- state ----
 status:       draft
 critic:       null
-words:        184
+words:        186
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      DEX, VOSS, MARA
@@ -52,6 +52,8 @@ words:        184
 #           never finishes a sentimental sentence). Deletion test applied: everything
 #           after it was cut.
 # mara:     radio only. Four words in the whole scene before the blast. AR-5 clean.
+# name:     exactly one name-address in the scene (.070 "Dex.") and none in any variant,
+#           which keeps 18.9 B's one-per-eight-turns cap satisfied on every branch.
 # band:     type is `in-mission-radio` (10-25). Ceiling respected: longest 12 w (.240).
 #           Floor read as advisory, as everywhere in this mission.
 # variance: 1 w (.030 "Ramp.") to 12 w (.240) = 12x.
@@ -95,7 +97,7 @@ lines:
     variants:
       pragmatist: "Four coming up. Ninety seconds, then we're loud."
       idealist:   "Four on the ramp. It should come from me."
-      personal:   "Dex. Four of them, ninety seconds."
+      personal:   "Four of them coming up. I'd want to know."
       strategic:  "Relief's early. Ninety seconds before it stops being quiet."
 
   - id:        M1.3.S04.060

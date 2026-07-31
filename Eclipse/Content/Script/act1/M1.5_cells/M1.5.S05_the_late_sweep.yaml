@@ -15,7 +15,7 @@ turn:         "The Iron Chorus fights the way they have survived — and Ember s
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        132
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, MARA, BRICK, the emissary, Iron Chorus fighters; VEIL SWEEP TEAM
@@ -39,4 +39,212 @@ words:        0
 # writer:    lines under fire use the CALLOUT band. The emissary's P4-b line is the one
 #            exception and it should sound like a jab, not an observation.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# format:    the stub's "lines under fire use the CALLOUT band" now has a field for it -
+#            L1-R1's `band: callout` override. Twenty-three of twenty-seven lines carry it.
+#            The four that do not are exactly the four the stub exempts: the emissary's jab
+#            and Ember's wave-off.
+# band:      in-mission-radio (10-25) for the four un-overridden lines; callout (2-6) for
+#            the rest. Every override checked against the callout ceiling of six.
+# spread:    1 w (.090 "Yes." / .210 "Mm.") to 12 w (.170) = 12x.
+# register:  reached at .170 (12 w) and .180 (11 w), neither of them band-overridden.
+#
+# THE TWO VOCABULARIES, and the whole reason this scene exists at that length:
+#   VEIL      no volume, no urgency, no profanity, no pronouns for the people they are
+#             shooting at. They MARK and they SORT and they LOG. Four lines in and the
+#             player should be colder than he was against forty conscripts in M1.4.
+#             .030 is the line that does it: civilians are established as not-the-target
+#             by a man who is deciding it with a hand signal.
+#   IRON CHORUS  numbers, never names. "Two, screen. Three, door."
+#   EMBER     names. "Brick, left side."
+#   That is the audible difference between two cells fighting in one street, and it is also
+#   the emissary's fingerprint (S02 L2 notes) turned into faction doctrine. Nobody remarks
+#   on it. The player hears it.
+#
+# method:   .070-.090. A door they do not open, and one syllable of confirmation. That is
+#           the entire argument and there is no other line about it, here or in S99 (Reyes
+#           raises the doorway, not the door - a different question, deliberately).
+# P4-b:     .170-.180. It sounds like a jab because he has spent the walk telling Voss what
+#           he thinks of the word "lucky" (S03.250), and the player heard him.
+# waveoff:  .190-.200. Dex, because he thinks in systems and is therefore the most credible
+#           person to be wrong. His explanation is the one act 1 is supposed to accept -
+#           "the Veil is police, not an army" - and act 4 takes it apart. He also breaks
+#           Mara's blackout from S01.210 and says so, which is the only joke in the scene.
+# emissary: .210 does not argue. He has made his point and he is not interested in winning
+#           it. That is what makes it stick.
+# flag:     .240/.250/.260 read story.m15_shiftboss (L1-R3, set at S04). Three branches,
+#           three different colds.
+
+lines:
+  - id:      M1.5.S05.010
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Block is closed. Work inward."
+
+  - id:      M1.5.S05.020
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "Two at the yard wall. Walking."
+
+  - id:      M1.5.S05.030
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Not ours. Mark and continue."
+    note:    "18.5 rule 5. Four lines in and the Veil has already sorted two human beings into a category and moved on. No shouting anywhere in this scene from them."
+
+  - id:      M1.5.S05.040
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "One is carrying. Left hand."
+
+  - id:      M1.5.S05.050
+    speaker: FIGHTER_C
+    voice:   eclipse_fighter_c
+    band:    callout
+    text:    "Two, screen. Three, door."
+    note:    "Iron Chorus: numbers, never names."
+
+  - id:      M1.5.S05.060
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Brick, left side!"
+    note:    "Ember: names. 18.5 rule 6, and the contrast with .050 is the scene's turn in four words."
+
+  - id:      M1.5.S05.070
+    speaker: FIGHTER_D
+    voice:   eclipse_fighter_d
+    band:    callout
+    text:    "Not that door. Leave it."
+
+  - id:      M1.5.S05.080
+    speaker: BRICK
+    voice:   brick
+    band:    callout
+    text:    "Somebody's in there."
+    shot:    "Hammering from the inside. The Iron Chorus files past it without slowing."
+
+  - id:      M1.5.S05.090
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    band:    callout
+    text:    "Yes."
+    note:    "*** THE METHOD. ONE IMAGE, NO ARGUMENT. *** One syllable, and nobody says another word about it for the rest of the mission."
+
+  - id:      M1.5.S05.100
+    speaker: FIGHTER_C
+    voice:   eclipse_fighter_c
+    band:    callout
+    text:    "Portico. Push them out."
+    shot:    "A stairwell doorway of curfewed residents shoved into the lane. The Veil line stops dead."
+
+  - id:      M1.5.S05.110
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Civilians in the lane. Hold."
+    note:    "The Veil is disciplined, not murderous. That is worse, and it is why the screen works."
+
+  - id:      M1.5.S05.120
+    speaker: MARA
+    voice:   mara
+    band:    callout
+    text:    "Don't shoot into that."
+
+  - id:      M1.5.S05.130
+    speaker: VEIL_B
+    voice:   veil_operative_b
+    band:    callout
+    text:    "Sorting. Stand by."
+
+  - id:      M1.5.S05.140
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Two on the stair."
+
+  - id:      M1.5.S05.150
+    speaker: VOSS
+    voice:   voss
+    band:    callout
+    text:    "Storm cut. The yard wall."
+    note:    "Pays S03.260 and S01.120. He is using the route the rival gave him, and he does not thank anybody for it."
+
+  - id:      M1.5.S05.160
+    speaker: FIGHTER_D
+    voice:   eclipse_fighter_d
+    band:    callout
+    text:    "Wall. Go."
+
+  - id:      M1.5.S05.170
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Nine of them. Two cells in one street, and they sent nine."
+    note:    "*** P4-b. *** The fact, hard, from an outsider. Not a mystery - a jab."
+
+  - id:      M1.5.S05.180
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    text:    "Either you're lucky, or you're carrying something we haven't got."
+    note:    "He said 'lucky' at S03.250 about a man who held eleven days. The player knows exactly what he means by it and Ember does not."
+
+  - id:      M1.5.S05.190
+    speaker: DEX
+    voice:   dex
+    text:    "I broke the silence. Shout at me later."
+
+  - id:      M1.5.S05.200
+    speaker: DEX
+    voice:   dex
+    text:    "They're police, not an army. Police always come afterwards."
+    note:    "*** THE WAVE-OFF. *** The act-1 explanation, from the most credible man to be wrong. Act 4 takes it apart. Nobody in Ember disagrees and nobody returns to it."
+
+  - id:      M1.5.S05.210
+    speaker: EMISSARY
+    voice:   iron_chorus_emissary
+    band:    callout
+    text:    "Mm."
+
+  - id:      M1.5.S05.220
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "They are in the cut."
+
+  - id:      M1.5.S05.230
+    speaker: VEIL_A
+    voice:   veil_operative_a
+    band:    callout
+    text:    "Seal the grate. Log the hour."
+
+  - id:        M1.5.S05.240
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    band:      callout
+    condition: 'story.m15_shiftboss == "killed"'
+    text:      "One less sheet."
+
+  - id:        M1.5.S05.250
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    band:      callout
+    condition: 'story.m15_shiftboss == "prevented"'
+    text:      "He files again Tuesday."
+
+  - id:        M1.5.S05.260
+    speaker:   EMISSARY
+    voice:     iron_chorus_emissary
+    band:      callout
+    condition: 'story.m15_shiftboss == "warned"'
+    text:      "He's running. Wonder who to."
+    note:      "The one line in the mission that agrees with his own S04.160 objection, spoken while it is happening."
+
+  - id:      M1.5.S05.270
+    speaker: MARA
+    voice:   mara
+    band:    callout
+    text:    "Out. All of us."

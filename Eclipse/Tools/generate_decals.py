@@ -26,7 +26,12 @@ from PIL import Image, ImageDraw
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "Saved", "GeneratedDecals")
 os.makedirs(OUT, exist_ok=True)
-random.seed(503)
+# NO module-level seed any more. Every map below owns its OWN random.Random
+# stream (770 poster, 771 stain, 772 hazard, 773 pool, 774 blob, 775 stencil),
+# which is what lets one map be re-authored without silently reshuffling the
+# next one's noise. The old `random.seed(503)` stream had exactly one consumer
+# left - the stencil - and the stencil now has a stream of its own, so dropping
+# the seed leaves every other map bit-identical to the banked round.
 
 
 def save(img, name):
@@ -35,20 +40,138 @@ def save(img, name):
     print(f"wrote {path}")
 
 
-# --- Dominion propaganda poster (512x768): stern geometry, bright emblem. ---
-poster = Image.new("L", (512, 768), 26)
+# --- Dominion propaganda poster (512x768) -----------------------------------
+# 20.2 FICTION FIX, 2026-07-31. What stood here was the EYE OF PROVIDENCE:
+#
+#     d.polygon([(256, 90), (96, 360), (416, 360)], outline=230, width=10)
+#     d.ellipse([196, 210, 316, 330], outline=235, width=10)
+#     d.ellipse([244, 258, 268, 282], fill=245)
+#
+# an equilateral triangle enclosing a ringed eye. That is the reverse of the
+# Great Seal of the United States (1782), freemasonry, "Illuminati" in popular
+# culture - a datable Earth institution mark, and it was the brightest graphic
+# element in the district's widest review camera. §20.2 forbids it flat out,
+# and line 5 of THIS file already forbade it thirty-odd lines earlier ("no
+# real-world marks"): the contract was written and then broken. Same class of
+# error as the ISO-361 radiation trefoil replaced the same evening, only older
+# and more heavily loaded.
+#
+# THE REPLACEMENT IS NOT A NEW SYSTEM. Tools/generate_dominion_signs.py had
+# already authored the district's signage family hours earlier, and its rule 1
+# is "THE RADIANCE IS THE ROOT GLYPH". Seven placards were speaking that
+# language while the posters fifteen metres away still carried an eye in a
+# triangle - two incompatible Dominion iconographies in one district, which
+# breaks the one-style law on top of the fiction. So this poster is that same
+# grammar, rule for rule:
+#
+#   rule 1  the mark is the Radiance: a solid disc with rays.
+#   rule 3  the carrier shape says who is talking. A closed RING = the state,
+#           and it is not negotiable - the same carrier as the checkpoint seal.
+#   rule 4  numbers are tallies, not digits: the rank under the emblem is the
+#           lots, filled = called to shift, hollow = standing.
+#   rule 5  every plate ends in the same code strip, and a FILLED authority
+#           mark means Dominion state authority.
+#
+# Proportions are the checkpoint seal's at half scale (ring r300/w26, disc
+# r104, twelve rays 138->246 on a 1024 plate), so the two read as one hand.
+# What makes the poster a different SENTENCE rather than the seal repeated
+# (§20.7: the same mark twice is visible) is what sits under the emblem: the
+# seal is closed by a halt bar, the poster opens onto the rank it is addressing.
+#
+# The dense ray field between disc and ring is also what stops a circle inside
+# a circle from reading as a pupil inside an iris - the scrubber placard
+# learned the same lesson about accidental faces ("symmetry was reading as a
+# body"). Trading one eye for another would have been a wasted round.
+#
+# And it is a PASTED SHEET, not a fresh print (§20.5, nothing is new and
+# nothing is evenly dirty): paste wrinkles, bleach where the light hits, grime,
+# and a scuffed lower corner at the height where people brush past it. The old
+# poster was pixel-perfect clean, which is its own kind of fiction break.
+P_W, P_H = 512, 768
+P_GROUND = 26                        # the sheet's printed ground
+P_GLYPH = 236                        # the mark
+P_DIM = 176                          # secondary / structural marks
+_poster_rng = random.Random(770)
+
+poster = Image.new("L", (P_W, P_H), P_GROUND)
 d = ImageDraw.Draw(poster)
-d.rectangle([16, 16, 495, 751], outline=200, width=6)  # frame
-# The AEGIS eye: triangle + circle + slit pupil.
-d.polygon([(256, 90), (96, 360), (416, 360)], outline=230, width=10)
-d.ellipse([196, 210, 316, 330], outline=235, width=10)
-d.ellipse([244, 258, 268, 282], fill=245)
-# Authority bars: three "text" blocks, unreadable by design.
-for i, y in enumerate((430, 500, 570)):
-    w = 360 - i * 60
-    d.rectangle([(512 - w) // 2, y, (512 + w) // 2, y + 34], fill=205)
-# Ground bar.
-d.rectangle([64, 660, 448, 700], fill=160)
+d.rectangle([16, 16, 495, 751], outline=200, width=6)          # the sheet's printed border
+
+# --- the emblem: ring (state) around the Radiance (rules 1 + 3) ---
+PCX, PCY, PR = 256, 250, 150
+d.ellipse([PCX - PR, PCY - PR, PCX + PR, PCY + PR], outline=P_GLYPH, width=13)
+for i in range(12):
+    _a = math.radians(15.0 + i * 30.0)
+    d.line([PCX + math.cos(_a) * 69, PCY + math.sin(_a) * 69,
+            PCX + math.cos(_a) * 123, PCY + math.sin(_a) * 123], fill=P_GLYPH, width=11)
+d.ellipse([PCX - 52, PCY - 52, PCX + 52, PCY + 52], fill=P_GLYPH)
+
+# --- the rank of lots (rule 4): tally groups, filled = called to shift ---
+_groups = ((4, True), (3, True), (2, False))
+_tw, _tgap, _tsep, _th = 22, 16, 48, 96
+_total = sum(n * _tw + (n - 1) * _tgap for n, _ in _groups) + _tsep * (len(_groups) - 1)
+_x = PCX - _total // 2
+for _n, _called in _groups:
+    for _ in range(_n):
+        if _called:
+            d.rectangle([_x, 540, _x + _tw, 540 + _th], fill=P_GLYPH)
+        else:
+            d.rectangle([_x, 540, _x + _tw, 540 + _th], outline=P_DIM, width=7)
+        _x += _tw + _tgap
+    _x += _tsep - _tgap
+# The ground the rank stands on.
+d.rectangle([64, 648, 448, 680], fill=P_DIM)
+
+# --- the code strip (rule 5): filled authority mark = Dominion state ---
+_cw, _cgap, _csep, _ch, _cy = 13, 17, 42, 42, 700
+_cgroups = (3, 1)
+_ctotal = sum(g * (_cw + _cgap) - _cgap for g in _cgroups) + _csep * (len(_cgroups) - 1)
+_cx = PCX - (_ctotal + 76) // 2
+d.rectangle([_cx, _cy, _cx + 36, _cy + _ch], fill=P_GLYPH)
+_cx += 76
+for _gi, _g in enumerate(_cgroups):
+    for _ in range(_g):
+        d.rectangle([_cx, _cy, _cx + _cw, _cy + _ch], fill=P_DIM)
+        _cx += _cw + _cgap
+    _cx += _csep - _cgap
+
+# --- §20.5 wear: this is paper that has been on a wall for a while ---
+_ppx = poster.load()
+# Paste wrinkles: long near-vertical creases where the sheet was smoothed down.
+# Drawn as a VALUE SHIFT on the existing pixels rather than as a line of its
+# own colour - a crease brightens or darkens whatever it runs across (ground,
+# ring, tally), and a flat-coloured line would have painted straight over the
+# mark instead.
+for _ in range(9):
+    _wx = _poster_rng.randrange(30, P_W - 30)
+    _wy = _poster_rng.randrange(20, 320)
+    _wl = _poster_rng.randint(180, 420)
+    _wd = _poster_rng.randint(-26, 26)
+    _delta = _poster_rng.choice((-16, -12, 13, 17))
+    for _k in range(_wl):
+        _t = _k / _wl
+        _px_ = int(_wx + _wd * _t)
+        _py_ = _wy + _k
+        if 0 <= _px_ < P_W and 0 <= _py_ < P_H:
+            _ppx[_px_, _py_] = max(0, min(255, _ppx[_px_, _py_] + _delta))
+# Bleach: the upper field has faced the light longest, so its ink has lifted
+# toward the sheet and its ground has greyed up - contrast loss, not a tint.
+for _y in range(20, 300):
+    _f = 0.72 + 0.28 * ((_y - 20) / 280.0)          # 0.72 at the top, 1.0 by y=300
+    for _x in range(20, P_W - 20):
+        _v = _ppx[_x, _y]
+        _ppx[_x, _y] = int(96 + (_v - 96) * _f + 0.5)
+# Scuffed lower corner: hip height, where people brush past.
+for _ in range(34):
+    _wx = _poster_rng.randrange(24, 210)
+    _wy = _poster_rng.randrange(600, P_H - 24)
+    _wl = _poster_rng.randint(20, 90)
+    d.line([_wx, _wy, _wx + _wl, _wy + _poster_rng.randint(-7, 7)],
+           fill=_poster_rng.randint(40, 120), width=_poster_rng.randint(1, 3))
+# Grime speckle over the whole sheet.
+for _ in range(7000):
+    _wx, _wy = _poster_rng.randrange(P_W), _poster_rng.randrange(P_H)
+    _ppx[_wx, _wy] = max(0, min(255, _ppx[_wx, _wy] + _poster_rng.randint(-34, 26)))
 save(poster, "T_decal_poster_diff.png")
 
 # --- Hazard stripes (256x256): worn paint pad. ---

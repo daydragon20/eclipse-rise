@@ -15,7 +15,7 @@ turn:         "She ratifies his decision without endorsing it, and tells the roo
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        344
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      MARA, VOSS, DEX, BRICK, REYES
@@ -36,4 +36,190 @@ words:        0
 #            not know what yet.
 #            Dex's joke here is the most bitter one in the act.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# format:    L1-R2 choice field, group m15_pact. L1-R3 applied to the outcome as well:
+#            story.m15_pact = full | limited | none, mapping to
+#            Story.Choice.M15_IronChorusPact.Full / .Limited / .None.
+#            ESCALATION: ACT1_OVERVIEW section 6 lists Story.Choice.M15_IronChorusPact as a
+#            single tag, which reads as a boolean. "Limited" is not half a yes - it is the
+#            branch where Ember fights beside the Iron Chorus and refuses their intake
+#            doctrine, and M1.8.S99's vote and act 2's merger/schism need to tell it apart
+#            from a full pact. Same argument L1-R3 already accepted for the shift boss.
+#            Read by: M1.8.S99, act 2, and .070/.080/.200/.210 in this file.
+# band:      cutscene (20-60). Ceiling respected (max 21 w), register reached at .110.
+# spread:    2 w (.130 / .190) to 21 w (.110) = 10.5x.
+#
+# MARA AND AR-5. This is the scene AR-5 was written for.
+# She transfers authority in public and she may not use the word "you" - that word is spent
+# once in the whole game, in M1.8.S08. So she uses his NAME instead (.160, .180), and the
+# formality of that is the transfer. Nobody comments on it. She still says no "I" anywhere.
+# .170 is the ratification and the whole distinction the stub asks for: "It stands" is
+# ratification. "Not because we agree with it" is the withheld endorsement. Two sentences,
+# one line, and the room has to live with both.
+# .180 is what she is quietly arranging, said as a routing instruction. The player has no
+# idea what it is yet. It is the same instruction she will not be here to give in M1.8.
+#
+# dex:      .050-.080. His fingerprint holds - fragments, hardware as insult, never finishes
+#           a sentimental sentence. .070 is the bitterest joke in the act and it POINTS
+#           OUTWARD, at the Iron Chorus. That is deliberate: it makes the player suspect the
+#           wrong cell, and act 3's answer comes from Ember's own intake (P3-c, M1.6.S06).
+#           It also does not touch P3-b. NOTHING IN THIS SCENE RETURNS TO S02.190.
+# reyes:    .090-.120. Complete clinical sentences, zero contractions, and she accuses
+#           nobody - she asks twice and gets no answer the second time. .110 counts the
+#           civilians onto a SHEET, which is the emissary's own doctrine turned back on him
+#           by the one person who was not in the room. It is the only point Ember scores in
+#           the whole mission and it is scored after everybody has gone home.
+# brick:    two words (.130) and he does not enlarge them when Dex pushes. Total spoken
+#           words for Brick across M1.5: twenty-one.
+# omitted:  a line where somebody says what the mission cost or meant. Nobody does. The
+#           closest is Reyes's second question, and it is a question. See report.
+
+lines:
+  - id:      M1.5.S99.010
+    speaker: MARA
+    voice:   mara
+    text:    "Say it out loud. Everyone in this room hears what we agreed to."
+    shot:    "Map table. Six people, a lamp, and the chip still sitting where she left it yesterday."
+
+  - id:      M1.5.S99.020
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_pact
+      set:   'story.m15_pact = "full"'
+      label: "Full pact."
+    text:    "We're in. Their operation first, ours after it."
+    variants:
+      pragmatist: "We're in. Their operation first, and the terms get renegotiated after it."
+      idealist:   "We're in. Two cells is the first true thing anybody said down there."
+      personal:   "We're in. I gave him my word at a door and I'm keeping it."
+      strategic:  "We're in. Their operation buys us the district; ours buys us the rest."
+
+  - id:      M1.5.S99.030
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_pact
+      set:   'story.m15_pact = "limited"'
+      label: "Fight together. No lists."
+    text:    "We fight beside them. We don't take names off a list."
+    variants:
+      pragmatist: "We fight beside them. Their lists stay their problem."
+      idealist:   "We fight beside them. Nobody in this cell hands over a name."
+      personal:   "We fight beside them. The list part I said no to."
+      strategic:  "We fight beside them and we keep our own intake. Both halves matter."
+
+  - id:      M1.5.S99.040
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m15_pact
+      set:   'story.m15_pact = "none"'
+      label: "No pact."
+    text:    "We're not in. They can have the water and the street."
+    variants:
+      pragmatist: "We're not in. Water and street when they ask, nothing signed."
+      idealist:   "We're not in. What they do, they do without us watching."
+      personal:   "We're not in. I stood in that kitchen and that was enough."
+      strategic:  "We're not in yet. Let them spend a winter needing us."
+
+  - id:      M1.5.S99.050
+    speaker: DEX
+    voice:   dex
+    text:    "Two cells, one street, one net."
+
+  - id:      M1.5.S99.060
+    speaker: DEX
+    voice:   dex
+    text:    "Their net's better than ours. Inside a month, every frequency we use is a frequency they've heard."
+
+  - id:        M1.5.S99.070
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m15_pact != "none"'
+    text:      "We doubled the number of people who can sell us. That's the whole upgrade."
+    note:      "*** THE BITTEREST JOKE IN THE ACT. *** 18.6 - the best jokes cost something, and Dex jokes hardest when he is most frightened. It points at the Iron Chorus, which is exactly where the player should be looking and exactly where the mole is not."
+
+  - id:        M1.5.S99.080
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m15_pact == "none"'
+    text:      "So we're the cell that says no to everybody. Consistent."
+
+  - id:      M1.5.S99.090
+    speaker: REYES
+    voice:   reyes
+    text:    "How many were in that doorway?"
+
+  - id:      M1.5.S99.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Eleven. Maybe fourteen."
+
+  - id:      M1.5.S99.110
+    speaker: REYES
+    voice:   reyes
+    text:    "Fourteen people were pushed into that lane so that we could leave it, and the Veil counted every one of them."
+    note:    "18.4 Reyes: complete, clinical, no contractions. She puts fourteen civilians onto a sheet in the same breath as the doctrine that justified the whole night. Nobody has an answer. The scene's register line (21 w)."
+
+  - id:      M1.5.S99.120
+    speaker: REYES
+    voice:   reyes
+    text:    "Did anyone go back for them?"
+    shot:    "Nobody answers her. Dex looks at the transmitter he is holding."
+
+  - id:      M1.5.S99.130
+    speaker: BRICK
+    voice:   brick
+    text:    "He's tired."
+    note:    "Brick's one thing about the emissary, and it is the truest sentence anybody says about him all mission."
+
+  - id:      M1.5.S99.140
+    speaker: DEX
+    voice:   dex
+    text:    "Four hours in a hole with him and that's the report?"
+    shot:    "Brick does not add anything. He never does."
+
+  - id:        M1.5.S99.150
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m15_terms == "counter"'
+    text:      "They said we were already on a list. That goes on the board as well."
+    note:      "Carries the S02 counter-branch forward. She does not say whose list, because he did not."
+
+  - id:      M1.5.S99.160
+    speaker: MARA
+    voice:   mara
+    text:    "Voss made that call in another man's kitchen, with all of us standing in it."
+    note:    "AR-5. She uses his name because the pronoun is not hers to spend, and the formality IS the transfer."
+
+  - id:      M1.5.S99.170
+    speaker: MARA
+    voice:   mara
+    text:    "It stands. Not because we agree with it."
+    note:    "*** THE RATIFICATION. *** Sentence one ratifies. Sentence two withholds the endorsement. The stub asks for exactly this distinction and it is the whole scene."
+
+  - id:      M1.5.S99.180
+    speaker: MARA
+    voice:   mara
+    text:    "From tonight they send to Voss. Not to this table."
+    shot:    "She is already folding the map. Nobody follows it up."
+    note:    "The first public transfer of authority in the game, given as a routing instruction. She is arranging something and the player will not know what until M1.8."
+
+  - id:      M1.5.S99.190
+    speaker: DEX
+    voice:   dex
+    text:    "That's new."
+
+  - id:        M1.5.S99.200
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m15_pact != "none"'
+    text:      "Mark the Tithe line. That's the one we do together."
+    note:      "M1.6 goes on the board. The Tithe Line is canon (ACT1_OVERVIEW section 7)."
+
+  - id:        M1.5.S99.210
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m15_pact == "none"'
+    text:      "Mark the Tithe line anyway. We do that one alone."

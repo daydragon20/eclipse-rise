@@ -43,10 +43,22 @@ Casting fase 1 klaar: **104 kandidaten, 0 credits**.
 *Volledige metingen staan in `phase0/DEBUG_DISCIPLINE.md`. Lees die vóór je iets aanraakt;
 alle drie zijn eerder de verkeerde kant op gestuurd door een plausibele redenering.*
 
-1. **Inslagspoor rendert niet** — de transform-diagnose is **weerlegd** (`ac09980`, §4.3).
-   Het spoor landt exact op de treffer (20/20 binnen 1 cm, mét controleproef). Terug naar
-   de renderkant. Volgende stap: zichtlijn-trace camera → spoor, zodat `inbeeld=1` een
-   *vrij zicht ja/nee* wordt.
+1. **Inslagspoor — OPGELOST. Het rendert prima; het is 14 pixels groot.** Geen
+   transform-bug (`ac09980`) én geen renderbug: het spoor is **9×9 cm**, plat, onder een
+   scherende hoek vanaf ~10 m. **Gemeten**: van bovenaf 5.459 veranderde pixels, fel amber,
+   GEZIEN — vanaf de spelercamera **14 pixels** (0,02 promille). De 44 grondvlakken samen
+   halen daar 6. De laag rendert en is op ooghoogte niets waard.
+   **De meting scheidt de twee verklaringen door constructie**: twee opnames van hetzelfde
+   frame met exact één verschil (object verborgen), dus elke bewegende pixel komt van dat
+   object. Controles eerst en alle drie groen: ruisvloer 0, wereld-kanarie 894.610,
+   negatieve controle 0.
+   **Volgende stap is dus geen RenderDoc maar een maat**: hoe groot moet een kogelspoor zijn
+   om op 8–15 m te lezen. Falsificatie ligt klaar — hetzelfde harnas telt de pixels.
+   **Eerst de dubbele spawner weg**: elke treffer zet er **twee** exact samenvallend neer
+   (`SpawnImpactMark` + `OnWorldImpact`), dus elk differentieel leest 0 en de diagnose
+   saboteert zichzelf. Dat is bovendien een duplicaat in verscheept gedrag.
+
+
 2. **Trillen bij het schieten** — mechanisme **vast** (`bc881f4`, §4.2): de envelope
    herstart per schot. Géén AnimBP, dus geen vechtende blend-nodes. Fix is een aparte
    iteratie; falsificatie ligt klaar.
