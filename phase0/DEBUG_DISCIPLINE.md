@@ -257,3 +257,81 @@ Dus niet alleen in een synthetische wereld: in de draaiende game staan de sporen
 **De volgende meting, niet de volgende hypothese.** De zwakke plek staat al in het dossier: *"inbeeld=1 zegt niets over wat er vóór het vlak staat"*, en geen enkele rig-stand kijkt naar onbelemmerd wegdek. De goedkoopste test die dat halveert is een **zichtlijn-trace van de camera naar elk levend spoor** in de `[PLAYSHOT n SPOREN]`-regel: die maakt van "inbeeld" een "vrij zicht ja/nee". Is het zicht vrij en staat er niets, dán is het een render-vraag en gaat RenderDoc open. Is het zicht nooit vrij, dan meet dit harnas de vraag helemaal niet en is een rig-stand die wél naar de grond kijkt de eerste stap. Exact dezelfde vraag staat open voor de 38 grondvlakken van de bouwer, waarvan nooit is vastgesteld dát ze renderen.
 
 *Geen dertiende hypothese. Eén meting — en die is nu gedaan.*
+
+### 4.5 GPU-crash "Device Removed" — **GEEN TDR-TIMEOUT, een PAGE FAULT**
+
+**Symptoom (31-07, 19:20):** `GPU crash detected — Device 0 Removed: DXGI_ERROR_DEVICE_HUNG`,
+midden in een automatische opnameronde (`unrealeditor-cmd.exe`, 1280×720, frame 259,
+vlak na `HighresScreenshot00002`).
+
+**De eerste diagnose was TDR-timeout. Die is weerlegd door te kijken in plaats van te
+redeneren.** Er lag een NVIDIA **Aftermath-dump** naast het log, en die decodeert de
+crash letterlijk:
+
+```
+Device Info:
+    Status       : PageFault
+    Adapter Reset: False
+    Engine Reset : True
+Page Fault Info:
+    GPU VA  : 0x00007fff00000000
+    Type    : AddressTranslationError
+    Access  : Read
+    Engine  : Graphics
+    Client  : GraphicsProcessingCluster
+Active Shaders: 2 total, beide Type = Compute
+```
+
+**Een page fault is geen timeout.** De GPU wachtte niet te lang — hij **las een adres dat
+er niet was**. Dat zijn twee verschillende defecten met twee verschillende oplossingen:
+een timeout los je op door de renderbelasting te verlagen, een page fault door de
+ongeldige toegang te vinden.
+
+**Drie metingen die de timeout-lezing uitsluiten:**
+
+1. **Nul** timeout- of hang-duurmeldingen in het hele log (`grep -c` op "timed out",
+   "GPU hang", "took too long" → 0).
+2. De regel `TDR settings OK - Level: Recover, Delay: 2` die de eerste diagnose aanhaalde,
+   staat op **regel 958, bij het opstarten**. Dat is de engine die zijn *instellingen*
+   rapporteert, geen gebeurtenis. Een instelling aflezen is geen meting van wat er gebeurde.
+3. `Adapter Reset: False` — bij een driver-reset door tijdsoverschrijding verwacht je juist
+   wél een adapter-reset.
+
+**Twee onderdelen van de eerste diagnose bestaan in dit project niet:**
+
+| Claim | Gemeten |
+|---|---|
+| "het project zet Nanite-cvars aan" | **geen enkele** `r.Nanite`-instelling in `Config/`, `Source/`, de bats of de tools |
+| "`r.TSR.History.ScreenPercentage:200`" | **nergens gezet** — niet in config, niet in `SPEEL_ECLIPSE.bat` (die geeft alleen `-ExecCmds="Eclipse.Guide.Overlay 1"`), niet in code |
+
+Die naar 100 zetten in een falsificatietest doet dus **niets**, en als de run dan niet
+crasht zou TSR ten onrechte de eer krijgen.
+
+**Wat er wél aan staat** (`Eclipse/Config/DefaultEngine.ini`): Lumen GI
+(`r.DynamicGlobalIlluminationMethod=1`), Lumen-reflecties (`r.ReflectionMethod=1`),
+Virtual Shadow Maps (`r.Shadow.Virtual.Enable=1`), mesh distance fields — op **Feature
+Level SM5**, waar Lumen terugvalt op software-raytracing. Uit het log bevestigd: GTX 1080 Ti,
+D3D12, draait SM5, kaart kan Feature Level 12_1. Lumen blijft daarmee de hoofdverdachte,
+maar als **bron van de foute lezing**, niet als traagheid.
+
+#### En het belangrijkste, voor wie hier verder gaat: de crash is GRILLIG
+
+**Gemeten over de logs van 31-07: 1 crash op 9 opnamerondes.** De crashende run heeft 28
+shot-regels tegen 220 in de geslaagde — hij stierf vroeg.
+
+**Daarmee is de voorgestelde falsificatietest ongeldig, en dat is een les die breder geldt.**
+Eén run "met Lumen uit" die niet crasht bewijst niets: bij een crashkans van ~11% gaat een
+willekeurige run in 89% van de gevallen vanzelf goed. Om met redelijke zekerheid te zeggen
+dat een wijziging de crash wegneemt, heb je grofweg **26 achtereenvolgende schone runs**
+nodig (0,89²⁶ ≈ 0,05). Een test die niet kan onderscheiden tussen "gerepareerd" en "geluk
+gehad", is geen test.
+
+**De goedkopere weg is er, en hij ligt al op schijf:** de Aftermath-dump
+(`Saved/Logs/D3D12.*.nv-gpudmp`) noemt de falende pass. Dat is één observatie tegenover
+tientallen runs statistiek. Volgende stap is dus die dump uitlezen, niet de crash
+wegtesten.
+
+**Waarom dit hier staat:** dit is §2 en §5 in één geval. De diagnose klonk sluitend, noemde
+een echt getal (Delay: 2) en wees een echte zwaarte aan (Lumen op SM5) — en was toch fout,
+omdat het getal een *instelling* was en niet een *gebeurtenis*. Het gereedschap dat het
+antwoord wél had, had de hele tijd naast het log gelegen.
