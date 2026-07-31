@@ -365,3 +365,48 @@ De M1.5-schrijver had gelijk: L1-R6's patroon rechtvaardigde zichzelf op AR-1/AR
 Dat "nooit" is het personage, geen tic: hij hoort bij een cel wier veiligheid haar trots is, en een man die geen namen afgeeft ís die leer, hoorbaar gemaakt. Het is bovendien met een regex te toetsen, en dat is waar §18.4 voor bestaat. Hij telt omdat hij Kessaraan is (ronde 1), maar hij telt **andere dingen** dan Ember: zij tellen wat ze hebben, hij telt wat dingen kosten.
 
 Dit maakt Q-4 minder dringend: een personage dat zelf geen namen gebruikt, heeft er zelf ook minder één nodig.
+
+---
+
+## Ronde 4 — 2026-07-31, de laatste blokkade op de ijkmissie
+
+### L1-R18 — De approach-keuze in M1.1.S01 vervalt (optie b)
+
+`.210 "The span. I want the height."` / `.220 "The drain. Let them walk over us."` **worden één Voss-regel.** Geen vlag, geen `choice:`-blok, geen conditionele varianten in S02/S04.
+
+**Dit was mijn fout, en het is dezelfde familie als L1-R12.** Mijn stub vroeg om *"een keuze in de planning (de overbrugging of de onderdoorgang)"* terwijl hetzelfde beat-sheet S02 op de **Overpass** zet en S04 op de reling. Ik heb een vertakking en haar tegenspraak in één document gespecificeerd. De schrijver heeft de regels netjes geschreven en terecht geweigerd een tag te verzinnen om ze formaat-conform te maken — precies wat `SCRIPT_FORMAT` §6 verlangt.
+
+**Waarom (b) en niet (a), en de doorslaggevende reden is niet het budget:**
+
+1. **Het level heeft geen duiker.** SPEC-P2-04 geeft M1.1 één site: de overlook-lane, met de hinderlaag die armt wanneer de squad daar positie houdt. Optie (a) zou betekenen dat ik dialoog schrijf voor een route die het missie-asset niet kan instantiëren. Dat is het exacte tegendeel van waar L1 voor bestaat.
+2. **M1.1's echte keuze is S04, en die is beter.** Voss herrekent de hinderlaag wanneer de patrouille in de verkeerde volgorde binnenloopt — genomen in het moment, onder druk, met de grond voor zich. Een kaarttafelkeuze vóór je de grond gezien hebt is een zwakkere versie van dezelfde beat, drie scènes te vroeg.
+3. **De insertiekeuze hoort bij M1.3**, waar hij de ontworpen agency-beat is (plein vs. servicetunnel) met twee volledige takken. Hem eerst in M1.1 doen maakt van M1.3's versie een herhaling in plaats van een escalatie.
+4. Budget is de vierde reden, niet de eerste. Maar hij telt: (a) koopt varianten in twee scènes in de duurste akte van het spel, voor een keuze die geen enkele latere scène leest.
+
+**De overblijvende regel is geen restant maar een verbetering.** Beat 4 van die scène is al *"Voss leest de route van de kaart en zegt iets technisch dat niemand vroeg."* Maak die regel over **de hoogte**, en laat hem betalen in S04 wanneer de patrouilleorde niet klopt en juist die hoogte hem de oplossing geeft. Een decoratieve keuze wordt een plant met een betaling twee scènes later.
+
+**§18.7 blijft voldaan.** Die vraagt om *"a choice, an interjection, or a movement beat"*. Dit wordt een **interjectie**: volledige Voss-as-varianten op de overblijvende regel, dus de speler kiest *hoe* hij het zegt, niet *wat*. Kost niets bovenop wat een Voss-regel toch al kost.
+
+**En voor de mal:** M1.1 houdt precies **één** echte keuze (S05 — vlag, lezer, drie takken). Dat is het model. Een tweede, decoratieve keuze in de ijkmissie zou veertig schrijvers leren dat keuzes een sausje zijn dat je erover strooit. **De missie is een sterkere demonstratie met één echte keuze dan met één echte en één nepkeuze.**
+
+*Opmerking bij de critic-beslissing: NO-GO in plaats van "GO met hold" was juist. Was S01 eerst gegenereerd, dan had (b) twee regels × twee geslachten weggegooid. De poort heeft hier letterlijk geld bespaard.*
+
+---
+
+### L1-R19 — Reyes krijgt een nullijn, en het is `M1.4.S99`
+
+Scherpe vondst. §18.4 geeft haar *"drops contractions **when stressed** — training reasserts"*. Dat is een **differentiële** tell, en een differentiaal zonder nullijn vuurt nooit. Ze gebruikt in M1.1 nul samentrekkingen — daar verdedigbaar, want ze staat in al haar optredens onder druk — en laat ze opnieuw vallen in M1.6.S06 en hard in M1.8.S07. **Zonder een vastgelegde ontspannen Reyes gaan vier akten schrijvers ervan uit dat dat clipped register háár stem is**, en dan is de tell onzichtbaar precies wanneer hij het hardst zou moeten landen.
+
+**M1.4.S99 is de nullijn**, en het is de goede scène: ze is er maximaal in haar element — een zorgvuldig onderzoek, in de basis, na een overwinning, op haar eigen voorwaarden. Daar contraheert ze, gewoon, zonder commentaar.
+
+De act-1-ladder wordt: **M1.4.S99 nullijn → M1.6.S06 laat vallen → M1.8.S07 laat hard vallen.**
+
+`HUB.A1.reyes_first_conversation` is een tweede nullijn, maar **daar kan niet op geleund worden**: de hub-tier viel uit het budget (L1-R11), dus M1.4.S99 is de enige *ingesproken* nullijn die ze krijgt. Dat is een gevolg van de budgetsnede dat niemand bij die snede kon voorzien, en het is precies het soort ding dat L1 moet opmerken.
+
+**Veralgemeend en in §18.4 gezet:** een *"when X"*-vingerafdruk heeft een **ingesproken niet-X** nodig, eerder. Dat geldt ook voor Torrens stiltes en Kaya's ondermijning; beide vallen in act 2 en krijgen dezelfde behandeling als ik daar ben.
+
+---
+
+### L1-R20 — Voorbeeld-ID's in `SCRIPT_FORMAT` zijn `M0.0.S00.*`
+
+Het `band:`-voorbeeld wees naar `M1.1.S04.070`, waarvan de werkelijke tekst iets heel anders is. ID's zijn permanent en dit document is de mal voor veertig schrijvers; een voorbeeld dat botst met een echte regel is hoe een scène zijn audio verliest. **Act 0 kan niet bestaan, dus `M0.0` botst nooit.** Doorgevoerd.

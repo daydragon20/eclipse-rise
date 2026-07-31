@@ -62,7 +62,9 @@ Beweging I, eerste stap. De cel is op zijn kleinst en het meest onzichtbaar. De 
 - **turn** — She stops arguing the odds and hands them the count as an inheritance instead of a shortage.
 
 **Beats:** (1) De telling wordt hardop gedaan — dertien, verdeeld over vier mensen. (2) Dex somt op wat hij níét heeft; zijn eerste grap, en hij is bang. (3) Reyes stelt één vraag in plaats van een bezwaar: hoeveel gewonden verwacht Mara. (4) Voss ziet de route op de kaart en zegt iets technisch dat niemand vroeg — de eerste keer dat de speler merkt dat zijn personage anders kijkt. (5) Mara sluit met de belofte-regel.
-**Speler:** één interjectie of keuze in de planning (de overbrugging of de onderdoorgang) — §18.7: de speler is deelnemer, geen publiek.
+**Speler:** **een interjectie, geen keuze** (ruling L1-R18). De eerdere formulering hier vroeg om "de overbrugging of de onderdoorgang" terwijl ditzelfde beat-sheet S02 op de Overpass zet en S04 op de reling — een vertakking en haar tegenspraak in één document, en dat was mijn fout. Het level heeft bovendien maar één site (SPEC-P2-04: de overlook-lane met arm-trigger). Beat 4 wordt dus **één** Voss-regel over de hoogte, met volledige as-varianten, en die regel is de plant die in S04 betaalt wanneer de patrouille in de verkeerde volgorde binnenloopt. §18.7 is voldaan: hij noemt uitdrukkelijk *"a choice, an interjection, or a movement beat"*.
+
+**M1.1 houdt precies één echte keuze — S05.** Dat is met opzet: een tweede, decoratieve keuze in de ijkmissie zou veertig schrijvers leren dat keuzes een sausje zijn.
 
 ### S02 — *The Overpass* · nadering
 `Kessara / Foundry District / Overpass` · walk-and-talk · tier 2

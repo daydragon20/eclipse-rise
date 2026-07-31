@@ -145,6 +145,8 @@ She is not, because **her imperatives elide the pronoun**: "Sit down." contains 
 | **Oren Callis** (56) | Passive voice. Bureaucratic hedging. Conditionals stacked. | Attributes every decision to a policy, never to himself | Never commits to anything in one sentence. |
 | **AEGIS** | Present tense. No self-reference pronouns. No persuasion — only statement. | States probability where a human would state opinion | Never argues. Never expresses preference. |
 
+**A "when X" fingerprint needs a voiced not-X, earlier.** Several rows above are *differential* tells: Reyes drops contractions **when stressed**, Torren's silences are longest **at his beats**, Kaya undercuts **serious** sentences. A differential with no baseline never fires — if Reyes never contracts anywhere the player hears, the clipped register simply becomes her voice and the tell is invisible at the moment it should land hardest. Each of these characters therefore needs one **voiced, unstressed** scene on record before the tell is spent. Reyes's is `M1.4.S99` (ruling L1-R19); Torren's and Kaya's fall in Act 2 and are owed the same treatment.
+
 **The Threx/Kaine contrast is load-bearing.** Threx is warm and unbearable; Kaine is cold and fair. If a reader can't tell them apart with the name stripped, both scenes are rewritten.
 
 ### The protagonist (Voss / "Cinder")
