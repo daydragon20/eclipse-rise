@@ -141,13 +141,14 @@
     },
     {
       "id": "O-3",
-      "prio": "gauw",
-      "vraag": "Welke stem hoort bij welk personage?",
-      "waarom": "Je krijgt per personage twee finalisten te horen. Jouw keuze is permanent: de cache-sleutel bevat de stem-ID, dus later omcasten maakt elke regel van dat personage ongeldig en herbetaalt alles.",
+      "prio": "nu",
+      "vraag": "Stemmen kiezen — en twee slots houden nu de bar rood",
+      "waarom": "Je hebt er twaalf gedaan. Twee dingen vragen nog aandacht, en het eerste is klein maar blokkerend: ECLIPSE_FIGHTER HEEFT VIER SLOTS EN TWEE STEMMEN. De scripts gebruiken eclipse_fighter_a t/m _d, en A en B zijn gebonden aan jouw twee keuzes — maar C en D hangen aan niets. Dat is nu het enige rode punt op de bar. En het zou geen foutmelding geven maar STILTE: een lege stem-ID wordt gelogd en overgeslagen, dus die regels bestaan gewoon niet in een run die er gezond uitziet. Er zit hier een dubbelzinnigheid in de vraag die ik je gesteld heb: 'top 2' betekende voor een personage een EERSTE KEUZE EN EEN RESERVE, maar voor een pool (de bark-registers) betekent het TWEE STEMMEN DIE ALLEBEI GEBRUIKT WORDEN. Voor eclipse_fighter moet het dat laatste zijn, dus daar zijn er nog twee nodig. Dat is mijn onduidelijkheid, niet die van jou. Verder wachten nog zes rollen, waarvan de Iron Chorus-emissaris de belangrijkste is: 71 regels, de tweede hoofdrol van een hele dialoogmissie, en M1.5 kan zonder hem niet genereren. Zeven kandidaten staan klaar, gekozen op een eigenschap die je kunt horen — kan deze stem VLAK zijn zonder dood te klinken.",
       "stappen": [
-        "NOG NIET AAN DE BEURT - de castingfragmenten bestaan nog niet",
-        "voice-director maakt eerst een gratis shortlist uit de Voice Library",
-        "Zodra de fragmenten er zijn verschijnen ze hieronder als afspeelknopjes en krijg je bericht"
+        "Open http://127.0.0.1:8377/progress_media/casting/CASTING.html",
+        "Kies TWEE EXTRA stemmen voor eclipse_fighter (slot C en D) — dat haalt de bar weer groen",
+        "Kies de emissaris uit de zeven kandidaten; let op: hij noemt in de hele missie geen enkele naam, dus de vraag is of de stem vlak kan zijn zonder dood",
+        "De overige vijf rollen als je toch bezig bent"
       ],
       "meer_info": "**Waar de audio staat en hoe je hem hoort**\n\nDe fragmenten komen in Eclipse/Content/Audio/Generated/. Zodra ze er zijn verschijnen ze **hier op deze kaart** als afspeelknopjes — je hoeft de Unreal Editor niet te openen en geen mappen te zoeken.\n\n**Per stem hoor je drie fragmenten, niet een:**\n\n1. De signature-regel — klinkt dit als het personage?\n2. Een emotioneel uiterste — Mara in haar laatste scène, Vex die dreigt, Kaya in paniek\n3. Een korte gevechtsregel — hoor je hem nog over geweervuur heen?\n\n**Waar je op let:**\n\n- Een stem die een rustige zin prachtig draagt maar instort bij het uiterste is de verkeerde stem, hoe mooi die eerste zin ook was\n- Personages die samen scenes hebben krijg je naast elkaar te horen. Vervagen ze in elkaar? Zeg het — dan ruilen we er een nu, niet na 90.000 credits\n- Twijfel je? Zeg dat. Twijfel bij de auditie wordt zekerheid dat het fout is na duizend regels\n\n**Doe er gerust lang over.** De screening was gratis; deze fragmenten zijn al betaald tegen de tijd dat jij luistert.",
       "audio_map": "Eclipse/Content/Audio/Casting",
