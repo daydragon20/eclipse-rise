@@ -38,6 +38,37 @@ words_generated: 252
 #
 # PETRA'S BEAT HERE - ruling L1-R10, and it costs one shot: note, no line.
 #
+# *** WHICH THREE CELLS - RULING L1-R24 (01-08). .010 IS CORRECT AND UNCONDITIONAL. ***
+# The NO-GO assumed the third cell is the Iron Chorus. It is not, and if it were, .010 would
+# be wrong in EVERY branch, not just `none` - with the pact there would be two (Ember +
+# Chorus) and without it, one. Counted instead of reasoned from the flag:
+#
+#   1  EMBER          the eleven minus their dead, plus Voss and Brick     P0    unconditional
+#   2  THE FORTY      Sela's intake off the Tithe train                    M1.6  unconditional
+#   3  THE FREED      the prisoners out of K-77, Petra among them          M1.8  unconditional
+#
+# Canon 2.9 - "the loyalty of three fused cells" - is delivered in all three pact branches.
+# BEATS_M1.8 section 4 beat 1 already said this: "Ember, de Iron Chorus (BIJ PACT), de
+# bevrijden, de veertig" - four groups, and the only one carrying a condition is the Chorus.
+#
+# THE IRON CHORUS DOES NOT FUSE, AND THIS SCENE SAYS SO IN ITS OWN LINE. .040: "Three cells
+# and one door out. The Chorus sleeps somewhere else." He counts the three and puts himself
+# outside them. ACT1_OVERVIEW section 5 reserves fusion/schism/tragedy with the Chorus for
+# acts 2-4, and L1-R13 hangs the whole act-2 branch on full-vs-limited staying legible. A
+# Chorus that fuses in act 1 destroys L1-R13.
+#
+# WHAT IS ACTUALLY BROKEN, AND IT IS SMALLER: the `shot:` on .010 puts "a knot of Iron
+# Chorus by the ramp" in the room UNCONDITIONALLY. In the `none` branch they are not there -
+# Voss said "We're not in. They can have the water and the street."
+# FIX, AND IT COSTS NOTHING: move that clause out of .010's shot and into .040's shot, which
+# already carries condition: story.m15_pact != "none". `shot:` is never voiced, so this is
+# free, and the cinematic pass then reads it exactly where it is true. No second spoken line,
+# no condition on .010, no variant. NOT a `silence:` - the branch does play; the camera was
+# wrong, and dressing a camera problem as a declared silence is the stale-silence failure.
+#
+# NO CONFLICT with M1.5.S99.030's idealist variant ("Two cells..."): at that moment the forty
+# and the freed do not exist yet. Checked.
+#
 # writer:    ANYONE WHO LETS ONE EXPLANATION WIN IN BEAT 4 DESTROYS TWIST 3.
 #            Half Voss variant set. He should speak less here than in any other debrief.
 

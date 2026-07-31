@@ -10,11 +10,11 @@ credit_tier:  2
 # ---- the three-sentence contract (18.7) ----
 want:         "Get everyone to the extraction route Mara assigned Voss."
 obstacle:     "The route is already closed, and the man closing it says so politely over the public address."
-turn:         "Threx uses Voss's first name, and Ember learns in one word how long he has been watching."
+turn:         "Threx addresses them directly for the first time, and what he knows about Voss turns out to be older than Ember."
 
 # ---- state ----
 status:          draft
-critic:          "NO-GO: het turn:-veld belooft Voss' voornaam, wat L1-R10 permanent onuitvoerbaar maakt -- architect-actie, geen schrijversactie"
+critic:          "NO-GO: architect-actie UITGEVOERD 01-08 (L1-R23) - turn: herschreven, AR-6 trede 4 gesplitst in 4a/4b. Geen schrijversactie open. Wacht op herscoring."
 words:           167
 words_heard:     167
 words_generated: 190
@@ -27,10 +27,32 @@ words_generated: 190
 #            2) Dex, on the radio, understands what it means before anyone says it
 #            3) THREX ON THE PA. Calm, friendly, and he names three people: one prisoner,
 #               one Ember fighter (THE SAME ONE as M1.7.S04), and VOSS
-#            4) AR-6 RUNG 4 - the ladder completes here
+#            4) AR-6 RUNG 4a - the ladder's first movement. IT COMPLETES IN S06
 #            5) containment begins
 #
 # HE DOES NOT GLOAT. He congratulates them, and he means it.
+#
+# *** AR-6 RUNG 4 HAS TWO MOVEMENTS - RULING L1-R23 (01-08). READ THIS BEFORE EDITING. ***
+# The escalation below was correct and the stub was wrong. AR-6's axis is NOT the name form -
+# it is DISTANCE, and it had to be: the name-form ladder tops out at rung 3 (an Ember first
+# name), and the only escalation past that is Voss's first name, which the game can never
+# voice (L1-R10 point 4). Rung 4 as originally written was unbuildable.
+#
+#   rung 1   M1.3.S02   propaganda from a mast          speaking to NOBODY
+#   rung 2   M1.3.S06   intercepted Veil channel        speaking to SOMEBODY ELSE
+#   rung 3   M1.7.S04   intercepted live traffic        about ONE OF OURS
+#   rung 4a  THIS SCENE ceiling speaker                 TO US, in public
+#   rung 4b  M1.8.S06   through glass, in person        TO HIM, alone
+#
+# S05 is a real rung transition and it earns it: this is the FIRST TIME IN THE ACT that
+# Threx speaks to them at all, which is why the corridor looks up. It is not "the same
+# medium as rung 3" - rung 3 is traffic Voss is EAVESDROPPING on.
+# The LADDER COMPLETES IN S06.040 - "You have your aunt's hands." That is the RELATION
+# instead of a name, in person, to him alone, and it is more intimate than any name form.
+# A first name proves he read a file; that line proves he read it and liked it.
+#
+# NOTHING IN THIS FILE CHANGES. No line, no variant, no ID. This block exists so the next
+# writer who reads AR-6 does not try to deliver a first name again and run into L1-R10 again.
 #
 # writer:    18.4 - never shouts, never uses rank when a first name will wound more.
 #            The horror is that he pronounces everything correctly.

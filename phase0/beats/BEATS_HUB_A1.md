@@ -22,6 +22,28 @@
 | **Type = `hub`, band 12–35 woorden** | De speler staat stil en heeft gekozen om te luisteren (§18.3) |
 | **`credit_tier: 4`** | Na de missies. Bij krapte valt deze laag als eerste af — schrijf hem daarom zo dat hij zonder audio als tekst nog werkt |
 | **Elke scène hangt aan een `condition`** | Een hubgesprek dat op het verkeerde moment beschikbaar is, is erger dan geen hubgesprek. Poort ze op `Story.Beat.*` |
+| **Een keuze in een hubscène zet een `run.`-vlag. Nooit een `story.`-vlag** | Ruling **L1-R27**. Zie hieronder |
+| **De poort wordt het scalaire kopveld `condition:`** | Ruling **L1-R28**. **Nog niet gebruiken** — zie hieronder |
+
+### L1-R27 · hub-takken zijn `run.`
+
+De twaalf scènes hebben elf lege *Zet*-kolommen in §5, en §6 zegt: *"Een speler die de hub overslaat, mist gezelschap — nooit begrip."* Een hubkeuze die de campagne verandert, spreekt dat tegen. De doorslaggevende reden is echter budgettair: **de hub-tier is de eerste die eruit valt en dat is één keer gebeurd (L1-R11).** Alles wat uit de hub persisteert, is dus een afhankelijkheid op een scène die misschien nooit klinkt — **de exacte faalvorm waar AR-9 voor bestaat.**
+
+De enige uitzondering blijft `Story.Thread.MaraLetters_Open`, en die is een *aanwezigheids*draad die `M1.8.S91` **verrijkt** in plaats van vertakt. Dat is de vorm die een uitzondering moet hebben.
+
+**Vorm, aangenomen als standaard** (precedent `M1.8.S06`, uitgevoerd in `HUB.A1.reyes_triage`): **vier keuze-opties in plaats van een vierassige variantenset.** Goedkoper op de as die telt (L1-R15) én beter drama — een variantenset deelt één antwoord, vier opties krijgen vier verschillende antwoorden.
+
+**Denk je een `story.`-rij nodig te hebben, dan heb je óf een beat die in een missie thuishoort, óf een owner-vraag. Escaleren, niet toevoegen.**
+
+### L1-R28 · de poort krijgt een kopveld — en je gebruikt het nog niet
+
+Twaalf schrijvers hebben de poort als **commentaar** opgeschreven (`# condition: story.beat_m14_quartermaster == true`). Dat valideert schoon en betekent niets: geen tool leest het. Het veld wordt scalair, met exact de grammatica van het regelveld:
+
+```yaml
+condition:    'story.beat_m14_quartermaster == true'
+```
+
+> **NOG NIET GEBRUIKEN.** `SCENE_OPTIONAL` in `validate_script.py` kent het veld niet, dus een scène die het vandaag draagt zakt op SCHEMA. Het commentaar blijft staan tot de tool bij is. De toolwijziging gaat eerst.
 | **De speler mag altijd weglopen** | Geen enkele hubscène mag informatie bevatten die nergens anders staat |
 | **Eén komische beat per zes regels in downtime, nul in nasleep** (§18.6) | Na M1.8 is de hele hub nasleep. `HUB.A1.dex_after` is geen grappige scène |
 | **Geen exposition** | Wie een hubscène gebruikt om de wereld uit te leggen, schrijft een codex-entry met een stem eraan (§18.8) |
@@ -59,7 +81,8 @@
 - **want** — Reyes wants to know what Voss did with the wounded conscript.
 - **obstacle** — She is not asking as an accusation and Voss cannot tell that yet.
 - **turn** — She writes his answer down, and explains that she keeps records because someone should.
-- **Conditie op `Story.Choice.M11_ConscriptSpared`** — drie varianten, en geen ervan is een oordeel.
+- **Drie takken op `story.m11_conscript_choice`** — bladeren `finished` · `left` · `bound`, en geen van de drie is een oordeel. **Alle drie moeten afgehandeld worden**; twee van drie is de L1-R12-vorm.
+  > **Gecorrigeerd 01-08, ruling L1-R29.** Hier stond `Story.Choice.M11_ConscriptSpared` — een vlag die **mijn eigen L1-R3 heeft ingetrokken** en die niets zet. De schrijver zag het, repareerde het niet stil, en las in plaats daarvan de drie bladeren die `M1.1.S05.170/.180/.190` werkelijk zetten. Hij had gelijk; dit beat-sheet had ongelijk. **Uitbreiding van de L1-R12-regel: een beat-sheet telt als lezer van een vlag**, want het wordt gelezen door een mens die daarna een `condition` typt.
 - Dit is de eerste keer dat het spel de speler laat merken dat er iemand meetelt (§2.5: *"Holds the player accountable for casualty-heavy tactics"*).
 
 ### 3 · `mara_map_table` *(na M1.2)*
@@ -136,7 +159,8 @@
 
 | Scène | Leest | Zet |
 |---|---|---|
-| 1, 2 | `Story.Beat.M11_ThirteenBullets`, `Story.Choice.M11_ConscriptSpared` | — |
+| 1 | `Story.Beat.M11_ThirteenBullets` | — |
+| 2 | `Story.Beat.M11_ThirteenBullets`, **`Story.Choice.M11_Conscript.{Finished,Left,Bound}`** | — |
 | 3 | `Story.Beat.M12_DeadDrop` | — |
 | 4 | `Story.Beat.M13_SignalFire` | — |
 | 5, 6 | `Story.Beat.M14_Quartermaster`, `Story.Beat.BrickRecruited` | — |

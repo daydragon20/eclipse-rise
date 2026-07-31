@@ -213,6 +213,8 @@ Canon (§2.4): de ouders stierven bij de **Foundry Collapse van 484 AE**, die AE
 
 **Beats:**
 (1) De vault, vol. Ember, de Iron Chorus (bij pact), de bevrijden, de veertig.
+
+> **DE DRIE CELLEN — ruling L1-R24 (01-08). Dit stond hierboven al impliciet en is één keer verkeerd gelezen.** Canon §2.9 eist *"the loyalty of three fused cells"* aan het eind van de act. Dat zijn **Ember**, **de veertig** (Sela's instroom van de Tithe-trein, M1.6) en **de bevrijden** (de gevangenen uit K-77, Petra erbij). Alle drie onvoorwaardelijk, in alle drie de pact-takken. **De Iron Chorus is er geen** — de enige groep in beat 1 met een voorwaarde eraan, en de scène zegt het in zijn eigen regel (`.040`: *"Three cells and one door out. The Chorus sleeps somewhere else."*). Fusie met de Chorus is een act-2-vraag (`ACT1_OVERVIEW` §5), en L1-R13 hangt de hele act-2-vertakking op aan full-vs-limited. **Een Chorus die in act 1 versmelt, sloopt L1-R13.**
 (2) **Sela spreekt.** Kort — geen oration (AR-7). Zij stelt de vraag die niemand durft: en nu?
 (3) De ruzie. Iron Chorus wil hun eigen lijn; sommigen willen weglopen; sommigen willen wraak.
 (4) **P3-d:** iemand vraagt hoe Threx het wist. **Er komen drie antwoorden en geen conclusie:** de instroom, de informantennetten van de Veil, of pech. Het gesprek gaat verder. **Niemand lost het op.** Dat is de plant voor twist 3 én twist 4, en de speler moet met woede blijven zitten die geen adres heeft.
@@ -239,7 +241,7 @@ Canon (§2.4): de ouders stierven bij de **Foundry Collapse van 484 AE**, die AE
 |---|---|
 | **T4** AEGIS | **geplant, dragend** (S03 P4-d, S09 laatste tik). De vraag "waarom kwam er niemand" verlaat act 1 onbeantwoord — met betaalplek in act 4. |
 | **T3** de mol | **geplant, dragend** (S99 P3-d): drie verklaringen, geen conclusie. |
-| Threx-ladder AR-6 | **trede 4, voltooid** (S05/S06). |
+| Threx-ladder AR-6 | **trede 4, twee bewegingen — L1-R23.** 4a in het openbaar over de omroep (S05), 4b in persoon en alleen (S06). **De ladder voltooit in `S06.040`** — *"You have your aunt's hands."* De as is afstand, niet naamvorm: de naamvorm loopt vast na trede 3, want Voss' voornaam is permanent onspeelbaar (L1-R10 punt 4). |
 | **T2** Whisper | niet aangeraakt. Act 1's Whisper-planten liggen in M1.2 en M1.7. |
 | **T5** Kaine | niet aangeraakt. |
 

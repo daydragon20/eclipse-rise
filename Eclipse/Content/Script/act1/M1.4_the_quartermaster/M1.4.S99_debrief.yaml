@@ -53,6 +53,29 @@ words:        302
 # HUB.A1.reyes_first_conversation is a second baseline but CANNOT be relied on: the hub
 # tier fell out of the budget (L1-R11), so this is the only VOICED baseline she gets.
 #
+# *** AMENDED 01-08 - RULING L1-R22. THE BASELINE WAS NEVER WRITTEN, AND THE FIX IS NOT
+#     "RELAX HER EVERYWHERE". READ THIS BEFORE TOUCHING A REYES LINE. ***
+# Counted, not assumed: this scene has TEN Reyes lines (.070 .090 .100 .110 .130 .140 .150
+# .170 .190 .200) and ZERO contractions in any of them. "That is a place." "Then it is
+# old... and I cannot open it tonight." "There is nothing in my kit for that."
+# So the L1-R19 differential has been firing against an identical background since it was
+# written, which makes it inaudible. That is my ruling failing, not a writing failure - the
+# L2 note below says "zero contractions", which is 18.4's static reading, and 18.4 is where
+# a writer looks when he needs a voice. The instruction was here and it lost.
+#
+# WHICH LINES, AND WHY .190 IS DIFFERENT:
+#   .070  .130  .140   CONTRACT. Inventory, a dry correction to Brick, a diagnosis. She is
+#                      working, in her element, after a win. This is the baseline.
+#   .190  .200         DO NOT CONTRACT, AND THAT IS PERMANENT. These are the two lines
+#                      AFTER "Tam. Oyelaran. Vic."
+# The tell therefore fires ONCE, quietly, INSIDE its own baseline scene, on the exact beat
+# where Brick puts three names on the table and she closes her kit. Then M1.6.S06 is the
+# same instrument louder and M1.8.S07 is it hard.
+# A baseline that is only a baseline teaches the player nothing. A baseline in which the
+# needle moves once teaches him what to listen for. Generalised in L1-R22 and it now applies
+# to Torren's silences and Kaya's undercutting in act 2 as well.
+# COST: zero. status is draft, critic is null. Nothing is generated and nothing is re-paid.
+#
 # writer:    Reyes's arc is "from penance to purpose" (2.5). This is the first stone: she
 #            treats a man she would once have been ordered to triage by loyalty score.
 #            The scene knows it. She does not say it.

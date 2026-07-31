@@ -124,6 +124,8 @@ lines:
 | `words` | auto | Written words — everything in the file. A workload figure. |
 | `words_heard` | auto | What **one playthrough** hears: base lines, one variant per branch point. The pacing and quality figure. |
 | `words_generated` | auto | What TTS must actually produce: every variant, ×2 for Voss gender lines. **This is the credit figure.** |
+| `silence` | ○ | Mapping: flag value → why nothing plays there. See below. |
+| `condition` | ○ | Scene gate — the scene is not offered until this resolves. **SPECIFIED, NOT YET ENABLED (L1-R28): `validate_script.py` will fail it as an unknown field. Keep writing it as a comment until the tool change lands.** |
 
 ### Why three word counts — RULING L1-R15
 
@@ -251,6 +253,15 @@ condition: 'run.zero_casualty == true'                # this mission run only
 
 **Run facts are not story flags.** A debrief scene asking "did anybody go down" is asking about the run, and persisting that as campaign state would grow the save with transient data for every mission in the game. `run.zero_casualty` reads the existing downed-soldier latch (SPEC-P2-04 amendment); it needs no new state at all.
 
+**Multi-value story flags use gameplay-tag leaves.** `StoryFlags` is a `TArray<FGameplayTag>` with no values, so a three-way choice is three mutually exclusive leaf tags under one parent:
+
+```
+story.m11_conscript_choice == "bound"   ⇄   Story.Choice.M11_Conscript.Bound
+story.brick_recruited      == true      ⇄   Story.Beat.BrickRecruited   (presence)
+```
+
+Zero schema change, and the parent tag stays queryable as "has this choice been made at all". `script_to_seed.py` performs the mapping; writers only ever use the lowercase form. **Any choice with more than two outcomes uses this shape** — collapsing three outcomes into a boolean is story loss disguised as simplification.
+
 #### The declared run facts, and what each one reads — RULING L1-R26
 
 There are two kinds, and the second kind is **a category, not a list**:
@@ -287,15 +298,6 @@ Same name and same grammar as the line-level field on purpose — one grammar, n
 **It must count as a reader in the fact table**, or it is decoration: then `CONDITION resolves` and the flag register's *gelezen door* column cover the gates too, and a hub scene hanging on a dead flag falls over. Checked: all twelve gates in `BEATS_HUB_A1.md` §5 have a row in `ACT1_OVERVIEW` §6 or exist in `EclipseGameplayTags.cpp` — with one exception, and that exception is L1-R29.
 
 **Tool change first, adoption second:** add `condition` to `SCENE_OPTIONAL`, check it with `COND_GRAMMAR`, feed it to the fact table. Until then the comment stays.
-
-**Multi-value story flags use gameplay-tag leaves.** `StoryFlags` is a `TArray<FGameplayTag>` with no values, so a three-way choice is three mutually exclusive leaf tags under one parent:
-
-```
-story.m11_conscript_choice == "bound"   ⇄   Story.Choice.M11_Conscript.Bound
-story.brick_recruited      == true      ⇄   Story.Beat.BrickRecruited   (presence)
-```
-
-Zero schema change, and the parent tag stays queryable as "has this choice been made at all". `script_to_seed.py` performs the mapping; writers only ever use the lowercase form. **Any choice with more than two outcomes uses this shape** — collapsing three outcomes into a boolean is story loss disguised as simplification.
 
 ### The three word counts, measured against the files — 01-08
 

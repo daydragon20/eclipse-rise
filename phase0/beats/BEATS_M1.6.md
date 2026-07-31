@@ -112,6 +112,21 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 **Beats:** (1) Het emplacement; zoeklichten; de respons. (2) **Het tactische probleem is nieuw:** burgers zijn geen eenheden. Dat is pillar 3 in mechaniek. (3) Sela organiseert ze — geroep, korte instructies, namen. (4) Ember dekt. (5) Verliezen, als die er zijn, zijn zichtbaar en hebben gezichten.
 **Bij doorrijden:** zwaarder gevecht, meer druk, meer kans op burgerverlies. **Bij stoppen:** korter gevecht, en op de terugweg ziet de speler de mensen die niet meekwamen, gemerkt en geteld. **Beide takken doen pijn en dat is de bedoeling** (§2.7 regel 2).
 
+> **DE `split`-TAK ONTBRAK — ruling L1-R25 (01-08).** De scène handelde `run` (`.200`–`.250`) en `emptied` (`.300`–`.340`) af en gaf `split` niets. De speler die de donkerste optie koos, kreeg de beats van een keuze die hij niet maakte, of stilte. **Dat is de L1-R12-vorm, op de tak met de minste spelers en het meest te verliezen.**
+>
+> **Een regelblok, geen `silence:`.** Het `silence:`-veld bestaat voor *"hier hoort niets"*, en dat is hier onwaar: S05 gaat over **mensen tellen terwijl je ze over een emplacement beweegt**, en in `split` ís het getal veranderd. Zwijgen in de enige telscène, in de tak waarin het aantal veranderde, is een gat met een verklaring eromheen.
+>
+> **`.350`–`.390`** — monotoon na `.340`, vóór de gedeelde staart op `.400`, dus niets hernummeren. Drie tot vijf regels:
+> 1. **Sela telt en het klopt.** Dat is de wreedheid. In `run` en `emptied` mist ze mensen; hier komt ze uit.
+> 2. **De vrouw in de gele werkjas** heeft in beide bestaande takken hetzelfde gezicht (neergeschoten op de spoordijk / op haar knieën bij de weegbrug). Haar derde afloop is gratis en de enige die dit blok nodig heeft: **zij zat in de tweede wagon en niemand weet het.** Geen enkele regel benoemt daar een gevoel bij.
+> 3. **Dit betaalt `M1.6.S04.190`** — Sela's *"Somebody should be able to say afterwards who got into that car."* Die zin is nu een belofte zonder afloop.
+> 4. **Geen vierde wegverklaring.** De gedeelde staart `.400`/`.410` draagt T4 al voor alle takken. Zie hieronder.
+> 5. **Geen Iron Chorus-stem** (Q-4). De Chorus neemt de wagon in een `shot:`, zoals in `M1.6.S04.180`.
+
+> **`.410` WORDT VLAK — ruling L1-R21 (01-08).** *"It's a freight yard. Freight yards get freight guards."* is de **derde** gepolijste T4-wegverklaring van de act, niet de tweede — L1-R17 telde er twee en zette ze allebei in de verkeerde missie. Deze staat in geen enkele P4-rij, zijn scène is nog `draft`, en hij is de meest hoorbaar *geschreven* van de drie. **De beat blijft, de politoer gaat eraf.**
+>
+> De schrijver had gelijk dat dit *"dezelfde verklaring die steeds moeilijker te zeggen wordt"* is. Wat ontbrak is dat de vórm dat dan ook moet doen. Vlak vanaf hier maakt van de reeks een **afbraakcurve** (gepolijst → gepolijst → **eerste barst** → letterlijke herhaling in M1.7.S06 → twee onafgemaakte redenen in M1.8.S03 → vier woorden op een lege radio in M1.8.S09), en daarmee wordt de vlakheid een karakterfeit over Mara in plaats van een auteursregel. Volledige aanrakingstabel: `ACT1_OVERVIEW` §4.
+
 ### S06 — *What We Do With Them* · de instroom
 `Kessara / Underworks / Hollow Point` · hub · tier 2
 **Aanwezig:** Mara, Voss, Sela, Reyes, Dex, Brick, tientallen nieuwkomers
