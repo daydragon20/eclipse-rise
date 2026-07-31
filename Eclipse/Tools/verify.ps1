@@ -184,6 +184,20 @@ if ($LASTEXITCODE -ne 0) { $Failures += "scriptvalidator kan niet meer rood word
 python "$Root\Tools\validate_script.py" --no-voice
 if ($LASTEXITCODE -ne 0) { $Failures += "scriptvalidatie meldt bevindingen" }
 
+# En dan de kaarten die de OWNER ziet. Dit is geen code-controle en hij hoort
+# hier toch, want een kapotte owner-kaart is duurder dan een rode test: Nathan
+# opent het dashboard, kan niets doen, en de fout ligt bij hem tot hij hem
+# uitzoekt. Op 01-08 stonden er drie tegelijk - "kies een stem voor Petra" (zij
+# had geen shortlist), "beluister de ijkmissie" (er was geen audio) en een
+# audio_map die naar een niet-bestaande map wees. Alle drie door mij geschreven
+# zonder te kijken of het ding aan de andere kant bestond.
+#
+# Zelftest eerst, om dezelfde reden als hierboven.
+python "$Root\Tools\check_owner_questions.py" --zelftest
+if ($LASTEXITCODE -ne 0) { $Failures += "kaartcontrole kan niet meer rood worden" }
+python "$Root\Tools\check_owner_questions.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "een owner-kaart vraagt iets dat niet kan" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"
