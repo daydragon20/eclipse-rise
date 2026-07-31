@@ -181,6 +181,23 @@ h3{font-size:17px;margin:0 0 8px}
 }
 .vt:focus{outline:0;border-color:var(--acc)}
 
+/* campagne-boom */
+.boomrij{display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer;border-bottom:1px solid var(--line);font-size:13.5px}
+.boomrij:hover{color:var(--acc2)}
+.boomrij .pijl{width:14px;color:var(--dim2);font-size:11px}
+.boomrij .m{margin-left:auto;font-size:12px;color:var(--dim2);white-space:nowrap}
+.boomrij.act{font-size:15px;border:0;padding:4px 0 10px}
+.boomrij.missie{padding-left:16px;color:var(--dim)}
+.boomrij.scene{padding-left:34px;color:var(--dim);font-size:13px}
+.boomrij.scene:last-child{border:0}
+.boom{margin:0 0 4px}
+.contract{background:#00000038;border:1px solid var(--line);border-radius:9px;padding:14px 16px;font-size:13.5px;display:grid;gap:8px}
+.contract b{color:var(--acc2);display:inline-block;min-width:74px}
+.dlg{padding:11px 0;border-bottom:1px solid var(--line)}
+.dlg .who{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc);margin-bottom:4px}
+.dlg .tx{font-size:14.5px;line-height:1.5}
+.dlg .shotnoot{font-size:12px;color:var(--dim2);margin-top:5px;font-style:italic}
+
 /* lagen-overzicht schrijflaag */
 .laag{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--dim2)}
 .laag:last-of-type{border:0}
@@ -530,18 +547,33 @@ function vSchrijf(){
     <div class="stat"><div class="n">${(v.remaining||0).toLocaleString("nl")}</div><div class="l">Credits over</div></div>
   </div>
 
-  <h2>Per missie</h2>
-  ${miss.length?miss.map(g=>{
-    const klaar=g.scenes.filter(s=>s.regels>0).length;
+  <h2>De campagne — klik open tot op de dialoog</h2>
+  ${(sc.acts||[]).map(a=>{
+    const heeft=a.missies.length;
     return `<div class="card">
-      <h3>${esc(g.missie)}
-        <span class="tag ${klaar===g.scenes.length?"ok":klaar?"warn":""}">${klaar}/${g.scenes.length} geschreven</span>
-        ${g.regels?`<span class="tag info">${g.regels} regels</span>`:""}</h3>
-      ${g.scenes.map(s=>`<div class="row">
-        <span class="t">${s.regels?"✍ ":"○ "}${esc(s.title)}</span>
-        <span class="m">${s.regels?s.regels+" regels · ":""}<span class="tag ${s.status==="generated"?"ok":s.status==="critic-pass"?"info":""}">${esc(s.status)}</span></span>
-      </div>`).join("")}
-    </div>`;}).join(""):'<div class="card"><div class="empty">Nog geen scènes. Ze komen in Eclipse/Content/Script/.</div></div>'}
+      <div class="boomrij act" onclick="klapBoom('act-${a.act}',this)">
+        <span class="pijl">${heeft?"▸":"·"}</span>
+        <strong>Act ${a.act} — ${esc(a.naam)}</strong>
+        <span class="m">${heeft?`${heeft} missies · ${a.scenes} scènes · ${a.geschreven}/${a.scenes} geschreven`
+                              :`${a.missiesVerwacht} missies gepland — nog geen skelet`}</span>
+      </div>
+      <div class="boom" id="act-${a.act}" style="display:none">
+        ${heeft?a.missies.map(g=>{
+          const k=g.scenes.filter(s=>s.regels>0).length;
+          return `<div class="boomrij missie" onclick="klapBoom('m-${esc(g.missie)}',this)">
+            <span class="pijl">▸</span><strong>${esc(g.missie)}</strong>
+            <span class="m">${k}/${g.scenes.length} geschreven${g.regels?` · ${g.regels} regels`:""}</span>
+          </div>
+          <div class="boom" id="m-${esc(g.missie)}" style="display:none">
+            ${g.scenes.map(s=>`
+              <div class="boomrij scene" onclick="openScene('${esc(s.file)}')">
+                <span class="pijl">${s.regels?"✍":"○"}</span>
+                <span>${esc(s.title)}</span>
+                <span class="m">${s.regels?s.regels+" regels":"geen dialoog"} · ${esc(s.status)}</span>
+              </div>`).join("")}
+          </div>`;}).join(""):'<div class="note">Nog geen beat-sheets. story-architect werkt acts 2-4 uit tot 11 augustus.</div>'}
+      </div>
+    </div>`;}).join("")}
 
   ${beats.length?`<h2>Beat-sheets — het skelet</h2>
   <div class="card"><div class="doclist">${beats.map(b=>`
@@ -678,6 +710,45 @@ function openRun(i){
     `<div class="msg assistant"><div class="who">Wat eruit kwam</div><div class="tx">${esc(r.result||"(geen resultaat vastgelegd)")}</div></div>`+
     `<div class="note" style="margin-top:14px">${esc(r.ago||"")}</div>`;
   ov.classList.add("on");
+}
+function klapBoom(id,rij){
+  const el=document.getElementById(id); if(!el)return;
+  const open=el.style.display!=="none";
+  el.style.display=open?"none":"block";
+  const p=rij.querySelector(".pijl");
+  if(p&&p.textContent!=="·")p.textContent=open?"▸":"▾";
+  event.stopPropagation();
+}
+async function openScene(pad){
+  document.getElementById("ov-t").textContent="Laden…";
+  document.getElementById("ov-b").innerHTML='<div class="empty">Laden…</div>';
+  ov.classList.add("on");
+  event.stopPropagation();
+  try{
+    const r=await fetch("/api/scene?path="+encodeURIComponent(pad));
+    const s=await r.json();
+    if(s.fout)throw new Error(s.fout);
+    document.getElementById("ov-t").textContent=s.titel||pad;
+    document.getElementById("ov-b").innerHTML=`
+      <div class="note" style="margin:0 0 14px">${esc(s.missie)} · ${esc(s.type)} · ${esc(s.locatie)}
+        <span class="tag ${s.status==="generated"?"ok":""}">${esc(s.status)}</span></div>
+      <div class="contract">
+        <div><b>Wil</b> ${esc(s.want)}</div>
+        <div><b>Obstakel</b> ${esc(s.obstacle)}</div>
+        <div><b>Wending</b> ${esc(s.turn)}</div>
+      </div>
+      ${s.regels&&s.regels.length?`
+        <h3 style="margin:20px 0 10px">Dialoog — ${s.regels.length} regels</h3>
+        ${s.regels.map(r=>`<div class="dlg">
+          <div class="who">${esc(r.speaker||"?")}${r.tags?` <span class="tag">${esc(r.tags)}</span>`:""}</div>
+          <div class="tx">${esc(r.text||"")}</div>
+          ${r.shot?`<div class="shotnoot">📷 ${esc(r.shot)}</div>`:""}
+        </div>`).join("")}`
+       :`<div class="empty" style="margin:18px 0">Nog geen dialoog geschreven. Deze scène is een skelet:
+          hij weet wát er moet gebeuren, maar niemand heeft nog een zin uitgesproken.</div>`}
+      ${s.notities&&s.notities.length?`<h3 style="margin:20px 0 8px">Instructies voor de schrijver</h3>
+        <div class="meerinfo">${s.notities.map(n=>esc(n)).join("<br>")}</div>`:""}`;
+  }catch(e){document.getElementById("ov-b").innerHTML='<div class="empty">Kon niet laden: '+esc(e.message)+'</div>'}
 }
 function openImg(u,n){
   document.getElementById("ov-t").textContent=n;

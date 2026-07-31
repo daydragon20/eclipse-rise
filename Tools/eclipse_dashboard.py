@@ -426,8 +426,12 @@ def scan_script() -> dict:
             # aantal dialoogregels = aantal '- id:' onder lines:
             regels = len(re.findall(r"^\s+-\s+id:", text, re.M))
 
+            am = re.search(r"^act:\s*(\d+)", head, re.M)
+            act = int(am.group(1)) if am else 1
+
             groep = per_missie.setdefault(missie, {
-                "missie": missie, "scenes": [], "regels": 0, "woorden": 0,
+                "missie": missie, "act": act, "scenes": [],
+                "regels": 0, "woorden": 0,
             })
             groep["scenes"].append({
                 "title": (t.group(1).strip() if t else yf.stem),
@@ -439,6 +443,30 @@ def scan_script() -> dict:
             groep["woorden"] += scene_words
 
     missies = sorted(per_missie.values(), key=lambda g: g["missie"])
+
+    # Nesten per act, zodat het dashboard een boom kan tonen:
+    # act -> missies -> scenes -> dialoog.
+    per_act: dict[int, dict] = {}
+    for g in missies:
+        a = g.get("act") or 1
+        acts = per_act.setdefault(a, {"act": a, "missies": [], "scenes": 0,
+                                      "regels": 0, "geschreven": 0})
+        acts["missies"].append(g)
+        acts["scenes"] += len(g["scenes"])
+        acts["regels"] += g["regels"]
+        acts["geschreven"] += sum(1 for s in g["scenes"] if s["regels"] > 0)
+
+    # De acts die nog geen enkele scene hebben, tonen we ook — anders lijkt
+    # het alsof de campagne uit één act bestaat.
+    ACT_NAAM = {1: "Embers", 2: "The Spreading Dark", 3: "The Long War", 4: "Eclipse"}
+    ACT_MISSIES = {1: 8, 2: 9, 3: 10, 4: 7}
+    acts_out = []
+    for a in (1, 2, 3, 4):
+        d = per_act.get(a, {"act": a, "missies": [], "scenes": 0,
+                            "regels": 0, "geschreven": 0})
+        d["naam"] = ACT_NAAM[a]
+        d["missiesVerwacht"] = ACT_MISSIES[a]
+        acts_out.append(d)
 
     # beat-sheets = laag L1 (het skelet waar de dialoog aan hangt)
     beats_dir = REPO / "phase0" / "beats"
@@ -464,7 +492,67 @@ def scan_script() -> dict:
         "regels": sum(g["regels"] for g in missies),
         "scenesMetDialoog": met_regels,
         "missies": missies,
+        "acts": acts_out,
         "beats": beats,
+    }
+
+
+def scene_detail(rel: str) -> dict:
+    """De inhoud van één scène: contract + de dialoogregels."""
+    if not rel or ".." in rel or not rel.endswith(".yaml"):
+        return {"fout": "ongeldig pad"}
+    target = (REPO / rel).resolve()
+    try:
+        target.relative_to(REPO)
+    except ValueError:
+        return {"fout": "buiten de repo"}
+    if not target.is_file():
+        return {"fout": "niet gevonden"}
+    try:
+        text = target.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return {"fout": str(exc)}
+
+    def veld(naam: str) -> str:
+        m = re.search(rf'^{naam}:\s*"?(.*?)"?\s*$', text, re.M)
+        return m.group(1).strip() if m else ""
+
+    # dialoogregels uit het lines-blok
+    regels = []
+    blok = text.split("lines:", 1)
+    if len(blok) > 1:
+        for stuk in re.split(r"\n\s+-\s+id:", blok[1])[1:]:
+            stuk = "id:" + stuk
+            r = {}
+            for k in ("id", "speaker", "voice", "text", "shot", "note"):
+                m = re.search(rf'^\s*{k}:\s*"?(.*?)"?\s*$', stuk, re.M)
+                if m and m.group(1):
+                    r[k] = m.group(1).strip()
+            tags = re.search(r"^\s*tags:\s*\[(.*?)\]", stuk, re.M)
+            if tags:
+                r["tags"] = tags.group(1).strip()
+            if r.get("text") or r.get("speaker"):
+                regels.append(r)
+
+    # schrijversnotities van story-architect (regels met '# ')
+    notities = [
+        l.lstrip("# ").rstrip()
+        for l in text.splitlines()
+        if l.strip().startswith("#") and not l.strip().startswith("# ----")
+    ]
+
+    return {
+        "path": rel,
+        "titel": veld("title"),
+        "missie": veld("mission"),
+        "locatie": veld("location"),
+        "type": veld("type"),
+        "status": veld("status"),
+        "want": veld("want"),
+        "obstacle": veld("obstacle"),
+        "turn": veld("turn"),
+        "regels": regels,
+        "notities": notities[:14],
     }
 
 
@@ -1015,6 +1103,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/state":
             with _state_lock:
                 return self._json(_state)
+
+        if path == "/api/scene":
+            return self._json(scene_detail((query.get("path") or [""])[0]))
 
         if path == "/api/doc":
             rel = (query.get("path") or [""])[0]
