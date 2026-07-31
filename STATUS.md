@@ -38,19 +38,22 @@ nul kosten leest als gratis. `Tools/count_generation_cost.py` maakt de telling
 herhaalbaar en **drukt altijd zijn eigen dekking af**. Saldo 125.612 — act 1 alleen is
 dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 
-> **Spoor A staat verder dan spoor B.** **Act 1 is geschreven op de hub na**: acht missies
-> plus de proloog, **1.471 regels**, `Eclipse/Content/Script/act1/`. Alleen de **12
-> hub-gesprekken** zijn nog stubs; twee schrijvers zijn ermee bezig.
+> **Spoor A staat verder dan spoor B. ACT 1 IS COMPLEET GESCHREVEN** — acht missies, de
+> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.623 regels, 97.275 credits**
+> (gemeten, `Tools/count_generation_cost.py`). Saldo 125.612, dus **act 1 alleen is 77%
+> van alles wat er nog is** — barks, muziek, SFX en de acts 2 t/m 4 komen daar nog bij.
+> Dat is de vraag op **O-14**.
 >
-> **De critic-poort is de rem, en dat hoort zo.** M1.1, M1.7 en M1.8 staan alle drie op
-> `critic: null` en er loopt een ronde op alle drie. **M1.1 is de ijkmissie** en blokkeert
-> alle generatie — hij ging terug naar draft doordat vijf van zijn zeven scènes vannacht
-> gerepareerd zijn. Geen regel gaat naar de generator zonder GO.
+> **De rem is nu de critic-poort, en dat hoort zo.** Stand: **17 GO, 9 NO-GO, 45 nog te
+> beoordelen**. De ijkmissie **M1.1 is NO-GO** (3 van 7 door) en blokkeert daarmee alle
+> generatie én owner-vraag O-4.
 >
-> **Act 1 kost ~100.000 credits van de 125.612 die er nog is** — zie de barnoot hierboven.
-> Generatie staat verder stil op **O-12** (2.475 credits op het verkeerde model; opnieuw of
-> niet). Meet met `python Eclipse/Tools/count_generation_cost.py`; die telt `text:` plus elke
-> variant, verdubbelt Voss, en drukt **altijd zijn eigen dekking af**.
+> ⚠ **Het `critic:`-veld werd tot 01-08 door niets gelezen** en stond 71 keer op `null`,
+> ook voor scènes die als GO gemeld waren — die oordelen leefden alleen in agentrapporten.
+> `EclipseGenerateVoicesCommandlet.cpp` noemt `critic`/`status`/`draft`/`GO` alle vier nul
+> keer. **De poort is niet omzeild: de weg die hij bewaakt is nooit gebouwd** — die
+> commandlet leest `DialogueSeed.json`, een bootstrap voor stem-*assets*. Wie de weg van
+> script naar generatie bouwt, moet de poort erin zetten.
 
 Spoor-B-prioriteit 1 is de **schermlaag**. Nathan speelt pas als die op niveau is.
 
