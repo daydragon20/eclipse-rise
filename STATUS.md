@@ -14,17 +14,29 @@ Bar (gemeten 01-08 ~02:20): build groen `-NoUba` · **226 tests, 0 gefaald, 0 ni
 gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** · EventCatalog
 **39/39** · creditmeter-poort groen.
 
-> ⚠️ **De BAR is desondanks ROOD, op één punt** — en dat onderscheid is de hele reden dat
-> `verify.ps1` meer doet dan build+tests. `check_voice_resolves.py` faalt: `eclipse_fighter`
-> heeft **vier slots** in de scripts (`_a`…`_d`) en **twee gekozen stemmen**, dus slot C en D
-> hangen aan niets. Dat zou géén foutmelding geven maar **stilte** — een lege
-> `ElevenLabsVoiceId` wordt op Display gelogd en overgeslagen, dus die regels bestaan
-> simpelweg niet in een run die er gezond uitziet.
+> ⚠ **De BAR is ROOD, en op méér punten dan gisteren — dat is winst.** Build en
+> `EclipseValidateData` staan groen; drie poorten melden iets:
 >
-> Het is een **owner-actie** (twee stemmen kiezen, staat als O-3) en er is bewust **geen
-> fallback** ingebouwd: een terugval op stem A zou de bar groen maken terwijl acht regels
-> nog steeds geen gekozen stem hebben. `phase0/SOAK_LOG.md` schrijft die rode regels
-> netjes weg — 22:11 en 22:20.
+> 1. **`check_voice_resolves.py`** — `eclipse_fighter` heeft **vier slots** in de
+>    scripts en **twee gekozen stemmen**, dus C en D hangen aan niets. Acht regels
+>    die géén foutmelding geven maar **stilte**: een lege `ElevenLabsVoiceId` wordt
+>    op Display gelogd en overgeslagen. **Owner-actie (O-3), bewust géén fallback** —
+>    terugvallen op stem A maakt de bar groen terwijl die acht regels nog steeds geen
+>    gekozen stem hebben.
+> 2. **`validate_script.py`** (nieuw, 01-08) — 31 bevindingen, waarvan twee de hele
+>    tool waard zijn: `M1.1.S99` vertakt op drie uitkomsten en handelt er **twee** af
+>    (`left` ontbreekt), `M1.6.S05` mist `split`. Plus vijf condities die door niemand
+>    gezet worden. Die bevindingen bestonden allemaal al; er kon alleen niets naar
+>    kijken. Zijn **zelftest draait ervóór** in de bar: zakt het bewijs dat de controles
+>    rood kúnnen worden, dan is het oordeel over het script waardeloos.
+> 3. **Vier suite-tests** (`Eclipse.Base.Vault*`) — in-flight werk van de vault-agent,
+>    niet gecommit. Daar geen conclusie aan verbinden tot die klaar is.
+
+**Act 1 kost ~100.000 credits, niet 65.015.** Dat oude bedrag telde zes van de acht
+missies: M1.7, M1.8 en de twaalf hub-gesprekken waren lege stubs en telden als nul, en
+nul kosten leest als gratis. `Tools/count_generation_cost.py` maakt de telling
+herhaalbaar en **drukt altijd zijn eigen dekking af**. Saldo 125.612 — act 1 alleen is
+dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 
 > **Spoor A staat verder dan spoor B.** Act 1 is **geschreven**: 40 scènes, ~9.400 woorden,
 > M1.1 t/m M1.6 plus de proloog. De critic-poort is voor 13 van de 20 beoordeelde scènes
@@ -154,6 +166,12 @@ bark-varianten, geen zes. Volledig in `21_quality_mandate.md` — kort, lees het
 - **Start de game nooit via de Bash-tool.** Argumenten die met `/Game/`, `/Script/` of
   `-ExecCmds=` beginnen worden door Git Bash verminkt. PowerShell. (`DEBUG_DISCIPLINE.md`
   §4.4 — dit kostte een halve avond.)
+- **Een zoek-en-vervang-script zonder `assert` is een stil falend script.** `s.find()` geeft
+  **-1** als het anker niet matcht, en `s[:-1] + nieuw + s[29:]` plakt het hele document er
+  een tweede keer achter — terwijl je `print("bijgewerkt")` gewoon afgaat. Gebeurd op 01-08
+  met `STATUS.md` (11 KB → 24 KB, elk kopje dubbel), op één afwijkend aanhalingsteken.
+  **Assert dat het anker gevonden is vóór je schrijft**, en controleer daarna de
+  bestandsgrootte tegen wat je toevoegde.
 - **Bugs:** volg `DEBUG_DISCIPLINE.md`. Drie iteraties zonder diagnose = escaleren.
 - **Owner-consent:** geen installs/downloads/security-prompts zonder akkoord. Nathan heeft
   **geen adminrechten** — queue dat als owner-actie, bouw er niet stil omheen.
