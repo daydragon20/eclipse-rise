@@ -50,9 +50,18 @@ alle drie zijn eerder de verkeerde kant op gestuurd door een plausibele redeneri
 2. **Trillen bij het schieten** — mechanisme **vast** (`bc881f4`, §4.2): de envelope
    herstart per schot. Géén AnimBP, dus geen vechtende blend-nodes. Fix is een aparte
    iteratie; falsificatie ligt klaar.
-3. **GPU-crash** — **page fault, geen TDR-timeout** (§4.5). Breadcrumbs wijzen
-   **SkyAtmosphere** aan; Lumen/TSR/SSR stonden op "Niet gestart". Crashkans **1 op 9**,
-   dus één schone run bewijst niets.
+3. **GPU-crash — GEPAUZEERD: hij reproduceert niet meer** (§4.5). Page fault, geen
+   TDR-timeout; breadcrumbs wezen **SkyAtmosphere** aan (Lumen/TSR/SSR stonden op "Niet
+   gestart"). **Maar de sky-hypothese is dood:** de bouwer draait één keer, op
+   `renderframe=0` vóór BeginPlay, en sloopt daar `0/0/0/0` — GrayboxDistrict draagt zelf
+   geen zon of sky, dus die sloopregels zijn op deze map dode code. Er ís geen mid-play
+   herbouw. En **35 rondes met 123.572 geforceerde sky-herbouwen gaven 0 crashes**; bij de
+   historische 1-op-9 is dat 1,6% waarschijnlijk. **Niet verder zoeken zonder signaal** —
+   `r.SkyAtmosphere 0` zou nul met nul vergelijken. Twee leads liggen open: de crash viel
+   *vroeg* (frame 259), wat elke "loopt vol"-verklaring tegenspreekt, en het crashende log
+   heette `Eclipse_2`, dus er was **contentie**. De enige niet-nagebootste vorm is een
+   **open editor** tijdens een ronde — en die kost het build-slot, dus dat is een
+   owner-afweging, geen agent-besluit.
 
 **Twee dingen die alleen een frame liet zien:** er staat een **STOP-verkeersbord** in het
 district (`EclipseGrayboxBuilder.cpp:1432`) terwijl `20_world_dressing_standard.md` §20.2
