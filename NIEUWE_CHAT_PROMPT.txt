@@ -215,25 +215,28 @@ HARDE REGELS
   sessie onderbroken wordt. Werk in één doorlopende sessie. Tegen een
   limiet aan? Draai push-all.bat, werk STATUS.md bij, en zeg het me.
 
-  ## Wat de volgende chat als eerste moet weten
-Er staat één test rood, en die is niet van vanavond. DocumentedConsoleCommandsExist faalt drie keer op drie — óók nadat ik mijn enige codewijziging had teruggedraaid. Hij faalt zonder assertiemelding, wat past bij een vroege uitgang: de test start eerst een harnas en geeft bij een mislukte start false terug zonder ooit een commando te controleren. Alle acht commando's hebben een registratieplek. Zoek dus waarom het harnas niet start, niet welk commando ontbreekt.
-
-Wat vanavond landde: de zes ingesproken zinnen (gegenereerd én bedraad, met jouw rem van 2 s), additieve terugslag uit een take die al in je Belica-pack lag, de HUD-nulmeting, en je lijst van 22 → 4.
-
-Wat niet lukte: de spelergerichte HUD vóór de debug-poort krijgen. Teruggedraaid — maar dát is wel de eerste bouwstap, want de schermlaag staat nu per constructie niet op een opname en is dus voor mij niet te controleren. Dat is precies waarom jij zegt "ik speel pas als de HUD er is".
-
-Eén ding om mee te nemen: mijn sessiecontext was van 27-07 terwijl de repo op 31-07 stond. Daardoor heb ik aan dossiers gewerkt die in DEBUG_DISCIPLINE.md al gediagnosticeerd waren. Een verse chat leest STATUS.md eerst en heeft dat probleem niet.
-
-
 --------------------------------------------------------------------
-WAT OP MIJ WACHT (staat ook in STATUS.md)
+WAT ER SPEELT — STAAT HIER MET OPZET NIET
 --------------------------------------------------------------------
-O-1  Verloopdatum van de 310k ElevenLabs-credits bevestigen  <-- blokkeert spoor A
-O-2  Commerciële gebruiksrechten bevestigen
-O-3  Stemmen kiezen uit de kandidaten
-O-4  IJkmissie M1.1 beluisteren en goed-/afkeuren
-O-5  Wapenbron — er bestaat nergens een los wapenmesh
-O-6  Stijlvraag: blijft de Borderlands-lock, of wil ik fotorealisme?
+Hier stond tot 01-08 een blok "wat de volgende chat als eerste moet
+weten" en een lijstje met O-1 t/m O-6. Allebei weg, en dat is de fix.
+
+Ze waren namelijk verlopen, en op de gevaarlijkste manier: dit bestand
+wordt als EERSTE gelezen, dus een verse sessie geloofde vier dingen die
+niet meer klopten — een rode test die allang groen was, een HUD-poort
+die als "teruggedraaid" beschreven stond terwijl hij geland was, 310.000
+credits waar er 131.000 zijn, en "er bestaat nergens een los wapenmesh"
+terwijl Nathan er zelf veel had gedownload.
+
+Dat is precies de fout waar dit bestand verderop tegen waarschuwt
+("mijn sessiecontext was van 27-07 terwijl de repo op 31-07 stond").
+Een startprompt die de stand HERHAALT, veroudert. Een die ERNAAR VERWIJST,
+niet.
+
+Dus: de stand staat in STATUS.md, de openstaande owner-vragen staan in
+phase0/owner_questions.json en op het dashboard, en de volgende taak
+staat in phase0/EXECUTION_PLAN.md §2. Alle drie zijn levend. Zet hier
+nooit een kopie van neer, hoe verleidelijk ook.
 
 --------------------------------------------------------------------
 BEGIN NU
