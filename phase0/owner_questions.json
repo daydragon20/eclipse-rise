@@ -22,6 +22,38 @@
   ],
   "vragen": [
     {
+      "id": "T-12",
+      "prio": "nu",
+      "vraag": "Drie API-scopes aanzetten — hier staat alle generatie op stil",
+      "waarom": "Dit is op dit moment de ENIGE echte rem in het project. De ingebouwde creditmeter was stuk en zei dat niet: generate_audio_assets.py vroeg bij ElevenLabs op wat een batch kost, kreeg daar een 401 op, slikte die fout en schreef stil geen verbruik weg. De ledger las dus als waarheid terwijl er niets gemeten was — en die 310.000 was daarmee jouw mededeling, geen meting. Dat is nu omgedraaid: generatie WEIGERT te draaien zonder gemeten spend (exit-code 3), en die weigering hangt als poort in verify.ps1 zodat hij niet stilletjes terug kan komen. Gevolg: zolang user_read ontbreekt komt er geen enkele regel audio uit, ook niet nadat je stemmen hebt gekozen. Goed nieuws: je saldo staat nog op de volle 310.000 — er is deze maand geen credit uitgegeven, ook casting fase 1 niet.",
+      "stappen": [
+        "Ga naar elevenlabs.io → je avatar rechtsboven → API Keys",
+        "Zet op de sleutel van dit project user_read aan — DIT is de blokkade: saldo lezen voor en na elke batch",
+        "Zet ook speech_history_read aan — anders is een uitschieter achteraf niet per regel te herleiden",
+        "Zet ook models_read aan — die checkt of eleven_v3 bestaat; de audio-tags uit 19.4 hangen eraan, en modelId zit in de cache-sleutel dus een verkeerde gok herbetaalt alles",
+        "Klik hieronder zodra het staat, dan meet ik het echte saldo na en zet dat in de ledger"
+      ],
+      "opties": [
+        {
+          "label": "Gedaan — alle drie staan aan",
+          "waarde": "gedaan",
+          "gevolg": "Ik meet het saldo na en zet de gemeten waarde in VOICE_LEDGER.md. Daarna kan Tier 1 draaien zodra jij stemmen gekozen hebt."
+        },
+        {
+          "label": "Deels — alleen user_read gelukt",
+          "waarde": "deels",
+          "gevolg": "Genoeg om te deblokkeren. De ledger krijgt er dan bij dat het verbruik per regel niet te herleiden is, zodat niemand die precisie later aanneemt."
+        },
+        {
+          "label": "Lukt niet",
+          "waarde": "lukt-niet",
+          "gevolg": "Zeg erbij wat je ziet. Waarschijnlijk staan de scopes op een ander sleuteltype, of hoort de sleutel bij een ander account dan het abonnement."
+        }
+      ],
+      "advies": "Dit kost drie minuten en het is het enige dat spoor A tegenhoudt. Alles eromheen ligt klaar.",
+      "vrijtekst": true
+    },
+    {
       "id": "O-8",
       "prio": "nu",
       "vraag": "HUD-uiterlijk: hoe Borderlands mag het worden?",
