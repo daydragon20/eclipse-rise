@@ -198,6 +198,19 @@ if ($LASTEXITCODE -ne 0) { $Failures += "kaartcontrole kan niet meer rood worden
 python "$Root\Tools\check_owner_questions.py"
 if ($LASTEXITCODE -ne 0) { $Failures += "een owner-kaart vraagt iets dat niet kan" }
 
+# En de owner-DOCUMENTEN. Op 01-08 stonden er vier verlopen, alle vier op dezelfde
+# manier: ze HERHAALDEN de stand in plaats van ernaar te verwijzen. Het project
+# heeft daar al een principe voor en dat hield het vier keer niet tegen.
+#
+# Deze controle dekt bewust maar EEN claim -- het testaantal in STATUS.md tegen de
+# laatste bar-regel in SOAK_LOG.md, want die schrijft dit script zelf. "De
+# ijkmissie is NO-GO" is niet mechanisch te toetsen, en een controle die doet
+# alsof hij meer dekt dan hij kan is precies de fout die hij moet vangen.
+python "$Root\Tools\check_owner_docs.py" --zelftest
+if ($LASTEXITCODE -ne 0) { $Failures += "documentcontrole kan niet meer rood worden" }
+python "$Root\Tools\check_owner_docs.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "STATUS.md claimt een getal dat niet meer klopt" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"
