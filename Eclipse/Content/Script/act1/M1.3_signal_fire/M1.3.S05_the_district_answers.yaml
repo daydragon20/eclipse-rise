@@ -74,12 +74,12 @@ lines:
 
   - id:      M1.3.S05.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "That's not the mast. That's the whole checkpoint."
 
   - id:      M1.3.S05.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "West. The ring is shut."
 
   - id:      M1.3.S05.040
@@ -117,12 +117,12 @@ lines:
 
   - id:      M1.3.S05.100
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "They don't send walkers for us."
 
   - id:      M1.3.S05.110
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "They did."
     note:    "The whole price of the mission in two words. Nobody elaborates and nobody is allowed to."
 
@@ -157,7 +157,7 @@ lines:
 
   - id:      M1.3.S05.160
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "What?"
 
   - id:      M1.3.S05.170
@@ -169,7 +169,7 @@ lines:
 
   - id:      M1.3.S05.180
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "There's a stair at the--"
 
   - id:         M1.3.S05.190
@@ -180,7 +180,7 @@ lines:
 
   - id:      M1.3.S05.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Between the shutters. Single file."
 
   - id:      M1.3.S05.210
@@ -191,14 +191,14 @@ lines:
 
   - id:      M1.3.S05.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [shouting]
     text:    "Down."
     shot:    "A walker lamp sweeps the row above their heads, slow, methodical, the way a thing looks when it has all night."
 
   - id:      M1.3.S05.230
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Count."
 
   - id:      M1.3.S05.240
@@ -213,10 +213,10 @@ lines:
 
   - id:      M1.3.S05.260
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "The case counts."
 
   - id:      M1.3.S05.270
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Go."

@@ -69,7 +69,7 @@ lines:
 
   - id:      M1.1.S99.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Thirty a piece."
 
   - id:      M1.1.S99.030
@@ -79,7 +79,7 @@ lines:
 
   - id:      M1.1.S99.040
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Four hundred and twenty."
 
   - id:      M1.1.S99.050
@@ -89,7 +89,7 @@ lines:
 
   - id:      M1.1.S99.060
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Four hundred and twenty."
 
   - id:      M1.1.S99.070
@@ -99,38 +99,38 @@ lines:
 
   - id:      M1.1.S99.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Put them in the rack before anybody says a number out loud again."
     note:    "The want, enacted: she stops the celebration before it starts. The obstacle is that nobody in the room can stop counting."
 
   - id:        M1.1.S99.090
     speaker:   REYES
-    voice:     elin_reyes
+    voice:     reyes
     condition: story.m11_zero_casualty == false
     text:      "One through the meat above the knee. He keeps the leg. He does not keep the week."
     note:      "Her first complete clinical sentence in the game. No contractions."
 
   - id:        M1.1.S99.100
     speaker:   REYES
-    voice:     elin_reyes
+    voice:     reyes
     condition: story.m11_zero_casualty == true
     text:      "I opened nothing tonight. Four units of plasma. Still four."
     note:      "Pays off S01.100 exactly. The optional objective is rewarded with an inventory line, not a compliment."
 
   - id:      M1.1.S99.110
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "That is the whole report."
 
   - id:      M1.1.S99.120
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Crate two is ration tabs and a spool of comm wire."
 
   - id:        M1.1.S99.130
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m11_zero_casualty == true
     tags:      [amused]
     text:      "Four hundred rounds in that crate and the wire is the part I'll dream about."
@@ -138,12 +138,12 @@ lines:
 
   - id:      M1.1.S99.140
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "The volley went on his mark."
 
   - id:      M1.1.S99.150
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Their leader walked last. He walked first, and he never learned why."
 
   - id:      M1.1.S99.160
@@ -166,12 +166,12 @@ lines:
 
   - id:      M1.1.S99.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Write it in the book anyway."
 
   - id:        M1.1.S99.190
     speaker:   REYES
-    voice:     elin_reyes
+    voice:     reyes
     condition: story.m11_conscript_spared == true
     text:      "Somebody used a pressure dressing tonight. It is not in the bag and it is not on anyone in this room."
     shot:      "Nobody answers her. She writes something down and does not ask twice."
@@ -179,7 +179,7 @@ lines:
 
   - id:        M1.1.S99.200
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: 'story.m11_conscript_choice == "finished"'
     text:      "Count says one round short. Somebody spent one on the way out."
     shot:      "He goes back to the wire. Nobody takes it up."
@@ -187,7 +187,7 @@ lines:
 
   - id:      M1.1.S99.210
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "The crates are the smallest thing we took."
 
   - id:      M1.1.S99.220
@@ -197,23 +197,23 @@ lines:
 
   - id:      M1.1.S99.230
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "They'll count six men missing and write it up as theft."
     note:    "Visibility 1/8. The Dominion under-reacts and a human being explains it away as good luck - the P4 pattern this mission lays the first stone of."
 
   - id:      M1.1.S99.240
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Theft."
 
   - id:      M1.1.S99.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nobody down there has said our name yet. That's worth more than the wire."
 
   - id:      M1.1.S99.260
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [exhausted]
     text:    "Count it into the book. Then sleep."
     shot:    "She leaves first. Voss stays at the table with the open crate and does not touch it."

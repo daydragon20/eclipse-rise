@@ -88,7 +88,7 @@ lines:
 
   - id:      M1.3.S02.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Four hundred people standing still. That's not a crowd, that's furniture."
 
   - id:      M1.3.S02.030
@@ -98,7 +98,7 @@ lines:
 
   - id:      M1.3.S02.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Long."
 
@@ -112,7 +112,7 @@ lines:
 
   - id:      M1.3.S02.060
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Third crown's blown. That buzz sitting on top of him."
     note:    "The required reaction: he hears a failed driver, not a sentence. 18.4 - technical noun as the whole of his opinion."
 
@@ -143,7 +143,7 @@ lines:
 
   - id:      M1.3.S02.110
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Behind the last of them."
 
   - id:      M1.3.S02.120

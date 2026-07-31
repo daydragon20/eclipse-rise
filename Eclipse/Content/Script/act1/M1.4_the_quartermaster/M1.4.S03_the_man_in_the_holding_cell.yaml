@@ -100,13 +100,13 @@ lines:
 
   - id:      M1.4.S03.060
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [urgent]
     text:    "Voss. The bridge over the floor is covered from both ends."
 
   - id:      M1.4.S03.070
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "The second crate is on the far side of it. Find another way."
 
   - id:      M1.4.S03.080

@@ -62,7 +62,7 @@ lines:
 
   - id:      M1.1.S04.020
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [quietly]
     text:    "Breathe out before, not after."
 
@@ -73,7 +73,7 @@ lines:
 
   - id:      M1.1.S04.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Leader?"
 
   - id:      M1.1.S04.050
@@ -88,7 +88,7 @@ lines:
 
   - id:      M1.1.S04.070
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Volley on the crates. Everybody onto the last man after."
     note:    "Her plan. It is workable and it is worse than his. She will drop it at .150."
 
@@ -129,7 +129,7 @@ lines:
 
   - id:      M1.1.S04.150
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "His mark."
     shot:    "She says it to the line, not to him. Two of them look at Voss for the first time."
@@ -153,7 +153,7 @@ lines:
 
   - id:      M1.1.S04.190
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [quietly]
     text:    "Lamps."
 
@@ -176,7 +176,7 @@ lines:
 
   - id:      M1.1.S04.230
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Two down."
     shot:    "The interruption is the volley. Nine seconds of dark, four muzzle flashes, no lamps."
@@ -199,7 +199,7 @@ lines:
 
   - id:      M1.1.S04.270
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Count."
 
   - id:      M1.1.S04.280
@@ -214,7 +214,7 @@ lines:
 
   - id:      M1.1.S04.300
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Five between us."
     note:    "The mission's arithmetic, audible: thirteen became five and bought a patrol."
 

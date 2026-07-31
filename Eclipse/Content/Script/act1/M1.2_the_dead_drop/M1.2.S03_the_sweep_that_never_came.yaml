@@ -73,7 +73,7 @@ lines:
 
   - id:      M1.2.S03.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Describe it."
 
   - id:      M1.2.S03.030
@@ -83,13 +83,13 @@ lines:
 
   - id:      M1.2.S03.040
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     interrupts: true
     text:    "Don't touch it."
 
   - id:      M1.2.S03.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "That's a sweep mark. I logged it. Eighth of the month, sweep due inside forty-eight hours."
 
   - id:      M1.2.S03.060
@@ -100,13 +100,13 @@ lines:
 
   - id:      M1.2.S03.070
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Eight days ago. Nothing on the band since. No detainments, no cordon, no van."
     note:    "Evidence 2. The scene's one permitted triad."
 
   - id:      M1.2.S03.080
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "A sweep is six hours of forty men on one channel. Can't miss it."
     note:    "Evidence 3, and it is the one that makes the absence a fact rather than a feeling."
 
@@ -119,45 +119,45 @@ lines:
 
   - id:      M1.2.S03.100
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "That is the third."
 
   - id:      M1.2.S03.110
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Third what?"
 
   - id:      M1.2.S03.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Third block they marked and never came back for. The pump gallery. The weighbridge before that."
     note:    "Both places are already canon: the pump gallery is in the act-1 location register, the weighbridge is spoken in M1.1.S01."
 
   - id:      M1.2.S03.130
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Marking a block costs one man and an hour."
 
   - id:      M1.2.S03.140
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Sweeping one costs forty and a night they do not have."
 
   - id:      M1.2.S03.150
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "They mark everything. They come back for what is worth the night."
     note:    "The explanation, delivered as arithmetic. Same method as her ammunition count in M1.1 - that is what makes it land as competence instead of as a cover story."
 
   - id:      M1.2.S03.160
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "For what it's worth, they run one channel across nine districts. Most of it's dead air."
     note:    "Corroboration from a second source, and it is the technical kind. One source is a claim."
 
   - id:      M1.2.S03.170
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Comforting. We're not worth the overtime."
     note:    "18.4 Dex: deflects the beat instead of sitting in it. The joke is also the theme."
 
@@ -169,12 +169,12 @@ lines:
 
   - id:      M1.2.S03.190
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Then we take this one while it is cheap."
 
   - id:      M1.2.S03.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "A marked block is a block nobody looks at twice."
     note:    "She turns the anomaly into an advantage. This is why she never investigates it, and it is the same blind spot that carries her into K-77."
 
@@ -188,5 +188,5 @@ lines:
 
   - id:      M1.2.S03.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Second pillar, behind the meter run. Move."

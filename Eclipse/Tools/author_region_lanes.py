@@ -99,15 +99,34 @@ def main():
 
     graph = unreal.EditorAssetLibrary.load_asset(path)
     written = apply_lanes(graph)
-    unreal.EditorAssetLibrary.save_asset(path)
-    print("Authored %d lane halves (%d undirected lanes) on %s." % (written, len(LANES), GRAPH_NAME))
+
+    # save_loaded_asset, and NOT save_asset(path): save_asset defaults to
+    # only_if_is_dirty=True, and set_editor_property on a struct array does not
+    # dirty the package. It then returns True having written nothing at all -
+    # measured on 31-07, three "authored 14 lane halves" runs in a row while the
+    # file on disk kept its timestamp from nine days earlier. A success value is
+    # not evidence of an effect; the file's mtime is.
+    graph.modify()  # the struct-array writes above do not dirty the package on their own
+    if not unreal.EditorAssetLibrary.save_loaded_asset(graph, only_if_is_dirty=False):
+        raise RuntimeError("save_loaded_asset('%s') failed - nothing was written." % path)
+    return "authored %d lane halves (%d undirected lanes) on %s" % (written, len(LANES), GRAPH_NAME)
 
 
-# NOT `if __name__ == "__main__"`. UE's pythonscript commandlet does not run a
-# -script= file under that name, so the usual guard silently does nothing and the
-# run reports "executed successfully" having authored zero lanes - measured, on
-# this script, on 31-07. Inverting it is the robust form: main() runs unless we
-# were imported as a module (which is exactly what create_phase1_content.py does,
-# and that caller applies the lanes itself at the right moment).
+# Runs unless imported as a module - which is exactly what create_phase1_content.py
+# does, and that caller applies the lanes itself at the right moment (after the
+# regions exist, before its own save loop).
+#
+# `__name__` under `-run=pythonscript -script=...` is plain `'__main__'`; that was
+# measured, not assumed, after this guard was briefly suspected of being the reason
+# the script "did nothing". It was not - see save_loaded_asset in main().
 if __name__ != "author_region_lanes":
-    main()
+    # unreal.log_* and not print(): the pythonscript commandlet does not route
+    # print() into the engine log, so a run that did nothing is indistinguishable
+    # from a run that worked. Measured on 31-07 - three "executed successfully"
+    # runs in a row that had authored nothing at all.
+    try:
+        unreal.log_warning("author_region_lanes: start")
+        unreal.log_warning("author_region_lanes: %s" % main())
+    except Exception as Error:  # noqa: BLE001 - the commandlet swallows these otherwise
+        unreal.log_error("author_region_lanes FAILED: %r" % (Error,))
+        raise

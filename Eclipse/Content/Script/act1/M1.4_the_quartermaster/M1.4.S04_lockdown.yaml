@@ -95,7 +95,7 @@ lines:
 
   - id:      M1.4.S04.060
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Doors first. Anybody still on the floor when they seat is staying."
 
   - id:      M1.4.S04.070
@@ -162,7 +162,7 @@ lines:
 
   - id:      M1.4.S04.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Down the trench. Do not stop to look at anybody."
 
@@ -179,7 +179,7 @@ lines:
 
   - id:      M1.4.S04.210
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Let him."
 
   - id:      M1.4.S04.220

@@ -121,6 +121,8 @@ def main() -> int:
         "rollen_gekozen": len(resolved),
         "finalisten_totaal": sum(len(r["finalisten"]) for r in resolved.values()),
         "library_finalisten_zonder_licentiecheck": lic,
+        "conflicten_eerste_keuze": {v: r for v, r in first_clash.items()},
+        "conflicten_inclusief_reserves": {v: r for v, r in any_clash.items()},
         "rollen": resolved,
     }, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -138,6 +140,19 @@ def main() -> int:
     else:
         print("Alle finalisten zijn premade-stemmen van ElevenLabs zelf — "
               "geen externe licentievoorwaarden, dus geen kaartcontrole nodig.")
+    if first_clash:
+        print("\nBOTSING OP EERSTE KEUS — twee personages zouden identiek klinken:")
+        for v, rs in first_clash.items():
+            print(f"  {rs[0][1]} ({v}) is eerste keus voor: "
+                  + ", ".join(r[0] for r in rs))
+    else:
+        print("\nEerste keuzes: geen botsingen, elke rol een eigen stem.")
+    reserve_only = {v: rs for v, rs in any_clash.items() if v not in first_clash}
+    if reserve_only:
+        print("Overlap in de RESERVES (bijt pas als een eerste keus in stage 2 afvalt):")
+        for v, rs in reserve_only.items():
+            print(f"  {rs[0][1]}: " + ", ".join(f"{r[0]} (keus {r[2]})" for r in rs))
+
     for p in problems:
         print("PROBLEEM:", p)
     print(f"\ngeschreven: {OUT.relative_to(ROOT)}")

@@ -78,7 +78,7 @@ lines:
 
   - id:      M1.4.S05.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Mark what stays. We are not coming back for it."
 
   - id:      M1.4.S05.050
@@ -107,7 +107,7 @@ lines:
 
   - id:      M1.4.S05.090
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     condition: 'story.m14_entry == "breach"'
     text:    "Then walk into the dark and stop looking at it."
 
@@ -120,7 +120,7 @@ lines:
 
   - id:      M1.4.S05.110
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     condition: 'story.m14_entry == "grate"'
     tags:    [quietly]
     text:    "Then nothing happened here. Walk."

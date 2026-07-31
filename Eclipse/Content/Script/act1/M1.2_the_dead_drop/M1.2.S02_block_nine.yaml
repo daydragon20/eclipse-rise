@@ -62,7 +62,7 @@ words:        230
 lines:
   - id:      M1.2.S02.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [quietly]
     text:    "Hands out of pockets. Nobody hurries in their own block."
     shot:    "Third gallery, Block Nine. Washing strung between pillars, sodium orange through it. A Bursary placard is pasted at eye height - MERIDIA RELIEF: YOUR RATION AT WORK. Two men walk past it without turning their heads."
@@ -74,7 +74,7 @@ lines:
 
   - id:      M1.2.S02.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Then walk like a nephew."
 
   - id:      M1.2.S02.040
@@ -85,7 +85,7 @@ lines:
 
   - id:      M1.2.S02.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Then move when they dim. That's free, and free is my favorite price."
 
   - id:      M1.2.S02.060
@@ -102,7 +102,7 @@ lines:
 
   - id:      M1.2.S02.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Quieter."
 
   - id:      M1.2.S02.090
@@ -113,7 +113,7 @@ lines:
 
   - id:      M1.2.S02.100
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Keep walking."
 
   - id:      M1.2.S02.110
@@ -123,7 +123,7 @@ lines:
 
   - id:      M1.2.S02.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "No word."
 
   - id:      M1.2.S02.130
@@ -142,7 +142,7 @@ lines:
 
   - id:      M1.2.S02.150
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Your background just tripled. Say again?"
 
   - id:      M1.2.S02.160
@@ -157,18 +157,18 @@ lines:
 
   - id:      M1.2.S02.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "She could have screamed."
 
   - id:      M1.2.S02.190
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "She turned it up instead."
 
   - id:      M1.2.S02.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nobody counts that. We do."
     note:    "18.4 Mara: plural first person, short declarative, no praise and no sentiment."
 
@@ -179,7 +179,7 @@ lines:
 
   - id:      M1.2.S02.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "She is a door we did not have an hour ago."
 
   - id:      M1.2.S02.230
@@ -189,12 +189,12 @@ lines:
 
   - id:      M1.2.S02.240
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "New seal on an old box. That's not maintenance."
 
   - id:      M1.2.S02.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Take it and walk."
 
   - id:      M1.2.S02.260
@@ -206,10 +206,10 @@ lines:
 
   - id:      M1.2.S02.270
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Nothing up there ever is."
 
   - id:      M1.2.S02.280
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Later."

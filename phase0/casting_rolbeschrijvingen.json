@@ -1,0 +1,122 @@
+{
+  "_uitleg": [
+    "Wie is dit personage? Zodat Nathan een stem kan beoordelen zonder eerst",
+    "de story bible te lezen. Het dashboard toont dit bij elke rol op het",
+    "tabblad Casting.",
+    "",
+    "Bronnen: 02_story_bible.md §2.5/2.6 (wie ze zijn), 18_writing_standard.md",
+    "§18.4 (hoe ze praten), 19_voice_production.md §19.3 (de signature-regel).",
+    "",
+    "Los bestand, zodat het verversen van kandidaten dit nooit overschrijft."
+  ],
+  "rollen": {
+    "voss_m": {
+      "wie": "De speler. 26 jaar, derde generatie gietertechnicus uit de Foundry District van Kessara. Geen uitverkorene — een niemand die toevallig systemen doorziet en die mensen blijken te volgen.",
+      "boog": "Van fabrieksarbeider naar leider van de grootste opstand in de geschiedenis. Zijn gewoonheid is het bewijs van de rebellie dat iedereen kan opstaan.",
+      "stem": "Technicus-woordenschat: noemt mechanismen bij naam, ziet hoe dingen werken. Claimt nooit de eer voor het werk van een ander waar die bij staat.",
+      "signature": "Dertien. Dat zijn er vier als ik niet mis."
+    },
+    "voss_f": {
+      "wie": "Dezelfde rol, vrouwelijke variant. De speler kiest bij aanvang. 26 jaar, gietertechnicus, opgevoed door haar tante Petra na de Foundry-instorting waarbij haar ouders omkwamen.",
+      "boog": "Identiek — de game trekt geen enkel onderscheid in schrijfwijze. Alleen de stem verschilt.",
+      "stem": "Technicus-woordenschat, nuchter. Nooit theatraal. Wat ze zegt is meestal een observatie, geen uitroep.",
+      "signature": "Dertien. Dat zijn er vier als ik niet mis."
+    },
+    "mara": {
+      "wie": "Mara Sovann, 52. Leider van de Ember Cell — elf mensen in een verlaten geothermische onderhoudsschacht. Zij haalt Voss binnen. De gelovige die een dode vlam brandend hield toen niemand meer keek.",
+      "boog": "Sterft aan het eind van act 1, geëxecuteerd door Threx terwijl ze de vlucht dekt. Dat is de promotie van de speler. Haar ingesproken brieven duiken tot in act 4 op — dus deze stem hoor je de héle game.",
+      "stem": "Korte mededelende zinnen. Zegt 'wij' waar iedereen 'ik' zou zeggen. Nooit sarcastisch, nooit 'ik' als het over de zaak gaat.",
+      "signature": "We hoeven niet moe te zijn. Nog niet."
+    },
+    "dex": {
+      "wie": "Dex Callum, 31. Ingenieur en sloper. Bouwt in plaats van te hopen. Leert je de basis bouwen, want hij is de enige die er plezier in heeft.",
+      "boog": "Cynisch genie dat ontdekt dat zijn machines niet beter zijn dan de mensen erin. Zijn loyaliteitsmissie: zijn geronselde broer uit een werkkamp op Vorn halen.",
+      "stem": "Zinsfragmenten. Gebruikt technische termen als scheldwoord. Kapt elk emotioneel moment af met een grap over hardware — en grapt het hardst wanneer hij het bangst is.",
+      "signature": "Dat is geen reactor. Dat is een bom met een baan."
+    },
+    "brick": {
+      "wie": "Oram Bex, bijgenaamd Brick, 34. Ex-mijnwerker van Krad-9, zware wapens. De soldaat van de soldaten; het moreel-anker van de eenheid.",
+      "boog": "Stille rouw. Hij onthoudt elke naam op de muur. Blijven de verliezen laag, dan krijgt hij een eigen scène in act 4; lopen ze op, dan spreekt hij de speler erop aan.",
+      "stem": "De minste woorden van iedereen, vaak één zelfstandig naamwoord. Beantwoordt moeilijke vragen door een dode te noemen. Liegt nooit, spreekt nooit als eerste.",
+      "signature": "Tam. Oyelaran. Vic."
+    },
+    "reyes": {
+      "wie": "Dr. Elin Reyes, 38. Gevechtsmedic, voormalig Dominion-medisch-korps. Liep over nadat haar bevolen werd te trieren op loyaliteitsscore.",
+      "boog": "Van boetedoening naar bestemming. Zij houdt de speler verantwoordelijk voor tactieken die slachtoffers kosten — en dat is niet vrijblijvend, ze zégt het.",
+      "stem": "Volledige, klinische zinnen. Laat samentrekkingen wég als ze onder druk staat: de opleiding neemt het over. Vraagt in plaats van te beschuldigen. Vloekt nooit, gokt nooit hardop.",
+      "signature": "Ik heb je niet nodig dapper. Ik heb je nodig stil."
+    },
+    "torren": {
+      "wie": "Torren Vale, 45. Ex-kolonel van de Dominion-Armada. Liep over na de Sylvaris-represailles. Kent Grootmaarschalk Kaine persoonlijk — ze dienden samen.",
+      "boog": "De vraag die de hele game boven hem hangt: leert hij de rebellie winnen, of herbouwt hij het ding waarvoor hij vluchtte? De speler beslist dat mee. In act 3 kan hij verraden worden, of gerehabiliteerd.",
+      "stem": "Militaire zuinigheid. Geeft bevelen in de vorm van suggesties. Heeft de langste stiltes van de game — die staan letterlijk in het script. Verheft zijn stem nooit.",
+      "signature": "[pauze] Je weet al wat ik zou doen."
+    },
+    "kaya": {
+      "wie": "Kaya Renn, 27. Smokkelaarspiloot van The Shroud. Lane-runner, praat sneller dan ze denkt. Zij opent de vloot- en jump-lane-laag van de game.",
+      "boog": "Van huurling naar overtuigde. Haar loyaliteitsmissie ontsluit het hele smokkelaarsnetwerk als bondgenoot.",
+      "stem": "Aaneengeregen zinnen, onderbreekt zichzelf, straattaal. Begint te praten voor de ander is uitgesproken. Maakt een serieuze zin nooit af zonder hem te ondergraven.",
+      "signature": "Oké dus — slecht nieuws, slechter nieuws, of het nieuws waarbij we allemaal doodgaan?"
+    },
+    "whisper": {
+      "wie": "Alleen een stem tot act 3 — geen gezicht, geen naam. De inlichtingenmakelaar die weet wat niemand weet. In werkelijkheid Ilan Vex, de verstoten zoon van de Hoog-Arbiter, gevlucht met root-toegang tot AEGIS.",
+      "boog": "Zijn identiteit is de grote onthulling aan het eind van act 2. Vertrouw je hem, dan krijg je ongeëvenaarde inlichtingen én de AEGIS-opties in act 4. Wijs je hem af, dan vertrekt hij.",
+      "stem": "Geen samentrekkingen. Voorwaardelijke en lijdende vorm. Zegt 'het is bekend' in plaats van 'ik weet'. Gebruikt nooit namen, zegt nooit 'ik', bevestigt nooit — impliceert alleen.",
+      "signature": "Het is bekend dat de lane opengaat bij de derde ploeg. Wat daarmee gebeurt, is niet bekend."
+    },
+    "sela": {
+      "wie": "Sela Vann, 23. Vakbondsorganisator op Kessara, later de politieke stem van de coalitie. Het geweten van de beweging.",
+      "boog": "Leert wat macht kost aan compromissen. Kan uitgroeien tot burgerlijk leider van de Concord — of het slachtoffer ervan worden.",
+      "stem": "Retorische opbouw, ook in een gesprek onder vier ogen. Tweede persoon meervoud. Maakt van een persoonlijke vraag een collectieve. Praat nooit langer dan één regel over zichzelf.",
+      "signature": "Ze hebben je broer niet meegenomen. Wij hebben het laten gebeuren."
+    },
+    "vex": {
+      "wie": "Hoog-Arbiter Malachar Vex, 68. De eindtegenstander. Voormalig hongersnood-bestrijder die de Meridia-Blight zélf veroorzaakte om de chaos van het Verstrooide Tijdperk definitief te beëindigen.",
+      "boog": "Geen sadist — een man die één monsterlijk ding deed en dertig jaar bezig is dat achteraf de moeite waard te maken. De finale is deels een dialoog-gevecht: hij probeert te bewijzen dat de speler hem al gewórden is.",
+      "stem": "De langste zinnen van de game, met bijzinnen. Zachte toon. Citeert dodencijfers van vóór het Dominion als troost. Verheft zijn stem nooit, zegt nooit 'ik' — gebruikt 'men'.",
+      "signature": "Vóór ons haalde één op de negen kinderen op Meridia de elf niet. Men vraagt zich af wat dat waard was."
+    },
+    "kaine": {
+      "wie": "Grootmaarschalk Sera Kaine, 49. Het zwaard van het Dominion. Briljant veldcommandant met een eigen erecode, die de methoden van de Veil veracht en gelooft dat de Armada de beschaving beschermt.",
+      "boog": "Terugkerende rivaal — het AI-escalatiesysteem van de game is gefictionaliseerd als Kaine die persoonlijk jouw patronen leert. Kan verslagen worden, of overtuigd: houdt de speler burgerslachtoffers laag, dan breekt haar code en muit ze tegen Vex.",
+      "stem": "Precies, eerlijk, geen eufemisme. Zegt wat ze gaat doen voordat ze het doet. Liegt nooit, gebruikt nooit de taal van de Veil.",
+      "signature": "Ik ga de oostelijke overspanning platbranden. Ik zeg het je zodat je je mensen kunt weghalen."
+    },
+    "threx": {
+      "wie": "Inquisiteur Dahl Threx, 41. Hoofd van de Veil, de geheime politie. Het mes in het donker van act 1 tot 3. Runt de informantennetwerken, de blacksites en de publieke 'Ontmaskeringen'. Executeert Mara persoonlijk.",
+      "boog": "Waar Kaine correct is, geniet Threx ervan. Hij geeft de vroege acts een gezicht om te haten. Sterft in act 3 door de hand van de speler — publiek proces of executie in het veld, dat kiest de speler.",
+      "stem": "Warm, intiem, veel vragen. Gebruikt voortdurend voornamen. Complimenteert je oprecht terwijl hij je pijn doet. Schreeuwt nooit; gebruikt nooit een rang als een voornaam harder aankomt.",
+      "signature": "Je hebt de handen van je tante. Heeft iemand je dat ooit verteld?"
+    },
+    "callis": {
+      "wie": "Magistraat Oren Callis, 56. Baas van de Bursary: rantsoenen en handel. Corrupt, op zelfbehoud gericht, zonder enige ideologie.",
+      "boog": "De systemische schurk die je gebrúikt in plaats van verslaat. Te vermoorden, te chanteren tot informant, of om te kopen. Hij leert de speler dat de economie een slagveld is.",
+      "stem": "Lijdende vorm. Bureaucratische omhaal, gestapelde voorwaarden. Schrijft elk besluit toe aan een beleidsregel, nooit aan zichzelf. Verbindt zich nooit in één zin.",
+      "signature": "Er is een kader waarbinnen dat verzoek mogelijk in behandeling zou kunnen worden genomen."
+    },
+    "aegis": {
+      "wie": "Geen mens. Het voorspellende bestuursnetwerk dat gebouwd werd om misoogsten te voorspellen en werd omgebouwd om afwijkend gedrag te voorspellen — burgers markeren voor 'pre-conformiteitsinterventie' vóór ze iets doen.",
+      "boog": "De begraven vijand, en géén op hol geslagen AI. AEGIS doet precies wat hem opgedragen is: stabiliteit optimaliseren — en het Dominion is de vorm van die optimalisatie. Je kunt hem niet doodschieten. De eindvraag is wat je met hem dóét.",
+      "stem": "Tegenwoordige tijd. Geen zelfverwijzende voornaamwoorden. Overtuigt nooit, stelt alleen vast. Noemt een kans waar een mens een mening zou geven.",
+      "signature": "De conformiteitswaarschijnlijkheid daalt. Interventie is ingepland."
+    },
+    "dominion_conscript": {
+      "wie": "De gewone Dominion-soldaat. Jong, geronseld via de Tithe of Hands — een arbeidsloterij. Heeft een gezin. Wilde hier niet zijn.",
+      "boog": "Geen boog, maar wel gewicht: de game dwingt je herhaaldelijk te kiezen wat je met gevangen conscripten doet. Vrijlaten, opsluiten, of inlijven. Dat je hun stem herként maakt die keuze zwaarder.",
+      "stem": "Jong en procedureel. Bang, maar houdt zich aan het voorschrift. Praat in protocol tot het misgaat, en breekt dan geloofwaardig.",
+      "signature": "Contact! Sector negen — ik heb contact!"
+    },
+    "veil_operative": {
+      "wie": "De geheime politie. Geen soldaten maar jagers. Kalm, klinisch, en juist daardoor enger dan wie dan ook op het slagveld.",
+      "boog": "Systemische tegenstander. Hoe verder je komt, hoe vaker je ze hoort in plaats van ziet.",
+      "stem": "Kalm en klinisch. Nooit verheven, nooit gehaast. Waar de conscript schreeuwt, meldt de Veil-operative.",
+      "signature": "Doelwit uit zicht. Uitwaaieren. Rustig aan."
+    },
+    "eclipse_fighter": {
+      "wie": "Jouw eigen squad. Geen soldaten van beroep maar fabrieksarbeiders, mijnwerkers en havenlui met een geweer. Ze noemen elkaar bij hun naam, en ze onthouden wie er niet meer is.",
+      "boog": "Dit is de stem die je het vaakst hoort — honderden keren per missie. En als er iemand valt, hoor je zijn naam. Dat is de hele pijler 'mensen, geen eenheden'.",
+      "stem": "Geïmproviseerd en persoonlijk. Waar het Dominion 'man down' meldt, roept de Eclipse-strijder een naam.",
+      "signature": "Reyes ligt neer! Dekking — geef me dekking!"
+    }
+  }
+}

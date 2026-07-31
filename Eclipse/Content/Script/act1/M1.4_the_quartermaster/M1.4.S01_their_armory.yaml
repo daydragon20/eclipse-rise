@@ -61,29 +61,29 @@ words:        247
 lines:
   - id:      M1.4.S01.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Foundry Row. The armory in the old casting hall."
     shot:    "Map table. A floor plan drawn in grease pencil on the back of a ration chart, weighted at the corners with rifle parts."
 
   - id:      M1.4.S01.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Forty crates on their manifest board. Nobody writes what's in them, so I weighed one off a checkpoint truck."
     note:    "Beat 1. He gives the armory as mass, not as firepower. That is the only way his head takes it in."
 
   - id:      M1.4.S01.030
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Twenty-two kilos sealed. The round boxes are worse. Grease-packed, and no handles."
 
   - id:      M1.4.S01.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "One night. What's left at first light stays theirs."
 
   - id:      M1.4.S01.050
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Shift changes on the third horn."
     note:    "The IC-intel prep result, delivered as a fact and not as a briefing."
 
@@ -104,7 +104,7 @@ lines:
 
   - id:      M1.4.S01.090
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "One at a time. The fourth one's still outside when it starts."
 
   - id:      M1.4.S01.100
@@ -121,67 +121,67 @@ lines:
 
   - id:      M1.4.S01.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Then that's the way in."
     note:    "Answers either option. Written so no approach flag is required at runtime."
 
   - id:      M1.4.S01.130
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "There are men inside that building who sleep there. What is the instruction if they put their hands up?"
     shot:    "She has not looked up from the kit she is repacking."
     note:    "Beat 3. 18.4 Reyes: a question instead of an accusation, and no contractions anywhere in her lines."
 
   - id:      M1.4.S01.140
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "Eleven bunks. No cell, no rope, and nobody to spare on watching a prisoner."
     note:    "Beat 4. The scene's one permitted triad (18.9 B). Her answer is logistics, which is what makes it ugly."
 
   - id:      M1.4.S01.150
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "So nobody comes back with us."
 
   - id:      M1.4.S01.160
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "That is not an answer I can write in a log."
 
   - id:      M1.4.S01.170
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Then leave it out of the--"
 
   - id:      M1.4.S01.180
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     interrupts: true
     text:    "Nobody lean on the plan. It's grease pencil and the grease is winning."
     shot:    "Reyes does not get her answer. Nobody comes back to it."
 
   - id:      M1.4.S01.190
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Four of us. Thirty kilos each over two kilometres. That's four crates out of forty."
     note:    "Beat 5. The arithmetic that S05 solves."
 
   - id:      M1.4.S01.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We get one night."
 
   - id:      M1.4.S01.210
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Then somebody tell me which thirty-six we're leaving."
     shot:    "Nobody answers him."
     note:    "The hole in the plan, said out loud and left open. Brick walks into it in S05."
 
   - id:      M1.4.S01.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Their armory has been feeding this district for years. Tonight it feeds us."
     shot:    "She rolls the plan up before anybody can answer Dex."
     note:    "Shipped BriefingText, MT_M14 in setup_story_missions.py, verbatim."

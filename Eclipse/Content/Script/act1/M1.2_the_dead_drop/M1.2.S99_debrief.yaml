@@ -69,91 +69,91 @@ words:        354
 lines:
   - id:      M1.2.S99.010
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Two hundred and six names. Warden rosters for four blocks."
     shot:    "Map table. Two cache tins open, the contents laid out in rows because Dex cannot help himself."
 
   - id:      M1.2.S99.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "And a frequency table. Handwritten. In a drawer, like a shopping list."
 
   - id:        M1.2.S99.030
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m12_ghost == true
     text:      "Nine thousand people in that block and not one of them can describe us."
 
   - id:        M1.2.S99.040
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m12_ghost == true
     text:      "Best kind of famous."
 
   - id:        M1.2.S99.050
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m12_ghost == false
     text:      "They have us on a gallery in Block Nine. Faces, height, the way we move."
 
   - id:        M1.2.S99.060
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m12_ghost == false
     text:      "So we're in a file somewhere."
 
   - id:        M1.2.S99.070
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m12_ghost == false
     text:      "We are in a file somewhere."
     note:      "She repeats it back flat and moves on. The act's engine turning over for the first time, and nobody in the room hears it."
 
   - id:      M1.2.S99.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "What does the table open?"
 
   - id:      M1.2.S99.090
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Every warden band in the Mid-Works. The maintenance channels under them."
 
   - id:      M1.2.S99.100
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Which is worth nothing, because we can't hear a word of it from down here."
 
   - id:      M1.2.S99.110
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Give me a repeater on a housing roof. Four parts and a mast. I've had it drawn for two years."
     note:    "The wish list. Two years of thinking about something nobody assigned him - and it is a listening post, not a weapon."
 
   - id:      M1.2.S99.120
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "It's on the back of a ration card in my kit. Two years."
 
   - id:      M1.2.S99.130
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Four parts we buy with names."
 
   - id:      M1.2.S99.140
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Names buy bread. Names buy the plasma Reyes counts twice."
     note:    "She weighs intel as food. Callback to M1.1.S01.100 - Reyes counted four units twice."
 
   - id:      M1.2.S99.150
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "So that's a no, that's a--"
 
   - id:      M1.2.S99.160
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "It is not tonight."
 
@@ -182,53 +182,53 @@ lines:
 
   - id:      M1.2.S99.200
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Twice in one night. That is twice."
 
   - id:      M1.2.S99.210
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Fine. It's a good idea. It's a good idea and I'm not saying it again."
     note:    "Callback to S01.200. He concedes without naming a single feeling, which is the whole of his fingerprint."
 
   - id:      M1.2.S99.220
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "A mast has a garrison on it. How many of ours come back through my door, and in what condition?"
     note:    "Her one line. A question instead of an objection, no contractions. Second of two act-1 questions, both about wounded."
 
   - id:      M1.2.S99.230
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We do not know yet."
 
   - id:      M1.2.S99.240
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "That is what tomorrow is for."
 
   - id:      M1.2.S99.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Put the mast on the table."
     shot:    "She takes the grease pencil off Dex without asking and marks the checkpoint on the map herself."
     note:    "The compliment, third and last time. She never says it was a good idea; she writes it down."
 
   - id:      M1.2.S99.260
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "And the roof after it. Not before."
     note:    "She adopts Voss's ordering word for word. That is the payment."
 
   - id:      M1.2.S99.270
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Half the Mid-Works will see it go."
     note:    "The mission title of M1.3 without anybody saying it. Restraint, 18.8."
 
   - id:      M1.2.S99.280
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "Good."
     shot:    "Reyes is already gone. Dex takes the grease pencil back."

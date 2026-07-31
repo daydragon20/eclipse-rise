@@ -91,14 +91,14 @@ words:        302
 lines:
   - id:      M1.4.S99.010
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Nine crates out. Eleven rifles that fire today. Four more when I've had a night with them."
     shot:    "Bunk row. The haul is laid down the middle of the floor and there is nowhere left to walk."
     note:    "Nine, against the four Dex costed in S01. The difference is Brick and nobody says so."
 
   - id:      M1.4.S99.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "And their book said forty were in that hall. There were twenty-six."
 
   - id:      M1.4.S99.030
@@ -108,47 +108,47 @@ lines:
 
   - id:      M1.4.S99.040
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Sold, or written into a column nobody checked. That's how we got in, and it's the only reason we--"
 
   - id:      M1.4.S99.050
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "We got in because we were better than they are."
 
   - id:      M1.4.S99.060
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Sure."
     shot:    "He shrugs and goes back to the crate. Nobody in the room disagrees with her."
 
   - id:      M1.4.S99.070
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Two crush injuries and a hand that will not close for a week."
 
   - id:      M1.4.S99.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Cheap."
 
   - id:      M1.4.S99.090
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Sit down and take the left arm out of the sleeve."
     shot:    "She pulls a crate over and sits on it, which puts her below him."
 
   - id:      M1.4.S99.100
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "The cuffs sit high in those blocks. Show me above the bone first."
     shot:    "She knows where to look before she looks. Dex glances up and says nothing."
     note:    "The whole of her history, and not one word of it is spoken. Do not add one."
 
   - id:      M1.4.S99.110
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "When did the shoulder go?"
 
   - id:      M1.4.S99.120
@@ -158,19 +158,19 @@ lines:
 
   - id:      M1.4.S99.130
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "That is a place."
 
   - id:      M1.4.S99.140
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     tags:    [pause]
     text:    "Then it is old, it set on its own, and I cannot open it tonight."
     note:    "The scene's one permitted triad (18.9 B)."
 
   - id:      M1.4.S99.150
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Three months in a holding block. What was there to do with the time?"
 
   - id:      M1.4.S99.160
@@ -180,7 +180,7 @@ lines:
 
   - id:      M1.4.S99.170
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Counted what?"
 
   - id:      M1.4.S99.180
@@ -192,30 +192,30 @@ lines:
 
   - id:      M1.4.S99.190
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     tags:    [pause]
     text:    "There is nothing in my kit for that."
 
   - id:      M1.4.S99.200
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Sleeve down. Come back in the morning and say them again."
     note:    "She prescribes the names. The turn, and she never explains it to anybody."
 
   - id:      M1.4.S99.210
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Bex goes on the roster."
 
   - id:      M1.4.S99.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "It used to be a list we could say out loud."
     note:    "Plant for M1.6. The list outgrows the mouth before it outgrows the room."
 
   - id:      M1.4.S99.230
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "The trench was not on any plan we had."
 
   - id:      M1.4.S99.240
@@ -231,17 +231,17 @@ lines:
 
   - id:      M1.4.S99.250
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "One more thing and then I'm going to bed."
 
   - id:      M1.4.S99.260
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "There's nine crates on that floor and no paper on any of it."
 
   - id:      M1.4.S99.270
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Somebody keeps the book now, or in a month we're stealing our own rounds back."
     note:    "P3-a. The job exists as of this line and it arrives inside a complaint."
 
@@ -252,6 +252,6 @@ lines:
 
   - id:      M1.4.S99.290
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "It comes with a pencil."
     shot:    "Somebody laughs down the row. Nobody volunteers and nobody is asked. The lamps go down."

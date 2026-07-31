@@ -83,18 +83,18 @@ words:        159
 lines:
   - id:      M1.3.S06.010
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Band's open. All of it."
     shot:    "Walking backwards down a service stair with the scanner held up like a lamp. Behind them the checkpoint is still shouting at itself."
 
   - id:      M1.3.S06.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Two years I've had a wall in this thing. There's no wall."
 
   - id:      M1.3.S06.030
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Shift calls. Somebody reading scrip numbers. Somebody's kid crying on an open channel."
     note:    "The world-state change, delivered as three ordinary noises. No character explains what it means and nobody celebrates it."
 
@@ -105,29 +105,29 @@ lines:
 
   - id:      M1.3.S06.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Nobody's talked out loud in this district since I was--"
 
   - id:         M1.3.S06.060
     speaker:    MARA
-    voice:      mara_sovann
+    voice:      mara
     interrupts: true
     text:       "Stop."
 
   - id:      M1.3.S06.070
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "What?"
 
   - id:      M1.3.S06.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Back one."
     note:    "She hears it before he does. Five years of listening to nothing has a use."
 
   - id:      M1.3.S06.090
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "That's a Veil carrier."
     shot:    "The hiss falls away. The air goes clean and close, the way a room sounds with the door shut."
 
@@ -146,12 +146,12 @@ lines:
 
   - id:      M1.3.S06.120
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "He's not talking to a handler."
 
   - id:      M1.3.S06.130
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [quietly]
     text:    "Quiet."
 
@@ -175,7 +175,7 @@ lines:
 
   - id:      M1.3.S06.170
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Gone."
 
   - id:      M1.3.S06.180
@@ -185,17 +185,17 @@ lines:
 
   - id:      M1.3.S06.190
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "No."
 
   - id:      M1.3.S06.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "He has time."
 
   - id:      M1.3.S06.210
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "We don't."
     note:    "Mara's haste, planted here, unexplained, five words total. It is the thing that gets her killed at K-77 and nobody in this scene notices it."
@@ -207,12 +207,12 @@ lines:
 
   - id:      M1.3.S06.230
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "No."
     shot:    "He does not lower the scanner and he does not say anything else. Nobody fills it."
     note:    "THE SILENCE. Voss hands him a perfect opening and he takes none of it. The only unused opening he leaves in the act - 18.7, silence is content."
 
   - id:      M1.3.S06.240
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Walk."

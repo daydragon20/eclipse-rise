@@ -61,7 +61,7 @@ words:        27
 lines:
   - id:      M1.1.S03.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [quietly]
     text:    "Thirteen."
     shot:    "CU Mara. Hand on his shoulder. She is not looking at him."
@@ -76,7 +76,7 @@ lines:
 
   - id:      M1.1.S03.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "It was enough for the ones who had six."
     shot:    "She moves off. Camera stays on Voss."

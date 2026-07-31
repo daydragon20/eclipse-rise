@@ -180,7 +180,7 @@ lines:
 
   - id:        M1.1.S05.180
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: 'story.m11_conscript_choice == "finished"'
     text:      "That was a round."
     shot:      "She is already moving. She does not look at the deck."
@@ -201,7 +201,7 @@ lines:
 
   - id:        M1.1.S05.210
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: 'story.m11_conscript_choice == "left"'
     text:      "Then we walk."
 
@@ -220,12 +220,12 @@ lines:
 
   - id:        M1.1.S05.240
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: 'story.m11_conscript_choice == "bound"'
     text:      "Above the hip. Tighter."
     shot:      "She crouches, fixes the knot, and stands up. She does not say whether it was right."
 
   - id:      M1.1.S05.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Off the deck."

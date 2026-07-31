@@ -66,12 +66,12 @@ lines:
 
   - id:      M1.1.S02.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Keep off the joint plates. They ring."
 
   - id:      M1.1.S02.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Check, check. If that comes through like a man in a pipe, that's the housing, not the range."
     note:    "Dex joke 2 of 3. Hardware humour, and he is telling them in advance which failure to expect."
 
@@ -82,7 +82,7 @@ lines:
 
   - id:      M1.1.S02.070
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Don't say that. It hasn't done a full hour yet."
 
   - id:      M1.1.S02.080
@@ -92,7 +92,7 @@ lines:
 
   - id:      M1.1.S02.090
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Ours."
     shot:    "She keeps walking. Voss is half a step behind her and hears it land on him too."
     note:    "18.4 Mara: plural where anyone else says I. One word answers a name question."
@@ -105,12 +105,12 @@ lines:
 
   - id:      M1.1.S02.110
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "North pier. Two flights down to the weighbridge."
 
   - id:      M1.1.S02.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Rain'll be in by then. Warm rain keeps the plates tacky. Good for the boots, bad for the sound."
 
   - id:      M1.1.S02.130
@@ -120,7 +120,7 @@ lines:
 
   - id:      M1.1.S02.140
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Nobody holds a pier for a supply run. They hold gates."
 
@@ -133,7 +133,7 @@ lines:
 
   - id:      M1.1.S02.160
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "One."
 
@@ -144,18 +144,18 @@ lines:
 
   - id:      M1.1.S02.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "That's the planning number. Four go up. Three come down."
     note:    "The turn. Smaller than he feared, worse than he wanted. No explanation follows - that is the crack in her, and one is all she gets (BEATS section 8)."
 
   - id:      M1.1.S02.190
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Say again? You're breaking on the low end."
 
   - id:      M1.1.S02.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nothing on the air."
 
   - id:      M1.1.S02.210
@@ -165,7 +165,7 @@ lines:
 
   - id:      M1.1.S02.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Positions. Nobody sits on the plates."
     shot:    "They spread out along the rail. Voss stays where he is, magazine open in his hand."
     note:    "Hands directly into S03: he is already counting when she reaches him."

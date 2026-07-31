@@ -68,7 +68,7 @@ lines:
 
   - id:      M1.4.S02.020
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     condition: 'story.m14_entry == "grate"'
     text:    "Loop's still live. If the return kicks while somebody's inside it, it gets warm very fast."
 
@@ -98,7 +98,7 @@ lines:
 
   - id:      M1.4.S02.070
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     condition: 'story.m14_entry == "grate"'
     text:    "Then the ones inside start without the rest."
 
@@ -111,7 +111,7 @@ lines:
 
   - id:      M1.4.S02.090
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     condition: 'story.m14_entry == "grate"'
     text:    "Nobody's ever had to. Congratulations, you're the survey."
 
@@ -124,13 +124,13 @@ lines:
 
   - id:      M1.4.S02.110
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     condition: 'story.m14_entry == "breach"'
     text:    "Stand off eight metres. That drum's going to throw."
 
   - id:      M1.4.S02.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     condition: 'story.m14_entry == "breach"'
     text:    "On the horn. Let the row hear a horn."
     shot:    "The third horn goes over Foundry Row. The bay door goes in underneath it."
@@ -173,7 +173,7 @@ lines:
 
   - id:      M1.4.S02.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     condition: 'story.m14_entry == "breach"'
     text:    "Leave him where he is. Racks, now."
     shot:    "Nobody looks back to see whether he stayed down."
@@ -192,7 +192,7 @@ lines:
 
   - id:      M1.4.S02.210
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Then start lifting."
 
@@ -203,7 +203,7 @@ lines:
 
   - id:      M1.4.S02.230
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Say that again with a number on it."
 
   - id:      M1.4.S02.240
@@ -213,7 +213,7 @@ lines:
 
   - id:      M1.4.S02.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Copy."
     shot:    "She is already moving where he put her. Nobody in the hall marks it."
     note:    "The turn. The plan is his from here to the end of the mission and it costs one word."

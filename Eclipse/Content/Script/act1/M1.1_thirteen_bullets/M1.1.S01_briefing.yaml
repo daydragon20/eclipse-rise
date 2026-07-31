@@ -54,7 +54,7 @@ words:        264
 lines:
   - id:      M1.1.S01.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Four to Voss. Four here. Three and two to the pair walking the low route. That is all of it."
     shot:    "Map table. She sets four small piles down and does not touch them again."
 
@@ -65,7 +65,7 @@ lines:
 
   - id:      M1.1.S01.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "He counts."
 
   - id:      M1.1.S01.040
@@ -76,35 +76,35 @@ lines:
 
   - id:      M1.1.S01.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Inventory. No charges. No spare cells. One transmitter, and the housing has a hairline in it."
 
   - id:      M1.1.S01.060
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     tags:    [nervous]
     text:    "I've been holding it together with a bootlace and language."
     note:    "Dex joke 1 of 3 (18.6, BEATS section 10.5). The frightened one. The joke IS the fear."
 
   - id:      M1.1.S01.070
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "What number am I preparing for?"
     note:    "18.4 Reyes: asks a question instead of accusing. No contractions anywhere in her lines - she is stressed."
 
   - id:      M1.1.S01.080
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Four go out."
 
   - id:      M1.1.S01.090
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Then I will set for two. Two is what one pair of hands turns over before morning."
 
   - id:      M1.1.S01.100
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Four units of plasma. One autoclave. I have counted them twice."
     note:    "Planted for payoff in S99 (zero-casualty branch): still four."
 
@@ -115,7 +115,7 @@ lines:
 
   - id:      M1.1.S01.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Two crates of sealed magazines and a hoist."
 
   - id:      M1.1.S01.130
@@ -125,7 +125,7 @@ lines:
 
   - id:      M1.1.S01.140
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Says the manifest board at the weighbridge. It's posted every shift."
 
   - id:      M1.1.S01.150
@@ -142,12 +142,12 @@ lines:
 
   - id:      M1.1.S01.170
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nine seconds."
 
   - id:      M1.1.S01.180
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Say the rest."
 
   - id:      M1.1.S01.190
@@ -174,7 +174,7 @@ lines:
 
   - id:      M1.1.S01.230
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Mark it on the table. That's the plan now."
     note:    "Answers either option. Written so no approach flag is required."
 
@@ -185,25 +185,25 @@ lines:
 
   - id:      M1.1.S01.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Thirty. We know."
 
   - id:      M1.1.S01.260
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "And in a month they have a month too."
 
   - id:      M1.1.S01.270
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Every round on this table was carried in by somebody who could have kept it."
     shot:    "She does not touch the piles. She looks at the people, one at a time."
     note:    "The turn: the count as inheritance, not shortage. No odds argued."
 
   - id:      M1.1.S01.280
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "Thirteen bullets between us and the first real strike. Make every one of them a promise."
     shot:    "Nobody moves. Then Dex picks up the transmitter."

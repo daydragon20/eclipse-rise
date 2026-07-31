@@ -73,18 +73,18 @@ words:        325
 lines:
   - id:      M1.3.S01.010
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "This is the mast."
     shot:    "Map table. She lays one finger on the checkpoint and leaves it there."
 
   - id:      M1.3.S01.020
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Two winters back we moved this district by runner."
 
   - id:      M1.3.S01.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We buried three of them."
     note:    "Beat 1. What the jammer does, told only as what it costs. Nobody says the word for it; the HUD objective already carries that."
 
@@ -95,34 +95,34 @@ lines:
 
   - id:      M1.3.S01.050
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nothing."
 
   - id:      M1.3.S01.060
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We take nothing off that plaza."
     note:    "The want, stated as a refusal. This is the line that says it is not a robbery, and it never uses the word."
 
   - id:      M1.3.S01.070
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Somebody tries this every couple of years."
 
   - id:      M1.3.S01.080
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Pump gallery, six. Foundry Row the winter after, nine."
 
   - id:      M1.3.S01.090
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "The overpass, four, and two of the four were fifteen."
     note:    "Beat 2, the once-per-act Brick beat, delivered as counts and places. See L2 escalation 1."
 
   - id:      M1.3.S01.100
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "There's more. I can keep going."
 
   - id:      M1.3.S01.110
@@ -132,12 +132,12 @@ lines:
 
   - id:      M1.3.S01.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "All of them went for the tower."
 
   - id:      M1.3.S01.130
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Nobody went for the footing."
     shot:    "Dex stops. He has been the man with the list for four years and somebody has read past the end of it."
 
@@ -159,7 +159,7 @@ lines:
 
   - id:      M1.3.S01.170
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "The footing."
 
   - id:      M1.3.S01.180
@@ -196,63 +196,63 @@ lines:
 
   - id:      M1.3.S01.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Set it that way."
     note:    "Answers either option. No approach flag required in this file."
 
   - id:      M1.3.S01.230
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "If the extraction is contested, what happens to the ones who cannot walk?"
     note:    "18.4 Reyes: a question instead of an accusation. No contractions - beat 4 begins."
 
   - id:      M1.3.S01.240
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "We carry who we can carry."
 
   - id:      M1.3.S01.250
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "And the rest?"
 
   - id:      M1.3.S01.260
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "They stay where they fall."
     shot:    "She does not soften it and she does not look away from the table."
 
   - id:      M1.3.S01.270
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "I would like that said to the room and not only to me."
 
   - id:      M1.3.S01.280
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "It was."
     note:    "The honest answer, and the second half of it is that she already gave it in front of everyone. Reyes has no reply, which is the point."
 
   - id:      M1.3.S01.290
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "The footing set is two hands. Clamps, then the collar."
 
   - id:      M1.3.S01.300
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Nobody here has done a collar."
 
   - id:      M1.3.S01.310
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "So."
     shot:    "He does not look up. He is squaring the edge of a chart that is already square."
 
   - id:      M1.3.S01.320
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "I'll set it."
     note:    "Beat 5, the turn. He asks for it as a staffing problem, because asking for it any other way is not available to him."
 
@@ -263,25 +263,25 @@ lines:
 
   - id:      M1.3.S01.340
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "I've never had anything out there worth--"
 
   - id:      M1.3.S01.350
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Dex sets it."
     note:    "She takes the sentence off him before he has to finish it. AR-5 clean: she says his name to the room, never 'you' to him. Only name-address in the scene."
 
   - id:      M1.3.S01.360
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Then I want the good gloves. The ones with palm left on them."
     note:    "18.4 Dex: the hardware joke arrives one line after the frightening thing, every time. Paid off in S99.280."
 
   - id:      M1.3.S01.370
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "Take the tower and the district goes deaf. It will answer - be gone before it does."
     shot:    "Nobody moves. Dex is already dragging the case across the table toward himself."

@@ -15,7 +15,7 @@ turn:         "Voss picks the smallest of her three words, and it sticks."
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        275
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      MARA, VOSS, DEX, REYES, SELA, BRICK
@@ -33,4 +33,151 @@ words:        0
 #            is doing four missions' worth of work - she is arranging something and the
 #            player still does not know what.
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `cutscene`. Ceiling 60, respected (longest 20 w at .010 and .030). Register
+#            reached at both. Spread 1 w (.100 "Shift.") to 20 w = 20x.
+# THE WORD:  ONE COINAGE IN THIS MISSION, and it is the one the stub asked me to make.
+#            Sela offers three (.090) and Voss takes the smallest: "shift". It is chosen
+#            because it is factory language and Voss is a Foundry District mechanic - he
+#            would reach for the industrial word, not the political one - and because of
+#            what a shift is: people who cover the same hours, cover for each other, and
+#            hand over to the next one. It is not "Eclipse", it is not a name, nobody paints
+#            it on a wall, and M1.8 is free to ignore it entirely. FLAGGED FOR M1.8's WRITER:
+#            if it is useful that the word is already in the room when the sigil arrives,
+#            it is here; if not, it costs that scene nothing.
+# sela:      three words at .090 - the scene's one permitted triad (18.9 B), and it is her
+#            fingerprint doing exactly what a rhetorician does with a room that has no word.
+# choice:    .130 / .140, group `m16_sela`, full four-axis coverage on both options. Read
+#            in-scene by .150 / .160. FLAGGED: HUB.A1 and act 2 should also read
+#            `story.m16_sela_invited`, or the choice pays only inside this scene - see report.
+#            Neither option removes Sela from the game. She is a companion later, so the
+#            "go" branch keeps her reachable and says where.
+# reyes:     .030 is a pair and a question, not a list, because Sela already owns the triad
+#            in this scene (18.9 B allows one).
+# branches:  .050 / .060 / .070 are one line each, reading S04's outcome. Small on purpose -
+#            a debrief that re-litigates the choice would flatten it.
+# brick:     no lines (BEATS section 8: he speaks in S01, S03 and S04 and nowhere else).
+#            He is at the table.
+# omitted:   nobody says Ember is now visible, or on a list, or being looked for. That is
+#            M1.7's discovery and saying it here would spend it. The scale of the room does
+#            the work; the dialogue does not point at it.
+# last shot: beat 6. Mara alone, no line, attached to Dex's exit line so the image is the
+#            last thing in the scene.
+
+lines:
+  - id:      M1.6.S99.010
+    speaker: DEX
+    voice:   dex
+    text:    "Fifty-three mouths. Nine days of food at the ration we write down, and four at the ration we actually eat."
+
+  - id:      M1.6.S99.020
+    speaker: DEX
+    voice:   dex
+    text:    "And the ledger's a book now. With a spine."
+    note:    "P3-a, still visible as growth and as a joke. Nobody is standing next to it."
+
+  - id:      M1.6.S99.030
+    speaker: REYES
+    voice:   reyes
+    text:    "I need antibiotics and a room with a door on it. Where does a room with a door--"
+
+  - id:         M1.6.S99.040
+    speaker:    MARA
+    voice:      mara
+    interrupts: true
+    text:       "Not from tonight."
+
+  - id:        M1.6.S99.050
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m16_train_choice == "run"'
+    text:      "That spur is scrap for a month. Nothing runs under the Mid-Works until somebody re-rails it."
+
+  - id:        M1.6.S99.060
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m16_train_choice == "emptied"'
+    text:      "The train made the yard forty minutes late and empty. Somebody counted that twice."
+
+  - id:        M1.6.S99.070
+    speaker:   DEX
+    voice:     dex
+    condition: 'story.m16_train_choice == "split"'
+    text:      "The second car's gone. Nobody wrote down where."
+
+  - id:      M1.6.S99.080
+    speaker: MARA
+    voice:   mara
+    text:    "We don't have a word for what's downstairs."
+    shot:    "Sela is at the edge of the light with her coat still on. Nobody has said anything to her since the vault."
+
+  - id:      M1.6.S99.090
+    speaker: SELA
+    voice:   sela
+    text:    "What's downstairs is a workforce, or a ward, or a shift."
+    note:    "Three words, offered flat. The scene's one permitted triad (18.9 B)."
+
+  - id:      M1.6.S99.100
+    speaker: VOSS
+    voice:   voss
+    text:    "Shift."
+    note:    "THE WORD. The smallest of the three, and the industrial one, which is the one a Foundry District mechanic reaches for. Not Eclipse - that arrives in M1.8."
+
+  - id:      M1.6.S99.110
+    speaker: DEX
+    voice:   dex
+    text:    "Then somebody's drawing up a rota, and it isn't going to be me."
+
+  - id:      M1.6.S99.120
+    speaker: MARA
+    voice:   mara
+    text:    "Put it up where they can see it."
+    shot:    "Somebody chalks the word on the edge of the map table. Nobody wipes it off for the rest of the act."
+
+  - id:      M1.6.S99.130
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m16_sela
+      set:   'story.m16_sela_invited = true'
+      label: "Ask her to stay."
+    text:    "There's a bunk by the water line. It's the worst one in the room."
+    variants:
+      pragmatist: "Nobody here can talk a room down off a wall. Take the bunk by the water line."
+      idealist:   "Forty-one people came off that train because somebody stood up in it. Stay."
+      personal:   "You've got nowhere to be tonight. Neither did I, once."
+      strategic:  "The Mid-Works listens to you. That's worth more than a rifle."
+
+  - id:      M1.6.S99.140
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m16_sela
+      set:   'story.m16_sela_invited = false'
+      label: "Let her go."
+    text:    "The way out is the way we came in. Nobody here will stop you."
+    variants:
+      pragmatist: "We can't feed you and forty-one others on nine days of food."
+      idealist:   "You didn't come here to be recruited. Go home."
+      personal:   "There's a district up there standing around waiting for you."
+      strategic:  "A voice in the galleries reaches further than one in this vault."
+
+  - id:        M1.6.S99.150
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_sela_invited == true'
+    text:      "I'm not joining anything. I'll be here in the morning."
+    note:      "18.4: one line about herself, and she refuses membership while accepting the work."
+
+  - id:        M1.6.S99.160
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_sela_invited == false'
+    text:      "The pump gallery, most nights. Everybody in the Mid-Works knows where that is."
+    note:      "The go branch does not remove her from the game. She stays reachable and says where."
+
+  - id:      M1.6.S99.170
+    speaker: DEX
+    voice:   dex
+    text:    "I'll do the rota."
+    shot:    "The room empties around Mara. She stays at the map with three markers she keeps moving and does not put back, and she is not looking at the end of the table where the chalk is."

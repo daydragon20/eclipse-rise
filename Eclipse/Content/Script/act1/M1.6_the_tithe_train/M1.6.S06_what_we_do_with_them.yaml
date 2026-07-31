@@ -15,7 +15,7 @@ turn:         "She admits out loud that they cannot vet anybody, decides to take
 # ---- state ----
 status:       draft
 critic:       null
-words:        0
+words:        428
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      MARA, VOSS, SELA, REYES, DEX, BRICK, dozens of newcomers (unnamed)
@@ -50,4 +50,217 @@ words:        0
 #            a mistake with foreshadowing on it. If the player thinks "that was stupid" in
 #            act 3, the scene failed; he must think "I would have done the same".
 
-lines: []
+# ---- dialogue-writer notes (L2) ----
+# band:      `hub`. Ceiling 35, respected (longest 24 w at .250). Register reached everywhere.
+#            Spread 1 w (.150 "No.") to 24 w = 24x.
+# THE TRAP:  checked line by line, and here is the audit so the critic does not have to
+#            reconstruct it.
+#            - No newcomer is named anywhere in this scene. Not once, by anybody.
+#            - Exactly one newcomer speaks: .140, and his line is the least suspicious
+#              sentence in the mission. He is CIVILIAN_A, the man from S03 who wanted to
+#              stay on the train to protect his door. Giving the letter to HIM is the
+#              opposite of mole-prep: it is the man whose whole scene was about not
+#              endangering the people at his address.
+#            - The shot on .140 instructs the camera explicitly to stay on the table.
+#            - The shot on .030 instructs it not to follow Dex's finger. That is the door
+#              (P3-c) and it is a piece of ordinary logistics with nobody standing in it.
+#            - No glances, no held reactions, no line anywhere in the scene that only makes
+#              sense on a second playthrough.
+# p3-c:      .030 is the plant. The ledger became a job in M1.4.S99 (P3-a); tonight it gets
+#            hands, and the hands are volunteers nobody checked. That is the whole of it.
+#            Twenty words, delivered by a frightened engineer who is not looking up.
+# mara:      SHE IS RIGHT. .090 is the argument and it is true: everyone in Ember, Voss
+#            first, arrived on somebody's word and nothing else. There is no foreshadowing
+#            in the scene, no pause on the decision, and nobody warns her. In act 3 the
+#            player will not be able to say she was careless, because she was not - she was
+#            correct, with the information she had, and that is what makes twist 3 hurt.
+# sela:      the person who could vet them IS Sela - she knows four hundred doors in the
+#            Mid-Works - and she is the one asking Mara not to. That is the stub's obstacle
+#            read literally, and it is her arc's first compromise refused. She wins.
+#            .080 carries the scene's one permitted triad (18.9 B).
+# reyes:     .130 draws the distinction that keeps the scene honest: she needs names for a
+#            medical book, not for a door. Clinical, no contractions, and it stops the
+#            "no vetting" decision from reading as sloppiness.
+# letters:   .190 / .200 are the P5-c choice, group `m16_letters`, full four-axis coverage.
+#            NOTE FOR SYSTEMS: the deny branch authors `= false`; if the tag is implemented
+#            as presence-only, false means "tag absent". Story.Thread.ConscriptLetters_Open
+#            is set by the scene commit, not by the choice - it opens either way, because
+#            Sela does not stop asking.
+# shiftboss: .250 / .260, one line each, and the scene does not come back to it. Spared: a
+#            compliment shaped like a piece of district gossip, and she never says the word
+#            mercy. Killed: a flat fact that the lists came out anyway, which is worse than
+#            a reproach and is the closing of the sub-thread (ACT1_OVERVIEW section 5).
+# brick:     no lines (BEATS section 8). He is in the room.
+
+lines:
+  - id:      M1.6.S06.010
+    speaker: DEX
+    voice:   dex
+    text:    "Forty-one. I counted it twice and got two numbers, so, forty-one."
+    shot:    "The vault floor is blankets end to end. Somebody is crying near the water line and somebody four feet away is asleep with a boot still on."
+
+  - id:      M1.6.S06.020
+    speaker: DEX
+    voice:   dex
+    text:    "Eleven bunks. This isn't a base any more, it's a settling tank."
+    note:    "18.4 Dex: technical noun as insult. 18.6: the joke is the fear."
+
+  - id:      M1.6.S06.030
+    speaker: DEX
+    voice:   dex
+    text:    "Anyone who's counted stock before, hands up. Good. You two are on crates and on the ledger with me."
+    shot:    "He does not look up while he says it. The camera does not follow his hand and it does not find a face."
+    note:    "P3-a to P3-c. THE DOOR. One line, in passing, no name, no close-up. Nobody the camera follows walks through it."
+
+  - id:      M1.6.S06.040
+    speaker: VOSS
+    voice:   voss
+    text:    "Forty-one people and one way out of this vault."
+
+  - id:      M1.6.S06.050
+    speaker: MARA
+    voice:   mara
+    text:    "Nobody in this room knows a single one of them."
+
+  - id:      M1.6.S06.060
+    speaker: MARA
+    voice:   mara
+    text:    "The Chorus would have them in a side gallery one at a time, asking about cousins until somebody said something useful."
+
+  - id:      M1.6.S06.070
+    speaker: SELA
+    voice:   sela
+    text:    "The yard had a list of who everybody was. It had the addresses on it too, and it worked."
+
+  - id:      M1.6.S06.080
+    speaker: SELA
+    voice:   sela
+    text:    "Make one. Then decide who reads it, where it lives, and what happens the night somebody else takes it."
+    note:    "The scene's one permitted triad (18.9 B). Rhetorical structure is her fingerprint; this is where it is allowed to show."
+
+  - id:      M1.6.S06.090
+    speaker: MARA
+    voice:   mara
+    text:    "Every one of us walked in here on somebody's word and nothing else."
+    note:    "MARA IS RIGHT. The best available decision, argued from a true fact that includes Voss. No foreshadowing anywhere near it."
+
+  - id:      M1.6.S06.100
+    speaker: MARA
+    voice:   mara
+    text:    "Bunk them along the wall. Feed them before anything else."
+    note:    "Story.Flag.IntakeUnvetted is set here, silently, by the scene commit. Nothing in the dialogue marks it."
+
+  - id:      M1.6.S06.110
+    speaker: REYES
+    voice:   reyes
+    text:    "Forty-one people on a water line sized for eleven. I have seen what that produces and it takes four days."
+    note:    "The only person in the room who says the numbers. No contractions - she is stressed."
+
+  - id:      M1.6.S06.120
+    speaker: REYES
+    voice:   reyes
+    text:    "Who is boiling water for forty-one people at three in the morning?"
+
+  - id:      M1.6.S06.130
+    speaker: REYES
+    voice:   reyes
+    text:    "I will want names for the medical book. Not for the door."
+
+  - id:      M1.6.S06.140
+    speaker: CIVILIAN_A
+    voice:   civilian_kessara_a
+    text:    "Is there a way to get word out? My mother buried a box with my coat in it."
+    shot:    "He is one of thirty standing at the edge of the light. The camera stays on the table and does not go to him."
+    note:    "P5-c. The only newcomer line in the scene, and it is the least suspicious sentence in the mission."
+
+  - id:      M1.6.S06.150
+    speaker: MARA
+    voice:   mara
+    text:    "No."
+
+  - id:      M1.6.S06.160
+    speaker: MARA
+    voice:   mara
+    text:    "Anything that leaves this room carries a postmark and a dist--"
+
+  - id:         M1.6.S06.170
+    speaker:    SELA
+    voice:      sela
+    interrupts: true
+    text:       "A man who can't write home is being kept by us instead of by them."
+
+  - id:      M1.6.S06.180
+    speaker: SELA
+    voice:   sela
+    text:    "Or say the rule out loud and let them weigh it themselves."
+
+  - id:      M1.6.S06.190
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m16_letters
+      set:   'story.m16_letters_allowed = true'
+      label: "Let them write home."
+    text:    "One page each. No names, no places, and they go out with the ration runners."
+    note:    "P5-c OPTION 1 of 2. Opens the 2.11 thread The Conscript Letters toward the act 4 mutiny path."
+    variants:
+      pragmatist: "One page, read before it goes. Nothing in it a stranger could use."
+      idealist:   "They write. Forty-one people aren't going to be a secret from their own mothers."
+      personal:   "Let them write. Somebody at my address waited a year for nothing."
+      strategic:  "Forty-one families who know which side kept them alive is worth a postmark."
+
+  - id:      M1.6.S06.200
+    speaker: VOSS
+    voice:   voss
+    choice:
+      group: m16_letters
+      set:   'story.m16_letters_allowed = false'
+      label: "Nothing leaves."
+    text:    "Nothing leaves. Not one page."
+    note:    "P5-c OPTION 2 of 2. The thread still opens; it is now about the refusal."
+    variants:
+      pragmatist: "One page finds this vault. That's the whole calculation."
+      idealist:   "Not yet. When there's a way that doesn't cost somebody else."
+      personal:   "I'd want to send one too. Nothing leaves."
+      strategic:  "A postmark is a map with a date on it."
+
+  - id:        M1.6.S06.210
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_letters_allowed == true'
+    text:      "Half of them can't write. I'll do those."
+    note:      "Her one line about herself in the scene, and it is a job, not a feeling (18.4)."
+
+  - id:        M1.6.S06.220
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m16_letters_allowed == true'
+    text:      "Then we carry it."
+
+  - id:        M1.6.S06.230
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.m16_letters_allowed == false'
+    text:      "Then it gets said tonight, out loud. A rule they find on their own is a wall."
+
+  - id:        M1.6.S06.240
+    speaker:   MARA
+    voice:     mara
+    condition: 'story.m16_letters_allowed == false'
+    text:      "It gets said tonight."
+
+  - id:        M1.6.S06.250
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.choice_m15_shiftbossspared == true'
+    text:      "The shift boss was at his gate on Tuesday. That is the only thing I have heard about this cell that I believed."
+    shot:      "She says it on her way past with an armful of blankets and does not stop walking."
+    note:      "SHIFT BOSS PAYOFF, spared branch. A compliment that arrives as district gossip. She never says mercy and nobody thanks her for it. Sub-thread closed (ACT1_OVERVIEW section 5)."
+
+  - id:        M1.6.S06.260
+    speaker:   SELA
+    voice:     sela
+    condition: 'story.choice_m15_shiftbossspared == false'
+    text:      "The absentee lists went out on time this week. Somebody else fills them in now."
+    shot:      "She says it to the table, not to anybody at it, and goes back to the blankets. Nobody in the room answers and the conversation does not come back to it."
+    note:      "SHIFT BOSS PAYOFF, killed branch. No reproach - a flat fact that the thing he did got done anyway. Worse than a reproach, and she will remember it. Sub-thread closed."

@@ -63,7 +63,7 @@ lines:
 
   - id:        M1.3.S03.010
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "There's water. Nobody said water."
     shot:      "Ankle deep and rising toward them. The old geothermal run, tiled a century before the Dominion, warm enough to steam."
@@ -76,19 +76,19 @@ lines:
 
   - id:        M1.3.S03.030
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "Water's fine for the charge. The charge is happier down here than I am."
 
   - id:        M1.3.S03.040
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "It's the clamps. Clamps rust. Four hours in this air and they're jewellery."
 
   - id:        M1.3.S03.050
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "Which is fine. Four hours is a career."
 
@@ -107,25 +107,25 @@ lines:
 
   - id:        M1.3.S03.080
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "Chest."
 
   - id:        M1.3.S03.090
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "I'm carrying a shaped charge at chest height through a hundred-year-old sump."
 
   - id:        M1.3.S03.100
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "Nobody stop me. I'm enjoying the itinerary."
 
   - id:        M1.3.S03.110
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m13_insertion == "tunnel"
     text:      "Keep talking."
     shot:      "She does not turn round. Everybody heard her give him permission and nobody remarks on it."
@@ -147,25 +147,25 @@ lines:
 
   - id:        M1.3.S03.140
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "Two high. Sure. Everything down here is two of something."
 
   - id:        M1.3.S03.150
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m13_insertion == "tunnel"
     text:      "Forty metres to the ring. Quiet after that."
 
   - id:        M1.3.S03.160
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     text:      "Quiet."
 
   - id:        M1.3.S03.170
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "tunnel"
     tags:      [pause]
     text:      "Right."
@@ -176,7 +176,7 @@ lines:
 
   - id:        M1.3.S03.200
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "It's very bright. Is anybody else finding it bright."
     shot:      "Under the crowns. Wet white-gold on wet stone, and four people crossing it with the last of the curfew crowd."
@@ -190,19 +190,19 @@ lines:
 
   - id:        M1.3.S03.220
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "A metre. I'm wider than a metre with this on my back."
 
   - id:        M1.3.S03.230
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "The case is rated. The case has been off a gantry and it was fine."
 
   - id:        M1.3.S03.240
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "The case is the most reliable thing out here and I include myself."
 
@@ -214,7 +214,7 @@ lines:
 
   - id:         M1.3.S03.260
     speaker:    MARA
-    voice:      mara_sovann
+    voice:      mara
     condition:  story.m13_insertion == "plaza"
     interrupts: true
     text:       "Stand still."
@@ -223,14 +223,14 @@ lines:
 
   - id:        M1.3.S03.270
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     tags:      [whispering]
     text:      "Standing still. My best event."
 
   - id:        M1.3.S03.280
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m13_insertion == "plaza"
     tags:      [quietly]
     text:      "Keep talking. Quieter."
@@ -238,7 +238,7 @@ lines:
 
   - id:        M1.3.S03.290
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "There's a shim in that gate hinge. Somebody props that gate."
     note:      "Somebody in this district was already cheating the checkpoint before Ember arrived. One line, no comment, no follow-up."
@@ -251,25 +251,25 @@ lines:
 
   - id:        M1.3.S03.310
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "Leaving the shim."
 
   - id:        M1.3.S03.320
     speaker:   MARA
-    voice:     mara_sovann
+    voice:     mara
     condition: story.m13_insertion == "plaza"
     text:      "Under the crowns. Quiet from here."
 
   - id:        M1.3.S03.330
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     text:      "Quiet."
 
   - id:        M1.3.S03.340
     speaker:   DEX
-    voice:     dex_callum
+    voice:     dex
     condition: story.m13_insertion == "plaza"
     tags:      [pause]
     text:      "Right."

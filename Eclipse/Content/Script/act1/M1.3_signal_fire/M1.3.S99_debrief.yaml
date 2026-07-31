@@ -82,39 +82,39 @@ words:        204
 lines:
   - id:      M1.3.S99.010
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Two burns and a shoulder."
     shot:    "They come down the last flight one at a time. Reyes is counting them in without appearing to."
 
   - id:      M1.3.S99.020
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "The shoulder will not lift above here for six weeks."
 
   - id:      M1.3.S99.030
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Six weeks."
 
   - id:      M1.3.S99.040
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "I do not guess at that. Six."
     note:    "18.4 Reyes: never guesses out loud, and says so when somebody hopes she might. No contractions - she has been awake for nineteen hours."
 
   - id:      M1.3.S99.050
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "It didn't fall. It folded. Like it sat down."
 
   - id:      M1.3.S99.060
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "That's a good casting failing correctly. That's a beautiful thing."
 
   - id:      M1.3.S99.070
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "And the crowns came in on top of it and the whole plaza just--"
 
   - id:         M1.3.S99.080
@@ -125,7 +125,7 @@ lines:
 
   - id:      M1.3.S99.090
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "How many."
 
   - id:      M1.3.S99.100
@@ -142,41 +142,41 @@ lines:
 
   - id:      M1.3.S99.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     tags:    [pause]
     text:    "Take names. Nothing else tonight."
     note:    "She wants them and she holds. M1.6.S06 is where she stops holding, and that beat belongs to that writer - this is a rhyme, not a payment."
 
   - id:      M1.3.S99.130
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Names and hands. I would like to know which of them can hold a light."
 
   - id:      M1.3.S99.140
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "There are eleven bunks in that room and I have counted--"
 
   - id:         M1.3.S99.150
     speaker:    MARA
-    voice:      mara_sovann
+    voice:      mara
     interrupts: true
     text:       "Then somebody gives up a bunk."
     note:       "She cuts off the person doing the arithmetic. That is the haste, one scene before it is named as anything."
 
   - id:      M1.3.S99.160
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "The band's open now. The whole district."
 
   - id:      M1.3.S99.170
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Anybody can hear anything."
 
   - id:      M1.3.S99.180
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     tags:    [beat]
     text:    "Anybody."
     shot:    "He is talking to the table. Nobody picks it up."
@@ -184,24 +184,24 @@ lines:
 
   - id:      M1.3.S99.190
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Morning."
     shot:    "She pulls the district sheet flat, takes a grease pencil out of her coat, and marks the checkpoint. It takes about two seconds. Nobody in this cell has seen her use that pencil."
     note:    "EMOTIONAL PEAK OF MOVEMENT II. One word about a time of day, and a mark. No thesis line, no music cue in the text, nobody names what it is."
 
   - id:      M1.3.S99.200
     speaker: REYES
-    voice:   elin_reyes
+    voice:   reyes
     text:    "Is that pencil going to come off?"
 
   - id:      M1.3.S99.210
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "No."
 
   - id:      M1.3.S99.220
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Say where the next one goes."
     shot:    "She holds the pencil out. Not to the room."
     note:    "Second deferral to Voss after M1.1.S04, and she does it with an object instead of a compliment. AR-5 clean - no 'you' anywhere in the line."
@@ -219,7 +219,7 @@ lines:
 
   - id:      M1.3.S99.240
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "When."
 
   - id:      M1.3.S99.250
@@ -229,18 +229,18 @@ lines:
 
   - id:      M1.3.S99.260
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Four days."
     note:    "No reason offered, none asked for. This is the haste that kills her, planted twice in one mission and explained neither time."
 
   - id:      M1.3.S99.270
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Four days."
 
   - id:      M1.3.S99.280
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "I want the gloves back before then."
     shot:    "Mara is still holding the pencil. She has not put it down since she marked the sheet."
     note:    "The joke returns at half strength, and it is the S01.360 gloves. He got some of it back. Not all of it."

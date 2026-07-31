@@ -65,7 +65,7 @@ lines:
 
   - id:      M1.1.S06.040
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Both crates come with us."
 
   - id:      M1.1.S06.050
@@ -107,7 +107,7 @@ lines:
 
   - id:      M1.1.S06.120
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Then we're not going that way."
 
   - id:      M1.1.S06.130
@@ -117,40 +117,40 @@ lines:
 
   - id:      M1.1.S06.140
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Hold. Pre-Dominion survey. Paper. Half of it's water damage."
 
   - id:      M1.1.S06.150
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "Drain gallery under the weighbridge. Runs east. Comes out behind the smelter, in the scrap."
 
   - id:      M1.1.S06.160
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     tags:    [nervous]
     text:    "Nobody's walked it. Not since the survey, so if the roof's come in--"
 
   - id:      M1.1.S06.170
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     interrupts: true
     text:    "Is it there or is it not?"
 
   - id:      M1.1.S06.180
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "It's on the paper."
     note:    "18.4 Reyes never guesses out loud; Dex does the opposite - he tells you exactly how thin his certainty is, and is right anyway."
 
   - id:      M1.1.S06.190
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Take the gallery."
 
   - id:      M1.1.S06.200
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Extraction through the scrap yard. Four of us, two crates."
 
   - id:      M1.1.S06.210
@@ -165,17 +165,17 @@ lines:
 
   - id:      M1.1.S06.230
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "That's the survey, not me. And check the housing when you're in. The set's been clipping."
     note:    "The thank-you lands and bounces in one breath. He never finishes a sentimental sentence - he does not start one."
 
   - id:      M1.1.S06.240
     speaker: DEX
-    voice:   dex_callum
+    voice:   dex
     text:    "And label the crates before they hit the floor. Please."
 
   - id:      M1.1.S06.250
     speaker: MARA
-    voice:   mara_sovann
+    voice:   mara
     text:    "Go."
     shot:    "The grate closes. Sodium light on wet scrap, and then nothing on the deck but a hoist."

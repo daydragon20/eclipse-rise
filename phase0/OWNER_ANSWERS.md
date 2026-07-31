@@ -22,3 +22,8 @@
 | 2026-07-31 20:12 | OBS-4 | hud-nog-niet-borderlands | WAARNEMING: de gegevens rond het scherm zijn nog niet Borderlands-achtig. Referentie met echte screenshots en element-voor-element vertaling staat nu in phase0/REFERENTIE_HUD_BORDERLANDS.md - inclusief Game UI Database en het officiele BL3-ontwerpproces. Waarschijnlijk was je hier al mee bezig. |
 | 2026-07-31 21:01 | OBS-5 | schrijf-door | OWNER-VRAAG: wanneer wordt er doorgeschreven aan de scenes? ANTWOORD EN CORRECTIE: er zat een valse afhankelijkheid in het plan. Massaproductie wachtte op de ijkmissie-gate, die op stemgeneratie, die op de ElevenLabs-scopes. Een ontbrekend vinkje hield daardoor AL het schrijfwerk tegen, terwijl schrijven geen credit en geen API-aanroep kost. OPGEHEVEN: act 1 mag NU volledig geschreven en door de critic gehaald worden. dialogue-writer is 1x gespawnd voor M1.1 maar er is nog geen enkele regel geland (71 scenes, 0 regels). Spawn 4-6 dialogue-writers parallel op act 1 en laat dialogue-critic per s |
 | 2026-07-31 21:09 | O-10 | 131000 | Verbatim: "het waren geen 310000 credits maar 131000, fout onthouden." Alle tiers opnieuw gesneden in ebc764e. Gevolg: ~17% van de gesproken tekst past deze maand in plaats van 40%; de Act-1-hub- en companiongesprekken vallen af. |
+| 2026-07-31 21:37 | T-12 | gedaan |  |
+| 2026-07-31 21:38 | O-11 | vervangen |  |
+| 2026-07-31 21:39 | O-9 | B |  |
+| 2026-07-31 21:39 | T-5 | mixamo |  |
+| 2026-07-31 21:39 | T-6 | ja |  |

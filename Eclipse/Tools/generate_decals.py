@@ -221,6 +221,15 @@ def _value_noise(size, cells, rng):
     return small.resize((size, size), Image.BICUBIC)
 
 
+def _smoothstep(t):
+    """Clamped smoothstep. Lives up here, above the first map that needs it -
+    it used to sit further down with the light pass, which is fine for a pure
+    function but not for a reader. It consumes no rng, so moving it leaves
+    every map bit-identical."""
+    t = max(0.0, min(1.0, t))
+    return t * t * (3.0 - 2.0 * t)
+
+
 S = 512
 _n_coarse = _value_noise(S, 6, _mask_rng).load()   # big blotch shape
 _n_fine = _value_noise(S, 28, _mask_rng).load()    # edge raggedness
@@ -237,20 +246,179 @@ for _y in range(S):
         _pm[_x, _y] = int(m * 255.0 + 0.5)
 save(stain_mask, "T_stain_mask.png")
 
-# --- Rebel eclipse stencil (512x512): sprayed annulus with a bite. ---
-stencil = Image.new("L", (512, 512), 18)
-d = ImageDraw.Draw(stencil)
-d.ellipse([96, 96, 416, 416], fill=225)
-d.ellipse([176, 176, 336, 336], fill=18)          # hollow core
-d.ellipse([280, 60, 470, 250], fill=18)           # the eclipse "bite"
-# Spray grain: bright speckle outside, dark speckle inside the mark.
-px = stencil.load()
-for _ in range(9000):
-    x, y = random.randrange(512), random.randrange(512)
-    r = math.hypot(x - 256, y - 256)
-    if 150 < r < 175 or random.random() < 0.15:
-        px[x, y] = max(0, min(255, px[x, y] + random.randint(-70, 70)))
-save(stencil, "T_decal_stencil_diff.png")
+# --- Rebel eclipse stencil: an OPACITY MASK, not a plate (20.2/20.5 fix) -----
+#
+# WHAT WAS WRONG. The old map was `T_decal_stencil_diff`: background value 18,
+# a hard 225 annulus, and a bite. Value 18 is not transparent - it is dark
+# grey - and the builder put that map on the OPAQUE toon master at AlbedoMix
+# 1.0. In frame that is a black rectangle with a perfectly geometric red "C"
+# in it (confirmed 31-07 on the wide review camera and on the gate camera).
+# Three things go wrong at once and all three are story, not polish:
+#
+#   1. It reads as PRINTED VINYL. §20.2 asks for the Eclipse sigil "gespoten,
+#      gekrast, weggeschuurd en terug". The old spray grain touched ~15% of
+#      pixels in a thin ring and was invisible at any play distance: no drips,
+#      no overspray, no broken edge.
+#   2. On a black plate the mark reads as something the REGIME hung on the
+#      wall, not something sprayed onto it. The politics invert.
+#   3. A crisp round logo centred on a black square reads as an app icon.
+#
+# THE CAUSE IS ONE WORD: the stencil was on the opaque path. The ground stains
+# next to it already ride M_EclipseToonDecal with a mask in .r driving opacity
+# - the same diagnosis generate_dominion_signs.py wrote down for the sign
+# plates ("flat black rectangles pasted on the wall") without carrying it over
+# to the stencil. So the mark moves to the masked path and this file stops
+# emitting a luminance map for it at all.
+#
+# WHAT THE MASK CARRIES. Coverage IS the paint. Everything that makes spray
+# read as spray is alpha, which is why no gain is needed (a mask modulates
+# coverage, never luminance - see the header):
+#   * a HAND-CUT edge: the outer and inner radii wobble with angle, so the
+#     silhouette is knife-cut card, not a vector circle;
+#   * STENCIL TIES: three radial bridges of bare wall where the card held the
+#     inner island. Nobody cuts a free-floating ring out of cardboard;
+#   * BLEED: coverage falls off over ~9 px at every cut edge, jittered per
+#     pixel, because paint creeps under the card and breaks up;
+#   * OVERSPRAY: a sparse halo of low-alpha dust for ~40 px around the mark,
+#     densest at the edge - the single strongest "this came out of a can" cue;
+#   * DRIPS: runs from the lowest painted edges, thinning as they fall and
+#     ending in a bead;
+#   * SCRUBBED BACK: broad diagonal bands where coverage is cut to a third -
+#     someone took a rag to it;
+#   * AND BACK: a faint ghost of an earlier, larger attempt behind the mark.
+#     That is the whole §20.2 sentence in one image: sprayed, scratched,
+#     scrubbed away, and sprayed again.
+#
+# Coverage is forced to zero in the outer 24 px, the same discipline as the
+# stain/pool/blob masks: a falloff that still carries value at the quad border
+# is exactly what made the first stain round read as carpet tiles.
+STEN = 512
+_st_rng = random.Random(775)
+
+
+def _wobble(rng, harmonics=4):
+    """A smooth 2pi-periodic wobble in [-1, 1]: the knife's hand."""
+    terms = [(rng.uniform(0.45, 1.0) / (k + 1), rng.uniform(0.0, 2.0 * math.pi), k + 2)
+             for k in range(harmonics)]
+    norm = sum(t[0] for t in terms)
+    return lambda a: sum(m * math.sin(k * a + p) for m, p, k in terms) / norm
+
+
+_cut_out = _wobble(_st_rng)
+_cut_in = _wobble(_st_rng)
+_cut_bite = _wobble(_st_rng)
+_cut_ghost = _wobble(_st_rng, 3)
+_dens_coarse = _value_noise(STEN, 7, _st_rng).load()    # where the can lingered
+_dens_fine = _value_noise(STEN, 23, _st_rng).load()     # the spatter of the nozzle
+
+SCX, SCY = 256.0, 256.0
+R_OUT, R_IN = 176.0, 100.0                 # the sprayed annulus
+BITE_X, BITE_Y, BITE_R = 334.0, 150.0, 108.0   # the occulting body: the eclipse
+GHOST_DX, GHOST_DY = 19.0, -13.0           # the earlier attempt, off by a hand
+TIES = ((math.radians(152.0), math.radians(6.5)),   # where the card bridged
+        (math.radians(214.0), math.radians(5.5)),
+        (math.radians(286.0), math.radians(6.0)))
+BLEED = 9.0                                # how far paint creeps under the card
+HALO = 40.0                                # overspray reach
+
+_cov = [[0.0] * STEN for _ in range(STEN)]
+for _y in range(STEN):
+    _row = _cov[_y]
+    for _x in range(STEN):
+        _dx, _dy = _x + 0.5 - SCX, _y + 0.5 - SCY
+        _r = math.hypot(_dx, _dy)
+        _a = math.atan2(_dy, _dx)
+        _ro = R_OUT * (1.0 + 0.065 * _cut_out(_a))
+        _ri = R_IN * (1.0 + 0.090 * _cut_in(_a))
+        _bx, _by = _x + 0.5 - BITE_X, _y + 0.5 - BITE_Y
+        _rb = math.hypot(_bx, _by)
+        _bite = BITE_R * (1.0 + 0.075 * _cut_bite(math.atan2(_by, _bx)))
+        # Signed distance to the mark: positive inside, in pixels.
+        _s = min(_ro - _r, _r - _ri, _rb - _bite)
+        # The ties are cut in ANGLE, so they leave bare wall right across the band.
+        for _ta, _tw in TIES:
+            _da = abs(((_a - _ta + math.pi) % (2.0 * math.pi)) - math.pi)
+            if _da < _tw:
+                _s = min(_s, (_da - _tw * 0.42) * 30.0)
+        _m = _smoothstep(_s / BLEED)
+        if _m > 0.0:
+            _m *= (0.80 + 0.20 * (_dens_coarse[_x, _y] / 255.0)) * \
+                  (0.86 + 0.14 * (_dens_fine[_x, _y] / 255.0))
+            if _m < 0.97:                      # only the bleeding edge breaks up
+                _m += _st_rng.uniform(-0.26, 0.26)
+        elif -HALO < _s < 0.0:
+            # Overspray: dust, densest against the edge, thinning outward.
+            _p = 1.0 + _s / HALO
+            if _st_rng.random() < 0.40 * _p * _p:
+                _m = _st_rng.uniform(0.05, 0.32) * _p
+        # "en terug": the ghost of the attempt before this one.
+        _gr = math.hypot(_dx - GHOST_DX, _dy - GHOST_DY)
+        _ga = math.atan2(_dy - GHOST_DY, _dx - GHOST_DX)
+        _gs = min(214.0 * (1.0 + 0.08 * _cut_ghost(_ga)) - _gr, _gr - 132.0)
+        if _gs > 0.0:
+            _m = max(_m, 0.13 * _smoothstep(_gs / 14.0) *
+                     (0.5 + 0.5 * (_dens_fine[_x, _y] / 255.0)))
+        _row[_x] = max(0.0, min(1.0, _m))
+
+# Drips: paint runs from the lowest wet edge, thinning, ending in a bead.
+for _dx0 in (118, 147, 186, 231, 268, 312, 349):
+    _from = None
+    for _y in range(STEN - 1, -1, -1):
+        if _cov[_y][_dx0] > 0.55:
+            _from = _y
+            break
+    if _from is None or _from > STEN - 60:
+        continue
+    _len = _st_rng.randint(34, 132)
+    _w0 = _st_rng.randint(2, 5)
+    _wander = _st_rng.uniform(-0.05, 0.05)
+    for _k in range(_len):
+        _t = _k / float(_len)
+        _yy = _from + _k
+        if _yy >= STEN:
+            break
+        _xx = int(_dx0 + _wander * _k)
+        _ww = max(1, int(round(_w0 * (1.0 - 0.62 * _t))))
+        _al = (1.0 - _t) * _st_rng.uniform(0.72, 1.0)
+        for _o in range(-_ww, _ww + 1):
+            if 0 <= _xx + _o < STEN:
+                _cov[_yy][_xx + _o] = max(_cov[_yy][_xx + _o], _al)
+    # the bead where the run stopped
+    _byy = min(STEN - 1, _from + _len)
+    _brr = _st_rng.randint(3, 6)
+    for _oy in range(-_brr, _brr + 1):
+        for _ox in range(-_brr, _brr + 1):
+            if _ox * _ox + _oy * _oy <= _brr * _brr:
+                _yy, _xx = _byy + _oy, int(_dx0 + _wander * _len) + _ox
+                if 0 <= _yy < STEN and 0 <= _xx < STEN:
+                    _cov[_yy][_xx] = max(_cov[_yy][_xx], 0.62)
+
+# Weggeschuurd: three broad diagonal bands where a rag took most of it back.
+for _sa, _sb, _sw, _skeep in ((0.62, 74.0, 46.0, 0.30), (0.51, -128.0, 33.0, 0.42),
+                              (0.78, 226.0, 27.0, 0.36)):
+    _norm = math.sqrt(_sa * _sa + 1.0)
+    for _y in range(STEN):
+        for _x in range(STEN):
+            if _cov[_y][_x] <= 0.0:
+                continue
+            _dist = abs(_sa * _x - _y + _sb) / _norm
+            if _dist < _sw:
+                _cov[_y][_x] *= _skeep + (1.0 - _skeep) * _smoothstep(_dist / _sw)
+
+stencil_mask = Image.new("L", (STEN, STEN), 0)
+_smpx = stencil_mask.load()
+for _y in range(STEN):
+    for _x in range(STEN):
+        _edge = min(_x, _y, STEN - 1 - _x, STEN - 1 - _y)
+        _v = _cov[_y][_x] * (_smoothstep(_edge / 24.0) if _edge < 24 else 1.0)
+        _smpx[_x, _y] = int(max(0.0, min(1.0, _v)) * 255.0 + 0.5)
+# Gekrast: thin scratches straight through the paint, down to bare wall.
+_sd = ImageDraw.Draw(stencil_mask)
+for _ in range(7):
+    _x0, _y0 = _st_rng.randrange(96, 416), _st_rng.randrange(96, 416)
+    _sd.line([_x0, _y0, _x0 + _st_rng.randint(-120, 120), _y0 + _st_rng.randint(-90, 90)],
+             fill=0, width=_st_rng.randint(1, 2))
+save(stencil_mask, "T_decal_stencil_mask.png")
 
 # --- The light pass (dressing-iteratie 2, phase0/DRESSING_ITERATIE_2.md) -------
 # The district renders UNLIT, so its "lighting" is decals: warm pools under the
@@ -264,12 +432,9 @@ save(stencil, "T_decal_stencil_diff.png")
 # the edge midpoints, and coverage is forced to 0 there. A falloff that still
 # carries value at the border is exactly what made the first stain round read as
 # "carpet tiles" (review shots 00008-00013).
-
-
-def _smoothstep(t):
-    t = max(0.0, min(1.0, t))
-    return t * t * (3.0 - 2.0 * t)
-
+#
+# _smoothstep used to be defined here; it now lives beside _value_noise above,
+# because the stencil mask needs it too.
 
 # Lamp pool: wide soft disc, small plateau core, faint smog mottle so the light
 # is not a CG-perfect gradient. Falloff span 0.78 -> core out to r 0.22.
