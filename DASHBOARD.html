@@ -184,6 +184,10 @@ h3{font-size:17px;margin:0 0 8px}
 /* casting */
 .rol{border-left:3px solid var(--warn)}
 .rol.klaar{border-left-color:var(--ok)}
+.rolinfo{background:#00000030;border:1px solid var(--line);border-radius:9px;padding:13px 15px;margin:12px 0 0;font-size:13px;display:grid;gap:7px;line-height:1.5}
+.rolinfo b{color:var(--acc2);display:inline-block;min-width:74px}
+.rolinfo em{color:var(--tx)}
+.pop{font-size:11.5px;color:var(--ok);margin:0 0 8px}
 .kandidaten{display:grid;gap:9px;margin-top:14px}
 .kand{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px}
 .kand.gekozen{border-color:var(--ok);background:#3ecf8e0f}
@@ -245,7 +249,7 @@ h3{font-size:17px;margin:0 0 8px}
 
 <header>
   <div class="logo">ECLIPSE<span>.</span></div>
-  <div class="pulse"><span class="dot" id="dot"></span><span id="pulse">verbinden…</span></div>
+  <div class="pulse"><span class="dot" id="dot"></span><span id="pulse">verbinden…</span><span id="pauze" style="color:var(--acc);font-size:12px"></span></div>
   <nav>
     <button class="on" data-v="nu">Nu</button>
     <button data-v="voortgang">Voortgang</button>
@@ -282,6 +286,7 @@ h3{font-size:17px;margin:0 0 8px}
 <script>
 let S={}, D=(window.PROGRESS_DATA||{}), lastOk=0, cur="nu";
 
+function toonPauze(reden){const e=document.getElementById("pauze");if(e)e.textContent=reden?" · vernieuwen gepauzeerd ("+reden+")":"";}
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* ---------- mini markdown ---------- */
@@ -728,7 +733,12 @@ function vCasting(){
         <h3 style="margin:0">${esc(r.label)}</h3>
         <span class="m" style="margin-left:auto">${esc(r.tier)}</span>
       </div>
-      ${r.fingerprint?`<p class="waarom"><strong>Moet klinken als:</strong> ${esc(r.fingerprint)}</p>`:""}
+      ${r.wie?`<div class="rolinfo">
+        <div><b>Wie</b> ${esc(r.wie)}</div>
+        ${r.boog?`<div><b>Verhaal</b> ${esc(r.boog)}</div>`:""}
+        ${r.stemstijl?`<div><b>Praat zo</b> ${esc(r.stemstijl)}</div>`:""}
+        ${r.signature?`<div><b>Proefzin</b> <em>"${esc(r.signature)}"</em></div>`:""}
+      </div>`:(r.fingerprint?`<p class="waarom"><strong>Moet klinken als:</strong> ${esc(r.fingerprint)}</p>`:"")}
       <div class="kandidaten">
         ${r.kandidaten.map(k=>`
           <div class="kand ${k.gekozen?"gekozen":""}">
@@ -741,6 +751,7 @@ function vCasting(){
             </div>
             <div class="kand-waarom">${esc(k.waarom)}</div>
             ${k.beschrijving?`<div class="kand-eigen">"${esc(k.beschrijving)}"</div>`:""}
+            ${k.populariteit?`<div class="pop">✓ ${esc(k.populariteit)}</div>`:""}
             ${k.url?`<audio controls preload="none" src="${k.url}"></audio>`:'<div class="note">geen fragment</div>'}
           </div>`).join("")}
       </div>
@@ -749,7 +760,30 @@ function vCasting(){
 
 const VIEWS={nu:vNu,voortgang:vVoortgang,agents:vAgents,taken:vTaken,schrijf:vSchrijf,casting:vCasting,beeld:vBeeld,docs:vDocs,historie:vHistorie};
 
-function render(){
+// Waarom dit bestaat: de pagina bouwde zichzelf elke 5 s opnieuw op, en gooide
+// daarmee een spelende <audio> weg. Owner 31-07: "als je de audio luistert
+// onderbreekt het omdat de pagina herlaadt."
+function magNietHerbouwen(){
+  for(const a of document.querySelectorAll("audio")) if(!a.paused && !a.ended) return "audio speelt";
+  if(ov.classList.contains("on")) return "venster open";
+  const f=document.activeElement;
+  if(f && (f.tagName==="INPUT"||f.tagName==="TEXTAREA")) return "je typt";
+  return null;
+}
+function vinger(o){
+  // handtekening zonder de velden die elke seconde veranderen
+  return JSON.stringify(o,(k,v)=>
+    ["generatedAt","modified","ago","laatsteBeeld","lastTime","time","mtime"].includes(k)?undefined:v);
+}
+let vorigeVinger="";
+
+function render(force){
+  const blok=magNietHerbouwen();
+  if(blok && !force){ toonPauze(blok); return; }
+  const v=vinger(S);
+  if(!force && v===vorigeVinger) return;   // niets veranderd: niet knipperen
+  vorigeVinger=v;
+  toonPauze(null);
   try{document.getElementById("v-"+cur).innerHTML=VIEWS[cur]();}
   catch(e){document.getElementById("v-"+cur).innerHTML='<div class="card"><div class="empty">Renderfout: '+esc(e.message)+'</div></div>';}
 }
@@ -901,7 +935,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("nav button").forEach(x=>x.classList.remove("on"));
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
   b.classList.add("on");cur=b.dataset.v;
-  document.getElementById("v-"+cur).classList.add("on");render();
+  document.getElementById("v-"+cur).classList.add("on");vorigeVinger="";render(true);
 });
 
 /* ---------- diep linken: /#casting opent meteen dat tabblad ---------- */

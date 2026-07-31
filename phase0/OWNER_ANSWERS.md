@@ -27,3 +27,4 @@
 | 2026-07-31 21:39 | O-9 | B |  |
 | 2026-07-31 21:39 | T-5 | mixamo |  |
 | 2026-07-31 21:39 | T-6 | ja |  |
+| 2026-07-31 21:50 | OBS-6 | nachtmodus | OWNER GAAT SLAPEN (31-07 laat). ER KOMT VANNACHT GEEN ENKELE REACTIE VAN HEM. Drie regels: (1) BLOKKEER NOOIT op een owner-actie. Loopt iets vast op zijn antwoord, zet het als kaart in owner_questions.json en ga meteen aan iets anders verder - er staat werk genoeg: HUD, wapen uit de mesh, de drie open dossiers, en de dialoog van act 1 die nergens meer op wacht. (2) VRAAG NIETS OVER DOWNLOADS. Zijn woorden: laat hem dat nu nog niet vragen, ik zal sturen wanneer hij het mag doen. De bestaande kaarten T-2 (Fab-packs) en T-8 (MetaHuman) blijven passief staan - hij klikt ze wanneer hij wil. Maak GE |

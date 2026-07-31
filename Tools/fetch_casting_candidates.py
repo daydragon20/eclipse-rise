@@ -129,8 +129,39 @@ def haal_bibliotheek(key: str, paginas: int = 12) -> list[dict]:
 
 
 def score(v: dict, prof: dict) -> int:
-    """Hoe goed past deze stem bij de rol? Hoger is beter, negatief = weg."""
+    """Hoe goed past deze stem bij de rol? Hoger is beter, negatief = weg.
+
+    HARDE EIS: alleen `professional`. Owner 31-07: "nu dat ze niet
+    professioneel zijn is er soms echo of slechte kwaliteit geluid — dus
+    behoud ze professioneel." Een Professional Voice Clone is in een studio
+    opgenomen; de rest zijn thuisopnames en die klinken ernaar. Dit is geen
+    smaakfilter maar een kwaliteitsvloer.
+    """
+    if (v.get("category") or "").lower() != "professional":
+        return -1
+
+    # KWALITEITSVLOER. `professional` filtert nauwelijks — 2192 van de 2400
+    # stemmen dragen dat label. Wat wél onderscheidt is of anderen de stem
+    # echt gebruiken: gebruik en klonen zijn duizenden luisteraars die hem
+    # hebben gehoord en gehouden. Een stem met nul gebruik heeft niemand
+    # ooit getest, en daar zit de echo en de slechte opname.
+    gebruik = v.get("usage_character_count_1y") or 0
+    klonen = v.get("cloned_by_count") or 0
+    if gebruik < 250_000 or klonen < 100:
+        return -1
+
     s = 0
+    # Zwaar wegen: dit is het beste kwaliteitssignaal dat de API geeft.
+    if gebruik >= 50_000_000:
+        s += 10
+    elif gebruik >= 10_000_000:
+        s += 7
+    elif gebruik >= 1_000_000:
+        s += 4
+    if klonen >= 10_000:
+        s += 3
+    elif klonen >= 1_000:
+        s += 2
     g = (v.get("gender") or "").lower()
     if prof["gender"] == "neutral":
         s += 1
@@ -163,8 +194,6 @@ def score(v: dict, prof: dict) -> int:
     elif acc in ("british", "australian"):
         s += 1
 
-    if (v.get("category") or "") == "professional":
-        s += 3
     return s
 
 
@@ -215,6 +244,7 @@ def main() -> int:
                 continue
             eig = " / ".join(x for x in (
                 v.get("gender"), v.get("age"), v.get("accent"), v.get("descriptive")) if x)
+            gebruik = v.get("usage_character_count_1y") or 0
             kand.append({
                 "nr": len(kand) + 1,
                 "stem": v.get("name", "?"),
@@ -225,6 +255,11 @@ def main() -> int:
                 "preview_url": v.get("preview_url", ""),
                 "categorie": v.get("category", "library"),
                 "bron": "shared-library",
+                "gebruik": gebruik,
+                "klonen": v.get("cloned_by_count") or 0,
+                "populariteit": (f"{gebruik/1_000_000:.0f} mln tekens door anderen gebruikt"
+                                 if gebruik >= 1_000_000 else
+                                 f"{gebruik//1000}k tekens gebruikt"),
             })
             hergebruik[vid] = hergebruik.get(vid, 0) + 1
             if len(kand) >= args.per_rol:

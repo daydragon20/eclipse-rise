@@ -1080,6 +1080,17 @@ def scan_casting() -> dict:
         return {"rollen": [], "totaal": 0, "gekozen": 0}
 
     keuze = read_casting_keuze()
+
+    # Wie is dit personage? Los bestand, zodat het verversen van kandidaten
+    # deze beschrijvingen nooit overschrijft.
+    rolinfo = {}
+    rb = REPO / "phase0" / "casting_rolbeschrijvingen.json"
+    if rb.is_file():
+        try:
+            rolinfo = json.loads(rb.read_text(encoding="utf-8")).get("rollen", {})
+        except Exception:
+            rolinfo = {}
+
     rollen = []
     for r in data.get("rollen", []):
         rid = r.get("rol", "")
@@ -1102,12 +1113,18 @@ def scan_casting() -> dict:
                 "beschrijving": k.get("beschrijving", ""),
                 "categorie": k.get("categorie", ""),
                 "bron": k.get("bron", "premade"),
+                "populariteit": k.get("populariteit", ""),
                 "url": url,
                 "gekozen": k.get("nr") in gekozen,
             })
+        beschrijving = rolinfo.get(rid, {})
         rollen.append({
             "rol": rid,
             "label": r.get("label", rid),
+            "wie": beschrijving.get("wie", ""),
+            "boog": beschrijving.get("boog", ""),
+            "stemstijl": beschrijving.get("stem", ""),
+            "signature": beschrijving.get("signature", ""),
             "prio": r.get("prio", 9),
             "tier": r.get("tier", ""),
             "fingerprint": r.get("fingerprint", ""),
