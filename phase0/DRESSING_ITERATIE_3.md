@@ -116,6 +116,43 @@ kleiner, niet onmogelijk — die compositing-wijziging is een eigen stap, net al
 bloom/halo (gemeten afwezig), de contactschaduwen op alle massaklassen, en de grijze
 vorken.
 
+## 1g. Stap 7 is DOORGESCHOTEN, en het is in de code na te rekenen (01-08)
+
+*Gemeten uit de palettabel in `EclipseGrayboxBuilder.cpp:1229` en `:177`/`:1067` — geen
+frame nodig, want dit gaat over geauthorde waarden.*
+
+Stap 7 schreef voor: `Prop_Barrier` van `(0.26, 0.27, 0.30)` **×0,518** naar
+`(0.135, 0.140, 0.155)`. Wat er verscheept is: `(0.046, 0.048, 0.053)`.
+
+| | lum | × vloer |
+|---|---|---|
+| barrière **oud** (vóór stap 7) | 0,2700 | 2,24× |
+| barrière **voorgeschreven** | 0,1400 | 1,16× |
+| **barrière nu verscheept** | **0,0479** | **0,40×** |
+| vloer (asfalt) | 0,1205 | 1,00× |
+| pool-kern | 0,1820 | 1,51× |
+
+**De correctie is 192% doorgeschoten** — de verscheepte waarde is 2,92× donkerder dan wat
+de stap zelf voorschreef. De plafondregel is in beide gevallen gehaald (allebei onder de
+pool-kern), dus de regel is niet de reden dat het zo ver ging.
+
+**En de richting is omgeslagen in plaats van gecorrigeerd.** De barrière stond op 2,24× de
+vloer; het doel was 1,16×; hij staat nu op **0,40×**. Een betonnen barrière is nu
+**donkerder dan het asfalt waar hij op staat** — en beton is in daglicht juist lichter dan
+asfalt. Dat is precies de omkering die §0 van dit document beschrijft ("de vloer werd 16%
+LICHTER terwijl hij naar schemer-waarden geschoven zou worden"), één iteratie later en op
+een ander object.
+
+> **Dit is dezelfde fout als §1f, van de andere kant gezien.** Daar leverde de plafondregel
+> een vault waarin ook de lichtbronnen eronder bleven; hier levert hij dressing die onder
+> zijn eigen ondergrond duikt. **Een plafond zonder vloer stuurt maar één kant op, en het
+> stopt niet vanzelf.**
+>
+> **Niet zelf teruggezet.** De 0,518 uit stap 7 is een geauthorde waarde met een
+> bisectieronde erachter (§1e), en er kan een meting achter de huidige 0,046 zitten die ik
+> niet gevonden heb. **Wie dit oppakt: zoek eerst die meting.** Is er geen, dan is
+> `(0.135, 0.140, 0.155)` de waarde die het document zelf voorschrijft.
+
 ## 1f. De vault is op dezelfde as GEBOUWD, en hij staat er slechter voor (01-08)
 
 *Gemeten op de vier vault-frames van vannacht met een luminantie-histogram (Rec.709,
