@@ -14,10 +14,10 @@ turn:         "Sela moves them, using her voice where Ember would have used cove
 
 # ---- state ----
 status:          draft
-critic:          "NO-GO: .410 draagt L1-R21 nog niet uit; zakt onafhankelijk op 18.9 C2 (schrappen van de tweede zin maakt de regel beter)"
-words:           264
-words_heard:     172
-words_generated: 297
+critic:          GO
+words:           267
+words_heard:     175
+words_generated: 300
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, BRICK, SELA, fighters, freed conscripts; Dominion response
@@ -91,6 +91,15 @@ words_generated: 297
 #            (.040 .220 .340 .400, no variants anywhere in this scene). The split block adds
 #            NO Voss line, so it costs nothing at all on the gender axis - 47 words of new
 #            text and 47 words of new generation.
+#            RECOUNTED BY HAND AGAIN 01-08 for the L1-R21 rewrite of .410, and again WITHOUT
+#            A SHELL - no tool was run in that session either, so this is a hand count too.
+#            .410 goes 9 w -> 12 w. All three figures move by exactly +3: the line is Mara's
+#            and it sits in the shared tail, so every playthrough hears it and nothing
+#            doubles on the gender axis. words 267 = 264 + 3. words_heard 175 = head 106 +
+#            branch 47 + tail 22 (the tail was 19); `run` hears 173. words_generated 300 =
+#            267 + the same 33 Voss words doubled. Spread is untouched: still 1 w (.420) to
+#            14 w (.140) = 14x, and .410 at 12 w is under the 25 w ceiling with the register
+#            still carried by .010 / .020 / .140.
 # reread:    .390 was first written "Everyone who got on with you is standing with you." and
 #            changed before delivery: "got on with" is also the idiom for getting along with
 #            somebody, and a TTS model has no context to disambiguate it. "came off that car"
@@ -132,6 +141,15 @@ words_generated: 297
 #            branches get it, no mystery attached, and it is not solved. NOT a new plant:
 #            P4-b belongs to M1.5.S05 and P4-c to M1.7. This is the same explanation getting
 #            harder to say, which is the act's spine working, and nobody names it.
+#            AMENDED 01-08 BY L1-R21, AND THE ORIGINAL REASONING ABOVE WAS HALF RIGHT. It
+#            is correct that this is no new plant - it is in no P4 row. But L1-R17 is not
+#            about plants, it is about FORM, and .410 was the third aphorism the player
+#            meets before M1.7. Three teaches the shape; the shape is then the tell, and
+#            twist 4 gets solved by spotting good prose instead of by act 4 earning it.
+#            So the tail now reads polished (M1.2.S03.150) -> polished (M1.5.S05.200) ->
+#            FLAT, and the flatness is a fact about Mara rather than a rule about writing:
+#            her explanations are running out. Two notes above say "both branches" - that
+#            predates the split block and it is three now; the tail is shared by all three.
 # brick:     no lines. He is a shot at .090.
 
 lines:
@@ -340,8 +358,8 @@ lines:
   - id:      M1.6.S05.410
     speaker: MARA
     voice:   mara
-    text:    "It's a freight yard. Freight yards get freight guards."
-    note:    "The running M1.2.S03 thread: the Dominion under-reacts and somebody explains it away. She believes it. Act 4 will not."
+    text:    "Somebody's called it in by now. They think they're short some ore."
+    note:    "The running M1.2.S03 thread: the Dominion under-reacts and somebody explains it away. She believes it. Act 4 will not. *** FLAT BY RULING L1-R21, REWRITTEN 01-08 - DO NOT POLISH IT BACK. *** The old text was 'It's a freight yard. Freight yards get freight guards.': literal anadiplosis, and T4 touch 3 of six (ACT1_OVERVIEW section 4). THE BEAT IS UNCHANGED AND SO IS THE CATEGORY ERROR. The old line answered a military absence with freight logic; so does this one - the enemy is doing inventory, so the enemy sent what you send about inventory. What went is the figure, the rhythm and the closing beat. AND IT IS A SMALLER CLAIM, which is what makes it the first crack: touches 1 and 2 are laws about how the Dominion behaves, and this is a guess about what they happen to believe tonight, which she cannot know. FLAT SERVES THE FIRST HALF OF THIS NOTE BETTER THAN THE MAXIM DID - a maxim is certainty performed, and a guess delivered flat is certainty. C2, AND THE SENTENCE ORDER IS THE ANSWER TO IT: delete the last sentence and 'Somebody's called it in by now.' explains nothing about a response that never came. The explanation IS the last sentence, so the deletion breaks the beat instead of tightening it. THE FIRST DRAFT OF THIS REWRITE OPENED 'Nothing was due down that road tonight.' and was cut before delivery - sentence-initial echo of .400's 'Nothing came down the Spire road', which is anaphora across the cut, and swapping one figure for another is not flat. It also borrows the emissary's tic (18.4: repeats the other person's word back at them), and that is his. L1-R17 POSTER TEST: neither half is a screenshot, and it ends on 'ore' - the night reduced to a commodity, with nobody underlining it. NO NEW CANON: 'ore' is M1.6.S01.010, 'Twelve of them are ore.' Branch-neutral - it is the same misreading after run, emptied and split."
 
   - id:      M1.6.S05.420
     speaker: MARA
