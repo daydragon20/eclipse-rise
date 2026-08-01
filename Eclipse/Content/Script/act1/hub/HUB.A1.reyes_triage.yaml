@@ -15,9 +15,9 @@ turn:         "She makes him choose, then tells him what the Dominion's version 
 # ---- state ----
 status:          draft
 critic:          "GO op 18.9 (scene) -- GEHOUDEN op de reeks. REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
-words:           222
-words_heard:     164
-words_generated: 257
+words:           228
+words_heard:     170
+words_generated: 269
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      REYES, VOSS
@@ -57,9 +57,28 @@ words_generated: 257
 #      at .160; at .170 she says it to his face. Nothing else in the file changes.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      `hub` (12-35) as a ceiling. Longest 22 w (.010). Register reached at .010,
+# band:      `hub` (12-35) as a ceiling. Longest 24 w (.010). Register reached at .010,
 #            .030, .040, .070, .130, .140, .150, .160, .170, .180.
-#            Spread 2 w (.020 "What order?") to 22 w = 11x.
+#            Spread 4 w (.050, .190) to 24 w = 6x, clear of 18.3's factor of three.
+#            THE OLD NOTE NAMED .020 "What order?" AS A TWO-WORD FLOOR. That line is rebuilt
+#            (8.3), so the floor is now four words and the ceiling has not moved. The old
+#            note also read "Longest 22 w (.010)": 22 is .030's count, carried under .010's
+#            id. `len(text.split())`, the validator's own rule, gives 24 for .010 and 22 for
+#            .030. HAND-COUNTED - no shell in this round, so nothing has been run.
+#
+# *** THE THREE SERIES-PASS CHANGES (8.2, 8.3) ARE EXECUTED. THE L1 BLOCK IS NOT PENDING. ***
+# The L1 block above is phrased as an instruction and was still unexecuted after the
+# architect round, which is the reason the series stayed red. Done here, and only .020 costs
+# anything:
+#   .020  REBUILT. Eight words, the full allowance. It cannot be swapped for "Go on": it
+#         hands her the constraint her document has to live inside, so .120 ("That fits on
+#         one line") and .180 (a second line, for a name) now land against a stated capacity
+#         instead of against nothing. See the note on the line.
+#   .170  GIVEN A `shot:`. It carried none, and it is the heaviest line in the file. The
+#         camera is on the plate at .160 and comes off it here - eyes on Voss, not down.
+#         This file is NOT one of the five permitted the stillness (8.2 (i)).
+#   .190  CLOSING CHANGED. She does not go back to the kit. Her hands are empty and stay
+#         empty; going back to the kit undoes the transfer the scene exists for.
 #
 # *** THE 18.9 A LINE IS .170, AND IT IS NOT A direct_beat. TWO SEPARATE EXEMPTIONS. ***
 # 18.9 A forbids a character naming their own emotion "UNLESS the character is Reyes,
@@ -91,8 +110,9 @@ words_generated: 257
 # reyes:     ZERO CONTRACTIONS in this file. Audited word by word. The L1-R19 ladder is
 #            M1.4.S99 baseline -> M1.6.S06 drops -> M1.8.S07 drops hard; this scene sits
 #            between the first two and she is stressed throughout it, which is the whole
-#            subject. Voss contracts twice (.050) so the contrast is audible inside the
-#            scene and not only across missions.
+#            subject. Voss contracts twice - .020 ("That's") and .050 ("You've") - so the
+#            contrast is audible inside the scene and not only across missions. The note
+#            used to claim two and the file only had one; the rebuilt .020 makes it true.
 # the four:  none of them is the wrong answer and none is the Dominion's. Her four replies
 #            are four different clerical problems - one fits, one needs a second author,
 #            one will be argued with, one is short enough to shout - and not one of them
@@ -117,7 +137,8 @@ lines:
   - id:      HUB.A1.reyes_triage.020
     speaker: VOSS
     voice:   voss
-    text:    "What order?"
+    text:    "That's bunk plate. Eight words a line, punched."
+    note:    "REBUILT PER 8.3. The old line was 'What order?', which is 'Go on' with a question mark on it. He does not take up the question; he prices the object she is pointing at - what it is made of, and how much document fits on it at punch size. That is 18.4's technician used as behaviour instead of vocabulary, and it is the mara_letters.040 move: measure the thing in front of him and hand the result back to the person it belongs to. Eight words, the whole allowance the rebuild was given."
 
   - id:      HUB.A1.reyes_triage.030
     speaker: REYES
@@ -225,6 +246,7 @@ lines:
     speaker: REYES
     voice:   reyes
     text:    "I am frightened of that plate. That is not a useful thing to be and it will pass."
+    shot:    "The camera comes off the plate and finds her looking straight at him, the punch still unused in her hand."
     note:    "*** 18.9 A, THE REYES CLINICAL EXEMPTION - NOT AR-12'S RATIONED direct_beat, WHICH IS SPENT IN M1.8.S90.050. *** She names the feeling and triages it as clinically unhelpful in the same breath, which is the only way this woman can say it out loud. One such line in act 1 and it is this one. See the L2 header note and the report."
 
   - id:      HUB.A1.reyes_triage.180
@@ -237,4 +259,5 @@ lines:
     speaker: VOSS
     voice:   voss
     text:    "Give me the punch."
-    shot:    "She hands it over and goes back to the kit while he is still working out how to hold it. Nobody says the order out loud again."
+    shot:    "She hands it over and picks nothing else up. Empty hands, the first time in the act, and she leaves them that way while he is still working out how to hold the punch. Nobody says the order out loud again."
+    note:    "THE CLOSING, CHANGED PER 8.2 (ii). She does not go back to the kit: she has given the tool away and has nothing to do, which is the first time act 1 shows this woman idle. Going back to the kit would undo the transfer the whole scene is for. One of the three deviant closings, and it costs no words."

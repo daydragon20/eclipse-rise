@@ -26,11 +26,15 @@ words_generated: 62
 # condition: story.beat_m16_tithetrain == true
 # flags-out: none
 #
-# *** REBUILT BY L1 2026-08-01. THE WHOLE `lines:` BLOCK BELOW IS TO BE REPLACED. ***
-# The L2 block and the five lines under it answer the OLD contract and are kept only so the
-# writer can see what is being replaced and why. Nothing here is generated (tier 4, status
-# draft), so the ID block .010-.050 is reused freely and no cache is at risk. Four lines now,
-# not five. VONNIS: phase0/beats/BEATS_HUB_A1.md 8.4 and section 4 entry 7.
+# *** REBUILT BY L1 2026-08-01 — AND THE REBUILD IS DONE. THE BLOCK BELOW IS THE NEW ONE. ***
+# THIS PARAGRAPH USED TO READ "THE WHOLE `lines:` BLOCK BELOW IS TO BE REPLACED" and to call
+# the five lines under it the old contract's. Both were true when it was written and neither
+# is true now: the L2 block was rebuilt on the same day, .050 is retired, and there are FOUR
+# lines below, all of them answering the contract at the top of this file. Corrected here
+# because a writer who reads the old wording rewrites a NEW scene believing it is the old
+# one - which is the same defect class as L1-R29 and the reason for this correction.
+# Nothing is generated (tier 4, status draft), so reusing ids .010-.040 cost no cache.
+# VONNIS: phase0/beats/BEATS_HUB_A1.md 8.4 and section 4 entry 7.
 #
 # *** THE CANON RULING. BRICK WAS TAKEN. NOBODY WENT IN HIS PLACE. ***
 # M1.6.S03.220 (spoken, and the player has heard it before this gate opens): "Krad-9.
@@ -84,8 +88,11 @@ words_generated: 62
 # ---- dialogue-writer notes (L2) — REBUILT 2026-08-01. The superseded block is deleted. ----
 # The withdrawn version is in git; keeping a block that instructs the next writer to put a
 # dead man's name in .040 next to a block that forbids it is how the error comes back.
-# band:      `hub` (12-35) as a ceiling. Longest 15 w (.010). FOUR LINES, so the scene is
+# band:      `hub` (12-35) as a ceiling. Longest 16 w (.010). FOUR LINES, so the scene is
 #            exempt from register and spread (L1-R1), and compression is the whole point.
+#            (Read 15 until 01-08. `len(text.split())` gives 16: thirteen tokens up to
+#            "manifest." plus "Exact, and kept." The total of 36 was and is correct, so the
+#            error was in the per-line label only. Nothing about the ceiling changes.)
 # budget:    HAND-COUNTED, NO SHELL IN THIS ROUND. 42 written words -> 36. words_generated
 #            72 -> 62, a saving of 10, all of it on Voss (30 -> 26, doubled for gender).
 #            Five lines -> four, as instructed. Whitespace tokens, validate_script.py's own

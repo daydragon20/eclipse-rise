@@ -49,7 +49,19 @@ words_generated: 290
 # ---- dialogue-writer notes (L2) ----
 # band:      `hub` (12-35) as a ceiling. Longest 24 w (.010). Register reached at .010,
 #            .030, .060, .070, .080, .110, .120, .150.
-#            Spread 1 w (.100 "No.") to 24 w = 24x.
+#            Spread 1 w (.100 "No.") to 24 w = 24x. Unchanged by the series pass: the one
+#            change to this file is a `shot:`, and a shot is not a word. HAND-COUNTED - no
+#            shell in this round, so nothing has been run.
+#
+# *** THE ONE SERIES-PASS CHANGE (8.2 (i)) IS EXECUTED. .140 HAS ITS SHOT. ***
+# The L1 block above is phrased as an instruction and was still unexecuted after the
+# architect round. .140 now carries one sentence and her eyes are on him, so the only place
+# in the twelve where somebody names their own compromise out loud is no longer delivered
+# without a camera on it. The sentence is built out of what the scene already established -
+# she has been speaking about a row of doors since .010, and this is the line where she
+# stops. The list stays under her arm here so that putting it down at .150 is a movement
+# and not a prop change. NOTHING ELSE MOVED: .090 stays, .130 stays with all four variants,
+# and the closing stays, all three as the L1 block rules them.
 #
 # *** THE RUMOUR, AND WHY IT IS THIS ONE. ***
 # The district is saying that everybody who went down the shaft came back up it. Three
@@ -165,6 +177,7 @@ lines:
     speaker: SELA
     voice:   sela
     text:    "I don't know. I've never had anything worth lying about before."
+    shot:    "She has been talking about the doors and the row all scene; on this line she is looking at nobody but him, and the intake list is still under her arm."
     note:    "*** HER FIRST COMPROMISE, NAMED BY HER AND BY NOBODY ELSE. *** The one line in the file about herself (18.4). Nobody contradicts it, softens it or returns to it, here or in act 2."
 
   - id:      HUB.A1.sela_after.150

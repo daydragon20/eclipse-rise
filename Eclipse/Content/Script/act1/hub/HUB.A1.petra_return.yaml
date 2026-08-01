@@ -53,8 +53,11 @@ words_generated: 72
 #            are retired, not reused - nothing is generated, so nothing is at risk, and a
 #            retired id is cheaper to read than a recycled one.
 #            EVERY PETRA LINE IS ANSWERED BY A MOVEMENT, AND THE MOVEMENT LIVES IN `shot:`.
-#            Seven turns, six of them physical. `shot:` costs nothing. The scene must not
-#            read as a woman talking to herself; it must read as two people working.
+#            Eight turns, all eight physical. `shot:` costs nothing. The scene must not read
+#            as a woman talking to herself; it must read as two people working.
+#            (This line read "Seven turns, six of them physical" until the `.095` insertion
+#            was counted and until `.070` got the shot it was owed. Eight and eight is the
+#            contract; six of seven was never it.)
 # .110:      "Until it stops smelling like water." now answers a question HE NEVER ASKS.
 #            That is the fingerprint at full strength and it is the only place in act 1
 #            where somebody knows this man without making him speak. Keep the line.
@@ -90,14 +93,17 @@ words_generated: 72
 #            Counts are whitespace tokens, validate_script.py's own rule (`len(txt.split())`).
 #            count_generation_cost.py is authoritative and nobody has run it on this file.
 #
-# *** SEVEN LINES, EIGHT ANSWERS, AND NOT ONE OF THE ANSWERS IS A SENTENCE. ***
+# *** EIGHT LINES, EIGHT ANSWERS, AND NOT ONE OF THE ANSWERS IS A SENTENCE. ***
+# (This heading read "SEVEN LINES" and the L1 block read "seven turns"; the table underneath
+# has listed eight rows since `.095` was inserted. Eight is the count. Corrected rather than
+# left, because the next writer trims to the number in the heading, not to the table.)
 # The rule I wrote the file against: A PETRA LINE MAY ONLY BE ANSWERED BY A BODY. Each `shot:`
 # below states what he does and the next line is her reply to that, so the scene reads as a
 # conversation with one voice in it rather than a woman issuing orders into a room.
 #   .010  he sets a folded blanket on the crate beside her    -> the whole want, staged
 #   .030  he takes the blanket back and lifts the tally board -> "the list says they ate"
 #   .050  he goes, finds three, comes back, starts to reach   -> the sentence he cannot say
-#   .070  he brings the salt and stands in her way            -> the last attempt at stopping her
+#   .070  he fetches the salt and stands in her way           -> the last attempt at stopping her
 #   .090  she takes the salt off him. THE SPOON.              -> PLAYER BEAT
 #   .095  he lowers the flame and looks up                    -> the question he never asks
 #   .110  he asked nothing                                    -> she answers it anyway
@@ -176,13 +182,14 @@ lines:
     speaker: PETRA
     voice:   petra
     text:    "Get the salt. Shelf above the pipe."
-    note:    "18.7's required interruption, carried by staging under the L1 exemption - the hand never lands. She does not refuse the gesture, disapprove of it or acknowledge it; she gives his hands something else. Verb first: Brick would have said 'Salt.'"
+    shot:    "HIS ANSWER: the hand never lands. He goes to the shelf above the pipe, comes back with the salt, and then does not hand it over, standing between her and the queue with it in his fist."
+    note:    "18.7's required interruption, carried by staging under the L1 exemption - the hand never lands. She does not refuse the gesture, disapprove of it or acknowledge it; she gives his hands something else. Verb first: Brick would have said 'Salt.' THE STAGING NOW SITS ON THIS LINE. It used to live under .090, so this was the one Petra line in the file with no `shot:` at all - correct in content, hanging under the wrong id, and in breach of the contract that EVERY Petra line is answered by a movement. Nothing was rewritten; the sentence moved up one line and split in two."
 
   - id:      HUB.A1.petra_return.090
     speaker: PETRA
     voice:   petra
     text:    "Second pot on the burner. Stir it, and do not let it catch."
-    shot:    "HIS ANSWER: he comes back with the salt and does not hand it over, standing between her and the queue. She takes it out of his fist on her way past without breaking step. PLAYER BEAT (18.7): the spoon is lying across the second pot and she is already three crates down the line. This is the scene's only input and it is a hand, not a sentence."
+    shot:    "She takes the salt out of his fist on her way past without breaking step. HIS ANSWER, AND IT IS THE PLAYER'S - PLAYER BEAT (18.7): the spoon is lying across the second pot and she is already three crates down the line. This is the scene's only input and it is a hand, not a sentence."
     note:    "*** THE TIC, THIRD FIRING, AND IT IS THE TURN ARRIVING. *** His last attempt at stopping her is answered with the biggest job in the room, and the player performs the answer. The stub's 'that is how they both survive the week', written as a cooking instruction."
 
   - id:      HUB.A1.petra_return.095

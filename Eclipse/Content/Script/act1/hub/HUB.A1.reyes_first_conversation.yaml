@@ -40,6 +40,28 @@ words_generated: 277
 #            drops contractions when stressed. She is NOT stressed here, so the
 #            contractions stay - which makes their absence later meaningful.
 #            Voss variants on all four axes.
+#
+# *** SERIES PASS 2026-08-01 (BEATS_HUB_A1 8): ONE SHOT IS ADDED. NO LINE MOVES. ***
+# THIS FILE WAS THE ONLY ONE OF THE SEVEN THAT NEVER RECEIVED A SERIES-PASS BLOCK, which is
+# exactly why the one change it owes went unmade: an instruction with no address gets built
+# by nobody, which is 8.0's own diagnosis of the round. Transcribed into the file by the
+# dialogue-writer on instruction; the source is BEATS_HUB_A1 8.1-8.3 and nothing below is
+# new architecture.
+# 8.2 (i): the heaviest line is .160 - the turn, and the only place the word "should" occurs
+# in the file - and its shot had her hands busy and her eyes unmentioned. This file is NOT
+# one of the five permitted to hold that line still, so .160 is delivered WITH HER EYES ON
+# VOSS and the shot now says which of the two it is. The book still goes under the shirt; it
+# goes afterwards. The look pays for itself: she has not looked up once since .010, and the
+# notes at .030 and .090 say so out loud, so the one time she does is legible without a line.
+# 8.2 (ii): THE CLOSING DOES NOT CHANGE AND MUST NOT BE NORMALISED. 8.1 names this scene as
+# one that already deviates - it ends on HER question to HIM, which reveals he came down for
+# something he never said out loud. It is the only one of the twelve that does not end on a
+# task over an object. A later pass that "fixes" .170 into a closing task breaks the one
+# thing this file contributes to the series.
+# 8.3: checked line by line. No Voss line here is on the rebuild list, and none of the six
+# lines 8.3 names as unassignable is in this file. .120 "You're writing it down." is an
+# observation of the thing in front of him and .130 is its answer, so "Go on" does not
+# replace it. Nothing else in the file changes.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      `hub` (12-35) as a CEILING per L1-R1. Longest base line 21 w (.140), longest
@@ -178,8 +200,8 @@ lines:
     speaker: REYES
     voice:   reyes
     text:    "Someone should."
-    shot:    "She closes the book and puts it under the folded shirt at the bottom of the kit, which is where it lives."
-    note:    "THE TURN, in two words, and it is the only time the word appears in the file. She does not explain it, defend it, or offer him the book, here or in any later act."
+    shot:    "Her eyes come up to his on the two words and stay there. Then she closes the book and puts it under the folded shirt at the bottom of the kit, which is where it lives."
+    note:    "THE TURN, in two words, and it is the only time the word appears in the file. She does not explain it, defend it, or offer him the book, here or in any later act. 8.2 (i): delivered with her eyes on Voss, not with her hands still - the first time she has looked up since he came down, which the notes at .030 and .090 are what make readable. The book goes away afterwards, so the look is the delivery and the task is the exit."
 
   - id:      HUB.A1.reyes_first_conversation.170
     speaker: REYES
