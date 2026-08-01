@@ -10,8 +10,9 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (zelf nagedraaid 02-08 ~03:25): build groen `-NoUba` · **250 tests, 0 gefaald, 0
-niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** ·
+Bar (zelf nagedraaid 02-08 ~03:25): build groen `-NoUba` · **257 tests, en op de laatste ronde 5 GEFAALD** — dat is werk in uitvoering: de
+basislaag bouwt en heeft er zeven tests bij gezet. Mijn eigen laatste groene meting was
+250 / 0 gefaald (02-08 ~03:25). De faler heet `Eclipse.Feel.Input.DocumentedConsoleCommandsExist`** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** ·
 EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 
 > ⚠ **De BAR is ROOD op twee punten, en allebei liggen ze buiten de build.** Dat de
