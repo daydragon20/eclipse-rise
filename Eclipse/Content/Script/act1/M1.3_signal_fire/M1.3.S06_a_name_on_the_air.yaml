@@ -14,7 +14,7 @@ turn:         "A man on a Veil frequency says a first name, warmly, about somebo
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        159
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----

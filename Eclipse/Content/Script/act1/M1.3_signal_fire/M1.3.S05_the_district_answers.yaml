@@ -14,7 +14,7 @@ turn:         "Voss recognises a shoulder plate in the response line and keeps m
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .150 zegt Nine one seven terwijl L1-R36 het kenteken op two six one heeft vastgelegd; de L2-notitie op r.50 gaat mee. Alles verder schoon"
 words:        130
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----

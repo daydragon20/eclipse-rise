@@ -14,7 +14,7 @@ turn:         "She marks it anyway, and asks Voss where the next one goes."
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        233
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----

@@ -14,7 +14,7 @@ turn:         "He tells Voss something about Mara's earlier refusals that Mara d
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .230/.240/.250 zetten elf naast .150 als verhoorduur; de M1.5-uitzondering van L1-R14 steunt alleen op GO en die staat er niet. Herbevestigt L1 hem op andere grond, dan is dit ongewijzigd GO"
+critic:       GO
 words:        226
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
@@ -86,6 +86,41 @@ words:        226
 # and Brick will not round that off to make it kinder.
 # If Q-4 lands and the Iron Chorus is given names, this line can take one at zero cost.
 # EXACTLY EIGHT WORDS. Counted.
+#
+# eleven:    L1-R14 checked, and this file is the reason the rule exists. ONE spoken eleven
+#            survives, at .150, where it measures the size of Ember Cell in the rival's mouth.
+#            That is the canonical meaning and it may never be harmonised away.
+# eighteen:  RULING L1-R31 EXECUTED 01-08. .230 / .240 / .250 were eleven / eleven / twelfth
+#            and are now eighteen / eighteen / nineteenth. Not one other word moved, and both
+#            hard constraints hold: .230 is still exactly eight words, .240 is still one. The
+#            second is the load-bearing one - a two-word number would turn a flat echo into a
+#            statement, and the echo is 18.4's whole fingerprint for this man.
+#            `words` does not move. Every substitution is one token for one token: 226.
+#            THE SCENE NOW CARRIES ONE MEANING OF ELEVEN INSTEAD OF TWO, which was the point.
+#
+# *** ESCALATION TO L1 - THE NUMBER REGISTER'S EIGHTEEN ROW IS ONE CARRIER SHORT. ***
+# I did not re-open the number and I did not go looking for a better one. This is what a
+# grep for the two words I was told to type turned up, reported because the register's own
+# rule is "add a row as soon as a number touches a SECOND scene", and eighteen just did:
+#   M1.1.S05.080 is SPOKEN and reads "We're eighteen minutes inside that." It took eighteen
+#   on 01-08, in this same rulings round, under L1-R14 - and its note says in as many words
+#   that eighteen is spoken nowhere in act 1. That was true when it was written and this line
+#   is what made it false. ACT1_OVERVIEW's register lists only .230/.240/.250 under
+#   "achttien / negentien"; M1.1.S05.080 is not in the carriers column and should be.
+#   I EXECUTED RATHER THAN STOPPED because the collision is much weaker than the one being
+#   repaired: minutes against days, a relief-cycle margin against an interrogation, four
+#   missions apart, and no payoff for it to invert. Eleven's defect was that both meanings
+#   were load-bearing. Neither of eighteen's is, yet.
+#   If L1 wants it clean anyway, SIXTEEN is free and costs one token in M1.1.S05.080. L1-R31
+#   excluded sixteen only because it forces .250 onto the seventeenth, which is Brick's; that
+#   objection does not exist in M1.1.
+# ALREADY RULED, NOT RE-OPENED: the register accepts nineteen against M1.8.S01.040's door
+# count - ordinal against cardinal, three missions apart. Two further uses are outside that
+# row and are noted for the register rather than argued: M1.7.S03.040 dates a log
+# "Nineteenth of last month" (ordinal against ordinal, but a date, not a count of days) and
+# M1.4.S04.140 is "Nineteen years old". .250 is forced arithmetic - one day after .230 - so
+# there was never anything here for a writer to choose.
+# I have not touched M1.1, M1.4, M1.7 or M1.8, or the register.
 #
 # lucky:     .250 puts "lucky" in the emissary's mouth attached to a man who was not. He
 #            spends the word again at S05.170 about the Veil sweep (P4-b), and by then the
@@ -224,21 +259,22 @@ lines:
   - id:      M1.5.S03.230
     speaker: BRICK
     voice:   brick
-    text:    "Cell two. He gave you eleven days first."
+    text:    "Cell two. He gave you eighteen days first."
     shot:    "The emissary stops walking. His two fighters go four paces before they notice he is not with them."
-    note:    "*** BRICK'S EIGHT WORDS. *** See the L2 escalation above. He answers a question nobody put to him, in the only currency he has, and it is worth more than everything said in the gallery."
+    note:    "*** BRICK'S EIGHT WORDS. *** See the L2 escalation above. He answers a question nobody put to him, in the only currency he has, and it is worth more than everything said in the gallery. EIGHTEEN, NOT ELEVEN, BY RULING L1-R31 - and still exactly eight words: Cell / two. / He / gave / you / eighteen / days / first."
 
   - id:      M1.5.S03.240
     speaker: EMISSARY
     voice:   iron_chorus_emissary
-    text:    "Eleven."
+    text:    "Eighteen."
+    note:    "*** ONE WORD, AND IT STAYS ONE. *** 18.4 emissary: he repeats the other man's last word back, flat, and adds nothing. A two-word number turns the echo into a statement and the tic into a comment."
 
   - id:      M1.5.S03.250
     speaker: EMISSARY
     voice:   iron_chorus_emissary
     tags:    [quietly]
-    text:    "We came out of that quarter on the twelfth day. We thought we'd been lucky."
-    note:    "*** 'Lucky' is planted here, on a man who was not. He spends the word again at S05.170. ***"
+    text:    "We came out of that quarter on the nineteenth day. We thought we'd been lucky."
+    note:    "*** 'Lucky' is planted here, on a man who was not. He spends the word again at S05.170. *** The nineteenth is one day after .230, and that gap is the beat: he walked out the morning after the other man stopped holding."
 
   - id:      M1.5.S03.260
     speaker: EMISSARY

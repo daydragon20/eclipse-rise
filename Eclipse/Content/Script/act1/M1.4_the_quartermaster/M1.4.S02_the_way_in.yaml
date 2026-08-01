@@ -14,7 +14,7 @@ turn:         "Inside, the place is bigger than the plan, and the plan quietly b
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .040 Eleven metres -- meters staan bij naam op de uitsluitingslijst van L1-R14"
 words:        231
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----

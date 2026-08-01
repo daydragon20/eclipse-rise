@@ -19,8 +19,13 @@ words:        354
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      MARA, DEX, VOSS, REYES
-# flags-in:  Story.Choice.M12_Ghost · Story.Clue.CustodianKey
-# flags-out: Story.Beat.M12_DeadDrop  (exists)
+# flags-in:  Story.Choice.M12_Ghost  - read in five conditions, .030-.070. Set on the quiet
+#            branch of S05 (L1-R39), which is before this scene, so the read is safe.
+#            Story.Clue.CustodianKey REMOVED 01-08 (L1-R38): this scene reads it in zero
+#            conditions and never did. A flags-in line that names a flag nothing here reads
+#            is a dangling reference the validator cannot see, because there is no condition
+#            to check it against.
+# flags-out: Story.Beat.M12_DeadDrop  (exists - EclipseGameplayTags.cpp:75)
 # commit:    +15 M / +30 C / +8 I, day +1, ghost optional +10 M / +4 I, no region flip
 # beats:     1) what the caches held - names, rosters, a frequency table
 #            2) Dex's wish list
@@ -232,4 +237,4 @@ lines:
     tags:    [pause]
     text:    "Good."
     shot:    "Reyes is already gone. Dex takes the grease pencil back."
-    note:    "Sets Story.Beat.M12_DeadDrop and Story.Clue.CustodianKey - systems, not dialogue."
+    note:    "Sets Story.Beat.M12_DeadDrop - systems, not dialogue. The CustodianKey clause was struck 01-08 under L1-R38: Story.Clue.* is set by the scene the clue is SPOKEN in, never by a debrief. This scene is unconditional and the clue is not - a player who skipped the warden's office would have been credited here with something he never heard, and act 2 would bill him for it. The setter is M1.2.S04, at .120."

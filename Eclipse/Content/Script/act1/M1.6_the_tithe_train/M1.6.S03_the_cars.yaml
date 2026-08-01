@@ -81,7 +81,14 @@ words:        256
 #            to protect his door AND the man whose brother went in the spring. That makes him
 #            better, not smaller. If the owner opens `civilian_kessara_c`, splitting him back
 #            out is two `speaker`/`voice` edits and no rewrite. ESCALATED in the report.
-# sela:      FIVE turns - .140, .160, .170, .190, .200. Two are questions (.140, .190).
+# sela:      FIVE turns - .140, .160, .170, .190, .200. ONE is a question (.140).
+#            CORRECTED 01-08, RULING L1-R34: this line read "Two are questions (.140, .190)"
+#            and the text has only ever had one. .190 ends on a full stop and hands out
+#            permission; it does not ask for anything. THE RULING MOVED THE STUB, NOT THE
+#            TEXT - the L1 writer note above still asks for "at least two", and L1-R34 answers
+#            that giving them permission to stay is better characterisation than a second
+#            question, because a second question makes her an interrogator. Nobody adds one
+#            back. Not one word of dialogue changed under this ruling.
 #            Her tic fires at .140 and .190: a private terror ("my address", "my brother") is
 #            handed straight back as a collective one. She speaks about herself ZERO times
 #            here, which is inside 18.4's limit of one.
@@ -221,7 +228,7 @@ lines:
     speaker: SELA
     voice:   sela
     text:    "No. So say it out loud if you're staying, and the rest of us can stop counting on you."
-    note:    "The organiser's move: she gives them permission to stay, which is exactly what makes them move. Second question."
+    note:    "The organiser's move: she gives them permission to stay, which is exactly what makes them move. NOT A QUESTION, and it never was - this note used to call it her second one. L1-R34, 01-08: the permission is the characterisation, and it is why her only question in the scene is .140."
 
   - id:      M1.6.S03.200
     speaker: SELA

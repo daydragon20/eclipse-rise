@@ -21,7 +21,18 @@ words_generated: 300
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, BRICK, SELA, fighters, freed conscripts; Dominion response
-# flags-in:  Story.Choice.M16_TrainRun
+# flags-in:  Story.Choice.M16_Train.{Run,Emptied,Split}  - script side
+#            story.m16_train_choice, read at .200-.250 (run), .300-.340 (emptied) and
+#            .350-.390 (split). THAT IS THE ONLY FLAG THIS SCENE READS FROM OUTSIDE ITSELF,
+#            and it is set at S04.100 / .110 / .120.
+#            CORRECTED 01-08, RULING L1-R32: this header read Story.Choice.M16_TrainRun -
+#            one leaf, named like a boolean, in the file that branches three ways, and a tag
+#            nothing anywhere sets. It is the last header left from the sweep that already
+#            did M1.5.S05/S99 and M1.6.S06/S99. THE SHIPPED `condition:` LINES WERE ALREADY
+#            RIGHT and not one of them was touched; only the instruction was wrong, and a
+#            header is what the next writer reads before he types anything (L1-R29). Three
+#            mutually exclusive leaf tags under one parent is L1-R3's form; spelling matched
+#            to S99 and to BEATS_M1.6 section on systems.
 # flags-out: none
 # beats:     1) the yard; searchlights; the response
 #            2) THE TACTICAL PROBLEM IS NEW: civilians are not units. That is pillar 3
@@ -69,7 +80,9 @@ words_generated: 300
 #            nobody in the yard thinks it is. The second car is not short a single person -
 #            it is not in the column at all.
 #            FORTY-ONE IS NOT A NEW NUMBER. It is the intake figure the mission already
-#            ships: S06.010 (Dex counts it twice), S06.040, S06.110/.120, S06.190/.200, and
+#            ships: S06.010 (Dex counts it twice), S06.040, S06.110/.120, two of S06.190's
+#            variants (this line used to cite ".190/.200" - .200 has no figure in it, in the
+#            text or in any of its four variants; corrected 01-08 alongside L1-R32), and
 #            M1.8.S99.080. Sela reckoning in it is her doing arithmetic in the only unit this
 #            mission has. L1-R14 checked: eleven is Ember and appears nowhere in this scene.
 #            Nine and six are saturated (30x / 29x in act 1) and are not used here either -
@@ -108,7 +121,9 @@ words_generated: 300
 # sela:      audibly the same person as S03, doing a different job. Same structure - a
 #            grouping, then an instruction, then who goes first - compressed into four to
 #            six words because there is a searchlight on her. She never asks a question here;
-#            S03 was two questions and this is none, and that difference is the character.
+#            S03 was one question and this is none, and that difference is the character.
+#            "two questions" until 01-08, when L1-R34 measured S03 and found one (.140).
+#            S03's own note carried the same miscount and is corrected there too.
 # names:     ESCALATION, and it is deliberate. The stub asks for "names". The writing brief
 #            forbids new canon names, and S06 carries the biggest trap in the act (no freed
 #            conscript may acquire a name or a close-up). So Sela identifies civilians by
@@ -332,7 +347,7 @@ lines:
     condition: 'story.m16_train_choice == "split"'
     text:      "Forty-one at the drawbar. Forty-one at this wall."
     shot:      "She goes down the line with a hand on each shoulder and comes off the end of it with the number she started with. Nobody writes anything down."
-    note:      "*** THE COUNT COMES OUT, AND THAT IS THE CRUELTY. *** She is short in run and short in emptied; here she is exact. Forty-one is the mission's own intake figure (S06.010, S06.110, M1.8.S99.080) - no new number, and L1-R14's eleven is untouched. She reckons in it because it is the only unit she has."
+    note:      "*** THE COUNT COMES OUT, AND THAT IS THE CRUELTY. *** She is short in run and short in emptied; here she is exact. Forty-one is the mission's own intake figure (S06.010, S06.110, M1.8.S99.080) - no new number, and L1-R14's eleven is untouched. She reckons in it because it is the only unit she has. *** DRAWBAR = THE COUPLING AT THE SWITCH. RULING L1-R32, PINNED HERE SO IT CANNOT DRIFT. *** The first count is taken where the second car was cut away - S04.120, 'Second car goes with the Chorus', and the shot on S04.180 - so the forty-one at the drawbar is the FIRST car's column and the second car was never inside it. It is NOT S03.230's ramp ('Head count at the bottom of the ramp. Twice.'), which is taken before the switch and before anything had been cut away, and it is not S03.210's shot, where the drawbar is only how somebody climbs down. Read against the ramp, this line counts the wrong population and the arithmetic looks broken; read against the cut, the two figures match because nobody was lost crossing the yard, and the people who are missing are missing from a column they were never in. *** AND FORTY-ONE DOES NOT BRANCH. *** It is a campaign constant: S06.010, .040, .110, .120 and two of .190's variants all ship it, so do M1.7.S99.100/.120, M1.8.S99.080 and Sela's hub scene, and NOT ONE of those lines carries a story.m16_train_choice condition - the whole of S06 carries none, measured with a grep and not assumed. The three branches differ in WHO comes through the door of that vault, never in how many. S01.110/.120 is the reason and it is not a convenience: 'Nobody outside that yard has ever counted them.' / 'Then that isn't a number. That's a hope.' Forty-one is what Ember counted at a wall, not a fraction of a total anybody knew, so there is no subtraction to perform and no branch may state a loss figure. A number that moved per branch would claim somebody had counted that train. Nobody did. Registered in ACT1_OVERVIEW's number register under 'eenenveertig', which is the authority if this note and that table ever disagree."
 
   - id:        M1.6.S05.380
     speaker:   FIGHTER_A
@@ -348,7 +363,7 @@ lines:
     condition: 'story.m16_train_choice == "split"'
     text:      "Everyone who came off that car with you is standing with you."
     shot:      "The fighter goes back to his place on the line and does not ask anybody else."
-    note:      "18.4 SELA: rhetorical parallelism, second person plural twice, and her tic - a question about one person handed back as a fact about the whole column. It is true, it does not answer him, and it is the habit that makes the woman disappear. She asks nothing here; S03 was two questions and this scene is none."
+    note:      "18.4 SELA: rhetorical parallelism, second person plural twice, and her tic - a question about one person handed back as a fact about the whole column. It is true, it does not answer him, and it is the habit that makes the woman disappear. She asks nothing here; S03 was one question (.140) and this scene is none - L1-R34, 01-08; both notes used to say two."
 
   - id:      M1.6.S05.400
     speaker: VOSS

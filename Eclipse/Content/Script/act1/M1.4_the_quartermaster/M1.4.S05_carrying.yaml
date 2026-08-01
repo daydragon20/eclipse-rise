@@ -14,7 +14,7 @@ turn:         "Brick picks up the load that was going to be left, and answers th
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .020/.030 zijn elkaar uitsluitende spelersopties zonder choice-blok -- zoals het er staat spreekt Voss zichzelf in twee opeenvolgende regels tegen"
 words:        74
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----

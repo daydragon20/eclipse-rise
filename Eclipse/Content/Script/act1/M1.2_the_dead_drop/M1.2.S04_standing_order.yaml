@@ -15,12 +15,14 @@ turn:         "Recovery of a stolen custodian key-token outranks cell suppressio
 # ---- state ----
 status:       draft
 critic:       "NO-GO: .220-.250 bestaat ook als M1.7.S03.250 (zelfde document, zelfde beat, hier onvoorwaardelijk en groter); geen condition op een blok dat de beat-sheet optioneel noemt; Story.Clue.CustodianKey heeft twee gedeclareerde zetters; .240 zakt op 18.9 C2 en .120 op C3"
-words:        205
+words:        171
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      VOSS (at the terminal), DEX (radio), MARA (on watch)
 # flags-in:  none
-# flags-out: Story.Clue.CustodianKey  (NEW TAG - systems task)
+# flags-out: Story.Clue.CustodianKey  (NEW TAG - systems task). SET BY THIS SCENE, on scene
+#            commit, because .120 is where the clue is spoken - ruling L1-R38. The debrief
+#            does not set it and never did; S99's note claiming otherwise is corrected.
 #
 # P2-a. Plant for twist 2 (Whisper = Ilan Vex, a former AEGIS custodian who fled with
 # root-access fragments). The writer must land exactly three facts and no more:
@@ -34,9 +36,9 @@ words:        205
 #               document into a mandatory spoken plant, per AR-9)
 #            4) a joke about what the Veil has lost
 #            5) Mara: it means they are looking at somebody else. Relief.
-# optional:  P2-d - a second record, a redacted and unpersoned name inside the Arbiter's
-#            household. Only if the player searches further. One Dex line that does not
-#            understand it and moves on. No second beat.
+# optional:  NONE. P2-d STANDS HERE NO LONGER - ruling L1-R37 (01-08), mirrored from the
+#            corrected BEATS_M1.2.md. The redacted household record is M1.7.S03.250's,
+#            gated on run.m17_record, where it stands beside P2-b.
 # writer:    Dex is the loudest character in this mission and it is the only mission in
 #            act 1 where that is true. This is where the player learns his voice.
 
@@ -52,20 +54,26 @@ words:        205
 #            SYSTEMS NOTE: AR-9 only holds if the warden's office is on the mandatory path.
 #            The plant table calls the terminal "optional". If level design makes this room
 #            skippable, P2-a loses its mandatory carrier and twist 2 has no plant. Reported.
-# p2-d:      .220-.250, four lines, one beat, then he drops it. Dex does not understand what
-#            he is holding and does not pretend to.
-#            NO CONDITION SET. This should only play if the player searches on, and there is
-#            no registered flag for that (act1 overview section 6 forbids conditions on tags
-#            that do not exist). Marked by note; nothing invented.
-#            CONFLICT: the overview plant table places P2-d at M1.7.S03, while BEATS_M1.2
-#            and this stub place it here. Written here per my stub, escalated upstream.
+# p2-d:      GONE FROM THIS SCENE, 01-08, ruling L1-R37. The escalation logged here in the
+#            previous draft ("the overview plant table places P2-d at M1.7.S03, while
+#            BEATS_M1.2 and this stub place it here") was answered: the record lives in
+#            M1.7.S03.250, one line behind run.m17_record, and this scene's four
+#            unconditional lines are struck. Two things this file was carrying go with them
+#            - the missing condition, and .240 on 18.9 C2. Do not write it back: a beat that
+#            the spec calls optional and every player hears is not texture any more, and P2-d
+#            only does its work standing next to P2-b, which is in M1.7 and not here.
 # joke:      .160/.170 is Dex's best line of the act per the beat sheet. It is built as a
 #            long sentence and a three-word one so the landing is the short half. It also
 #            does the plant's work: the scale of the search IS the size of what was lost.
 # band:      in-mission-radio (10-25). Ceiling honoured: longest 18 w (.120, after the 01-08
-#            C3 fix; .030 is 17). Shortest 1 w (.020, .140). Variance 18x.
-# words:     205 = 211 before the 01-08 edits, +2 at .120 (key-token split, sentence added),
-#            -8 at .240 (C2 cut). Hand-counted, no shell in that session; the 211 it
+#            C3 fix; .030 is 17). Shortest 1 w (.020, .140). Variance 18x. Register reached
+#            at .010, .030, .050, .060, .120, .160. Twenty-two lines after the L1-R37 cut,
+#            so register and spread both still apply and both still pass.
+# maxims:    the scene's one permitted maxim (18.9 B, added by L1-R40) is Mara's .200
+#            "Orders change. Lists do not." Dex's .060 is the borderline second and it is a
+#            different mouth, so the row is clear either way. Reported to L1 with the sweep.
+# words:     171 = 205 before the 01-08 L1-R37 cut, -34 for .220 (13 w), .230 (15 w),
+#            .240 (3 w) and .250 (3 w). Hand-counted, no shell in that session; the 205 it
 #            replaces was re-verified line by line first and was exact.
 # ar-5:      Mara: zero "you", zero "I". She has five lines and four of them are under six
 #            words - she is on watch, and a person on watch does not make speeches.
@@ -186,28 +194,9 @@ lines:
     voice:   voss
     text:    "Taking the quarter. All of it."
 
-  - id:      M1.2.S04.220
-    speaker: DEX
-    voice:   dex
-    text:    "Hang on. There's a personnel sheet stapled to the back of the quarter."
-    note:    "P2-d begins. OPTIONAL: plays only on a deeper search. No condition written - the flag does not exist. See L2 header."
-
-  - id:      M1.2.S04.230
-    speaker: DEX
-    voice:   dex
-    text:    "Household staff. Arbiter's residence. One row, and the name has been lifted out of it."
-
-  - id:      M1.2.S04.240
-    speaker: DEX
-    voice:   dex
-    text:    "Not blacked. Lifted."
-    note:    "18.9 C2, cut 01-08. The third sentence was 'Somebody went back through the index for that.' - it glossed 'lifted' for a player who had just been told twice, and it made the following line's 'Anyway' land on an explanation instead of on a shrug."
-
-  - id:      M1.2.S04.250
-    speaker: DEX
-    voice:   dex
-    text:    "Anyway. Not ours."
-    note:    "P2-d ends. He does not understand it and does not pretend to. One beat, no second beat."
+  # .220-.250 REMOVED 01-08 per ruling L1-R37. P2-d - the redacted personnel record from the
+  # Arbiter's household - lives in M1.7.S03.250 and nowhere else. .210 runs clean into .260.
+  # IDs .220-.250 are retired, not free: never reuse them in this scene (SCRIPT_FORMAT 2).
 
   - id:      M1.2.S04.260
     speaker: MARA

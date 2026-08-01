@@ -14,7 +14,7 @@ turn:         "He gives Voss the route in nine words, asks for nothing, and that
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        180
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----

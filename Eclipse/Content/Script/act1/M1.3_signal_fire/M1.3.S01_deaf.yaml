@@ -14,7 +14,7 @@ turn:         "Dex volunteers to set the charge himself, which is the first thin
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        325
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----

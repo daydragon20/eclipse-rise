@@ -14,7 +14,7 @@ turn:         "Whichever they take, Dex talks the entire distance, and the cell 
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        213
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----

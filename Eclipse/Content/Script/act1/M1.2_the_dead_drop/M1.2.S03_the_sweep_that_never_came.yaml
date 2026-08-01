@@ -15,7 +15,7 @@ turn:         "Mara names it as the third time this has happened, decides it is 
 # ---- state ----
 status:       draft
 critic:       GO
-words:        206
+words:        210
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      MARA, VOSS, DEX (radio)
@@ -49,8 +49,8 @@ words:        206
 #            2. Mara does not wonder. She does ARITHMETIC (.130-.150), which is exactly how
 #               she solved M1.1's ammunition count. The explanation convinces because it is
 #               her established method, not because it is argued.
-#            3. She then converts the anomaly into an ADVANTAGE (.200): a marked block is a
-#               block nobody looks at twice. A character who profits from a thing has
+#            3. She then converts the anomaly into an ADVANTAGE (.200): the chalk is cover,
+#               so she stops looking at it. A character who profits from a thing has
 #               stopped examining it. That is the whole trick, and it is why act 4 hurts.
 #            4. Dex CORROBORATES (.160) before he jokes. One source is a claim; two is a
 #               fact. The player leaves this scene with a fact.
@@ -59,8 +59,16 @@ words:        206
 #            is under-reacting", closed (waved away, unresolved) in M1.8.S09. He offers a
 #            COMPETING HYPOTHESIS, not a shiver - and in act 4 it turns out to be correct.
 # no flag:   deliberate. The scene is mandatory, so "the player saw it" is always true.
-# band:      in-mission-radio (10-25). Ceiling honoured: longest 17 w. Variance 1 to 17.
+# band:      in-mission-radio (10-25). Ceiling honoured: longest 17 w (.090). Variance 1 to
+#            17 = 17x. The flattened .200 is 14 w, so neither end of the spread moves.
 # triads:    exactly one (.070 "no detainments, no cordon, no van").
+# maxims:    the scene's one permitted maxim (18.9 B, added by L1-R40) is .150. .200 was the
+#            second from the same mouth and was rewritten flat on 01-08 under that ruling.
+#            Dex's .080 and .160 are technical specs, not general truths - they are evidence
+#            in his own vocabulary, and flattening them would cost the scene its proof.
+# words:     210 = 206 before the 01-08 flattening, +4 at .200 (10 w -> 14 w). Hand-counted,
+#            no shell in that session; the 206 it replaces was re-verified line by line and
+#            was exact.
 # ar-5:      Mara: zero "you". Zero "I".
 # names:     nobody is addressed by name.
 
@@ -175,8 +183,8 @@ lines:
   - id:      M1.2.S03.200
     speaker: MARA
     voice:   mara
-    text:    "A marked block is a block nobody looks at twice."
-    note:    "She turns the anomaly into an advantage. This is why she never investigates it, and it is the same blind spot that carries her into K-77."
+    text:    "And the chalk stays up. Whoever comes past tonight reads it and keeps walking."
+    note:    "She turns the anomaly into an advantage. This is why she never investigates it, and it is the same blind spot that carries her into K-77. 18.9 B maxims / L1-R40, rewritten flat 01-08: it read 'A marked block is a block nobody looks at twice.' - a second polished general truth from the same mouth, four lines after .150, about the same anomaly. Beat untouched, polish gone: no parallelism, no antithesis, no closing image, and nothing that survives being lifted out of this doorway. 18.9 C2 now runs BACKWARDS on it, which is how I checked the flattening took: cut the last sentence and 'And the chalk stays up.' explains nothing, because the explanation IS the last sentence. .150 stays polished - it is touch #1 and the degradation curve needs a top."
 
   - id:      M1.2.S03.210
     speaker: VOSS

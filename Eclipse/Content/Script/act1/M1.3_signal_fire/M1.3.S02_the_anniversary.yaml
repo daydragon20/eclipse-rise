@@ -14,7 +14,7 @@ turn:         "The address ends, the curfew tone empties the plaza, and the cell
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        139
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
