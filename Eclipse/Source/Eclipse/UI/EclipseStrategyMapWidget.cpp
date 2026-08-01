@@ -1,12 +1,20 @@
 #include "UI/EclipseStrategyMapWidget.h"
 
 #include "Blueprint/WidgetTree.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+#include "Components/Image.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Core/EclipseGameplayTags.h"
 #include "Eclipse.h"
+#include "Misc/ScopeExit.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
+#include "UI/EclipseMapGraphWidget.h"
+#include "UI/EclipseScreenPlate.h"
 #include "Strategy/EclipseStrategySubsystem.h"
 #include "UI/EclipseStrategyMapLogic.h"
 
@@ -21,7 +29,7 @@ namespace
 	 * lane die er hetzelfde uitziet als een open lane leert je niets
 	 * (REFERENTIE_BASE_MAP.md §1.4).
 	 */
-	const FLinearColor InkBone(0.93f, 0.90f, 0.83f);
+	const FLinearColor InkBone = EclipseScreenPlate::BoneColor();
 
 	// GEMETEN op HUD_hub_kaart.png (1280x720, 01-08): op 0.62 grijs viel de
 	// "borders:"-regel weg tegen de lichte muur die achter het bord door loopt.
@@ -86,8 +94,12 @@ void UEclipseStrategyMapWidget::NativeOnInitialized()
 	// een lege WidgetTree->RootWidget en maakt er een SSpacer van. De kaart stond
 	// dus nooit op het scherm, hoeveel rijen Rebuild() er ook in hing. Zelfde
 	// oorzaak en reparatie als in UEclipseMissionHudWidget; dit is de hoogte "Map".
+	//
+	// Sinds 01-08 is de wortel de PLAAT en niet meer de lijst. Zie de header voor
+	// de meting die dat afdwong; hier staat alleen de bouw.
 	RootBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MapRoot"));
-	WidgetTree->RootWidget = RootBox;
+	BoardPlate = EclipseScreenPlate::Wrap(*WidgetTree, *RootBox, TEXT("MapBoardPlate"));
+	WidgetTree->RootWidget = BoardPlate;
 }
 
 void UEclipseStrategyMapWidget::NativeConstruct()
@@ -151,6 +163,19 @@ void UEclipseStrategyMapWidget::Rebuild()
 		return;
 	}
 	RootBox->ClearChildren();
+	// ClearChildren gooit de kolom van de vorige ronde weg; de pointer moet mee,
+	// anders schrijft AddLine in een doos die nergens meer hangt en is het bord
+	// leeg zonder dat er iets misgaat dat je kunt zien.
+	ListBox = nullptr;
+	GraphView = nullptr;
+
+	// ON_SCOPE_EXIT en niet vier losse aanroepen: elke uitgang hieronder laat een
+	// ANDER aantal regels achter, en de plaat hoort bij het aantal regels. Een
+	// uitgang die de aanroep vergeet, laat een lege plaat op het frame staan.
+	ON_SCOPE_EXIT
+	{
+		EclipseScreenPlate::ApplyVisibility(BoardPlate, RootBox->GetChildrenCount() > 0);
+	};
 
 	const UEclipseCampaignSubsystem* Campaign = GetGameInstance()->GetSubsystem<UEclipseCampaignSubsystem>();
 	UEclipseStrategySubsystem* Strategy = GetGameInstance()->GetSubsystem<UEclipseStrategySubsystem>();
@@ -170,6 +195,45 @@ void UEclipseStrategyMapWidget::Rebuild()
 		Campaign->GetState(), Graph != nullptr ? Graph->Regions : NoDefinitions, Tuning);
 
 	AddLine(View.HeaderText, InkBone, 18, /*bBold*/ true);
+
+	// DE GRAAF NAAST DE LIJST, en beide blijven staan.
+	//
+	// `REFERENTIE_BASE_MAP.md` §1.5 is daar expliciet over: een lijst mag naast
+	// de graaf bestaan, nooit ervoor in de plaats. Tekst is beter in exacte
+	// getallen, een graaf is beter in verhoudingen — wie de lijst weggooit
+	// verliest de precisie, wie de graaf weglaat heeft nog steeds geen
+	// strategische laag.
+	//
+	// NAAST en niet BOVEN, en dat is gemeten: met de graaf boven de lijst werd het
+	// bord ~250 px te hoog voor 720p en vielen de aanbodknoppen van het scherm —
+	// je kon geen missie meer starten. Naast elkaar past het (600 eenheden graaf +
+	// ~1140 lijst binnen de ~1800 die 1280 px op 720p oplevert; zie de DPI-notitie
+	// in EclipseMapGraphWidget.cpp) én het leest als een echt strategiebord: kaart
+	// links, dossier rechts.
+	if (View.IsRenderable())
+	{
+		UHorizontalBox* BodyRow = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
+		RootBox->AddChildToVerticalBox(BodyRow);
+
+		GraphView = WidgetTree->ConstructWidget<UEclipseMapGraphWidget>(UEclipseMapGraphWidget::StaticClass());
+		GraphView->SetBoard(View);
+		if (UHorizontalBoxSlot* GraphSlot = BodyRow->AddChildToHorizontalBox(GraphView))
+		{
+			GraphSlot->SetVerticalAlignment(VAlign_Top);
+			GraphSlot->SetPadding(FMargin(0.0f, 4.0f, 14.0f, 4.0f));
+		}
+
+		ListBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MapList"));
+		BodyRow->AddChildToHorizontalBox(ListBox);
+
+		// Waarom er geen graaf staat hoort op het bord en niet alleen in een log:
+		// een leeg vlak is niet van een tekenfout te onderscheiden.
+		if (!View.bHasLayout)
+		{
+			UE_LOG(LogEclipse, Warning, TEXT("Strategiekaart: geen bordindeling — %s"),
+				*View.LayoutStatusText.ToString());
+		}
+	}
 
 	// EEN KAPOTTE OF ONTBREKENDE GRAAF TEKENT NIETS. Niet de regio's, en ook
 	// niet het missie-aanbod — dat aanbod komt uit dezelfde graaf, dus een
@@ -212,6 +276,10 @@ void UEclipseStrategyMapWidget::Rebuild()
 		}
 	}
 
+	// Terug naar de volle breedte: het aanbod is geen bijschrift bij de kaart maar
+	// de KEUZE, en die hoort onder allebei de lezingen te staan.
+	ListBox = nullptr;
+
 	const TArray<FEclipseMissionOfferView> Offers = Strategy->GetAvailableOffers();
 	if (!Offers.IsEmpty())
 	{
@@ -226,8 +294,12 @@ void UEclipseStrategyMapWidget::Rebuild()
 		UTextBlock* Label = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		Label->SetText(FText::FromString(FString::Printf(TEXT("STRIKE %s [%s] — %s"),
 			*Offer.RegionId.ToString(), *Offer.TemplateId.ToString(), *Offer.ContextLine.ToString())));
+		EclipseScreenPlate::StyleButton(*Button, *Label);
 		Button->AddChild(Label);
-		RootBox->AddChildToVerticalBox(Button);
+		if (UVerticalBoxSlot* ButtonSlot = RootBox->AddChildToVerticalBox(Button))
+		{
+			ButtonSlot->SetPadding(FMargin(0.0f, 3.0f, 0.0f, 0.0f));
+		}
 	}
 }
 
@@ -235,22 +307,16 @@ UTextBlock* UEclipseStrategyMapWidget::AddLine(const FText& Text, const FLinearC
 {
 	UTextBlock* Line = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 	Line->SetText(Text);
-	Line->SetColorAndOpacity(FSlateColor(Color));
+	// Kleur, korps en de inktrand van 1 px op één plek voor de hele schermlaag.
+	EclipseScreenPlate::StyleLine(*Line, Color, FontSize, bBold);
 
-	FSlateFontInfo Font = Line->GetFont();
-	Font.Size = FontSize;
-	Font.TypefaceFontName = bBold ? TEXT("Bold") : TEXT("Regular");
-	Line->SetFont(Font);
-
-	// De inktrand (15.5). Een harde zwarte verschuiving van 1 px is wat een
-	// gestileerde kaart van een spreadsheet onderscheidt, en het is hetzelfde
-	// gebaar als de outline in de wereld — één stijl, niet twee.
-	Line->SetShadowOffset(FVector2D(1.0f, 1.0f));
-	Line->SetShadowColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.95f));
+	// De regio-regels gaan in de kolom NAAST de graaf; alles daarbuiten (kop,
+	// aanbod, foutmelding) staat over de volle breedte eronder.
+	UVerticalBox* Target = ListBox != nullptr ? ListBox.Get() : RootBox.Get();
 
 	// LineSlot en niet Slot: UWidget heeft zelf een `Slot`-lid, en die schaduw is
 	// hier een harde fout (C4458 als error).
-	if (UVerticalBoxSlot* LineSlot = RootBox->AddChildToVerticalBox(Line))
+	if (UVerticalBoxSlot* LineSlot = Target->AddChildToVerticalBox(Line))
 	{
 		LineSlot->SetPadding(FMargin(0.0f, TopPadding, 0.0f, 0.0f));
 	}

@@ -48,6 +48,148 @@ namespace
 			FText::FromName(Lane.GateRegionId),
 			OwnerText(Lane.GateOwner));
 	}
+
+	/**
+	 * Twee knopen op dezelfde plek zijn één knoop op het scherm. Onder deze
+	 * afstand (in genormaliseerde bordruimte, dus ~2,5 % van de bordbreedte)
+	 * overlappen de knooplabels en is de lijn ertussen korter dan de knopen
+	 * zelf — dan tekent het bord een leugen over wie waar ligt.
+	 */
+	constexpr double MinNodeSeparation = 0.025;
+
+	/**
+	 * DE LIJST NOG EEN KEER LEZEN, NU ALS VORM.
+	 *
+	 * Twee dingen gebeuren hier en verder nergens:
+	 *   1. de kanten worden ONTDUBBELD (elke ongerichte lane staat in beide
+	 *      regio's; een lijn hoort er één keer te zijn);
+	 *   2. de tekenpoort gaat open of dicht, en als hij dicht gaat staat er WAAROM.
+	 *
+	 * De poort is opzettelijk streng: één regio zonder positie betekent geen
+	 * graaf, geen half bord. Een halve graaf is erger dan geen graaf, want een
+	 * ontbrekende knoop leest als "die regio grenst nergens aan" — precies de
+	 * verkeerde conclusie, en niet van een fout te onderscheiden.
+	 */
+	void BuildLayout(FEclipseMapView& View)
+	{
+		TArray<FName> Unplaced;
+		for (const FEclipseMapRegionView& Region : View.Regions)
+		{
+			if (!Region.bHasBoardPosition)
+			{
+				Unplaced.Add(Region.RegionId);
+			}
+		}
+
+		if (!Unplaced.IsEmpty())
+		{
+			TArray<FText> Names;
+			for (FName Id : Unplaced)
+			{
+				Names.Add(FText::FromName(Id));
+			}
+			View.LayoutStatusText = FText::Format(
+				LOCTEXT("LayoutUnplaced",
+					"NO MAP LAYOUT — {0} of {1} region(s) have no authored board position ({2}). The list below is complete; the graph is not drawn, because half a graph reads as \"this region borders nothing\"."),
+				Num(Unplaced.Num()), Num(View.Regions.Num()),
+				FText::Join(FText::FromString(TEXT(", ")), Names));
+			return;
+		}
+
+		// Twee knopen op dezelfde plek. Apart van "geen positie", want het is een
+		// andere fout met een andere reparatie: hier heeft iemand wél geauthord.
+		for (int32 First = 0; First < View.Regions.Num(); ++First)
+		{
+			for (int32 Second = First + 1; Second < View.Regions.Num(); ++Second)
+			{
+				const double Distance = FVector2D::Distance(
+					View.Regions[First].BoardPosition, View.Regions[Second].BoardPosition);
+				if (Distance < MinNodeSeparation)
+				{
+					View.LayoutStatusText = FText::Format(
+						LOCTEXT("LayoutCoincident",
+							"MAP LAYOUT REJECTED — {0} and {1} are authored on the same spot. Two nodes in one place is one node on screen."),
+						FText::FromName(View.Regions[First].RegionId),
+						FText::FromName(View.Regions[Second].RegionId));
+					return;
+				}
+			}
+		}
+
+		auto PositionOf = [&View](FName RegionId, FVector2D& Out) -> bool
+		{
+			const FEclipseMapRegionView* Found = View.Regions.FindByPredicate(
+				[RegionId](const FEclipseMapRegionView& R) { return R.RegionId == RegionId; });
+			if (Found == nullptr)
+			{
+				return false;
+			}
+			Out = Found->BoardPosition;
+			return true;
+		};
+
+		TSet<TPair<FName, FName>> Seen;
+		for (const FEclipseMapRegionView& Region : View.Regions)
+		{
+			for (const FEclipseMapLaneView& Lane : Region.Lanes)
+			{
+				// De sleutel is de kant en niet de richting: het paar wordt
+				// gesorteerd, dus A->B en B->A landen op dezelfde sleutel. De
+				// validator garandeert al dat beide helften hetzelfde zeggen,
+				// dus de eerste helft die langskomt is de waarheid.
+				const bool bFirstFirst = Region.RegionId.Compare(Lane.NeighborRegionId) < 0;
+				const TPair<FName, FName> Key = bFirstFirst
+					? TPair<FName, FName>(Region.RegionId, Lane.NeighborRegionId)
+					: TPair<FName, FName>(Lane.NeighborRegionId, Region.RegionId);
+				if (Seen.Contains(Key))
+				{
+					continue;
+				}
+
+				FVector2D Other;
+				if (!PositionOf(Lane.NeighborRegionId, Other))
+				{
+					// Een lane naar een regio die niet op het bord staat. De
+					// validator vangt dat al af vóór deze functie draait, dus
+					// hier stil overslaan is geen verlies — en tekenen zou een
+					// lijn naar het niets zetten.
+					continue;
+				}
+				Seen.Add(Key);
+
+				FEclipseMapEdgeView& Edge = View.Edges.AddDefaulted_GetRef();
+				Edge.RegionIdA = Region.RegionId;
+				Edge.RegionIdB = Lane.NeighborRegionId;
+				Edge.A = Region.BoardPosition;
+				Edge.B = Other;
+				Edge.Status = Lane.Status;
+				Edge.GateRegionId = Lane.GateRegionId;
+				Edge.GateOwner = Lane.GateOwner;
+				Edge.bMilitaryPassable = Lane.bMilitaryPassable;
+				Edge.MilitaryTravelDays = Lane.MilitaryTravelDays;
+				Edge.MilitaryRisk = Lane.MilitaryRisk;
+				Edge.bSmugglerPassable = Lane.bSmugglerPassable;
+				Edge.SmugglerTravelDays = Lane.SmugglerTravelDays;
+				Edge.SmugglerRisk = Lane.SmugglerRisk;
+
+				// Wat de oversteek KOST staat op de lijn (GDD 3.1 regel 4). Kan
+				// er geen colonne door, dan is de smokkelprijs de enige prijs
+				// die er is — en dan hoort díé er te staan, met een teken ervoor
+				// zodat je niet denkt dat er een colonne doorheen kan.
+				//
+				// Een TEKEN en niet "(smug)": op het frame van 01-08 liep dat
+				// woord dwars door twee knooplabels. Op een lijn van 90 px telt
+				// elke letter, en de gestreepte lijn zegt het al een keer.
+				Edge.CostText = Lane.bMilitaryPassable
+					? FText::Format(LOCTEXT("EdgeCost", "{0}d · r{1}"),
+						Num(Lane.MilitaryTravelDays), Num(Lane.MilitaryRisk))
+					: FText::Format(LOCTEXT("EdgeCostSmuggler", "~{0}d · r{1}"),
+						Num(Lane.SmugglerTravelDays), Num(Lane.SmugglerRisk));
+			}
+		}
+
+		View.bHasLayout = true;
+	}
 }
 
 FText OwnerText(EEclipseRegionOwner Owner)
@@ -154,6 +296,11 @@ FEclipseMapView ComposeMapView(
 
 		Region.bSupplied = IsRegionSupplied(State, Definitions, Definition.RegionId, Tuning);
 
+		// Waar de knoop staat. Geauthord op de definitie; de logica leest hem
+		// alleen door en beslist er niets over.
+		Region.bHasBoardPosition = Definition.HasBoardPosition();
+		Region.BoardPosition = Region.bHasBoardPosition ? Definition.BoardPosition : FVector2D::ZeroVector;
+
 		// --- de kanten, eindelijk aan de toestand gekoppeld ---
 		TArray<FText> NeighborNames;
 		NeighborNames.Reserve(Definition.Lanes.Num());
@@ -243,6 +390,13 @@ FEclipseMapView ComposeMapView(
 				LOCTEXT("RegionNoState", "{0} — NO CAMPAIGN STATE (the graph knows this region, the campaign does not)"),
 				Region.DisplayName);
 	}
+
+	// ------------------------------------------------------ knopen op posities
+	//
+	// DE GRAAF ALS VORM (REFERENTIE_BASE_MAP.md §1.4 rij 1). Vanaf hier wordt er
+	// niets meer aan de LIJST toegevoegd; dit is de tweede lezing van dezelfde
+	// data, als knopen en lijnen.
+	BuildLayout(View);
 
 	// Rijen die alleen in de campagnetoestand bestaan. Ze horen op geen enkele
 	// lane en zijn dus onbereikbaar; stil weglaten zou precies de datadrift

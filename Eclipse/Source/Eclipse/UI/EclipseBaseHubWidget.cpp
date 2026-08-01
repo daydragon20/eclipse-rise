@@ -11,7 +11,10 @@
 #include "Eclipse.h"
 #include "Economy/EclipseEconomySubsystem.h"
 #include "Squad/EclipseRosterLogic.h"
+#include "Components/Overlay.h"
+#include "Components/VerticalBoxSlot.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
+#include "UI/EclipseScreenPlate.h"
 #include "UI/EclipseStrategyMapWidget.h"
 
 namespace
@@ -21,6 +24,10 @@ namespace
 	{
 		UTextBlock* Row = Tree.ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		Row->SetText(FText::FromString(Text));
+		// Bot-inkt met contour, hetzelfde als op het bord. Zonder dit staat de
+		// helft van de hub in het standaard Slate-wit zonder rand, en dan hangt
+		// de leesbaarheid weer aan wat er toevallig achter valt.
+		EclipseScreenPlate::StyleLine(*Row, EclipseScreenPlate::BoneColor(), 13, /*bBold*/ false);
 		Box.AddChildToVerticalBox(Row);
 		return Row;
 	}
@@ -32,6 +39,11 @@ namespace
 		Button->Bind(PayloadId, MoveTemp(OnClicked));
 		UTextBlock* Text = Tree.ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		Text->SetText(FText::FromString(Label));
+		// Dezelfde inkt als het bord eronder. GEMETEN 01-08 op `HUD_hub_kaart.png`:
+		// de standaard UMG-knop is lichtgrijs en de tekst erop haalde 1,36 : 1 —
+		// de slechtste waarde op het hele scherm, op de elementen die je moet
+		// aanklikken. Eén plek waar dat wordt rechtgezet, want het is één klasse.
+		EclipseScreenPlate::StyleButton(*Button, *Text);
 		Button->AddChild(Text);
 		Box.AddChildToVerticalBox(Button);
 		return Button;
@@ -84,12 +96,36 @@ void UEclipseBaseHubWidget::BuildLayout()
 	RootBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("HubRoot"));
 	WidgetTree->RootWidget = RootBox;
 
-	HeaderText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-	RootBox->AddChildToVerticalBox(HeaderText);
+	// ELKE TEKSTGROEP OP ZIJN EIGEN PLAAT, en met opzet NIET één plaat over het
+	// hele scherm.
+	//
+	// Eén grote plaat zou de leesbaarheid net zo goed oplossen en de kluis
+	// erachter volledig weggummen. Hollow Point is een PLEK (`05_base_building.md`
+	// §5.2) en geen menu op een zwart vlak, dus de platen krimpen naar hun eigen
+	// inhoud (HAlign_Left hieronder) en laten de wereld ernaast staan. Dat is ook
+	// wat een gestileerd bord is: panelen met een dikke rand, geen wash.
+	auto AddPlated = [this](UWidget& Content, FName Name) -> UOverlay*
+	{
+		UOverlay* Plate = EclipseScreenPlate::Wrap(*WidgetTree, Content, Name);
+		if (UVerticalBoxSlot* PlateSlot = RootBox->AddChildToVerticalBox(Plate))
+		{
+			PlateSlot->SetHorizontalAlignment(HAlign_Left);
+			PlateSlot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 4.0f));
+		}
+		return Plate;
+	};
 
-	// Tab bar.
+	HeaderText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	EclipseScreenPlate::StyleLine(*HeaderText, EclipseScreenPlate::BoneColor(), 15, /*bBold*/ true);
+	HeaderPlate = AddPlated(*HeaderText, TEXT("HubHeaderPlate"));
+
+	// Tab bar. De knoppen dragen hun eigen inkt (StyleButton), dus geen plaat
+	// eromheen: dat zou een plaat op een plaat zijn.
 	UVerticalBox* TabBar = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
-	RootBox->AddChildToVerticalBox(TabBar);
+	if (UVerticalBoxSlot* TabSlot = RootBox->AddChildToVerticalBox(TabBar))
+	{
+		TabSlot->SetHorizontalAlignment(HAlign_Left);
+	}
 	const TCHAR* TabNames[] = { TEXT("COMMAND"), TEXT("WORKSHOP"), TEXT("BARRACKS"), TEXT("MEMORIAL") };
 	for (int32 TabIndex = 0; TabIndex < 4; ++TabIndex)
 	{
@@ -98,25 +134,46 @@ void UEclipseBaseHubWidget::BuildLayout()
 	}
 
 	TabSwitcher = WidgetTree->ConstructWidget<UWidgetSwitcher>(UWidgetSwitcher::StaticClass());
-	RootBox->AddChildToVerticalBox(TabSwitcher);
+	if (UVerticalBoxSlot* SwitcherSlot = RootBox->AddChildToVerticalBox(TabSwitcher))
+	{
+		SwitcherSlot->SetHorizontalAlignment(HAlign_Left);
+	}
 
+	// De COMMAND-tab krijgt GEEN eigen plaat: zijn twee inhoudsblokken (de kaart
+	// en het voorbereidingspaneel) dragen er ieder een, en een plaat op een plaat
+	// telt de doorzichtigheid twee keer op — dat leest als een naad.
 	CommandTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	TabSwitcher->AddChild(CommandTab);
 	WorkshopTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
-	TabSwitcher->AddChild(WorkshopTab);
+	TabSwitcher->AddChild(EclipseScreenPlate::Wrap(*WidgetTree, *WorkshopTab, TEXT("HubWorkshopPlate")));
 	BarracksTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
-	TabSwitcher->AddChild(BarracksTab);
+	TabSwitcher->AddChild(EclipseScreenPlate::Wrap(*WidgetTree, *BarracksTab, TEXT("HubBarracksPlate")));
 	MemorialTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
-	TabSwitcher->AddChild(MemorialTab);
+	TabSwitcher->AddChild(EclipseScreenPlate::Wrap(*WidgetTree, *MemorialTab, TEXT("HubMemorialPlate")));
 
 	// Command tab: advance-day + the district map (SPEC-P1-04 widget hosted here).
-	AddButtonRow(*WidgetTree, *CommandTab, TEXT("ADVANCE DAY"), NAME_None, [this](FName) { HandleAdvanceDay(); });
+	UEclipseStrategyOfferButton* AdvanceButton =
+		AddButtonRow(*WidgetTree, *CommandTab, TEXT("ADVANCE DAY"), NAME_None, [this](FName) { HandleAdvanceDay(); });
+	if (UVerticalBoxSlot* AdvanceSlot = Cast<UVerticalBoxSlot>(AdvanceButton->Slot))
+	{
+		// Anders rekt hij mee met de breedte van het bord eronder en leest een
+		// knop van 800 px als een balk in plaats van als iets dat je indrukt.
+		AdvanceSlot->SetHorizontalAlignment(HAlign_Left);
+	}
 	MapWidget = CreateWidget<UEclipseStrategyMapWidget>(this, UEclipseStrategyMapWidget::StaticClass());
-	CommandTab->AddChildToVerticalBox(MapWidget);
+	if (UVerticalBoxSlot* MapSlot = CommandTab->AddChildToVerticalBox(MapWidget))
+	{
+		MapSlot->SetHorizontalAlignment(HAlign_Left);
+		MapSlot->SetPadding(FMargin(0.0f, 4.0f, 0.0f, 4.0f));
+	}
 
 	// Preparation panel lives under the command tab (briefing -> launch).
 	PrepPanel = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
-	CommandTab->AddChildToVerticalBox(PrepPanel);
+	PrepPlate = EclipseScreenPlate::Wrap(*WidgetTree, *PrepPanel, TEXT("HubPrepPlate"));
+	if (UVerticalBoxSlot* PrepSlot = CommandTab->AddChildToVerticalBox(PrepPlate))
+	{
+		PrepSlot->SetHorizontalAlignment(HAlign_Left);
+	}
 }
 
 void UEclipseBaseHubWidget::OnAnyFact(FGameplayTag EventTag, const FInstancedStruct& Payload)

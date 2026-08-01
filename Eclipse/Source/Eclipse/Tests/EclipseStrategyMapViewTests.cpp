@@ -77,6 +77,17 @@ namespace EclipseMapViewTest
 			Half(B, A);
 		};
 
+		// GEAUTHORDE POSITIES, want dat is de beslissing (`EXECUTION_PLAN.md`
+		// §2a-quinquies): geen afgeleide layout. Ze staan hier zo dat de vorm het
+		// plaatje in de kop hierboven volgt — Home links, Vault eronder, Target
+		// helemaal rechts achter de poort.
+		auto Place = [&Find](FName Id, double X, double Y) { Find(Id).BoardPosition = FVector2D(X, Y); };
+		Place(TEXT("Home"), 0.10, 0.55);
+		Place(TEXT("Relay"), 0.50, 0.30);
+		Place(TEXT("SpireBeta"), 0.45, 0.78);
+		Place(TEXT("Target"), 0.88, 0.22);
+		Place(TEXT("Vault"), 0.16, 0.94);
+
 		Link(TEXT("Home"), TEXT("Relay"), 1, 5);
 		Link(TEXT("Home"), TEXT("SpireBeta"), 1, 0);
 		Link(TEXT("Home"), TEXT("Vault"), 1, 0, EEclipseLaneStatus::SmugglerOnly);
@@ -587,6 +598,251 @@ bool FEclipseMapViewDriftTest::RunTest(const FString& Parameters)
 		AddError(TEXT("Orbital werd stil weggelaten — precies de drift die zichtbaar moest blijven"));
 	}
 
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// N-d: VAN LIJST MET TOPOLOGIE NAAR GRAAF.
+//
+// Het bord noemde zijn buren al, maar als TEKST. Deze drie tests meten de
+// tweede lezing van dezelfde data: knopen op posities en lanes als lijnen.
+//
+// Wat ze bewaken is niet "er staat een plaatje" (dat kan geen enkele headless
+// test zien) maar de twee dingen die stil fout kunnen gaan en die je op een
+// screenshot pas ontdekt als je gaat tellen:
+//   1. elke ongerichte lane hoort ÉÉN lijn te zijn en niet twee;
+//   2. een bord zonder geauthorde indeling tekent GEEN graaf en behoudt WEL
+//      de lijst — twee poorten, niet één.
+// ---------------------------------------------------------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMapViewLayoutDrawsEachLaneOnceTest,
+	"Eclipse.UI.MapView.LayoutDrawsEachLaneExactlyOnce",
+	EclipseMapViewTest::TestFlags)
+
+bool FEclipseMapViewLayoutDrawsEachLaneOnceTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseMapViewTest;
+
+	const TArray<FEclipseRegionDefinition> Board = MakeBoard();
+	const FEclipseMapView View = ComposeMapView(MakeState(), Board, FEclipseLaneTuning());
+
+	if (!TestTrue(TEXT("Een volledig geauthord bord heeft een indeling"), View.bHasLayout))
+	{
+		AddError(FString::Printf(TEXT("reden: %s"), *View.LayoutStatusText.ToString()));
+		return false;
+	}
+
+	// DE HELE CLAIM IN ÉÉN VERGELIJKING. Het fixture draagt vijf ongerichte
+	// lanes en dus TIEN lane-helften (elke regio noemt zijn eigen kant). Zou de
+	// tekenlaag de lijst simpelweg aflopen, dan stonden er tien lijnen — elke
+	// lane twee keer over elkaar, dikker en donkerder dan een lane die maar één
+	// kant heeft. Vijf is het bewijs dat er ontdubbeld wordt.
+	int32 LaneHalves = 0;
+	for (const FEclipseRegionDefinition& Definition : Board)
+	{
+		LaneHalves += Definition.Lanes.Num();
+	}
+	TestEqual(TEXT("CONTROLE — het fixture draagt tien lane-helften"), LaneHalves, 10);
+	TestEqual(TEXT("En de tekenlaag krijgt vijf lijnen"), View.Edges.Num(), 5);
+
+	// Geen enkele kant twee keer, in welke richting dan ook.
+	TSet<FString> Seen;
+	for (const EclipseStrategyMap::FEclipseMapEdgeView& Edge : View.Edges)
+	{
+		const FString Forward = FString::Printf(TEXT("%s>%s"), *Edge.RegionIdA.ToString(), *Edge.RegionIdB.ToString());
+		const FString Backward = FString::Printf(TEXT("%s>%s"), *Edge.RegionIdB.ToString(), *Edge.RegionIdA.ToString());
+		TestFalse(FString::Printf(TEXT("%s staat er maar één keer"), *Forward),
+			Seen.Contains(Forward) || Seen.Contains(Backward));
+		Seen.Add(Forward);
+	}
+
+	// De posities komen ONGEWIJZIGD door. Een layout die onderweg iets schaalt of
+	// verschuift zou de authoring stil overrulen, en dan is "geauthord" een leugen.
+	const EclipseStrategyMap::FEclipseMapRegionView* Home = RegionOf(View, TEXT("Home"));
+	if (TestNotNull(TEXT("Home staat op het bord"), Home))
+	{
+		TestTrue(TEXT("Home draagt zijn geauthorde positie"), Home->bHasBoardPosition);
+		TestEqual(TEXT("Home X"), Home->BoardPosition.X, 0.10, 1e-6);
+		TestEqual(TEXT("Home Y"), Home->BoardPosition.Y, 0.55, 1e-6);
+	}
+
+	// En één lijn helemaal nagelopen: de gepoorte lane draagt zijn twee
+	// eindpunten, zijn status én de reden dat er geen colonne door kan.
+	const EclipseStrategyMap::FEclipseMapEdgeView* Gated = View.Edges.FindByPredicate(
+		[](const EclipseStrategyMap::FEclipseMapEdgeView& E) { return E.Status == EEclipseLaneStatus::SpireGated; });
+	if (TestNotNull(TEXT("De gepoorte lane is een lijn"), Gated))
+	{
+		TestEqual(TEXT("Hij loopt tussen Relay en Target"),
+			FString::Printf(TEXT("%s-%s"), *Gated->RegionIdA.ToString(), *Gated->RegionIdB.ToString()),
+			FString(TEXT("Relay-Target")));
+		TestEqual(TEXT("Zijn eerste eindpunt is de positie van Relay"), Gated->A.X, 0.50, 1e-6);
+		TestEqual(TEXT("Zijn tweede eindpunt is de positie van Target"), Gated->B.X, 0.88, 1e-6);
+		TestFalse(TEXT("Militair dicht zolang SpireBeta vijandig is"), Gated->bMilitaryPassable);
+		TestTrue(TEXT("Smokkelaars komen er wel door"), Gated->bSmugglerPassable);
+		TestFalse(TEXT("En wat hij kost staat op de lijn"), Gated->CostText.IsEmpty());
+	}
+
+	// De TWEEDE lezing moet dezelfde waarheid vertellen als de eerste: evenveel
+	// lijnen als er unieke kanten in de tekstregels staan.
+	int32 LaneRows = 0;
+	for (const EclipseStrategyMap::FEclipseMapRegionView& Region : View.Regions)
+	{
+		LaneRows += Region.Lanes.Num();
+	}
+	TestEqual(TEXT("Lijst en graaf spreken over dezelfde kanten"), LaneRows, View.Edges.Num() * 2);
+
+	AddInfo(FString::Printf(TEXT("GEMETEN  %d regio's · %d lane-helften in de lijst · %d lijnen in de graaf"),
+		View.Regions.Num(), LaneRows, View.Edges.Num()));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMapViewLayoutGateKeepsTheListTest,
+	"Eclipse.UI.MapView.NoLayoutHidesTheGraphButKeepsTheList",
+	EclipseMapViewTest::TestFlags)
+
+bool FEclipseMapViewLayoutGateKeepsTheListTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseMapViewTest;
+
+	const FEclipseCampaignState State = MakeState();
+	const FEclipseLaneTuning Tuning;
+
+	// CONTROLE EERST: bewijs dat dit bord met indeling WEL een graaf oplevert.
+	// Zonder deze regel bewijst "geen graaf" hieronder alleen dat er iets stuk is.
+	{
+		const FEclipseMapView Good = ComposeMapView(State, MakeBoard(), Tuning);
+		TestTrue(TEXT("CONTROLE — mét authoring is er een graaf"), Good.bHasLayout);
+		TestEqual(TEXT("CONTROLE — met vijf lijnen"), Good.Edges.Num(), 5);
+		TestTrue(TEXT("CONTROLE — en geen klacht"), Good.LayoutStatusText.IsEmpty());
+	}
+
+	// 1. Eén regio niet geplaatst. HALVE GRAAF IS ERGER DAN GEEN GRAAF: een
+	//    ontbrekende knoop leest als "die regio grenst nergens aan".
+	{
+		TArray<FEclipseRegionDefinition> Board = MakeBoard();
+		Board.FindByPredicate([](const FEclipseRegionDefinition& D) { return D.RegionId == TEXT("Vault"); })
+			->BoardPosition = FVector2D(-1.0, -1.0);
+		const FEclipseMapView View = ComposeMapView(State, Board, Tuning);
+
+		TestFalse(TEXT("Eén ontbrekende positie sluit de tekenlaag"), View.bHasLayout);
+		TestEqual(TEXT("Er wordt geen enkele lijn getekend"), View.Edges.Num(), 0);
+		TestTrue(TEXT("Het scherm noemt de regio die ontbreekt"),
+			View.LayoutStatusText.ToString().Contains(TEXT("Vault")));
+
+		// EN DIT IS HET PUNT VAN TWEE POORTEN. De asymmetriepoort slaat het bord
+		// blank; deze niet. Een bord zonder indeling is niet kapot — het is niet
+		// ingedeeld, en de lijst is dan alles wat de speler heeft.
+		TestTrue(TEXT("Het bord blijft tekenbaar"), View.IsRenderable());
+		TestEqual(TEXT("En de lijst staat er nog voluit"), View.Regions.Num(), 5);
+		TestTrue(TEXT("Inclusief de buren per regio"),
+			RegionOf(View, TEXT("Home"))->NeighborsText.ToString().Contains(TEXT("Relay")));
+	}
+
+	// 2. Twee knopen op dezelfde plek. Andere fout, andere reparatie: hier heeft
+	//    iemand wél geauthord, alleen twee keer hetzelfde.
+	{
+		TArray<FEclipseRegionDefinition> Board = MakeBoard();
+		Board.FindByPredicate([](const FEclipseRegionDefinition& D) { return D.RegionId == TEXT("Vault"); })
+			->BoardPosition = Board.FindByPredicate(
+				[](const FEclipseRegionDefinition& D) { return D.RegionId == TEXT("Home"); })->BoardPosition;
+		const FEclipseMapView View = ComposeMapView(State, Board, Tuning);
+
+		TestFalse(TEXT("Twee knopen op één plek is geen indeling"), View.bHasLayout);
+		TestEqual(TEXT("Er wordt niets getekend"), View.Edges.Num(), 0);
+		TestTrue(TEXT("Het scherm noemt beide regio's"),
+			View.LayoutStatusText.ToString().Contains(TEXT("Home"))
+			&& View.LayoutStatusText.ToString().Contains(TEXT("Vault")));
+		TestTrue(TEXT("En ook hier blijft de lijst staan"), View.IsRenderable() && View.Regions.Num() == 5);
+	}
+
+	// 3. Een positie BUITEN het bord telt niet als geauthord. Een knoop op
+	//    (1,4 · 0,5) zou buiten het vlak vallen en dus onzichtbaar zijn — dat is
+	//    hetzelfde als niet geplaatst, en het hoort net zo hard te melden.
+	{
+		TArray<FEclipseRegionDefinition> Board = MakeBoard();
+		Board.FindByPredicate([](const FEclipseRegionDefinition& D) { return D.RegionId == TEXT("Target"); })
+			->BoardPosition = FVector2D(1.4, 0.5);
+		const FEclipseMapView View = ComposeMapView(State, Board, Tuning);
+
+		TestFalse(TEXT("Buiten het bord is niet geplaatst"), View.bHasLayout);
+		TestTrue(TEXT("En dat wordt bij naam gemeld"),
+			View.LayoutStatusText.ToString().Contains(TEXT("Target")));
+	}
+
+	return true;
+}
+
+/**
+ * AUTHORED IS NOT SHIPPED — dezelfde toets als bij de lanes
+ * (`Eclipse.Strategy.Lanes.ShippedBoardActuallyUsesTheThreeStatuses`), en om
+ * dezelfde reden: alle tests hierboven draaien op een C++-fixture en zouden
+ * groen blijven op een verscheept bord waar niemand ooit een knoop heeft
+ * neergezet. Dan bestaat de graaf in de engine en nergens in het spel.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseMapViewShippedLayoutTest,
+	"Eclipse.UI.MapView.ShippedBoardCarriesAnAuthoredLayout",
+	EclipseMapViewTest::TestFlags)
+
+bool FEclipseMapViewShippedLayoutTest::RunTest(const FString& Parameters)
+{
+	UEclipseRegionGraphAsset* Graph = LoadObject<UEclipseRegionGraphAsset>(
+		nullptr, TEXT("/Game/Data/DA_KessaraDistrictGraph.DA_KessaraDistrictGraph"));
+	if (!TestNotNull(TEXT("Het verscheepte districtsbord laadt"), Graph))
+	{
+		AddError(TEXT("Draai Tools/author_region_layout.py."));
+		return false;
+	}
+
+	FEclipseCampaignState State;
+	for (const FEclipseRegionDefinition& Definition : Graph->Regions)
+	{
+		FEclipseRegionState& Region = State.Regions.AddDefaulted_GetRef();
+		Region.RegionId = Definition.RegionId;
+		Region.Owner = Definition.StartingOwner;
+	}
+
+	const EclipseStrategyMap::FEclipseMapView View =
+		EclipseStrategyMap::ComposeMapView(State, Graph->Regions, Graph->LaneTuning);
+	if (!TestTrue(TEXT("Het verscheepte bord heeft een geauthorde indeling"), View.bHasLayout))
+	{
+		AddError(FString::Printf(TEXT("reden: %s"), *View.LayoutStatusText.ToString()));
+		return false;
+	}
+
+	TestEqual(TEXT("Elke regio staat ergens"), View.Regions.Num(), Graph->Regions.Num());
+	TestTrue(TEXT("En er lopen lijnen tussen"), View.Edges.Num() > 0);
+
+	// DE VORM MOET DE FICTIE DRAGEN, en dat is precies waarom er geauthord wordt
+	// in plaats van afgeleid. Twee eisen die een automatische layout NIET haalt
+	// en die een mens per ongeluk kan omgooien:
+	//   - de Underworks liggen ONDER (grootste Y van het bord);
+	//   - de Comms Relay ligt aan het uiteinde van de gepoorte lane, dus ver
+	//     naar rechts.
+	const EclipseStrategyMap::FEclipseMapRegionView* Under = View.Regions.FindByPredicate(
+		[](const EclipseStrategyMap::FEclipseMapRegionView& R) { return R.RegionId == TEXT("Underworks"); });
+	const EclipseStrategyMap::FEclipseMapRegionView* Relay = View.Regions.FindByPredicate(
+		[](const EclipseStrategyMap::FEclipseMapRegionView& R) { return R.RegionId == TEXT("CommsRelay"); });
+	if (Under != nullptr)
+	{
+		double LowestY = 0.0;
+		for (const EclipseStrategyMap::FEclipseMapRegionView& Region : View.Regions)
+		{
+			LowestY = FMath::Max(LowestY, Region.BoardPosition.Y);
+		}
+		TestEqual(TEXT("De Underworks liggen onderaan het bord"), Under->BoardPosition.Y, LowestY, 1e-6);
+	}
+	if (Relay != nullptr)
+	{
+		double RightmostX = 0.0;
+		for (const EclipseStrategyMap::FEclipseMapRegionView& Region : View.Regions)
+		{
+			RightmostX = FMath::Max(RightmostX, Region.BoardPosition.X);
+		}
+		TestEqual(TEXT("De Comms Relay ligt aan het verre eind"), Relay->BoardPosition.X, RightmostX, 1e-6);
+	}
+
+	AddInfo(FString::Printf(TEXT("GEMETEN  verscheept bord: %d knopen op posities · %d lijnen"),
+		View.Regions.Num(), View.Edges.Num()));
 	return true;
 }
 

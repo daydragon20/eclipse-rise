@@ -6,6 +6,8 @@
 #include "CoreMinimal.h"
 #include "EclipseStrategyMapWidget.generated.h"
 
+class UImage;
+class UOverlay;
 class UTextBlock;
 class UVerticalBox;
 
@@ -71,8 +73,36 @@ private:
 	 */
 	UTextBlock* AddLine(const FText& Text, const FLinearColor& Color, int32 FontSize, bool bBold, float TopPadding = 0.0f);
 
+	/**
+	 * DE PLAAT ONDER HET BORD, en hij is de wortel van deze widget.
+	 *
+	 * GEMETEN 01-08 op `HUD_hub_kaart.png`: het bord stond direct over de
+	 * 3D-wereld, de ondergrond onder de regels liep van 0,0010 tot 0,6267
+	 * luminantie binnen één scherm en het slechtste punt gaf 1,21 : 1 — dwars
+	 * door een personage en langs een zonnebanner. Dezelfde oorzaak als de
+	 * onleesbare HUD-debugtekst; zie `UI/EclipseScreenPlate.h` voor de reparatie
+	 * en waarom die op één plek staat.
+	 */
+	UPROPERTY()
+	TObjectPtr<UOverlay> BoardPlate;
+
+	/**
+	 * De tekenlaag: knopen op posities, lanes als lijnen. Wordt per Rebuild
+	 * opnieuw gemaakt (net als de regels), want ClearChildren gooit hem eruit.
+	 */
+	UPROPERTY()
+	TObjectPtr<class UEclipseMapGraphWidget> GraphView;
+
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> RootBox;
+
+	/**
+	 * De kolom met regio-regels, náást de graaf. Nullptr = schrijf op de volle
+	 * breedte (kop, aanbod, foutmelding). Per Rebuild opnieuw, want ClearChildren
+	 * gooit hem weg.
+	 */
+	UPROPERTY()
+	TObjectPtr<UVerticalBox> ListBox;
 
 	FEclipseEventSubscriptionHandle RegionChangedHandle;
 	FEclipseEventSubscriptionHandle BeatReachedHandle;

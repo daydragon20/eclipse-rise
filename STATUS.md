@@ -10,7 +10,7 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (zelf nagedraaid 01-08 ~16:30): build groen `-NoUba` · **247 tests, 0 gefaald, 0
+Bar (zelf nagedraaid 02-08 ~03:25): build groen `-NoUba` · **250 tests, 0 gefaald, 0
 niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** ·
 EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 
@@ -40,19 +40,22 @@ herhaalbaar en **drukt altijd zijn eigen dekking af**. Saldo 125.612 — act 1 a
 dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 
 > **Spoor A staat verder dan spoor B. ACT 1 IS COMPLEET GESCHREVEN** — acht missies, de
-> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.632 regels, 97.815 credits**
+> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.628 regels, 97.659 credits**
 > (gemeten, `Tools/count_generation_cost.py`; deze drie getallen worden sinds 01-08 door
 > `Tools/check_owner_docs.py` tegen die teller bewaakt). Saldo 125.612, dus **act 1 alleen
 > is 78% van alles wat er nog is** — barks, muziek, SFX en de acts 2 t/m 4 komen daar nog
 > bij. Dat is de vraag op **O-14**.
 >
 > **Maar dat is niet wat je vandaag zou uitgeven.** `Tools/check_generation_ready.py`
-> splitst het: **26 scènes / 35.097 credits staan KLAAR** (poort groen én stem gecast),
-> 36 scènes / 46.514 zijn door de kwaliteitspoort gehouden en 9 scènes / 16.204 wachten
+> splitst het: **35 scènes / 49.663 credits staan KLAAR** (poort groen én stem gecast),
+> 26 scènes / 30.309 zijn door de kwaliteitspoort gehouden en 10 scènes / 17.687 wachten
 > op casting. Het grote getal is wat act 1 *zou* kosten; dit is wat er *kan*.
 >
 > **DE IJKMISSIE IS DOOR DE POORT.** M1.1 staat op **7 van 7 GO** na drie critic-rondes.
-> Corpus: **21 GO, 4 NO-GO, 46 nog te beoordelen**.
+> Corpus: **45 GO, 13 NO-GO, 11 gehouden op de hub-reeks, 2 nog te beoordelen**.
+> De elf hub-scènes halen §18.9 apart maar de REEKS zakt — negen van twaalf delen
+> dezelfde motor en elf van twaalf sluiten identiek af. Ze dragen daarom geen kaal
+> `GO`: dat veld is een vergunning om te genereren.
 >
 > **De rem is nu de CASTING, niet de poort.** Alle acht stemmen van M1.1 resolven — en
 > dat was waar én misleidend: **resolven is niet UNIEK resolven**. Drie stem-ID's staan op
@@ -90,7 +93,7 @@ alleen in normaal spel. Daarmee is de blokkade uit §1b weg.
 
 Spoor A raakt de build niet aan en loopt dus altijd door — dat is de reden dat hij
 vooruit is gekomen terwijl het build-slot bezet was. De 71 scène-stubs uit
-`phase0/beats/` zijn **geschreven**, op de 12 hub-gesprekken na. Casting fase 1 klaar:
+`phase0/beats/` zijn **geschreven**, inclusief de 12 hub-gesprekken. Casting fase 1 klaar:
 **104 kandidaten over 19 rollen, 0 credits** — Petra ontbrak daar en wordt nu toegevoegd.
 
 ## Open dossiers — alle drie met een gemeten stand

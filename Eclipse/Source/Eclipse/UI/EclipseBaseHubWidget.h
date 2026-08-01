@@ -7,6 +7,7 @@
 #include "EclipseBaseHubWidget.generated.h"
 
 class UButton;
+class UOverlay;
 class UTextBlock;
 class UVerticalBox;
 class UWidgetSwitcher;
@@ -60,6 +61,17 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UTextBlock> HeaderText;
+
+	/**
+	 * Platen onder de twee tekstgroepen die de hub zelf bezit. De kaart draagt
+	 * zijn eigen plaat (die hoort bij het bord, niet bij de hub) en de knoppen
+	 * dragen hun inkt in hun stijl. Zie `UI/EclipseScreenPlate.h` voor de meting.
+	 */
+	UPROPERTY()
+	TObjectPtr<UOverlay> HeaderPlate;
+
+	UPROPERTY()
+	TObjectPtr<UOverlay> PrepPlate;
 
 	UPROPERTY()
 	TObjectPtr<UWidgetSwitcher> TabSwitcher;

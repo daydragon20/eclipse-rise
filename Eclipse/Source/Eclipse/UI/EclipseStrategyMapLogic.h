@@ -86,6 +86,41 @@ namespace EclipseStrategyMap
 		FText Text;
 	};
 
+	/**
+	 * ÉÉN LANE ALS LIJN — één keer per ONGERICHTE kant, met beide eindpunten.
+	 *
+	 * `FEclipseMapRegionView::Lanes` draagt elke kant twee keer (één keer per
+	 * regio), want een regel op het bord hoort bij een regio. Een LIJN hoort bij
+	 * een kant, en die twee keer tekenen zou elke lane dubbel zetten: dikker,
+	 * donkerder, en bij een halfdoorzichtige inkt zichtbaar anders dan een lane
+	 * die maar één kant heeft. De ontdubbeling gebeurt hier, in de pure laag,
+	 * zodat een test hem kan vastpinnen zonder viewport.
+	 */
+	struct FEclipseMapEdgeView
+	{
+		/** A is de regio die in `Definitions` het eerst voorkomt; B de andere. Vast, dus toetsbaar. */
+		FName RegionIdA;
+		FName RegionIdB;
+
+		/** Genormaliseerde bordpositie van beide uiteinden (X rechts, Y omlaag, 0..1). */
+		FVector2D A = FVector2D::ZeroVector;
+		FVector2D B = FVector2D::ZeroVector;
+
+		EEclipseLaneStatus Status = EEclipseLaneStatus::Open;
+		FName GateRegionId;
+		EEclipseRegionOwner GateOwner = EEclipseRegionOwner::Dominion;
+
+		bool bMilitaryPassable = false;
+		int32 MilitaryTravelDays = 0;
+		int32 MilitaryRisk = 0;
+		bool bSmugglerPassable = false;
+		int32 SmugglerTravelDays = 0;
+		int32 SmugglerRisk = 0;
+
+		/** "2d · r18" — kort, want dit staat óp de lijn en niet op een regel. */
+		FText CostText;
+	};
+
 	/** Eén regio: de mutabele toestand en de statische topologie, eindelijk in één rij. */
 	struct FEclipseMapRegionView
 	{
@@ -110,6 +145,16 @@ namespace EclipseStrategyMap
 		bool bHasDefinition = true;
 
 		TArray<FEclipseMapLaneView> Lanes;
+
+		/**
+		 * Waar deze knoop op het bord staat (genormaliseerd, X rechts, Y omlaag).
+		 * Geauthord op de regiodefinitie; zie `FEclipseRegionDefinition::BoardPosition`
+		 * voor waarom dit geen afgeleide layout is.
+		 */
+		FVector2D BoardPosition = FVector2D::ZeroVector;
+
+		/** False = niemand heeft deze regio op het bord gezet. Dan wordt er niets getekend. */
+		bool bHasBoardPosition = false;
 
 		/** "Underworks — PLAYER · garrison 3 · unrest 12 · SUPPLIED" */
 		FText HeaderText;
@@ -144,6 +189,35 @@ namespace EclipseStrategyMap
 
 		/** Leeg zodra DataState != Valid. Dat is de falsificatie, geen bijwerking. */
 		TArray<FEclipseMapRegionView> Regions;
+
+		/**
+		 * De lanes als LIJNEN, ontdubbeld. Leeg zodra `bHasLayout` false is.
+		 *
+		 * Volgorde: de kanten van de eerste regio eerst, dan die van de tweede, en
+		 * binnen een regio de volgorde van `Lanes`. Vast, dus een test kan er iets
+		 * over zeggen zonder te sorteren.
+		 */
+		TArray<FEclipseMapEdgeView> Edges;
+
+		/**
+		 * TWEE ONAFHANKELIJKE POORTEN, en dat is met opzet.
+		 *
+		 * `IsRenderable()` (de asymmetriepoort) zegt of het BORD mag bestaan: een
+		 * graaf die zichzelf tegenspreekt tekent niets, ook geen lijst. `bHasLayout`
+		 * zegt alleen of de GRAAF getekend mag worden. Een bord zonder geauthorde
+		 * posities is niet kapot — het is niet ingedeeld, en dan hoort de lijst
+		 * gewoon te blijven staan (REFERENTIE_BASE_MAP.md §1.5: de lijst mag naast
+		 * de graaf bestaan, nooit ervoor in de plaats).
+		 *
+		 * Layout tot een validatiefout maken zou het bord blank slaan om een
+		 * TEKENkwestie, en dat is precies de klasse fout die de asymmetriepoort
+		 * moest voorkomen: niet tekenen wat je niet kunt garanderen, maar ook niet
+		 * weggooien wat je wél weet.
+		 */
+		bool bHasLayout = false;
+
+		/** Waaróm er geen graaf getekend wordt. Leeg zodra bHasLayout waar is. */
+		FText LayoutStatusText;
 
 		bool IsRenderable() const { return DataState == EEclipseMapDataState::Valid; }
 	};

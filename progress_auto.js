@@ -1,78 +1,78 @@
 ﻿// AUTOMATISCH GEGENEREERD door Tools/update_progress.ps1 - NIET met de hand bewerken.
 window.PROGRESS_AUTO = {
-    "generatedAt":  "2026-07-31 19:09",
+    "generatedAt":  "2026-08-01 03:30",
     "tests":  {
-                  "ok":  185,
+                  "ok":  250,
                   "failed":  0,
-                  "total":  185,
-                  "reportAge":  "18 min geleden"
+                  "total":  250,
+                  "reportAge":  "5 min geleden"
               },
     "commits":  [
                     {
-                        "hash":  "8152b8b",
-                        "date":  "31-07 19:06",
-                        "msg":  "[Dashboard] O-3 wijst naar de werkende castinglink, met de eerlijke kanttekening"
+                        "hash":  "fd5cca9",
+                        "date":  "01-08 03:26",
+                        "msg":  "[Dashboard] Waar Voss\u0027 helft van act 1 in zit, en de hub-vormen"
                     },
                     {
-                        "hash":  "30b28af",
-                        "date":  "31-07 19:04",
-                        "msg":  "[Dashboard] \u0027Wacht op jou\u0027 leest nu ALLE owner-blokkades uit de docs"
+                        "hash":  "4f1ec83",
+                        "date":  "01-08 03:24",
+                        "msg":  "[Poort+Story] Een doorlaat die stil was, en de hub die zijn drie vormen krijgt"
                     },
                     {
-                        "hash":  "1bedb87",
-                        "date":  "31-07 19:03",
-                        "msg":  "[Repo] Maatstaf voor base en map, met een eigen claim weerlegd"
+                        "hash":  "fff9a80",
+                        "date":  "01-08 03:18",
+                        "msg":  "[Dashboard] O-14 vraagt nu naar het bedrag waarover Nathan echt beslist"
                     },
                     {
-                        "hash":  "50fad12",
-                        "date":  "31-07 18:59",
-                        "msg":  "[Repo] Nulmeting van de twee ongemeten hoogtes: base en map (1c)"
+                        "hash":  "bbf0543",
+                        "date":  "01-08 03:16",
+                        "msg":  "[Story] Tien rulings: L1-R31 t/m L1-R40, en twee keer wees de melder de verkeerde kant aan"
                     },
                     {
-                        "hash":  "f2b4b30",
-                        "date":  "31-07 18:57",
-                        "msg":  "[Dashboard] Agent-tab toont echte agents; tabs op de echte data gezet"
+                        "hash":  "aa91c7e",
+                        "date":  "01-08 03:11",
+                        "msg":  "[Dashboard] De hub-reeks en het verschil tussen wat act 1 kost en wat je kunt uitgeven"
                     },
                     {
-                        "hash":  "8e9bf53",
-                        "date":  "31-07 18:52",
-                        "msg":  "[Tests] Stuurteken-bewaker volgt de verhuisde owner-docs (DEBUG_DISCIPLINE)"
+                        "hash":  "fb29e9e",
+                        "date":  "01-08 03:10",
+                        "msg":  "[Poort] De documentcontrole dekt nu ook het getal waarop het budgetbesluit rust"
                     },
                     {
-                        "hash":  "fd22223",
-                        "date":  "31-07 18:47",
-                        "msg":  "[Voice] Casting fase 1 kost nul credits: de bibliotheek is gratis"
+                        "hash":  "49a64c8",
+                        "date":  "01-08 03:06",
+                        "msg":  "[Story+Poort] M1.2.S01 door de poort, en een teller die zegt wat je VANDAAG kunt uitgeven"
                     },
                     {
-                        "hash":  "42099b8",
-                        "date":  "31-07 18:44",
-                        "msg":  "[Repo] O-2 stond terecht als beantwoord: het citaat van de owner erbij"
+                        "hash":  "8aebb1c",
+                        "date":  "01-08 03:01",
+                        "msg":  "[Story] M1.6.S05 door de poort: negen woorden vlak, en drie citaten die verouderd waren"
                     }
                 ],
     "screenshots":  [
                         {
                             "file":  "progress_media/live_01.jpg",
-                            "caption":  "Laatste run - beeld 1 (12 min geleden)"
+                            "caption":  "Laatste run - beeld 1 (1 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_02.jpg",
-                            "caption":  "Laatste run - beeld 2 (12 min geleden)"
+                            "caption":  "Laatste run - beeld 2 (1 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_03.jpg",
-                            "caption":  "Laatste run - beeld 3 (12 min geleden)"
+                            "caption":  "Laatste run - beeld 3 (1 uur geleden)"
                         },
                         {
                             "file":  "progress_media/live_04.jpg",
-                            "caption":  "Laatste run - beeld 4 (12 min geleden)"
+                            "caption":  "Laatste run - beeld 4 (1 uur geleden)"
                         }
                     ],
     "werk":  {
-                 "taken":  90,
-                 "klaar":  48,
-                 "bezig":  23,
-                 "open":  19,
-                 "gemiddeld":  74,
+                 "taken":  140,
+                 "klaar":  101,
+                 "bezig":  22,
+                 "open":  17,
+                 "gemiddeld":  86,
                  "fases":  [
                                {
                                    "naam":  "Fase 0 â€” Pre-productie",
@@ -105,43 +105,40 @@ window.PROGRESS_AUTO = {
                            ],
                  "heleGamePct":  8,
                  "dataAge":  "3 min geleden",
-                 "dataStamp":  "2026-07-31 19:05"
+                 "dataStamp":  "2026-08-01 03:26"
              },
     "onderhanden":  {
-                        "totaal":  28,
+                        "totaal":  22,
                         "gebieden":  [
                                          {
+                                             "gebied":  "Assets",
+                                             "aantal":  7,
+                                             "bestanden":  [
+                                                               "DA_KessaraDistrictGraph.uasset",
+                                                               "M1.2.S03_the_sweep_that_never_came.yaml",
+                                                               "M1.2.S04_standing_order.yaml"
+                                                           ]
+                                         },
+                                         {
                                              "gebied":  "Documentatie",
-                                             "aantal":  3,
+                                             "aantal":  2,
                                              "bestanden":  [
-                                                               "19_voice_production.md",
                                                                "EventCatalog.md",
-                                                               "VOICE_LEDGER.md"
+                                                               "SOAK_LOG.md"
                                                            ]
                                          },
                                          {
-                                             "gebied":  "Personage en camera",
-                                             "aantal":  5,
-                                             "bestanden":  [
-                                                               "EclipseAnimInstance.cpp",
-                                                               "EclipseCharacter.cpp",
-                                                               "EclipseCharacter.h"
-                                                           ]
-                                         },
-                                         {
-                                             "gebied":  "Gevecht",
+                                             "gebied":  "Overige code",
                                              "aantal":  1,
                                              "bestanden":  [
-                                                               "EclipseHitscanWeaponComponent.cpp"
+                                                               "EclipseRegionGraphAsset.h"
                                                            ]
                                          },
                                          {
-                                             "gebied":  "Kern",
-                                             "aantal":  5,
+                                             "gebied":  "Tests",
+                                             "aantal":  1,
                                              "bestanden":  [
-                                                               "EclipseEventPayloads.h",
-                                                               "EclipseGameMode.cpp",
-                                                               "EclipseGameMode.h"
+                                                               "EclipseStrategyMapViewTests.cpp"
                                                            ]
                                          },
                                          {
@@ -150,16 +147,7 @@ window.PROGRESS_AUTO = {
                                              "bestanden":  [
                                                                "EclipseBaseHubWidget.cpp",
                                                                "EclipseBaseHubWidget.h",
-                                                               "EclipseMissionHudWidget.cpp"
-                                                           ]
-                                         },
-                                         {
-                                             "gebied":  "Gereedschap",
-                                             "aantal":  3,
-                                             "bestanden":  [
-                                                               "generate_audio_assets.py",
-                                                               "verify.ps1",
-                                                               "update_progress.ps1"
+                                                               "EclipseStrategyMapLogic.cpp"
                                                            ]
                                          },
                                          {
@@ -175,44 +163,115 @@ window.PROGRESS_AUTO = {
                     },
     "recentWerk":  {
                        "urenTerug":  9,
-                       "totaal":  26,
+                       "totaal":  174,
                        "perUur":  [
                                       {
-                                          "uur":  "19:00",
-                                          "aantal":  3,
+                                          "uur":  "03:00",
+                                          "aantal":  8,
                                           "titels":  [
-                                                         "O-3 wijst naar de werkende castinglink, met de eerlijke kanttekening",
-                                                         "\u0027Wacht op jou\u0027 leest nu ALLE owner-blokkades uit de docs",
-                                                         "Maatstaf voor base en map, met een eigen claim weerlegd"
+                                                         "Waar Voss\u0027 helft van act 1 in zit, en de hub-vormen",
+                                                         "Een doorlaat die stil was, en de hub die zijn drie vormen krijgt",
+                                                         "O-14 vraagt nu naar het bedrag waarover Nathan echt beslist",
+                                                         "Tien rulings: L1-R31 t/m L1-R40, en twee keer wees de melder de verkeerde kant aan"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "02:00",
+                                          "aantal":  18,
+                                          "titels":  [
+                                                         "De hub: elf scenes halen de poort, de REEKS zakt",
+                                                         "Een ruling mag niet redeneren vanuit een toestand die de bestanden niet dragen",
+                                                         "Drie poortrondes: 19 scenes beoordeeld, twee rulings getoetst",
+                                                         "M1.2 gepoort: twee GO, vier NO-GO, en geen daarvan gaat over de zinnen"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "01:00",
+                                          "aantal":  23,
+                                          "titels":  [
+                                                         "Vier verlopen owner-teksten in een nacht: nu een poort in plaats van een principe",
+                                                         "Veertig taken stonden op \"bezig\" terwijl er twee liepen",
+                                                         "Correctie op mijn eigen lezing: stap 7 noemt maar vier doelwitten",
+                                                         "De opnamepoort in situ getoetst, en de ruis eruit"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "00:00",
+                                          "aantal":  19,
+                                          "titels":  [
+                                                         "De ijkmissie is door de poort en wordt ingesproken",
+                                                         "De schermlaag luistert nu, en de ijkmissie is DOOR DE POORT",
+                                                         "Negen rulings, waarvan twee fouten in de rulings zelf",
+                                                         "Stap 7 heeft een plafond en geen vloer, en de vault laat zien wat dat kost"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "23:00",
+                                          "aantal":  15,
+                                          "titels":  [
+                                                         "De vault: het plafond is absoluut zwart en de lampen zijn donkerder dan de vloer",
+                                                         "Act 1 compleet, en de critic-poort is nu de rem",
+                                                         "De ijkmissie is NO-GO, en vier van de bevindingen lagen al vast",
+                                                         "Act 1 is compleet: 78 scenes, 1.623 regels, 97.275 credits"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "22:00",
+                                          "aantal":  14,
+                                          "titels":  [
+                                                         "Het act 1-budget ging over zes van de acht missies, en 23 regels waren stil",
+                                                         "M1.7 staat er, de critic-reparaties zijn door, en Brick zegt zeventien",
+                                                         "De bar is rood, en de statuskaart zei groen",
+                                                         "O-3 aangescherpt: twee lege slots houden de bar rood"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "21:00",
+                                          "aantal":  23,
+                                          "titels":  [
+                                                         "Beantwoorde vragen van de kliklijst, nu automatisch tegen OWNER_ANSWERS",
+                                                         "2.475 credits op het verkeerde model, en een bijna-ongeluk met de casting",
+                                                         "18.0: de brontaal is Engels, en dat stond nergens hard",
+                                                         "Kwaliteitsvloer op gebruik; personages beschreven; audio breekt niet meer af"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "20:00",
+                                          "aantal":  17,
+                                          "titels":  [
+                                                         "Stage B afgerond, met de twee meetfouten die de agent zelf vond",
+                                                         "Wapens komen nu uit Lyra, en mijn eigen tegenmeting was half fout",
+                                                         "GPU-dossier gepauzeerd met leads, en de kliklijst terug naar vier",
+                                                         "GPU-crash: de sky-hypothese valt, en er is geen signaal meer om iets mee te bewijzen"
+                                                     ]
+                                      },
+                                      {
+                                          "uur":  "19:00",
+                                          "aantal":  27,
+                                          "titels":  [
+                                                         "Campagne als boom: act - missie - scene - dialoog",
+                                                         "Statuskaart teruggesnoeid van 15,6 naar ~6 KB",
+                                                         "Statuskaart: de HUD-poort is alsnog gelukt, en vier diagnoses zijn omgegooid",
+                                                         "Stage B open na T-11, en de squad-lijst toont een magic-constante"
                                                      ]
                                       },
                                       {
                                           "uur":  "18:00",
-                                          "aantal":  16,
+                                          "aantal":  10,
                                           "titels":  [
                                                          "Nulmeting van de twee ongemeten hoogtes: base en map (1c)",
                                                          "Agent-tab toont echte agents; tabs op de echte data gezet",
                                                          "Stuurteken-bewaker volgt de verhuisde owner-docs (DEBUG_DISCIPLINE)",
                                                          "Casting fase 1 kost nul credits: de bibliotheek is gratis"
                                                      ]
-                                      },
-                                      {
-                                          "uur":  "17:00",
-                                          "aantal":  7,
-                                          "titels":  [
-                                                         "Terugslag is nu ADDITIEF en ligt op je bovenlijf - de vorm die de referentie vraagt",
-                                                         "De additieve schiettake bestaat wel, en is gemeten SLECHTER - dus niet aangesloten",
-                                                         "Camera-inzakking hermeten voor de owner hem beoordeelt: onveranderd",
-                                                         "Jouw vier beslissingen uitgevoerd; kliklijstje van 8 naar 4"
-                                                     ]
                                       }
                                   ]
                    },
     "tempo":  {
-                  "vandaag":  26,
-                  "week":  633,
-                  "laatsteCommit":  "2026-07-31 19:06",
-                  "laatsteAge":  "3 min geleden"
+                  "vandaag":  68,
+                  "week":  794,
+                  "laatsteCommit":  "2026-08-01 03:26",
+                  "laatsteAge":  "4 min geleden"
               }
 };
 

@@ -197,6 +197,41 @@ struct FEclipseRegionDefinition
 	UPROPERTY()
 	TArray<FName> ConnectedRegionIds_DEPRECATED;
 
+	/**
+	 * WHERE this region sits on the board, in normalised board space: X to the
+	 * right, Y DOWN, both in 0..1. The drawing layer maps it to pixels; nothing
+	 * in routing reads it.
+	 *
+	 * AUTHORED, NOT DERIVED, and that decision is the whole reason this field
+	 * exists instead of a layout function.
+	 *
+	 * An automatic layout (force-directed, circular, layered) is the short road:
+	 * it needs no content and it always produces something. On six nodes it
+	 * produces an arbitrary scatter that says nothing about the district — and
+	 * the standing quality mandate (`21_quality_mandate.md`) is "never the
+	 * shortest way to the goal, always the best way". Authored coordinates put
+	 * the Underworks UNDER, the Gate Spire above the roads it watches, and the
+	 * Comms Relay at the far end of the gated lane. Then the SHAPE carries the
+	 * fiction, which is exactly what GDD 3.1's four map rules ask a map to do.
+	 *
+	 * Reversible in one field: delete the authoring and the board falls back to
+	 * the list, loudly (see `EclipseStrategyMap::ComposeMapView`), never to a
+	 * scatter that pretends to be geography.
+	 *
+	 * DEFAULT IS DELIBERATELY OFF-BOARD (-1,-1). (0,0) is a legal corner, so a
+	 * zero default would be indistinguishable from "authored top-left" and every
+	 * unauthored region would silently pile up in one corner.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Strategy")
+	FVector2D BoardPosition = FVector2D(-1.0, -1.0);
+
+	/** True once someone put this region somewhere on the board (see BoardPosition). */
+	bool HasBoardPosition() const
+	{
+		return BoardPosition.X >= 0.0 && BoardPosition.X <= 1.0
+			&& BoardPosition.Y >= 0.0 && BoardPosition.Y <= 1.0;
+	}
+
 	/** The lane to a given neighbour, or null when no lane exists (GDD 3.1 rule 1: no lane, no movement). */
 	const FEclipseLaneDefinition* FindLane(FName NeighborRegionId) const
 	{
