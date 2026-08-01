@@ -15,7 +15,7 @@ turn:         "Inside, the place is bigger than the plan, and the plan quietly b
 # ---- state ----
 status:       draft
 critic:       "NO-GO: .040 Eleven metres -- meters staan bij naam op de uitsluitingslijst van L1-R14"
-words:        231
+words:        232
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, MARA, two Ember fighters, DEX (radio)
@@ -40,6 +40,31 @@ words:        231
 #            purpose - same waiver M1.1.S04 took, same reason: nobody speaks in
 #            radio-length sentences while a roller door is coming in.
 # variance:  1 w (.250) to 17 w (.220) = 17x.
+# words:     232, recounted by hand line by line (whitespace tokens in `text:`, which is
+#            what the tool counts). The field read 231 and was one short; every other file
+#            in this mission was exact.
+#
+# eleven:    L1-R14 checked. *** READ THIS BEFORE PUTTING A NUMBER BACK. ***
+#            .040 read "Eleven metres". Metres are named in the ruling's own exclusion
+#            list, and eleven means the size of Ember Cell and nothing else. The crawl is
+#            TWENTY metres as of 01-08.
+#            WHERE I LOOKED BEFORE TAKING IT, and why the collision is one I will sign
+#            for. `check_spoken_numbers.py` could not be run in this session - no shell -
+#            so the corpus was swept with the rule that tool applies: number words inside
+#            `text:` and variant lines, nowhere else. Twenty is already spoken: "Twenty
+#            minutes" twice in M1.2.S05 (a route estimate) and "Twenty kilos and a stair"
+#            in M1.1.S06. Every one of those is a transient measurement that no later
+#            scene reaches back for. That is the whole argument, and it is L1-R33's: the
+#            defect is referent DRIFT, not repetition, and twenty cannot drift here
+#            because the corpus has only ever used it for "roughly this much" and never
+#            once for a count of people or things. Eleven's problem was the opposite -
+#            both meanings were load-bearing.
+#            Do not read this as "twenty is free". Four agents wrote that sentence about
+#            four different numbers on 01-08 and all four are now untrue. Run the tool.
+#            M1.4 keeps one eleven and it is correct: S01.140, "Eleven bunks", the cell.
+#            The other figure in metres here is .110, "Stand off eight metres", and it is
+#            a blast standoff in the branch this line is not in. The two are never heard
+#            in the same playthrough and neither is quoted anywhere else in the corpus.
 # branches:  .010-.090 grate | .100-.180 breach | .190-.250 shared. Conditions use the
 #            expression the architect put in this stub verbatim; no invented flags
 #            anywhere in this mission.
@@ -82,7 +107,8 @@ lines:
     speaker: VOSS
     voice:   voss
     condition: 'story.m14_entry == "grate"'
-    text:    "Eleven metres, then it opens out under the rack floor."
+    text:    "Twenty metres, then it opens out under the rack floor."
+    note:    "L1-R14: this was eleven, for a distance, and metres are named in the ruling. See the `eleven` note in the L2 block for where twenty was checked and why its existing uses do not bite."
 
   - id:      M1.4.S02.050
     speaker: VOSS

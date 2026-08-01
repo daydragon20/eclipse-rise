@@ -14,7 +14,7 @@ turn:         "Somebody uses a name that was not a name an hour ago, it goes aro
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          GO
 words:           224
 words_heard:     182
 words_generated: 252

@@ -61,7 +61,14 @@ words:        180
 # .130:      NOT a yes. Offered an open door, he asks about the work. His yes is one word
 #            and it is in S05.
 # first:     18.4 - never speaks first in a group. He is with Voss and one fighter here,
-#            so he answers; check every Brick line, each one follows a question.
+#            so he answers; no Brick line in this scene opens a turn.
+#            The wording here used to be "each one follows a question", and counted, that
+#            is one line wrong. .040 answers .030 and .090 answers .080, both questions.
+#            .130 follows .120, which is a STATEMENT - Voss says what the bolt costs and
+#            what it costs him. Brick answers that. The rule is untouched by it: it asks
+#            that he never speak first, not that he only ever be interrogated, and his
+#            best line in the scene is the one where he responds to an offer nobody made
+#            him take. Only the claim under the rule was false.
 # variants:  .120 branches on all four axes per section 9.7. What changes is WHY the bolt
 #            comes off; what never changes is that Voss offers rather than asks, and that
 #            the offer is conditional on the work, not on gratitude.

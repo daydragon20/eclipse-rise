@@ -15,7 +15,7 @@ turn:         "The garrison coming down the aisles is nineteen years old, and Em
 # ---- state ----
 status:       draft
 critic:       "NO-GO: .160 draagt six-one-one met koppeltekens, tegen de cijferconventie van L1-R36 en 18.9 C3; plus .220 is een niet-geregistreerde T4-aanraking"
-words:        215
+words:        221
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, MARA, BRICK, fighters; Dominion quartermaster (PA); conscript garrison (barks)
@@ -35,10 +35,18 @@ words:        215
 #            middle-aged administrator reading a checklist.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      `in-mission-radio` (10-25) as a ceiling. The PA lines sit at 10-17 because a
-#            man reading a checklist speaks in whole clauses. The floor traffic is
-#            CALLOUT length (2-6) - same waiver as M1.1.S04.
-# variance:  2 w (.210) to 17 w (.220) = 8.5x.
+# band:      `in-mission-radio` (10-25) as a ceiling. The PA lines sit at 10-16 because a
+#            man reading a checklist speaks in whole clauses. The exception is .160 at 22,
+#            and it is arithmetic rather than rhetoric: L1-R36 spells nine spoken digits
+#            as nine words. Still inside the ceiling. The floor traffic is CALLOUT length
+#            (2-6) - same waiver as M1.1.S04.
+# variance:  2 w (.210) to 22 w (.160) = 11x.
+# words:     221. Hand-counted per line, whitespace tokens in `text:`. The field read 215
+#            and was exact before .160 gave up its six hyphens (16 w -> 22 w).
+# eleven:    L1-R14 checked. Not used here. Every number in this scene labels or counts
+#            something that belongs to the Dominion - post and rack numbers, a countdown,
+#            the crate run at .160, a garrison of thirty and an age of nineteen at .140.
+#            None of them measures Ember, which is what the ruling protects.
 # THE OFFICER: he is not a villain and he never raises his voice or threatens anybody.
 #            He does four things and only four: he states condition, he counts stock, he
 #            reassigns the work of men who have stopped answering, and he protects his
@@ -152,7 +160,8 @@ lines:
   - id:      M1.4.S04.160
     speaker: OFFICER_A
     voice:   dominion_officer
-    text:    "Crates six-one-one through six-one-nine are unaccounted. Anyone with eyes on six-one-one, call it to the office."
+    text:    "Crates six one one through six one nine are unaccounted. Anyone with eyes on six one one, call it to the office."
+    note:    "L1-R36: digits spoken one at a time are separate words, never hyphenated. A hyphen is a TTS guess -- a model can take `six-one-one` for a compound instead of three digits, and that is the class of error 18.9 C3 has to catch before generation, because after it you can only hear it. Nine spoken digits, so 16 words becomes 22, against a ceiling of 25. The repeat is the clerk and not an accident: he anchors on the first crate in the run."
 
   - id:      M1.4.S04.170
     speaker: CONSCRIPT_A

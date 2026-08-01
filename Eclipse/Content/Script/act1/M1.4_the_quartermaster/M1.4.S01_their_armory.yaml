@@ -63,8 +63,15 @@ words:        247
 #            ugliest moment in the scene with a joke about his own drawing. 18.6: the
 #            best jokes cost something. This one costs Reyes her answer.
 # choice:    .100 / .110 are the player's insertion options (grate / breach), matching
-#            Entry_Sewer / Entry_Vault in setup_story_missions.py. SCRIPT_FORMAT has no
-#            player-choice construct - marked by note only, per the M1.1 precedent.
+#            Entry_Sewer / Entry_Vault in setup_story_missions.py. They carry real
+#            `choice:` blocks with `group`, `set` and `label`.
+#            The sentence that stood here said SCRIPT_FORMAT has no player-choice
+#            construct and that the options were marked by note only. That was untrue of
+#            the format from 31-07 (L1-R2) and untrue of these two lines, which have had
+#            the blocks all along - so it was a comment describing a file that no longer
+#            existed. It is deleted rather than softened: the same sentence sat in S05 and
+#            the writer there believed it, which is how that scene shipped two mutually
+#            exclusive Voss lines with no prompt between them.
 # variants:  none. BEATS_M1.4 section 9.7 restricts Voss axis variants to S03 and S99
 #            ("elders neutraal"), which is the budget ruling in ACT1_OVERVIEW C-6/Q-7.
 # seed:      .220 is the shipped BriefingText from setup_story_missions.py (MT_M14),

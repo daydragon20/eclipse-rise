@@ -15,7 +15,7 @@ turn:         "She stops asking about his body and asks about the names, and he 
 # ---- state ----
 status:       draft
 critic:       "NO-GO: .010 Eleven rifles -- geweren staan bij naam op de uitsluitingslijst van L1-R14, en de telling valt niet samen met de cel; plus een niet-geregistreerde T4-aanraking op .020-.050"
-words:        299
+words:        300
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      MARA, VOSS, DEX, REYES, BRICK, the cell
@@ -55,11 +55,14 @@ words:        299
 #
 # *** AMENDED 01-08 - RULING L1-R22. THE BASELINE WAS NEVER WRITTEN, AND THE FIX IS NOT
 #     "RELAX HER EVERYWHERE". READ THIS BEFORE TOUCHING A REYES LINE. ***
-# Counted, not assumed: this scene has TEN Reyes lines (.070 .090 .100 .110 .130 .140 .150
-# .170 .190 .200) and ZERO contractions in any of them. "That is a place." "Then it is
-# old... and I cannot open it tonight." "There is nothing in my kit for that."
-# So the L1-R19 differential has been firing against an identical background since it was
-# written, which makes it inaudible. That is my ruling failing, not a writing failure - the
+# Counted, not assumed. This scene has TEN Reyes lines (.070 .090 .100 .110 .130 .140 .150
+# .170 .190 .200), and ON THE DAY THIS RULING WAS WRITTEN not one of them contracted:
+# .130 read "That is a place", .140 read "Then it is old... and I cannot open it tonight".
+# So the L1-R19 differential was firing against an identical background, which made it
+# inaudible. THAT IS NO LONGER THE STATE OF THIS FILE - the ruling was executed on 01-08
+# and .070 .130 .140 contract now. The diagnosis is kept because it is the reason the
+# lines look the way they do; do not read it as work still owed, and do not put the
+# uncontracted wording back. That is my ruling failing, not a writing failure - the
 # L2 note below says "zero contractions", which is 18.4's static reading, and 18.4 is where
 # a writer looks when he needs a voice. The instruction was here and it lost.
 #
@@ -84,6 +87,33 @@ words:        299
 # band:      `cutscene` (20-60) read as a CEILING per the M1.1 precedent; longest base
 #            line 19 w. A 20-word floor and 18.3's variance rule cannot both hold.
 # variance:  1 w (.060 / .080 / .120 / .160) to 19 w (.040) = 19x.
+#
+# eleven:    L1-R14 checked. *** READ THIS BEFORE PUTTING A NUMBER BACK. ***
+#            .010 read "Eleven rifles that fire today". Rifles are on the ruling's own
+#            exclusion list, and the defence that eleven rifles are eleven people does not
+#            survive the same line: "Four more when I've had a night with them" makes it
+#            fifteen, and twenty lines later .210 puts Bex on the roster. The count never
+#            was the cell. It is gone.
+#            WHAT REPLACED IT, AND WHY IT IS NOT A NUMBER. `check_spoken_numbers.py` could
+#            not be run in this session - no shell - so the corpus was swept by hand with
+#            the rule that tool applies (number words inside `text:` and variant lines).
+#            Every value that would fit a haul of nine crates is already carrying weight
+#            somewhere: thirteen is M1.1's title and is quoted in this mission at
+#            S02.200; fourteen is M1.5's civilians and stands two lines below at .030;
+#            fifteen is the age of two dead conscripts in M1.3.S01; seventeen is Brick's
+#            days on the Krad-9 wagon and Brick is in this room; nineteen is his own line
+#            in S04; twelve is what the cell becomes when Voss joins, which is the exact
+#            drift this ruling exists to stop, in the exact scene where the roster grows.
+#            So the clause stopped counting. "A rifle each that fires today" says the
+#            thing the mission is for without spending a number on it, it is true whether
+#            the roster reads eleven or twelve, and it pays M1.1 - five between us,
+#            thirteen rounds - without quoting either. Dex still opens on a hard count,
+#            which is his fingerprint; he just does not put a second one next to it.
+#            Do not write here that some number is free. Four agents wrote that sentence
+#            about four different numbers on 01-08 and all four are untrue now. The one
+#            eleven this mission keeps is S01.140, "Eleven bunks", and it means the cell.
+# words:     300. The line is one word longer than it was (17 -> 18) and .040 is still the
+#            longest at 19, so the deliberate REGISTER red below is untouched.
 #
 # *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
 # The scene misses the cutscene floor by one word, and the 19-word line is .040 - the line
@@ -144,9 +174,9 @@ lines:
   - id:      M1.4.S99.010
     speaker: DEX
     voice:   dex
-    text:    "Nine crates out. Eleven rifles that fire today. Four more when I've had a night with them."
+    text:    "Nine crates out. A rifle each that fires today. Four more when I've had a night with them."
     shot:    "Bunk row. The haul is laid down the middle of the floor and there is nowhere left to walk."
-    note:    "Nine, against the four Dex costed in S01. The difference is Brick and nobody says so."
+    note:    "Nine, against the four Dex costed in S01. The difference is Brick and nobody says so. L1-R14: the middle clause was a spoken rifle count and it is now a ratio - see the `eleven` note in the L2 block. It also pays M1.1 without quoting it: five between us, thirteen rounds, and now one each that works."
 
   - id:      M1.4.S99.020
     speaker: DEX
@@ -179,7 +209,7 @@ lines:
     speaker: REYES
     voice:   reyes
     text:    "Two crush injuries and a hand that won't close for a week."
-    note:    "L1-R22 EXECUTED 01-08. She contracts here. This is the baseline the M1.6/M1.8 tell fires against; the header ruling named this line and the text had never been changed."
+    note:    "L1-R22. She contracts here -- `won't` -- and this is the baseline the M1.6 and M1.8 tell fire against. Leave it in: .190 and .200 drop the contraction and they only land against this line."
 
   - id:      M1.4.S99.080
     speaker: MARA

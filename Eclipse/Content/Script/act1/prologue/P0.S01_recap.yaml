@@ -14,7 +14,7 @@ turn:         "The last card stops describing a life and states a debt — eleve
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .100 draagt zijn syntaxis in aanhalingstekens die TTS niet uitspreekt -- came 'pre-compliance' wordt zonder die tekens geen Engelse zin. GEEN SCHRIJVERSACTIE: verbatim goedgekeurde kopij (RECAP_CARDS_M1.md r.27), dus owner + architect"
 words:        127
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_P0_prologue.md ----

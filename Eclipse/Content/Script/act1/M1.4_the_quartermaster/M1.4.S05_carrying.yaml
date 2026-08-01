@@ -15,7 +15,7 @@ turn:         "Brick picks up the load that was going to be left, and answers th
 # ---- state ----
 status:       draft
 critic:       "NO-GO: .020/.030 zijn elkaar uitsluitende spelersopties zonder choice-blok -- zoals het er staat spreekt Voss zichzelf in twee opeenvolgende regels tegen"
-words:        74
+words:        85
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
 # cast:      VOSS, MARA, BRICK, fighters
@@ -34,10 +34,16 @@ words:        74
 # writer:    Dex is on the radio and will want to fill this silence. Do not let him.
 
 # ---- dialogue-writer notes (L2) ----
-# 13 lines, 74 words, and the whole mission is in the last two of them.
-# band:      `in-mission-radio` as a ceiling; longest line 10 w. Everything here is short
+# 14 lines, 85 words, and the whole mission is in the last two of them.
+# band:      `in-mission-radio` as a ceiling; longest line 11 w. Everything here is short
 #            because nobody in this scene has breath to spare.
-# variance:  1 w (.060 / .070 / .130) to 10 w (.030 / .040 / .090) = 10x.
+# variance:  1 w (.060 / .070 / .130) to 11 w (.040) = 11x.
+# REGISTER:  this scene reaches its floor of 10 on FOUR lines and no others - .030, .040
+#            (11), .045 and .090. It used to reach it on three. Anybody trimming a word
+#            off those turns the bar red, and the trim will look harmless in the diff.
+# eleven:    L1-R14 checked. Not used. The only thing counted in this scene is the crates
+#            on the floor, and that count runs DOWN - four, three, two - because Brick is
+#            taking them. It measures nothing about the cell.
 # THE LIFT:  Brick carrying is written as a COUNT GOING DOWN and nothing else. .050 says
 #            four crates are being left, .060 says three, .070 says two. No line describes
 #            him, nobody thanks him, nobody says the word heavy. The interruption at .060
@@ -52,8 +58,22 @@ words:        74
 # exits:     .080-.110 are the loud/quiet exits. The grate branch leaves on "Then nothing
 #            happened here" - the ghost run, no alarm, no record. The breach branch leaves
 #            with the dock burning. Neither exit comments on the other.
-# choice:    .020 / .030 are the player's leave-behind options (rounds or rifles). Marked
-#            by note only; SCRIPT_FORMAT has no player-choice construct.
+# choice:    .020 / .030 are the player's leave-behind options (rounds or rifles) and they
+#            carry real `choice:` blocks. The sentence that stood here said SCRIPT_FORMAT
+#            has no player-choice construct; L1-R2 added one on 31-07 and S01 in this same
+#            mission has been using it since. Two lines of Voss contradicting each other
+#            back to back was the visible damage; a stale justification left in a comment
+#            is the durable damage, because the next writer reads it as instruction.
+#            `run.`, not `story.` - the decision is made up and paid off inside the
+#            mission, so it has no business in the save (L1-R4), and there is no register
+#            row for it to hang on, which a `story.` flag would need. The L1 block's
+#            `flags-out: none` stays true: a run fact is not a story flag and nothing
+#            leaves this mission.
+#            THE LOAD-BEARING PART IS THE READER. .040 / .045 are Mara marking what he
+#            left, by name. That is the smallest consequence that is a real one, and it
+#            costs the scene nothing it had: .050 still picks up on the crates on the
+#            floor in either branch, and the player now knows exactly which four Brick
+#            puts on his shoulder.
 # variants:  none - section 9.7. The repeat offer is deliberately axis-neutral: whatever
 #            Voss said in S03, this is the same three words.
 
@@ -67,19 +87,36 @@ lines:
   - id:      M1.4.S05.020
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m14_leave_behind
+      set:   'run.m14_leave_behind = "rounds"'
+      label: "Carry the rifles. Leave the round boxes."
     text:    "Rifles out. The round boxes stay where they are."
-    note:    "PLAYER OPTION 1 of 2 (what gets left). Flavor plus small materials variation."
+    note:    "PLAYER OPTION 1 of 2 (what gets left). Read at .040."
 
   - id:      M1.4.S05.030
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m14_leave_behind
+      set:   'run.m14_leave_behind = "rifles"'
+      label: "Carry the rounds. Leave the rifles."
     text:    "Rounds out. An empty rifle is a club either way."
-    note:    "PLAYER OPTION 2 of 2 (what gets left)."
+    note:    "PLAYER OPTION 2 of 2 (what gets left). Read at .045."
 
   - id:      M1.4.S05.040
     speaker: MARA
     voice:   mara
-    text:    "Mark what stays. We are not coming back for it."
+    condition: 'run.m14_leave_behind == "rounds"'
+    text:    "Mark the round boxes. We are not coming back for them."
+    note:    "The reader for option 1. This was one unconditioned line, `Mark what stays`, and it read no flag at all -- which would have left the new choice setting something nobody looks at. That is the decorative choice L1-R18 warned about, and CHOICE integrity fails it mechanically."
+
+  - id:      M1.4.S05.045
+    speaker: MARA
+    voice:   mara
+    condition: 'run.m14_leave_behind == "rifles"'
+    text:    "Mark the rifles. We are not coming back for them."
+    note:    "The reader for option 2. Both values handled, so BRANCH closes without a silence. She does not argue with his call - she names what he left and shuts it. AR-5 holds: no `you`, no `I`."
 
   - id:      M1.4.S05.050
     speaker: FIGHTER_B
