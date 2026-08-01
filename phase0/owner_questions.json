@@ -74,6 +74,35 @@
    "advies": "Ongeveer 5 minuten.",
    "vrijtekst": false,
    "prio": "gauw"
+  },
+  {
+   "id": "O-21",
+   "prio": "gauw",
+   "vraag": "Voss' vier persoonlijkheidsassen: houden, halveren of schrappen? (9.556 credits)",
+   "waarom": "Je hebt gekozen voor één Voss-stem en dat bespaart 23.507. Deze vraag zit eronder en je hebt er niets over gezegd, dus ik stel hem apart in plaats van hem aan te nemen.\n\nGEMETEN, met één stem:\n  Voss' basisregels     13.951 credits\n  zijn as-varianten      9.556 credits  (162 stuks)\n  samen                 23.507\n\nDie varianten zijn 41% van wat hij kost. Ze bestaan omdat de speler op vier assen (pragmatisch / idealistisch / persoonlijk / strategisch) een eigen Voss hoort — zelfde beat, andere mond.\n\nWAT IK ERBIJ MOET ZEGGEN, WANT HET IS GEEN ZUIVERE BESPARING: de striptest van act 1 leunt op die assen. Verschillende critici noemden Voss de zwakste stem van het corpus toen zijn regels korte vragen waren; wat hem een personage maakt zijn juist de regels waarin hij het ding meet dat voor hem staat — en dat zijn vaak as-varianten. Alle assen schrappen maakt hem goedkoper én vlakker.\n\nHalveren is de tussenweg: twee assen in plaats van vier. De speler hoort nog steeds een Voss die bij hem past, maar minder fijnmazig.",
+   "stappen": "Kies hieronder. Ik voer het uit in de teller en in de generatievolgorde; er is nog niets gegenereerd.",
+   "opties": [
+    {
+     "label": "Houden — alle vier de assen",
+     "waarde": "vier_assen",
+     "toelichting": "Voss blijft zoals hij geschreven is.",
+     "gevolg": "Act 1 kost 74.703. Geen enkele regel sneuvelt en de striptest houdt zoals hij nu is."
+    },
+    {
+     "label": "Halveren — twee assen",
+     "waarde": "twee_assen",
+     "toelichting": "Bespaart 4.778 credits.",
+     "gevolg": "Act 1 kost 69.925. De speler hoort nog een Voss die bij hem past, minder fijnmazig. Kost één schrijfronde om te kiezen wélke twee assen blijven."
+    },
+    {
+     "label": "Schrappen — één Voss voor iedereen",
+     "waarde": "geen_assen",
+     "toelichting": "Bespaart 9.556 credits.",
+     "gevolg": "Act 1 kost 65.147. Maar Voss verliest de regels die hem het duidelijkst een personage maken, en dat is precies waar critici hem eerder op afrekenden. Ik raad dit af tenzij het budget knelt."
+    }
+   ],
+   "advies": "Halveren. Je hebt met één stem al 23.507 bespaard en zit op 57% van je saldo in plaats van 75% — de druk is eraf. De 4.778 die halveren oplevert is minder waard dan het risico dat je Voss vlak maakt, maar het is wel het enige voorstel dat geld bespaart zónder een regel te verliezen die iemand hoort.",
+   "vrijtekst": true
   }
  ]
 }
