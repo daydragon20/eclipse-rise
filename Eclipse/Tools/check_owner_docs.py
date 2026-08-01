@@ -25,6 +25,23 @@ NO-GO" is niet mechanisch te toetsen zonder de betekenis te kennen, dus dat staa
 hier NIET in -- een controle die doet alsof hij meer dekt dan hij kan, is precies
 de fout die deze hele reeks tools bestrijdt.
 
+BEKEND GAT, gevonden op 02-08 doordat hij er GROEN op ging.
+-----------------------------------------------------------
+De testcontrole vergelijkt alleen het AANTAL tests. STATUS.md zei
+"250 tests, 0 gefaald"; de bar-regel zei 257 / 5 gefaald. Deze tool meldde
+netjes dat 250 verlopen was -- en zweeg over de vijf falers. Na het bijwerken
+van het aantal stond er dus "257 tests, 0 gefaald" en was hij groen op een
+onwaarheid.
+
+Dat is de fout die dit gereedschap juist bestrijdt: hij belooft "de getallen in
+STATUS.md kloppen met hun bron" en toetst er een van de twee.
+
+NIET GEREPAREERD, en de reden hoort erbij: op het moment van ontdekken draaiden
+er drie agents en veranderde de bar per minuut. Een controle bouwen tegen een
+bewegend doel levert een test op die je niet kunt vertrouwen. Wie hem uitbreidt:
+het gefaald-getal staat in dezelfde bar-regel (RE_SOAK vangt hem nu niet), en
+de zelftest moet bewijzen dat "0 gefaald" naast een rode regel ROOD wordt.
+
 Draaien:
     python Eclipse/Tools/check_owner_docs.py
     python Eclipse/Tools/check_owner_docs.py --zelftest
