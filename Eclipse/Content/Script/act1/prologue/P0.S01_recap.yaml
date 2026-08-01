@@ -14,7 +14,7 @@ turn:         "The last card stops describing a life and states a debt — eleve
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .100 draagt zijn syntaxis in aanhalingstekens die TTS niet uitspreekt -- came 'pre-compliance' wordt zonder die tekens geen Engelse zin. GEEN SCHRIJVERSACTIE: verbatim goedgekeurde kopij (RECAP_CARDS_M1.md r.27), dus owner + architect  ||  ARCHITECT-ACTIE UITGEVOERD 02-08, RULING L1-R46: .100 herschreven en RECAP_CARDS_M1.md kaart 3 in dezelfde beurt bijgewerkt. Ter herbeoordeling."
+critic:       "NO-GO (nieuwe grond; .100 is GESLAAGD en blijft woordelijk): L1-R47 is niet afgemaakt in het bestand dat de ruling draagt. r.57, r.94 en r.102 zeggen card 3 waar slot 3 bedoeld is, en r.57 overhandigt daarmee een systems-taak met een nieuwe tag aan het verkeerde blok. Drie woorden in commentaar"
 words:        129
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_P0_prologue.md ----
