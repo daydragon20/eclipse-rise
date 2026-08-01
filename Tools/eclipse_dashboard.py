@@ -76,6 +76,13 @@ def ago(ts: float) -> str:
     return f"{int(d // 86400)} dagen geleden"
 
 
+# De server draait onder pythonw.exe en heeft dus zelf GEEN console. Elk
+# subproces krijgt daarom een gloednieuw consolevenster -- zichtbaar als een
+# zwarte flits, bij elke verversing opnieuw. CREATE_NO_WINDOW onderdrukt dat.
+# Alleen op Windows: het vlaggetje bestaat niet op andere platforms.
+_GEEN_VENSTER = getattr(subprocess, "CREATE_NO_WINDOW", 0) if os.name == "nt" else 0
+
+
 def run_git(*args: str) -> str:
     try:
         out = subprocess.run(
@@ -86,6 +93,7 @@ def run_git(*args: str) -> str:
             timeout=15,
             encoding="utf-8",
             errors="replace",
+            creationflags=_GEEN_VENSTER,
         )
         return out.stdout.strip()
     except Exception:
