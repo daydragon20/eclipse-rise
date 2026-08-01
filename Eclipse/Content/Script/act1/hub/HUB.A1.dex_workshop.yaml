@@ -16,9 +16,9 @@ turn:         "He finishes showing it to the man who is still standing there, an
 # ---- state ----
 status:          draft
 critic:          "GO op 18.9 (scene) -- GEHOUDEN op de reeks. REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
-words:           164
-words_heard:     164
-words_generated: 182
+words:           172
+words_heard:     172
+words_generated: 196
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      DEX, MARA, VOSS
@@ -74,87 +74,153 @@ words_generated: 182
 #            not one of the five permitted (8.2 (i)).
 # budget:    WORD-NEUTRAL. What Mara gets, Dex gives up.
 
-# ---- dialogue-writer notes (L2) ----
-# band:      hub (12-35) as a ceiling (L1-R1). Longest 25 w (.030 and .070), ceiling clear.
-#            Register reached at .010 (12), .030 (25), .040 (23), .060 (14), .070 (25),
-#            .100 (19), .110 (16). Spread 1 w (.130 "Seven.") to 25 w = 25x.
+# ---- dialogue-writer notes (L2) — REBUILT 2026-08-01 AGAINST THE FORM A CONTRACT ----
+# band:      hub (12-35) as a ceiling (L1-R1). Longest 19 w (.010). Register reached at .010
+#            (19), .012 (14), .030 (12), .060 (12), .070 (18), .100 (17). Spread 1 w (.130
+#            "Seven.") to 19 w = 19x. Ceiling clear by sixteen words.
+# ids:       .012 .014 .016 .018 ARE INSERTIONS, not a renumber. Every pre-existing id keeps
+#            its speaker and its job (.020 Voss's first line, .050 his mechanism question,
+#            .080/.090 the interrupt pair, .120 the player beat, .130 the number). The row
+#            goes into the gap the tens exist for (SCRIPT_FORMAT section 2). Nothing in this
+#            file has been generated, so nothing was at risk either way - but a reader can
+#            still diff the old scene against this one line for line, which a renumber would
+#            have destroyed.
 #
-# *** THE SYSTEM IS TAUGHT AS FOUR COMPLAINTS AND TWO WISHES. NOT ONE LINE IS A TUTORIAL. ***
-#   .030  ENERGY      - 05_base_building 5.2's "generator that coughs", said as the reason
-#                       everything he wants is impossible. He is not describing an upkeep
-#                       stat; he is describing the thing he hates.
-#   .040  SLOTS       - act 1 has four slots (5.2: 4 -> 8 -> 12 -> 16). Here that is four
-#                       patches of floor that are rock instead of fill. The scarcity is
-#                       geology, so the player never hears a rule, and "Everything heavy
-#                       has to stand on one of them" is the entire slot system in ten words.
-#   .060  OCCUPANCY   - what is standing on the four now. Bunks, table, generator, bench.
-#                       An inventory, said flat, and it is why he cannot have anything.
-#   .070  MEDBAY      - the first thing he would build is not for him, and he does not say
-#                       so. He says a bench comes off a rock patch and a room goes on it.
-#   .100  HANGAR      - 5.3.1's Hangar, wished for in act 1 by a man who knows it is absurd.
+# *** THE ROW IS ABOUT THE GENERATOR CARD AND ABOUT NOTHING ELSE. ***
+# Dex wants to move the machine onto one of the four hard patches. It costs half a day dark,
+# once. Mara rules against it because there are people above ground tonight. BOTH OF THEM ARE
+# RIGHT AND NEITHER OF THEM IS INTERESTING ABOUT IT (18.9 D), which is the entire assignment.
+# The medbay card is deliberately NOT the card they fight over: it is never shown to her, so
+# the closing can make it private. That is the only thing that can happen to .070 that makes
+# it stronger, and it only works if she never saw it.
+# .010 OPENS ON "So" - the second half of an argument that started before the camera did.
+# No greeting, no question, and the lamp line is gone.
+#
+# *** WHAT MARA GETS, DEX GIVES UP - COUNTED BY HAND, NOT ASSERTED. ***
+# Mara 25 words across three lines. Dex 146 -> 123, so he gives up 23. Net on that axis: +2.
+# The whole remaining delta is Voss's sanctioned .020 rebuild (+6 words, doubled for gender):
+# words 164 -> 172, words_generated 182 -> 196. Nobody paid for the row except Dex, which is
+# the instruction. NO SHELL IN THIS ROUND - these are whitespace-token counts done by hand
+# against validate_script.py's own rule (`len(txt.split())`), not a tool reading. The
+# authoritative figures come from count_generation_cost.py when somebody can run it.
+#
+# *** THE SLOT SYSTEM IS NOW TAUGHT IN THREE PIECES AND NONE OF THEM IS A RULE. ***
+#   .010  the heaviest thing down here ends up standing on rock  -> weight goes on rock
+#   .040  four places in this floor are rock and not fill. Four.  -> there are exactly four
+#   .060  bunks, table, generator, bench                          -> all four are taken
+# The old .040 carried "Everything heavy has to stand on one of them" - the whole slot
+# system in ten words, which the critic nearly failed and kept because without it the
+# inventory meant nothing. THE ROW MADE IT REDUNDANT: .010 has to say what moving the
+# machine buys, and what it buys is rock. The rule is gone and the system survives intact.
+# Flagged in the report; it is the one place the rebuild bought something back.
+#   .030  ENERGY      - 05_base_building 5.2's generator that coughs. It is short now
+#                       BECAUSE the row already showed the machine being the constraint. He
+#                       does not explain it to Voss; he names it and moves on.
+#   .070  MEDBAY      - the first thing he would build is not for him and he does not say so.
+#                       A bench comes off a rock patch and a room goes on it. She is never
+#                       named. This is the heaviest line in the file.
+#   .100  HANGAR      - 5.3.1, wished for by a man who prices it himself at never.
 #   .110  BUILD COST  - a week of nobody needing him, and forty kilos of plate. Time and
-#                       materials, priced by the person paying, which is 5.4 without 5.4.
-# If any of these lines were deleted the scene would lose a want, not a fact. That is the
-# test the stub sets and it is the only reason they are allowed to be in the file.
+#                       materials, priced by the person paying. After the row, "a week where
+#                       nobody needs me" is no longer a figure of speech.
 #
 # *** THE PLAN IS SEVEN RATION CARDS AND THAT IS THE SHOT. ***
 # M1.2.S99.120: "It's on the back of a ration card in my kit. Two years." One card was the
-# repeater. This is seven, laid down one at a time as he talks, and by .130 they are lying
-# on the bench in the shape of a building - Medbay, Power, Workshop, a way down for a
-# vehicle. The player will build exactly this over four acts and nobody in the room knows
-# that. The plan is measured in ration cards because that is what Kessara measures things
-# in (RULINGS_L1 ronde 1) and because it is the cheapest possible way to say TOO BIG.
+# repeater. This is seven, and by .130 they are lying on the bench in the shape of a building.
+# The player will build exactly this over four acts and nobody in the room knows that. Ration
+# cards because that is what Kessara measures things in (RULINGS_L1 ronde 1) and because it
+# is the cheapest possible way to say TOO BIG.
 #
-# humour:    two comic beats in thirteen lines (18.6's ratio for downtime): .090, where a
-#            sentimental line about his own bench is refused by explaining what the bench
-#            is made of, and .100, where he asks for a hangar and prices it himself at
-#            never. He is funniest describing what he will not be allowed to build, exactly
-#            as the stub says. .060 is dry, not comic, and I am not counting it.
-# dex:       nine of the thirteen lines. This is the one scene in act 1 where he is
-#            allowed to talk, and the shape of the scene is a man who has been holding this
-#            in since before the player arrived. He never states a feeling; the closest he
-#            comes is .110, where the obstacle is "a week where nobody needs me" and he
-#            says it as a materials problem.
-# voss:      four lines, eighteen words, and three of them are questions. He is the reason
-#            the plan comes out and he adds nothing to it. .120 is the counting move that
-#            turns a wish into a number, which is what he does to everything (M1.1 circuit,
-#            M1.2 mast feed, M1.7 arithmetic).
+# mara:      pronoun audit, all three lines - zero "you", zero "your", zero "I". AR-5 and
+#            AR-5b untouched; the second person is still unspent going into M1.8.S08. She
+#            says "we" once (.012) where anybody else would say "I", which is 18.4.
+#            SHE TALKS ABOUT THE CARD AND NEVER ABOUT HIM. She gives no reason for refusing
+#            the stack beyond this week, because she has not got one, and .018 is three words
+#            of a woman being almost kind on her way out: paper does not spoil. She wins by
+#            leaving, and the shot makes the win physical - the card goes back on the stack,
+#            not into his hand.
+# voss:      four lines, twenty-four words, and he does not speak until she is gone. .020 is
+#            REBUILT to the 8.3 test: he turns over the card that was put in his hands during
+#            somebody else's argument and reads a wall off it that is not in the room he is
+#            standing in. That cannot be replaced by "Go on", it is a measurement of the
+#            object in front of him, and it is the only line in the file that says the plan
+#            is a building nobody has built. .050 and .120 are mechanism and count.
 #            NO VARIANTS - BEATS_HUB_A1 section 7.6 restricts axis variants to scenes 2, 6,
 #            8 and 11. Nothing here branches and nothing here is a judgement.
-# interrupt: .080/.090. One dash in thirteen lines (18.9 B), and it is Dex refusing to let
-#            a sentence about him finish. Third time in the act; the player is starting to
-#            be able to predict it, which is what makes M1.8's silence readable.
-# eleven:    L1-R14 checked. Not used - the plan is seven cards and the floor has four
-#            hard patches.
-# omitted:   a promise, a costing in Materials or Credits, any line where Voss says the
-#            plan is good, and any explanation of what a Workshop is for. See report.
+# dex:       ten lines. Fragments throughout, articles dropped (.040, .060, .070, .110),
+#            technical nouns doing the work of adjectives. He never states a feeling; the
+#            closest he comes is .110, where the obstacle is a week where nobody needs him
+#            and he prices it in plate.
+# humour:    two comic beats in seventeen lines (18.6's downtime ratio): .090, where a
+#            sentimental line about his own bench is refused by explaining what the bench is
+#            made of, and .100, where he asks for a hangar and prices it himself at never.
+#            ZERO comic beats before .090 - there is nothing funny about the row and he does
+#            not reach for a joke to cover it, which is the point of putting the joke after.
+# interrupt: .080/.090. One dash in seventeen lines (18.9 B), and it is Dex refusing to let a
+#            sentence about him finish. Third time in the act.
+# closings:  the heaviest line (.070) is delivered WITH THE HANDS STILL - 8.2 (i); this file
+#            is not one of the five permitted the stillness of the eyes. Nothing in this file
+#            says "does not look up" or "goes back to". Audited line by line.
+# eleven:    L1-R14 checked. Not used - the plan is seven cards and the floor has four hard
+#            patches.
+# omitted:   a promise, a costing in Materials or Credits, any line where Voss says the plan
+#            is good, any line where either man remarks on Mara leaving, and any explanation
+#            of what a Workshop is for. See report.
 
 lines:
   - id:      HUB.A1.dex_workshop.010
     speaker: DEX
     voice:   dex
-    text:    "Stand where the lamp is. You can't see it from the door."
-    shot:    "Workshop, two nights after the mast. The bench is clear, which nobody has ever seen. He puts one ration card down on it, drawn on both sides in grease pencil."
-    note:    "He has been waiting for somebody to be in this room with nothing to do. The first card goes down before he has said what any of it is."
+    text:    "So it's half a day dark. Once. And after that the heaviest thing down here is standing on rock."
+    shot:    "Workshop, two nights after the mast. Seven ration cards on the bench in two rows, drawn on both sides in grease pencil. Mara is holding one of them. Dex put another in Voss's hands on the way past and has not looked at him since."
+    note:    "THE SCENE OPENS ON THE SECOND HALF OF A SENTENCE. He is finishing an argument, not starting a conversation. One card, one cost, and the beginning of the slot system arrives as the thing the cost buys."
+
+  - id:      HUB.A1.dex_workshop.012
+    speaker: MARA
+    voice:   mara
+    text:    "People are above ground tonight. That machine is the light we come back to."
+    shot:    "She holds the card at arm's length, the way she holds a manifest, and reads the whole of it before she says anything."
+    note:    "She rules on the one card, and the ground is tomorrow. Two short declaratives, one 'we' where anyone else would say 'I' (18.4). Zero 'you', zero 'your', zero 'I' - AR-5b intact. She is not unkind: she read the card first."
+
+  - id:      HUB.A1.dex_workshop.014
+    speaker: DEX
+    voice:   dex
+    text:    "Six more behind that one. Look at all of it first."
+    note:    "THE WANT, said once and never again. He is not asking for a vote on the plan - he is asking her not to rule on one seventh of it. This is the only line in the file where he asks anybody for anything."
+
+  - id:      HUB.A1.dex_workshop.016
+    speaker: MARA
+    voice:   mara
+    text:    "Nothing on that bench feeds anybody this week."
+    note:    "She refuses the stack without opening it, and she gives no reason past this week because she has not got one. This is the uninteresting wrongness 18.9 D asks for, and it is also completely correct."
+
+  - id:      HUB.A1.dex_workshop.018
+    speaker: MARA
+    voice:   mara
+    text:    "The cards keep."
+    shot:    "She sets the card back on the stack, square, and goes. She does not hand it to him and she does not take it with her. Out before he answers."
+    note:    "SHE WINS BY LEAVING. Three words, and they are almost kind - paper does not spoil, so the plan will still be there. Said in her own unit: she is a woman who knows what keeps and what does not."
 
   - id:      HUB.A1.dex_workshop.020
     speaker: VOSS
     voice:   voss
-    text:    "What am I looking at?"
+    text:    "There's a wall on this card that isn't in the room."
+    shot:    "He turns over the card he has been holding since before the row started."
+    note:    "REBUILT to the 8.3 test - the old line was 'What am I looking at?', which is 'Go on' with a question mark. He measures the object in his hands against the room he is standing in and finds a wall that does not exist yet. Nobody says the word plan. He does not mention Mara, then or ever."
 
   - id:      HUB.A1.dex_workshop.030
     speaker: DEX
     voice:   dex
-    text:    "Everything down here runs off one machine that stops when it feels like it, and every single thing I want to build makes that worse."
+    text:    "One machine, and it coughs. Everything on that bench makes it worse."
     shot:    "Second card down, left of the first."
-    note:    "ENERGY. 05_base_building 5.2's generator that coughs, delivered as the reason he cannot have anything rather than as an upkeep number."
+    note:    "ENERGY. 05_base_building 5.2's generator that coughs. Short, because the row already put the machine in front of the player - he names the constraint instead of explaining it, which is what a man says after he has lost the argument about it."
 
   - id:      HUB.A1.dex_workshop.040
     speaker: DEX
     voice:   dex
-    text:    "There are four places in this floor that are rock and not fill. Four. Everything heavy has to stand on one of them."
+    text:    "Four places in this floor are rock and not fill. Four."
     shot:    "He kicks the floor twice in two different places and it sounds like two different floors."
-    note:    "SLOTS. Act 1 has four (5.2). Here they are geology, so scarcity arrives as a fact about a vault instead of a rule about a game."
+    note:    "SLOTS. Act 1 has four (5.2). The old third sentence - 'Everything heavy has to stand on one of them' - is GONE, because .010 has to say what half a day dark buys and what it buys is rock. Scarcity is now geology and the rule is never spoken."
 
   - id:      HUB.A1.dex_workshop.050
     speaker: VOSS
@@ -164,15 +230,15 @@ lines:
   - id:      HUB.A1.dex_workshop.060
     speaker: DEX
     voice:   dex
-    text:    "Bunks, the table, the generator, and a bench I made out of a door."
-    note:    "The inventory, flat. One enumeration in the scene (18.9 B triads). Everything in this vault is made out of a door, including the thing Reyes lays people on."
+    text:    "Bunks, table, generator, and a bench I made out of a door."
+    note:    "OCCUPANCY, flat. The one enumeration in the scene (18.9 B). Everything in this vault is made out of a door, including the thing Reyes lays people on, and nobody says that either."
 
   - id:      HUB.A1.dex_workshop.070
     speaker: DEX
     voice:   dex
-    text:    "First thing that comes off is the bench. Put a room there with a door on it, and she stops treating people on the floor."
-    shot:    "Third card, and this one he squares up with the edge of the bench before he lets go of it."
-    note:    "MEDBAY, wished for by the engineer, out of his own slot, for somebody else, without one word about why. He does not name a feeling and does not name her either."
+    text:    "Bench comes off first. Room goes there with a door, and she stops treating people on the floor."
+    shot:    "Third card down. His hands stop on the bench and stay there for the whole line. He is looking at Voss."
+    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private."
 
   - id:      HUB.A1.dex_workshop.080
     speaker: VOSS
@@ -184,21 +250,21 @@ lines:
     voice:      dex
     interrupts: true
     text:       "Bench is a door on two drums. I'll steal another door."
-    note:       "Comic beat 1 of 2, and it is a deflection: he kills a sentence about himself by explaining what the furniture is made of. Third time in the act he does this."
+    note:       "Comic beat 1 of 2, and it is a deflection: he kills a sentence about himself by explaining what the furniture is made of. Third time in the act he does this. First joke in the file, and it arrives after the row rather than over it."
 
   - id:      HUB.A1.dex_workshop.100
     speaker: DEX
     voice:   dex
     tags:    [amused]
-    text:    "And when there's steel, a stair wide enough to bring a vehicle down. Not this year. Not ever, probably."
+    text:    "And when there's steel, a stair wide enough for a vehicle. Not this year. Not ever, probably."
     shot:    "He goes into his kit for three more cards and lays them out fast, like he is dealing."
     note:    "Comic beat 2 of 2. It is the Hangar (5.3.1), asked for in a damp vault by a man who prices it himself at never. He is funniest describing what he will not be allowed to build."
 
   - id:      HUB.A1.dex_workshop.110
     speaker: DEX
     voice:   dex
-    text:    "All of it needs a week where nobody needs me, and about forty kilos of plate."
-    note:    "BUILD COST, priced by the person who pays it. The obstacle from the stub, said by him instead of by Voss, and said as a materials problem because that is the only way he can say it."
+    text:    "A week where nobody needs me. And forty kilos of plate."
+    note:    "BUILD COST, priced by the person who pays it, as a materials problem because that is the only way he can say it. Twenty minutes ago somebody needed him and said so on her way out the door. No line in the file connects those two facts."
 
   - id:      HUB.A1.dex_workshop.120
     speaker: VOSS
@@ -210,5 +276,5 @@ lines:
     speaker: DEX
     voice:   dex
     text:    "Seven."
-    shot:    "Laid out edge to edge under the lamp they are a floor plan, and it is the base the player will spend four acts building. Neither man says that. He does not put them away."
-    note:    "One word. The whole scene is the size of the thing, and the size is measured in ration cards because that is the unit this district has."
+    shot:    "Laid out edge to edge under the lamp they are a floor plan, and it is the base the player will spend four acts building. Somebody crosses the workshop towards the bunks with a rifle on the sling, not stopping, not looking. Dex has all seven off the bench and into his kit before they reach the lamp. The bench is bare again."
+    note:    "One word, and then the plan is covered. He has shown this to one person and he puts it away for a stranger's footsteps. That is what makes .070 private, and no line remarks on it."

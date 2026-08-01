@@ -17,9 +17,9 @@ turn:         "Voss stops asking, and on his way out he sees what Brick has been
 # ---- state ----
 status:          draft
 critic:          "NO-GO: .040 (Tam went in my place) spreekt M1.6.S03.220, M1.6.S01 en M1.8.S02 tegen -- Brick IS meegenomen; de bron is het turn-veld van de stub, niet de schrijver. Plus: de want is al beantwoord voor de scene speelt, en .030 dupliceert mara_map_table.020. Ook los van de REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
-words:           42
-words_heard:     42
-words_generated: 72
+words:           36
+words_heard:     36
+words_generated: 62
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      BRICK, VOSS
@@ -81,72 +81,102 @@ words_generated: 72
 # omitted:   Tam, any name at all, what the Tithe is, what the seventeen days were, an
 #            apology, a reaction, and any line in which either man says the word water.
 
-# ---- dialogue-writer notes (L2) — SUPERSEDED 2026-08-01, DO NOT FOLLOW ----
-# Everything below answers the withdrawn contract. It is kept unedited (L1 does not rewrite
-# a writer's block) so the next writer can see the reasoning that was correct and the one
-# premise that was not: the stub told him a man went in Brick's place, and no man did.
-# band:      `hub` (12-35) as a ceiling. Longest 17 w (.010). FIVE LINES, so the scene is
-#            exempt from register and spread (L1-R1) - and compression is the point of it.
+# ---- dialogue-writer notes (L2) — REBUILT 2026-08-01. The superseded block is deleted. ----
+# The withdrawn version is in git; keeping a block that instructs the next writer to put a
+# dead man's name in .040 next to a block that forbids it is how the error comes back.
+# band:      `hub` (12-35) as a ceiling. Longest 15 w (.010). FOUR LINES, so the scene is
+#            exempt from register and spread (L1-R1), and compression is the whole point.
+# budget:    HAND-COUNTED, NO SHELL IN THIS ROUND. 42 written words -> 36. words_generated
+#            72 -> 62, a saving of 10, all of it on Voss (30 -> 26, doubled for gender).
+#            Five lines -> four, as instructed. Whitespace tokens, validate_script.py's own
+#            rule; count_generation_cost.py is authoritative and has not been run.
+# ids:       .050 IS RETIRED. .010-.040 keep their speakers and their positions; the L1 block
+#            authorises reuse here explicitly and nothing is generated.
 #
-# *** THE NAME IS TAM, AND THAT IS NOT A NEW NAME. ***
-# The stub asks for "the name of the man who was taken off Krad-9 in his place". I have not
-# invented one. It is Tam, from "Tam. Oyelaran. Vic." - Brick's first line in the game
-# (M1.4.S03.040) and the three names he counted for three months (M1.4.S99.180). The player
-# has heard those three words twice without ever learning what they are. This scene tells
-# them one third of it, in five words, and never mentions the other two.
-# That makes the scene a PAYOFF rather than an addition: zero new canon, zero new proper
-# nouns, and one of the game's most repeated lines acquires a floor under it.
-# WHAT IS NOT EXPLAINED, HERE OR ANYWHERE: how a place changes hands on that list, who did
-# the swapping, whether Tam volunteered, and what happened to him. 18.8 - the codex explains,
-# dialogue never does.
+# *** NEITHER BRICK LINE IS AN ANSWER AND NEITHER IS A DEFLECTION. ***
+# A deflection is a different subject offered in good faith - that is what the old .020
+# ("Cars are the same on every line") was, and it is why the scene had a second beat to
+# spare. These two refuse the thing that was actually asked, in its own terms, and offer
+# nothing in exchange. .020 refuses a place. .040 refuses an object. Between them there is
+# not one sentence that could be followed up.
+# HE NAMES NOBODY. The tic (18.4: answers a difficult question by naming a dead soldier) is
+# NOT SPENT here - M1.8.S90.050 keeps it, and this would have been its sixth outing. The
+# empty slot at .040 is the strongest use the device has had: Voss has just counted marks
+# that are names, and the man who counts names says nothing.
+# I DID NOT COPY brick_bunk.040. That scene inverts the tic by having him ASK for names.
+# This one does not touch names as a verb at all: Voss counts, Brick shuts a lid. Different
+# mover, different verb, and the two scenes read as one man twice rather than one move twice.
 #
-# *** THE TIC IS NOT BEING RE-RUN. ***
-# In M1.4 and M1.6 the three names arrive INSTEAD of an answer. Here the name IS the answer -
-# it is literally responsive to the question Voss asked, and it is the only line in act 1
-# where that is true. The difference is the whole scene and no line points at it. The M1.8
-# writer spends the deflection for good in M1.8.S90.050; nothing here touches that, because
-# this is not a deflection.
+# *** THE SECOND ASK IS A MEASUREMENT, AND IT DEPENDS ON NO OTHER SCENE. ***
+# 8.3: a Voss hub line that could be "Go on" is not a Voss line.
+#   .010 measures a SENTENCE - the flat, exact, kept way Brick gave the number at the cars,
+#        which is how a manifest gives a number. That is the mara_letters.040 move: he does
+#        arithmetic on a person and hands them the result. It closes on two words, "Exact,
+#        and kept", and the second one is about a man rather than a figure. Nobody says so.
+#        AN EARLIER DRAFT CLOSED ON "Somebody counted." AND I CUT IT: M1.6.S99.060 gives Dex
+#        "Somebody counted that twice" in the debrief of the mission that opens this gate, so
+#        the player could hear the pair inside one sitting. Class 4 (BEATS_HUB_A1 8.6),
+#        caught by sweeping the corpus for my own lines before shipping them.
+#   .030 measures a COUNT AGAINST A COUNT - more marks on that frame than this cell has lost.
+#        It fixes no number, states no head count, and needs no prior scene: the frame is in
+#        the shot. A player who saw brick_bunk gets a second floor under it for free; a player
+#        who skipped it loses company, never comprehension (BEATS_HUB_A1 section 6).
+#   AN EARLIER DRAFT OF .030 SAID "than I gave you names for" AND I CUT IT: brick_bunk is
+#   optional, so that line asserts an event that may never have happened. Flagged in the
+#   report rather than shipped.
+# DECLARED RHYME, NOT A COLLISION: M1.6.S03.090 is VOSS - "The list goes up with the car.
+# Nobody reads anything tonight." Four scenes later BRICK says a frame is not for reading,
+# about a list of names he keeps himself. Different mouths, different objects, opposite
+# meanings, and the second one is only audible if the first landed. Left in on purpose.
+# NO NUMERAL IS SPOKEN. "Seventeen" is not said - M1.6.S03.220 owns it and this scene does
+# not re-price it. No head count, in a line or in a shot. sela_intake.010 owns that number.
 #
-# .010:      the want, and it is about a rule of the room rather than about Brick. 18.4 says
-#            he never speaks first in a group, and M1.6.S01.140 is the one time he did.
-# .020:      a fact about rolling stock offered instead of a fact about himself. It is a real
-#            answer to a question nobody asked and it is how this man changes the subject.
-# .050:      Voss gives him work rather than sympathy, in eight words, and does not look at
-#            him while he does it. That is the whole of the game's idea of tenderness.
-# eleven:    L1-R14 checked. Not used, and no duration is stated - M1.6.S03.220 already owns
-#            the seventeen days and this scene does not re-price them.
-# omitted:   what the Tithe is, what happened to Tam, an apology, a reaction, and any second
-#            beat after .040. See report.
+# *** THE PAYOFF IS A SENTENCE THE PLAYER ALREADY OWNS, PERFORMED. ***
+# M1.6.S01.140: "They water them at the yard. Not before." He has been doing it before, all
+# night, for people he will not talk about. Neither man says the word water, nobody says
+# Tithe, and no line points at any of it. The cups are in frame from .010 so the closing is a
+# change of SCALE rather than a reveal - the player has been looking at the answer for the
+# whole scene without a meaning attached to it.
+# interrupt: NONE, and it is not an oversight. 18.7 asks for one interruption per
+#            multi-character scene; a scene whose content is that one man will not speak
+#            cannot contain a man being cut off. Voss cannot interrupt a four-word refusal
+#            and Brick interrupting anybody would be a different character. Precedent:
+#            brick_bunk carries seven lines with no dash and L1 ruled that file unchanged.
+#            18.7's player input does not apply either - four turns, well under six.
+#            ESCALATED IN THE REPORT so the critic does not have to find it.
+# closings:  THIS FILE KEEPS THE STILLNESS on its heaviest line (.040) - one of the five
+#            permitted by 8.2 (i), and here the refusal and the image are the same thing.
+#            LAST IMAGE CONTAINS NEITHER SPEAKER: the floor and the cups.
+# omitted:   Tam, any name, any numeral, what the Tithe is, what the seventeen days were, an
+#            apology, a reaction, the word water in any mouth, and any second beat after the
+#            refusal. See report.
 
 lines:
   - id:      HUB.A1.brick_the_tithe.010
     speaker: VOSS
     voice:   voss
-    text:    "You went first at the map table. Nobody in that room had ever heard you go first."
-    shot:    "Bunk row, days after the yard. Brick is re-seating a bolt on somebody else's rifle and has not asked whose it is."
+    text:    "You said that number at the cars like it came off a manifest. Exact, and kept."
+    shot:    "Bunk row, late, the night the vault filled up. He is sitting on the end frame with a can between his boots and a stack of tin cups beside him, and there are fewer cups in the stack than there were an hour ago. Voss has been standing there a while."
+    note:    "THE WANT, and it is a measurement rather than a question (8.3). He heard a number delivered the way a document delivers one, and he prices it in two words: exact means somebody was counting, kept means somebody is still carrying it. The numeral itself is never spoken - M1.6.S03.220 owns it. An earlier draft closed on 'Somebody counted.' and I cut it: M1.6.S99.060 gives Dex 'Somebody counted that twice' in the debrief of the mission that opens this gate."
 
   - id:      HUB.A1.brick_the_tithe.020
     speaker: BRICK
     voice:   brick
-    text:    "Cars are the same on every line."
-    note:    "A true fact about rolling stock, offered in place of a fact about himself. Nothing in it is a lie (18.4) and nothing in it is an answer."
+    text:    "It stays in the car."
+    shot:    "He fills the cup in his hand and sets it with the ones that are already full."
+    note:    "REFUSAL ONE, and it is not a deflection - he offers no other subject, no fact about rolling stock, nothing to follow up. He answers where the thing is kept instead of what it is. Five words, no lie in any of them (18.4)."
 
   - id:      HUB.A1.brick_the_tithe.030
     speaker: VOSS
     voice:   voss
-    text:    "That isn't what I asked."
+    text:    "More marks on that frame than this cell has lost."
+    shot:    "The underside of the bunk above him is scratched over in letters that are wrong and deep. Voss is counting them, not reading them."
+    note:    "THE SECOND ASK, and it is a count against a count rather than a repeat (8.3). It fixes no number, states no head count, and stands on its own: the frame is in the shot. The old .030 - 'That isn't what I asked.' - is gone; mara_map_table.020 has that line and got there first."
 
   - id:      HUB.A1.brick_the_tithe.040
     speaker: BRICK
     voice:   brick
     tags:    [pause]
-    text:    "Tam went in my place."
-    shot:    "He does not stop working. He does not look up. Nothing in the room reacts and no line follows it."
-    note:    "*** AR-11 PAID IN FULL, IN FIVE WORDS. *** Tam is one of the three names the player has heard twice (M1.4.S03.040, M1.4.S99.180) without ever learning what they were. No new proper noun. And the tic is not being re-run: here the name IS the answer to the question that was asked, which is true of no other Brick line in act 1."
-
-  - id:      HUB.A1.brick_the_tithe.050
-    speaker: VOSS
-    voice:   voss
-    text:    "Next one that moves people, you're on it."
-    shot:    "He says it to the rifle, not to Brick, and goes. Brick finishes the bolt."
-    note:    "Work instead of sympathy, in eight words, and neither man looks at the other. Nobody says Tam again in act 1."
+    text:    "That frame isn't for reading."
+    shot:    "He does not look up and he does not stop. Voss stands there for the length of one breath and goes. On the way out the bunk row opens onto the vault floor, and there is a full tin cup on the ground beside every person lying on it, and none of them were there this morning. LAST IMAGE: the floor and the cups. Neither man is in it."
+    note:    "*** REFUSAL TWO, AND THE SLOT WHERE A NAME WOULD GO IS LEFT EMPTY. *** Voss has just counted marks that are names; the man whose whole device is naming the dead says nothing, so the tic survives intact into M1.8.S90.050. He shuts the object rather than the subject, which is a door with no handle on Voss's side. HEAVIEST LINE - it keeps the stillness (8.2 (i)), one of five permitted, because here the refusal and the image are the same thing. The payoff is M1.6.S01.140 done instead of said, and nobody connects it out loud."

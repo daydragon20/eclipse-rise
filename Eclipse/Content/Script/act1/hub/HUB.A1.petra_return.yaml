@@ -16,9 +16,9 @@ turn:         "He picks up the spoon, nobody says anything about it, and that is
 # ---- state ----
 status:          draft
 critic:          "GO op 18.9 (scene) -- GEHOUDEN op de reeks. REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
-words:           107
-words_heard:     107
-words_generated: 145
+words:           72
+words_heard:     72
+words_generated: 72
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      PETRA VOSS, VOSS
@@ -77,115 +77,131 @@ words_generated: 145
 #            removing five of them is worth more than their word count. Petra may take back
 #            up to 20 words; the scene still ends cheaper than it started.
 
-# ---- dialogue-writer notes (L2) ----
-# band:      `hub` (12-35) as a ceiling. Longest 16 w (.030). Register reached at .010, .030,
-#            .060 and .090. Spread 2 w (.100 "How long?") to 16 w = 8x.
+# ---- dialogue-writer notes (L2) — REBUILT 2026-08-01 AGAINST THE FORM B CONTRACT ----
+# band:      `hub` (12-35) as a ceiling. Longest 16 w (.030). Register reached at .010 (12),
+#            .030 (16) and .090 (13). Spread 3 w (.095) to 16 w = 5.3x.
+# ids:       .020 .040 .060 .080 .100 ARE RETIRED, exactly as the L1 block instructs. They do
+#            not appear below and they will never be reused. .095 is the one new line and it
+#            sits in a gap that a retired id opened, so nothing renumbered.
+# budget:    HAND-COUNTED, NO SHELL IN THIS ROUND. 107 written words -> 72. words_generated
+#            145 -> 72, a refund of 73, because every word removed was a Voss word and Voss
+#            doubles for player gender. Petra took back 4 of the 20 she was allowed; the rest
+#            of the allowance is unspent and I am not spending it to hit a quota.
+#            Counts are whitespace tokens, validate_script.py's own rule (`len(txt.split())`).
+#            count_generation_cost.py is authoritative and nobody has run it on this file.
 #
-# *** THE PRONOUN REGEX, WHOLE-FILE. ***
-# Zero occurrences of "you" or "your" in any text: field in this file - hers AND his. The
-# M1.8.S04 writer held the same line across a whole scene and the reasoning carries: the word
-# stays scarce around this woman, so nothing anybody says near her competes with Mara's one
-# use of it in M1.8.S08. Voss's five lines are built round it without strain ("There's a
-# bunk", "Nobody's asking"), which is the test that it is not a cage.
-# Petra additionally uses no "I" and no "we", names nobody, and never once uses his name or a
-# callsign (L1-R10). SCOPE: text: fields. This comment block uses the words in prose.
+# *** SEVEN LINES, EIGHT ANSWERS, AND NOT ONE OF THE ANSWERS IS A SENTENCE. ***
+# The rule I wrote the file against: A PETRA LINE MAY ONLY BE ANSWERED BY A BODY. Each `shot:`
+# below states what he does and the next line is her reply to that, so the scene reads as a
+# conversation with one voice in it rather than a woman issuing orders into a room.
+#   .010  he sets a folded blanket on the crate beside her    -> the whole want, staged
+#   .030  he takes the blanket back and lifts the tally board -> "the list says they ate"
+#   .050  he goes, finds three, comes back, starts to reach   -> the sentence he cannot say
+#   .070  he brings the salt and stands in her way            -> the last attempt at stopping her
+#   .090  she takes the salt off him. THE SPOON.              -> PLAYER BEAT
+#   .095  he lowers the flame and looks up                    -> the question he never asks
+#   .110  he asked nothing                                    -> she answers it anyway
+#   .120  she is gone before the line ends                    -> hold on him
+# The old file put the want in .020 ("There's a bunk behind the gallery with nobody in it").
+# THE BLANKET SAYS IT CHEAPER AND WORSE, which is the point: he cannot say it, so he does it,
+# and she moves it off the crate herself on the next beat without one word about it.
+#
+# *** THE PRONOUN REGEX, WHOLE-FILE - AND IT IS NOW TRIVIALLY TRUE. ***
+# Zero occurrences of "you" or "your" in any text: field, because there is only one speaker
+# and she never uses them. Petra additionally uses no "I", no "we", names nobody, and never
+# once uses his name or a callsign (L1-R10). Mara's single "you" in M1.8.S08 sits four scenes
+# from here in a vacuum, which is what AR-5b is protecting. SCOPE: text: fields only.
 #
 # *** BRICK vs PETRA, DEMONSTRATED. ***
-# He hands you a noun, she hands you a verb (18.4). Every one of her seven lines opens on a
-# verb or lands on one - Fill, Take, Go and look, Get the salt, Stir it, Roll the sleeves -
-# and the one line that starts with a noun (.090) turns into an instruction inside four
-# words. Read .070 against M1.8.S09.110 ("Coats."): same length, same room, and neither is
-# deliverable by the other person.
+# He hands you a noun, she hands you a verb (18.4). Every one of her eight lines opens on a
+# verb or lands on one - Fill, Take, Go and look, Get, Stir, Lower, Roll - and the one line
+# that starts with a noun (.090) turns into an instruction inside four words. Read .070
+# against M1.8.S09.110 ("Coats."): same length, same room, and neither is deliverable by the
+# other person.
 #
-# the tic:   fires three times and never as a refusal. .030 answers an offer of a bed with
-#            three people at the far end. .070 answers a sentence he cannot finish with the
-#            salt shelf. .090 answers his last attempt at making her stop by handing her the
-#            largest job in the room.
-# .060/.070: 18.7's required interruption, and it is the whole scene. He starts the only
-#            emotional sentence either of them attempts and she cuts it off with a condiment.
-#            She does not refuse it, disapprove of it, or acknowledge it. She gives him
-#            something to do with his hands instead, which is the only comfort she has.
-# .100:      TWO WORDS AND IT IS THE TURN. He stops trying to make her rest and asks how long
-#            to stir a pot. That is the stub's "and that is how they both survive the week",
-#            and it is written as a question about cooking.
-# .120:      the last line and it is a woman rolling up a grown man's sleeves in her kitchen
-#            without touching him or saying so. Nothing that was done to her is named, K-77
-#            is not mentioned, and nobody thanks anybody.
+# the tic:   fires three times and never as a refusal. .030 answers a blanket with three
+#            people at the far end. .070 answers a hand reaching for her with the salt shelf.
+#            .090 answers a man standing in her way by handing him the largest job in the room.
+# .050:      SHE OVERRULES A DOCUMENT WITH A LOOK. He holds up Reyes's tally board; she does
+#            not read it. This is the same beat as the old .040/.050 pair and it is better
+#            without his line, because a written list refuted by "Go and look" is a sharper
+#            picture than a spoken one.
+# .070:      the interruption that 18.7 requires, carried entirely by staging under the L1
+#            exemption. He gets a hand as far as her arm. She does not refuse it, disapprove
+#            of it, or acknowledge it - she gives his hands something else, which is the only
+#            comfort she has. Verb first: Brick would have said "Salt."
+# .090:      THE TURN, and it is a spoon. The stub's "that is how they both survive the week",
+#            written as a cooking instruction and performed by the player.
+# .095:      NEW LINE, three words, and it is the smallest thing in the file. It is also the
+#            only moment she looks at what he is doing instead of at what needs doing - the
+#            nearest thing to affection this woman has, and it is a note about a flame. It
+#            carries the spread on its own (16/3) now that "How long?" is gone.
+# .110:      she answers the question he did not ask. He looked up from the pot once, and she
+#            read it. Nothing in the file marks this and nobody remarks on it.
+# .120:      a woman rolling up a grown man's sleeves in her kitchen without touching him and
+#            without saying so. No thanks are offered and none would be accepted. Nothing that
+#            was done to her is named, here or in any later act.
+# closings:  HOLD ON VOSS (8.2 (ii)). She is out of frame before the last word. Nothing in
+#            this file says "does not look up", "does not stop" or "goes back to" - the old
+#            .120 shot carried "she does not stop" and it is gone. Audited line by line.
 # aftermath: ZERO comic beats (18.6). Audited.
 # eleven:    L1-R14 checked. Not used. Nine and six are not used either.
-# omitted:   thanks, an embrace, a question about the cell, any mention of Mara, and any line
-#            in which either of them says that the other should be resting instead. See
-#            report.
+# omitted:   thanks, an embrace, a question about the cell, any mention of Mara, any mention
+#            of the lift, and any line in which either of them says that the other should be
+#            resting instead. See report.
 
 lines:
   - id:      HUB.A1.petra_return.010
     speaker: PETRA
     voice:   petra
     text:    "Water line runs dry at the second horn. Fill everything before then."
-    shot:    "The corner of the vault that has become a kitchen because she stood in it. A pot, a burner, two crates and a queue that has not formed yet."
-    note:    "Her first line back in the base is a task, and it is about a pipe. She has been here under a day and already knows the shift horns."
-
-  - id:      HUB.A1.petra_return.020
-    speaker: VOSS
-    voice:   voss
-    text:    "There's a bunk behind the gallery with nobody in it."
-    note:    "The want, and he never states it more directly than this. No second person anywhere in it."
+    shot:    "The corner of the vault that has become a kitchen because she stood in it. A pot, a burner, two crates and a queue that has not formed yet. HIS ANSWER: he sets a folded blanket on the empty crate beside her and pushes it an inch towards her. That is all he came to say and he does not say it."
+    note:    "Her first line back in the base is a task, and it is about a pipe. She has been here under a day and already knows the shift horns. The blanket is the entire want (18.7) and it costs no words."
 
   - id:      HUB.A1.petra_return.030
     speaker: PETRA
     voice:   petra
     text:    "Three at the far end have not eaten since the ramp. Take a bowl to each."
-    note:    "THE TIC. An offer of a bed comes back as three people and a job. The ramp is M1.8.S09 and she does not say the word K-77."
-
-  - id:      HUB.A1.petra_return.040
-    speaker: VOSS
-    voice:   voss
-    text:    "Reyes has a list of who's eaten."
+    shot:    "HIS ANSWER: he takes the blanket back off the crate, tucks it under his arm, and lifts Reyes's tally board off its nail so she can see the marks on it."
+    note:    "THE TIC. A bed comes back as three people and a job. The ramp is M1.8.S09 and she does not say the word K-77. He answers a task with a document, which is the most his side of the family can manage."
 
   - id:      HUB.A1.petra_return.050
     speaker: PETRA
     voice:   petra
     text:    "The list has them fed. Go and look."
+    shot:    "She does not read the board. HIS ANSWER: he goes. He comes back a long minute later with three empty bowls, sets them down, stops in front of her and starts to put a hand on her arm."
+    note:    "She overrules a written record with a look, in eight words. Better than the old version, where she was refuting a sentence: a tally board that is wrong is a picture, and nobody has to say what it means about who is doing the counting."
 
-  - id:      HUB.A1.petra_return.060
-    speaker: VOSS
-    voice:   voss
-    text:    "Nobody expected any of this. When the lift came up I thought--"
-    note:    "The only emotional sentence either of them attempts, and he does not get to the end of it. Nobody in this game finishes that sentence."
-
-  - id:         HUB.A1.petra_return.070
-    speaker:    PETRA
-    voice:      petra
-    interrupts: true
-    text:       "Get the salt. Shelf above the pipe."
-    note:       "18.7's required interruption, and it is the fingerprint doing the work. She does not refuse the sentence, disapprove of it or acknowledge it - she gives his hands something else. Verb first: Brick would have said 'Salt.'"
-
-  - id:      HUB.A1.petra_return.080
-    speaker: VOSS
-    voice:   voss
-    text:    "Nobody's asking for any of this tonight."
+  - id:      HUB.A1.petra_return.070
+    speaker: PETRA
+    voice:   petra
+    text:    "Get the salt. Shelf above the pipe."
+    note:    "18.7's required interruption, carried by staging under the L1 exemption - the hand never lands. She does not refuse the gesture, disapprove of it or acknowledge it; she gives his hands something else. Verb first: Brick would have said 'Salt.'"
 
   - id:      HUB.A1.petra_return.090
     speaker: PETRA
     voice:   petra
     text:    "Second pot on the burner. Stir it, and do not let it catch."
-    note:    "THE TIC, third firing, and it is the turn arriving: his last attempt at stopping her is answered with the biggest job in the room."
+    shot:    "HIS ANSWER: he comes back with the salt and does not hand it over, standing between her and the queue. She takes it out of his fist on her way past without breaking step. PLAYER BEAT (18.7): the spoon is lying across the second pot and she is already three crates down the line. This is the scene's only input and it is a hand, not a sentence."
+    note:    "*** THE TIC, THIRD FIRING, AND IT IS THE TURN ARRIVING. *** His last attempt at stopping her is answered with the biggest job in the room, and the player performs the answer. The stub's 'that is how they both survive the week', written as a cooking instruction."
 
-  - id:      HUB.A1.petra_return.100
-    speaker: VOSS
-    voice:   voss
-    text:    "How long?"
-    shot:    "He has taken the spoon. Neither of them remarks on it and the camera does not hold on either face."
-    note:    "*** THE TURN, IN TWO WORDS. *** He stops trying to make her rest and asks how long to stir a pot. That is the stub's 'that is how they both survive the week', written as a question about cooking."
+  - id:      HUB.A1.petra_return.095
+    speaker: PETRA
+    voice:   petra
+    text:    "Lower the flame."
+    shot:    "HIS ANSWER: he turns the burner down and looks up from the pot. Once."
+    note:    "The smallest line in the file and the only moment she looks at what he is doing instead of at what needs doing. Three words. It is also the whole of the spread now that 'How long?' is retired."
 
   - id:      HUB.A1.petra_return.110
     speaker: PETRA
     voice:   petra
     text:    "Until it stops smelling like water."
+    shot:    "He has asked nothing. He is still looking at her."
+    note:    "SHE ANSWERS A QUESTION HE NEVER ASKS. He looked up from the pot once and she read it off him. 18.4 at full strength, and the only place in act 1 where somebody knows this man without making him speak. Nothing in the file marks it."
 
   - id:      HUB.A1.petra_return.120
     speaker: PETRA
     voice:   petra
     text:    "Roll the sleeves. Both, above the elbow."
-    shot:    "She says it going past him with the bowls. She does not touch him and she does not stop. Last line of the scene; hold on the pot."
-    note:    "A woman rolling up a grown man's sleeves in her kitchen without touching him and without saying so. No thanks are offered and none would be accepted. Nothing that was done to her is named, here or in any later act."
+    shot:    "She says it going past him with the bowls and is out of frame before the last word. No hand on his shoulder. HOLD ON VOSS: the burner, the spoon, both sleeves going up above the elbow, alone in the corner she made."
+    note:    "A woman rolling up a grown man's sleeves in her kitchen without touching him and without saying so. No thanks are offered and none would be accepted. Nothing that was done to her is named, here or in any later act. The camera stays with him (8.2 (ii)), which it is allowed to do exactly once in the twelve."
