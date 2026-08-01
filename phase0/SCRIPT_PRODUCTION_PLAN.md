@@ -110,6 +110,34 @@ M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
 
 ## 4. De sprintkalender
 
+> ### STAND 01-08 MIDDAG — de kalender liep achter op de werkelijkheid
+>
+> Twee rijen hieronder waren onwaar geworden, en één ervan draagt een afhankelijkheid die
+> **de owner zelf heeft geschrapt** (OBS-5, 31-07 21:01): *"er zat een valse afhankelijkheid
+> in het plan. Massaproductie wachtte op de ijkmissie-gate, die op stemgeneratie, die op de
+> scopes. Een ontbrekend vinkje hield daardoor AL het schrijfwerk tegen, terwijl schrijven
+> geen credit en geen API-aanroep kost."*
+>
+> **Wat er in werkelijkheid staat:**
+>
+> | | |
+> |---|---|
+> | **L2 act 1** | **KLAAR.** 71 bestanden, 1.623 regels, alle acht missies + proloog + 12 hub-gesprekken. Niet "vanaf gate L0" — ruim ervóór, precies zoals OBS-5 voorschreef. |
+> | **Ijkmissie M1.1** | **DOOR DE POORT.** 7 van 7 GO na drie critic-rondes. |
+> | **Critic-gate** | 21 GO · 4 NO-GO · 46 nog te beoordelen. |
+> | **Gate L0** | **niet gehaald, en niet om een schrijfreden.** De generatie is afgeblazen met **0 credits** omdat drie stem-ID's op twee rollen staan. Owner-kaart **O-16**. |
+> | **Tier 0 casting** | fase 1 klaar (104 kandidaten, 0 credits) + een voorstel van tien stemmen met 19 previews. Wacht op één knop. |
+> | **Begroting** | act 1 kost **97.275** gemeten, niet de 65.015 uit een eerdere telling die zes van de acht missies telde. Saldo 125.612. |
+>
+> **Dagen tot de werkdeadline (19-08): 18.** Spoor A loopt daarmee **vóór** op deze kalender
+> voor het schrijven en **achter** op de stem — en die achterstand is één owner-klik groot.
+>
+> *De rijen hieronder zijn de oorspronkelijke planning van 31-07. Ze blijven staan omdat de
+> redenering eronder (waarom 19-08 en niet 21-08, waarom lagen per act locken) nog klopt.
+> **Lees ze als plan, niet als stand.***
+
+
+
 **De credits vervallen op 21 augustus 2026** (owner-bevestigd 31-07) en rollen niet door. Dat zijn 21 dagen. **Werkdeadline is 19 augustus** — twee dagen buffer, want een mislukte batch op de laatste avond is niet meer over te doen.
 
 | Datum | Spoor A (schrijven & stem) | Spoor B (systemen & feel) |
