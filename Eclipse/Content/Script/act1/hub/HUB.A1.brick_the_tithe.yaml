@@ -14,7 +14,7 @@ turn:         "He says the name of the man who was taken off Krad-9 in his place
 
 # ---- state ----
 status:          draft
-critic:          null
+critic:          "NO-GO: .040 (Tam went in my place) spreekt M1.6.S03.220, M1.6.S01 en M1.8.S02 tegen -- Brick IS meegenomen; de bron is het turn-veld van de stub, niet de schrijver. Plus: de want is al beantwoord voor de scene speelt, en .030 dupliceert mara_map_table.020. Ook los van de REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
 words:           42
 words_heard:     42
 words_generated: 72
