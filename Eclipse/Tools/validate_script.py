@@ -914,6 +914,27 @@ class Validator:
         register = self.canon["register"]
         run_facts = self.canon["run_facts"]
 
+        # WELKE WAARDEN KENT EEN SCENE? Een `silence:`-blok noemt een BLAD, niet
+        # de vlag waar dat blad bij hoort. Leest een scene twee vlaggen, dan kan
+        # de controle hieronder niet weten welke bedoeld is -- en meldde hij
+        # `silence: none` als onbekend omdat de ANDERE vlag die waarde niet kent.
+        # Dat gebeurde op 02-08 met M1.8.S99, dat zowel `story.m15_pact`
+        # (full/limited/none) als `story.m15_shiftboss` (killed/prevented/warned)
+        # leest. Het blok was juist; de tool was dubbelzinnig.
+        #
+        # Daarom telt een waarde als bekend zodra EEN gelezen vlag hem kent. Dat
+        # is precies zo streng als een veld zonder vlagnaam kan zijn. Wil je
+        # strenger, dan moet `silence:` de vlag noemen -- dat is een
+        # formaatwijziging en die hoort bij L1, niet hier.
+        self.scene_universum: dict[str, set] = defaultdict(set)
+        for _n, _f in self.facts.items():
+            _row = register.get(fact_key(_n))
+            _u = ({v for _, v, _, _ in _f.setters}
+                  | {v for _, _op, v, _ in _f.readers if _op in ("==", "!=")}
+                  | set(_row.leaves if _row else ()))
+            for _sc in _f.scene_reads:
+                self.scene_universum[_sc] |= _u
+
         for name, f in sorted(self.facts.items()):
             row = register.get(fact_key(name))
             declared = name in run_facts
@@ -1028,10 +1049,11 @@ class Validator:
                          f"`silence: {val}` staat in de kop maar die tak WORDT bespeeld "
                          f"in deze scene. Een verouderde stilte dekt de volgende echte "
                          "omissie af; haal hem weg.")
-            for val in sorted(set(verklaard) - universe):
+            for val in sorted(set(verklaard) - self.scene_universum.get(scene, universe)):
                 self.add("SILENCE", scene,
-                         f"`silence: {val}` staat in de kop maar `{name}` kent die waarde "
-                         f"niet. Bekend: {sorted(universe)}.")
+                         f"`silence: {val}` staat in de kop maar GEEN vlag die deze scene "
+                         f"leest kent die waarde. Bekend hier: "
+                         f"{sorted(self.scene_universum.get(scene, universe))}.")
 
             echt_gemist = gemist - set(verklaard)
             if len(positive) >= 2 and echt_gemist:
