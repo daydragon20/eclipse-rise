@@ -22,32 +22,32 @@
  ],
  "vragen": [
   {
-   "id": "O-12",
+   "id": "O-20",
    "prio": "nu",
-   "vraag": "2.475 credits zijn op het verkeerde model gegaan — opnieuw doen, en hoeveel?",
-   "waarom": "Je hebt de API-scopes aangezet terwijl een agent aan het werk was. Goed nieuws: de generatie is daarmee open, eleven_v3 is bevestigd beschikbaar, en het saldo is nu ECHT te meten. Slecht nieuws: precies daardoor ging de rem eraf midden in een run, en die run draaide op het verkeerde model. 51 auditieclips zijn gegenereerd op multilingual_v2 in plaats van eleven_v3, en 21 daarvan dragen audio-tags die v2 niet kan. De agent had die controle als WAARSCHUWING geschreven in plaats van als poort, en zag hem niet omdat de uitvoer werd weggegooid. Dat is nu een harde poort (exit 6) en geverifieerd weigerend; het standaardmodel is eleven_v3. DE SCHADE IS GEMETEN EN NIET GESCHAT: zelfde stem, zelfde regel, tag weg — 4,44 s met tag tegen 2,14 s zonder. Een uitschieter van 2,30 s op een basis van 2,14 s is veel meer dan een woord uitspreken, dus v2 doet iets groots en onbedoelds met die haakjes. Wat precies — de tag voorlezen of de voordracht veranderen — scheidt die meting NIET, en dat wordt ook niet geclaimd. Wat wel vaststaat: die 21 clips zijn geen eerlijke basis voor een permanente castingbeslissing. Je saldo staat gemeten op 125.612 en de ledger klopt tot op de credit.",
-   "stappen": [
-    "Kies hoeveel er opnieuw moet",
-    "Bij twijfel: alles opnieuw — dan vergelijk je 17 finalisten op precies hetzelfde model"
-   ],
+   "vraag": "Licentiecontrole op tien stemmen — dit is het enige dat nog tussen jou en audio staat",
+   "waarom": "De poort staat GROEN (exitcode 0) en 63 scènes / 85.354 credits staan klaar. Er is nog één ding, en het is owner-werk omdat ik het niet kan: 19_voice_production.md eist dat de COMMERCIËLE LICENTIE met de hand op de stemkaart wordt gelezen voor er iets mee gegenereerd wordt.\n\nIk genereer geen seconde audio voor jij dit hebt afgevinkt. Niet uit voorzichtigheid maar omdat casting onomkeerbaar is: blijkt één stem achteraf niet commercieel bruikbaar, dan is elke regel die eronder gegenereerd is verloren geld — en voor Mara alleen zijn dat er 332.\n\nDE TIEN LINKS, klaar om te openen:\n\n  dominion_conscript:B       Miguel - American English - Clear and Yout https://elevenlabs.io/app/voice-library?voiceId=6UZ6Y6OSl14UA2aOxuMM\n  eclipse_fighter:B          Michael - Gruff and Serious                https://elevenlabs.io/app/voice-library?voiceId=iPYqcpY8j8Ap4jUf28I3\n  eclipse_fighter:C          Beth - Bold and Smooth Narrator            https://elevenlabs.io/app/voice-library?voiceId=y3UNfL9XC5Bb5htg8B0q\n  eclipse_fighter:D          Arric - Steady and Deadpan                 https://elevenlabs.io/app/voice-library?voiceId=AOLUVLMs1jzrUpQeAea8\n  iron_chorus_emissary:-     Marcus K - Calm Documentary Narrator       https://elevenlabs.io/app/voice-library?voiceId=3H55HGnNE1XjYxigHSAS\n  kaine:-                    Eryn – Strong Female Military Commander    https://elevenlabs.io/app/voice-library?voiceId=wa4sQVgbDDzUDEzJwch3\n  kaya:-                     Veronica - Sassy and Energetic             https://elevenlabs.io/app/voice-library?voiceId=ejl43bbp2vjkAFGSmAMa\n  petra:-                    Blue - Low, Calm with Grit                 https://elevenlabs.io/app/voice-library?voiceId=YGWwh1G8pUwWmJyCCpma\n  torren:-                   Onyx – Calm & Friendly Podcast Narrator    https://elevenlabs.io/app/voice-library?voiceId=An7r4HL8TAw73K5uSMpy\n  veil_operative:B           Madison Ray - Sharp News Anchor            https://elevenlabs.io/app/voice-library?voiceId=FyrYFW3P9GUxA348YGWu\n\nKijk per stem naar 'commercial use' of 'licensing' op de kaart. Duurt ongeveer een minuut per stem.",
+   "stappen": "1. Open de tien links hierboven.\n2. Lees per stem de licentie op de stemkaart.\n3. Zeg hieronder of ze allemaal mogen, of welke niet.",
    "opties": [
     {
-     "label": "Alleen de 21 getagde clips opnieuw",
-     "waarde": "21",
-     "gevolg": "1.439 credits. Tier 0 komt daarmee op 3.959 van de 6.000. Nadeel: je vergelijkt straks clips van twee verschillende modellen naast elkaar, en dat is precies wat een castingoordeel vertroebelt."
+     "label": "Alle tien mogen commercieel",
+     "waarde": "alle_tien_ok",
+     "toelichting": "Ik begin meteen met genereren.",
+     "gevolg": "Tier 1 barks en daarna act 1. Eerste batch is M1.1 zodat je de ijkmissie kunt horen."
     },
     {
-     "label": "Alle 51 opnieuw op eleven_v3",
-     "waarde": "51",
-     "gevolg": "2.470 credits. Tier 0 komt op 4.990 van de 6.000, dus nog steeds binnen het plafond. Alle 17 finalisten op een model, eerlijke vergelijking. Dit is mijn advies."
+     "label": "Eén of meer mogen niet — ik zeg welke",
+     "waarde": "gedeeltelijk",
+     "toelichting": "Vertel welke, dan zoeken we vervangers voor die rol.",
+     "gevolg": "Ik genereer alleen wat wel mag, en zet een kaart klaar voor de rollen die een nieuwe stem nodig hebben."
     },
     {
-     "label": "Niets opnieuw — ik oordeel op wat er ligt",
-     "waarde": "geen",
-     "gevolg": "Nul credits. Maar 21 van de 51 clips zijn dan op een model gemaakt dat de tags niet aankan, en casting is permanent — omcasten herbetaalt elke regel van dat personage."
+     "label": "Ik wil dat jij het eerst uitzoekt",
+     "waarde": "uitzoeken",
+     "toelichting": "Ik kan de kaarten niet openen zonder browsertoegang.",
+     "gevolg": "Dat kost een owner-actie (browsertoegang) en is dus langzamer dan zelf tien links openen. Generatie blijft tot dan stil."
     }
    ],
-   "advies": "Alles opnieuw. 2.470 credits is 2% van je budget, en casting is de enige beslissing die je niet goedkoop kunt terugdraaien.",
+   "advies": "Dit is een minuut of tien werk en het is het enige dat nog tussen jou en de eerste ingesproken regel staat. Negen van de tien komen uit de Voice Library, en dat is precies de categorie waar de licentie per stem verschilt.",
    "vrijtekst": true
   },
   {
@@ -74,41 +74,6 @@
    "advies": "Ongeveer 5 minuten.",
    "vrijtekst": false,
    "prio": "gauw"
-  },
-  {
-   "id": "O-15",
-   "prio": "gauw",
-   "vraag": "De vault is beloopbaar — vier kamers, en de vraag is of dit Hollow Point is",
-   "waarom": "Je basis was tot vannacht vier keer dezelfde drie dozen in een andere tint. Nu zegt elke kamer wat er gebeurt: de commandopost heeft de gestolen Dominion-kaarttafel, de barakken hebben elf bunks langs beide wanden met footlockers en een waslijn, de werkplaats heeft een loopkat met hijsblok, en de inlichtingenkamer heeft de enige kromme lijn in de hele vault. Plus de generator die hoest en de gedenkalkoof — een bank en drie kaarsen, en verder bewust niets, want die mag er nooit gekocht uitzien.\n\nEr is ook iets groters opgelost: DE VAULT WERD NOOIT GETEKEND. Het anker verbergt zichzelf, en een verborgen actor tekent zijn onderdelen niet — 175 blokken stonden er onzichtbaar. Rondlopen werkte, botsingen werkten, de tests waren groen. Alleen een camera vond het, en die was er nooit geweest.\n\nWAT IK AL WEET EN NIET AAN JOU VRAAG: het licht deugt niet, en dat is gemeten en geen gevoel. Het plafond rendert als absoluut zwart (nul over 144.000 pixels), dus een kamer 150 meter onder de grond leest als open naar de nacht. En de lampen zijn donkerder dan de vloer die ze verlichten — in de commandopost is de kaarttafel twintig keer helderder dan de lamp erboven. Dat repareer ik, daar hoef je niets over te vinden.\n\nWAT IK WEL AAN JOU VRAAG is het enige dat een meting niet kan: LEZEN DEZE VIER RUIMTES ALS JOUW BASIS? Mijn instrument zegt dat ze met 12% marge van elkaar te onderscheiden zijn. Het kan niet zeggen of ze aanvoelen als de plek waar elf mensen wonen die nee blijven zeggen.",
-   "stappen": [
-    "Open de vier frames (klikbaar): http://127.0.0.1:8377/Eclipse/Saved/Screenshots/WindowsEditor/HighresScreenshot00033.png",
-    "En 00034 (barakken), 00035 (werkplaats), 00036 (inlichtingen) — zelfde pad, laatste twee cijfers anders",
-    "Kijk niet naar het licht, dat weet ik al. Kijk of je gelooft dat hier iemand woont."
-   ],
-   "opties": [
-    {
-     "label": "Ja, dit is het — ga door",
-     "waarde": "ja",
-     "gevolg": "Ik repareer het licht en ga verder met de informatielaag erbovenop: slots, ETA's, bemanning."
-    },
-    {
-     "label": "De vorm klopt, de sfeer nog niet",
-     "waarde": "sfeer",
-     "gevolg": "Dan wordt de vault een eigen level met eigen atmosfeer. Dat haalt meteen het noodverband weg dat er nu in zit: hij ligt onder een mist die aan de oppervlakte geauthord is en op 150 m diepte ondoorzichtig is."
-    },
-    {
-     "label": "Een kamer klopt niet — zie tekstveld",
-     "waarde": "kamer",
-     "gevolg": "Zeg welke en wat je mist; die kamer krijgt een eigen ronde."
-    },
-    {
-     "label": "Nog niet gekeken",
-     "waarde": "later",
-     "gevolg": "Blijft staan. Het licht repareer ik ondertussen."
-    }
-   ],
-   "advies": "Kijk eerst naar de barakken (00034). Dat is de kamer waar de elf bunks staan, en als één frame moet bewijzen dat dit een thuis is en geen menu, is het die.",
-   "vrijtekst": true
   }
  ]
 }
