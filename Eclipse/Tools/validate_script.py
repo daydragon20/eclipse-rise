@@ -75,6 +75,42 @@ ROOT = ECLIPSE.parent
 SCRIPTS = ECLIPSE / "Content" / "Script"
 SCRIPT_FORMAT = ROOT / "phase0" / "SCRIPT_FORMAT.md"
 ACT1_OVERVIEW = ROOT / "phase0" / "beats" / "ACT1_OVERVIEW.md"
+
+
+def _overzichten() -> list:
+    """Alle ACTn_OVERVIEW.md. Act 1 is er altijd.
+
+    ELKE ACTE HEEFT ZIJN EIGEN OVERZICHT, en de registers hieronder lezen ze
+    ALLEMAAL. Tot 02-08 stond hier alleen ACT1_OVERVIEW als vast pad. Dat werkte
+    zolang er een akte was; zodra de eerste act-2-scene landt, is elke act-2-
+    locatie "onbekend" en elke act-2-vlag "niet geregistreerd" -- tientallen
+    bevindingen die geen van alle een defect zijn.
+
+    Dat is de gevaarlijkste soort ruis: hij komt precies op het moment dat er
+    nieuw werk landt, dus hij leert een schrijver dat de poort onbetrouwbaar is
+    op de dag dat hij hem het hardst nodig heeft. Gemeld door de act-2-architect
+    als RQ-2, met de juiste urgentie: dit hoort VOOR de eerste stub.
+    """
+    paden = sorted((ROOT / "phase0" / "beats").glob("ACT*_OVERVIEW.md"))
+    if not paden:
+        raise SourceShapeError("geen enkel ACTn_OVERVIEW.md in phase0/beats")
+    return paden
+
+
+def _secties(kop: str) -> str:
+    """De genoemde sectie uit ELK overzicht, aan elkaar geplakt.
+
+    Een acte zonder die sectie levert niets en geen fout -- een nieuw overzicht
+    mag onaf zijn. De ondergrenzen verderop bewaken dat het TOTAAL nog ergens
+    op slaat.
+    """
+    delen = []
+    for pad in _overzichten():
+        try:
+            delen.append(_section(pad.read_text("utf-8"), kop))
+        except Exception:
+            continue
+    return "\n".join(delen)
 INDEX = ROOT / "00_INDEX.md"
 VOICE_PRODUCTION = ROOT / "19_voice_production.md"
 EVENT_CATALOG = ECLIPSE / "Docs" / "EventCatalog.md"
@@ -171,10 +207,10 @@ def load_locations() -> set[str]:
     C-1 established that document has no district names, so section 7 is the
     canonical source until L4 lands.
     """
-    body = _section(ACT1_OVERVIEW.read_text("utf-8"), r"^#+ 7\. Locatieregister.*$")
+    body = _secties(r"^#+ 7\. Locatieregister.*$")
     locs = {m for m in re.findall(r"^\|\s*`([^`]+)`\s*\|", body, re.M)}
     if len(locs) < 10:
-        raise SourceShapeError(f"ACT1_OVERVIEW section 7: read {len(locs)} locations, expected >=10")
+        raise SourceShapeError(f"locatieregisters samen: {len(locs)} locaties, verwacht >=10")
     return locs
 
 
@@ -227,7 +263,7 @@ def load_flag_register() -> dict[str, RegisterRow]:
     veiligheidscontrole", and L1-R12 is the record of what happens when it is
     not used.
     """
-    body = _section(ACT1_OVERVIEW.read_text("utf-8"), r"^#+ 6\. Vlaggenregister.*$")
+    body = _secties(r"^#+ 6\. Vlaggenregister.*$")
     rows: dict[str, RegisterRow] = {}
     ambiguous: dict[str, list[str]] = defaultdict(list)
 
@@ -276,7 +312,7 @@ def load_flag_register() -> dict[str, RegisterRow]:
                 f"two register tags normalise to the same fact `{key}`: {sorted(set(tags))}. "
                 "The binder cannot pick one and will not guess.")
     if len(rows) < 15:
-        raise SourceShapeError(f"ACT1_OVERVIEW section 6: read {len(rows)} flags, expected >=15")
+        raise SourceShapeError(f"vlaggenregisters samen: {len(rows)} vlaggen, verwacht >=15")
     return rows
 
 

@@ -271,6 +271,8 @@ De telling loopt door: burgerslachtoffers laag **én** conscripten gespaard (§2
 ---
 
 ## 6. Vlaggenregister
+> **NAAMBOTSING GEREPAREERD 02-08, en dit is een OMKEERBARE keuze van de main-agent, geen architect-oordeel.** `Story.Beat.M25_Relay` en `Story.Choice.M25_Relay` normaliseren allebei naar het feit `m25relay`, en `validate_script.py` weigert dan te raden — terecht, want het zijn twee verschillende waarheden: *de relay is gebeurd* tegenover *wat er met de relay gebeurde*. Zolang die botsing er stond, kon geen enkele act-2-scene gevalideerd worden. De KEUZE is hernoemd naar `M25_RelayFate` omdat de beat-naam de conventie van act 1 volgt (`Story.Beat.M12_DeadDrop`). Vindt L1 een betere naam, dan is dit één zoek-vervang.
+
 
 **De kolom *gelezen door* is geen documentatie — hij is de veiligheidscontrole (L1-R12), en hij is bij het schrijven ingevuld, niet achteraf.** Een lege of vage cel is zelf een bevinding. Een cel die een ongebouwd systeem noemt in plaats van de scènes die er staan, is een lege cel met een jasje aan (L1-R39).
 
@@ -311,7 +313,7 @@ De telling loopt door: burgerslachtoffers laag **én** conscripten gespaard (§2
 |---|---|---|---|
 | `Story.Choice.M22_Krad.{Won,Armed}` | `story.m22_krad` = `won` \| `armed` | **M2.2.S05** | **M2.2.S06 (2 takken — de uitvoering)** · **M2.2.S99 (2 takken)** · **M2.9.S04** (wat Krad-9 stuurt) · **Brick in M2.2.S99 en act 3** · Sela-reputatie · act 3 coalitiepolitiek |
 | `Story.Choice.M23_Terms.{Paid,Owed}` | `story.m23_terms` | **M2.3.S04** | **M2.4.S02** (waarmee je de crew betaalt) · **M2.7.S01** · `LOY.kaya` · act 3 vlootkosten |
-| `Story.Choice.M25_Relay.{Kept,Burned}` | `story.m25_relay` | **M2.5.S06** | **M2.5.S99 (2)** · **M2.7.S02** (heeft Whisper nog een kanaal) · act 3 intel |
+| `Story.Choice.M25_RelayFate.{Kept,Burned}` | `story.m25_relay_fate` | **M2.5.S06** | **M2.5.S99 (2)** · **M2.7.S02** (heeft Whisper nog een kanaal) · act 3 intel |
 | `Story.Choice.M26_Carry.{Wounded,Records,Cache}` | `story.m26_carry` | **M2.6.S07** | **M2.6.S99 (3 takken)** · **M2.7.S03** · **M2.8.S01** (wat de Momentum-fase kost) · act 3 |
 | `Story.Choice.M27_Whisper.{Trusted,Refused}` | `story.m27_whisper` | **M2.7.S06** | **M2.7.S99 (2)** · **M2.9.S02** · act 3 espionage-arc · **act 4 AEGIS-beslissing en de *free*-optie van §2.10 — de verste lezer in het spel** |
 | `Story.Choice.M29_Ashline.{Broken,Bought,Spared}` | `story.m29_ashline` | **M2.9.S06** | **M2.9.S99 (3 takken)** · act 3 Tarsis-onrust · Sela-reputatie |
