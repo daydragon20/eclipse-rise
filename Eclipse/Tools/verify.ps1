@@ -227,6 +227,24 @@ if ($LASTEXITCODE -ne 0) { $Failures += "premissecontrole kan niet meer rood wor
 python "$Root\Tools\check_ruling_premises.py"
 if ($LASTEXITCODE -ne 0) { $Failures += "een ruling redeneert vanuit een poortstatus die de bestanden niet dragen" }
 
+# En de GETALLEN. In de nacht van 01 op 02-08 kozen VIER schrijvers onafhankelijk
+# "het enige vrije getal onder de twintig" om een botsing met L1-R14 op te lossen:
+# M1.1 nam achttien, M1.2 zestien, M1.6 zeventien, M1.5 opnieuw achttien. Elk had
+# GELIJK op het moment van meten, en alle vier de metingen waren de volgende
+# ochtend onwaar -- ze maten tegen een corpus dat in dezelfde nacht onder hen
+# veranderde. Twee schreven hun meting op als `note:`, en die notitie stuurt de
+# volgende schrijver verkeerd.
+#
+# De poort is smal met opzet. Hij oordeelt NIET dat twee gebruiken van een getal
+# een defect zijn -- L1-R33 heeft juist beslist dat herhaling geen defect is en
+# REFERENTDRIFT wel, en dat onderscheid kan geen tool maken. Hij vangt precies
+# een ding: een notitie die beweert dat een getal nergens gesproken wordt terwijl
+# de telling het tegendeel meet.
+python "$Root\Tools\check_spoken_numbers.py" --zelftest
+if ($LASTEXITCODE -ne 0) { $Failures += "getallencontrole kan niet meer rood worden" }
+python "$Root\Tools\check_spoken_numbers.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "een notitie noemt een getal vrij dat elders gesproken wordt" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"
