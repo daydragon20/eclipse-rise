@@ -14,7 +14,7 @@ turn:         "The last card stops describing a life and states a debt — eleve
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO (nieuwe grond; .100 is GESLAAGD en blijft woordelijk): L1-R47 is niet afgemaakt in het bestand dat de ruling draagt. r.57, r.94 en r.102 zeggen card 3 waar slot 3 bedoeld is, en r.57 overhandigt daarmee een systems-taak met een nieuwe tag aan het verkeerde blok. Drie woorden in commentaar"
+critic:       GO
 words:        129
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_P0_prologue.md ----
@@ -54,7 +54,11 @@ words:        129
 # which approved card each slot holds. Slot 3 stays EMPTY and reserved if Q-2 is refused.
 #
 # flags-in:  none
-# flags-out: Story.Thread.Enforcer_BadgeHeld  (card 3 only - NEW TAG, systems task)
+# flags-out: Story.Thread.Enforcer_BadgeHeld  (SLOT 3 only - NEW TAG, systems task)
+#            SLOT, not card - L1-R47, repaired 02-08. This tag belongs to the reserved
+#            Enforcer block at 070/080/090. Read as `card 3` it points at Petra, which hands
+#            a systems task with a new tag to the wrong block, and this tag is the root of
+#            the 2.11 thread `The Enforcer` plus the trigger for M1.2.S01's intel beat.
 # plants:    T4 groundwork - AEGIS is introduced as an arresting machine, not a predictor.
 #            Keep that impression flat and hard. Act 4 inverts it; act 1 must not hedge it.
 # *** 18.9 D, THE THREE-CONSECUTIVE-BEATS ROW: THIS SCENE HAS THE EXCEPTION, IN WRITING. ***
@@ -91,7 +95,7 @@ words:        129
 #   writer was right to refuse this rewrite and right to escalate it. Every other line in
 #   this file is still verbatim, and the rule above still stands for everybody.
 #
-# CARD 3 IS NOT WRITTEN. Block 070-090 is left empty and reserved exactly as the stub
+# SLOT 3 IS NOT WRITTEN. Block 070-090 is left empty and reserved exactly as the stub
 #   instructs. Q-2 is unanswered, the Enforcer badge is a live canon conflict (C-2), and
 #   inventing it here would put uncleared canon into the first ninety seconds of the game.
 #   The architect's proposed copy already exists in BEATS_P0_prologue.md section 3; it is
@@ -99,8 +103,12 @@ words:        129
 #
 # ONE-TO-ONE MAPPING. Each '>' line of an approved card becomes exactly one script line.
 #   Cards with two copy lines leave their third id unused (030, 180). That is what the
-#   tens scheme is for: card 3's copy can land, or a second Petra line can be added in
+#   tens scheme is for: SLOT 3's copy can land, or a second Petra line can be added in
 #   October, without renumbering a single generated asset.
+#   SLOT, not card - L1-R47, repaired 02-08. The copy that could land at 070-090 is the
+#   Enforcer proposal, and `card 3` in this file used to name Petra. The two nouns are not
+#   interchangeable anywhere below the slot table; when this paragraph means an APPROVED
+#   card number it says so, as it does for approved card 3 six lines above.
 #
 # WHY EVERY LINE CARRIES 'band: ambient'.
 #   The scene's type is 'cutscene' (20-60), which is right for the SCENE REGISTER - this

@@ -14,7 +14,7 @@ turn:         "She stops asking about his body and asks about the names, and he 
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO (nieuwe grond; de twee oude zijn gesloten): .020 zegt forty were in that hall en bedoelt MANNEN, maar M1.4 heeft forty al twee keer als KRATTEN gesproken (S01.020, S01.190) en een keer als rekken in dezelfde hal (S02.220). De kratlezing sluit bovendien rekenkundig rond, dus P4-e wordt gehoord als een corrupte kwartiermeester in plaats van een dunne Dominion. Onherstelbaar na generatie"
+critic:       GO
 words:        300
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
@@ -164,6 +164,9 @@ words:        300
 #            eleven this mission keeps is S01.140, "Eleven bunks", and it means the cell.
 # words:     300. The line is one word longer than it was (17 -> 18) and .040 is still the
 #            longest at 19, so the deliberate REGISTER red below is untouched.
+#            STILL 300 AFTER THE .020 REFERENT REPAIR (02-08): `said forty were` became
+#            `put forty men`, twelve words before and twelve after. Nothing in the register
+#            paragraph below needs re-deciding, and .040 is still the longest line at 19.
 #
 # *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
 # The scene misses the cutscene floor by one word, and the 19-word line is .040 - the line
@@ -188,9 +191,15 @@ words:        300
 # doubtful, the twist is flagged sixty hours early and the scene is worthless.
 # NOTE - CORRECTED 02-08 BY RULING L1-R45. The sentence that stood here said "this
 # deliberately does NOT plant T4", on the ground that "the armory was fully defended". That
-# ground is contradicted by .020 four lines above it: the book said forty and there were
-# twenty-six. IT IS A T4 TOUCH AND IT IS NOW REGISTERED - see the L1 block for the full
-# reasoning, and do not put the old sentence back.
+# ground is contradicted by .020 four lines above it: the book put forty MEN in that hall and
+# there were twenty-six. IT IS A T4 TOUCH AND IT IS NOW REGISTERED - see the L1 block for the
+# full reasoning, and do not put the old sentence back.
+# THE WORD `MEN` IN THAT PARAPHRASE IS NOT DECORATION - REPAIRED 02-08. Until this pass .020
+# read "forty were in that hall" and named nothing, against three earlier forties in this same
+# mission that were all crates or racks (S01.020, S01.190, S02.220). The T4 reading and the
+# crate reading were both available and the crate one was better supported. The dialogue note
+# on .020 carries the full argument; the only thing that changed is one noun, and the line is
+# the same twelve words it was.
 # WHAT THE NOTE HAD RIGHT, AND IT IS THE HALF THAT MATTERS TO THE WRITING: what is planted
 # here is Mara's READING of the win. It is a character fact first and an enemy fact second,
 # and it is written flat on purpose. Nothing changes in these five lines.
@@ -236,8 +245,8 @@ lines:
   - id:      M1.4.S99.020
     speaker: DEX
     voice:   dex
-    text:    "And their book said forty were in that hall. There were twenty-six."
-    note:    "*** T4 TOUCH OPENS - L1-R45 (02-08). *** Fourteen missing bodies off a defended position: the same shape as P4-a and P4-b, one mission earlier than either. In act 1 this is a paperwork fact about a corrupt garrison and it must never read as stranger than that. FORTY here is the Dominion's OWN BOOK and it is a lie in the fiction - it is not the forty-one of M1.6's intake (L1-R32) and not the freed of M1.8. Nobody counts it twice and nobody comes back to it."
+    text:    "And their book put forty men in that hall. There were twenty-six."
+    note:    "*** T4 TOUCH OPENS - L1-R45 (02-08). *** Fourteen missing bodies off a defended position: the same shape as P4-a and P4-b, one mission earlier than either. In act 1 this is a paperwork fact about a corrupt garrison and it must never read as stranger than that. FORTY here is the Dominion's OWN BOOK and it is a lie in the fiction - it is not the forty-one of M1.6's intake (L1-R32) and not the freed of M1.8. *** REFERENT REPAIRED 02-08. THE WORD THAT CHANGED IS `men` AND IT IS THE WHOLE PLANT. *** The line read `forty were in that hall`, which never says what forty counts, and by the time the player hears it this mission has spoken forty three times and not once about people: S01.020 `Forty crates on their manifest board`, S01.190 `four crates out of forty`, S02.220 `Racks run to forty and then the hall turns` - that last one in THIS hall. So the crate reading was the better supported one, and it closed arithmetically: forty booked, twenty-six standing, fourteen gone, nine carried out. That hands the player a corrupt quartermaster where P4-e needs a thin Dominion, and .040's inventory language pulls the same way. L1-R45 part 1 already reads this beat as fourteen missing BODIES; the line now says so in its own mouth, and nothing else about it moved - same count, same flatness, same twelve words. Do not delete `men`, do not move it off the number, and do not expect .040 to carry it: across three lines and three earlier forties, a listener does not backfill a referent. The sentence that stood here - nobody counts it twice - was untrue about this mission's own script and is retired. The true half stays: nobody in act 1 comes back to the shortfall, and nobody may."
 
   - id:      M1.4.S99.030
     speaker: FIGHTER_B
