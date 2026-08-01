@@ -313,8 +313,8 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
-	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
+	TestEqual(TEXT("Sanity: file header is v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 7);
+	TestEqual(TEXT("Sanity: block leads with state schema v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 7);
 
 	int32 TailSize = sizeof(int32);
 	for (const FEclipseSoldierRecord& Soldier : Source.Campaign->GetState().Roster)
@@ -335,6 +335,8 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 		TailSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1;
 	}
 	TailSize += sizeof(uint8); // response-tier byte (v6 tail — GDD 9.4)
+	// En de schadestaart (v7 — GDD 5.4): telling + een byte per faciliteit.
+	TailSize += sizeof(int32) + Source.Campaign->GetState().BaseState.Facilities.Num() * sizeof(uint8);
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 2;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 2;
@@ -344,7 +346,7 @@ bool FEclipseClassSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseClassTest::FFixture Target = EclipseClassTest::FFixture::Make();
 	TestTrue(TEXT("v2 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("The 2->3, 3->4, 4->5 and 5->6 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 4);
+	TestEqual(TEXT("The 2->3, 3->4, 4->5, 5->6 and 6->7 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 5);
 
 	const TArray<FEclipseSoldierRecord>& Loaded = Target.Campaign->GetState().Roster;
 	TestEqual(TEXT("All soldiers came home"), Loaded.Num(), 4);

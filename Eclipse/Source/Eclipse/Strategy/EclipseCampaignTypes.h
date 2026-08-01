@@ -201,6 +201,28 @@ struct FEclipseFacilityState
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	TArray<FGuid> AssignedSoldierIds;
+
+	/**
+	 * Beschadigd door een aanval op de basis: OFFLINE tot reparatie (GDD 5.4,
+	 * "the base is a place you defend, not a menu").
+	 *
+	 * WAAROM ALLEEN EEN VLAG. De REGEL is beslist — een beschadigde faciliteit
+	 * ligt stil — en dat is precies zoveel als de spec vastlegt. Wat een
+	 * reparatie KOST, hoe lang hij duurt en waardoor schade ontstaat staat
+	 * nergens; dat hoort bij de base-attack-missies (GDD 11) en is niet aan de
+	 * schermlaag om te verzinnen. Deze vlag is dus de hele beslissing en geen
+	 * halve economie: hij draagt de zichtbaarheid die §2.3 eist ("schade hoort
+	 * zichtbaar te zijn zonder dat je erop klikt") en houdt op waar het ontwerp
+	 * ophoudt.
+	 *
+	 * Beschadigd raakt de OPBRENGST, niet de bouw: een site die nog bouwt is
+	 * niet operationeel en levert sowieso niets.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
+	bool bDamaged = false;
+
+	/** Draait deze faciliteit vandaag echt? Klaar gebouwd EN niet beschadigd (GDD 5.4). */
+	bool IsOperational() const { return Level > 0 && DaysRemaining <= 0 && !bDamaged; }
 };
 
 /**
@@ -247,9 +269,9 @@ struct FEclipseCampaignState
 {
 	GENERATED_BODY()
 
-	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). v5: +StoryFlags tail (SPEC-P2-04). v6: +ResponseTier tail (GDD 9.4). */
+	/** Bumped on breaking layout change; the save system routes migrations off it. v2: +UnlockedLoadoutTags (SPEC-P1-03). v3: +Roster ClassIds tail (SPEC-P2-01). v4: +BaseState tail (SPEC-P2-03). v5: +StoryFlags tail (SPEC-P2-04). v6: +ResponseTier tail (GDD 9.4). v7: +facility damage flags tail (GDD 5.4). */
 	UPROPERTY(VisibleAnywhere, Category = "Eclipse|Campaign")
-	int32 SchemaVersion = 6;
+	int32 SchemaVersion = 7;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Eclipse|Campaign")
 	int32 Day = 0;

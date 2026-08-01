@@ -27,6 +27,34 @@ class ECLIPSE_API UEclipseBaseHubWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	/**
+	 * De tabbladen bij naam, zodat een opnameronde niet op een indexgetal hoeft
+	 * te gokken. Een tab toevoegen verschuift elke index erna, en een
+	 * opnameronde die dan stil de verkeerde tab fotografeert is erger dan een
+	 * die niets fotografeert.
+	 */
+	enum class ETab : int32
+	{
+		Command = 0,
+		Facilities = 1,
+		Workshop = 2,
+		Barracks = 3,
+		Memorial = 4
+	};
+
+	/** Zet het actieve tabblad (opnameronde en toekomstige invoerbinding). */
+	void SelectTab(ETab Tab);
+
+#if !UE_BUILD_SHIPPING
+	/**
+	 * Duw de PRESENTATIETOESTAND uit `EclipseBaseView::MakeReviewView` in het
+	 * raster, zodat één opname alle vijf de tegelvormen draagt. Nooit gecommit,
+	 * nooit opgeslagen; alleen de opnameronde roept dit aan. De eerstvolgende
+	 * `RefreshFacilities()` overschrijft hem weer met de echte campagne.
+	 */
+	void ShowReviewGridForShot();
+#endif
+
 	/** De boom, vóór RebuildWidget hem pakt — zie de toelichting in de implementatie. */
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
@@ -36,6 +64,15 @@ private:
 	void BuildLayout();
 	void RefreshAll();
 	void RefreshHeader();
+
+	/**
+	 * Het basisscherm van `REFERENTIE_BASE_MAP.md` §2.3: slotraster, bouwvoortgang,
+	 * rushprijs, bemanning, energiebalans en schade. Leest één keer
+	 * `UEclipseBaseSubsystem::ComposeBaseView` en verdeelt die view over het
+	 * geverfde raster en de tekstbanden — de widget rekent niets uit.
+	 */
+	void RefreshFacilities();
+
 	void RefreshWorkshop();
 	void RefreshBarracks();
 	void RefreshMemorial();
@@ -87,6 +124,17 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> MemorialTab;
+
+	/** De FACILITIES-tab: het geverfde slotraster met de banden eronder (§2.3). */
+	UPROPERTY()
+	TObjectPtr<UVerticalBox> FacilitiesTab;
+
+	/** De tekstbanden onder het raster; eigen doos zodat het raster niet elke refresh opnieuw wordt gebouwd. */
+	UPROPERTY()
+	TObjectPtr<UVerticalBox> FacilitiesBands;
+
+	UPROPERTY()
+	TObjectPtr<class UEclipseBaseGridWidget> FacilitiesGrid;
 
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> PrepPanel;

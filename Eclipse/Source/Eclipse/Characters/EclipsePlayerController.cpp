@@ -218,6 +218,13 @@ void AEclipsePlayerController::BeginPlay()
 	// Event.Strategy-feit, en de campagne commit zijn openingsfeiten tijdens
 	// BeginPlay. Een opname op frame 1 fotografeert een bord dat nog niet weet
 	// welke regio's er zijn.
+	//
+	// TWEE FRAMES EN NIET ÉÉN (01-08, de basishelft van §2.3). De hub is een
+	// tabblad-scherm, dus één opname fotografeert per definitie één tab — en dat
+	// was tot nu toe altijd COMMAND. Het slotraster, de bouwvoortgang en de
+	// energieband zaten daarmee in dezelfde blinde hoek waar de hele basislaag
+	// in zat: beoordeeld op broncode, nooit op een frame. De ronde stapt dus
+	// door naar FACILITIES en maakt een tweede opname.
 	if (FParse::Param(FCommandLine::Get(), TEXT("EclipseShotHub")))
 	{
 		FTimerHandle HubShotTimer;
@@ -227,12 +234,40 @@ void AEclipsePlayerController::BeginPlay()
 			if (Mode == nullptr)
 			{
 				UE_LOG(LogEclipse, Warning, TEXT("[HUBSHOT] geen EclipseGameMode — geen opname van de basislaag."));
+				ConsoleCommand(TEXT("quit"));
+				return;
 			}
-			else
+
+			Mode->CaptureHudFrame(TEXT("hub_kaart"));
+
+			if (BaseHub == nullptr)
 			{
-				Mode->CaptureHudFrame(TEXT("hub_kaart"));
+				UE_LOG(LogEclipse, Warning, TEXT("[HUBSHOT] geen basis-hub — geen opname van het slotraster."));
+				ConsoleCommand(TEXT("quit"));
+				return;
 			}
-			ConsoleCommand(TEXT("quit"));
+
+			// Een frame de tijd geven om de tabwissel te verwerken: de opname
+			// leest de backbuffer, en die draagt anders nog de vorige tab.
+			BaseHub->SelectTab(UEclipseBaseHubWidget::ETab::Facilities);
+			FTimerHandle FacilitiesShotTimer;
+			GetWorldTimerManager().SetTimer(FacilitiesShotTimer, FTimerDelegate::CreateWeakLambda(this, [this, Mode]()
+			{
+				Mode->CaptureHudFrame(TEXT("hub_faciliteiten"));
+
+				// EN EEN DERDE FRAME MET ALLE VIJF DE TEGELVORMEN. Op dag 1 bouwt
+				// er niets, is er niets stuk en is er niets vergrendeld, dus een
+				// echte campagne kan maar twee van de vijf vormen laten zien. De
+				// andere drie zouden alleen door tests gedekt zijn — precies de
+				// blinde hoek waar deze hele opnameronde tegen bestaat.
+				BaseHub->ShowReviewGridForShot();
+				FTimerHandle ReviewShotTimer;
+				GetWorldTimerManager().SetTimer(ReviewShotTimer, FTimerDelegate::CreateWeakLambda(this, [this, Mode]()
+				{
+					Mode->CaptureHudFrame(TEXT("hub_slotvormen"));
+					ConsoleCommand(TEXT("quit"));
+				}), 1.0f, /*bLoop*/ false);
+			}), 1.0f, /*bLoop*/ false);
 		}), 6.0f, /*bLoop*/ false);
 	}
 #endif

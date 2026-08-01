@@ -14,16 +14,38 @@ namespace
 	/**
 	 * HET PALET, en het is hetzelfde als dat van de tekstregels eronder. Twee
 	 * paletten op één bord zouden twee verhalen vertellen over dezelfde data.
+	 *
+	 * DE `Graph`-VOORVOEGSELS ZIJN GEEN STIJL, ZE ZIJN DE ISOLATIE.
+	 *
+	 * GEMETEN 01-08: dit bestand en `EclipseStrategyMapWidget.cpp` droegen
+	 * allebei een anonieme namespace met exact DEZELFDE namen — toen nog
+	 * `OwnerPlayer`, `LaneOpen`, `ColorForOwner`, zonder voorvoegsel. Dat ging
+	 * goed zolang UBT ze in verschillende unity-blokken stopte. Eén nieuw
+	 * .cpp-bestand in deze map verschoof die indeling, beide bestanden landden
+	 * in hetzelfde blok, en toen waren het herdefinities: 18 compilerfouten in
+	 * bestanden waar niemand iets aan veranderd had. De toenmalige `Ink` deed
+	 * hetzelfde tegen de lokale `UImage* Ink` in `EclipseScreenPlate.cpp`
+	 * (C4459, hides global declaration).
+	 *
+	 * Een anonieme namespace geeft interne binding per TRANSLATION UNIT — en in
+	 * een unity-build zijn deze bestanden samen één translation unit. De
+	 * anonieme namespace beschermt hier dus niets; de naam doet dat.
+	 *
+	 * Waarom niet een BENOEMDE namespace met `using namespace` eronder: dan
+	 * staan deze namen alsnog in de globale scope van het hele blok, en wordt
+	 * elke onvoorgevoegde aanroep in `EclipseStrategyMapWidget.cpp` DUBBELZINNIG
+	 * (zijn eigen anonieme `ColorForOwner` plus die van hier). Dat ruilt een
+	 * herdefinitie in voor een ambiguïteit en lost niets op.
 	 */
-	const FLinearColor OwnerPlayer(0.35f, 0.92f, 0.45f);
-	const FLinearColor OwnerContested(0.97f, 0.76f, 0.22f);
-	const FLinearColor OwnerDominion(0.92f, 0.31f, 0.26f);
-	const FLinearColor LaneOpen(0.70f, 0.82f, 0.88f);
-	const FLinearColor LaneGated(0.98f, 0.66f, 0.18f);
-	const FLinearColor LaneSmuggler(0.74f, 0.53f, 0.95f);
-	const FLinearColor Alarm(0.97f, 0.29f, 0.24f);
-	const FLinearColor Ink(0.02f, 0.02f, 0.03f, 1.0f);
-	const FLinearColor Bone(0.93f, 0.90f, 0.83f);
+	const FLinearColor GraphOwnerPlayer(0.35f, 0.92f, 0.45f);
+	const FLinearColor GraphOwnerContested(0.97f, 0.76f, 0.22f);
+	const FLinearColor GraphOwnerDominion(0.92f, 0.31f, 0.26f);
+	const FLinearColor GraphLaneOpen(0.70f, 0.82f, 0.88f);
+	const FLinearColor GraphLaneGated(0.98f, 0.66f, 0.18f);
+	const FLinearColor GraphLaneSmuggler(0.74f, 0.53f, 0.95f);
+	const FLinearColor GraphAlarm(0.97f, 0.29f, 0.24f);
+	const FLinearColor GraphInk(0.02f, 0.02f, 0.03f, 1.0f);
+	const FLinearColor GraphBone(0.93f, 0.90f, 0.83f);
 
 	/** De inktlijn is DIKKER dan de kleur; dat verschil ís de outline (15.5). */
 	constexpr float LaneInkThickness = 7.0f;
@@ -68,13 +90,13 @@ namespace
 		return Brush;
 	}
 
-	FLinearColor ColorForOwner(EEclipseRegionOwner Owner)
+	FLinearColor GraphColorForOwner(EEclipseRegionOwner Owner)
 	{
 		switch (Owner)
 		{
-		case EEclipseRegionOwner::Player:    return OwnerPlayer;
-		case EEclipseRegionOwner::Contested: return OwnerContested;
-		default:                             return OwnerDominion;
+		case EEclipseRegionOwner::Player:    return GraphOwnerPlayer;
+		case EEclipseRegionOwner::Contested: return GraphOwnerContested;
+		default:                             return GraphOwnerDominion;
 		}
 	}
 
@@ -83,13 +105,13 @@ namespace
 	{
 		if (!Edge.bMilitaryPassable && !Edge.bSmugglerPassable)
 		{
-			return Alarm;
+			return GraphAlarm;
 		}
 		switch (Edge.Status)
 		{
-		case EEclipseLaneStatus::SpireGated:   return Edge.bMilitaryPassable ? LaneGated : Alarm;
-		case EEclipseLaneStatus::SmugglerOnly: return LaneSmuggler;
-		default:                               return LaneOpen;
+		case EEclipseLaneStatus::SpireGated:   return Edge.bMilitaryPassable ? GraphLaneGated : GraphAlarm;
+		case EEclipseLaneStatus::SmugglerOnly: return GraphLaneSmuggler;
+		default:                               return GraphLaneOpen;
 		}
 	}
 }
@@ -144,7 +166,7 @@ public:
 				View.LayoutStatusText.IsEmpty()
 					? LOCTEXT("NoLayout", "no map layout").ToString()
 					: View.LayoutStatusText.ToString(),
-				FVector2f(8.0f, 8.0f), Alarm, 11);
+				FVector2f(8.0f, 8.0f), GraphAlarm, 11);
 			return LayerId + 1;
 		}
 
@@ -171,7 +193,7 @@ public:
 		{
 			const TArray<FVector2f> Points = { ToLocal(Edge.A), ToLocal(Edge.B) };
 			FSlateDrawElement::MakeLines(OutDrawElements, Layer, PaintGeometry, Points,
-				ESlateDrawEffect::None, Ink, /*bAntialias*/ true, LaneInkThickness);
+				ESlateDrawEffect::None, GraphInk, /*bAntialias*/ true, LaneInkThickness);
 		}
 		++Layer;
 
@@ -206,7 +228,7 @@ public:
 			{
 				const TArray<FVector2f> Bar = { Middle - Across * 9.0f, Middle + Across * 9.0f };
 				FSlateDrawElement::MakeLines(OutDrawElements, Layer + 1, PaintGeometry, Bar,
-					ESlateDrawEffect::None, Alarm, /*bAntialias*/ true, 5.0f);
+					ESlateDrawEffect::None, GraphAlarm, /*bAntialias*/ true, 5.0f);
 			}
 
 			// Wat de oversteek kost, op de lijn (GDD 3.1 regel 4).
@@ -225,13 +247,13 @@ public:
 			}
 
 			const FVector2f Centre = ToLocal(Region.BoardPosition);
-			const FLinearColor Owner = ColorForOwner(Region.Owner);
+			const FLinearColor Owner = GraphColorForOwner(Region.Owner);
 
 			FSlateDrawElement::MakeBox(OutDrawElements, Layer,
 				AllottedGeometry.ToPaintGeometry(
 					FVector2f(NodeInkHalf * 2.0f, NodeInkHalf * 2.0f),
 					FSlateLayoutTransform(Centre - FVector2f(NodeInkHalf, NodeInkHalf))),
-				&WhiteBrush(), ESlateDrawEffect::None, Ink);
+				&WhiteBrush(), ESlateDrawEffect::None, GraphInk);
 
 			FSlateDrawElement::MakeBox(OutDrawElements, Layer + 1,
 				AllottedGeometry.ToPaintGeometry(
@@ -248,7 +270,7 @@ public:
 					AllottedGeometry.ToPaintGeometry(
 						FVector2f(NodeHalf, NodeHalf),
 						FSlateLayoutTransform(Centre - FVector2f(NodeHalf * 0.5f, NodeHalf * 0.5f))),
-					&WhiteBrush(), ESlateDrawEffect::None, Ink);
+					&WhiteBrush(), ESlateDrawEffect::None, GraphInk);
 			}
 
 			// HET LABEL BOVEN DE KNOOP, en de getallen eronder. Beide onder de
@@ -261,7 +283,7 @@ public:
 			DrawInkedText(OutDrawElements, Layer + 3, AllottedGeometry, Name,
 				Centre + FVector2f(-HalfTextWidth(Name, NodeNameFont), -NodeInkHalf - 19.0f), Owner, NodeNameFont);
 			DrawInkedText(OutDrawElements, Layer + 3, AllottedGeometry, Numbers,
-				Centre + FVector2f(-HalfTextWidth(Numbers, NodeNumbersFont), NodeInkHalf + 3.0f), Bone, NodeNumbersFont);
+				Centre + FVector2f(-HalfTextWidth(Numbers, NodeNumbersFont), NodeInkHalf + 3.0f), GraphBone, NodeNumbersFont);
 		}
 
 		return Layer + 4;

@@ -1,5 +1,6 @@
 #include "UI/EclipseBaseHubWidget.h"
 
+#include "Base/EclipseBaseSubsystem.h"
 #include "Base/EclipsePrepSubsystem.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
@@ -14,6 +15,7 @@
 #include "Components/Overlay.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Strategy/EclipseCampaignSubsystem.h"
+#include "UI/EclipseBaseGridWidget.h"
 #include "UI/EclipseScreenPlate.h"
 #include "UI/EclipseStrategyMapWidget.h"
 
@@ -126,8 +128,8 @@ void UEclipseBaseHubWidget::BuildLayout()
 	{
 		TabSlot->SetHorizontalAlignment(HAlign_Left);
 	}
-	const TCHAR* TabNames[] = { TEXT("COMMAND"), TEXT("WORKSHOP"), TEXT("BARRACKS"), TEXT("MEMORIAL") };
-	for (int32 TabIndex = 0; TabIndex < 4; ++TabIndex)
+	const TCHAR* TabNames[] = { TEXT("COMMAND"), TEXT("FACILITIES"), TEXT("WORKSHOP"), TEXT("BARRACKS"), TEXT("MEMORIAL") };
+	for (int32 TabIndex = 0; TabIndex < UE_ARRAY_COUNT(TabNames); ++TabIndex)
 	{
 		AddButtonRow(*WidgetTree, *TabBar, TabNames[TabIndex], FName(*FString::FromInt(TabIndex)),
 			[this](FName Id) { HandleTab(FCString::Atoi(*Id.ToString())); });
@@ -144,6 +146,14 @@ void UEclipseBaseHubWidget::BuildLayout()
 	// telt de doorzichtigheid twee keer op — dat leest als een naad.
 	CommandTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	TabSwitcher->AddChild(CommandTab);
+
+	// De FACILITIES-tab draagt GEEN eigen plaat om het geheel: het raster verft
+	// zijn eigen tegels met inkt en vulling (dat ís de plaat), en de tekstbanden
+	// eronder krijgen er wel één. Een plaat over allebei zou de doorzichtigheid
+	// twee keer optellen, en dat leest als een naad.
+	FacilitiesTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+	TabSwitcher->AddChild(FacilitiesTab);
+
 	WorkshopTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	TabSwitcher->AddChild(EclipseScreenPlate::Wrap(*WidgetTree, *WorkshopTab, TEXT("HubWorkshopPlate")));
 	BarracksTab = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
@@ -165,6 +175,23 @@ void UEclipseBaseHubWidget::BuildLayout()
 	{
 		MapSlot->SetHorizontalAlignment(HAlign_Left);
 		MapSlot->SetPadding(FMargin(0.0f, 4.0f, 0.0f, 4.0f));
+	}
+
+	// FACILITIES: het geverfde raster boven, de banden eronder. Twee lagen, want
+	// het raster toont VERHOUDINGEN (hoeveel bezet, hoeveel vrij) en de banden de
+	// exacte getallen — dezelfde afweging die §1.5 voor de kaart maakt, en om
+	// dezelfde reden staat de een niet in plaats van de ander.
+	FacilitiesGrid = WidgetTree->ConstructWidget<UEclipseBaseGridWidget>(UEclipseBaseGridWidget::StaticClass(), TEXT("FacilitiesGrid"));
+	if (UVerticalBoxSlot* GridSlot = FacilitiesTab->AddChildToVerticalBox(FacilitiesGrid))
+	{
+		GridSlot->SetHorizontalAlignment(HAlign_Left);
+		GridSlot->SetPadding(FMargin(0.0f, 2.0f, 0.0f, 6.0f));
+	}
+	FacilitiesBands = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+	if (UVerticalBoxSlot* BandSlot = FacilitiesTab->AddChildToVerticalBox(
+		EclipseScreenPlate::Wrap(*WidgetTree, *FacilitiesBands, TEXT("HubFacilitiesPlate"))))
+	{
+		BandSlot->SetHorizontalAlignment(HAlign_Left);
 	}
 
 	// Preparation panel lives under the command tab (briefing -> launch).
@@ -235,6 +262,7 @@ void UEclipseBaseHubWidget::OnAnyFact(FGameplayTag EventTag, const FInstancedStr
 void UEclipseBaseHubWidget::RefreshAll()
 {
 	RefreshHeader();
+	RefreshFacilities();
 	RefreshWorkshop();
 	RefreshBarracks();
 	RefreshMemorial();
@@ -260,6 +288,66 @@ void UEclipseBaseHubWidget::RefreshHeader()
 		State.GetBalance(EclipseTags::Resource_Credits.GetTag()),
 		State.GetBalance(EclipseTags::Resource_Materials.GetTag()),
 		State.GetBalance(EclipseTags::Resource_Intel.GetTag()))));
+}
+
+void UEclipseBaseHubWidget::RefreshFacilities()
+{
+	if (FacilitiesBands == nullptr || FacilitiesGrid == nullptr)
+	{
+		return;
+	}
+	FacilitiesBands->ClearChildren();
+
+	UEclipseBaseSubsystem* Base = GetGameInstance() != nullptr ? GetGameInstance()->GetSubsystem<UEclipseBaseSubsystem>() : nullptr;
+	if (Base == nullptr)
+	{
+		return;
+	}
+
+	// EEN CONSUMENT EN NIETS MEER (12.1, 8.8). Alles wat hieronder op het scherm
+	// komt, is één aanroep verderop al uitgerekend en headless getoetst; deze
+	// functie kiest alleen wat waar staat.
+	const EclipseBaseView::FEclipseBaseView View = Base->ComposeBaseView();
+	FacilitiesGrid->SetGrid(View);
+
+	// HET RASTER IS EEN EIGEN POORT. Geen tegels = geen blad: `ComputeDesiredSize`
+	// geeft dan 0x0 terug, maar een widget die niets tekent en toch zichtbaar
+	// staat, is precies de plaat van 21x21 px die eerder op het frame bleef staan.
+	FacilitiesGrid->SetVisibility(View.Slots.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+
+	if (!View.IsRenderable())
+	{
+		// DE DATAPOORT OP HET SCHERM. Geen raster, en de reden erbij — een leeg
+		// vlak zonder uitleg laat niemand weten of dit de data of de tekenlaag is.
+		AddTextRow(*WidgetTree, *FacilitiesBands, View.StatusText.ToString());
+		for (const FString& Error : View.Errors)
+		{
+			AddTextRow(*WidgetTree, *FacilitiesBands, FString::Printf(TEXT("  %s"), *Error));
+		}
+		EclipseScreenPlate::ApplyVisibility(Cast<UOverlay>(FacilitiesBands->GetParent()), /*bHasContent*/ true);
+		return;
+	}
+
+	// De strategische klok eerst: zonder dag heeft geen enkele ETA betekenis.
+	AddTextRow(*WidgetTree, *FacilitiesBands, View.HeaderText.ToString());
+	AddTextRow(*WidgetTree, *FacilitiesBands, View.SlotCountText.ToString());
+
+	// SCHADE BOVENAAN, want dat is het enige dat je NU moet weten (§2.3 rij 7).
+	if (!View.DamageText.IsEmpty())
+	{
+		AddTextRow(*WidgetTree, *FacilitiesBands, View.DamageText.ToString());
+	}
+
+	// De energieband draagt zijn eigen poort: onvolledige energiedata sluit
+	// alleen deze regel, nooit het raster erboven.
+	AddTextRow(*WidgetTree, *FacilitiesBands, View.EnergyText.ToString());
+
+	if (View.bHasCrewBand)
+	{
+		AddTextRow(*WidgetTree, *FacilitiesBands, View.CrewText.ToString());
+	}
+
+	EclipseScreenPlate::ApplyVisibility(Cast<UOverlay>(FacilitiesBands->GetParent()), FacilitiesBands->GetChildrenCount() > 0);
 }
 
 void UEclipseBaseHubWidget::RefreshWorkshop()
@@ -423,6 +511,39 @@ void UEclipseBaseHubWidget::HandleTab(int32 TabIndex)
 		TabSwitcher->SetActiveWidgetIndex(TabIndex);
 	}
 }
+
+void UEclipseBaseHubWidget::SelectTab(ETab Tab)
+{
+	HandleTab(static_cast<int32>(Tab));
+}
+
+#if !UE_BUILD_SHIPPING
+void UEclipseBaseHubWidget::ShowReviewGridForShot()
+{
+	if (FacilitiesGrid == nullptr || FacilitiesBands == nullptr)
+	{
+		return;
+	}
+
+	const EclipseBaseView::FEclipseBaseView Review = EclipseBaseView::MakeReviewView();
+	FacilitiesGrid->SetGrid(Review);
+	FacilitiesGrid->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+	FacilitiesBands->ClearChildren();
+	AddTextRow(*WidgetTree, *FacilitiesBands, TEXT("REVIEW STATE — all five slot shapes (never committed, never saved)"));
+	AddTextRow(*WidgetTree, *FacilitiesBands, Review.SlotCountText.ToString());
+	if (!Review.DamageText.IsEmpty())
+	{
+		AddTextRow(*WidgetTree, *FacilitiesBands, Review.DamageText.ToString());
+	}
+	AddTextRow(*WidgetTree, *FacilitiesBands, Review.EnergyText.ToString());
+	if (Review.bHasCrewBand)
+	{
+		AddTextRow(*WidgetTree, *FacilitiesBands, Review.CrewText.ToString());
+	}
+	EclipseScreenPlate::ApplyVisibility(Cast<UOverlay>(FacilitiesBands->GetParent()), /*bHasContent*/ true);
+}
+#endif
 
 bool UEclipseBaseHubWidget::NoteActionResult(bool bSucceeded, const FString& Error, const TCHAR* What)
 {

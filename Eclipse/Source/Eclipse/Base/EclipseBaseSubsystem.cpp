@@ -169,6 +169,51 @@ EclipseBaseLogic::FEclipseFacilityYieldParams UEclipseBaseSubsystem::ComputeToda
 		});
 }
 
+EclipseBaseView::FEclipseBaseView UEclipseBaseSubsystem::ComposeBaseView() const
+{
+	const UEclipseCampaignSubsystem* Campaign = GetCampaign();
+	if (Campaign == nullptr)
+	{
+		// Geen campagne = geen basis. De view komt terug op zijn eigen default
+		// (`Absent`), en dat is de eerlijke lezing: er is geen leeg raster, er
+		// is geen raster.
+		return EclipseBaseView::FEclipseBaseView();
+	}
+
+	const UEclipseBaseLayoutAsset* Layout = ResolveLayout();
+	const UDataTable* Table = ResolveFacilitiesTable();
+
+	// Lokale lvalues: TFunctionRef bewaart alleen een verwijzing, en een
+	// tijdelijke lambda zou al dood zijn tegen de tijd dat Compose hem aanroept.
+	auto RowResolver = [Table](FName FacilityId) -> const FEclipseFacilityRow*
+	{
+		return Table != nullptr
+			? Table->FindRow<FEclipseFacilityRow>(FacilityId, TEXT("EclipseBaseView"), /*bWarnIfMissing*/ false)
+			: nullptr;
+	};
+	const FEclipseCampaignState& State = Campaign->GetState();
+	auto SoldierResolver = [&State](const FGuid& SoldierId) -> const FEclipseSoldierRecord*
+	{
+		return State.FindSoldier(SoldierId);
+	};
+
+	// DE BEREIKTE UITBREIDINGSTRAP IS 1, EN DAT IS EEN GEMETEN FEIT GEEN AANNAME.
+	// GDD 5.2 geeft de ladder 4 -> 8 -> 12 -> 16, maar nergens staat WAT hem
+	// ophoogt; de verscheepte layout authort dan ook alleen trap-1-slots. Hier
+	// een hoger getal invullen zou slots ontgrendelen die niemand heeft
+	// ontworpen. Zodra de trigger beslist is, komt hij hier binnen en verandert
+	// er niets aan de logica of het scherm.
+	constexpr int32 AvailableSlotTier = 1;
+
+	return EclipseBaseView::ComposeBaseView(
+		State,
+		Layout != nullptr ? TConstArrayView<FEclipseBaseSlotDef>(Layout->Slots) : TConstArrayView<FEclipseBaseSlotDef>(),
+		ResolveTuningParams(),
+		RowResolver,
+		SoldierResolver,
+		AvailableSlotTier);
+}
+
 bool UEclipseBaseSubsystem::TryStartConstruction(FName FacilityId, FString& OutError)
 {
 	const UEclipseBaseLayoutAsset* Layout = ResolveLayout();

@@ -17,7 +17,7 @@ namespace EclipseSave
 	 * v4: Campaign block gained the base facility tail (SPEC-P2-03).
 	 * v5: Campaign block gained the story-flag tail (SPEC-P2-04).
 	 */
-	inline constexpr int32 CurrentSchemaVersion = 6;
+	inline constexpr int32 CurrentSchemaVersion = 7;
 
 	inline const FString AutosaveSlotName = TEXT("Autosave");
 	inline const FString ManualSlotName = TEXT("Manual");

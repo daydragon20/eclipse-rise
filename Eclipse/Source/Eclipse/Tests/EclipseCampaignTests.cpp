@@ -367,7 +367,7 @@ bool FEclipseCampaignSaveMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("Load of v0 file succeeds via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4, 4->5, 5->6)"), Target.Save->GetLastLoadMigrationStepCount(), 6);
+	TestEqual(TEXT("All migration steps ran (0->1, 1->2, 2->3, 3->4, 4->5, 5->6, 6->7)"), Target.Save->GetLastLoadMigrationStepCount(), 7);
 	TestEqual(TEXT("Migrated state matches source"),
 		Target.Campaign->GetState().ComputeStateHash(),
 		Source.Campaign->GetState().ComputeStateHash());
@@ -584,8 +584,8 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
-	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
+	TestEqual(TEXT("Sanity: file header is v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 7);
+	TestEqual(TEXT("Sanity: block leads with state schema v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 7);
 
 	int32 BaseTailSize = sizeof(int32);
 	for (const FEclipseFacilityState& Facility : Source.Campaign->GetState().BaseState.Facilities)
@@ -603,6 +603,8 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 		StripSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1;
 	}
 	StripSize += sizeof(uint8); // the v6 response-tier byte (GDD 9.4) — a v3 file predates it too
+	// En de v7-schadestaart erachter (GDD 5.4): telling + een byte per faciliteit.
+	StripSize += sizeof(int32) + Source.Campaign->GetState().BaseState.Facilities.Num() * sizeof(uint8);
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 3;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 3;
@@ -612,7 +614,7 @@ bool FEclipseCampaignBaseStateMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("v3 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 3->4, 4->5 and 5->6 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 3);
+	TestEqual(TEXT("Exactly the 3->4, 4->5, 5->6 and 6->7 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 4);
 
 	const FEclipseBaseState& Base = Target.Campaign->GetState().BaseState;
 	TestEqual(TEXT("Spec start state: exactly one facility"), Base.Facilities.Num(), 1);
@@ -662,8 +664,8 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
-	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
+	TestEqual(TEXT("Sanity: file header is v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 7);
+	TestEqual(TEXT("Sanity: block leads with state schema v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 7);
 	TestEqual(TEXT("Sanity: the scripted campaign has no beats yet"), Source.Campaign->GetState().StoryFlags.Num(), 0);
 
 	int32 StoryTailSize = sizeof(int32);
@@ -672,6 +674,8 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 		StoryTailSize += sizeof(int32) + Flag.GetTagName().ToString().Len() + 1; // ANSI FName-as-FString
 	}
 	StoryTailSize += sizeof(uint8); // and the v6 tier byte sitting behind it (GDD 9.4)
+	// ...en de v7-schadestaart daar weer achter (GDD 5.4).
+	StoryTailSize += sizeof(int32) + Source.Campaign->GetState().BaseState.Facilities.Num() * sizeof(uint8);
 
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 4;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 4;
@@ -681,7 +685,7 @@ bool FEclipseCampaignStoryFlagMigrationTest::RunTest(const FString& Parameters)
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("v4 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 4->5 and 5->6 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
+	TestEqual(TEXT("Exactly the 4->5, 5->6 and 6->7 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 3);
 	TestEqual(TEXT("Pre-story campaign lands on empty flags"), Target.Campaign->GetState().StoryFlags.Num(), 0);
 	TestEqual(TEXT("Migrated state matches source (flags included in hash)"),
 		Target.Campaign->GetState().ComputeStateHash(),
@@ -726,20 +730,32 @@ bool FEclipseCampaignResponseTierMigrationTest::RunTest(const FString& Parameter
 		Source.Campaign->GetState().ResponseTier, EEclipseDominionResponseTier::Insurgency);
 	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
 
-	// Reconstruct a v5 file from the v6 save: the tier byte is the last thing
-	// in the Campaign block. Same container math as the v3/v4 reconstructions.
+	// Reconstruct a v5 file from the v7 save: the tier byte sits behind the
+	// story tail, and de v7-schadestaart weer achter de tierbyte. Same container
+	// math as the v3/v4 reconstructions.
 	TArray<uint8> FileBytes;
 	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(FileBytes, *SlotPath));
 
 	const int32 HeaderVersionOffset = sizeof(uint32);
 	const int32 BlockSizeOffset = 12 + (4 + 9);
 	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
-	TestEqual(TEXT("Sanity: file header is v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 6);
-	TestEqual(TEXT("Sanity: block leads with state schema v6"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 6);
-	TestEqual(TEXT("Sanity: the last byte IS the tier we committed"),
-		static_cast<int32>(FileBytes.Last()), static_cast<int32>(EEclipseDominionResponseTier::Insurgency));
+	TestEqual(TEXT("Sanity: file header is v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset), 7);
+	TestEqual(TEXT("Sanity: block leads with state schema v7"), *reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset), 7);
 
-	const int32 TierTailSize = sizeof(uint8);
+	// De schadestaart (v7) staat ACHTER de tierbyte, dus die gaat er in dezelfde
+	// knip af — een v5-bestand kent geen van beide.
+	const int32 DamageTailSize = sizeof(int32)
+		+ Source.Campaign->GetState().BaseState.Facilities.Num() * sizeof(uint8);
+	const int32 TierTailSize = sizeof(uint8) + DamageTailSize;
+
+	// DE TIERBYTE IS NIET MEER DE LAATSTE BYTE, en deze regel is de reden dat
+	// die controle hier blijft staan in plaats van te verdwijnen: hij pint vast
+	// WAAR de byte staat die we zo gaan wegknippen. Zou de staartvolgorde ooit
+	// veranderen, dan zakt deze test op de sanity-regel in plaats van op een
+	// raadselachtige migratie-uitkomst dertig regels verderop.
+	TestEqual(TEXT("Sanity: the tier we committed sits just before the v7 damage tail"),
+		static_cast<int32>(FileBytes[FileBytes.Num() - 1 - DamageTailSize]),
+		static_cast<int32>(EEclipseDominionResponseTier::Insurgency));
 	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 5;
 	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 5;
 	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= TierTailSize;
@@ -748,11 +764,134 @@ bool FEclipseCampaignResponseTierMigrationTest::RunTest(const FString& Parameter
 
 	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
 	TestTrue(TEXT("v5 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
-	TestEqual(TEXT("Exactly the 5->6 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+	TestEqual(TEXT("Exactly the 5->6 and 6->7 steps ran"), Target.Save->GetLastLoadMigrationStepCount(), 2);
 	TestEqual(TEXT("A pre-tier campaign comes home unnoticed"),
 		Target.Campaign->GetState().ResponseTier, EEclipseDominionResponseTier::Indifference);
 	TestNotEqual(TEXT("...which is NOT what the source held — the byte really was stripped"),
 		Target.Campaign->GetState().ResponseTier, Source.Campaign->GetState().ResponseTier);
+
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+	Source.Shutdown();
+	Target.Shutdown();
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseCampaignDamageMigrationTest,
+	"Eclipse.Strategy.Campaign.SaveMigrationV6RecordsWithoutFacilityDamage",
+	EclipseCampaignTest::TestFlags)
+
+bool FEclipseCampaignDamageMigrationTest::RunTest(const FString& Parameters)
+{
+	// GDD 5.4 / 14.3.6 (vijfde R6-oefening): een byte-getrouw v6-bestand kent de
+	// schadestaart niet en moet thuiskomen met ALLES HEEL — een campagne van
+	// vóór het schadesysteem heeft nooit een aanval op de basis meegemaakt.
+	//
+	// EN DE CONTROLEPROEF ZIT ERIN: de broncampagne zet één faciliteit op
+	// beschadigd en bewijst dat die vlag de save-ronde OVERLEEFT. Zonder die
+	// helft bewijst "alles komt heel thuis" niets — dat zou ook waar zijn als de
+	// vlag helemaal niet werd weggeschreven.
+	const FString SlotName = TEXT("AutomationDamageMigration");
+	const FString SlotPath = UEclipseSaveSubsystem::GetSlotFilePath(SlotName);
+	IFileManager::Get().Delete(*SlotPath, false, true, true);
+
+	EclipseCampaignTest::FFixture Source = EclipseCampaignTest::FFixture::Make();
+	FString Error;
+	TestTrue(TEXT("Scripted sequence commits"), EclipseCampaignTest::RunScriptedSequence(*Source.Campaign, Error));
+	TestTrue(TEXT("Save succeeds"), Source.Save->SaveToSlot(SlotName, Error));
+
+	const int32 FacilityCount = Source.Campaign->GetState().BaseState.Facilities.Num();
+	TestTrue(TEXT("Fixture has at least one facility"), FacilityCount > 0);
+
+	const int32 HeaderVersionOffset = sizeof(uint32);
+	const int32 BlockSizeOffset = 12 + (4 + 9);
+	const int32 BlockStartOffset = BlockSizeOffset + sizeof(int64);
+	const int32 DamageTailSize = sizeof(int32) + FacilityCount * sizeof(uint8);
+
+	TArray<uint8> Pristine;
+	TestTrue(TEXT("Save file readable"), FFileHelper::LoadFileToArray(Pristine, *SlotPath));
+	TestEqual(TEXT("Sanity: file header is v7"), *reinterpret_cast<int32*>(Pristine.GetData() + HeaderVersionOffset), 7);
+	TestEqual(TEXT("Sanity: block leads with state schema v7"), *reinterpret_cast<int32*>(Pristine.GetData() + BlockStartOffset), 7);
+	TestEqual(TEXT("Sanity: the tail counts exactly the facilities we have"),
+		*reinterpret_cast<int32*>(Pristine.GetData() + Pristine.Num() - DamageTailSize), FacilityCount);
+
+	// --- CONTROLEPROEF: de staart wordt ECHT gelezen ----------------------
+	//
+	// De schadevlag wordt vandaag door geen enkele mutatie gezet (het
+	// aanvalssysteem is GDD 11 en niet van deze ronde), dus zetten we hem waar
+	// hij leeft: in de bytes. Zonder deze helft zou de migratietest hieronder
+	// even groen zijn als de staart nooit was gelezen — "alles komt heel thuis"
+	// is een uitspraak over niets zolang niet vaststaat dat kapot ook aankomt.
+	{
+		TArray<uint8> Damaged = Pristine;
+		Damaged.Last() = 1; // de vlag van de LAATSTE faciliteit
+		TestTrue(TEXT("Control: damaged-shaped file written"), FFileHelper::SaveArrayToFile(Damaged, *SlotPath));
+
+		EclipseCampaignTest::FFixture RoundTrip = EclipseCampaignTest::FFixture::Make();
+		TestTrue(TEXT("Control: the v7 file loads"), RoundTrip.Save->LoadFromSlot(SlotName, Error));
+		TestEqual(TEXT("Control: no migration step was needed"), RoundTrip.Save->GetLastLoadMigrationStepCount(), 0);
+
+		const TArray<FEclipseFacilityState>& Back = RoundTrip.Campaign->GetState().BaseState.Facilities;
+		TestEqual(TEXT("Control: same number of facilities"), Back.Num(), FacilityCount);
+		if (Back.Num() > 0)
+		{
+			TestTrue(TEXT("Control: the damage flag really arrives"), Back.Last().bDamaged);
+		}
+		if (Back.Num() > 1)
+		{
+			// Alleen zinvol bij meer dan één faciliteit: met één post is "de
+			// juiste" en "allemaal" hetzelfde ding, en dan meet deze regel niets.
+			// (Eerste versie schreef dit als één expressie met `|| Num()==1`
+			// erin en zakte precies daarop — de vacuüme helft maakte hem waar.)
+			TestFalse(TEXT("Control: and it lands on the RIGHT facility, not all of them"), Back[0].bDamaged);
+		}
+		RoundTrip.Shutdown();
+	}
+
+	// --- CONTROLEPROEF 2: DE VERSIEPOORT KAN ROOD WORDEN -----------------
+	//
+	// `MigrateBlocks` loopt versie voor versie omhoog en WEIGERT te laden zodra
+	// er voor een stap geen migratie geregistreerd staat. Dat is precies waarom
+	// de v6->v7-registratie erbij hoort en niet optioneel is: zonder die entry
+	// laadt géén enkele bestaande save meer.
+	//
+	// Die poort hier één keer rood maken is de reden dat het groen hieronder
+	// iets betekent. Een bestand dat zegt v8 te zijn kan deze build niet kennen,
+	// en dan hoort het te WEIGEREN met een leesbare fout in plaats van stil de
+	// helft te lezen.
+	{
+		TArray<uint8> FromTheFuture = Pristine;
+		*reinterpret_cast<int32*>(FromTheFuture.GetData() + HeaderVersionOffset) = 8;
+		TestTrue(TEXT("Control: future-shaped file written"), FFileHelper::SaveArrayToFile(FromTheFuture, *SlotPath));
+
+		EclipseCampaignTest::FFixture Future = EclipseCampaignTest::FFixture::Make();
+		FString FutureError;
+		TestFalse(TEXT("Control: a save newer than this build is REFUSED, not half-read"),
+			Future.Save->LoadFromSlot(SlotName, FutureError));
+		TestFalse(TEXT("Control: and the refusal says why"), FutureError.IsEmpty());
+		Future.Shutdown();
+	}
+
+	// --- DE MUTATIE: knip de schadestaart eraf en noem het bestand v6 -----
+	TArray<uint8> FileBytes = Pristine;
+	FileBytes.Last() = 1; // dezelfde schade als in de controleproef...
+	*reinterpret_cast<int32*>(FileBytes.GetData() + HeaderVersionOffset) = 6;
+	*reinterpret_cast<int32*>(FileBytes.GetData() + BlockStartOffset) = 6;
+	*reinterpret_cast<int64*>(FileBytes.GetData() + BlockSizeOffset) -= DamageTailSize;
+	FileBytes.SetNum(FileBytes.Num() - DamageTailSize); // ...maar de staart gaat eraf
+	TestTrue(TEXT("v6-shaped file written"), FFileHelper::SaveArrayToFile(FileBytes, *SlotPath));
+
+	EclipseCampaignTest::FFixture Target = EclipseCampaignTest::FFixture::Make();
+	TestTrue(TEXT("v6 file loads via migration"), Target.Save->LoadFromSlot(SlotName, Error));
+	TestEqual(TEXT("Exactly the 6->7 step ran"), Target.Save->GetLastLoadMigrationStepCount(), 1);
+
+	const TArray<FEclipseFacilityState>& Migrated = Target.Campaign->GetState().BaseState.Facilities;
+	TestEqual(TEXT("Every facility came home"), Migrated.Num(), FacilityCount);
+	for (const FEclipseFacilityState& Facility : Migrated)
+	{
+		// EN DIT IS AANTOONBAAR NIET GRATIS: exact dezelfde byte stond in de
+		// controleproef hierboven op 1 en kwam daar als schade aan.
+		TestFalse(TEXT("A pre-damage campaign comes home intact"), Facility.bDamaged);
+	}
 
 	IFileManager::Get().Delete(*SlotPath, false, true, true);
 	Source.Shutdown();

@@ -4,6 +4,7 @@
 #include "Base/EclipseBaseLogic.h"
 #include "Core/EclipseEventBusSubsystem.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UI/EclipseBaseViewLogic.h"
 #include "EclipseBaseSubsystem.generated.h"
 
 class IConsoleObject;
@@ -80,6 +81,23 @@ public:
 
 	/** Today's facility output for the economy day tick (SPEC-P2-03: one deterministic tick — the economy folds this in). */
 	EclipseBaseLogic::FEclipseFacilityYieldParams ComputeTodaysFacilityYields() const;
+
+	/**
+	 * HET BASISSCHERM ALS DATA (`phase0/REFERENTIE_BASE_MAP.md` §2.3): slotraster,
+	 * bouwvoortgang, rushprijs, bemanning, energiebalans en schade in één struct.
+	 *
+	 * Dit is de stap-3-omhulling en niets meer — hij lost de drie assets op
+	 * (layout, DT_Facilities, DA_BaseTuning) en geeft ze aan
+	 * `EclipseBaseView::ComposeBaseView` door. Alle regels zitten in die pure
+	 * laag, zodat wat er op het scherm komt te staan headless getoetst is
+	 * (`Tests/EclipseBaseViewTests.cpp`) en de widget alleen nog kleur en
+	 * plaatsing bezit (GDD 14.5).
+	 *
+	 * Zonder layout of zonder campagne komt er een view terug met
+	 * `DataState != Valid` en een spelerregel erin — nooit een crash en nooit
+	 * een half raster (GDD 14.3.5).
+	 */
+	EclipseBaseView::FEclipseBaseView ComposeBaseView() const;
 
 private:
 	const UEclipseCampaignSetupAsset* ResolveSetup() const;

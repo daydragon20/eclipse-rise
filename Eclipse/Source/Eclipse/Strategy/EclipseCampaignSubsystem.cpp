@@ -291,14 +291,88 @@ namespace
 					UE_LOG(LogEclipse, Warning, TEXT("Campaign load: response tier byte %u is off the GDD 9.4 ladder — read as Indifference."), Tier);
 				}
 			}
-			// Whatever shape came in, the in-memory state is now current.
-			// (Convention: this normalize lives at the LAST tail — v7 moves it.)
-			State.SchemaVersion = 6;
 		}
 		else
 		{
 			uint8 Tier = static_cast<uint8>(State.ResponseTier);
 			Ar << Tier;
+		}
+
+		// Schema v7 (GDD 5.4): welke faciliteiten BESCHADIGD zijn, als aparte
+		// staart in plaats van als veld in de v4-faciliteitenlus.
+		//
+		// WAAROM NIET IN DIE LUS. Een byte tussen `DaysRemaining` en `StaffCount`
+		// schuiven zou elke bestaande save vanaf dat punt verkeerd uitlezen —
+		// het staffaantal zou de schadevlag lezen en de guids zouden verschuiven.
+		// De staart-conventie (v2..v6) bestaat precies daarom: oude bytes blijven
+		// waar ze stonden, nieuwe kennis komt erachteraan. Een pre-v7 save heeft
+		// geen staart en komt heel thuis met alles onbeschadigd, en dat is de
+		// eerlijke lezing: een campagne van vóór het schadesysteem heeft nooit
+		// een aanval op de basis meegemaakt.
+		//
+		// Het aantal wordt apart weggeschreven en bij het lezen getoetst: een
+		// staart die niet bij de faciliteitenlijst past is een corrupt of
+		// handmatig bewerkt bestand, en dan is stil de eerste N vlaggen plakken
+		// erger dan ze allemaal laten staan op "heel".
+		if (Ar.IsLoading())
+		{
+			for (FEclipseFacilityState& Facility : State.BaseState.Facilities)
+			{
+				Facility.bDamaged = false;
+			}
+			if (State.SchemaVersion >= 7)
+			{
+				int32 DamageCount = 0;
+				Ar << DamageCount;
+
+				// Eerst LEZEN, dan pas beslissen of het past. De bytes staan in
+				// de stream of we ze willen of niet; ze overslaan bij een
+				// mismatch zou de leeskop op een onbekende plek achterlaten en
+				// de volgende staart (v8) stil vergiftigen.
+				TArray<bool> Flags;
+				Flags.Reserve(FMath::Max(0, DamageCount));
+				for (int32 Index = 0; Index < DamageCount && !Ar.IsError(); ++Index)
+				{
+					uint8 Damaged = 0;
+					Ar << Damaged;
+					Flags.Add(Damaged != 0);
+				}
+
+				if (Flags.Num() == State.BaseState.Facilities.Num())
+				{
+					for (int32 Index = 0; Index < Flags.Num(); ++Index)
+					{
+						State.BaseState.Facilities[Index].bDamaged = Flags[Index];
+					}
+				}
+				else if (DamageCount != 0)
+				{
+					// Nul vlaggen tegen een gesynthetiseerde standaardbasis is
+					// GEEN corruptie — het v4-blok hierboven vervangt een lege
+					// faciliteitenlijst door de standaard (Command Center L1), dus
+					// die mismatch is te verwachten en betekent gewoon "niets
+					// beschadigd". Elke andere mismatch is een corrupt of
+					// handmatig bewerkt bestand: luid, eenmalig en niet fataal
+					// (GDD 14.3.5), en alles blijft heel — stil de eerste N
+					// vlaggen plakken zou schade aan de verkeerde faciliteit
+					// hangen, en dat leest als een bug in het spel.
+					UE_LOG(LogEclipse, Warning, TEXT("Campaign load: damage tail carries %d flags for %d facilities — every facility read as intact."),
+						DamageCount, State.BaseState.Facilities.Num());
+				}
+			}
+			// Whatever shape came in, the in-memory state is now current.
+			// (Convention: this normalize lives at the LAST tail — v8 moves it.)
+			State.SchemaVersion = 7;
+		}
+		else
+		{
+			int32 DamageCount = State.BaseState.Facilities.Num();
+			Ar << DamageCount;
+			for (FEclipseFacilityState& Facility : State.BaseState.Facilities)
+			{
+				uint8 Damaged = Facility.bDamaged ? 1 : 0;
+				Ar << Damaged;
+			}
 		}
 	}
 }
@@ -422,6 +496,31 @@ void UEclipseCampaignSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 				}
 				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 6;
 				CampaignBlock->Add(static_cast<uint8>(EEclipseDominionResponseTier::Indifference));
+				return true;
+			}));
+
+		// v6 -> v7 (GDD 5.4): het Campaign-blok kreeg een staart met de
+		// SCHADEVLAGGEN van de faciliteiten.
+		//
+		// EEN LEGE TELLING EN GEEN VLAGGEN, en dat is met opzet de veilige kant.
+		// De migratie weet niet HOEVEEL faciliteiten er in dit blok staan — dat
+		// zou betekenen dat hij het hele blok moet ontleden, en een migratie die
+		// de rest van het formaat moet begrijpen breekt bij de volgende
+		// wijziging. Een telling van 0 leest de deserializer als "de staart past
+		// niet bij de lijst", waarna hij alles op HEEL zet: precies het juiste
+		// antwoord voor een campagne die van vóór het schadesysteem komt en dus
+		// nooit een aanval op de basis heeft meegemaakt.
+		SaveSubsystem->RegisterMigration(6, UEclipseSaveSubsystem::FEclipseSaveMigration::CreateLambda(
+			[](TMap<FName, TArray<uint8>>& SaveBlocks)
+			{
+				TArray<uint8>* CampaignBlock = SaveBlocks.Find(TEXT("Campaign"));
+				if (CampaignBlock == nullptr || CampaignBlock->Num() < static_cast<int32>(sizeof(int32)))
+				{
+					return false;
+				}
+				*reinterpret_cast<int32*>(CampaignBlock->GetData()) = 7;
+				const int32 NoDamageFlags = 0;
+				CampaignBlock->Append(reinterpret_cast<const uint8*>(&NoDamageFlags), sizeof(int32));
 				return true;
 			}));
 	}

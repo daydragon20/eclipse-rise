@@ -332,6 +332,16 @@ FEclipseFacilityYieldParams ComputeFacilityYields(const FEclipseBaseState& BaseS
 			continue; // first build still in progress: no yield yet
 		}
 
+		// Beschadigd = OFFLINE tot reparatie (GDD 5.4). Dit hoort HIER en niet
+		// alleen op het scherm: een schadevlag die de opbrengst niet raakt is
+		// een plaatje, en dan is de aanval op de basis een cosmetisch akkefietje
+		// in plaats van iets wat je moet repareren. De vlag kost de speler
+		// vandaag echt zijn dagopbrengst.
+		if (Facility.bDamaged)
+		{
+			continue;
+		}
+
 		// Upgrades keep producing at the current level; a missing row or level
 		// entry is a silent skip here (the wrapper logs it once - GDD 14.3.5).
 		const FEclipseFacilityLevelData* LevelData = GetLevelData(FindFacilityRow(Facility.FacilityId), Facility.Level);

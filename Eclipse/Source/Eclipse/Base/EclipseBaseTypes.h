@@ -45,6 +45,38 @@ struct FEclipseFacilityLevelData
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base")
 	FGameplayTag UnlockTag;
+
+	/**
+	 * Dagelijks energieverbruik op dit niveau — de kolom "Energy upkeep" uit
+	 * GDD 5.3.1 (CC 2/4/6, Barracks 1/2/4, Workshop 2/5/9, IC 2/5/8, ...).
+	 *
+	 * NUL IS HIER GEEN NUL, EN DAT IS MET OPZET. De sliceverzameling in
+	 * `Tools/setup_base_data.py` authort vandaag GEEN energie — geen upkeep en
+	 * geen Power Plant — dus elke rij staat op 0. Het scherm mag daar niet
+	 * "balans in orde" van maken: 0 verbruik tegen 0 opwekking is niet een
+	 * gezonde basis, het is een basis waarvan niemand het verbruik heeft
+	 * ingevuld. `EclipseBaseView::ComposeBaseView` scheidt die twee expliciet
+	 * (`EEclipseEnergyDataState::Unauthored`), want een verzonnen groene balk
+	 * ziet er precies zo uit als een gemeten groene balk.
+	 *
+	 * De GETALLEN staan in GDD 5.3.1 en horen in de data, niet hier: zodra
+	 * iemand ze in DT_Facilities zet, gaat de band vanzelf leven zonder één
+	 * regel code (GDD 14.2).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base", meta = (ClampMin = 0))
+	int32 EnergyUpkeep = 0;
+
+	/**
+	 * Dagelijkse energie-OPWEKKING op dit niveau (GDD 5.3.1: de Power Plant is
+	 * de enige rij met "+10/+25/+50 Energy" als voordeel in plaats van upkeep).
+	 *
+	 * Een eigen veld en geen negatieve upkeep: opwekking en verbruik zijn twee
+	 * getallen die de speler apart moet kunnen lezen ("ik verbruik 14 van 25"),
+	 * en één veld met een teken zou die twee tot één samenvatten precies waar
+	 * de schaarste zit.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base", meta = (ClampMin = 0))
+	int32 EnergyOutput = 0;
 };
 
 /**
@@ -101,6 +133,26 @@ struct FEclipseBaseSlotDef
 	/** Streaming id per built level; index 0 = L1 (Workshop adds an L2 entry). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base")
 	TArray<FName> LevelStreamingIds;
+
+	/**
+	 * Vanaf welke uitbreidingstrap dit slot bestaat (GDD 5.2: 4 -> 8 -> 12 -> 16
+	 * over de campagne). 1 = er vanaf dag één.
+	 *
+	 * WAAROM DIT VELD ER IS TERWIJL ER NOG GEEN TRAP 2 BESTAAT. Het slotraster
+	 * moet drie toestanden tonen — bezet, vrij, nog VERGRENDELD
+	 * (`phase0/REFERENTIE_BASE_MAP.md` §2.3) — en zonder dit veld bestaat de
+	 * derde niet in de data. Dan is "vergrendeld" iets dat de tekenlaag moet
+	 * verzinnen, en dat is precies de fout die dit document verbiedt.
+	 *
+	 * WAT HIER NIET STAAT, en dat is een echt gat: GDD 5.2 geeft de LADDER
+	 * (4/8/12/16) maar nergens de TRIGGER — wat de trap doet oplopen (verhaal,
+	 * Command Center-niveau, aankoop, gegraven uitbreiding) is niet beslist.
+	 * `ComposeBaseView` neemt de bereikte trap daarom als PARAMETER aan in
+	 * plaats van hem af te leiden; zodra de trigger beslist is, vult de
+	 * aanroeper hem en verandert er niets aan de logica of het scherm.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Eclipse|Base", meta = (ClampMin = 1))
+	int32 UnlockTier = 1;
 };
 
 /**
