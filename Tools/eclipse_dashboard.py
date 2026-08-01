@@ -983,6 +983,29 @@ def scan_questions() -> list[dict]:
         qid = str(q.get("id", "")).upper()
         item = {**q, "id": qid, "antwoord": answers.get(qid)}
 
+        # Vorm afdwingen. Op 01-08 zetten O-17, O-18 en O-19 `stappen` als
+        # één string neer in plaats van een lijst; de pagina riep .map() aan
+        # en het tabblad Nu — het hoofdscherm van de owner — bleef leeg.
+        # Eén agent die een veld verkeerd invult mag zijn scherm nooit slopen,
+        # dus de server maakt er hier een lijst van in plaats van het door te
+        # geven en te hopen.
+        stappen = item.get("stappen")
+        if isinstance(stappen, str):
+            regels = [
+                re.sub(r"^\s*\d+[.)]\s*", "", r).strip()
+                for r in stappen.splitlines() if r.strip()
+            ]
+            item["stappen"] = regels
+        elif not isinstance(stappen, list):
+            item["stappen"] = []
+
+        opties = item.get("opties")
+        item["opties"] = [o for o in opties if isinstance(o, dict)] if isinstance(opties, list) else []
+
+        for veld in ("vraag", "waarom", "advies", "meer_info", "prio"):
+            if item.get(veld) is not None and not isinstance(item[veld], str):
+                item[veld] = str(item[veld])
+
         # Audio die bij deze vraag hoort, zodat hij het IN het dashboard
         # kan afspelen in plaats van mappen te moeten zoeken.
         item["audio"] = []
@@ -1039,6 +1062,17 @@ def write_answer(qid: str, waarde: str, tekst: str = "") -> dict:
 
 CASTING_DATA = REPO / "progress_media" / "casting" / "casting_stage1.json"
 CASTING_KEUZE = REPO / "phase0" / "CASTING_KEUZE.json"
+
+# O-16 is een ANDER soort keuze dan de shortlist hierboven. De shortlist vraagt
+# TWEE finalisten per rol en bewaart posities op de castingpagina; O-16 vraagt
+# EEN stem per rol+slot en bewaart de stem-id zelf. Die twee in een bestand
+# proppen zou `resolve_casting_choice.py` breken, dat posities verwacht.
+O16_KEUZE = REPO / "phase0" / "O16_KEUZE.json"
+
+# Waar de generator zijn audio neerzet. De namen zijn hashes van de opgeloste
+# stem-id + tekst, dus het bestand zelf zegt niets; de betekenis komt uit het
+# ledger en uit de .uasset ernaast.
+AUDIO_DIR = REPO / "Eclipse" / "Content" / "Audio" / "Generated"
 _casting_lock = threading.Lock()
 
 # De ElevenLabs-eigenschappen zijn Engelse steekwoorden. Nathan leest
@@ -1149,6 +1183,193 @@ def scan_casting() -> dict:
     }
 
 
+def lees_o16_keuze() -> dict:
+    if not O16_KEUZE.is_file():
+        return {}
+    try:
+        return json.loads(O16_KEUZE.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {}
+
+
+def scan_voorstel() -> dict:
+    """O-16: per rol+slot het voorstel en het alternatief, met Nathans keuze.
+
+    De bron is het `voorstel`-blok in casting_stage1.json. `rang` 1 is het
+    voorstel, hoger is een alternatief. Elk item draagt zijn eigen licentiestand
+    mee — negen van de tien komen uit de Voice Library en die moet Nathan met de
+    hand op de stemkaart nakijken; de API heeft dat veld niet.
+    """
+    if not CASTING_DATA.is_file():
+        return {"slots": [], "open": 0, "totaal": 0}
+    try:
+        data = json.loads(CASTING_DATA.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {"slots": [], "open": 0, "totaal": 0}
+
+    blok = data.get("voorstel") or {}
+    keuzes = blok.get("keuzes") or []
+    if not keuzes:
+        return {"slots": [], "open": 0, "totaal": 0}
+
+    gekozen = lees_o16_keuze()
+    per_slot: dict[str, dict] = {}
+    for k in keuzes:
+        rol = str(k.get("rol", ""))
+        slot = str(k.get("slot", "") or "-")
+        sleutel = f"{rol}:{slot}"
+        bestand = str(k.get("bestand", "")).replace("\\", "/")
+        lic = k.get("licentie") or {}
+        optie = {
+            "stem": k.get("stem", ""),
+            "voice_id": k.get("voice_id", ""),
+            "rang": k.get("rang", 9),
+            "reden": k.get("reden", ""),
+            "eigenschappen": _leesbaar(k.get("eigenschappen", "")),
+            "url": ("/" + urllib.parse.quote(bestand)) if bestand else "",
+            "licentie_status": lic.get("status", ""),
+            "licentie_url": lic.get("kaart_url", ""),
+        }
+        vak = per_slot.setdefault(sleutel, {
+            "sleutel": sleutel, "rol": rol, "slot": slot, "opties": [],
+        })
+        vak["opties"].append(optie)
+
+    slots = []
+    for vak in per_slot.values():
+        vak["opties"].sort(key=lambda o: o.get("rang", 9))
+        keus = gekozen.get(vak["sleutel"], {})
+        vak["gekozen_id"] = keus.get("voice_id", "")
+        vak["gekozen_stem"] = keus.get("stem", "")
+        vak["klaar"] = bool(vak["gekozen_id"])
+        for o in vak["opties"]:
+            o["gekozen"] = (o["voice_id"] == vak["gekozen_id"])
+        slots.append(vak)
+
+    slots.sort(key=lambda v: (v["klaar"], v["rol"], v["slot"]))
+    return {
+        "slots": slots,
+        "totaal": len(slots),
+        "klaar": sum(1 for v in slots if v["klaar"]),
+        "open": sum(1 for v in slots if not v["klaar"]),
+        "wat": blok.get("wat", ""),
+        "credits": blok.get("credits", ""),
+    }
+
+
+def zet_voorstel_keuze(rol: str, slot: str, voice_id: str) -> dict:
+    """Legt EEN stem vast op rol+slot. Klik dezelfde nog eens = weer los."""
+    rol = re.sub(r"[^a-zA-Z0-9_\-]", "", str(rol))[:48]
+    slot = re.sub(r"[^a-zA-Z0-9_\-]", "", str(slot))[:8]
+    voice_id = re.sub(r"[^a-zA-Z0-9]", "", str(voice_id))[:48]
+    if not rol or not voice_id:
+        return {"ok": False, "fout": "ongeldige rol of stem"}
+
+    # De naam erbij, zodat het bestand ook zonder de bron leesbaar blijft.
+    naam = ""
+    try:
+        data = json.loads(CASTING_DATA.read_text(encoding="utf-8", errors="replace"))
+        for k in (data.get("voorstel") or {}).get("keuzes") or []:
+            if k.get("voice_id") == voice_id:
+                naam = k.get("stem", "")
+                break
+    except Exception:
+        pass
+
+    sleutel = f"{rol}:{slot or '-'}"
+    with _casting_lock:
+        huidig = lees_o16_keuze()
+        if huidig.get(sleutel, {}).get("voice_id") == voice_id:
+            huidig.pop(sleutel, None)
+        else:
+            huidig[sleutel] = {"voice_id": voice_id, "stem": naam, "gezet": now_str()}
+        O16_KEUZE.parent.mkdir(parents=True, exist_ok=True)
+        O16_KEUZE.write_text(
+            json.dumps(huidig, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    return {"ok": True, "sleutel": sleutel, "gekozen": huidig.get(sleutel, {})}
+
+
+# O-14: Voss spreekt in twee stemmen omdat de speler kiest, en dat verdubbelt
+# elke regel — 41.140 credits, de helft van act 1. Nathans besluit (01-08): we
+# starten met ÉÉN stem. De tweede pas wanneer hij er zelf om vraagt, en die
+# vraag is deze knop. Hij vuurt met opzet GEEN generatie af: de dashboardserver
+# praat niet met ElevenLabs, en een klik die 20.570 credits uitgeeft hoort niet
+# in een pagina te zitten die zichzelf elke 5 seconden hertekent. De knop zet de
+# aanvraag klaar; de voice-director voert hem uit binnen de tier-volgorde.
+VOSS_AANVRAAG = REPO / "phase0" / "VOSS_TWEEDE_STEM_AANVRAAG.json"
+
+
+def scan_voss() -> dict:
+    aangevraagd = None
+    if VOSS_AANVRAAG.is_file():
+        try:
+            aangevraagd = json.loads(VOSS_AANVRAAG.read_text(encoding="utf-8", errors="replace"))
+        except Exception:
+            aangevraagd = None
+    return {
+        "aangevraagd": bool(aangevraagd),
+        "wanneer": (aangevraagd or {}).get("gezet", ""),
+        "kosten": 20_570,
+        "besluit": "Act 1 wordt met één Voss-stem ingesproken (O-14, 01-08).",
+    }
+
+
+def zet_voss_aanvraag(aan: bool) -> dict:
+    with _casting_lock:
+        if aan:
+            VOSS_AANVRAAG.parent.mkdir(parents=True, exist_ok=True)
+            VOSS_AANVRAAG.write_text(json.dumps({
+                "wat": "Genereer de tweede Voss-stem (de vrouwelijke variant).",
+                "kosten_schatting": 20_570,
+                "gezet": now_str(),
+                "voorwaarde": "Alleen uitvoeren als het ledger het toelaat en O-16 groen is.",
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+        elif VOSS_AANVRAAG.is_file():
+            VOSS_AANVRAAG.unlink()
+    return {"ok": True, "aangevraagd": aan}
+
+
+def scan_audio(limit: int = 200) -> dict:
+    """De geluidslaag: wat er daadwerkelijk gegenereerd op schijf staat.
+
+    Dit is met opzet een meting van BESTANDEN, niet van het ledger. Het ledger
+    zegt wat er betaald is; deze lijst zegt wat er klinkt. Lopen ze uit elkaar,
+    dan is dat precies het soort verschil dat je wilt zien.
+    """
+    bestanden = []
+    if AUDIO_DIR.is_dir():
+        for p in AUDIO_DIR.iterdir():
+            if p.suffix.lower() not in {".wav", ".mp3", ".ogg", ".flac"}:
+                continue
+            try:
+                st = p.stat()
+            except OSError:
+                continue
+            rel = p.relative_to(REPO).as_posix()
+            bestanden.append({
+                "naam": p.name,
+                "url": "/audio/" + urllib.parse.quote(rel),
+                "kb": round(st.st_size / 1024, 1),
+                "tijd": ago(st.st_mtime),
+                "ts": st.st_mtime,
+            })
+    bestanden.sort(key=lambda b: b["ts"], reverse=True)
+
+    # Hoeveel .uasset-barks er al gebouwd zijn — dat is de andere helft van
+    # de geluidslaag en staat in dezelfde map.
+    assets = 0
+    if AUDIO_DIR.is_dir():
+        assets = sum(1 for p in AUDIO_DIR.iterdir() if p.suffix.lower() == ".uasset")
+
+    return {
+        "bestanden": bestanden[:limit],
+        "totaal": len(bestanden),
+        "assets": assets,
+        "map": AUDIO_DIR.relative_to(REPO).as_posix() if AUDIO_DIR.is_dir() else "",
+    }
+
+
 def zet_casting_keuze(rol: str, nr: int) -> dict:
     """Zet een kandidaat aan of uit. Maximaal twee per rol — de oudste valt af."""
     rol = re.sub(r"[^a-zA-Z0-9_\-]", "", str(rol))[:48]
@@ -1231,6 +1452,9 @@ def scanner_loop() -> None:
             fresh["vragen"] = scan_questions()
             fresh["bevindingen"] = scan_findings()
             fresh["casting"] = scan_casting()
+            fresh["voorstel"] = scan_voorstel()
+            fresh["audio"] = scan_audio()
+            fresh["voss"] = scan_voss()
             fresh["docs"] = cached_docs
             fresh["disk"] = cached_disk
             slow_counter += 1
@@ -1269,8 +1493,32 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:  # noqa: N802
         """Nathan beantwoordt een vraag of kiest een stem, met een knop."""
         pad = urllib.parse.urlparse(self.path).path
-        if pad not in ("/api/answer", "/api/casting"):
+        if pad not in ("/api/answer", "/api/casting", "/api/voorstel", "/api/voss"):
             return self._send(404, b"niet gevonden", "text/plain; charset=utf-8")
+        if pad == "/api/voss":
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                payload = json.loads(self.rfile.read(min(length, 2_000)).decode("utf-8"))
+            except Exception as exc:
+                return self._json({"ok": False, "fout": f"onleesbaar: {exc}"})
+            res = zet_voss_aanvraag(bool(payload.get("aan")))
+            if res.get("ok"):
+                with _state_lock:
+                    _state["voss"] = scan_voss()
+            return self._json(res)
+        if pad == "/api/voorstel":
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                payload = json.loads(self.rfile.read(min(length, 8_000)).decode("utf-8"))
+            except Exception as exc:
+                return self._json({"ok": False, "fout": f"onleesbaar: {exc}"})
+            res = zet_voorstel_keuze(
+                payload.get("rol", ""), payload.get("slot", ""), payload.get("voice_id", "")
+            )
+            if res.get("ok"):
+                with _state_lock:
+                    _state["voorstel"] = scan_voorstel()
+            return self._json(res)
         if pad == "/api/casting":
             try:
                 length = int(self.headers.get("Content-Length") or 0)
@@ -1308,12 +1556,13 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/", "/index.html", "/START_HIER.html", "/PROGRESS.html"):
             return self._serve_file(REPO / "DASHBOARD.html", "text/html; charset=utf-8")
 
-        # De losse castingpagina is vervangen door het tabblad Casting: daar
-        # kan hij ook KIEZEN, en twee implementaties lopen gegarandeerd uit
-        # elkaar. Oude link blijft werken, hij komt alleen op de goede plek uit.
+        # De castingtab is op 01-08 verwijderd: alle tien slots liggen vast in
+        # phase0/O16_KEUZE.json en de poort bewaakt ze. Een oude bladwijzer mag
+        # daardoor niet op een lege pagina uitkomen — hij gaat naar Geluidslaag,
+        # waar de stemmen en het ledger nu wonen.
         if path.lower().endswith("/casting.html"):
             self.send_response(302)
-            self.send_header("Location", "/#casting")
+            self.send_header("Location", "/#geluid")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             return

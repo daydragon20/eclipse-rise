@@ -237,6 +237,16 @@ Live, ververst elke 5 s. **Werk na elke iteratie `progress_data.js` bij**: `bijg
 Houd deze drie vers, het dashboard kleurt ze rood als ze verlopen: `STATUS.md` (elke
 sessie), `JOUW_ACTIES.md` (bij elke owner-wijziging), `BESTURING.md` (7 d).
 
+> **De castingtab is 01-08 verwijderd** — alle keuzes liggen vast en de poort bewaakt ze,
+> dus een tab die niets meer doet is ruis op zijn scherm. **Er is niets verloren.** De
+> keuzes staan leesbaar in **`phase0/CASTING_DEFINITIEF.md`** (10 O-16-slots, 20 rollen,
+> 40 finalisten), gegenereerd uit de bron door `Tools/dump_casting_definitief.py`.
+> Bewerk dat document nooit met de hand — de bron blijft `O16_KEUZE.json` (Nathans eigen
+> keuzes, winnen altijd), `CASTING_KEUZE.json` en `CASTING_RESOLVED.json`.
+> **Vier stemmen wachten nog op licentiecontrole** (kaart O-20, owner-werk): genereer
+> niets voor die rond is, want een stem zonder licentie vervangen herbetaalt élke regel
+> van dat personage.
+
 ## Waar de rest staat
 
 | Nodig? | Lees dit |

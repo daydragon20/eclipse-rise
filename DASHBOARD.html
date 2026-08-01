@@ -256,7 +256,7 @@ h3{font-size:17px;margin:0 0 8px}
     <button data-v="agents">Agents</button>
     <button data-v="taken">Taken</button>
     <button data-v="schrijf">Schrijflaag</button>
-    <button data-v="casting">Casting</button>
+    <button data-v="geluid">Geluidslaag</button>
     <button data-v="beeld">Beeld</button>
     <button data-v="docs">Documenten</button>
     <button data-v="historie">Historie</button>
@@ -269,7 +269,7 @@ h3{font-size:17px;margin:0 0 8px}
   <section class="view" id="v-agents"></section>
   <section class="view" id="v-taken"></section>
   <section class="view" id="v-schrijf"></section>
-  <section class="view" id="v-casting"></section>
+  <section class="view" id="v-geluid"></section>
   <section class="view" id="v-beeld"></section>
   <section class="view" id="v-docs"></section>
   <section class="view" id="v-historie"></section>
@@ -350,7 +350,7 @@ function vNu(){
           <span class="tag ${q.prio==="nu"?"bad":q.prio==="later"?"":"warn"}">${esc(q.prio||"gauw")}</span>
           <h3 style="margin:0">${esc(q.vraag)}</h3></div>
         ${q.waarom?`<p class="waarom">${esc(q.waarom)}</p>`:""}
-        ${(q.stappen&&q.stappen.length)?`
+        ${(Array.isArray(q.stappen)&&q.stappen.length)?`
           <div class="stappen"><b>Wat je doet:</b><ol>${q.stappen.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>`:""}
         ${q.meer_info?`
           <button class="uitklap" onclick="klapUit('mi-${esc(q.id)}',this)">Hoe doe ik dit precies? ▾</button>
@@ -361,12 +361,12 @@ function vNu(){
               <audio controls preload="none" src="${a.url}"></audio></div>`).join("")}
           </div>`:(q.audio_map?`<div class="note">Zodra de fragmenten gegenereerd zijn, verschijnen ze hier als afspeelknopjes. Nu is er nog niets.</div>`:"")}
         <div class="knoppen">
-          ${(q.opties||[]).map(o=>`
+          ${(Array.isArray(q.opties)?q.opties:[]).map(o=>`
             <button class="kb" onclick="antwoord('${esc(q.id)}','${esc(o.waarde)}',this)"
                     title="${esc(o.gevolg||"")}">${esc(o.label)}</button>`).join("")}
         </div>
-        ${(q.opties||[]).some(o=>o.gevolg)?`<div class="gevolgen">
-          ${(q.opties||[]).filter(o=>o.gevolg).map(o=>`<div><b>${esc(o.label)}</b> — ${esc(o.gevolg)}</div>`).join("")}
+        ${(Array.isArray(q.opties)?q.opties:[]).some(o=>o&&o.gevolg)?`<div class="gevolgen">
+          ${(Array.isArray(q.opties)?q.opties:[]).filter(o=>o&&o.gevolg).map(o=>`<div><b>${esc(o.label)}</b> — ${esc(o.gevolg)}</div>`).join("")}
         </div>`:""}
         ${q.advies?`<div class="advies"><b>Mijn advies:</b> ${esc(q.advies)}</div>`:""}
         ${q.vrijtekst?`<input class="vt" id="vt-${esc(q.id)}" placeholder="Iets toe te voegen? (optioneel)">`:""}
@@ -709,56 +709,126 @@ function vHistorie(){
   </div>`;
 }
 
-function vCasting(){
-  const c=S.casting||{}, rollen=c.rollen||[];
-  if(!rollen.length)return '<h2>Casting</h2><div class="card"><div class="empty">Nog geen kandidaten. voice-director maakt de shortlist.</div></div>';
-  const pct=c.totaal?Math.round(c.gekozen/c.totaal*100):0;
+/* O-16: de blokkade. Dit staat BOVEN de shortlist omdat het de enige keuze is
+   die nu echt iets tegenhoudt — 704 regels audio staan hierop te wachten. */
+function voorstelBlok(){
+  const v=S.voorstel||{}, slots=v.slots||[];
+  if(!slots.length)return "";
+  const klaar=v.klaar||0, tot=v.totaal||0;
+  const pct=tot?Math.round(klaar/tot*100):0;
   return `
-  <h2>Stemmen kiezen — ${c.gekozen} van ${c.totaal} rollen klaar</h2>
-  <div class="card">
-    <div class="bar"><i style="width:${pct}%"></i></div>
+  <div class="card" style="border-left:3px solid var(--bad)">
+    <div class="ow-h">
+      <span class="tag ${v.open?"bad":"ok"}">${v.open?v.open+" open":"✓ compleet"}</span>
+      <h3 style="margin:0">O-16 — de castingblokkade</h3>
+      <span class="m" style="margin-left:auto">${klaar}/${tot}</span>
+    </div>
+    <div class="bar" style="margin-top:10px"><i style="width:${pct}%"></i></div>
     <div class="note" style="margin-top:12px">
-      <strong>Kies er TWEE per rol.</strong> Niet één winnaar — twee finalisten. Die krijgen daarna
-      jouw échte tekst te spreken (de signature-regel, een emotioneel uiterste en een gevechtsregel),
-      en pas dán wordt er gelockt. Wat je nu hoort zijn de <strong>gratis previews</strong> met
-      algemene voorbeeldtekst, dus je beoordeelt timbre, leeftijd, accent en register — geen acteerwerk.
-      <br><br>Je keuzes worden meteen bewaard in <code>phase0/CASTING_KEUZE.json</code>. Je kunt
-      later terugkomen en wisselen; klik een gekozen stem nog eens aan om hem los te laten.
+      <strong>Hier kies je ÉÉN stem per slot</strong> — niet twee. Drie stem-id's staan nu op
+      twéé rollen tegelijk, en dat is niet "lijkt op elkaar" maar letterlijk dezelfde stem:
+      Mara zou klinken als een willekeurige schutter. Twee slots zijn helemaal leeg — die acht
+      regels worden zonder foutmelding <strong>stilte</strong>.
+      <br><br>Casting is <strong>permanent</strong>: de stem-id zit in de cachesleutel, dus wie
+      later wisselt herbetaalt elke regel van dat personage. Daarom staat er per slot een
+      voorstel én een alternatief, met een fragment bij allebei.
+      <br><br>Je keuze gaat naar <code>phase0/O16_KEUZE.json</code>. Klik dezelfde stem nog eens
+      aan om hem los te laten. <strong>Er wordt niets ingesproken tot dit rond is</strong>, dus
+      wisselen kost je nu nog nul credits.
     </div>
   </div>
-  ${rollen.map(r=>`
-    <div class="card rol ${r.klaar?"klaar":""}">
+  ${slots.map(s=>`
+    <div class="card rol ${s.klaar?"klaar":""}">
       <div class="ow-h">
-        <span class="tag ${r.klaar?"ok":r.prio<=1?"bad":"warn"}">${r.klaar?"✓ 2 gekozen":r.gekozen.length+"/2"}</span>
-        <h3 style="margin:0">${esc(r.label)}</h3>
-        <span class="m" style="margin-left:auto">${esc(r.tier)}</span>
+        <span class="tag ${s.klaar?"ok":"bad"}">${s.klaar?"✓ gekozen":"open"}</span>
+        <h3 style="margin:0">${esc(s.rol)}${s.slot&&s.slot!=="-"?" · slot "+esc(s.slot):""}</h3>
+        ${s.klaar?`<span class="m" style="margin-left:auto">${esc(s.gekozen_stem)}</span>`:""}
       </div>
-      ${r.wie?`<div class="rolinfo">
-        <div><b>Wie</b> ${esc(r.wie)}</div>
-        ${r.boog?`<div><b>Verhaal</b> ${esc(r.boog)}</div>`:""}
-        ${r.stemstijl?`<div><b>Praat zo</b> ${esc(r.stemstijl)}</div>`:""}
-        ${r.signature?`<div><b>Proefzin</b> <em>"${esc(r.signature)}"</em></div>`:""}
-      </div>`:(r.fingerprint?`<p class="waarom"><strong>Moet klinken als:</strong> ${esc(r.fingerprint)}</p>`:"")}
       <div class="kandidaten">
-        ${r.kandidaten.map(k=>`
-          <div class="kand ${k.gekozen?"gekozen":""}">
+        ${(s.opties||[]).map(o=>`
+          <div class="kand ${o.gekozen?"gekozen":""}">
             <div class="kand-kop">
-              <button class="kies ${k.gekozen?"aan":""}"
-                onclick="kiesStem('${esc(r.rol)}',${k.nr},this)">${k.gekozen?"✓ gekozen":"kies"}</button>
-              <strong>${esc(k.stem)}</strong>
-              <span class="eig">${esc(k.eigenschappen)}</span>
-              ${k.categorie&&k.categorie!=="premade"?`<span class="tag warn">licentie nakijken</span>`:""}
+              <button class="kies ${o.gekozen?"aan":""}"
+                onclick="kiesVoorstel('${esc(s.rol)}','${esc(s.slot)}','${esc(o.voice_id)}',this)">${o.gekozen?"✓ gekozen":"kies"}</button>
+              <strong>${esc(o.stem)}</strong>
+              <span class="tag ${o.rang===1?"ok":"warn"}">${o.rang===1?"voorstel":"alternatief"}</span>
+              <span class="eig">${esc(o.eigenschappen)}</span>
             </div>
-            <div class="kand-waarom">${esc(k.waarom)}</div>
-            ${k.beschrijving?`<div class="kand-eigen">"${esc(k.beschrijving)}"</div>`:""}
-            ${k.populariteit?`<div class="pop">✓ ${esc(k.populariteit)}</div>`:""}
-            ${k.url?`<audio controls preload="none" src="${k.url}"></audio>`:'<div class="note">geen fragment</div>'}
+            <div class="kand-waarom">${esc(o.reden)}</div>
+            ${o.licentie_status&&o.licentie_status!=="OK"?`<div class="pop">⚠ licentie nog niet nagekeken —
+              ${o.licentie_url?`<a href="${esc(o.licentie_url)}" target="_blank" rel="noopener">open de stemkaart</a>`:"handmatig controleren"}</div>`:""}
+            ${o.url?`<audio controls preload="none" src="${o.url}"></audio>`:'<div class="note">geen fragment</div>'}
           </div>`).join("")}
       </div>
     </div>`).join("")}`;
 }
 
-const VIEWS={nu:vNu,voortgang:vVoortgang,agents:vAgents,taken:vTaken,schrijf:vSchrijf,casting:vCasting,beeld:vBeeld,docs:vDocs,historie:vHistorie};
+/* De geluidslaag: wat er echt gegenereerd op schijf staat, naast het budget. */
+function vGeluid(){
+  const a=S.audio||{}, v=S.voice||{}, best=a.bestanden||[], vs=S.voss||{};
+  const pct=v.budget?Math.round((v.spent||0)/v.budget*100):0;
+  return `
+  <h2>Geluidslaag — ${a.totaal||0} fragmenten gegenereerd</h2>
+  <div class="card">
+    <div class="ow-h">
+      <span class="tag ${pct>90?"bad":pct>70?"warn":"ok"}">${(v.spent||0).toLocaleString("nl")} / ${(v.budget||0).toLocaleString("nl")}</span>
+      <h3 style="margin:0">Credits</h3>
+      <span class="m" style="margin-left:auto">${(v.remaining||0).toLocaleString("nl")} over</span>
+    </div>
+    <div class="bar" style="margin-top:10px"><i style="width:${pct}%"></i></div>
+    <div class="note" style="margin-top:12px">
+      De credits vervallen op <strong>21 augustus</strong> en rollen niet door; de harde stop voor
+      generatie is <strong>19 augustus</strong>, twee dagen buffer voor een mislukte batch.
+      Act 1 alleen kost al ~100.000. Acts 2–4 krijgen daarom géén stem — die worden
+      script-compleet afgemaakt.
+      <br><br>Deze lijst meet <strong>bestanden op schijf</strong>, niet het ledger. Het ledger zegt
+      wat er betaald is, dit zegt wat er klinkt — lopen ze uit elkaar, dan wil je dat zien.
+      ${a.assets?`<br><br><strong>${a.assets}</strong> bark-assets (.uasset) gebouwd in dezelfde map.`:""}
+    </div>
+  </div>
+  <div class="card" style="border-left:3px solid ${vs.aangevraagd?"var(--warn)":"var(--line)"}">
+    <div class="ow-h">
+      <span class="tag ${vs.aangevraagd?"warn":"ok"}">${vs.aangevraagd?"aangevraagd":"O-14 beslist"}</span>
+      <h3 style="margin:0">Voss — de tweede stem</h3>
+      <span class="m" style="margin-left:auto">${(vs.kosten||0).toLocaleString("nl")} credits</span>
+    </div>
+    <div class="note" style="margin-top:12px">
+      Voss spreekt in twee stemmen omdat de speler kiest, en dat verdubbelt elke regel:
+      <strong>41.140 credits, de helft van heel act 1</strong>. Besluit: we starten met
+      <strong>één stem</strong>. Dat bespaart 20.570 in één klap — de keerzijde is dat tot dan
+      de helft van de spelers zichzelf niet hoort.
+      <br><br>Deze knop <strong>genereert niets meteen</strong>. Hij zet de aanvraag klaar in
+      <code>phase0/VOSS_TWEEDE_STEM_AANVRAAG.json</code>; de voice-director voert hem uit binnen
+      de tier-volgorde en pas als het ledger het toelaat. Zo kan één misklik op een pagina die
+      zichzelf elke 5 seconden hertekent nooit 20.570 credits kosten.
+      ${vs.aangevraagd?`<br><br><strong>Aangevraagd op ${esc(vs.wanneer)}.</strong>`:""}
+    </div>
+    <button class="kies ${vs.aangevraagd?"aan":""}" style="margin-top:12px"
+      onclick="vraagVoss(${vs.aangevraagd?"false":"true"},this)">
+      ${vs.aangevraagd?"↩ aanvraag intrekken":"Maak ook de vrouwelijke Voss-stem"}</button>
+  </div>
+  ${(v.rows||[]).length?`<div class="card"><h3>Ledger <span class="tag">${(v.rows||[]).length}</span></h3>
+    ${(v.rows||[]).map(r=>`<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px">
+      <span class="m">${esc(r.datum)}</span><strong>${esc(r.tier)}</strong>
+      <span style="color:var(--dim)">${esc(r.scope)}</span>
+      <span style="margin-left:auto">${(r.credits||0).toLocaleString("nl")}</span></div>`).join("")}
+  </div>`:""}
+  <div class="card"><h3>Gegenereerde fragmenten <span class="tag">${a.totaal||0}</span></h3>
+    ${best.length?best.map(b=>`
+      <div style="padding:9px 0;border-bottom:1px solid var(--line)">
+        <div style="display:flex;gap:10px;align-items:center;font-size:12.5px">
+          <strong style="font-family:monospace">${esc(b.naam)}</strong>
+          <span class="m">${b.kb} kB</span>
+          <span class="m" style="margin-left:auto">${esc(b.tijd)}</span>
+        </div>
+        <audio controls preload="none" src="${b.url}" style="margin-top:6px"></audio>
+      </div>`).join(""):`<div class="empty">Nog niets gegenereerd — O-16 blokkeert alle generatie.
+        Zolang die kaart open staat wordt er geen seconde ingesproken.</div>`}
+  </div>`;
+}
+
+
+const VIEWS={nu:vNu,voortgang:vVoortgang,agents:vAgents,taken:vTaken,schrijf:vSchrijf,geluid:vGeluid,beeld:vBeeld,docs:vDocs,historie:vHistorie};
 
 // Waarom dit bestaat: de pagina bouwde zichzelf elke 5 s opnieuw op, en gooide
 // daarmee een spelende <audio> weg. Owner 31-07: "als je de audio luistert
@@ -785,7 +855,13 @@ function render(force){
   vorigeVinger=v;
   toonPauze(null);
   try{document.getElementById("v-"+cur).innerHTML=VIEWS[cur]();}
-  catch(e){document.getElementById("v-"+cur).innerHTML='<div class="card"><div class="empty">Renderfout: '+esc(e.message)+'</div></div>';}
+  catch(e){
+    console.error("view "+cur+" faalde:",e);
+    document.getElementById("v-"+cur).innerHTML=
+      '<div class="card"><h3 style="color:var(--bad)">Deze tab kon niet getekend worden</h3>'+
+      '<p class="waarom">'+esc(e.message)+'</p>'+
+      '<div class="note">De rest van het dashboard werkt gewoon. Meestal betekent dit dat een agent een veld verkeerd heeft ingevuld in phase0/owner_questions.json of progress_data.js.</div></div>';
+  }
 }
 
 /* ---------- overlay ---------- */
@@ -870,6 +946,33 @@ function openImg(u,n){
   document.getElementById("ov-t").textContent=n;
   document.getElementById("ov-b").innerHTML='<img src="'+u+'">';
   ov.classList.add("on");
+}
+
+async function vraagVoss(aan,btn){
+  if(aan&&!confirm("De tweede Voss-stem klaarzetten?\n\nKost naar schatting 20.570 credits wanneer de voice-director hem uitvoert. Er gaat NU niets uit — dit zet alleen de aanvraag klaar."))return;
+  btn.disabled=true;
+  try{
+    const r=await fetch("/api/voss",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({aan})});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.fout||"mislukt");
+    poll();
+  }catch(e){btn.textContent="mislukt";}
+  finally{btn.disabled=false;}
+}
+
+async function kiesVoorstel(rol,slot,voice_id,btn){
+  btn.disabled=true;
+  try{
+    const r=await fetch("/api/voorstel",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({rol,slot,voice_id})});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.fout||"mislukt");
+    poll();
+  }catch(e){btn.textContent="mislukt";}
+  finally{btn.disabled=false;}
 }
 
 async function kiesStem(rol,nr,btn){
