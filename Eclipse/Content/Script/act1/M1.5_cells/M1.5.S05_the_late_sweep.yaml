@@ -19,7 +19,13 @@ words:        132
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      VOSS, MARA, BRICK, the emissary, Iron Chorus fighters; VEIL SWEEP TEAM
-# flags-in:  Story.Choice.M15_ShiftBossSpared
+# flags-in:  Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}
+#            script side: story.m15_shiftboss == "killed" | "prevented" | "warned",
+#            read at .240 / .250 / .260. CORRECTED 01-08 (L1-R31 housekeeping): this header
+#            still carried the boolean Story.Choice.M15_ShiftBossSpared, withdrawn by L1-R3
+#            and set by nothing. THE THREE `condition:` LINES IN THIS FILE WERE ALWAYS
+#            CORRECT - only the instruction was wrong, and a header is what the next writer
+#            reads before he types one (L1-R29).
 # flags-out: none
 # beats:     1) the sweep closes
 #            2) THE VEIL, PHYSICALLY, FOR THE FIRST TIME. Calm, clinical vocabulary

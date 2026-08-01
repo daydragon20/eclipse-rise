@@ -231,7 +231,7 @@ Canon (§2.4): de ouders stierven bij de **Foundry Collapse van 484 AE**, die AE
 
 | In | Uit |
 |---|---|
-| `Story.Intel.K77Manifest` · `Story.Char.PetraLocated` · `Story.Choice.M15_IronChorusPact` · `Story.Thread.MaraLetters_Open` (hub) | `Story.Beat.M18_BlacksiteK77` ✚ · `Story.Char.MaraDead` ✚ · `Story.Char.PetraRescued` ✚ · `Story.Char.CinderNamed` ✚ · `Story.Thread.WallOpen` ✚ · `Story.Thread.MaraLetters_Open` ✚ · `Story.Beat.Act1Complete` ✚ |
+| `Story.Intel.K77Manifest` · `Story.Char.PetraLocated` · `Story.Choice.M15_Pact.{Full,Limited,None}` (script-zijde `story.m15_pact`, gelezen in S99 — naam bijgetrokken 01-08) · `Story.Choice.M15_ShiftBoss.Warned` (P3-d-verwisseling, alleen die tak) · `Story.Thread.MaraLetters_Open` (hub) | `Story.Beat.M18_BlacksiteK77` ✚ · `Story.Char.MaraDead` ✚ · `Story.Char.PetraRescued` ✚ · `Story.Char.CinderNamed` ✚ · `Story.Thread.WallOpen` ✚ · `Story.Thread.MaraLetters_Open` ✚ · `Story.Beat.Act1Complete` ✚ |
 
 ---
 

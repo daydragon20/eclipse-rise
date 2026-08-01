@@ -233,11 +233,16 @@ Never ship a line containing:
 | **Symmetry** | Characters alternate strict A-B-A-B for more than six turns with no interruption or silence |
 | **Name density** | Characters address each other by name more than once per eight turns |
 | **Triads** | Any "X, Y, and Z" rhetorical triple more than once per scene |
+| **Maxims** | More than one quotable general truth from the same mouth per scene |
 | **Em-dash rate** | More than one dash-interrupted line per five lines |
 | **Explaining** | Any line whose sole function is to convey information the codex could carry |
 | **Articulacy** | Every character speaks in complete, grammatical sentences — nobody stumbles, repeats, or trails off |
 | **Fingerprint** | **Scene-level, scored by C1's 80% bar — not per line.** Taken literally per line this check fails every scene ever written, because "Move." and "Nine minutes." belong to nobody in particular and should. The failure is a *scene* whose lines are broadly interchangeable; the measure is C1's strip test. |
 | **Breath** | Any line that cannot be read aloud in one breath (§18.2 law 5) |
+
+**The Maxims row, added 2026-08-01 by `story-architect` (ruling L1-R40).** A maxim is a line that would survive being lifted out of the room — a general truth about war, people, or the Dominion, shaped to be repeated. **One per scene per character. Six across a mission is a leader who thinks in rules and that is characterisation; two in one scene, four lines apart, about the same thing, is the form becoming the tell.** This is the same boundary the Triads row draws and it is drawn for the same reason: the construction is not the problem, the density is.
+
+It exists because the Act 1 touch inventory measured *plants* and nobody measured *touches* — a table that counts one thing and is used to check another is not a measurement (`phase0/beats/RULINGS_L1.md`, L1-R21). **Not yet swept across the existing corpus**: apply it to new work, and measure before gating an already-written scene on it.
 
 ### C. The three tests
 

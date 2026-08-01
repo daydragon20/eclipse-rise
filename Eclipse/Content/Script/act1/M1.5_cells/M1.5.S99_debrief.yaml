@@ -19,8 +19,14 @@ words:        344
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----
 # cast:      MARA, VOSS, DEX, BRICK, REYES
-# flags-in:  Story.Choice.M15_ShiftBossSpared
-# flags-out: Story.Beat.M15_Cells ✚ · Story.Choice.M15_IronChorusPact ✚  (NEW TAGS)
+# flags-in:  Story.Choice.M15_Terms.{Accepted,Conditional,Counter,Refused}  - read at .150
+#            (story.m15_terms == "counter"). THAT IS THE ONLY FLAG THIS SCENE READS.
+#            CORRECTED 01-08: this header named Story.Choice.M15_ShiftBossSpared, which is
+#            (a) withdrawn by L1-R3 and set by nothing, and (b) NOT READ ANYWHERE IN THIS
+#            FILE - zero conditions. Two lies in one line, and a header is an instruction.
+# flags-out: Story.Beat.M15_Cells ✚ · Story.Choice.M15_Pact.{Full,Limited,None} ✚  (NEW TAGS)
+#            script side: story.m15_pact = "full" | "limited" | "none", set by the choice
+#            block on .020/.030/.040 and read in-scene at .070/.080/.200/.210.
 # commit:    modest materials + intel; the real reward is the alliance
 # beats:     1) the outcome: pact or refusal
 #            2) Dex's objection or agreement - he thinks in systems and immediately sees
@@ -39,13 +45,22 @@ words:        344
 # ---- dialogue-writer notes (L2) ----
 # format:    L1-R2 choice field, group m15_pact. L1-R3 applied to the outcome as well:
 #            story.m15_pact = full | limited | none, mapping to
-#            Story.Choice.M15_IronChorusPact.Full / .Limited / .None.
-#            ESCALATION: ACT1_OVERVIEW section 6 lists Story.Choice.M15_IronChorusPact as a
-#            single tag, which reads as a boolean. "Limited" is not half a yes - it is the
-#            branch where Ember fights beside the Iron Chorus and refuses their intake
-#            doctrine, and M1.8.S99's vote and act 2's merger/schism need to tell it apart
-#            from a full pact. Same argument L1-R3 already accepted for the shift boss.
-#            Read by: M1.8.S99, act 2, and .070/.080/.200/.210 in this file.
+#            Story.Choice.M15_Pact.Full / .Limited / .None  (spelling fixed 01-08).
+#            *** ESCALATION CLOSED 01-08 - RULING L1-R13, AND THE WRITER WAS RIGHT. ***
+#            He escalated that ACT1_OVERVIEW section 6 listed Story.Choice.M15_IronChorusPact
+#            as a single tag, which reads as a boolean, while "limited" is not half a yes -
+#            it is the branch where Ember fights beside the Iron Chorus and refuses their
+#            intake doctrine, and M1.8.S99's vote and act 2's merger/schism have to tell it
+#            apart from a full pact. UPHELD. The three leaves are in ACT1_OVERVIEW section 6
+#            and the tag is now spelled Story.Choice.M15_Pact (the explanatory name lost on
+#            01-08 because twenty script lines already normalise to story.m15_pact - see the
+#            block under that row). L1-R13 additionally gated `split` on the FULL pact only
+#            and ruled that the limited branch gets two options and no invented third.
+#            Read by: M1.8.S99 (3), M1.6.S02 (2), M1.6.S04 (2), act 2, and
+#            .070/.080/.200/.210 in this file.
+#            LEFT OPEN AND NOT DECIDED: .050/.060 ("Two cells, one street, one net") play
+#            unconditionally and read as a pact statement in the `none` branch. Defensible,
+#            weakest of the three, on the act-1 continuity pass (L1-R24).
 # band:      cutscene (20-60). Ceiling respected (max 21 w), register reached at .110.
 # spread:    2 w (.130 / .190) to 21 w (.110) = 10.5x.
 #
@@ -155,6 +170,7 @@ lines:
     speaker: VOSS
     voice:   voss
     text:    "Eleven. Maybe fourteen."
+    note:    "ELEVEN CLAIMED, ruling L1-R31. This is not a second meaning of the number - it is Voss reaching for the size of his own cell as a yardstick for strangers, and finding it too small inside four words. The scene uses fourteen from here on (.110). L1-R14 holds: eleven is Ember."
 
   - id:      M1.5.S99.110
     speaker: REYES

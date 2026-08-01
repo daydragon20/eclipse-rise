@@ -20,7 +20,10 @@ words:        134
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, BRICK, fighters; Iron Chorus fighters IF the pact holds;
 #            Dominion conscript guards (barks)
-# flags-in:  Story.Choice.M15_IronChorusPact
+# flags-in:  Story.Choice.M15_Pact.{Full,Limited,None} - script side story.m15_pact, read at
+#            .160/.170 with != "none". The Chorus fights beside Ember in the LIMITED branch
+#            too; only S04's `split` option requires == "full" (L1-R13). Name corrected
+#            01-08; the shipped conditions were already right.
 # flags-out: none
 # beats:     1) the run-up; the train
 #            2) boarding

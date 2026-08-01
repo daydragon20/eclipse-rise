@@ -39,8 +39,13 @@ words:        259
 # ---- dialogue-writer notes (L2) ----
 # format:    written against SCRIPT_FORMAT rulings L1-R1 (bands are ceilings), L1-R5 (voice
 #            keys from the casting file: mara / dex / reyes / brick / voss) and L1-R6 (role
-#            speakers). NOTE: M1.1's scenes still carry the superseded mara_sovann /
-#            dex_callum / elin_reyes keys - flagged in the report, not touched by me.
+#            speakers).
+#            *** THE DEFECT THIS NOTE REPORTED IS FIXED - CLOSED 01-08 BY L1. ***
+#            It said "M1.1's scenes still carry the superseded mara_sovann / dex_callum /
+#            elin_reyes keys". Grepped across the corpus: those three keys appear nowhere
+#            except in this note. The report was correct when it was written and the sweep
+#            happened afterwards. A closed finding left standing is an instruction to the
+#            next writer (L1-R30), which is the only reason this is being touched at all.
 # band:      cutscene (20-60). Ceiling respected (max 22 w). Register reached at .040.
 # spread:    1 w (.180) to 22 w (.040) = 22x.
 # ar-5:      Mara says neither "I" nor "you" anywhere in this mission. Checked line by line.

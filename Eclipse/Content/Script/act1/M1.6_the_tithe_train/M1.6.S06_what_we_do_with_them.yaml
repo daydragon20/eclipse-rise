@@ -19,7 +19,10 @@ words:        456
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      MARA, VOSS, SELA, REYES, DEX, BRICK, dozens of newcomers (unnamed)
-# flags-in:  story.m15_shiftboss ("killed" | "prevented" | "warned")  ·  story.m16_train
+# flags-in:  story.m15_shiftboss ("killed" | "prevented" | "warned")  - read at .250/.260/.270
+#            AND NOTHING ELSE. Corrected 01-08: this line also named `story.m16_train`, which
+#            this scene reads in zero conditions. (`story.m16_letters_allowed` is set AND read
+#            inside this file, .190/.200 -> .210-.240, so it is an out, not an in.)
 #
 # *** CORRECTED 2026-07-31 - RULING L1-R12. THIS WAS MY ERROR, NOT THE WRITER'S. ***
 # Ruling L1-R3 turned the shift-boss choice into three leaves and I propagated it to the
@@ -139,6 +142,7 @@ lines:
     voice:   dex
     text:    "Forty-one. I counted it twice and got two numbers, so, forty-one."
     shot:    "The vault floor is blankets end to end. Somebody is crying near the water line and somebody four feet away is asleep with a boot still on."
+    note:    "*** FORTY-ONE IS A CAMPAIGN CONSTANT AND THIS LINE DOES NOT BRANCH - ruling L1-R32, 01-08. *** The number is the intake in ALL THREE branches; the branches differ in WHO, not in how many. It is spoken on fourteen further occasions across M1.6, M1.7, M1.8 and the hub, so conditioning it here would turn thirteen unconditional lines into contradictions and push the count into act 2 as a `condition` on every line about the intake. AND IT WOULD CLAIM SOMETHING UNTRUE: nobody ever counted that train (S01.110/.120 - 'that isn't a number, that's a hope'). This is the only count anybody makes, by one man, twice, disagreeing with himself. The price of each branch is the woman in the yard coat, three times (M1.6.S05), and it is already written."
 
   - id:      M1.6.S06.020
     speaker: DEX

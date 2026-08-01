@@ -103,8 +103,13 @@ Vertel dat de speler niet. Laat het achteraf blijken, in M1.7, als het log laat 
 
 **Beats:** (1) Het wardenkantoortje: een bureau, een stempelkussen, een lijst met absenten. (2) Voss opent de terminal — technicus-vocabulaire, geen uitleg (§18.8). (3) **Dex leest de staande order hardop.** (4) Een grap over wat de Veil kwijt is. (5) Mara's reactie: dat betekent dat ze naar iemand anders kijken. Opluchting.
 **P2-a.** De schrijver moet drie dingen halen en niet meer: *custodian*, *key-token*, *staat boven celbestrijding*. Geen enkel personage vraagt wat een custodian is. Dat is §18.8 in één beat, en het is de reden dat de onthulling in act 2 werkt.
-**P2-d (optioneel):** een tweede record met een weggelakte naam in het huishouden van de Arbiter. Alleen als de speler doorzoekt. Geen dialoog nodig — één regel van Dex die het niet begrijpt en verder gaat.
-**Systeem:** `Story.Clue.CustodianKey`.
+**Systeem:** `Story.Clue.CustodianKey`, **gezet door deze scène** — daar waar `.120` hem uitspreekt, en uitdrukkelijk niet door de debrief (L1-R38). Zet je hem in S99, dan krijgt de speler die dit kantoortje oversloeg de clue alsnog, en act 2 rekent hem af op iets wat hij nooit gehoord heeft.
+
+> **P2-d STAAT HIER NIET MEER — ruling L1-R37 (01-08). Dit was mijn fout en hij stond in twee van mijn eigen documenten.** Deze beat-sheet zette het geredigeerde personeelsrecord in `M1.2.S04`; `ACT1_OVERVIEW` §4 zet hem in `M1.7.S03`. **Beide zeiden "één Dex-regel die het niet begrijpt en verder gaat", en ze noemden twee verschillende scènes.** De M1.2-schrijver heeft het conflict gezien, volgens deze stub geschreven en geëscaleerd — de juiste volgorde.
+>
+> **P2-d woont in `M1.7.S03.250` en nergens anders.** Vier redenen, op volgorde van gewicht: (1) de M1.7-versie is poortbaar (`run.m17_record`) en de M1.2-versie was onvoorwaardelijk — een beat die per spec optionele textuur is en die elke speler verplicht hoort, is geen textuur meer; (2) de beat moet iets zijn waar niemand twee keer naar kijkt, en vier regels ís twee keer kijken; (3) **P2-d hoort bij P2-b, niet bij P2-a** — in M1.7.S03 vindt de speler twee afwezigheden in één scherm (een query-keten ouder dan alles erboven, en een naam die uit een index is gelicht), en dat cluster is waar hij een tweede jager moet voelen; hier zou het een curiositeit zijn zonder iets om aan te hechten; (4) L1-R26 heeft de machinerie al aan de M1.7-kant gezet (vlag gedeclareerd, 96 credits begroot, datataak in `VOICE_LEDGER.md`).
+>
+> **AR-9 blijft voldaan:** `.120` is de verplichte gesproken drager van P2-a en verandert niet. **Wat er nu moet gebeuren:** `dialogue-writer` M1.2 verwijdert `.220`–`.250`; `.210` loopt schoon door naar `.260`.
 
 ### S05 — *Two Ways Out* · extractie
 `Kessara / Mid-Works / Worker Housing` · in-mission-radio · tier 2
@@ -144,7 +149,7 @@ Vertel dat de speler niet. Laat het achteraf blijken, in M1.7, als het log laat 
 
 | Wending | Handeling |
 |---|---|
-| **T2** Whisper = Ilan Vex | **geplant, dragend** (S04, P2-a). Optionele verdieping P2-d. |
+| **T2** Whisper = Ilan Vex | **geplant, dragend** (S04, P2-a). **P2-d valt hier weg** — die hoort bij P2-b in `M1.7.S03` (L1-R37). |
 | **T4** AEGIS liet het toe | **geplant, dragend** (S03, P4-a). De verklaring moet overtuigen. |
 | **T1** Blight | geplant als dressing (S02, P1-c). Geen dialoog. |
 | **T5** Kaine | telling loopt door in de alarm-tak van S05. |
@@ -169,7 +174,7 @@ Vertel dat de speler niet. Laat het achteraf blijken, in M1.7, als het log laat 
 |---|---|---|
 | 5 Intel uitgeven in prep | prep, opgezet in S01 | precieze dropplekken vs. zoekgebieden |
 | Ghost of luid | uitvoering | `Story.Choice.M12_Ghost`; twee volledige takken in S05; +10 M/+4 I |
-| Doorzoeken van het wardenkantoortje | S04 | `Story.Clue.CustodianKey` verdieping (P2-d) |
+| Het wardenkantoortje binnengaan | S04 | `Story.Clue.CustodianKey` — **de clue zelf**, niet een verdieping. Wie de kamer overslaat, mist hem, en dat is de bedoeling (L1-R38). P2-d hoort niet meer bij deze keuze (L1-R37) |
 
 ---
 

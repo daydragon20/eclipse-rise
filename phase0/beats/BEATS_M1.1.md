@@ -111,7 +111,7 @@ Beweging I, eerste stap. De cel is op zijn kleinst en het meest onzichtbaar. De 
 - **turn** — Whatever Voss decides, the cell watches him decide it, and that is the thing that changes.
 
 **Beats:** (1) De conscript leeft, is jong, en praat procedureel omdat hij het zo geleerd heeft — hij noemt zijn eenheidsnummer, niet zijn naam. (2) De vechter wil doorlopen. (3) Mara zegt niets. Bewust — zij bewaart haar "wij" hier. (4) Voss kiest: **afmaken / laten liggen / verbinden en achterlaten**. (5) Eén reactie per keuze van de vechter, één van Mara.
-**Systeem:** zet `Story.Choice.M11_ConscriptSpared`. Eerste invoer in de T5-telling (Kaine's geweten, act 4).
+**Systeem:** zet `Story.Choice.M11_Conscript.{Finished,Left,Bound}` — script-zijde `story.m11_conscript_choice` = `finished` | `left` | `bound` (L1-R3). Eerste invoer in de T5-telling (Kaine's geweten, act 4); **`.Bound` telt als genade.** De boolean `M11_ConscriptSpared` is ingetrokken en kan de derde uitkomst niet uitdrukken — *"gebonden en levend achtergelaten"* moet te scheiden zijn van *"laten doodbloeden"*.
 **Valkuil:** geen personage mag hier de moraal uitspreken. §18.9 A verbiedt het en de scène heeft het niet nodig — de speler weet zelf wel wat hij deed.
 
 ### S06 — *Off The Deck* · extractie
@@ -142,7 +142,9 @@ Beweging I, eerste stap. De cel is op zijn kleinst en het meest onzichtbaar. De 
 
 | In | Uit |
 |---|---|
-| — (openingsmissie, `UnlockBeatTag` leeg) | `Story.Beat.M11_ThirteenBullets` ✔ bestaat · `Story.Choice.M11_ConscriptSpared` ✚ nieuw |
+| — (openingsmissie, `UnlockBeatTag` leeg) | `Story.Beat.M11_ThirteenBullets` ✔ bestaat · `Story.Choice.M11_Conscript.{Finished,Left,Bound}` ✚ nieuw |
+
+> **Gecorrigeerd 01-08, dezelfde veegbeurt als L1-R29.** Dit beat-sheet droeg op drie plekken nog `Story.Choice.M11_ConscriptSpared` — **door mijn eigen L1-R3 ingetrokken.** `M1.1.S05.170/.180/.190` zetten de drie bladeren al en `HUB.A1.reyes_first_conversation` leest ze alle drie; alleen de instructie stond fout. **Een beat-sheet telt als lezer van een vlag** (L1-R12, uitgebreid in L1-R29), want een mens leest hem en typt daarna een `condition`.
 
 ---
 
@@ -171,7 +173,7 @@ Beweging I, eerste stap. De cel is op zijn kleinst en het meest onzichtbaar. De 
 | Keuze | Waar | Gevolg |
 |---|---|---|
 | Overbrugging of onderdoorgang | S01 | tactische opzet; kleine variant in S02/S04 |
-| De gewonde conscript | S05 | `Story.Choice.M11_ConscriptSpared` → T5-telling, act 4 |
+| De gewonde conscript | S05 | `Story.Choice.M11_Conscript.{Finished,Left,Bound}` → T5-telling, act 4 |
 | Zero-casualty (systemisch, geen dialoogkeuze) | uitvoering | +20 M; één extra regel van Reyes in S99 |
 
 ---

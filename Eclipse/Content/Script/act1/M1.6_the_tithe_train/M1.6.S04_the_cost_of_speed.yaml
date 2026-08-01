@@ -19,7 +19,9 @@ words:        318
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
 # cast:      VOSS, MARA, SELA, BRICK
-# flags-in:  Story.Choice.M15_IronChorusPact
+# flags-in:  Story.Choice.M15_Pact.{Full,Limited,None} - script side story.m15_pact, read at
+#            .080 and .120 with == "full". Name corrected 01-08; the shipped conditions were
+#            already right.
 # flags-out: Story.Choice.M16_Train.Run | .Emptied | .Split   (NEW TAGS)
 #            THREE outcomes, three mutually exclusive leaf tags under one parent - ruling
 #            L1-R3. Write them with the `choice:` field (SCRIPT_FORMAT 4, L1-R2),
@@ -109,9 +111,13 @@ words:        318
 #            If the architect rules the other way it is a one-token edit on two lines.
 #            Not one letter of text changes either way.
 # brick:     .130 is his one line in this scene (stub beat 5) and his last of the mission.
-#            Three words, and they are the whole of what a man does who has spent eleven days
-#            in a car with the doors shut. He does not mention Krad-9 and nobody connects it
-#            for him.
+#            Three words, and they are the whole of what a man does who has spent SEVENTEEN
+#            days in a car with the doors shut. He does not mention Krad-9 and nobody
+#            connects it for him.
+#            CORRECTED 01-08 (L1-R31): this note said "eleven days" while the spoken line at
+#            S03.220 has said seventeen since L1-R14. That is the exact mechanism L1-R14
+#            describes - a writer reaches for eleven because a document tells him it is the
+#            number - running inside the mission that already paid to get rid of it.
 # p5-d:      the choice itself is the plant, and .070 is its mandatory spoken carrier (AR-9):
 #            civilian risk is priced out loud, by a person, before the player picks.
 

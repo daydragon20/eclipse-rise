@@ -763,8 +763,311 @@ Acht keer, op aangrenzende regels, en het leest als een bug. Iemand repareert da
 - **Ik heb de twee controles opnieuw niet kunnen draaien** (geen shell, tweede keer op rij). Ik heb in plaats daarvan `validate_script.py`, `check_voice_resolves.py` en `resolve_casting_choice.py` gelézen en de uitkomst daaruit afgeleid; dat is een afleiding en geen meting, en zo staat het ook in mijn rapport. **De eerstvolgende met een shell draait beide en meldt het.** Wat ik verwacht: `validate_script.py --no-voice` blijft op **5 bevindingen** (4 REGISTER, 1 BRANCH — geen enkele check die ik heb aangeraakt telt mee), en `check_voice_resolves.py` blijft **rood** met de nieuwe sleutelnamen in de melding (`iron_chorus_fighter_a/_b → eclipse_fighter slot C/D, unbound`) plus de drie botsingen. **Wijkt dat af, dan is deze ruling het probleem en niet de tool.**
 - **De rolsplitsing hoort bij O-16 en is niet gedaan.** `eclipse_fighter:C/D` heten nog Ember terwijl ze de Chorus zijn. Bewust: het is een owner-bestand en de knop staat op scherp. Daarna gratis.
 - **Embers barkpool is twee registers.** Gemeld in deel 4 hierboven, castingvraag, niet beslist.
-- **`M1.5` staat in dit log twee keer als GO** (L1-R14, L1-R21: *"M1.5 is GO en wordt niet heropend"*), maar gemeten dragen alle zes de scènebestanden `status: draft` / `critic: null`. Twee eerdere rulings hebben dus op een toestand geleund die de bestanden niet dragen. **Niet door mij op te lossen** — een verdict zetten is het veld van `dialogue-critic`. Gemeld, en het staat op de act-1-continuïteitsdoorloop.
+- **`M1.5` staat in dit log twee keer als GO** (L1-R14, L1-R21: *"M1.5 is GO en wordt niet heropend"*), maar gemeten dragen alle zes de scènebestanden `status: draft` / `critic: null`. Twee eerdere rulings hebben dus op een toestand geleund die de bestanden niet dragen. **Niet door mij op te lossen** — een verdict zetten is het veld van `dialogue-critic`. Gemeld, en het staat op de act-1-continuïteitsdoorloop.  <!-- premisse-nagelopen: deze regel MELDT de botsing, hij beweert hem niet -->
 - **Q-4 (een eigen naam voor de emissaris) blijft open** en blijft optioneel; L1-R6b maakte hem al minder dringend en L1-R30 verandert daar niets aan.
 - **Nog open uit ronde 5:** L1-R28 (gespecificeerd, niet actief), `M1.5.S99.050`/`.060` in de `none`-tak, en `M1.4.S99`'s registerdrempel.
 
 > **En de rest is nagelopen, zodat niemand dat opnieuw doet.** Elke claim in dit document van de vorm *"M1.x is GO / draft / NO-GO"* is machinaal tegen de scènebestanden gehouden (01-08). **M1.5 is de enige die niet klopt** — drie voorkomens, alle drie tegenover zes bestanden op `critic: null`. De klas is dus begrensd en dit is de enige instantie, geen steekproef.
+
+---
+
+## Ronde 7 — 2026-08-01, twee dragende getallen, een kenteken, en een beat die twee keer bestaat
+
+**Zes van deze tien zijn dezelfde fout in verschillende kleren:** een dragend feit dat op twee plekken een andere waarde heeft, waarbij geen van beide schrijvers het totaal kan zien. Elf, eenenveertig, het Enforcer-kenteken, het personeelsrecord, `CustodianKey` en `M12_Ghost`. Dat is geen toeval en het is ook geen slordigheid van schrijvers — **het is de faalvorm van parallel schrijven, en het is precies waarvoor L1 boven L2 zit.**
+
+| # | Onderwerp | Uitkomst | Raakt jou als schrijver? |
+|---|---|---|---|
+| **L1-R31** | L1-R14's M1.5-uitzondering stond op een grond die onwaar is | **De uitzondering vervalt.** `M1.5.S03` wijkt naar **achttien**; M1.6's zeventien blijft | M1.5 |
+| **L1-R32** | `forty-one` telt de eerste wagon én de instroom | **Eén getal, één betekenis: de instroom.** `S06.010` vertakt **niet** | M1.6, M1.7, M1.8, hub |
+| **L1-R33** | `Nobody`/`Nothing` + presens is 1,6× de act-norm in M1.6 | **Geen plafond. Dit is thema**, en hier staat waarom | allen |
+| **L1-R34** | O-4: de stub eist twee vragen van Sela, er is er één | **De stub wijkt.** De tekst had gelijk | M1.6 |
+| **L1-R35** | O-7: Dex' grappen in `M1.6.S99` | **Ze blijven, onvoorwaardelijk.** En hier staat wat "nasleep" betekent | M1.6, en elke debrief hierna |
+| **L1-R36** | Het Enforcer-kenteken is 261 én 917 | **Het is `two six one`.** `M1.3.S05.150` wijkt. Cijferconventie vastgelegd | M1.2, M1.3 |
+| **L1-R37** | Het geredigeerde personeelsrecord bestaat twee keer | **P2-d woont in `M1.7.S03.250`.** `M1.2.S04.220`–`.250` vervalt | M1.2, M1.7 |
+| **L1-R38** | `Story.Clue.CustodianKey` heeft twee gedeclareerde zetters | **`Story.Clue.*` wordt gezet waar hij gesproken wordt**, nooit in de debrief | alle clue-vlaggen |
+| **L1-R39** | Het register noemt de verkeerde zetter voor `M12_Ghost` | **Het bestand had gelijk, het register niet** | M1.2 |
+| **L1-R40** | Zes maximes uit één mond in één missie, en de tabel telt er één | **§18.9 B krijgt een maxime-rij**; `M1.2.S03.200` gaat de aanrakingstabel in | allen |
+
+---
+
+### L1-R31 — De M1.5-uitzondering vervalt. Elf blijft van Ember, ook in de scène die het duurst was
+
+**De uitzondering had één gestelde grond en die was al onwaar toen ik hem schreef:** *"M1.5 is GO en wordt niet heropend voor een getal."* Alle zes M1.5-bestanden droegen `critic: null`. Ik heb dat zelf gemeten en opgeschreven in ronde 6 — en de ruling die erop leunde niet heropend. **Een uitzondering wiens enige grond is ingetrokken, is geen uitzondering meer maar een verzuim met een voetnoot eronder.**  <!-- premisse-nagelopen: L1-R31 CITEERT de oude grond om hem te verwerpen -->
+
+**Maar de grond is niet het argument dat mij overtuigt, en dat is de moeite waard om te scheiden.** Er zijn er drie die zwaarder wegen, en de eerste twee zijn metingen:
+
+1. **Het corpus is overal geveegd behalve daar.** **Vijftien** scènebestanden dragen inmiddels een expliciete `# eleven: L1-R14 checked`-notitie (geteld, niet aangenomen: negen hub-bestanden, zes M1.8-scènes). Dat is de slechtst denkbare verdeling van een regel: **hij wordt gehandhaafd waar hij niets kost en gepasseerd op de enige plek waar hij iets kost.** Een regel die zo verdeeld is, leert schrijvers dat handhaving over gemak gaat.
+2. **De uitzondering was nooit gratis — hij is elders afgeschreven.** `M1.6.S03.220` heeft zijn getal ingeleverd (*"Krad-9. Eleven days."* → *"Seventeen days."*) met als opgeschreven reden: *"Three scenes earlier, in M1.5.S03, 'eleven days' means HOW LONG A MAN HELD OUT."* Een andere missie heeft de specificiteit van haar beat betaald voor een uitzondering die alleen stond omdat M1.5 GO heette.  <!-- premisse-nagelopen: citaat uit M1.6.S03 dat de oude toestand beschrijft -->
+3. **En dit is de enige scène in het corpus met twee betekenissen van elf.** `.150` — *"We told her no. Eleven people is not a cell. It's a list somebody hasn't filed yet."* — is niet zomaar een gebruik: het is **L1-R14's eigen stelling, hardop gezegd, door de man die er het meeste recht op heeft.** Het is het beste gebruik van het getal in de act. Tachtig regels verderop meet hetzelfde woord verhoordagen, en `.240` is een vlakke herhaaltic die het getal isoleert precies op de botsing. **De tweede betekenis beschadigt de eerste, en de eerste is de reden dat de regel bestaat.**
+
+**Ruling: de uitzondering vervalt. `.230` / `.240` / `.250` wijken.**
+
+Er is geen kostenargument meer over: de scène staat op `draft` en op NO-GO, het bestand gaat toch open, en de timingvoorwaarde uit L1-R14 zelf (*"bij de eerstvolgende keer dat die missie toch open is"*) is voldaan.
+
+**Wat er precies moet gebeuren, en de eisen zijn van mij, de regels zijn van de schrijver:**
+
+| Regel | Eis |
+|---|---|
+| `.230` | **Exact acht woorden blijven** (L2-eis, nageteld). Vorm blijft *"Cell two. He gave you N days first."* |
+| `.240` | **Eén woord blijven.** Dit is de tic van de emissaris (§18.4: *"repeats the other person's last word back at them, flat"*) en een tweewoordig getal maakt van een echo een mededeling |
+| `.250` | **Eén dag ná `.230` blijven.** Dat is de beat: hij kwam eruit op de dag nadat de ander brak |
+
+**Het getal is `eighteen`, en `.250` landt op de negentiende dag.** Ik noem het zelf in plaats van het aan de schrijver te laten, want vijf schrijvers hebben onafhankelijk naar hetzelfde getal gegrepen en dat is hoe L1-R14 ontstond. De uitsluitingslijst, gemeten:
+
+| Uitgesloten | Waarom |
+|---|---|
+| **eleven** | de ruling |
+| **seventeen** | staat sinds 01-08 in `M1.6.S03.220` als transportduur in een kist. Zeventien hier zou de reparatie **spiegelen** in plaats van hem af te maken: de speler leerde dan drie scènes eerder dat zeventien dagen verhoor betekent |
+| **nine, six** | verzadigd — 30× resp. 29× gesproken in act 1, gemeten door de M1.6-schrijver |
+| **thirteen** | M1.1's titel en zes gesproken gebruiken |
+| **fourteen** | staat **in dezelfde missie**, `M1.5.S99.100`/`.110`, als burgertelling |
+| **sixteen** | werkt alleen als `.250` op de **zeventiende** dag landt, en dat is `M1.6.S03` opnieuw |
+
+Daarmee is achttien het enige vrije getal onder de twintig dat `.240` één woord laat blijven. **Restrisico, gemeld en aanvaard:** negentien is gesproken in `M1.8.S01` en `M1.8.S03`, beide over K-77's cellenblok. Dat is drie missies later, cardinaal tegenover ordinaal (*"nineteen doors"* tegenover *"the nineteenth day"*), en in een ander soort zin. Dat is een lean, geen botsing — zie L1-R33 voor waarom die twee klassen niet dezelfde behandeling verdienen.
+
+**`M1.6.S03`'s zeventien blijft, en dat is geen coulance.** De vraag was terecht: is die betaling nu voor niets geweest? Nee — **L1-R14's hoofdregel veroordeelde die regel sowieso.** *"Elf betekent de omvang van Ember Cell"*, en *"eleven days in a car"* meet transportdagen. De botsing met M1.5 bepaalde alleen **wanneer** hij weg moest, niet **of**. Zeventien blijft staan, en ik heb dat in het L1-blok van `M1.6.S03` vastgelegd zodat niemand hem terugdraait met het argument dat de aanleiding verdwenen is.
+
+**En `M1.5.S99.100` — *"Eleven. Maybe fourteen."* — blijft, geclaimd.** Dat is de vierde elf van de missie in een dérde betekenis (burgers in een portiek), en hij corrigeert zichzelf binnen vier woorden naar veertien, dat de scène daarna gebruikt. Geen poort. **Maar ongeclaimde gebruiken stapelen zich op, en L1-R14 bestaat omdat dat gebeurd is.** De goede lezing was al beschikbaar en is nu opgeschreven in een `note:`: **Voss telt vreemden in de eenheid van zijn eigen cel en corrigeert zichzelf.** Dat is geen tweede betekenis van elf; dat is elf gebruikt als maatstaf en meteen te klein bevonden — wat de regel eerder bevestigt dan ondermijnt.
+
+---
+
+### L1-R32 — Eenenveertig is de instroom en niets anders. `S06.010` vertakt niet
+
+Buiten de opdracht gevonden, en het is exact de L1-R14-klasse. **Ik heb de arithmetiek van alle drie de takken uitgeschreven in plaats van de melding over te nemen, en de melding wees de verkeerde tak aan.**
+
+| Tak | Wie er in Hollow Point aankomt | Wat het corpus daarover zegt |
+|---|---|---|
+| `run` | beide wagons, min wie op de spoordijk viel | niets — geen enkel getal |
+| `emptied` | beide wagons, min de veertig die gemerkt op de weegbrug knielen (`S05.310` shot) | veertig achtergelaten |
+| `split` | de **eerste wagon**, heel | *"Forty-one at the drawbar. Forty-one at this wall."* (`S05.370`) |
+
+En `S06.010` zegt **onvoorwaardelijk** eenenveertig, in alle drie.
+
+**Reken het na en de breuk zit niet waar de melding hem zette.** `emptied` en `split` zijn onderling consistent: ze verliezen allebei ruwweg één wagon, dus beide impliceren een trein van ~81 en leveren ~41. **`run` is de tak die breekt** — dat is de tak waarin iedereen meekomt, dus die zou ~81 moeten leveren en levert 41. **De tak waarvoor de speler een zwaarder gevecht kocht om niemand achter te laten, is de tak waarin het getal hem niets teruggeeft.**
+
+**De criticus stelde één conditionele variant op `S06.010` voor. Ik neem dat niet over, en de reden is een telling die hij niet kon doen.**
+
+Eenenveertig staat, gemeten, **op veertien plekken in vier missies plus de hub**: `M1.6.S06` (.010, .040, .110, .120, .190×2 varianten), `M1.6.S99` (.130, .140 varianten), `M1.6.S05.370`, `M1.7.S99` (3×), `HUB.A1.sela_intake` (1× gesproken), `M1.8.S99` (1×). **Eén conditionele variant op de eerste van die veertien maakt de andere dertien tot tegenspraken** — en het duwt het getal als vertakking act 2 in, waar het voor altijd een `condition` op elke regel over de instroom wordt. Dat is de duurste van de twee beschikbare reparaties en hij repareert de goedkoopste plek. **Dat is L1-R12 omgekeerd: de zetter vertakken en dertien lezers laten staan.**
+
+**Ruling, in drie delen.**
+
+**1. Eenenveertig is een campagneconstante. De takken verschillen in wíé, niet in hoevéél.**
+
+Dat is geen boekhoudkundig gemak — het is wat de missie zelf zegt. `M1.6.S01.110`/`.120`: *"Nobody outside that yard has ever counted them."* / *"Then that isn't a number. That's a hope."* Reyes' *"sixty-six"* wordt twee regels later expliciet als schatting neergezet. **De trein is nooit geteld, en dat is geen omissie maar de these van de missie** (pijler 3, en de reden dat Brick in S01 als eerste spreekt). Binnen elke afzonderlijke speelbeurt klopt eenenveertig met alles wat die speler zelf gezien heeft; de tegenspraak bestaat uitsluitend **tussen** takken, in een totaal dat het spel weigert uit te spreken.
+
+**En een vertakt getal zou iets beweren dat niet waar is:** dat iemand de trein geteld heeft. Legibel maken hoeveel mensen je gered hebt, is de gewoonte van het manifest dat *"counts the ore and counts the rest the same way"* (`S01.160`). Het getal dat de speler mag hebben, is het getal dat Ember zelf heeft: **één man die een vaultvloer twee keer telde en twee antwoorden kreeg.**
+
+**2. De prijs van elke tak is kwalitatief en hij is al geschreven — beter dan een getal het kon.** Dezelfde vrouw in de gele werkjas: neergeschoten op de spoordijk onder `run`, geknield en gemerkt bij de weegbrug onder `emptied`, en onder `split` weet niemand in welke wagon ze stapte. **Drie afloopen, één jas, en de derde is de enige die niemand kan betreuren omdat niemand hem kan benoemen.** Dat is de kostprijs. Een ander getal in Dex' mond is een zwakkere versie van dezelfde mededeling.
+
+**3. Wat er wél moet gebeuren is één notitie, en het is de enige regel die van eenenveertig een deeltelling maakt.**
+
+`M1.6.S05.370` is juist zoals hij staat en er verandert geen letter — in `split` heeft Sela alleen nog de eerste wagon, ze telt hem bij het loskoppelen en bij de muur, en ze komt uit. **Het risico zit in het woord *"drawbar"**: als een latere schrijver dat leest als de telling uit `S03` (vóór de vertakking), dan is de eerste wagon in álle takken eenenveertig en klopt `run` niet meer. **De drawbar in `.370` is de koppeling waar de wagons gescheiden zijn, niet de ramp van S03.** Dat moet in het bestand staan.
+
+`M1.6.S05` is deze ronde niet van mij — er zit een schrijver aan `.410`. **De notitie gaat mee in dezelfde beurt als L1-R21 (`.410` vlak) en L1-R25 (`.350`–`.390`), dus het bestand gaat één keer open, niet drie keer.** Kosten: nul credits, nul gesproken woorden.
+
+**En dit gaat in het nummerregister** (`ACT1_OVERVIEW` §7). Elf had een ruling nodig omdat niemand het totaal kon zien; eenenveertig krijgt een rij vóórdat dat gebeurt.
+
+---
+
+### L1-R33 — `Nobody`/`Nothing` is thema. Geen plafond, en hier staat waarom, zodat niemand het opnieuw afleidt
+
+De M1.6-criticus mat een tweede verzadiging met dezelfde vorm als elf: `Nobody`/`Nothing` + presens + locatief. **Nagemeten, en de meting klopt:** 30 regels in M1.6 tegen 159 corpusbreed (mijn telling; de zijne was 158 — het verschil is één regel en niet materieel). Genormaliseerd: **15,6% van M1.6 tegen 9,7% corpusbreed, 1,6× de act-norm.**
+
+**Ruling: geen plafond. Dit is thema, en het verschil met elf is categorisch.**
+
+| | **L1-R14 (elf)** | **Dit** |
+|---|---|---|
+| Wat drift | de **referent** — acht betekenissen op één token | niets. Eén constructie, één betekenis |
+| Wat de speler oploopt | een feitelijke tegenspraak die hij kan horen | textuur die hij als stem ervaart |
+| Klasse | **continuïteitsdefect** | **stijl-lean** |
+| Instrument | corpusbrede ruling + veegbeurt | scèneoordeel van de criticus |
+
+**Dat onderscheid is de eigenlijke opbrengst van deze ruling, en het geldt vooruit:** een corpusbrede telling is pas een ruling waard als de **betekenis** meeschuift. Een constructie die overal hetzelfde betekent, kan alleen te vaak zijn — en "te vaak" is een smaakoordeel op scèneniveau, waar de striptest en §18.9 B het al meten. Een percentageplafond zou schrijvers laten tellen in plaats van schrijven, en dat is de duurste soort regel: hij kost aandacht in elke scène om een schade te voorkomen die niemand kan aanwijzen.
+
+**M1.6 mag de piek zijn en hij is het om de goede reden.** Het is de missie waarin niemand geteld, benoemd of opgeschreven is: *"Nobody outside that yard has ever counted them."* · *"Nobody wrote down where."* · *"Nobody in this room knows a single one of them."* · *"Somebody should be able to say afterwards who got into that car."* **Het onderwerp van de missie is grammatica geworden, en dat is precies wat §18.9 D's tegendeel is** — dat is geen auteur die naar dezelfde constructie grijpt, dat is een missie die één ding zegt.
+
+**Twee begrenzingen, in dezelfde vorm als ronde 1's "iedereen telt":**
+
+1. **Dit is het register van deze missie, niet van het spel.** Act 2 verlaat Kessara en verandert van register (L1-R30, ronde 1). Wie in act 2 op 15% zit, heeft geen thema maar een gewoonte.
+2. **De constructie draagt hoogstens één wending per scène.** Ze is hoe de wereld praat; ze is niet de enige manier waarop een scène kan landen. Dat is dezelfde begrenzing als de telbeat uit ronde 1, en om dezelfde reden.
+
+**Wat niet gebeurt: er komt geen §18.9-rij voor.** Een rij toevoegen zou de klasse gelijkstellen aan triaden en em-dashes, en dat is precies het onderscheid dat deze ruling maakt.
+
+---
+
+### L1-R34 — O-4: de stub wijkt. Sela wint met toestemming, niet met een tweede vraag
+
+`BEATS_M1.6` §4 eist van Sela in `M1.6.S03` *"vier tot zes korte beurten, waarvan minstens twee vragen"*. Geteld: vijf beurten (`.140` `.160` `.170` `.190` `.200`), en **één** vraag (`.140`). `.190` — *"No. So say it out loud if you're staying, and the rest of us can stop counting on you."* — is een imperatief, geen vraag. De L2-notitie in het bestand claimt twee vragen en die claim is onwaar; ook dat moet weg.
+
+**De criticus denkt dat de tekst gelijk heeft en de stub moet wijken. Aangenomen, en de reden is beter dan "het staat er nu eenmaal".**
+
+**Mijn "minstens twee vragen" was een proxy en geen eis.** Wat de stub wilde, staat er twee regels boven: *"Sela mag geen toespraak houden (AR-7). Retoriek is structuur, geen volume."* De vraagvorm was de mechanische stok om dat af te dwingen. De scène levert waar het om ging — vijf beurten, langste negentien woorden, geen oration — via een ánder mechanisme, en dat mechanisme is sterker.
+
+**En het is beter karakterisering dan wat ik vroeg.** Een tweede vraag maakt van haar een ondervrager. `.190` geeft de wagon **toestemming om te blijven**, en dat is precies wat ze in beweging brengt. Dat is de organisator: haar macht is dat ze mensen mag laten gaan en dat ze dan blijven. Het bedient §2.5 rechtstreeks (*"learns power's compromises"*) — ze begint als iemand die nog nooit heeft hoeven kiezen tussen twee goede dingen, en haar eerste wapen is dat ze niemand hoeft te dwingen.
+
+**Doorgevoerd in `BEATS_M1.6.md` §4 S03.** De eis wordt wat hij altijd had moeten zijn: *geen oration, hoogstens zes beurten, en minstens één vraag* — en de vraag die er is (`.140`) draagt haar tic. **Wat er nu moet gebeuren:** `dialogue-writer` M1.6 corrigeert de L2-claim *"Two are questions (.140, .190)"* naar één. Geen regel verandert.
+
+---
+
+### L1-R35 — O-7: Dex' grappen blijven, in alle drie de takken. En dit is wat "nasleep" betekent
+
+`M1.6.S99` geeft Dex twee komische beats (`.020`, en `.110` met `.170` als knop) onvoorwaardelijk — ook in `run`, waar de vrouw in de gele werkjas negentig seconden eerder op de spoordijk bleef liggen. §18.6 wil **nul** komische beats in nasleep, en L1-R7 heeft precies dit geval beslist voor `M1.1.S99`: *"Ligt er iemand gewond, dan is S99 nasleep."*
+
+**Ik heb L1-R7's criterium tegen de act gehouden in plaats van het toe te passen, en het criterium is te ruim geformuleerd geweest.**
+
+Als "nasleep" betekent *de missie heeft levens gekost*, dan is elke debrief vanaf M1.2 nasleep, en dan is het komische budget van zes opeenvolgende missies nul. Dat sloopt §18.6's eigen redenering (*"the game earns its darkness by having been funny earlier"*), het sloopt `M1.5.S99.070` — de bitterste grap van de act, expliciet zo gespecificeerd — en het sloopt Dex' halve functie in de cast.
+
+**Ruling: een debrief is nasleep wanneer iemand in de kámer dood of gewond is.** Niet wanneer de missie doden heeft gekost. In `M1.1.S99` vuurt het criterium omdat er een squadlid op tafel ligt; dat is waarom die uitzondering aan `run.zero_casualty` hangt en niet aan een verliezenteller. In `M1.6.S99` is niemand in de kamer gewond en zijn de eenenveertig beneden in leven.
+
+**En de takken vragen alle drie dezelfde terughoudendheid, wat betekent dat conditioneren niets oplost.** Onder `run` sterft een vrouw voor iedereens ogen; onder `emptied` knielen er veertig gemerkt op een weegbrug; onder `split` is een hele wagon weg. **Er is geen tak waarin de grappen "schoon" zijn**, dus een `condition` zou geen tonaal probleem oplossen maar er alleen één tak uit knippen.
+
+**Drie redenen dat ze blijven, op volgorde van gewicht:**
+
+1. **Ze voldoen aan §18.6 zoals hij bedoeld is.** *"The best jokes cost something. Dex jokes hardest when he's most frightened."* `.020` is een man die zijn werk onmogelijk ziet worden; `.110`→`.170` is een man die een last weigert en hem dan optilt. Geen van beide is opluchting en geen van beide gaat over de doden.
+2. **De verhouding klopt.** Twee komische beats op zeventien regels is 1 op 8,5, ruim binnen §18.6's 1-op-6 voor downtime.
+3. **En de productiereden, die noch de criticus noch een schrijver kan zien: een conditionele grap is een grap die de helft van de spelers nooit hoort, in de tak die daarmee de dunste wordt.** We hebben deze ronde net een ruling besteed (L1-R25) om de `split`-tak dikker te maken omdat hij de minste spelers en het meeste te verliezen had. Komedie uit een tak conditioneren doet het omgekeerde. `.170` is bovendien de laatste gesproken regel vóór het slotbeeld van Mara alleen bij de kaart; hem voorwaardelijk maken laat één op de drie spelers de scène zonder knop eindigen.
+
+**Wat er nu moet gebeuren: niets.** De scène is goed zoals hij is. Ik leg het criterium vast in `BEATS_M1.6.md` §4 S99 en hierboven, want de volgende criticus zou het anders per debrief opnieuw afleiden — en dat is precies wat er nu gebeurd is.
+
+---
+
+### L1-R36 — Het kenteken is `two six one`. `M1.3.S05` wijkt, en cijfers worden los geschreven
+
+`M1.2.S01` zegt *"Two-six-one"*; `M1.3.S05.150` zegt *"Nine one seven"*. Mijn eigen register (`ACT1_OVERVIEW` §5) wijst beide scènes aan als **dezelfde man**: *"M1.2.S01 (badge → intel), M1.3.S05 (hij antwoordt op de toren, levend gezien)"*. **Beide schrijvers hebben het gemeld; geen van beiden kon het oplossen, want er is nooit een registerrij voor het getal geweest.** §2.11 draagt deze draad tot het einde van de campagne, dus zonder rij verzint schrijver drie een derde nummer.
+
+**Ruling: het kenteken is `two six one`. `M1.3.S05.150` verandert.**
+
+Drie redenen, en de eerste is niet de goedkoopste maar de juiste:
+
+1. **`M1.2.S01` is de scène waar het nummer intel wórdt** — het is letterlijk de `turn:` van die scène (*"Voss produces a badge number he has been carrying since the ration line, and the room's arithmetic changes"*). In `M1.3.S05` is het een callout van drie woorden bij een herkenning. **Het dragende gebruik wint van het bevestigende gebruik.**
+2. **Zes voorkomens tegen één** (`.130`, `.145` plus vier as-varianten tegen één regel).
+3. **De M1.3-schrijver heeft zich vooraf gewonnen gegeven** in zijn eigen bestand (r. 50–52: *"If M1.2's writer or the recap card gives this man a different number, L1 reconciles and I change .150"*). Dat is het goede gedrag en het maakt de wijziging kosteloos in overleg.
+
+**En een eerlijkheid bij reden 2: die weegt minder dan hij lijkt**, want de zes M1.2-regels worden hoe dan ook aangeraakt door het tweede deel van deze ruling. Het besluit rust dus op reden 1.
+
+**De cijferconventie, en die is van mij omdat hij het hele corpus raakt: los geschreven, geen koppeltekens.**
+
+Gemeten: `M1.1.S05` schrijft *"Four six two"* op vier plekken (de ijkmissie, plus `M1.1.S99`), `M1.3.S05` schrijft *"Nine one seven"*. **`M1.2.S01`'s gekoppelde vorm is de enige in het corpus.** En een koppelteken is bovendien een TTS-gok: een model kan *"two-six-one"* als samenstelling lezen in plaats van als drie cijfers, en dat is precies de klasse fouten die §18.9 C3 (hardop lezen) moet vangen maar die pas hoorbaar wordt ná generatie.
+
+> **Conventie: cijfers die één voor één worden uitgesproken, worden als losse woorden geschreven.** *"Two six one."* Geen koppeltekens, geen cijfers. Getallen die als getal worden uitgesproken blijven één woord (*"Forty-one"*, *"Seventeen"*).
+
+**Wat er nu moet gebeuren:** `dialogue-writer` M1.2 ontkoppelt de zes voorkomens in `M1.2.S01`; `dialogue-writer` M1.3 zet `.150` op *"Two six one."* — en zijn L2-notitie op r. 50 (*"NEW DETAIL: the number 917 is..."*) gaat mee, want die notitie is de instructie die schrijver drie ook fout zou zetten. **Het nummer staat vanaf nu in het nummerregister** (`ACT1_OVERVIEW` §7), samen met eenenveertig en elf.
+
+---
+
+### L1-R37 — Het geredigeerde personeelsrecord bestaat twee keer, en de verkeerde helft is verplicht
+
+`M1.2.S04.220`–`.250` en `M1.7.S03.250` zijn hetzelfde document, hetzelfde personage, dezelfde laat-het-vallen-beat: een geredigeerd personeelsrecord uit het huishouden van de Arbiter (P2-d, twist 2).
+
+| | `M1.7.S03.250` | `M1.2.S04.220`–`.250` |
+|---|---|---|
+| omvang | **één** regel | **vier** regels |
+| toegang | `condition: 'run.m17_record == true'` | **onvoorwaardelijk** |
+| wanneer | vijf missies later | eerst |
+
+**Dit is mijn fout en hij staat in twee van mijn eigen documenten.** `ACT1_OVERVIEW` §4 zet P2-d bij `M1.7.S03`; `BEATS_M1.2.md` §4 zet hem bij `M1.2.S04`. **Beide zeggen "één Dex-regel die het niet begrijpt en verder gaat", en ze noemen twee verschillende scènes.** De M1.2-schrijver heeft het conflict gezien, het volgens zijn eigen stub geschreven en het geëscaleerd — de juiste volgorde. En **L1-R26 is daarna over M1.7 gegaan zonder de M1.2-kopie te zien**, heeft hem gedeclareerd en 96 credits begroot. Beide bestanden staan op `draft`, dus dit is nu nog gratis.
+
+**Ruling: P2-d woont in `M1.7.S03.250` en nergens anders. `M1.2.S04.220`–`.250` vervalt.**
+
+Vier redenen, op volgorde van gewicht:
+
+1. **Optioneel-per-spec en onvoorwaardelijk-in-het-bestand kan niet allebei.** Beide stubs noemen P2-d optionele textuur; alleen de M1.7-versie is dat ook. De M1.2-schrijver kon hem niet poorten omdat er geen vlag voor bestond en heeft dat netjes opgeschreven. **Een beat die per spec optioneel is en die elke speler verplicht hoort, is geen textuur meer.**
+2. **De beat moet iets zijn waar niemand twee keer naar kijkt, en vier regels ís twee keer kijken.** *"Not blacked. Lifted. Somebody went back through the index for that."* is een goed beeld en dat is het probleem: het is Dex die geboeid is door iets waarvan hij in de volgende regel zegt *"Anyway. Not ours."* De ene M1.7-regel doet hetzelfde werk en laat het los in dezelfde adem.
+3. **P2-d hoort bij P2-b, niet bij P2-a.** In M1.2 leert de speler dat een gestolen custodian-key-token boven celbestrijding gaat (P2-a). Vijf missies later vindt hij in één scherm **twee afwezigheden**: een query-keten die ouder is dan alles erboven (P2-b) en een naam die chirurgisch uit een index is gelicht (P2-d). Dat tweede cluster is waar de speler een tweede jager moet voelen. **In M1.2 is P2-d een curiositeit zonder iets om aan te hechten; in M1.7 is het het tweede bewijs van dezelfde afwezigheid.**
+4. **L1-R26 heeft de machinerie al aan de M1.7-kant gezet:** `run.m17_record` gedeclareerd, 96 credits begroot, en de datataak (één optionele objective-rij plus de mapping) staat in `VOICE_LEDGER.md`. Aan de M1.2-kant bestaat daar niets van.
+
+**AR-9 blijft voldaan.** `M1.2.S04.120` is de verplichte gesproken drager van P2-a en die verandert niet; `M1.7.S03.130`/`.140` is de verplichte drager van P2-b. P2-d mag optioneel zijn omdat hij nergens alleen draagt.
+
+**Wat er nu moet gebeuren:** `dialogue-writer` M1.2 verwijdert `.220`–`.250` en de bijbehorende L2-alinea; `.210` loopt schoon door naar `.260`. **`BEATS_M1.2.md` is door mij gecorrigeerd** — dat was de bron van de fout en het is mijn document. Twee bevindingen van de criticus vervallen daarmee vanzelf (`.240` op §18.9 C2, en het ontbreken van een `condition` op een blok dat de beat-sheet optioneel noemt).
+
+---
+
+### L1-R38 — `Story.Clue.*` wordt gezet waar de clue gesproken wordt. Nooit in de debrief
+
+`M1.2.S04`'s kop zegt dat S04 `Story.Clue.CustodianKey` zet, en `ACT1_OVERVIEW` §6 bevestigt dat. `M1.2.S99.280`'s `note:` zegt dat **S99** hem zet. **Twee opslagplekken voor één waarheid (L1-R3), en de lezer staat in act 2, twist 2 — de duurste klasse van L1-R12.**
+
+**Ruling: `M1.2.S04` zet hem, bij de scène-commit, en niets anders.**
+
+De reden is niet dat het register ouder is, maar dat de andere kant een gat maakt dat je kunt uitspelen. **Een clue-vlag registreert dat de speler de clue gehóórd heeft.** Hij wordt op precies één plek uitgesproken: `M1.2.S04.120`. De M1.2-schrijver noteert zelf dat het wardenkantoortje mogelijk niet op het verplichte pad ligt (AR-9-melding, r. 52–54). **Zet je hem in de debrief, dan krijgt de speler die die kamer oversloeg de clue alsnog** — en act 2 rekent hem af op iets wat hij nooit gehoord heeft.
+
+**En dit is geen incident maar een klasse, dus het wordt een regel.** Nageteld tegen het register: `BlightBroadcast` (M1.3.S02), `OutsideQuery` en `AegisDenial` (M1.7.S03), `ThrexVoice_1` (M1.3.S06), `ThrexKnowsSector` (M1.7.S04) — **alle vijf worden gezet in de scène waarin ze klinken.** `CustodianKey` was de enige met een tweede claim, en die claim was de uitzondering.
+
+> **Regel: `Story.Clue.*` wordt gezet door de scène waarin de clue wordt uitgesproken. Debriefs zetten `Story.Beat.*` en de uitkomst van keuzes; ze zetten nooit een clue.** De debrief is onvoorwaardelijk en een clue is dat niet.
+
+**Wat er nu moet gebeuren:** `dialogue-writer` M1.2 corrigeert de `note:` op `M1.2.S99.280` en haalt `Story.Clue.CustodianKey` uit `M1.2.S99`'s `flags-in:` — die scène leest hem in nul condities, dus de kop liegt twee keer over hetzelfde. Ik heb de regel in `ACT1_OVERVIEW` §6 gezet.
+
+---
+
+### L1-R39 — `Story.Choice.M12_Ghost` wordt gezet op de stille tak van S05. Het register had ongelijk
+
+`ACT1_OVERVIEW` §6 r. 237 noemt *"M1.2 debrief"* als zetter; `M1.2.S05` zegt exit van de stille tak. **Het bestand heeft gelijk en mijn register niet.**
+
+`M1.2.S99.030`–`.070` **lezen** de vlag — vijf regels, twee blokken. Een vlag die gezet wordt aan het eind van de scène die hem bij `.030` leest, is bij die lezing nog niet gezet. **Wint het register, dan krijgt de speler na een vlekkeloze ghost-run alsnog *"They have us on a gallery in Block Nine."*** En inhoudelijk hoort hij daar ook: "ghost" is een eigenschap van hoe M1.2's extractie liep, en die wordt in S05 beslist.
+
+**En de validator ziet dit niet, met opzet:** `Story.Choice.M12_Ghost` heeft geen bladeren, en `validate_script.py:924-938` rapporteert setterloze enkelbladvlaggen niet. **Dat is precies waarom L1-R12's kolom *gelezen door* bestaat — en diezelfde rij is daar óók fout, door omissie.** Er stond *"Veil-alertheid act 1"*, een systeem dat niet gebouwd is, terwijl de enige aantoonbare lezer vijf regels in `M1.2.S99` is. **Een cel in die kolom die een ongebouwd systeem noemt in plaats van de vijf regels die er staan, is een lege cel met een jasje aan.**
+
+**Doorgevoerd in `ACT1_OVERVIEW` §6:** zetter `M1.2.S05` (stille tak), lezers `M1.2.S99 (5)` plus de systeemlezer expliciet als *ongebouwd* gemarkeerd. **Wat er nu moet gebeuren:** niets aan het bestand. De schrijver had gelijk.
+
+---
+
+### L1-R40 — Zes maximes uit één mond in één missie, en de tabel telt er één
+
+De criticus richt dit expliciet aan mij omdat het een standaardwijziging is, en hij heeft gelijk dat het er een moet worden.
+
+Mara levert in M1.2 zes gepolijste maximes: `S01.080` *"Paper does not keep."* · `S02.220` *"She is a door we did not have an hour ago."* · `S03.150` *"They mark everything. They come back for what is worth the night."* · `S03.200` *"A marked block is a block nobody looks at twice."* · `S04.200` *"Orders change. Lists do not."* · `S99.240` *"That is what tomorrow is for."* **De T4-aanrakingsinventaris telt er één.**
+
+**Dit is mijn eigen L1-R21-diagnose die nog steeds openstaat.** Ik schreef daar: *"de P4-tabel telt plants en niemand telde de aanrakingen; een tabel die de ene meet en waartegen de andere gecontroleerd wordt, is geen meting."* Ik heb toen de aanrakingsinventaris gemaakt en hem **alleen voor T4-wegverklaringen** gevuld. §18.9 B heeft een rij voor triaden en een voor em-dashes — de standaard wíl dit soort verzadiging meten, alleen niet voor epigrammen.
+
+**Ruling, in twee delen.**
+
+**1. §18.9 B krijgt een rij, en hij krijgt de vorm van de triadenrij omdat schrijvers die al toepassen.**
+
+> | **Maximes** | Meer dan één citeerbare algemene waarheid uit dezelfde mond per scène |
+
+Eén per scène per mond, precies zoals *"Any 'X, Y, and Z' rhetorical triple more than once per scene"*. Schrijvers schrijven nu al *"the scene's one permitted triad (18.9 B)"* in hun L2-blokken; dit hangt aan een gewoonte die er is in plaats van een nieuwe te vragen. **Op M1.2 zakt daarmee precies één scène: S03, met twee.** De andere vijf missiescènes hebben er één en zijn schoon.
+
+**Waarom een scène-cap en geen missie-cap:** zes maximes over vijf scènes is een leider die in stelregels denkt, en dat is Mara. Twee in één scène, vier regels uit elkaar, over dezelfde anomalie, is de vorm die een tell wordt. **Het is dezelfde grens die de triadenrij trekt en om dezelfde reden: de constructie is niet het probleem, de dichtheid is het.**
+
+**Eerlijk over wat ik niet gemeten heb: ik heb geen shell in deze sessie en heb het corpus hier niet op kunnen vegen.** De rij geldt vanaf nu voor nieuw werk; **de retro-sweep over M1.1 en M1.3–M1.8 hoort bij de act-1-continuïteitsdoorloop en moet gemeten worden vóór iemand er een NO-GO op geeft.** Dat is dezelfde behandeling als L1-R14 kreeg, en om dezelfde reden: een regel die op een ongemeten corpus meteen als poort gaat werken, produceert bevindingen die niemand kan wegen.
+
+**2. `M1.2.S03.200` gaat de aanrakingstabel in, en hij wordt vlak.**
+
+Hij staat vier regels na aanraking #1, uit dezelfde mond, over dezelfde anomalie, en in geen enkele rij van welke tabel dan ook. **Het is geen T4-wegverklaring — het is de *exploitatie* van de anomalie**, en de `note:` in het bestand zegt precies waarom dat erger is: *"Dit is waarom ze het nooit onderzoekt, en het is dezelfde blinde vlek die haar K-77 in draagt."* **Dat maakt hem geen mindere aanraking maar een zwaardere**, en L1-R17's drempel (*"twee is toeval"*) is daarmee al binnen één scène opgebruikt, vóór `M1.5.S05.200` er ook maar aan te pas komt.
+
+`M1.2.S03.150` blijft gepolijst — dat is de ontworpen eerste, *"het is competentie"*, en de afbraakcurve heeft een top nodig. **`.200` is de regel die wijkt**, want twee gepolijste zinnen in één scène over hetzelfde raadsel leren de speler de vorm in plaats van het feit. De beat blijft: ze draait de anomalie om in een voordeel en Voss laat haar. Alleen de politoer gaat eraf — dezelfde behandeling en dezelfde reden als `M1.6.S05.410`.
+
+**Wat er nu moet gebeuren:** `dialogue-writer` M1.2 herschrijft `.200` vlak en verwijdert niets. De aanrakingstabel in `ACT1_OVERVIEW` §4 is door mij bijgewerkt en telt er nu acht, in speelvolgorde.
+
+---
+
+### Huishouding — de veegbeurt die bij ronde 7 hoorde, en wat hij extra opleverde
+
+Vier plekken waren gemeld. **Het waren er tien, en dat is het punt.**
+
+| Waar | Wat er stond | Nu |
+|---|---|---|
+| `M1.5.S05` kop `flags-in:` | `M15_ShiftBossSpared` | de drie bladeren, met de leesplekken erbij |
+| `M1.5.S99` kop `flags-in:` | `M15_ShiftBossSpared` — **en S99 leest die vlag in nul condities** | `M15_Terms.*`, de enige die hij wél leest |
+| `M1.5.S99` kop `flags-out:` | `M15_IronChorusPact` | `M15_Pact.{Full,Limited,None}` |
+| `M1.5.S99` L2 `format:` | idem | idem |
+| `BEATS_M1.5.md` r. 94 / 116 / 124 | beide oude namen | bladvorm, plus welke vlag S99 werkelijk leest |
+| **`BEATS_M1.1.md` r. 114 / 145 / 174** | **`M11_ConscriptSpared`** — ingetrokken door L1-R3, en L1-R29 heeft in juli alleen `BEATS_HUB_A1` gerepareerd | `M11_Conscript.{Finished,Left,Bound}` |
+| **`BEATS_M1.6.md` casttabel** | `M15_IronChorusPact` | `story.m15_pact != "none"`, met het onderscheid met `split` erbij |
+| **`BEATS_M1.8.md` §vlaggen** | `M15_IronChorusPact` | `M15_Pact.*` + de ontbrekende `M15_ShiftBoss.Warned` |
+| **`M1.6.S02` / `M1.6.S04` koppen** | `M15_IronChorusPact` | bladvorm, mét de regel dat S02 `!= "none"` test en S04 `== "full"` |
+| `M1.6.S06` / `M1.6.S99` koppen | vlaggen die de scènes niet lezen, en de vlaggen die ze wél lezen ontbraken | rechtgezet |
+
+**In elk van de tien gevallen waren de `condition`-regels correct en was de validator schoon.** Alleen de instructies logen. **Dat is precies wat L1-R29 zegt** — *"een beat-sheet is ook een lezer"* — en de zes extra vondsten laten zien dat die uitbreiding in juli maar half is doorgevoerd: ik heb toen het beat-sheet gerepareerd dat de escalatie noemde en de andere vijf niet nagelopen. **Een naamveegbeurt is pas af als je hem op de hele boom hebt gedraaid, niet op de melding.**
+
+Verder afgesloten: `M1.5.S99`'s L2-escalatie (open sinds 31-07, opgelost door L1-R13/L1-R3), en `M1.5.S01`'s L2-notitie die een verholpen defect meldde (`mara_sovann` / `dex_callum` / `elin_reyes` komen nergens meer voor behalve in die notitie). **Een afgehandelde escalatie die open blijft staan, is een instructie aan de volgende schrijver** (L1-R30).
+
+---
+
+## Wat ronde 7 niet heeft opgelost, expliciet
+
+- **Ik heb `validate_script.py` opnieuw niet kunnen draaien — geen shell, derde sessie op rij.** Ik heb in deze sessie uitsluitend commentaarblokken, koppen, `note:`-velden en mijn eigen documenten aangeraakt; geen `text:`, geen `condition:`, geen ID. Dat zijn allemaal categorieën waarvan ik in ronde 5 in de parser heb bevestigd dat ze door de bestaande scalaire tak lopen. **Verwachting: de bar blijft op 5 bevindingen (4 REGISTER, 1 BRANCH) — geen daarvan is van mij, en geen enkele wijziging in deze ronde raakt een check aan.** Wijkt dat af, dan is deze ronde het probleem en niet de tool. **Dat drie L1-rondes op rij blind zijn afgesloten, is zelf een bevinding en hij hoort op de statuskaart, niet in een voetnoot.**
+- **De veegbeurt voor L1-R40 is niet gedaan.** M1.1 en M1.3–M1.8 zijn niet op maximedichtheid gemeten. Poort pas na meting.
+- **`M1.5.S03`'s achttien is een schrijversactie en is niet uitgevoerd.** De ruling staat; de drie regels zijn van de schrijver.
+- **`M1.6.S05` is deze ronde niet aangeraakt** — er zat een schrijver aan `.410`. Twee dingen gaan mee in dezelfde beurt als L1-R21 en L1-R25: **(a)** de drawbar-notitie op `.370` (L1-R32), en **(b)** de kop, die `flags-in: Story.Choice.M16_TrainRun` draagt terwijl de scène de drie bladeren `story.m16_train_choice` leest — dezelfde koppenveegbeurt als in `M1.5.S05`/`S99` en `M1.6.S06`/`S99`, en de enige die is blijven liggen.
+- **De M1.2-`.yaml`'s zijn niet door mij aangeraakt** (L1-R36, L1-R37, L1-R38, L1-R40 deel 2 en de `.220`–`.250`-verwijdering zijn alle vijf schrijversacties). Afgesproken met de coördinator, want er zat een schrijver aan die missie.
+- **Nog open uit eerdere rondes:** L1-R28 (gespecificeerd, niet actief), `M1.5.S99.050`/`.060` in de `none`-tak, `M1.4.S99`'s registerdrempel, de rolsplitsing bij O-16, Embers barkpool van twee registers, en Q-4.

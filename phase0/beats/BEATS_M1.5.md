@@ -79,6 +79,14 @@ Dat is meteen de belangrijkste schrijfopdracht van deze missie: **de Iron Chorus
 **Beats:** (1) Lopen door de blokken; curfew; niemand buiten. (2) De emissaris' vragen — waarom Ember Voss vertrouwt, wat er gebeurt als Mara er niet meer is. **Dat is een vraag die niemand nog gesteld heeft en hij zaait M1.8.** (3) **Wat hij over Mara vertelt.** Iets waars, iets kleins, iets dat haar niet slechter maakt maar wel menselijker: bijvoorbeeld dat zij drie jaar geleden zelf om hulp vroeg en dat ze nee kregen omdat Ember toen te klein was om waard te zijn. (4) Bricks acht woorden. Hij noemt een naam, en de emissaris herkent hem. **Dat is het moment waarop de twee cellen elkaar voor het eerst iets echt geven.**
 **Waarom Brick hier zit:** hij is de enige die niet onderhandelt. §18.4 — hij liegt nooit. Voor een cel die van wantrouwen leeft, is een man die niet kan liegen de beste diplomaat aan tafel.
 
+> **`.230` / `.240` / `.250` WIJKEN NAAR ACHTTIEN — ruling L1-R31 (01-08).** Deze scène is de **enige plek in het corpus met twee betekenissen van elf**. `.150` (*"Eleven people is not a cell"*) is L1-R14's eigen stelling, hardop, uit de mond van de rivaal — het beste gebruik van het getal in de act. Tachtig regels verderop meet hetzelfde woord verhoordagen, en `.240` is een vlakke herhaaltic die het getal isoleert precies op de botsing.
+>
+> **De M1.5-uitzondering uit L1-R14 stond op één grond — *"M1.5 is GO"* — en die is gemeten onwaar.** Wat de uitzondering intussen wél kostte: `M1.6.S03.220` heeft zijn getal ingeleverd om deze regel te beschermen, en vijftien scènebestanden dragen inmiddels een `# eleven: L1-R14 checked`-notitie. Het corpus is overal geveegd behalve hier.
+>
+> **Eisen, en de regels zijn van de schrijver:** `.230` blijft **exact acht woorden** (*"Cell two. He gave you eighteen days first."*), `.240` blijft **één woord** — dat is de tic van de emissaris en een tweewoordig getal maakt van een echo een mededeling — en `.250` blijft **één dag later**, dus de negentiende. **Uitgesloten en waarom:** *seventeen* (staat sinds L1-R14 in `M1.6.S03` als transportduur; het hier zetten spiegelt de reparatie), *nine* en *six* (verzadigd, 30× en 29× in act 1), *thirteen* (M1.1), *fourteen* (deze missie, `S99.100`/`.110`, burgers), *sixteen* (dwingt `.250` op de zeventiende). Volledige tabel: `ACT1_OVERVIEW` §7 nummerregister.
+>
+> **`M1.5.S99.100` — *"Eleven. Maybe fourteen."* — blijft**, met een `note:` die hem claimt: Voss telt vreemden in de eenheid van zijn eigen cel en corrigeert zichzelf binnen vier woorden. Dat is elf als maatstaf, niet elf als tweede betekenis.
+
 ### S04 — *The Shift Boss* · de keuze
 `Kessara / Mid-Works / Worker Housing` · cutscene · tier 2
 **Aanwezig:** Voss, emissaris, Brick, Mara; de shift-baas
@@ -91,7 +99,7 @@ Dat is meteen de belangrijkste schrijfopdracht van deze missie: **de Iron Chorus
 **§2.7 regel 2 — beide kanten in één zin:**
 - *Doden:* zonder de lijsten stopt de Tithe, en de Tithe kost elke maand mensen.
 - *Sparen:* wie beslist wie er sterft omdat hij een formulier invult, is de administratie geworden waar hij tegen vecht.
-**Systeem:** `Story.Choice.M15_ShiftBossSpared`. **Betaald in M1.6.S06** door Sela — binnen dezelfde act. Geen wees.
+**Systeem:** `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` — script-zijde `story.m15_shiftboss` = `killed` | `prevented` | `warned` (L1-R3; de boolean `M15_ShiftBossSpared` is ingetrokken en kan de derde uitkomst niet uitdrukken). **Betaald in M1.6.S06** door Sela, drie takken, `.250`/`.260`/`.270` — binnen dezelfde act. Geen wees.
 
 ### S05 — *The Late Sweep* · het gevecht
 `Kessara / Mid-Works / Worker Housing` · in-mission-radio + callout · tier 2
@@ -113,7 +121,7 @@ Dat is meteen de belangrijkste schrijfopdracht van deze missie: **de Iron Chorus
 - **turn** — She ratifies his decision without endorsing it, and tells the room it was his to make — which is the first public transfer of authority in the game.
 
 **Beats:** (1) De uitkomst: pact of weigering. (2) Dex' bezwaar of instemming — hij denkt in systemen en ziet meteen wat een alliantie betekent voor radiodiscipline en veiligheid. (3) Reyes' vraag over de burgers in het portiek. (4) Brick zegt één ding over de emissaris. (5) **Mara bekrachtigt Voss' besluit en zegt hardop dat het zijn besluit was.** Dit is beweging III's structurele beat: gezag verschuift in het openbaar. (6) Als er een pact is: de eerste gezamenlijke operatie staat op de kaart — en die operatie is M1.6.
-**Systeem:** `Story.Beat.M15_Cells`, `Story.Choice.M15_IronChorusPact`, `Story.Choice.M15_ShiftBossSpared`. Rewards: bescheiden materiaal + intel; de echte beloning is de alliantie.
+**Systeem:** `Story.Beat.M15_Cells` ✚ en `Story.Choice.M15_Pact.{Full,Limited,None}` ✚ (script-zijde `story.m15_pact` = `full` | `limited` | `none`) worden **hier gezet**. `Story.Choice.M15_ShiftBoss.*` wordt in S04 gezet en **niet in deze scène gelezen** — de enige vlag die S99 leest is `story.m15_terms` (`.150`). Rewards: bescheiden materiaal + intel; de echte beloning is de alliantie.
 
 ---
 
@@ -121,7 +129,9 @@ Dat is meteen de belangrijkste schrijfopdracht van deze missie: **de Iron Chorus
 
 | In | Uit |
 |---|---|
-| `Story.Beat.M14_Quartermaster` · `Story.Clue.ThrexVoice_1` (S01, één regel) | `Story.Beat.M15_Cells` ✚ · `Story.Choice.M15_IronChorusPact` ✚ · `Story.Choice.M15_ShiftBossSpared` ✚ |
+| `Story.Beat.M14_Quartermaster` · `Story.Clue.ThrexVoice_1` (S01, één regel) | `Story.Beat.M15_Cells` ✚ · `Story.Choice.M15_Pact.{Full,Limited,None}` ✚ · `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` ✚ · `Story.Choice.M15_Terms.{Accepted,Conditional,Counter,Refused}` ✚ |
+
+> **De namen in deze tabel stonden tot 01-08 in de ingetrokken booleanvorm** (`M15_IronChorusPact`, `M15_ShiftBossSpared`), terwijl de scènebestanden al de bladvorm zetten en lezen. **De `condition`-regels waren overal correct en de validator was schoon — het waren uitsluitend de instructies die fout stonden**, en een beat-sheet is ook een lezer (L1-R29). Kanonieke spelling en de kolom *gelezen door*: `ACT1_OVERVIEW` §6.
 
 ---
 

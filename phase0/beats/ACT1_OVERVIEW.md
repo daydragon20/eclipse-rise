@@ -159,15 +159,18 @@ Dit is de moeilijkste, want hij moet **retroactief kloppen met wat de speler in 
 
 | # | Regel | ID | Plant | Vorm | Status |
 |---|---|---|---|---|---|
-| 1 | MARA *"They mark everything. They come back for what is worth the night."* | `M1.2.S03.150` | P4-a | parallellisme + slotbeeld | **blijft gepolijst** — het is competentie |
-| 2 | DEX *"They're police, not an army. Police always come afterwards."* | `M1.5.S05.200` | P4-b | antithese + maxime | **blijft** — M1.5 is GO en wordt hier niet voor heropend |
-| 3 | MARA *"It's a freight yard. Freight yards get freight guards."* | `M1.6.S05.410` | *geen rij* | anadiplose | **WORDT VLAK (L1-R21)** — de eerste barst |
-| 4 | P4-c, de afgewezen aanvraag | `M1.7.S03` | P4-c | — | vlak by spec, staat op NO-GO |
-| 5 | MARA, haar eigen zin uit #1, woordelijk herhaald, onderwerp dichtgeslagen | `M1.7.S06.160` | P4-d opzet | herhaling | goed zoals hij is |
-| 6 | MARA, twee redenen en geen van beide af | `M1.8.S03.130` | P4-d | — | vlak by spec |
-| 7 | DEX, vier vlakke woorden op een lege radio | `M1.8.S09.130` | P4-d slot | — | vlak by spec |
+| 1 | MARA *"They mark everything. They come back for what is worth the night."* | `M1.2.S03.150` | P4-a | parallellisme + slotbeeld | **blijft gepolijst** — het is competentie, en de curve heeft een top nodig |
+| 2 | MARA *"A marked block is a block nobody looks at twice."* | `M1.2.S03.200` | *geen rij* | maxime | **WORDT VLAK (L1-R40)** — vier regels na #1, zelfde mond, zelfde raadsel |
+| 3 | DEX *"They're police, not an army. Police always come afterwards."* | `M1.5.S05.200` | P4-b | antithese + maxime | **blijft** — één gepolijste per mond per missie, en dit is de zijne |
+| 4 | MARA *"It's a freight yard. Freight yards get freight guards."* | `M1.6.S05.410` | *geen rij* | anadiplose | **WORDT VLAK (L1-R21)** — de eerste barst |
+| 5 | P4-c, de afgewezen aanvraag | `M1.7.S03` | P4-c | — | vlak by spec, staat op NO-GO |
+| 6 | MARA, haar eigen zin uit #1, woordelijk herhaald, onderwerp dichtgeslagen | `M1.7.S06.160` | P4-d opzet | herhaling | goed zoals hij is |
+| 7 | MARA, twee redenen en geen van beide af | `M1.8.S03.130` | P4-d | — | vlak by spec |
+| 8 | DEX, vier vlakke woorden op een lege radio | `M1.8.S09.130` | P4-d slot | — | vlak by spec |
 
-**Wat #3 vlak maken oplevert is beter dan wat L1-R17 oorspronkelijk vroeg.** Vlak-vanaf-nummer-drie maakt van de reeks een **afbraakcurve** — gepolijst, gepolijst, de eerste barst, een letterlijke herhaling, twee onafgemaakte redenen, vier woorden op een lege radio. De vlakheid wordt daarmee een **karakterfeit over Mara**, een vrouw wier verklaringen opraken, in plaats van een auteursregel. **Wie een achtste aanraking schrijft, zet hem in deze tabel of schrijft hem niet.**
+**Wat vlak maken oplevert is beter dan wat L1-R17 oorspronkelijk vroeg.** De reeks wordt een **afbraakcurve** — gepolijst, dan de eerste barst, dan een letterlijke herhaling, dan twee onafgemaakte redenen, dan vier woorden op een lege radio. De vlakheid wordt daarmee een **karakterfeit over Mara**, een vrouw wier verklaringen opraken, in plaats van een auteursregel. **Wie een negende aanraking schrijft, zet hem in deze tabel of schrijft hem niet.**
+
+> **#2 toegevoegd 01-08, ruling L1-R40, en de rij die eronder hoort staat nu in §18.9 B.** Hij stond in geen enkele tabel omdat hij **geen wegverklaring is maar de exploitatie van de anomalie** — Mara draait hem om in een voordeel, en dat is dezelfde blinde vlek die haar K-77 in draagt. Dat maakt hem zwaarder, niet lichter. Twee gepolijste zinnen over hetzelfde raadsel binnen vier regels leren de speler de **vorm** in plaats van het feit, en dat is precies de faalwijze die L1-R17 beschrijft. **Rij #3's status droeg tot 01-08 de motivering *"M1.5 is GO en wordt hier niet voor heropend"*; die grond is gemeten onwaar (alle zes M1.5-bestanden staan op `draft`) en is vervangen door de grond die wél houdt.**
 
 ### T5 — Kaine's geweten *(betaald: act 4, voorwaardelijk)*
 
@@ -196,7 +199,7 @@ Kaine komt niet voor in act 1. Wat wél in act 1 begint, is de **telling** waar 
 | Draad | Geopend | Aangeraakt in act 1 | Gesloten | Wees? |
 |---|---|---|---|---|
 | **Letters from the Wall** | M1.8.S90 (de eerste gelaste naamplaat) | — | act 4 | nee — loopt door, bewust |
-| **The Enforcer** | proloog kaart 3 **(alleen met Q-2)** | M1.2.S01 (badge → intel), M1.3.S05 (hij antwoordt op de toren, levend gezien) | act 3/4, persoonlijke keuze | **JA, zolang Q-2 openstaat.** Zie C-2. |
+| **The Enforcer** | proloog kaart 3 **(alleen met Q-2)** | M1.2.S01 (badge → intel), M1.3.S05 (hij antwoordt op de toren, levend gezien) — **dezelfde man, kenteken `two six one`, zie §7 nummerregister** | act 3/4, persoonlijke keuze | **JA, zolang Q-2 openstaat.** Zie C-2. |
 | **Petra Voss** | proloog | M1.8.S04, HUB.A1.petra_return | act 2 (Siege) e.v. | nee |
 | **Iron Chorus** | M1.5 | M1.5.S02/S04/S05/S99, M1.8.S99 (ze stemmen mee) | act 2–4: fusie, schisma of tragedie | nee |
 | **The Conscript Letters** | M1.6.S06 | M1.6.S99 | act 4 muiterijpad | nee |
@@ -234,7 +237,7 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Char.PetraRescued` | M1.8.S04 | hub, act 2 Siege |
 | `Story.Char.CinderNamed` | M1.8.S99 | barks (callsign-gebruik), act 2+ |
 | `Story.Choice.M11_Conscript.{Finished,Left,Bound}` | M1.1.S05 | T5-telling — **`.Bound` telt als genade** |
-| `Story.Choice.M12_Ghost` | M1.2 debrief | Veil-alertheid act 1 |
+| `Story.Choice.M12_Ghost` | **M1.2.S05, exit van de stille tak** | **M1.2.S99 (5: `.030`–`.070`)** · Veil-alertheid act 1 *(systeem, nog niet gebouwd)* |
 | `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` | M1.5.S04 | **M1.6.S06 (.250/.260/.270 — drie takken, verplicht)** · M1.8.S99 (alleen `.Warned`: P3-d-verwisseling) · Sela-reputatie |
 | `Story.Choice.M15_Pact.{Full,Limited,None}` | M1.5.S99 | M1.5.S99 (4) · M1.8.S99 (3) · M1.6.S02 (2) · M1.6.S04 (2) — act 2 |
 
@@ -259,7 +262,7 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 | `Story.Choice.M16_LettersAllowed` | M1.6.S06 | draad *Conscript Letters* → act 4 |
 | `Story.Flag.IntakeUnvetted` | M1.6.S06, stil | **act 3, twist 3** |
 | `Story.Clue.BlightBroadcast` | M1.3.S02 | act 3, twist 1 |
-| `Story.Clue.CustodianKey` | M1.2.S04 | act 2, twist 2 |
+| `Story.Clue.CustodianKey` | **M1.2.S04** (waar `.120` hem uitspreekt) — **niet de debrief** | act 2, twist 2 |
 | `Story.Clue.OutsideQuery` | M1.7.S03 | act 2, twist 2 |
 | `Story.Clue.AegisDenial` | M1.7.S03 | **act 4, twist 4 — de dragende** |
 | `Story.Clue.ThrexVoice_1` | M1.3.S06 | M1.7.S04 |
@@ -286,6 +289,14 @@ Naamgeving volgt de bestaande conventie strikt. **Dit is een systeemtaak, geen s
 > **De kolom "gelezen door" is niet documentatie — hij is de veiligheidscontrole, en ik heb hem één keer niet gebruikt (L1-R12).** Toen L1-R3 de shift-baas-vlag van boolean naar drie bladeren omzette, patchte ik de zetter en dit register, en niet de lezer — die in een andere missie staat, bij een andere schrijver. Eén op de drie spelers zou de verkeerde sluitscène hebben gekregen.
 >
 > **Regel: een vlagvormwijziging is pas doorgevoerd als elke cel in "gelezen door" is nagelopen en gepatcht.** Een lege of vage cel in die kolom is zelf een bevinding: een vlag die niemand leest is een keuze zonder gevolg, en een lezer die hier niet staat is een breuk die niemand ziet tot na generatie.
+>
+> **En een cel die een ongebouwd systeem noemt in plaats van de regels die er staan, is een lege cel met een jasje aan (01-08, L1-R39).** `M12_Ghost` droeg *"Veil-alertheid act 1"* terwijl de enige aantoonbare lezer vijf regels in `M1.2.S99` is. Dat verborg dat de **zetter** in deze tabel ook fout stond: het register zei "M1.2 debrief", het bestand zegt exit van `S05`. Wint het register, dan wordt de vlag gezet aan het eind van de scène die hem bij `.030` al leest, en krijgt de speler na een vlekkeloze ghost-run alsnog het luide antwoord. **`validate_script.py:924-938` rapporteert setterloze enkelbladvlaggen niet, dus dit was per constructie onzichtbaar voor de tool** — deze kolom is het enige instrument dat het vangt.
+
+### Clue-vlaggen — ruling L1-R38
+
+**`Story.Clue.*` wordt gezet door de scène waarin de clue wordt uitgesproken. Nooit door de debrief.** Een clue-vlag registreert dat de speler de clue **gehoord** heeft; een debrief speelt onvoorwaardelijk en een clue niet. Nageteld: `BlightBroadcast` (M1.3.S02), `OutsideQuery` en `AegisDenial` (M1.7.S03), `ThrexVoice_1` (M1.3.S06) en `ThrexKnowsSector` (M1.7.S04) doen dit alle vijf al. `CustodianKey` had twee gedeclareerde zetters — de kop van `M1.2.S04` en de `note:` op `M1.2.S99.280` — en de tweede is ingetrokken. Dat is niet cosmetisch: het wardenkantoortje ligt mogelijk niet op het verplichte pad (AR-9-melding in `M1.2.S04`), en dan zou de debriefzetter de clue geven aan een speler die de kamer oversloeg.
+
+**Debriefs zetten `Story.Beat.*` en de uitkomst van keuzes. Verder niets.**
 
 ### Meerwaardige keuzes — ruling L1-R3
 `StoryFlags` is een `TArray<FGameplayTag>` zónder waarden, dus een keuze met drie uitkomsten wordt **drie elkaar uitsluitende bladeren onder één ouder**. De ouder blijft opvraagbaar als "is deze keuze gemaakt". Geen schemawijziging. **`Story.Choice.M11_ConscriptSpared` uit de eerste versie van dit document is ingetrokken** — één waarheid, één opslagplek.
@@ -322,6 +333,25 @@ Kessara heeft drie hoogtes (`03_world_design.md` §3.3): **Spire Levels** (Domin
 De regionamen komen uit de gebouwde Phase-1-graaf (`Eclipse/Tools/create_phase1_content.py`) en zijn dus **feit, geen voorstel**: `Underworks`, `TransitCheckpoint`, `FoundryRow`, `WorkerHousing`, `SupplyDepot`, `CommsRelay`.
 
 **Bereikbaarheidscontrole (gemeten door de main-agent, vastgelegd in `setup_story_missions.py`):** na M1.3's Foothold bezit de speler `TransitCheckpoint` + `WorkerHousing` + `SupplyDepot`. Daardoor is `CommsRelay` (grenst aan `SupplyDepot` en `FoundryRow`) selecteerbaar voor M1.7, en `FoundryRow` voor M1.4. **De pin-volgorde van act 1 is dus lane-legaal.** Dat is nagerekend, niet aangenomen.
+
+### Nummerregister — dragende getallen die meer dan één scène raken
+
+*Aangelegd 01-08 na L1-R31, L1-R32 en L1-R36. **Drie keer heeft één getal in twee missies een andere waarde gedragen, en geen enkele schrijver kon dat zien.** Dit register bestaat zodat de vierde keer niet gebeurt.*
+
+| Getal | Betekent | Zetters/dragers | Mag niets anders meten |
+|---|---|---|---|
+| **elf** | de omvang van Ember Cell (AR-1), inclusief het aantal bunks | `P0.S01` · `M1.5.S01.090` · `M1.5.S03.150` · `M1.6.S06.020`/`.110` · `M1.4.S01.159` · `M1.3.S99.182` · de elf opnames in `M1.8.S91` | **L1-R14.** Geen minuten, meters, geweren, patrouille-, verhoor- of transportdagen |
+| **eenenveertig** | de instroom van de Tithe-trein: het aantal mensen dat in Hollow Point aankomt, **in alle drie de takken** | `M1.6.S06.010` (de enige telling die iemand doet) · 13 verdere gebruiken in M1.6, M1.7, M1.8 en de hub | **L1-R32.** Het is geen wagontelling en geen treintotaal. De trein is nooit geteld (`M1.6.S01.110`/`.120`) en dat is de these van de missie |
+| **veertien** | de burgers in het portiek, M1.5 | `M1.5.S99.100`/`.110` | — |
+| **dertien** | M1.1's munitie | `M1.1` (6×), titel van de missie | — |
+| **zeventien** | Bricks dagen in de wagon van Krad-9 | `M1.6.S03.220` | staat sinds L1-R14 vast; **niet terugdraaien naar elf** — de hoofdregel veroordeelde dat gebruik los van de M1.5-botsing |
+| **achttien / negentien** | hoe lang een man het verhoor volhield, en de dag waarop de Chorus eruit kwam | `M1.5.S03.230`/`.240`/`.250` — **te schrijven, L1-R31** | negentien telt in M1.8 K-77's deuren; ordinaal tegenover cardinaal, drie missies apart, aanvaard |
+| **negen · zes** | verzadigd (30× resp. 29× gesproken in act 1) | overal | **niet als nieuw dragend getal gebruiken** |
+| **`two six one`** | het Enforcer-kenteken (§2.11-draad *The Enforcer*, loopt tot het eind van de campagne) | `M1.2.S01` (6×) · `M1.3.S05.150` — **te corrigeren, L1-R36** | er is precies één Enforcer en precies één nummer |
+
+**Cijferconventie (L1-R36).** Cijfers die één voor één worden uitgesproken, worden als **losse woorden zonder koppeltekens** geschreven: *"Two six one."*, *"Four six two."*, *"Nine one seven."* Een koppelteken is een TTS-gok — een model kan het als samenstelling lezen — en het corpus schrijft ze overal los behalve op één plek. Getallen die als gétal klinken blijven één woord: *"Forty-one"*, *"Seventeen"*.
+
+**Wanneer je hier een rij bij zet:** zodra een getal een tweede scène raakt. Niet als het een keer valt.
 
 ---
 

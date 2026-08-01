@@ -34,6 +34,37 @@ words:        226
 #            on distrust, a man who cannot lie is the best diplomat at the table.
 # writer:    the emissary is never menacing. He is somebody who has already buried the
 #            version of himself that would have liked Ember.
+#
+# *** RULING L1-R31, 01-08. THE L1-R14 EXCEPTION FOR THIS MISSION IS WITHDRAWN. ***
+# .230 / .240 / .250 MOVE OFF ELEVEN. THE NUMBER IS EIGHTEEN, AND .250 LANDS ON THE
+# NINETEENTH DAY.
+#
+# WHY. This is the only scene in the corpus carrying two meanings of eleven. .150 - "Eleven
+# people is not a cell" - is L1-R14's own thesis said out loud by the rival, and it is the
+# best use of the number in the act. Eighty lines later the same word measures days under
+# questioning, and .240 is a flat echo that isolates the number exactly on the collision.
+# The exception rested on one stated ground - "M1.5 is GO" - and all six M1.5 files carry
+# status: draft. Meanwhile fifteen scene files now carry an explicit "eleven: L1-R14
+# checked" note and M1.6.S03.220 gave up its own number to protect this line. The corpus was
+# swept everywhere except here.
+#
+# REQUIREMENTS - the lines are the writer's, these are not:
+#   .230  EXACTLY EIGHT WORDS, unchanged shape: "Cell two. He gave you eighteen days first."
+#   .240  ONE WORD. This is the emissary's tic (18.4: repeats the other's last word back,
+#         flat). A two-word number turns an echo into a statement.
+#   .250  ONE DAY LATER, so the nineteenth. The beat is that he came out the day after the
+#         other man broke.
+#
+# EXCLUDED, MEASURED, DO NOT SUBSTITUTE:
+#   seventeen - lives in M1.6.S03.220 since L1-R14 as transit days in a box. Putting it here
+#               MIRRORS the defect instead of finishing the repair.
+#   nine, six - saturated: spoken 30x and 29x across act 1.
+#   thirteen  - M1.1's title and six spoken uses.
+#   fourteen  - IN THIS MISSION, S99.100/.110, counting civilians.
+#   sixteen   - forces .250 onto the seventeenth, which is M1.6.S03 again.
+# Full table: ACT1_OVERVIEW section 7, number register.
+#
+# NOT AFFECTED: .150 keeps eleven and must. That is the canonical meaning.
 
 # ---- dialogue-writer notes (L2) ----
 # format:    L1-R1 / L1-R5 / L1-R6 applied. Speaker EMISSARY was escalated in S02's L2 notes

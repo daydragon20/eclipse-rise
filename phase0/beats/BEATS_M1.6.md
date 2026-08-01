@@ -25,7 +25,7 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 | **VOSS**, **MARA** | veld |
 | **BRICK** | veld — **dit is zijn missie**, ook al zegt hij bijna niets. De Tithe heeft hem van Krad-9 gehaald (AR-11) |
 | **SELA VANN** | in de wagons — **debuut** |
-| Iron Chorus-vechters | veld, **alleen als `Story.Choice.M15_IronChorusPact` waar is** |
+| Iron Chorus-vechters | veld, **alleen als `story.m15_pact != "none"`** (`Story.Choice.M15_Pact.{Full,Limited}`) — zij vechten mee in de limited-tak; alleen de `split`-optie in S04 vereist `== "full"` (L1-R13) |
 | Dominion-conscriptbewaking | barks |
 | bevrijde conscripten (3–4 sprekende bijrollen) | wagons + instroom — **castingsleutels ontbreken, Q-5** |
 | **DEX**, **REYES** | Hollow Point; Reyes krijgt S06 en S99 |
@@ -83,7 +83,9 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 **Beats:** (1) Het luik open. De geur, het licht, te veel mensen die niet bewegen. (2) De eerste conscript die zegt dat hij blijft. Zijn reden is goed. (3) Voss probeert het. Het werkt niet — **en dat is belangrijk: Voss kan dit niet.** (4) **Sela.** Ze spreekt niet tegen Voss. Ze spreekt tegen de wagon. Haar signature-regel valt hier: *"They didn't take your brother. We let them."* (5) De wagon komt in beweging. (6) **Brick.** Hij staat in het luik en zegt drie of vier woorden en ze gaan over Krad-9, en de speler snapt nu waarom hij als eerste sprak in S01.
 **Dit is de beste scène van beweging III en waarschijnlijk de op één na beste van de act.** Zij bewijst pillar 3 (PEOPLE, NOT UNITS) zonder één statistiek.
 **Systeem:** `Story.Char.SelaMet`.
-**Valkuil:** Sela mag geen toespraak houden (AR-7). Ze overtuigt met vier tot zes korte beurten, waarvan minstens twee vragen zijn. Retoriek is structuur, geen volume.
+**Valkuil:** Sela mag geen toespraak houden (AR-7). Ze overtuigt met **vier tot zes korte beurten en minstens één vraag**. Retoriek is structuur, geen volume.
+
+> **GECORRIGEERD 01-08 — ruling L1-R34. Hier stond "minstens twee vragen" en dat was een proxy, geen eis.** De scène levert vijf beurten, langste negentien woorden, en **één** vraag (`.140`); `.190` is een imperatief. Wat de stub wilde staat een regel hoger — geen oration, structuur boven volume — en de scène haalt dat langs een andere weg. **Die weg is bovendien beter karakterisering dan wat ik vroeg:** een tweede vraag maakt van Sela een ondervrager, terwijl `.190` de wagon **toestemming geeft om te blijven** en hen precies daarmee in beweging brengt. Dat is de organisator, en het is de wortel van §2.5's *"learns power's compromises"* — haar macht is dat ze mensen mag laten gaan en dat ze dan blijven. **De tekst had gelijk en de stub is bijgetrokken.** De L2-notitie in het bestand claimt nog twee vragen; die claim is onwaar en gaat mee bij de eerstvolgende beurt.
 
 ### S04 — *The Cost of Speed* · de keuze
 `Kessara / Mid-Works / Tithe Line` · cutscene · tier 2
@@ -99,7 +101,7 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 - **Splitsen** (alleen bij Iron Chorus-pact) — de Iron Chorus neemt de tweede wagon en Ember weet niet waar die mensen heen gaan.
 
 **Beats:** (1) De wissel komt eraan. (2) Mara geeft de keuze aan Voss — **derde keer** (na M1.1.S05 en M1.5.S04) en de speler moet het patroon nu bewust voelen. (3) Sela's rekening: wie er betaalt bij elke optie, in haar vocabulaire (tweede persoon meervoud). (4) De keuze. (5) Eén regel van Brick.
-**Systeem:** `Story.Choice.M16_TrainRun`.
+**Systeem:** `Story.Choice.M16_Train.{Run,Emptied,Split}` — script-zijde `story.m16_train_choice` = `run` | `emptied` | `split` (L1-R3). De `split`-optie draagt `condition: 'story.m15_pact == "full"'` (L1-R13). **De oude enkelvoudige naam `M16_TrainRun` is ingetrokken**; hij las als een boolean en kan drie uitkomsten niet dragen.
 
 ### S05 — *The Yard* · de respons
 `Kessara / Mid-Works / Supply Depot Yard` · in-mission-radio + callout · tier 2
@@ -127,6 +129,12 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 >
 > De schrijver had gelijk dat dit *"dezelfde verklaring die steeds moeilijker te zeggen wordt"* is. Wat ontbrak is dat de vórm dat dan ook moet doen. Vlak vanaf hier maakt van de reeks een **afbraakcurve** (gepolijst → gepolijst → **eerste barst** → letterlijke herhaling in M1.7.S06 → twee onafgemaakte redenen in M1.8.S03 → vier woorden op een lege radio in M1.8.S09), en daarmee wordt de vlakheid een karakterfeit over Mara in plaats van een auteursregel. Volledige aanrakingstabel: `ACT1_OVERVIEW` §4.
 
+> **`.370`'s "drawbar" MOET GEPIND WORDEN — ruling L1-R32 (01-08). Eén notitie, geen letter tekst.** `.370` (*"Forty-one at the drawbar. Forty-one at this wall."*) is juist zoals hij staat: in `split` heeft Sela alleen nog de eerste wagon, ze telt hem bij het loskoppelen en bij de muur, en ze komt uit — dat is de wreedheid en die blijft. **Het risico zit in één woord.** Leest een latere schrijver *"drawbar"* als de telling uit `S03` (vóór de vertakking), dan is de eerste wagon in álle takken eenenveertig, en dan klopt `run` niet meer — want daar komt iedereen uit beide wagons mee.
+>
+> **De drawbar in `.370` is de koppeling waar de wagons gescheiden zijn, niet de ramp van S03.** Dat moet in het bestand staan, want zonder die pin gaat schrijver zeventien rekenen met een trein van ~81 mensen die het spel nooit geteld heeft.
+>
+> **Eenenveertig is een campagneconstante en `S06.010` vertakt niet.** Het getal staat op veertien plekken in vier missies plus de hub; het vertakken van de eerste maakt de andere dertien tot tegenspraken en duwt de telling als `condition` act 2 in. **De takken verschillen in wíé, niet in hoevéél** — en dat is geen boekhoudkundig gemak maar wat `S01.110`/`.120` uitdrukkelijk vastlegt: niemand heeft die trein ooit geteld. De prijs van elke tak is de vrouw in de gele werkjas, drie keer, en de derde is de enige die niemand kan betreuren omdat niemand hem kan benoemen. **Deze notitie gaat mee in dezelfde beurt als `.410` en `.350`–`.390`, dus het bestand gaat één keer open.**
+
 ### S06 — *What We Do With Them* · de instroom
 `Kessara / Underworks / Hollow Point` · hub · tier 2
 **Aanwezig:** Mara, Voss, Sela, Reyes, Dex, Brick, tientallen nieuwkomers
@@ -150,7 +158,13 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 - **turn** — Voss picks the smallest of her three words, and it sticks.
 
 **Beats:** (1) De cijfers: hoeveel mensen, hoeveel eten, hoeveel dagen. Dex' realiteit. (2) Reyes' lijst met wat ze nodig heeft en niet krijgt. (3) Sela's plaats in de kamer: ze is er nog, en niemand heeft haar gevraagd te blijven. (4) **Voss vraagt haar te blijven** — of niet; laat dat een keuze zijn. (5) Het woord voor wat Ember nu is. **Nog niet "Eclipse"** — dat komt in M1.8. Iets kleiners en menselijkers. (6) Mara, alleen bij de kaart, laatste beeld. Geen regel.
-**Systeem:** `Story.Beat.M16_TitheTrain`, `Story.Char.SelaMet`, wervingsinstroom (+recruits), dag +1.
+**Systeem:** `Story.Beat.M16_TitheTrain` ✚ en `Story.Choice.M16_SelaInvited` ✚ (in de scène gezet én gelezen). **Gelezen uit S04:** `story.m16_train_choice`, drie takken, `.050`/`.060`/`.070`. `Story.Char.SelaMet` wordt in **S03** gezet, niet hier. Wervingsinstroom (+recruits), dag +1.
+
+> **DEX' TWEE KOMISCHE BEATS BLIJVEN, ONVOORWAARDELIJK — ruling L1-R35 (01-08).** De melding was juist gezien en het antwoord is nee, om een reden die de scène overstijgt. **L1-R7 zei *"ligt er iemand gewond, dan is S99 nasleep"*, en dat criterium was te ruim geformuleerd.** Als "nasleep" betekent *de missie heeft levens gekost*, is elke debrief vanaf M1.2 nasleep en is het komische budget van zes opeenvolgende missies nul — inclusief `M1.5.S99.070`, dat ik zelf als de bitterste grap van de act heb gespecificeerd.
+>
+> **Een debrief is nasleep wanneer iemand in de kámer dood of gewond is.** In M1.1.S99 vuurt dat omdat er een squadlid op tafel ligt; daarom hangt die uitzondering aan `run.zero_casualty`. Hier is niemand in de kamer gewond en zijn de eenenveertig beneden in leven.
+>
+> **En conditioneren zou niets oplossen:** alle drie de takken kosten mensen (een dode op de spoordijk, veertig gemerkt op een weegbrug, een hele wagon weg), dus er is geen tak waarin de grappen "schoon" zijn. Wat een `condition` wél zou doen, is de tak dunner maken waarvoor L1-R25 net een ruling heeft besteed om hem dikker te maken — en `.170` is de laatste gesproken regel vóór het slotbeeld van Mara alleen bij de kaart. **Beide grappen voldoen aan §18.6 zoals hij bedoeld is: ze kosten iets, ze zijn de angst, en de verhouding is 2 op 17.**
 
 ---
 
@@ -158,7 +172,9 @@ Structureel is dit de missie die de zwaarste morele last van act 1 draagt, en de
 
 | In | Uit |
 |---|---|
-| `Story.Beat.M15_Cells` · `Story.Choice.M15_IronChorusPact` · `Story.Choice.M15_ShiftBossSpared` | `Story.Beat.M16_TitheTrain` ✚ · `Story.Char.SelaMet` ✚ · `Story.Choice.M16_TrainRun` ✚ · `Story.Choice.M16_LettersAllowed` ✚ · `Story.Thread.ConscriptLetters_Open` ✚ · `Story.Flag.IntakeUnvetted` ✚ |
+| `Story.Beat.M15_Cells` · `Story.Choice.M15_Pact.{Full,Limited,None}` (S01, S02, S04) · `Story.Choice.M15_ShiftBoss.{Killed,Prevented,Warned}` (S06) | `Story.Beat.M16_TitheTrain` ✚ · `Story.Char.SelaMet` ✚ (S03) · `Story.Choice.M16_Train.{Run,Emptied,Split}` ✚ (S04) · `Story.Choice.M16_LettersAllowed` ✚ (S06) · `Story.Choice.M16_SelaInvited` ✚ (S99) · `Story.Thread.ConscriptLetters_Open` ✚ · `Story.Flag.IntakeUnvetted` ✚ |
+
+> **Namen bijgetrokken 01-08.** `M16_TrainRun` las als een boolean voor drie uitkomsten en `M15_IronChorusPact` / `M15_ShiftBossSpared` waren al ingetrokken (L1-R3). De **`condition`-regels in de scènebestanden waren overal correct**; het waren de instructies die fout stonden. Kanonieke spelling en de kolom *gelezen door*: `ACT1_OVERVIEW` §6.
 
 ---
 
