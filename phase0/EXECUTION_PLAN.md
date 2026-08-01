@@ -273,6 +273,42 @@ achtergrondplaat** — elke regel staat op wat er toevallig achter ligt (gemeten
 van 0,078 tot 0,163 luminantie binnen één scherm, met geclipt wit erin). Dat is dezelfde
 oorzaak als de onleesbare HUD-debugtekst; zie `phase0/SHOT_FINDINGS.md`, blok bovenaan.
 
+### 2a-sexies. N-e — de cache-manifest moet zeggen wat hem gemaakt heeft
+
+*Gescopet 01-08. **Hoort vóór de eerste grote generatie**, want daarna is de blinde vlek
+duur in plaats van hinderlijk.*
+
+`Eclipse/Content/Audio/Generated/VoiceCacheManifest.json` heeft 16 entries en is een kale
+afbeelding van hash naar bestandsnaam. **Geen stem-ID, geen model, geen tekst, geen datum,
+geen credits.** De sleutel is `hash(voiceId + text + emotion + modelId)` en dus
+onomkeerbaar.
+
+**Wat dat vandaag al kostte:** ik wilde `DialogueSeed.json` van `multilingual_v2` naar
+`eleven_v3` zetten en wilde weten hoeveel cache-entries dat wees zou maken — het model zit
+in de sleutel. **Dat is niet te beantwoorden.** Daardoor werd een correctie van één veld een
+uitgavebesluit, en dat hoort nu bij owner-vraag **O-12**.
+
+**Scope:** `Eclipse/Source/Eclipse/Audio/EclipseVoiceCache.{h,cpp}`. Per entry meeschrijven:
+stem-ID, model, tekst-hash, datum, credits.
+
+**Twee dingen die de klassekop zelf al voorschrijft en die je niet mag breken:**
+1. **Eén schrijver.** De klasse is met opzet gedeeld door de runtime-subsystem én de
+   editor-commandlet, *"why: two independent manifest writers would inevitably drift and
+   break the 'never generate the same line twice' guarantee (16.15 rule 7)."*
+2. **Oude entries blijven geldig.** De kop legt vast dat legacy-`.mp3`-entries een hit
+   blijven geven. Metadata is dus **additief** — een entry zonder metadata mag nooit een
+   miss worden, want dat regenereert betaalde regels.
+
+**Falsificatie:** een run schrijft een entry mét alle velden · een bestaande entry zónder
+metadata geeft nog steeds een hit en wordt **niet** opnieuw gegenereerd (controleproef
+eerst: bewijs dat een echte miss wél regenereert) · en na een run is *"welke entries hangen
+aan model X"* een query met een antwoord.
+
+**Waarom het de moeite is:** de ledger noteert zelf dat de credit-teller **achterloopt**
+(een generatie van 45 tekens gaf een delta van 0, en 341 credits landden pas minuten later).
+De cache is daarmee de enige andere bron van waarheid over wat er betaald is — en die weet
+op dit moment niets.
+
 ### 2b. Daarna klaarstaand (in deze volgorde)
 
 **N-a — Munitie- en wapenstatus op de bus** *(element-builder; tweede helft van de datalaag onder boots)*
