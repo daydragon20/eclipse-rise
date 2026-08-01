@@ -211,37 +211,37 @@
   },
   {
    "id": "O-17",
-   "prio": "gauw",
-   "vraag": "Vier sprekers hebben helemaal geen rol in de casting-tabel — 32 regels, en één hele scène",
-   "waarom": "Dit is NIET de botsing van O-16, en daarom staat het apart. Bij O-16 delen twee personages een stem; hier is er helemaal geen. Vier sprekers staan in de scripts maar in geen enkele rol:\n\n  dominion_officer      8 regels — blokkeert M1.4.S04 volledig\n  civilian_kessara_a    6 regels\n  civilian_kessara_b    5 regels\n  civilian_kessara_c    3 regels\n\nDe rest zijn losse regels elders. Ze staan in VoiceKeyMap onder 'uncast' — bewust, zodat de controle ze als 'bekend en onbeslist' meldt in plaats van elke run rood te maken. Maar bekend is niet opgelost: ze kunnen niet gegenereerd worden.\n\nDE OFFICIER IS DE URGENTE. Zeven van zijn acht regels zitten in M1.4.S04, en de criticus noemt hem 'het best getekende niet-companionpersonage van de missie' — hij herverdeelt het papierwerk van een dode zonder van tempo te veranderen. Die scène kan niet verschepen zonder hem, wat de poort er ook van vindt.\n\nDE DRIE BURGERS ZIJN GOEDKOPER DAN ZE LIJKEN: samen 14 regels, en ze staan in M1.2.S02, M1.5.S04, M1.6.S03/S06 en twee M1.8-scènes. Ze hoeven geen eigen casting-ronde — een bestaande stem hergebruiken kan, als je dat goedvindt.",
+   "prio": "nu",
+   "vraag": "Drie ambient-burgers houden 11.523 credits tegen — mogen ze een bestaande stem lenen?",
+   "waarom": "Deze kaart is scherper geworden nadat je vanochtend gecast hebt. De emissaris en Petra zijn nu wél gebonden; wat er overblijft in de casting-bak is bijna helemaal dit.\n\nGEMETEN, uitgesplitst naar oorzaak:\n  • 7 scènes / 11.523 credits worden geblokkeerd door ALLEEN de drie Kessara-burgers\n  • 1 scène  /  1.310 credits door de Dominion-officier\n\nDie verhouding is het punt. De drie burgers spreken samen 14 regels — ambient volk in een steeg, in M1.2.S02, M1.5.S04, M1.6.S03 en S06 en twee M1.8-scènes. Voor die 14 regels staat 11.523 credits aan ándere tekst stil, want een scène kan niet half gegenereerd worden.\n\nZe hoeven geen eigen castingronde. Eén bestaande stem hergebruiken maakt zeven scènes vrij, en het valt niet op: het zijn omstanders, geen personages.\n\nDe officier is een ander geval. Zeven van zijn acht regels zitten in M1.4.S04, en de criticus noemt hem ‘het best getekende niet-companionpersonage van de missie’ — hij herverdeelt het papierwerk van een dode zonder van tempo te veranderen. Die verdient een eigen mond.",
    "stappen": "1. Open de castingpagina (progress_media/casting/CASTING.html).\n2. Kies een stem voor de Dominion-officier — dat is de enige die een scène tegenhoudt.\n3. Zeg voor de drie burgers of ze een eigen stem krijgen of een bestaande hergebruiken.",
    "opties": [
     {
      "label": "Officier een eigen stem, burgers hergebruiken bestaande",
      "waarde": "officier_eigen_burgers_hergebruik",
      "toelichting": "Goedkoopste weg die M1.4.S04 vrijmaakt. Burgers zijn ambient; hergebruik valt niet op.",
-     "gevolg": "M1.4.S04 kan gegenereerd worden. De 14 burgerregels krijgen een bestaande stem en niemand hoort het."
+     "gevolg": "Zeven scènes / 11.523 credits komen vrij zodra de burgers een bestaande stem lenen, plus 1.310 als de officier zijn eigen stem krijgt. Samen 12.833 — dat is de hele casting-bak."
     },
     {
      "label": "Alle vier een eigen stem",
      "waarde": "alle_vier_eigen",
      "toelichting": "Duurder, maar vier verschillende monden. Kost een castingronde per rol.",
-     "gevolg": "Alle 32 regels krijgen een eigen mond. Kost drie extra castingrondes en een deel van je saldo."
+     "gevolg": "Alle 32 regels krijgen een eigen mond. Zelfde 12.833 credits vrij, maar het kost drie extra castingrondes voor 14 ambient-regels."
     },
     {
      "label": "Alles hergebruiken uit bestaande stemmen",
      "waarde": "alles_hergebruik",
      "toelichting": "Nul castingwerk. Risico: de officier deelt dan een stem met iemand die de speler kent, en dat is precies het defect dat O-16 oplost.",
-     "gevolg": "Nul castingwerk, maar de officier deelt dan een stem met iemand die de speler al kent — en dat is precies het defect dat O-16 oplost. Ik raad dit af."
+     "gevolg": "Nul castingwerk en dezelfde 12.833 vrij, maar de officier deelt dan een stem met iemand die de speler kent — precies het defect dat O-16 oplost. Ik raad dit af."
     },
     {
      "label": "Laat maar even wachten",
      "waarde": "uitstellen",
      "toelichting": "M1.4.S04 blijft ongenereerbaar. De andere 24 regels ook, maar die blokkeren geen scène.",
-     "gevolg": "M1.4.S04 blijft ongenereerbaar en zakt uit de klaar-bak. De andere 24 regels ook, maar die houden geen scène tegen."
+     "gevolg": "De 12.833 blijft staan, waarvan 11.523 voor veertien regels omstandersgeluid."
     }
    ],
-   "advies": "Optie 1. De officier draagt een scène en verdient een eigen mond; de drie burgers zijn samen 14 ambient-regels en daar hoort geen castingronde bij. Dat is ook de enige optie die M1.4.S04 vrijmaakt zonder het defect van O-16 opnieuw te introduceren.",
+   "advies": "Optie 1, en de verhouding maakt het makkelijk: veertien regels omstandersgeluid houden 11.523 credits aan gepoorte tekst tegen. De burgers lenen een stem, de officier krijgt er een.",
    "vrijtekst": true
   },
   {
