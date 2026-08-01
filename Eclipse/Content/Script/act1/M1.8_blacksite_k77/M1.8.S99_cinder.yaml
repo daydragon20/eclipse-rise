@@ -19,6 +19,19 @@ words:           224
 words_heard:     182
 words_generated: 252
 
+# ---- declared silence — RULING L1-R41 (02-08, story-architect) ----
+# The writer proposed this block, checked it against the checker's four conditions, and did
+# NOT paste it because L1-R24 had rejected `silence:` here. L1 has now ruled: L1-R24 rejected
+# it for a DIFFERENT defect (the camera clause on .010) and its stated reason does not reach
+# this one. The field is correct here and it is now in the file. One word of the writer's
+# proposed reason changed - "the forty" is "the forty-one" per L1-R32/L1-R42, same round.
+silence:
+  none: "The emissary is not in Hollow Point at all in this branch - Voss declined the pact
+         and the Chorus kept the water and the street. The scene's three cells are Ember, the
+         forty-one and the freed and are unconditional (L1-R24), so nothing is withheld from
+         this player: he gets the same count and an empty ramp, which is what refusing an ally
+         looks like at the end of act 1."
+
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, SELA, BRICK, DEX, REYES, PETRA, the Iron Chorus emissary (pact only),
 #            the crowd
@@ -44,8 +57,17 @@ words_generated: 252
 # Chorus) and without it, one. Counted instead of reasoned from the flag:
 #
 #   1  EMBER          the eleven minus their dead, plus Voss and Brick     P0    unconditional
-#   2  THE FORTY      Sela's intake off the Tithe train                    M1.6  unconditional
+#   2  THE FORTY-ONE  Sela's intake off the Tithe train                    M1.6  unconditional
 #   3  THE FREED      the prisoners out of K-77, Petra among them          M1.8  unconditional
+#
+# *** GROUP 2 IS "THE FORTY-ONE", NOT "THE FORTY" - RULING L1-R42 (02-08). ***
+# This block said THE FORTY while .080 in this same file speaks "Forty-one", and L1-R32 fixed
+# forty-one as a campaign constant for exactly that intake. Worse, "forty" is already taken
+# INSIDE THIS MISSION for the OTHER group in this room: S07's want, S08's want, S09's shot and
+# S05's .120 shot all call the K-77 prisoners forty, and S08.140's strategic variant SPEAKS it
+# ("Forty people up a shaft rated for six"). So in M1.8 forty means the freed and forty-one
+# means the intake, and a note calling the intake "the forty" points at the wrong group in the
+# only scene where both stand in one room. Registered in ACT1_OVERVIEW section 7.
 #
 # Canon 2.9 - "the loyalty of three fused cells" - is delivered in all three pact branches.
 # BEATS_M1.8 section 4 beat 1 already said this: "Ember, de Iron Chorus (BIJ PACT), de
@@ -73,8 +95,27 @@ words_generated: 252
 # The `none` branch is written up in full in the L2 `emissary:` note below, including one
 # escalation the ruling could not see because the validator was not run when it was written.
 #
-# NO CONFLICT with M1.5.S99.030's idealist variant ("Two cells..."): at that moment the forty
-# and the freed do not exist yet. Checked.
+# NO CONFLICT with M1.5.S99.030's idealist variant ("Two cells..."): at that moment the
+# forty-one and the freed do not exist yet. Checked.
+#
+# *** .090 GOES FLAT - RULING L1-R43 (02-08). ONE LINE. NO BEAT CHANGES. ***
+# The touch inventory in ACT1_OVERVIEW section 4 was T4-scoped, and that scope was wrong:
+# L1-R17's danger is FORM, not which twist a line serves. A player who learns that a neat
+# little saying means the game is hiding something does not check which table it came from.
+# So the inventory is now twist-agnostic, and this scene lands in it three times.
+# THE MEASUREMENT THAT DECIDES IT IS IN THIS FILE. .090 and .100 fill the SAME SLOT - the
+# warned swap. .100 is flat ("There's a shift boss out there who saw both cells in one
+# kitchen"); .090 carries a generalising tail ("That's the whole job") and its own note calls
+# it "eight flat words", which is what the writer believed it was. So the default-branch
+# player gets a quotable explanation where the warned-branch player gets a plain one, for no
+# reason anybody chose. Flattening .090 puts the two halves of one slot in the same register.
+# .110 STAYS QUOTABLE AND THAT IS THE POINT. Of the three explanations exactly one may be
+# repeatable, and it is the one that DEFLATES the room - the epigram is the deflation. .080 is
+# the true one and it is the least finished sentence in the room. Polished-false / flat-false /
+# unfinished-true is a designed asymmetry; two polished falses is just density.
+# The beat does not move: explanation two still arrives from the crowd, still interrupts, still
+# goes unanswered, and NOTHING here resolves P3-d. Cost is zero - nothing in this scene has
+# been generated. WRITER ACTION: rewrite .090 flat. L1 does not write the line.
 #
 # writer:    ANYONE WHO LETS ONE EXPLANATION WIN IN BEAT 4 DESTROYS TWIST 3.
 #            Half Voss variant set. He should speak less here than in any other debrief.
@@ -139,7 +180,7 @@ words_generated: 252
 #            watch somebody else be named. His three lines are gated on the pact and all three
 #            correctly go quiet together.
 #            THAT PLAYER LOSES NOTHING FROM THE SCENE'S SPINE. .010's three cells are Ember,
-#            the forty and the freed - unconditional, ruling L1-R24 - so the count is true
+#            the forty-one and the freed - unconditional, ruling L1-R24 - so the count is true
 #            with him and true without him. He never voted for the name in any branch; .180 /
 #            .190 are him refusing to, in a number. What the `none` player gets instead is a
 #            room with nobody standing by the ramp, and that is the branch's whole statement:
@@ -150,32 +191,22 @@ words_generated: 252
 #            at the exact moment act 2 has to tell them apart (L1-R13). Silence here costs the
 #            player nothing and buys act 2 its evidence.
 #
-#            *** ESCALATION TO L1 - THE VALIDATOR WILL STILL REPORT THIS SCENE. ***
-#            I could not run validate_script.py (no shell), so I read it instead. Its per-scene
-#            branch check is `if len(positive) >= 2 and echt_gemist` at line 990. For
-#            story.m15_pact in this file positive = {full, limited} (.180 / .190), excluded =
-#            {none} (.040), universe = {full, limited, none}, so `none` lands in `gemist` and
-#            BRANCH fires. THE SHOT MOVE DOES NOT CLEAR IT, and it was never going to - the
-#            finding is about the flag's branch content, not about the camera.
-#            L1-R24 rejects `silence:` here, and its stated reason is that "the branch does
-#            play; only the camera was wrong". That answers a different question than the one
-#            the tool asks. The tool is not asking whether the SCENE plays in `none` - it does,
-#            in full, and that is not in doubt. It is asking whether the FLAG contributes
-#            anything spoken in `none`, and the honest answer is no, on purpose, for the
-#            reasons written above. That is exactly the "nothing belongs here" case the field
-#            was added for (SCRIPT_FORMAT section 4, 01-08).
-#            I HAVE NOT ADDED IT, because a writer quietly overriding a named ruling is worse
-#            than a red bar. If L1 rules for it, it is one paste into the header and it passes
-#            the field's four checks (reason over 40 chars, branch really is silent, value
-#            exists, this scene reads the flag):
-#
-#              silence:
-#                none: "The emissary is not in Hollow Point at all in this branch - Voss
-#                       declined the pact and the Chorus kept the water and the street. The
-#                       scene's three cells are Ember, the forty and the freed and are
-#                       unconditional (L1-R24), so nothing is withheld from this player: he
-#                       gets the same count and an empty ramp, which is what refusing an ally
-#                       looks like at the end of act 1."
+#            *** ESCALATION CLOSED 02-08 - RULING L1-R41. THE FIELD IS IN THE HEADER. ***
+#            The escalation was correct on every point and it is answered, not still open.
+#            What it said: the per-scene branch check is `if len(positive) >= 2 and
+#            echt_gemist`. For story.m15_pact in this file positive = {full, limited}
+#            (.180 / .190), excluded = {none} (.040), universe = {full, limited, none}, so
+#            `none` lands in `gemist` and BRANCH fires. The shot move never was going to clear
+#            it - that finding is about the flag's branch content, not about the camera.
+#            L1's answer: L1-R24 rejected `silence:` for a DIFFERENT defect and its reason
+#            ("the branch does play; only the camera was wrong") does not reach this one. The
+#            tool is not asking whether the SCENE plays in `none` - it does, in full. It is
+#            asking whether the FLAG contributes anything spoken in `none`, and the answer is
+#            no, on purpose. That is the "nothing belongs here" case the field exists for.
+#            The writer did not paste it because a writer quietly overriding a named ruling is
+#            worse than a red bar. That was right, and it is why this is a ruling and not a
+#            silent patch. THE BLOCK IS NOW IN THE HEADER, one word changed (forty ->
+#            forty-one, L1-R42). Do not remove it and do not add a substitute line in `none`.
 # petra:     NO LINES. Ruling L1-R10, one shot note at .160. She is the only person in the
 #            room who does not join the naming, and it is not disapproval - she does not use
 #            names, and the only name she ever had for him is the one the game cannot voice.
@@ -247,7 +278,7 @@ lines:
     condition:  'story.m15_shiftboss != "warned"'
     interrupts: true
     text:       "The Veil buys people. That's the whole job."
-    note:       "EXPLANATION TWO, default branch. Replaced - not joined - by .100 in the warned branch."
+    note:       "EXPLANATION TWO, default branch. Replaced - not joined - by .100 in the warned branch. *** L1-R43: THIS LINE GOES FLAT, WRITER ACTION. *** `That's the whole job` is a generalising tail, so this slot reads as a maxim in the default branch and as plain speech in the warned branch (.100), which is the same slot. Keep the beat exactly: from the crowd, interrupting, unanswered. Take the polish off. The one quotable explanation the scene is allowed is .110, because there the epigram IS the deflation."
 
   - id:         M1.8.S99.100
     speaker:    FIGHTER_A

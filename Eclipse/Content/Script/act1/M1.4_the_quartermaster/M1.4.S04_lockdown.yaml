@@ -14,7 +14,7 @@ turn:         "The garrison coming down the aisles is nineteen years old, and Em
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .160 draagt six-one-one met koppeltekens, tegen de cijferconventie van L1-R36 en 18.9 C3; plus .220 is een niet-geregistreerde T4-aanraking"
+critic:       GO
 words:        221
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.4.md ----
@@ -22,6 +22,34 @@ words:        221
 # flags-in:  none
 # flags-out: none
 # plants:    P5-b - conscript garrison, the mercy tally continues toward twist 5 (act 4)
+#            P4-e - .220, the ALLOCATION word, spoken once by the Dominion about itself
+#                   (added 02-08, ruling L1-R44 - see the block below before touching .220)
+#
+# *** .220 IS NOT A NINTH T4 TOUCH. IT IS A PLANT, AND IT IS NOW REGISTERED. RULING L1-R44. ***
+# The critic could not settle this and was right not to: the touch inventory says "write a
+# ninth one into this table or do not write it", and only L1 may put a row in that table.
+# THE ANSWER IS THAT IT IS NOT THAT KIND OF LINE, and the distinction is worth having.
+# A T4 TOUCH is a character explaining away a Dominion failure while the player accepts the
+# explanation. Three parts: the Dominion falls short, a person accounts for it, nobody argues.
+# .220 has none of them. Nothing has fallen short in his eyes, he is not accounting for
+# anybody's behaviour, and he is not talking to the player at all - he is a clerk filing a
+# materiel loss at the end of his shift. It is the Dominion describing ITSELF.
+# WHAT IT IS INSTEAD: the first and only time in act 1 that the act-4 vocabulary is spoken
+# out loud. 02_story_bible 2.4 books the Foundry Collapse dead as "optimal loss allocation";
+# the twist-4 truth column in ACT1_OVERVIEW section 4 reads "allocation, not incompetence" on
+# two separate rows. Here a middle-aged administrator says the shortfall goes against the
+# DISTRICT ALLOCATION and not against his depot, and it means nothing more sinister than
+# whose column it lands in. That is a recognition plant of exactly the shape P1-a already
+# uses: the player is given a word sixty hours before it means anything, so that act 4 can be
+# earned instead of announced. The two senses are genuinely different - his is bookkeeping,
+# AEGIS's is planning - which is why it does not tip the twist.
+# IT ALSO SATISFIES L1-R17 ALREADY, and the critic measured that: the line is flat. No
+# parallelism, no antithesis, no closing image. It adds nothing to the form-tell, which is the
+# only thing the touch count exists to ration. LEAVE IT FLAT. If it ever reads well on a
+# poster, rewrite it.
+# CARRIER: mandatory, spoken, unconditional, on the public address. AR-9 satisfied. It shares
+# the P4-e row with M1.4.S99 .020-.050, which is the same fact seen from the cell's side -
+# see the ruling block in that file. One plant, two carriers, one mission.
 # beats:     1) crate 2 opens; the lockdown starts
 #            2) THE OFFICER ON THE PA - procedural, bureaucratic, reading crate numbers
 #               while people die. He is not cruel; he is a man completing a form.
@@ -197,3 +225,4 @@ lines:
     tags:    [pause]
     text:    "Note for the morning shift. The shortfall is written against the district allocation, not against this depot."
     shot:    "The aisles are full of noise. The voice on the address system has not changed its pace once."
+    note:    "*** P4-e, REGISTERED 02-08 BY RULING L1-R44. NOT a T4 touch - a T4 PLANT. *** No character is explaining away a Dominion failure here; a clerk is filing a loss, and `district allocation` means only whose column it lands in. That is the word 02_story_bible 2.4 uses for the Foundry Collapse dead (`optimal loss allocation`) and the word both twist-4 truth columns use, spoken once, sixty hours early, in its innocent sense. KEEP IT FLAT (L1-R17) and keep it last in the scene. Do not sharpen it, do not repeat the word anywhere else in act 1, and do not let anybody in the room react to it."
