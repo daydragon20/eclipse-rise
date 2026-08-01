@@ -14,10 +14,10 @@ turn:         "Voss asks where the tip came from, and Mara ends the conversation
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .180 'There isn't one.' heeft geen antecedent -- op de letter spreekt hij .160 tegen"
-words:        268
-words_heard:  268
-words_generated: 290
+critic:       GO
+words:        270
+words_heard:  270
+words_generated: 292
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      MARA, VOSS, DEX, BRICK, REYES, SELA
@@ -39,9 +39,14 @@ words_generated: 290
 # here, and a shadow that gets pointed at is a spotlight.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      cutscene (20-60). Ceiling respected (longest 24 w at .170). Register reached at
-#            .010 (23), .100 (21) and .170 (24).
-# spread:    3 w (.180 "There isn't one.") to 24 w = 8x.
+# band:      cutscene (20-60). Ceiling respected (longest 24 w, at .010 AND .170 - they tie).
+#            Register reached at .010 (24), .100 (21) and .170 (24).
+#            CORRECTED 01-08: this row said "longest 24 w at .170" and ".010 (23)". Counted
+#            again by hand, .010 is 24 and ties .170. The convention used throughout this
+#            file is that a free-standing em-dash is not a word, which is why .100 is 21.
+# spread:    4 w (.210 "Somebody stayed with Tam.") to 24 w = 6x.
+#            RECOUNTED 01-08: the shortest line used to be .180 at 3 w. .180 is now 5 w
+#            (antecedent repair, see the line note), so .210 is the floor.
 # humour:    18.6 - this is downtime, so it pays. Three beats, all of them costing something:
 #            .020 (a warden sat down on the dead drop), .050 (Dex correcting himself out
 #            loud), .110 (Dex answering Sela's question honestly, which is the frightened
@@ -61,7 +66,18 @@ words_generated: 290
 #            she hears "one route in". .170 is her tic - the accusation arrives as anatomy.
 # mara:      .180 is the stub's beat 5. She does not have an answer and the line does not
 #            pretend she does; .190 is what she offers instead, and it is worse than nothing.
-#            AR-5: zero "you" in this scene. Zero "I".
+#            AR-5: zero "you" in every Mara line in this scene. Zero "I". (Sela's "how many
+#            of you" at .100 is Sela's second person plural and is her fingerprint, not a
+#            breach of Mara's - AR-5 is a rule about one mouth.)
+#            .180 ANTECEDENT, 01-08: the line was three words and referred to nothing. The
+#            only countable in the exchange is the surface access Reyes asks for at .150 and
+#            Dex names at .160, so "one" now has it, and the pronoun does the work the beat
+#            wanted: there is a way up and it is not one you carry a man out of.
+# eleven:    L1-R14 checked. Not used, spoken or written, anywhere in this file - lines,
+#            shots and notes. Counted rather than assumed: two weeks and twice and the second
+#            time (.010/.020), four times and eight months (.060), once (.110), two hundred
+#            metres (.160), four (.190), the second and third horn (.220), plus Block Nine
+#            and the fourth horn as names. Nothing in the scene counts people in Ember.
 # brick:     .210, four words, and it answers Reyes's question with a dead man's name - his
 #            18.4 tic aimed at the only question in the room nobody wants. Nobody replies.
 # omitted:   Voss has no line after .140. He asked, he was answered, and he lets it go. That
@@ -168,7 +184,8 @@ lines:
   - id:      M1.7.S01.180
     speaker: MARA
     voice:   mara
-    text:    "There isn't one."
+    text:    "There isn't a better one."
+    note:    "ANTECEDENT REPAIR 01-08. This read \"There isn't one.\" and on the letter it contradicted .160, where Dex names a surface access that exists. `one` now takes `the nearest surface access` from .150 and the line says what beat 5 needs it to say: this is the only way up and it is not good enough for a stretcher. Two words changed, no beat moved. It is an evaluation and not a claim about the map, so it cannot collide with whatever S06 does with the way out."
 
   - id:      M1.7.S01.190
     speaker: MARA

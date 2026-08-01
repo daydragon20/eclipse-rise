@@ -14,10 +14,10 @@ turn:         "He stops trying to comfort her and does what she says, and she le
 
 # ---- state ----
 status:          draft
-critic:          "NO-GO: zeven strikt alternerende beurten zonder onderbreking of gemarkeerde stilte (18.9 B); plus twee toetsbare claims in de L2-noot die het eigen bestand weerlegt"
-words:           135
-words_heard:     85
-words_generated: 215
+critic:          GO
+words:           143
+words_heard:     93
+words_generated: 223
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.8.md ----
 # cast:      VOSS, PETRA VOSS (debut), MARA
@@ -44,6 +44,11 @@ words_generated: 215
 # band:      cutscene (20-60). Ceiling respected (longest 27 w, a variant of .040).
 #            Register reached at .040 (24 w base). Spread 1 w (.020 "Petra.") to 24 w = 24x.
 #
+# *** TWO CLAIMS IN THIS BLOCK WERE FALSE AND THE LINES WERE NOT. CORRECTED 01-08. ***
+# Both were overstatements of a rule the file obeys, and both would have sent the next
+# writer somewhere the scene never went. They are rewritten below to say what is actually
+# in the text: field of this file. The lines themselves were not touched for either.
+#
 # *** THE REGEX, AND ITS SCOPE. ***
 # Zero occurrences of "you" or "your" in every text: field in this file, including variants,
 # including Mara's line and Voss's. The stub asks for the scene, not just for Petra, and the
@@ -51,31 +56,75 @@ words_generated: 215
 # Mara spends it four scenes later it lands in a vacuum. Checked by hand, base and variant.
 # SCOPE: text: fields only. The inherited L1 comment block above uses the word in prose, as
 # does this note, and none of it is voiced. A whole-file grep will report false hits.
-# Petra additionally uses no first person either - no "I", no "we", nowhere. Mara's whole
-# fingerprint is "we"; Petra has no pronouns at all. That is a second regex and it is the
-# cleanest available separation between the two women.
 #
-# *** MARA vs PETRA - THE MECHANICAL DIFFERENCE, DEMONSTRATED AT .080/.090. ***
+# CORRECTION 1. This block used to end: "Petra has no pronouns at all." SHE HAS FOUR, and
+# they are in the file it was written about: "Roll IT" (.010), "IT goes back" (.030), "where
+# SHE can see the door" (.050), "Both of THEM" (.090). What is true, and is the separation
+# that was meant, is narrower and still mechanical:
+#   * no second person ANYWHERE in the file - `\b(you|your)\b` returns nothing
+#   * no first person in ANY Petra line - `\b(I|I'm|I've|we|we're|we've|us|our)\b` returns
+#     nothing across .010 .030 .035 .050 .070 .090 .110 .120
+# So the only pronouns she owns point at crockery, at bedding, and at another prisoner. She
+# has no word for herself and no word for him, which is the asymmetry the scene is built on.
+# Mara's whole fingerprint is "we"; Petra never reaches first person at all. THAT is the
+# cleanest available separation between the two women, and it survives being checked.
+# Why it mattered: "no pronouns at all" is unwritable. A writer taking it literally in act 3
+# would produce a woman who cannot say "Both of them", and the tic dies with it.
+#
+# *** MARA vs PETRA - THE MECHANICAL DIFFERENCE, AT .080/.090. ***
 # The two lines are adjacent on purpose, so the strip test (18.9 C1) can be run on them
 # alone:
-#   MARA  names a PLACE and a GROUP.  "Everyone in the corridor."   She moves a room.
-#   PETRA names a THING and a VERB.   "Cups. Both of them."         She moves two hands.
-# Mara's unit is the room; Petra's unit is the next thing a pair of hands does. Mara says
-# "we" constantly and never "you"; Petra says neither. Two laconic women, four scenes apart,
-# and no line of either is deliverable by the other.
-# Against Brick the published rule holds unchanged: he hands you a noun ("Carpet.",
-# "Plates."), she hands you a verb ("Roll it.", "Go and stand.").
+#   MARA   a first person plural and a collective, plus a place.  "We move on the hour.
+#          Everyone in the corridor."     She moves a room.
+#   PETRA  no person in the line at all - a household object and a count.
+#          "Cups. Both of them."          She moves two hands.
+# Mara's unit is the room; Petra's unit is the next thing a pair of hands does.
 #
+# CORRECTION 2. The row above used to read "PETRA names a THING and a VERB" and cite .090
+# for it. THERE IS NO VERB IN "Cups. Both of them." The published 18.4 rule - he hands you a
+# noun, she hands you a verb - is right and holds across her set, but .090 is one of her
+# VERBLESS lines and cannot be the example. The lines that carry the rule are .010 ("Roll it
+# from the foot end"), .035 ("Square the pillow"), .050 ("Go and stand"), and S09.080 ("And
+# somebody boil water") - four imperatives, all pronoun-elided. Against Brick, .090 separates
+# on noun class and on the count instead: "Carpet." and "Plates." (M1.8.S03.020, M1.8.S90.070)
+# are what a room contains; "Cups. Both of them." is what two hands are about to carry, and
+# the number is the instruction.
+# Two laconic women, four scenes apart, and no line of either is deliverable by the other.
+#
+# symmetry:  *** THE NO-GO, AND THE ONE LINE THAT FIXES IT. ***
+#            The scene ran .010 P / .020 V / .030 P / .040 V / .050 P / .060 V / .070 P -
+#            seven strict alternating turns, no interruption, no marked silence, which is
+#            18.9 B's ceiling of six passed by one. Repaired with a DOUBLE rather than a tag,
+#            and placed at .035 rather than at .015, because placement is the whole value:
+#            a double at the top would have left .035-.070 still alternating five deep, and
+#            it would have separated her name from the bowl that answers it. At .035 the two
+#            runs are three turns (.010-.030) and five (.035-.070), and the second one ends
+#            on Mara, a third voice. Longest strict run in the scene is now five.
+#            Nothing else moved. No tag was added: `[pause]` before .050 would have marked
+#            her refusal as deliberate hesitation, and the point of .050 is that there is no
+#            hesitation in it at all. The pattern is M1.5.S02's, which breaks its own long
+#            run at .130/.140 with a written interruption.
 # the tic:   fires three times and never once as a refusal. .030 answers his use of her name
 #            with a bowl. .050 answers his account of the search with somebody else's cell.
 #            .110 answers the fact that she cannot walk by telling him which arm to take -
 #            she does not accept help, she assigns it. That is the same move as the other
 #            two and it is why the scene turns without anybody softening.
-# names:     Voss says "Petra" exactly once, at .020. She never says anything back that is a
-#            name, a callsign or a pronoun, here or in S09 or in S99. The asymmetry IS the
-#            scene: he still has a word for her and she has none for him, and the reason is
-#            that the only word she ever used is the one the game cannot voice (L1-R10).
-#            One name use in twelve turns - inside 18.9 B's density limit.
+#            .035 is NOT a fourth firing. It answers nothing, because nothing was asked
+#            between .030 and it; it is the second half of one refusal, and that is why it
+#            is the line that breaks the symmetry rather than a new beat.
+# names:     Voss says "Petra" exactly once, at .020. She gives nothing back that is a name,
+#            a callsign, or any word at all that refers to him - here, and in her four lines
+#            in S09. She has no line in S99 (L1-R10: one shot, no dialogue), so the claim
+#            there is about a silence, not about a line.
+#            CORRECTED 01-08: this row used to say "a name, a callsign or a pronoun". She
+#            uses four pronouns in this scene; none of them is him. See correction 1 above.
+#            The asymmetry IS the scene: he still has a word for her and she has none for
+#            him, and the reason is that the only word she ever used is the one the game
+#            cannot voice (L1-R10).
+#            One name use in thirteen turns - inside 18.9 B's density limit.
+# eleven:    L1-R14 checked. Not used, spoken or written, anywhere in this file - base lines,
+#            variants and shots. Nothing in the scene counts Ember: "Four" at .050/.060 is a
+#            cell number, and "ninety" in the strategic variant of .040 is the manifest.
 # .040:      his longest line in the mission, and it fails. He offers the months, the vigil,
 #            the arithmetic - and gets a cell number back. He claims nothing for himself in
 #            any version of it ("somebody in our vault", "nobody in that vault") which is his
@@ -112,6 +161,13 @@ lines:
     voice:   petra
     text:    "Bowl on the shelf. It goes back on the shelf."
     note:    "THE TIC. She answers her own name with crockery. She is putting the cell in order because that is what hands are for, and nothing in the scene explains it."
+
+  - id:      M1.8.S04.035
+    speaker: PETRA
+    voice:   petra
+    text:    "Square the pillow. Nothing stays on the floor."
+    shot:    "She has still not looked up. He has not moved out of the doorway."
+    note:    "*** THE DOUBLE - 18.9 B SYMMETRY, ADDED 01-08. *** The scene ran seven strict P-V-P-V turns with no interruption and no marked silence; this is the cheapest legal break and it is placed where it costs the most, immediately after her tic fires. He has said her name and been handed a bowl, and before he can answer he is handed a second job. His .040 then arrives from a man who has been talked over twice. Second sentence: a house rule, learned, stated flat about nobody. It is as close as any line in this mission comes to what was done to her, and it does not name it."
 
   - id:      M1.8.S04.040
     speaker: VOSS
@@ -151,7 +207,7 @@ lines:
     speaker: PETRA
     voice:   petra
     text:    "Cups. Both of them."
-    note:    "*** THE STRIP TEST, DELIBERATELY ADJACENT TO .080. *** Mara names a place and a group; Petra names a thing and a verb. Neither line is deliverable by the other woman."
+    note:    "*** THE STRIP TEST, DELIBERATELY ADJACENT TO .080. *** Mara's line carries a first person plural, a collective and a place; this one carries no person at all - an object and a count. Neither line is deliverable by the other woman. CORRECTED 01-08: this note used to call the line \"a thing and a verb\". There is no verb in it. Her verbs are at .010, .035 and .050; this is one of her verbless lines, and it separates from Brick on the count rather than on the grammar."
 
   - id:      M1.8.S04.100
     speaker: VOSS

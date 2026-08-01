@@ -14,10 +14,10 @@ turn:         "Ember's own operations are in the log by date — and so is a que
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: C1 zakt (62% wisselbaar), P4-c niet vlak (.210 is een antithese die aan het eind draait), .130/.250 onspeelbaar in de dex_along==false-tak"
-words:        225
-words_heard:  199
-words_generated: 309
+critic:       GO
+words:        272
+words_heard:  233
+words_generated: 411
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.7.md ----
 # cast:      VOSS, MARA, DEX (present or radio)
@@ -82,32 +82,109 @@ words_generated: 309
 #            will not.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      in-mission-radio (10-25). Ceiling respected (longest 15 w at .210). Register
-#            reached at .030 (12), .130 (12), .160 (12), .210 (15).
-# spread:    2 w (.240 "That's room.") to 15 w = 7.5x.
-# flag-in:   story.m17_dex_along (set S02.030/.040) is read at .020/.030 and .250.
+# REWRITTEN 01-08 AGAINST THE NO-GO. Three defects were named and they were three different
+# jobs: a scene-level voice failure, one line with the wrong shape, and two lines that could
+# not be played by half the players. What follows describes what the file DOES. Every claim
+# below is one a reader can check against the lines without leaving this file.
 #
-# *** P4-c, .160-.240. THE MOST IMPORTANT DOCUMENT IN ACT 1, AND IT IS FLAT. ***
-# L1-R17 read and applied. Here is exactly how it is kept off a poster, so the critic can
-# check it mechanically instead of by taste:
-#   1. NO APHORISM ANYWHERE IN THE BEAT. Not one line is a general truth about the Dominion,
-#      the Veil, or war. Every line is about THIS form: a stamp, a signature, a line item.
-#      Read .160-.240 aloud out of context and none of it means anything.
+# band:      in-mission-radio (10-25). Ceiling respected (longest 20 w at .210). Register
+#            reached at .010/.030/.040 (12), .050 (15), .070 (10), .090 (13), .110 (10),
+#            .120 (19), .130 (12), .160 (15), .210 (20), .245 (19).
+# spread:    2 w (.240 "That's room.") to 20 w = 10x.
+# lines:     27, of which 4 carry a `condition:` (.020/.030 on the Dex branch, .245/.250 on
+#            the optional record). No variants anywhere - this scene has no axis choice.
+#
+# *** DEFECT A - THE STRIP TEST. THREE RULES A REGEX CAN CHECK. ***
+# 62% was not a taste problem, it was Voss reading form fields in Dex's grammar: ".040 Relay
+# mast. Nineteenth of last month" and ".160 Requisition, same sector" and ".200 Allocation.
+# Not a command signature." are bare-noun fragments, and bare-noun fragments are the one
+# thing 18.4 gives Dex by name. Two men reading the same screen in the same syntax is mush
+# no amount of tone fixes. So the separation is mechanical, and it is stated here so the
+# critic can run it instead of feeling it:
+#
+#   VOSS   EVERY line opens on a subject and a finite verb, and NO line of his contains a
+#          verbless sentence. He reads, and what he reads he names by its function: a log
+#          sorted by sector, an authorisation chain, a stamp, a command signature. 18.4's
+#          fixed trait - sees systems, names mechanisms - carried by sentence shape rather
+#          than by vocabulary, because vocabulary is what the two of them share.
+#          Check: .010 .040 .050 .070 .080 .100 .120 .140 .160 .180 .200 .245
+#   DEX    EVERY line contains at least one verbless sentence. All nine, checked one by
+#          one: .020 "Off." / "My chair." · .030 "Top right." · .060 "Not an alert log."
+#          · .130 "Somebody else's chain, bolted under a Veil file." · .170 "Right." ·
+#          .190 "Across it how?" · .210 "Not his chain, then." · .220 "Told no." · .250
+#          "Household staff, then." / "No idea."
+#          That is the whole regex and it is exceptionless. The looser half of his
+#          fingerprint - hardware nouns and hardware verbs where an abstract would go -
+#          is present where he has a noun at all (a chair, a sector index, a case file, a
+#          chain BOLTED under a file, a stamp, a personnel record) but it is NOT every
+#          line: .170 and .220 are pure register. Do not write that down as a rule; the
+#          verbless sentence is the rule.
+#   MARA   zero "I" and zero "you" (AR-5), and every instruction she gives carries a first
+#          person plural: .110 "We take", .150 "We take", .260 "We have ... Everybody off".
+#          She never gives a bare pronoun-elided imperative in this scene, and that is not
+#          decoration - THAT SHAPE IS PETRA'S (18.4), and Petra debuts later in the same act
+#          (M1.8.S04). .110 and .150 both used to be bare imperatives.
+#          Her two non-instructions (.230, .240) are flat third person about somebody else.
+#
+# ONE line changed speaker to make this hold: .140, which was Dex's and is a screen read.
+# .120 did not change speaker - it was already Voss's and it absorbed the two fields Dex
+# used to supply. Nothing was renumbered, and .245 is the only new ID.
+#
+# *** DEFECT B - P4-c, .160-.240, AND THE ONE LINE IT RESTS ON. ***
+# .210 read: "Then it wasn't his chain that said no to him. It was a line item." That is a
+# cleft antithesis with the turn parked on the last three words, which is a poster. It now
+# reads: "Not his chain, then. An allocation stamp means it stopped with whoever sets the
+# sector's team numbers for the quarter."
+#   - the beat is unchanged: a commander did not refuse him, an allocator did.
+#   - THE DELETION TEST NOW GOES THE OTHER WAY, which is the point. On the old line, cutting
+#     the last sentence IMPROVED it (18.9 C2), because the last sentence was the flourish.
+#     Cut the last sentence of the new one and you are left with "Not his chain, then.",
+#     which explains nothing. The explanation IS the final sentence, so there is nothing
+#     ornamental on the end to remove. Same test, opposite result, and that is the difference
+#     between a flat line and a shaped one.
+#   - poster test (L1-R17): it ends on "for the quarter". Nobody screenshots a fiscal period.
+#     No rhythm, no symmetry, no antithesis, no general truth about anything.
+#   - it still sounds like an aside, because it opens on a four-word shrug and because the
+#     next thing anybody says is .220, which is about Dex being surprised, not about AEGIS.
+# The rest of the beat holds the shape the stub asks for:
+#   1. NO APHORISM ANYWHERE IN IT. Every line is about THIS form - a stamp, a signature, a
+#      team count, a quarter. Read .160-.240 aloud out of context and none of it means
+#      anything.
 #   2. THE FINDING ARRIVES AS SOMEBODY BEING WRONG. Dex assumes at .170 that the package is
 #      coming - of course it is - and .180 corrects him. A beat that begins with an expert's
 #      wrong guess cannot be screenshotted as wisdom, and it is the false start 18.9 B says
 #      this script has none of.
-#   3. NO CLOSING BEAT AND NO RHYTHM. .210 ends on "a line item", which is the dullest
-#      available noun. .230 restates the document in eight words and adds nothing.
-#      No triad, no symmetry, no antithesis, no sentence that turns at the end.
-#   4. THE JOKE IS NOT THE EXPLANATION. .220 is Dex's stub-mandated budget joke and it is
-#      deliberately limp - a small deflated realisation, not a witticism. The explanation
-#      (.230) is Mara's and it is boring on purpose.
+#   3. THE JOKE IS NOT THE EXPLANATION. .220 is the stub's budget joke and it is deliberately
+#      limp. It was "They get told no. I didn't know they got told no."; it is now "Told no.
+#      I didn't know they got told no." - the same deflation with the run-up taken off.
+#   4. THE EXPLANATION IS MARA'S AND IT IS BORING ON PURPOSE. .230 restates the document in
+#      eight words and adds nothing.
 #   5. NOBODY LOOKS TWICE. .240 is two words, nobody agrees with it, nobody follows up, and
-#      the next line is about a completely different document.
-# Poster test applied to every line in the beat. .210 and .230 were both rewritten once for
-# failing it: "Somebody in accounts said no" and "he's working with what he's got, same as
-# everybody" were the earlier versions and both had a snap to them.
+#      the next thing on screen is an unrelated document.
+#
+# *** DEFECT C - THE dex_along == false BRANCH. NOBODY IS LOOKING AT A SCREEN BUT VOSS. ***
+# story.m17_dex_along is set at S02.030/.040 and read in this scene at .020 and .030 ONLY.
+# (The S02 line notes say it is also read here at .200/.210. IT IS NOT, and it was not before
+# this rewrite either - those two lines are unconditioned and always have been. Reported, not
+# quietly patched: S02 is a GO file and not mine.)
+# In the false branch Dex is on the stair with the Veil's own band in his ear and cannot see
+# a screen at all. Three lines assumed he could:
+#   .130  "Different authorisation, and it's older than everything above it."  - a screen read
+#   .140  "Nothing was ever filed after it."                                   - a screen read
+#   .250  "Personnel record ... Taking it anyway."                             - read AND hands
+# THE RULE NOW, AND IT IS CHECKABLE: no Dex line in this scene states a fact he could only
+# get by looking. He infers, he asks, he interprets, and he is told. Voss reads .120 and .140
+# and .245; Dex answers them. Nothing is conditioned on the branch except the two lines that
+# already were, and the scene is identical in every playthrough.
+# WHY NOT A CONDITIONED TWIN: `COND_GRAMMAR` in validate_script.py accepts exactly one
+# comparison, so `run.m17_record == true and story.m17_dex_along == true` does not parse.
+# A twin of P2-d would need the flags nested, which the format does not have. Even if it
+# did, the twist-2 record living behind a player choice is the thing the AR-9 note below
+# refuses on principle.
+# Staging, so the next reader does not trip on it: .010's shot puts FOUR screens on that
+# desk. In the along branch Dex takes one (.020) and Voss has the log on another, which is
+# why Dex still asks "read me the stamp" while standing two feet away. In the stair branch
+# he has none.
 #
 # *** AR-9 DEVIATION, DELIBERATE, AND IT MAKES THE PLANT STRONGER - see report. ***
 # The stub says DEX reads the refusal aloud. In the branch where the player left him on the
@@ -118,6 +195,10 @@ words_generated: 309
 # means on a Veil requisition. Zero conditioned lines, identical in every playthrough, and
 # it is the same division of expertise the two of them have had since M1.2.S03. AR-9's
 # requirement - mandatory, spoken, never document-only - is met harder, not softer.
+# EXTENDED 01-08: the same division now runs through findings 2 and 4 as well, which is
+# where defect C came from. It was applied to P4-c and to nothing else, so two other beats
+# kept the old assumption and nobody heard it, because the branch that breaks them is the
+# one most players do not take.
 #
 # finding 1: .040-.110, and it is the only beat in the scene with any emotional content.
 #            The player reads his own campaign back to himself with timestamps on it. The
@@ -126,15 +207,34 @@ words_generated: 309
 #            place in the mission where it would have been easiest to break.
 #            The count at .100 is the scene's single Kessaran counting beat (rulings ronde 1,
 #            limit of one per scene). Fourteen and five - not eleven (L1-R14).
-# finding 2: .120-.150. TWO LINES OF DEX AND NO THEORY. Nobody speculates about whose query
-#            it is, nobody says "second hunter", nobody frowns. Mara's five-word answer is
-#            the whole reaction the scene permits. Whisper does not exist yet; a shadow that
-#            gets pointed at is a spotlight.
-# finding 4: .250, one line, conditioned. He does not understand it and he does not stop.
+# finding 2: .120-.150, and it is three lines now instead of two, because the middle one had
+#            to stop being a screen read. Voss reads the chain and its date (.120), Dex says
+#            the ONE thing the stub allows - what it is NOT (.130) - and Voss reads the second
+#            absence (.140). NO THEORY ANYWHERE. Nobody speculates about whose query it is,
+#            nobody says "second hunter", nobody frowns. Sets Story.Clue.OutsideQuery at .140.
+#            Mara's four-word answer is the whole reaction the scene permits. Whisper does not
+#            exist yet; a shadow that gets pointed at is a spotlight.
+# finding 4: .245/.250, both conditioned on the same flag, and it is one beat in two mouths
+#            for the branch reason above - Voss reads it, Dex does not understand it and does
+#            not stop. No reaction from anybody, no second beat.
+#            L1-R37 MOVED THE WEIGHT HERE: the M1.2 copy of P2-d is withdrawn, so this is the
+#            only place in act 1 the redacted record exists. It therefore has to play for
+#            every player who does the optional objective, in both Dex branches, which is
+#            exactly what the old single line did not do.
 #            SYSTEMS: run.m17_record is set by the optional record objective, not by script.
-#            If that objective is cut, delete this line - nothing else reads the fact.
-# names:     nobody is addressed by name in twenty-six lines.
-# mara:      zero "you", zero "I" (AR-5).
+#            If that objective is cut, delete BOTH lines - nothing else reads the fact.
+# names:     nobody is addressed by name in twenty-seven lines.
+# em-dash:   one, at .160, and it is an interruption (18.9 B allows one per five lines).
+# eleven:    L1-R14 checked. Not used, spoken or written, in any line or shot. Counted the
+#            file instead of trusting the last note: the spoken numbers are eight (months,
+#            .010), nineteenth and twenty-one forty (.040), fourteen and five (.100), and
+#            four (standing teams, .160). None of them counts people in Ember.
+# numbers:   NO NEW NUMBER WAS INTRODUCED BY THIS REWRITE, so nothing here needed a free one.
+#            That is deliberate: the P4-c rewrite reaches for "the quarter" rather than a
+#            figure precisely because a fiscal period is duller than a count, and dull is the
+#            specification. If a later pass wants a number on that stamp, it is an L1 call
+#            and it collides with something - measure first, then write down why the
+#            collision is acceptable.
 # omitted:   Voss has no reaction line to finding 1 beyond the count, and there is no line
 #            anywhere connecting the three findings to each other. See report.
 
@@ -142,8 +242,9 @@ lines:
   - id:      M1.7.S03.010
     speaker: VOSS
     voice:   voss
-    text:    "It's a log. Eight months of it, and it's sorted by sector."
+    text:    "It's a log, eight months of it, and it's sorted by sector."
     shot:    "Four screens on a plywood desk in what used to be a valve gallery. Somebody's tea has gone cold beside the keyboard. Two coats on a hook."
+    note:    "One sentence, three finite verbs, and it names what the thing is FOR. That is the Voss rule for this scene and it starts on line one."
 
   - id:        M1.7.S03.020
     speaker:   DEX
@@ -160,19 +261,20 @@ lines:
   - id:      M1.7.S03.040
     speaker: VOSS
     voice:   voss
-    text:    "Relay mast. Nineteenth of last month, twenty-one forty."
+    text:    "The relay mast is in here. Nineteenth of last month, twenty-one forty."
+    note:    "Was \"Relay mast. Nineteenth of last month, twenty-one forty.\" - three bare-noun fragments, which is Dex's grammar in Voss's mouth. The clause goes back on the front and the timestamp stays a field value, because that is what a man reading a field aloud sounds like."
 
   - id:      M1.7.S03.050
     speaker: VOSS
     voice:   voss
-    text:    "Foundry Row armoury. The pump gallery. The tithe line. The yard."
-    note:    "Four items, not three - 18.9 B's triad check. All four are canon act-1 locations."
+    text:    "The Foundry Row armoury is in it. The pump gallery. The tithe line. The yard."
+    note:    "Four items, not three - 18.9 B's triad check. All four are canon act-1 locations. The first arrives as a sentence and the rest arrive faster than he can build sentences for them, which is how a list comes off a screen."
 
   - id:      M1.7.S03.060
     speaker: DEX
     voice:   dex
-    text:    "That's not an alert log. That's a case file."
-    note:    "18.4 Dex: the technical noun does the work and no feeling is stated anywhere near it."
+    text:    "Not an alert log. That's a case file."
+    note:    "18.4 Dex: the technical noun does the work and no feeling is stated anywhere near it. Opens verbless now - it was \"That's not an alert log\", which is Voss's shape. He is not reading; he is naming what he has just heard, so it plays on the stair."
 
   - id:      M1.7.S03.070
     speaker: VOSS
@@ -187,47 +289,50 @@ lines:
   - id:      M1.7.S03.090
     speaker: MARA
     voice:   mara
-    text:    "Then they saw the mast and not the two before it."
+    text:    "Then they saw the mast and not the two we did before it."
+    note:    "The two are the overpass and Block Twelve, named by Voss one line earlier. \"we did\" is the fingerprint and it is also the knife: she is the one who puts Ember's hand on the two that were missed."
 
   - id:      M1.7.S03.100
     speaker: VOSS
     voice:   voss
-    text:    "Fourteen entries. Five of them are us."
+    text:    "There are fourteen entries. Five of them are us."
     shot:    "Nobody answers him. The cursor goes on down the list by itself."
     note:    "*** ACT 1'S ENGINE ON A SCREEN. *** Every victory made them more visible, in the player's own chronology, with timestamps. The reaction is the shot. Nobody says one word about how it feels (18.9 A)."
 
   - id:      M1.7.S03.110
     speaker: MARA
     voice:   mara
-    text:    "Copy the sub-file. All of it, not the summary."
+    text:    "We take the sub-file. All of it, not the summary."
+    note:    "Was a bare imperative (\"Copy the sub-file\"). Bare pronoun-elided imperatives are Petra's fingerprint and Petra debuts later in this same act; Mara's fingerprint is the first person plural. Same instruction, and now only one of the two women can say it."
 
   - id:      M1.7.S03.120
     speaker: VOSS
     voice:   voss
-    text:    "There's a query chain sitting under ours."
+    text:    "There's a query chain sitting under ours. The authorisation isn't the same, and it's older than the whole file."
+    note:    "P2-b setup. He reads BOTH fields - chain and date - because the man at the desk is the only person who can, in either branch. This used to be seven words and Dex supplied the fields he could not see."
 
   - id:      M1.7.S03.130
     speaker: DEX
     voice:   dex
-    text:    "That's not theirs. Different authorisation, and it's older than everything above it."
-    note:    "P2-b, line 1 of 2. He says what it is NOT."
+    text:    "That's not theirs, then. Somebody else's chain, bolted under a Veil file."
+    note:    "P2-b, and it is the one line the stub gives him: he says what it is NOT. \"then\" is doing the branch work - he is answering .120, not reading a screen, so it plays identically on the stair. \"bolted\" is the hardware verb 18.4 hands him. He does not say who, and nobody asks."
 
   - id:      M1.7.S03.140
-    speaker: DEX
-    voice:   dex
+    speaker: VOSS
+    voice:   voss
     text:    "Nothing was ever filed after it."
-    note:    "P2-b, line 2 of 2. Sets Story.Clue.OutsideQuery. NO THEORY FOLLOWS. Nobody guesses, nobody frowns, nobody says the word hunter."
+    note:    "Sets Story.Clue.OutsideQuery. Moved off Dex 01-08: it is an absence you can only see in a file tree, and half the players have him a hundred metres away on a stair. NO THEORY FOLLOWS. Nobody guesses, nobody frowns, nobody says the word hunter."
 
   - id:      M1.7.S03.150
     speaker: MARA
     voice:   mara
-    text:    "Take it with the rest."
+    text:    "We take that too."
 
   - id:      M1.7.S03.160
     speaker: VOSS
     voice:   voss
-    text:    "Requisition, same sector. Interdiction package. Four standing teams and a permanent--"
-    note:    "P4-c OPENS. Bureaucratic listing, not rhetoric - no 'and the whole hammer', no triad, no flourish. He does not get to finish it."
+    text:    "There's a requisition on the same sector. Interdiction package. Four standing teams and a permanent--"
+    note:    "P4-c OPENS. Bureaucratic listing, not rhetoric - no 'and the whole hammer', no triad, no flourish. He does not get to finish it. The clause on the front is the Voss rule; the fragments after it are him reading faster than he is speaking."
 
   - id:         M1.7.S03.170
     speaker:    DEX
@@ -249,19 +354,20 @@ lines:
   - id:      M1.7.S03.200
     speaker: VOSS
     voice:   voss
-    text:    "Allocation. Not a command signature."
+    text:    "It says Allocation. There's no command signature on it."
+    note:    "Was \"Allocation. Not a command signature.\" - punchier, and belonging to the wrong man. He reports the field and then reports the field that is missing, which is duller and is his."
 
   - id:      M1.7.S03.210
     speaker: DEX
     voice:   dex
-    text:    "Then it wasn't his chain that said no to him. It was a line item."
-    note:    "*** THE LINE TWIST 4 RESTS ON. *** Ends on the dullest available noun. No rhythm, no turn, nothing that survives being taken out of this room. Sets Story.Clue.AegisDenial."
+    text:    "Not his chain, then. An allocation stamp means it stopped with whoever sets the sector's team numbers for the quarter."
+    note:    "*** THE LINE TWIST 4 RESTS ON, REWRITTEN FLAT 01-08 (L1-R17). *** The old text was a cleft antithesis that turned on its last three words. This one carries the same fact and has nothing on the end to cut: delete the final sentence and only a shrug is left, which is the deletion test running backwards and is the whole difference. Ends on a fiscal period. Sets Story.Clue.AegisDenial."
 
   - id:      M1.7.S03.220
     speaker: DEX
     voice:   dex
-    text:    "They get told no. I didn't know they got told no."
-    note:    "The stub's budget joke, kept limp on purpose (L1-R17). It is a deflated realisation, not a witticism, and 18.4 Dex deflects the beat rather than sitting in it."
+    text:    "Told no. I didn't know they got told no."
+    note:    "The stub's budget joke, kept limp on purpose (L1-R17). It is a deflated realisation, not a witticism, and 18.4 Dex deflects the beat rather than sitting in it. The run-up came off the front so it opens verbless like the rest of him."
 
   - id:      M1.7.S03.230
     speaker: MARA
@@ -276,12 +382,19 @@ lines:
     shot:    "She is already looking at the next screen. Nobody agrees with her and nobody argues."
     note:    "She sees room in it. Two words, no follow-up, and the next line is about an unrelated document. Nobody in this room looks at any of it twice."
 
+  - id:        M1.7.S03.245
+    speaker:   VOSS
+    voice:     voss
+    condition: 'run.m17_record == true'
+    text:      "There's a personnel record in here out of the Arbiter's household. The name's lacquered out and so's the post."
+    note:      "P2-d, half one. NEW 01-08. The read moved to the man who is always at the desk, because L1-R37 withdrew the M1.2 copy and this is now the only place in act 1 the record exists - so it cannot sit behind the Dex branch as well as behind the optional objective. Same flag as .250, and the format allows only one comparison per condition, which is why it is two lines and not one conditioned twin."
+
   - id:        M1.7.S03.250
     speaker:   DEX
     voice:     dex
     condition: 'run.m17_record == true'
-    text:      "Personnel record, Arbiter's household. Name's lacquered out and so's the post. Taking it anyway."
-    note:      "P2-d, fully optional. ONE line, no second beat, no reaction from anybody. SYSTEMS: run.m17_record is set by the optional-record objective; if that objective is cut, delete this line."
+    text:      "Household staff, then. No idea. Take it anyway."
+    note:      "P2-d, half two, and it is the stub's line: he does not understand it and he does not stop. Nothing here requires eyes on a screen and nothing requires hands on the desk - \"Take it anyway\" is said TO Voss, which is why it plays on the stair. No reaction from anybody, no second beat. SYSTEMS: if the optional record objective is cut, delete this line and .245 together."
 
   - id:      M1.7.S03.260
     speaker: MARA
