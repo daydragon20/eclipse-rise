@@ -117,7 +117,9 @@ silence:
 # goes unanswered, and NOTHING here resolves P3-d. Cost is zero - nothing in this scene has
 # been generated. WRITER ACTION: rewrite .090 flat. L1 does not write the line.
 #
-# *** DONE 02-08 BY dialogue-writer. ONE LINE, .090. NOTHING ELSE IN THIS FILE MOVED. ***
+# *** DONE 02-08 BY dialogue-writer. ONE LINE. NO OTHER `text:` IN THIS FILE MOVED. ***
+# The rest of the diff is bookkeeping, listed so nobody has to hunt for it: .090's own note,
+# the P3-d block below where .090 was described as "eight flat words", and the three counts.
 # The tail is gone and the claim is now a single past-tense accusation about one transaction
 # instead of a rule about the Veil. The two halves of the swapped slot sit in the same
 # register at last: .100 has a shift boss in a kitchen, .090 has somebody eating on the money,

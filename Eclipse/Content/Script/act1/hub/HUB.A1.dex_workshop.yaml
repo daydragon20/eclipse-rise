@@ -107,9 +107,11 @@ words_generated: 197
 # Placed a clause before the pronoun rather than beside it: by the time `she` is spoken the
 # only person in the sentence is the one who has a room coming. A bare role noun with the
 # article dropped, which is his form at .040, .060 and .110, so it reads as Dex and not as a
-# repair. NO NAME, NO REASON, NO REACTION, NO SECOND PRONOUN, and no other text, shot or note
-# in the file changed. `words:` 172 -> 173, `words_heard` 172 -> 173, `words_generated`
-# 196 -> 197 (Dex is not doubled for gender; only Voss's four lines are).
+# repair. NO NAME, NO REASON, NO REACTION, NO SECOND PRONOUN. NO OTHER `text:` OR `shot:` IN
+# THE FILE MOVED; what else changed is bookkeeping and is listed so nobody has to diff for it -
+# .070's own note, the L2 band line where .070 was counted at 18, and the three word figures:
+# `words:` 172 -> 173, `words_heard` 172 -> 173, `words_generated` 196 -> 197 (Dex is not
+# doubled for gender; only Voss's four lines are).
 
 # ---- dialogue-writer notes (L2) — REBUILT 2026-08-01 AGAINST THE FORM A CONTRACT ----
 # band:      hub (12-35) as a ceiling (L1-R1). Longest 19 w (.010 and, since L1-R54, .070).
@@ -275,7 +277,7 @@ lines:
     voice:   dex
     text:    "Bench comes off first. Medic's room goes there with a door, and she stops treating people on the floor."
     shot:    "Third card down. His hands stop on the bench and stay there for the whole line. He is looking at Voss."
-    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private. *** L1-R54 DONE 02-08, ONE WORD: `Medic's`, in front of `room`. *** It stands a clause BEFORE the pronoun instead of repairing it after, so the referent is already set while he is still talking about the room and `she` has nowhere else to go. Bare role noun, article dropped - his own form at .040, .060 and .110 - and it names nobody. The line always identified her by function; what it withholds is WHY, and that is untouched. No reason, no reaction, no second pronoun, and nothing else in this file moved."
+    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private. *** L1-R54 DONE 02-08, ONE WORD: `Medic's`, in front of `room`. *** It stands a clause BEFORE the pronoun instead of repairing it after, so the referent is already set while he is still talking about the room and `she` has nowhere else to go. Bare role noun, article dropped - his own form at .040, .060 and .110 - and it names nobody. The line always identified her by function; what it withholds is WHY, and that is untouched. No reason, no reaction, no second pronoun, and no other `text:` or `shot:` in this file moved."
 
   - id:      HUB.A1.dex_workshop.080
     speaker: VOSS

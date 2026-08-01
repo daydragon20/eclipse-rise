@@ -15,7 +15,7 @@ turn:         "Dex volunteers to set the charge himself, which is the first thin
 # ---- state ----
 status:       draft
 critic:       GO
-words:        325
+words:        353
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
 # cast:      MARA, VOSS, DEX, REYES, the cell
@@ -83,16 +83,17 @@ words:        325
 # knows it is spent.
 
 # ---- dialogue-writer notes (L2) ----
-# band:      type is `cutscene` (20-60 per 18.3). MOST LINES SIT FAR BELOW 20, and the
-#            longest is 16. Same reading as M1.1: the band is a CEILING, not a floor -
-#            18.3's own note says the bands "cap the length of one line", and 18.3's
-#            variance rule (>=3x inside a scene) is unsatisfiable against a floor of 20.
+# band:      type is `cutscene` (20-60 per 18.3). MOST LINES STILL SIT FAR BELOW 20 and that
+#            is the scene, not a fault: the band is a CEILING, not a floor - 18.3's own note
+#            says the bands "cap the length of one line", and 18.3's variance rule (>=3x
+#            inside a scene) is unsatisfiable against a floor of 20. Since 02-08 exactly ONE
+#            line reaches the floor and it is .095, which is the whole design of L1-R49.
 #            No line exceeds the ceiling.
-# variance:  1 w (.110 "Don't.") to 16 w (.370) = 16x. (The validator reports 17 for .370
-#            because the bare hyphen in the shipped string splits as a token. Sixteen real
-#            words. Same line either way; noted so nobody hunts for a 17-word line.)
+# variance:  1 w (.110 "Don't.") to 28 w (.095) = 28x. (Until .095 it was 1 to 16 at .370 -
+#            where the validator reports 17 because the bare hyphen in the shipped string
+#            splits as a token. Sixteen real words. Noted so nobody hunts for a 17-word line.)
 #
-# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. ***
+# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08 - CLOSED 02-08, TWO PARAGRAPHS DOWN. ***
 # 37 lines and the longest is .370 - which is the shipped BriefingText for MT_M13, quoted
 # verbatim, hyphen included. THE LONGEST LINE IN THIS SCENE IS NOT MINE TO LENGTHEN. It is
 # in data. So reaching 20 means inventing a long line somewhere else in a room where all
@@ -113,6 +114,21 @@ words:        325
 # changes about the refusal to write a twentieth word: it was the right refusal (a word added
 # to close a bar is padding), and the line that now reaches the floor is not that word - it is
 # a beat that was underfed because the canon it wanted did not exist.
+#
+# *** WRITTEN 02-08. .095 IS IN THE FILE AND REGISTER CLOSES ON THIS SCENE. ***
+# 28 words, one sentence, one subordinate clause, and the only line in the scene that reaches
+# the cutscene floor of 20 - which is all the check asks: validate_script counts base `text:`
+# only and excludes variants by design, so the eight Voss variants at .200/.210 were never
+# going to close it, and no other line here was ever going to be lengthened to do it.
+# It is 2.8x his next longest line (.090, 10 w), so "his longest, by a distance" is machine-
+# checkable exactly as L1 asked. ONE CORRECTION TO THE RULING'S WORDING, because a claim a
+# critic can falsify is worse than no claim: L1 wrote "HIS ONLY FULL SENTENCE", and .070 and
+# .300 are already complete simple sentences. The checkable and true version is HIS ONLY
+# COMPLEX ONE - the only finite subordinate clause he speaks in this scene. The device is
+# unchanged; the sentence he builds is still the only built thing he says.
+# `words:` 325 -> 353 (the added line, len(text.split())); nothing else in the file moved.
+# NOT RUN: no shell in this session. This is a read of the checker's rule at
+# validate_script.py check_shape / register_hits, not a run of it.
 # ar-5:      Mara spends ZERO of her "you" allowance here and says "I" never. Checked line
 #            by line. Her only second-person constructions are bare imperatives.
 # reyes:     no contraction anywhere in her THREE lines (the count read "four" until 02-08;
@@ -204,6 +220,13 @@ lines:
     voice:   dex
     text:    "The overpass, four, and two of the four were fifteen."
     note:    "Beat 2, the once-per-act Brick beat, delivered as counts and places. See L2 escalation 1."
+
+  - id:      M1.3.S01.095
+    speaker: DEX
+    voice:   dex
+    text:    "I used to ask for names, and what came back was a place and a number, from people who were still alive and meant to stay that way."
+    shot:    "He gets through all of it without stopping once. Nobody in the room helps him to the end of it."
+    note:    "*** THE ONE FULL SENTENCE - L1-R49, WRITTEN 02-08. *** Twenty-eight words, one sentence, one subordinate clause, and it is the only place in this scene where Dex subordinates anything to anything: .070 and .300 are complete but simple, and the rest of him is fragments. The man who talks in pieces assembles one whole thing, once, about the part of the list he cannot fix. It answers beat 2 without inventing a cell, a person or a place - the list is places and counts because places and counts are what people would hand him, and why they handed him nothing else is the last clause. NO NUMBER WORD in it: check_spoken_numbers reports nothing under twenty free, so this line spends none. No maxim (it states no general truth - it says what he asked and what he got), no triad, no named feeling, and he never says he is frightened. .100 and .110 are still the button, which is why it stands here and not after them. REGISTER: this is the line that reaches the cutscene floor of 20."
 
   - id:      M1.3.S01.100
     speaker: DEX
