@@ -243,6 +243,35 @@
    ],
    "advies": "Optie 1. De officier draagt een scène en verdient een eigen mond; de drie burgers zijn samen 14 ambient-regels en daar hoort geen castingronde bij. Dat is ook de enige optie die M1.4.S04 vrijmaakt zonder het defect van O-16 opnieuw te introduceren.",
    "vrijtekst": true
+  },
+  {
+   "id": "O-18",
+   "prio": "als je zin hebt",
+   "vraag": "Wil je het creditbedrag in je statuskaart blijven zien, of mag het een commando worden?",
+   "waarom": "Kleine vraag, en hij kost je niets als je hem laat liggen — maar hij komt terug.\n\nIn je statuskaart staat wat act 1 kost. Dat getal is vannacht VIER KEER verschoven: 97.275, 97.659, 97.963, 98.035. Niet door fouten, maar doordat elke scènereparatie het verplaatst, en er waren vijf schrijvers tegelijk bezig.\n\nEr is een poort die controleert of dat getal nog klopt, en die staat daardoor tijdens elke werknacht rood. Dat is technisch juist — hij meet dat de kaart de stand HERHAALT in plaats van ernaar te verwijzen — maar een poort die vaak rood staat om iets onschuldigs, leert mensen om er niet meer naar te kijken. En dat is precies waar deze hele reeks controles vóór bestaat.\n\nDe keuze gaat over jouw leesgemak, niet over techniek. Daarom is het jouw vraag en niet de mijne.",
+   "stappen": "Kies hieronder. Er hoeft niets geïnstalleerd of gedraaid te worden.",
+   "opties": [
+    {
+     "label": "Laat het bedrag staan, ik lees liever een getal",
+     "waarde": "getal_blijft",
+     "toelichting": "De kaart houdt het bedrag; ik werk het bij aan het einde van een werkronde.",
+     "gevolg": "Je ziet het bedrag meteen. De poort staat tijdens werknachten regelmatig rood op iets onschuldigs, en ik meld je dat dan niet meer elke keer."
+    },
+    {
+     "label": "Vervang het door een verwijzing naar de tool",
+     "waarde": "verwijzing",
+     "toelichting": "De kaart zegt WAAR het staat in plaats van hoeveel het is.",
+     "gevolg": "De poort wordt stil en blijft betekenisvol als hij rood gaat. Prijs: je moet één commando draaien om het bedrag te zien, of het van je dashboard aflezen."
+    },
+    {
+     "label": "Allebei: bedrag én de datum waarop het gemeten is",
+     "waarde": "bedrag_met_datum",
+     "toelichting": "Het getal blijft, met erbij wanneer het gemeten is en hoe je het ververst.",
+     "gevolg": "Je ziet het bedrag én weet meteen hoe oud het is. De poort blijft rood gaan bij drift — dat is dan bewust, want de kaart belooft geen actualiteit meer."
+    }
+   ],
+   "advies": "Optie 3. Je verliest het getal niet en de kaart belooft niets wat hij niet kan waarmaken. Dat is dezelfde vorm die vannacht bij tien andere notities werkte: niet de telling opschrijven maar wáár je gekeken hebt.",
+   "vrijtekst": true
   }
  ]
 }
