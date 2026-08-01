@@ -14,8 +14,8 @@ turn:         "Voss produces a badge number he has been carrying since the ratio
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .250/.260 zijn twee spelersopties zonder choice-blok (L1-R2, bindend sinds 31-07); .180 gebruikt elf als patrouilleduur (L1-R14); Two-six-one is de enige gekoppelde spelling in het corpus; het REGISTER-blok draagt een claim die voor de strategic-variant onwaar is (17 woorden)"
-words:        393
+critic:       GO
+words:        434
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      DEX, MARA, VOSS, REYES
@@ -46,41 +46,81 @@ words:        393
 # Q-2 green (card 3 added) => this scene plays as written, no edit.
 # Q-2 red                  => lines .090 through .200 are the ONLY affected block. They are
 #                             written as one contiguous run on purpose so the fallback
-#                             ("Dex has a name in the ledger") is a surgical eleven-line
+#                             ("Dex has a name in the ledger") is a surgical twelve-line
 #                             patch, not a rewrite. I have NOT written that fallback:
 #                             BEATS_M1.2 section 5 says escalate first. Escalated.
-# The plate number "two-six-one" is invented by me. Digits are not glossary names, but
-# M1.3.S05 shows this Enforcer alive and answering the tower - that writer must use the
-# same number. Flagged so it gets registered rather than re-invented.
+#
+# *** THE PLATE: SPELLING SETTLED 01-08, VALUE STILL OPEN ***
+# The number is invented by me and its VALUE is not mine to settle: M1.3.S05 shows this
+# Enforcer alive and answering the tower on 917, and one man does not carry two plates.
+# Architect call, escalated. It is a cheap one either way - the number lives in exactly six
+# places (.090, .110 base, and the four .110 variants) and nowhere else in the corpus, so a
+# change is one sweep, not a rewrite.
+# THE SPELLING is settled: "two six one", spaced. It was hyphenated and it was the only
+# hyphenated number-spelling in the corpus - M1.1.S05 ships "Four six two" (5x, and that is
+# the calibration mission) and M1.3.S05 ships "Nine one seven". A hyphen is a known way to
+# get a TTS model to read a plate as one compound word.
 #
 # band:      type is `cutscene` (20-60 per 18.3). Most lines sit well under 20. Same
 #            escalation as M1.1.S01: 18.3's variance rule (>=3x) and a 20-word FLOOR cannot
 #            both hold. Read the band as a CEILING, per 18.3's own note and 21_quality_mandate.
 #            Ceiling respected: longest line 19 w. Variance 1 w to 19 w = 19x.
 #
-# *** REGISTER: RED, DELIBERATELY, REVIEWED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
-# Two measured reasons, and the second one is the interesting one.
-# 1. The 19-word line is .120 - the line VOSS CUTS OFF at .130. Its length is set by where
-#    the interrupter comes in, not by me. Padding it means Voss talks over one more word.
-# 2. THE SCENE DOES REACH THE REGISTER IN PERFORMANCE. Counted: three of the four .110
-#    variants run 20 / 22 / 24 words (pragmatist / personal / idealist), and every player
-#    on an axis hears one of them at the scene's turn. The check reads base `text:` only,
-#    which is a deliberate tool decision (validate_script.py: variants are checked against
-#    the CEILING and excluded from register/spread, because those two measure the scene's
-#    written shape and not its heard one). So the finding is true of the file and false of
-#    the playthrough. NOT an argument for changing the tool - it is the argument for
-#    leaving these 28 lines exactly as they are.
+# *** REGISTER: RED, DELIBERATELY, RE-MEASURED 01-08. DO NOT "FIX" THIS BY ONE WORD. ***
+# The check asks a scene-level question - does ANY line of the thirty reach 20 - so the
+# answer has to be scene-level too. Two reasons, and the second one is the measured one.
+# 1. Nobody standing at this table has a 20-word line in them. Four fingerprints share the
+#    room and three of them forbid it: Dex is fragments (18.4), Mara is short declaratives,
+#    Voss is a technician's economy, and Reyes gets one question and goes quiet. The two
+#    longest lines are .120 (19 w, and its length is set by where Voss cuts in, not by me)
+#    and .240 (19 w, an offer that has to stay countable in one breath). A twentieth word
+#    on either is padding, and padding to clear a floor is the machine tell 18.3 wrote the
+#    floor to catch.
+# 2. THE SCENE DOES REACH THE REGISTER IN PERFORMANCE, ON ALL FOUR AXES. Counted by hand
+#    01-08, after the plate respacing: pragmatist 22, strategic 23, personal 24, idealist
+#    26. Voss is defined on two axes, this file ships all four keys, and every player is on
+#    one of them - so every player hears a 20-plus line, and hears it on the scene's turn.
+#    The earlier version of this block claimed exactly that while strategic ran 17. A
+#    quarter of the audience got a scene whose longest line was 19, which is the scene the
+#    check describes, and the block said "do not touch" over it. Strategic was rewritten;
+#    the tool was not.
+# The check reads base `text:` only and that is deliberate (validate_script.py: variants are
+# measured against the CEILING and excluded from register and spread, because those two
+# measure the scene's written shape, not its heard one). So the finding stays red, and it is
+# true of the file and false of the playthrough.
 # ar-5:      Mara says "you" ZERO times in this scene, and "I" never. Checked line by line.
 #            Her imperatives address without the word - that is the mechanism.
 # triads:    exactly one, and it is the shipped canon string at .280. Mine were removed.
-# names:     one name-address in 28 turns (.220 "Reyes").
-# choice:    .250 / .260 are the prep decision PLAYED, not explained (11.1's honesty loop).
-#            SCRIPT_FORMAT still has no player-choice construct - same gap M1.1's writer
-#            reported. Marked by note only; no flag invented.
+# names:     one name-address in 30 turns (.220 "Reyes"). It was 28 before .262/.264.
+# choice:    .250 / .260 are the prep decision PLAYED, not explained (11.1's honesty loop),
+#            and since 01-08 they are a real `choice:` block per L1-R2 / SCRIPT_FORMAT 4.
+#            The note-only version was written when the construct did not exist. It does
+#            now, and without `group` nothing bound these two lines into one prompt: they
+#            could play back to back and have Voss buy and refuse the same stairwell inside
+#            four seconds. No validator fires on that - no `choice:` and no `condition:` is
+#            nothing to check - so it was going to reach an actor as written.
+#            NAMESPACE: `run.m12_drops_bought`, not story. A prep purchase is spent inside
+#            the mission it was bought for and has no business in the save (L1-R4). Set at
+#            .250/.260, read at .262/.264 in this file - the shape L1 has already cleared
+#            twice (run.hub_triage_order, run.m18_threx_probe).
+#            SYSTEMS, NOT DIALOGUE: this flag is what decides whether S02/S03 mark exact
+#            stairwells or search areas, and it needs a row in the mission prep table and in
+#            SCRIPT_FORMAT 4's run-fact list. Escalated; not invented further here.
+# eleven:    L1-R14. .180 read "Eleven days. It's an eleven-day loop" - eleven twice in one
+#            line, and patrol days are named in the ruling as one of the misuses. The loop
+#            is SIXTEEN days as of 01-08. Sixteen is spoken nowhere else in act 1; M1.6.S03
+#            measured the free numbers under twenty when he took seventeen, and eighteen is
+#            spent at M1.1.S05.136. "The ninth" and the Block Nine rhyme are untouched -
+#            they were never the problem, and the ninth of a sixteen-day loop is still
+#            tonight. S99's "eleven mouths" is the ruling's own meaning and stays.
 # variants:  .110 only. The scene branches on exactly one axis (offhand vs calculated), so
 #            per C-6 option (b) that is the only line that pays for four variants.
-# words:     393 = 310 spoken base + 83 in the four .110 variants. Variants are generated,
-#            so they are counted. (M1.1.S01 appears to count base only - flagged upstream.)
+# words:     434 = 339 spoken base + 95 in the four .110 variants. Variants are generated,
+#            so they are counted; choice `label:` text is not, because it is never voiced.
+#            Hand-counted - no shell in the session that wrote the 01-08 edits. The 310 the
+#            file carried before was re-verified line by line and was exact; 339 = 310, +2
+#            at .090 and +2 at .110 for the spaced plate, +25 for .262/.264.
+#            (M1.1.S01 appears to count base only - flagged upstream.)
 
 lines:
   - id:      M1.2.S01.010
@@ -130,7 +170,7 @@ lines:
   - id:      M1.2.S01.090
     speaker: VOSS
     voice:   voss
-    text:    "Two-six-one."
+    text:    "Two six one."
     shot:    "He has not moved from the edge of the table. Nobody was talking to him."
     note:    "THE TURN. 01_game_vision 1.7 moment 1, paid. First line of the C-2 block (.090-.200)."
 
@@ -142,13 +182,13 @@ lines:
   - id:      M1.2.S01.110
     speaker: VOSS
     voice:   voss
-    text:    "Enforcer plate, two-six-one. Foundry District ration line, third shift."
+    text:    "Enforcer plate, two six one. Foundry District ration line, third shift."
     variants:
-      pragmatist: "Enforcer plate, two-six-one. Foundry District ration line, third shift. It was the only thing in that queue worth taking home."
-      idealist:   "Enforcer plate, two-six-one. He pulled a man out of the ration line over a permit, and I read his sleeve while he did it."
-      personal:   "Two-six-one. Foundry District ration line. He was there every third day, and I stood close enough to read him every third day."
-      strategic:  "Enforcer plate, two-six-one. Third shift, Foundry District ration line, and he was never once off the rotation."
-    note:    "The one axis this scene branches on: offhand or calculated. Four variants, per BEATS section 10.7."
+      pragmatist: "Enforcer plate, two six one. Foundry District ration line, third shift. It was the only thing in that queue worth taking home."
+      idealist:   "Enforcer plate, two six one. He pulled a man out of the ration line over a permit, and I read his sleeve while he did it."
+      personal:   "Two six one. Foundry District ration line. He was there every third day, and I stood close enough to read him every third day."
+      strategic:  "Enforcer plate, two six one. Third shift, Foundry District ration line. A man that regular is a schedule with a face on it."
+    note:    "The one axis this scene branches on: offhand or calculated. Four variants, per BEATS section 10.7. Strategic was 17 words and is now 23 - it was the one axis that left its player without a single 20-word line anywhere in the scene, and it was the flattest of the four. It now does what the axis is for: he did not keep a man, he kept a pattern."
 
   - id:      M1.2.S01.120
     speaker: DEX
@@ -187,7 +227,8 @@ lines:
   - id:      M1.2.S01.180
     speaker: DEX
     voice:   dex
-    text:    "Eleven days. It's an eleven-day loop, and on the ninth, Block Nine gets one walker and no van."
+    text:    "Sixteen days. It's a sixteen-day loop, and on the ninth, Block Nine gets one walker and no van."
+    note:    "L1-R14: this was eleven, twice, for a patrol duration. Eleven is Ember. The ninth stays - it is the rhyme with Block Nine and the reason .190 exists."
 
   - id:      M1.2.S01.190
     speaker: DEX
@@ -226,20 +267,42 @@ lines:
   - id:      M1.2.S01.250
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m12_prep
+      set:   'run.m12_drops_bought = true'
+      label: "Pay the five. Buy the exact stairwells."
     text:    "Pay the five. I'd rather buy the stairwell than stand in it looking for it."
     note:    "PLAYER OPTION 1 of 2 (prep spend). No axis variants - the choice is the branch, not the tone."
 
   - id:      M1.2.S01.260
     speaker: VOSS
     voice:   voss
+    choice:
+      group: m12_prep
+      set:   'run.m12_drops_bought = false'
+      label: "Keep the five. Walk the two blocks."
     text:    "Keep the five. Two blocks and a guess is still a night's work."
     note:    "PLAYER OPTION 2 of 2 (prep spend)."
+
+  - id:        M1.2.S01.262
+    speaker:   DEX
+    voice:     dex
+    condition: 'run.m12_drops_bought == true'
+    text:      "Five it is. I'll wake somebody who owes me, and he'll hate it."
+    note:      "The spend is answered by the man who has to go and get it. Nobody says what five buys or who the somebody is (18.8) - the honesty loop is that intel comes off a person, not out of a menu."
+
+  - id:        M1.2.S01.264
+    speaker:   DEX
+    voice:     dex
+    condition: 'run.m12_drops_bought == false'
+    text:      "Areas, then. Two blocks, and you walk them until something looks wrong."
+    note:      "11.1's honesty loop, played: the game says out loud what the player did not buy, in the voice of the man who now cannot deliver it."
 
   - id:      M1.2.S01.270
     speaker: MARA
     voice:   mara
     text:    "Whichever it is, we are out before the second horn."
-    note:    "Answers either option. Written so no prep flag is required."
+    note:    "Answers either option, and she declines to weigh in on which. Written before the choice block existed and it still needs no branch - that is why it survived the 01-08 edit unchanged."
 
   - id:      M1.2.S01.280
     speaker: MARA

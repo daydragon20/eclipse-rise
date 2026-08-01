@@ -15,7 +15,7 @@ turn:         "In the quiet branch the block covers for them unasked; in the lou
 # ---- state ----
 status:       draft
 critic:       "NO-GO: ACT1_OVERVIEW 6 r.237 noemt de debrief als zetter van Story.Choice.M12_Ghost terwijl het bestand S05-exit zegt -- wint het register, dan leest S99 de vlag voor hij gezet is; .120 zakt op 18.9 C2"
-words:        267
+words:        260
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
 # cast:      VOSS, MARA, one Ember fighter, DEX (radio); loud branch adds Enforcer hunter set
@@ -69,8 +69,15 @@ words:        267
 # mara:      .300 "He stays." is the hard call and it costs two words. Her justification at
 #            .330 is a real one and she is probably wrong, and .340 tells her so, and she
 #            does not answer it. The scene ends without resolving that - 18.9 D.
-# band:      in-mission-radio (10-25). Ceiling honoured: longest 17 w. Variance 1 to 17
-#            within each branch independently, so the rule holds whichever branch plays.
+# band:      in-mission-radio (10-25). Ceiling honoured. Counted per branch, because the
+#            player only ever hears one: ghost runs 1 w (.080) to 17 w (.110), alarm runs
+#            1 w (.370) to 16 w (.280). Both clear the floor and both clear 3x, so the rule
+#            holds whichever branch plays. (The block this replaces said "1 to 17 within
+#            each branch"; the alarm branch tops out at 16, and a note that rounds is a
+#            note the next reader trusts.)
+# words:     260 = 267 before 01-08, -7 at .120 (C2 cut). Hand-counted, no shell in that
+#            session; the 267 it replaces was re-verified line by line, 123 ghost + 144
+#            alarm, and was exact.
 # ar-5:      Mara: zero "you", zero "I", across both branches. Three "we".
 # names:     nobody is addressed by name in either branch.
 # triads:    one in the whole file (.110 route). None in the alarm branch.
@@ -154,8 +161,8 @@ lines:
     speaker:   VOSS
     voice:     voss
     condition: run.alarm_raised == false
-    text:      "The chain's dry underneath. It came off before we got here."
-    note:      "18.4 Voss: the mechanism carries the meaning. He does not say what it means."
+    text:      "The chain's dry underneath."
+    note:      "18.4 Voss: the mechanism carries the meaning. He does not say what it means. 18.9 C2, cut 01-08 - the second sentence was 'It came off before we got here.', which is the inference, and .040's shot has already SHOWN the dry step. Mara makes that inference at .130; with the sentence in, Voss made it for her and her line became agreement instead of arithmetic. The note above this line said 'He does not say what it means' while the line said it."
 
   - id:        M1.2.S05.130
     speaker:   MARA
