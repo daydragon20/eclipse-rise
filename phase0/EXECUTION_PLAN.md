@@ -316,6 +316,20 @@ stem-ID, model, tekst-hash, datum, credits.
    blijven geven. Metadata is dus **additief** — een entry zonder metadata mag nooit een
    miss worden, want dat regenereert betaalde regels.
 
+**NULMETING 02-08, gemeten in plaats van beschreven.** Het manifest is een **platte**
+JSON-map van 1.251 bytes: 16 sleutels, en elke **waarde is een string** — de bestandsnaam,
+die bovendien gelijk is aan de hash plus `.wav`. Er is geen `entries`-omhulsel en er is
+geen enkel veld. Naast het manifest staan precies 16 audiobestanden, dus er is geen
+wees en geen ontbrekend bestand.
+
+> **Dat maakt eis 2 concreter dan hij klinkt, en het is de plek waar iemand hem breekt.**
+> Metadata toevoegen betekent dat een waarde een **object** wordt. De lezer moet dus
+> vanaf dat moment **beide vormen** accepteren — een string én een object — want een
+> entry zonder metadata mag nooit een miss worden. Wie alleen de schrijver aanpast en
+> de lezer een object laat verwachten, regenereert zestien betaalde regels stil.
+> Draai daarom de controleproef éérst: bewijs dat een échte miss wél regenereert,
+> anders toont een groene test alleen aan dat er niets gebeurt.
+
 **Falsificatie:** een run schrijft een entry mét alle velden · een bestaande entry zónder
 metadata geeft nog steeds een hit en wordt **niet** opnieuw gegenereerd (controleproef
 eerst: bewijs dat een echte miss wél regenereert) · en na een run is *"welke entries hangen
