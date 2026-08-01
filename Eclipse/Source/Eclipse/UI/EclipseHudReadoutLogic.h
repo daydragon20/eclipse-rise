@@ -1,6 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+// EEclipseStance — pure data (een enum uit de payload-header, geen engine-actor).
+// Bewust de ECHTE enum en geen eigen kopie: twee enums die hetzelfde bedoelen
+// lopen uit elkaar zodra er een houding bij komt, en dan zegt het scherm iets
+// anders dan de feed. Zie de toelichting bij EEclipseStance zelf.
+#include "Core/EclipseEventPayloads.h"
 
 /**
  * Pure core van de SPELERLAAG van de HUD (GDD 14.5 stap 2, 14.3.2 headless-regel).
@@ -151,6 +156,100 @@ namespace EclipseHudReadout
 	 * naam nergens in de data en kan hij ook nooit vertaald worden.
 	 */
 	ECLIPSE_API FString HumaniseRowName(FName RowName);
+
+	// ---------------------------------------------------------------------------
+	// DE GEZONDHEIDSUITLEZING (N-c)
+	// ---------------------------------------------------------------------------
+	//
+	// GEMETEN op 01-08 in alle tien geopende HUD-frames van 23:34: linksonder staat
+	// NIETS. Geen balk, geen getal, geen schade-indicatie. `REFERENTIE_HUD_BORDERLANDS.md`
+	// r36-37 wijst die hoek expliciet aan gezondheid toe.
+	//
+	// Het was geen datagat: `Event.Player.VitalsChanged` bestaat sinds `4747010` met
+	// payload én tests. De feed was er, de consument niet — precies de vorm die de
+	// munitiehoek had. Dit is de pure helft van die consument: alles wat een BESLISSING
+	// is over wat er komt te staan, zodat het toetsbaar is zonder game.
+
+	/** Onder deze fractie kleurt de uitlezing: hier moet je BESLUITEN (zelfde grens als het magazijn). */
+	inline constexpr float LowHealthFraction = 1.0f / 3.0f;
+
+	/** Wat er van het spelerslichaam bekend is; één op één de velden van FEclipsePlayerVitalsPayload. */
+	struct FEclipseVitalsReadoutFacts
+	{
+		/**
+		 * Is er ooit een feit binnengekomen? Zonder feit hoort er NIETS te staan.
+		 *
+		 * Apart veld en niet "MaxHealth > 0" als vervanger: die twee zijn verschillende
+		 * vragen, en de HUD moet ze kunnen scheiden. Een lichaam waarvan het maximum nog
+		 * niet is toegekend geeft de bus nog niets — een balk die dan alvast "0 / 0"
+		 * toont, meldt "je bent dood" op het moment dat er alleen nog niets bekend is.
+		 */
+		bool bHasFact = false;
+
+		float Health = 0.0f;
+		float MaxHealth = 0.0f;
+
+		/** Waar de gezondheid vandaan komt; het TEKEN van het verschil scheidt de klap van het verband. */
+		float PreviousHealth = 0.0f;
+
+		EEclipseStance Stance = EEclipseStance::Standing;
+
+		bool bDowned = false;
+
+		/** Dít feit is de overgang zelf — de enige manier om "neer gegaan" van "ligt al" te scheiden. */
+		bool bDownedChanged = false;
+	};
+
+	/** Wat de velden linksonder moeten zeggen. Leeg = dat veld hoort weg. */
+	struct FEclipseVitalsReadout
+	{
+		/** "62" — het grote getal. Geen FText: het zijn cijfers, en AsNumber zet er op sommige locales een scheiding in. */
+		FString HealthText;
+
+		/** "/ 100" — staat vast, dus kleiner en gedimd ernaast. */
+		FString CapacityText;
+
+		/** 0..1 voor de balk. Het getal en de balk komen uit dezelfde bron en kunnen dus niet uiteenlopen. */
+		float HealthFraction = 0.0f;
+
+		/** "STANDING" / "CROUCHED" / "SPRINTING" / "IN COVER"; LEEG zolang het lichaam neer ligt. */
+		FText StanceText;
+
+		/**
+		 * "DOWN" of "STABILIZED", of leeg.
+		 *
+		 * TWEE ONDERSCHEIDBARE TOESTANDEN EN NIET ÉÉN "GEWOND", en dat is de harde eis
+		 * van deze stap. Neergaan en gestabiliseerd worden hebben allebei een lage
+		 * gezondheid en zijn met een balk alleen niet uit elkaar te houden — terwijl het
+		 * verschil tussen "ik lig" en "ik sta weer" het enige is waar je op dat moment
+		 * naar handelt.
+		 */
+		FText StatusText;
+
+		/** Hoort de hele uitlezing weg? (nog geen feit, of een lichaam zonder maximum) */
+		bool bHidden = false;
+
+		/** Onder LowHealthFraction: kleuren. */
+		bool bLow = false;
+
+		bool bDowned = false;
+
+		/** Dit feit IS de herstelmelding; de vormlaag mag hem anders kleuren dan "neer". */
+		bool bStabilized = false;
+	};
+
+	/**
+	 * De gezondheidsuitlezing samenstellen.
+	 *
+	 * NAAR BOVEN AFGEROND EN NIET REKENKUNDIG, en dat is geen kosmetiek: bij 0,4 hp zou
+	 * afronden "0" op het scherm zetten terwijl je nog leeft, en dat is een leugen in
+	 * precies de richting waarin hij het duurst is. Naar boven afronden liegt de andere
+	 * kant op — hooguit één punt te gunstig — en houdt "0" gereserveerd voor werkelijk nul.
+	 */
+	ECLIPSE_API FEclipseVitalsReadout ComposeVitalsReadout(const FEclipseVitalsReadoutFacts& Facts);
+
+	/** Houding -> het woord op het scherm. Brontaal Engels, net als de rest van de spelerlaag. */
+	ECLIPSE_API FText StanceLabel(EEclipseStance Stance);
 
 	// ---------------------------------------------------------------------------
 	// HET RICHTKRUIS (defect 5)

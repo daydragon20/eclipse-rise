@@ -13,6 +13,8 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/Image.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Eclipse.h"
@@ -135,6 +137,20 @@ void UEclipseMissionHudWidget::LogUiReport() const
 		bHasWeaponStatus ? TEXT("") : TEXT(" (NOG GEEN FEIT)"),
 		*GetMagazineTextOnScreen());
 
+	// DE GEZONDHEIDSHOEK ALS DEZELFDE KETEN. Drie plekken waar hij stil kan vallen —
+	// het lichaam zendt niet (poort/tracker), de bus levert niet af, of de HUD tekent
+	// niet — en dat zijn drie verschillende reparaties.
+	UE_LOG(LogEclipse, Display,
+		TEXT("UI:   vitalsbron   feiten=%d getekend=%d · gecachet %.0f/%.0f hp, houding=%s, neer=%d%s · op het scherm '%s' %s (%s)"),
+		VitalsEventsReceived, VitalsDrawCount,
+		Vitals.Health, Vitals.MaxHealth,
+		*UEnum::GetValueAsString(Vitals.Stance).RightChop(FString(TEXT("EEclipseStance::")).Len()),
+		Vitals.bDowned ? 1 : 0,
+		bHasVitals ? TEXT("") : TEXT(" (NOG GEEN FEIT)"),
+		*GetHealthTextOnScreen(),
+		GetStanceTextOnScreen().IsEmpty() ? TEXT("(geen houding)") : *GetStanceTextOnScreen(),
+		GetVitalsStatusOnScreen().IsEmpty() ? TEXT("geen status") : *GetVitalsStatusOnScreen());
+
 	// EN OORDELEN WAAR HET KAN. Een dump die je moet lezen is beter dan
 	// niets, maar hij vangt alleen wat iemand toevallig naleest. Deze
 	// drie gevallen zijn voor de speler kapot en horen dus op te vallen
@@ -179,6 +195,21 @@ void UEclipseMissionHudWidget::LogUiReport() const
 		UE_LOG(LogEclipse, Warning,
 			TEXT("UI: FOUT — %d wapenfeiten aangekomen en de munitiehoek is nul keer getekend."),
 			WeaponStatusEventsReceived);
+	}
+	if (VitalsEventsReceived > 0 && VitalsDrawCount == 0)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("UI: FOUT — %d vitals-feiten aangekomen en de gezondheidshoek is nul keer getekend."),
+			VitalsEventsReceived);
+	}
+	// EN DE NULMETING VAN 01-08 ALS VASTE CONTROLE: er staat een spelerslichaam en er
+	// staat geen gezondheid op het scherm. Dat was op alle tien geopende HUD-frames de
+	// toestand, en zonder deze regel kan hij net zo stil terugkomen als hij ontstond.
+	if (ReportBody != nullptr && GetHealthTextOnScreen().IsEmpty())
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("UI: FOUT — er is een spelerslichaam, maar er staat geen gezondheid op het scherm (%d vitals-feiten aangenomen)."),
+			VitalsEventsReceived);
 	}
 	// Een wapen zonder richtkruis: dan schiet je zonder te weten WAAR je
 	// richt. Dit is de owner-melding van 27-07 als vaste controle, zodat
@@ -380,6 +411,169 @@ void UEclipseMissionHudWidget::OnWeaponStatusChanged(FGameplayTag /*EventTag*/, 
 	}
 }
 
+void UEclipseMissionHudWidget::RefreshVitalsReadout()
+{
+	if (HealthReadout == nullptr)
+	{
+		// NIET TELLEN, met opzet — zie RefreshAmmoReadout. De aanroeper ziet aan de
+		// stilstaande teller dat er een feit binnenkwam zonder dat er iets op het scherm
+		// gebeurde, en meldt dat luid.
+		return;
+	}
+	++VitalsDrawCount;
+
+	// DE BRON IS DE BUS EN NIET DE PAWN. Er staat hier geen GetHealth(), geen
+	// GetOwningPlayerPawn() en geen FindComponentByClass: dit is een consument
+	// (GDD 12.1/8.8). En ALLE BESLISSINGEN KOMEN UIT DE PURE KERN — welk getal,
+	// welk woord, welke toestand — zodat ze te toetsen zijn zonder de game te starten.
+	EclipseHudReadout::FEclipseVitalsReadoutFacts Facts;
+	Facts.bHasFact = bHasVitals;
+	if (bHasVitals)
+	{
+		Facts.Health = Vitals.Health;
+		Facts.MaxHealth = Vitals.MaxHealth;
+		Facts.PreviousHealth = Vitals.PreviousHealth;
+		Facts.Stance = Vitals.Stance;
+		Facts.bDowned = Vitals.bDowned;
+		Facts.bDownedChanged = Vitals.bDownedChanged;
+	}
+
+	const EclipseHudReadout::FEclipseVitalsReadout Readout = EclipseHudReadout::ComposeVitalsReadout(Facts);
+
+	if (Readout.bHidden)
+	{
+		// Nog niets bekend: dan hoort er niets te staan. Een balk die alvast op nul
+		// staat, meldt de dood van een lichaam waarover nog geen feit binnen is.
+		HealthReadout->SetVisibility(ESlateVisibility::Hidden);
+		SetVisibilityIfChanged(HealthCapacity, false);
+		SetVisibilityIfChanged(StanceReadout, false);
+		SetVisibilityIfChanged(VitalsStatusReadout, false);
+		SetVisibilityIfChanged(HealthBarTrack, false);
+		SetVisibilityIfChanged(HealthBarFill, false);
+		SetVisibilityIfChanged(VitalsPanelInk, false);
+		SetVisibilityIfChanged(VitalsPanelFill, false);
+		return;
+	}
+
+	HealthReadout->SetVisibility(ESlateVisibility::HitTestInvisible);
+	HealthReadout->SetText(FText::FromString(Readout.HealthText));
+	SetVisibilityIfChanged(VitalsPanelInk, true);
+	SetVisibilityIfChanged(VitalsPanelFill, true);
+	SetVisibilityIfChanged(HealthCapacity, true);
+	SetVisibilityIfChanged(HealthBarTrack, true);
+	SetVisibilityIfChanged(HealthBarFill, true);
+	if (HealthCapacity != nullptr)
+	{
+		HealthCapacity->SetText(FText::FromString(Readout.CapacityText));
+	}
+
+	// DEZELFDE KLEURTAAL ALS DE MUNITIEHOEK — wit, dan amber, dan rood. Bewust geen
+	// tweede kleurtaal ernaast: twee hoeken die "let op" met verschillende kleuren
+	// zeggen, laten de speler twee dingen leren waar er één is.
+	//
+	// De referentie (r36-37) vraagt hier "de teamkleur van Eclipse". Die kleur ligt
+	// nergens vast en de stijlvraag is owner-vraag O-8; hem raden zou een smaakbesluit
+	// zijn dat vervolgens als gebouwd telt. Dit is de FUNCTIONELE ronde ("eerst
+	// compleet, dan mooi", r57) — de kleurkeuze hoort in de stijlronde erna.
+	const FLinearColor HealthColour = Readout.bDowned
+		? FLinearColor(1.0f, 0.25f, 0.18f)
+		: (Readout.bLow ? FLinearColor(1.0f, 0.55f, 0.15f) : FLinearColor(0.95f, 0.95f, 0.95f));
+	HealthReadout->SetColorAndOpacity(FSlateColor(HealthColour));
+	if (HealthBarFill != nullptr)
+	{
+		// Balk en getal uit dezelfde uitlezing, dus ze kunnen niet uiteenlopen.
+		HealthBarFill->SetColorAndOpacity(HealthColour);
+		if (UCanvasPanelSlot* FillSlot = Cast<UCanvasPanelSlot>(HealthBarFill->Slot))
+		{
+			const FVector2D Size = FillSlot->GetSize();
+			FillSlot->SetSize(FVector2D(HealthBarWidthPx * Readout.HealthFraction, Size.Y));
+		}
+	}
+
+	const bool bHasStance = !Readout.StanceText.IsEmpty();
+	SetVisibilityIfChanged(StanceReadout, bHasStance);
+	if (bHasStance && StanceReadout != nullptr)
+	{
+		StanceReadout->SetText(Readout.StanceText);
+	}
+
+	const bool bHasStatus = !Readout.StatusText.IsEmpty();
+	SetVisibilityIfChanged(VitalsStatusReadout, bHasStatus);
+	if (bHasStatus && VitalsStatusReadout != nullptr)
+	{
+		VitalsStatusReadout->SetText(Readout.StatusText);
+		// DE TWEE TOESTANDEN KRIJGEN OOK TWEE KLEUREN. Het woord alleen zou al genoeg
+		// zijn om ze te scheiden, maar niet snel genoeg: in een gevecht lees je kleur
+		// eerder dan letters, en juist "lig ik of sta ik weer" is het feit waar je
+		// onmiddellijk op handelt.
+		VitalsStatusReadout->SetColorAndOpacity(FSlateColor(Readout.bDowned
+			? FLinearColor(1.0f, 0.25f, 0.18f)
+			: FLinearColor(0.45f, 0.90f, 0.50f)));
+	}
+}
+
+void UEclipseMissionHudWidget::OnVitalsChanged(FGameplayTag /*EventTag*/, const FInstancedStruct& Payload)
+{
+	const FEclipsePlayerVitalsPayload* Fact = Payload.GetPtr<FEclipsePlayerVitalsPayload>();
+	if (Fact == nullptr)
+	{
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: Event.Player.VitalsChanged kwam aan met een payload van een ander type — de gezondheidshoek beweegt niet mee."));
+		return;
+	}
+
+	++VitalsEventsReceived;
+	Vitals = *Fact;
+	bHasVitals = true;
+
+	const int32 DrawsBefore = VitalsDrawCount;
+	RefreshVitalsReadout();
+
+	// HET SCHERM MAG NOOIT STILLER ZIJN DAN DE BUS — dezelfde bewaking als bij de
+	// munitiehoek, en om dezelfde reden: bij een event-gedreven HUD is een feit dat
+	// aankomt zonder dat het scherm beweegt de enige echte regressie die deze stap kan
+	// opleveren, en hij ziet er op een frame volstrekt gezond uit.
+	if (VitalsDrawCount == DrawsBefore && !bReportedSilentVitals)
+	{
+		bReportedSilentVitals = true;
+		UE_LOG(LogEclipse, Warning,
+			TEXT("HUD: FOUT — er kwam een vitals-feit binnen (%d in totaal, %.0f/%.0f hp) en de gezondheidshoek is niet getekend; het scherm is stiller dan de bus."),
+			VitalsEventsReceived, Vitals.Health, Vitals.MaxHealth);
+	}
+}
+
+FString UEclipseMissionHudWidget::GetHealthTextOnScreen() const
+{
+	// Uit het WIDGET, en verborgen telt als leeg — zelfde regel als de munitieteller:
+	// een getal dat er staat maar gecollapseerd is, leest de speler niet.
+	if (HealthReadout == nullptr || HealthReadout->GetVisibility() == ESlateVisibility::Hidden
+		|| HealthReadout->GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		return FString();
+	}
+	return HealthReadout->GetText().ToString();
+}
+
+FString UEclipseMissionHudWidget::GetStanceTextOnScreen() const
+{
+	if (StanceReadout == nullptr || StanceReadout->GetVisibility() == ESlateVisibility::Hidden
+		|| StanceReadout->GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		return FString();
+	}
+	return StanceReadout->GetText().ToString();
+}
+
+FString UEclipseMissionHudWidget::GetVitalsStatusOnScreen() const
+{
+	if (VitalsStatusReadout == nullptr || VitalsStatusReadout->GetVisibility() == ESlateVisibility::Hidden
+		|| VitalsStatusReadout->GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		return FString();
+	}
+	return VitalsStatusReadout->GetText().ToString();
+}
+
 FString UEclipseMissionHudWidget::GetMagazineTextOnScreen() const
 {
 	// Uit het WIDGET, en verborgen telt als leeg: een getal dat er staat maar
@@ -506,6 +700,22 @@ void UEclipseMissionHudWidget::NativeTick(const FGeometry& Geometry, float Delta
 	// daar is de stap grof genoeg om te kwantiseren, hier niet.
 	RefreshCrosshair();
 
+	// EN HIER STAAT MET OPZET GÉÉN RefreshVitalsReadout().
+	//
+	// De gezondheidshoek hangt aan Event.Player.VitalsChanged (OnVitalsChanged). Dat
+	// die nul in Tests/EclipseHudVitalsFeedTests.cpp iets betekent, is GEMETEN en niet
+	// beweerd: met deze ene regel er tijdelijk in viel de test op precies twee plekken
+	// om en op geen andere —
+	//
+	//   tekenbeurten in 60 stille frames        0  ->   60
+	//   tekenbeurten op 8 vitals-feiten         8  ->   16
+	//
+	// Die tweede regel is de scherpste: 16 op 8 feiten laat zien dat het pollen en het
+	// luisteren ELKAAR NIET VERVANGEN maar OPTELLEN. Precies dezelfde handtekening als
+	// bij de munitiehoek (daar 20 -> 200 op 180 frames), en precies de toestand waarin
+	// twee bronnen naar hetzelfde getal wijzen. Zonder deze proef zou een half
+	// geslaagde ombouw als geslaagd zijn gemeld.
+
 	if (HitMarkerSecondsLeft > 0.0f)
 	{
 		HitMarkerSecondsLeft -= DeltaSeconds;
@@ -560,17 +770,6 @@ void UEclipseMissionHudWidget::NativeOnInitialized()
 	Canvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("MissionHudCanvas"));
 	WidgetTree->RootWidget = Canvas;
 
-	Root = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MissionHudRoot"));
-	if (UCanvasPanelSlot* RootSlot = Canvas->AddChildToCanvas(Root))
-	{
-		RootSlot->SetAutoSize(true);
-		RootSlot->SetAnchors(FAnchors(0.0f, 0.0f));
-		// De marge zelf wordt PER FRAME gezet (ApplySafeAreaLayout); hier staat alleen
-		// een plek zodat het slot bestaat. Zie ApplySafeAreaLayout voor waarom dat
-		// niet bij de bouw kan.
-		RootSlot->SetPosition(FVector2D::ZeroVector);
-	}
-
 	// ---------------------------------------------------------------------------
 	// DE SPELERLAAG — altijd, ook onder -EclipseShot.
 	// ---------------------------------------------------------------------------
@@ -600,6 +799,82 @@ void UEclipseMissionHudWidget::NativeOnInitialized()
 	// ---------------------------------------------------------------------------
 	// DE DEBUGLAAG — alleen als de poort open staat.
 	// ---------------------------------------------------------------------------
+	//
+	// DE PLAAT HOORT HIER EN NIET BOVEN DE POORT, en dat is GEMETEN en niet bedacht.
+	//
+	// Eerste versie bouwde de overlay onvoorwaardelijk en zette hem in deze tak op
+	// Collapsed. Dat werkte niet: op `HUD_spelerlaag/HUD_gevecht_op_fel_doel.png` van
+	// de reviewronde stond linksboven een donker vierkant van 21x21 px in kleur
+	// (16,16,21) — precies de 32x32-borstelmaat van InfoPanelFill, want zonder
+	// tekstlijst is er geen kind dat de overlay groter maakt. Een SetVisibility in
+	// NativeOnInitialized haalde de Slate-kant kennelijk niet, en dat is exact de
+	// klasse fout waar deze hele widget al een keer op is vastgelopen: iets vastleggen
+	// op een moment waarop de andere kant er nog niet is.
+	//
+	// De oplossing is niet een tweede poging tot verbergen maar NIET BOUWEN. Een
+	// element dat er niet is, kan ook niet per ongeluk getekend worden — en de plaat
+	// dient de DEBUGTEKST, dus hij hoort per definitie aan dezelfde kant van de poort
+	// als die tekst. De gezondheidshoek en de munitiehoek hebben hun eigen plaat en
+	// staan wél vóór de poort, want die dienen de speler.
+	InfoPanel = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass(), TEXT("MissionHudInfoPanel"));
+	if (UCanvasPanelSlot* PanelSlot = Canvas->AddChildToCanvas(InfoPanel))
+	{
+		PanelSlot->SetAutoSize(true);
+		PanelSlot->SetAnchors(FAnchors(0.0f, 0.0f));
+		// De marge zelf wordt PER FRAME gezet (ApplySafeAreaLayout); hier staat alleen
+		// een plek zodat het slot bestaat. Zie ApplySafeAreaLayout voor waarom dat
+		// niet bij de bouw kan.
+		PanelSlot->SetPosition(FVector2D::ZeroVector);
+	}
+	InfoPanel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	// WAAROM DE PLAAT ER ÜBERHAUPT IS. GEMETEN 01-08 op `HUD_3e_persoon_terug.png`:
+	// waar een felle wereldbalk achter de statusregel valt, staat wit op 0,7065
+	// luminantie met 53 % geclipte pixels → contrast 1,39 : 1. De munitieteller, het
+	// enige element mét eigen paneel, meet op datzelfde frame ruim 8 : 1 in dezelfde
+	// meting. Dat verschil is het bewijs dat dit een ontbrekend ONDERDEEL is en geen
+	// smaakvraag: het middel bestond al in dit bestand en lag alleen onder één element.
+	//
+	// EEN OVERLAY EN GEEN CANVAS. De lijst groeit en krimpt met het aantal regels; op
+	// een canvas zou de plaat een vaste maat moeten krijgen en dus of te klein of te
+	// groot zijn. In een overlay bepaalt het grootste kind (de lijst) de maat en volgen
+	// de twee plaatafbeeldingen op Fill — de plaat kan de tekst dus niet meer mislopen,
+	// hoeveel objectives er ook bij komen.
+	//
+	// Zelfde twee kleuren als de munitiehoek: een andere waarde zou een tweede,
+	// ongemeten getal introduceren. FromSRGBColor omdat Slate een FLinearColor als
+	// LINEAIR leest — 0,055 lineair is 64 van de 255, niet 14.
+	InfoPanelInk = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("InfoPanelInk"));
+	InfoPanelInk->SetColorAndOpacity(FLinearColor::FromSRGBColor(FColor(5, 5, 7, 255)));
+	if (UOverlaySlot* InkSlot = InfoPanel->AddChildToOverlay(InfoPanelInk))
+	{
+		// EXPLICIET Fill: UOverlaySlot staat standaard op Left/Top, en dan zou de plaat
+		// zijn eigen 32x32-borstelmaat aanhouden in plaats van de lijst te dekken.
+		InkSlot->SetHorizontalAlignment(HAlign_Fill);
+		InkSlot->SetVerticalAlignment(VAlign_Fill);
+	}
+
+	InfoPanelFill = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("InfoPanelFill"));
+	InfoPanelFill->SetColorAndOpacity(FLinearColor::FromSRGBColor(FColor(18, 19, 24, 209)));
+	if (UOverlaySlot* FillSlot = InfoPanel->AddChildToOverlay(InfoPanelFill))
+	{
+		FillSlot->SetHorizontalAlignment(HAlign_Fill);
+		FillSlot->SetVerticalAlignment(VAlign_Fill);
+		// 3 px binnen de inkt: dát is de dikke lijn uit §15.5, hier in Slate in plaats
+		// van als post-effect op 3D-geometrie (die haalt een widget per definitie nooit).
+		// Positieve inspringing en geen negatieve uitloop, zodat er nergens op een
+		// negatieve marge in een Fill-slot vertrouwd wordt.
+		FillSlot->SetPadding(FMargin(3.0f));
+	}
+
+	Root = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("MissionHudRoot"));
+	if (UOverlaySlot* RootSlot = InfoPanel->AddChildToOverlay(Root))
+	{
+		RootSlot->SetHorizontalAlignment(HAlign_Fill);
+		RootSlot->SetVerticalAlignment(VAlign_Fill);
+		// 3 px inkt + 8/6 px lucht: de letters raken de rand van hun eigen plaat niet.
+		RootSlot->SetPadding(FMargin(11.0f, 9.0f, 11.0f, 9.0f));
+	}
 
 	LiveBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 	Root->AddChildToVerticalBox(LiveBox);
@@ -625,6 +900,12 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	bReportedSilentScreen = false;
 	WeaponStatus = FEclipseWeaponStatusPayload();
 
+	VitalsEventsReceived = 0;
+	VitalsDrawCount = 0;
+	bHasVitals = false;
+	bReportedSilentVitals = false;
+	Vitals = FEclipsePlayerVitalsPayload();
+
 	SubscribePlayerEvents();
 
 	// Meteen één keer vullen — met de LEGE stand, zodat de hoek verborgen staat in
@@ -632,11 +913,13 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	// hem sinds vandaag niet meer, dus dit is de enige garantie dat de eerste frame
 	// ná het monteren (precies het frame dat een opnameronde vastlegt) klopt.
 	RefreshAmmoReadout();
+	RefreshVitalsReadout();
 
 	// En dan het echte beginbeeld ophalen. Dit gaat via de bus en dus via
-	// OnWeaponStatusChanged; zie RequestInitialWeaponStatus voor waarom de volgorde
-	// (wapen zendt vroeg, HUD monteert laat) dit noodzakelijk maakt.
+	// OnWeaponStatusChanged/OnVitalsChanged; zie RequestInitialWeaponStatus voor waarom
+	// de volgorde (producent zendt vroeg, HUD monteert laat) dit noodzakelijk maakt.
 	RequestInitialWeaponStatus();
+	RequestInitialVitals();
 
 	if (!IsDebugHudAllowed())
 	{
@@ -723,6 +1006,12 @@ void UEclipseMissionHudWidget::NativeConstruct()
 	RefreshGauntletRows(/*bForce*/ true);
 	RefreshGuideRows(/*bForce*/ true);
 	Rebuild();
+	// NOG EEN KEER, EN DAT IS GEEN SLORDIGHEID. De regels van de lijst bestaan pas ná
+	// Rebuild(), en de zichtbaarheid van de plaat hangt aan het aantal regels. De
+	// aanroep hierboven zag een lege lijst; deze ziet de gevulde. Zonder deze regel
+	// blijft de plaat gecollapseerd tot het eerste feit binnenkomt — en dat is precies
+	// het frame dat een opnameronde vastlegt.
+	ApplyPanelVisibility();
 }
 
 void UEclipseMissionHudWidget::NativeDestruct()
@@ -993,6 +1282,7 @@ void UEclipseMissionHudWidget::BuildPlayerLayer()
 	BuildCrosshair();
 	BuildHitMarker();
 	BuildAmmoReadout();
+	BuildVitalsReadout();
 	BuildDamageIndicator();
 }
 
@@ -1032,6 +1322,18 @@ void UEclipseMissionHudWidget::SubscribePlayerEvents()
 		EclipseTags::Event_Player_WeaponStatusChanged,
 		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnWeaponStatusChanged),
 		FEclipseWeaponStatusPayload::StaticStruct()));
+
+	// DE GEZONDHEIDSHOEK, de tweede helft van hetzelfde dashboard.
+	//
+	// Ook hier een EIGEN abonnement en niet de familie-route (Event.Player): een
+	// houdingswissel of een treffer mag geen volledige herbouw van de tekstlijst
+	// veroorzaken, en dat is precies wat OnAnyFact doet. Het typeveld staat er
+	// expliciet bij, zodat producent/consument-drift wordt gemeld op de naad waar hij
+	// ontstaat in plaats van diep in de teken-functie.
+	EventHandles.Add(Bus->Subscribe(
+		EclipseTags::Event_Player_VitalsChanged,
+		FEclipseEventNativeDelegate::CreateUObject(this, &UEclipseMissionHudWidget::OnVitalsChanged),
+		FEclipsePlayerVitalsPayload::StaticStruct()));
 }
 
 void UEclipseMissionHudWidget::RequestInitialWeaponStatus()
@@ -1063,6 +1365,29 @@ void UEclipseMissionHudWidget::RequestInitialWeaponStatus()
 		return;
 	}
 	Weapon->RequestStatusResend();
+}
+
+void UEclipseMissionHudWidget::RequestInitialVitals()
+{
+	// Zelfde gat als bij het wapen, en het is structureel: het lichaam zendt zijn
+	// eerste vitals-foto uit bij de bezetting (NotifyControllerChanged) en bij
+	// InitializeHealth; deze widget wordt gemonteerd door
+	// AEclipsePlayerController::EnterMissionMode, dat aan Event.Mission.Started hangt.
+	// De bus bewaart niets, dus zonder dit verzoek blijft de hoek leeg tot de eerste
+	// klap — en dan is er nog steeds geen beginwaarde om tegen af te zetten.
+	//
+	// EEN VERZOEK EN GEEN UITLEZING: het antwoord komt via dezelfde bus en dezelfde
+	// handler als elk ander feit, dus er is maar één pad naar het scherm.
+	AEclipseCharacter* Body = Cast<AEclipseCharacter>(GetOwningPlayerPawn());
+	if (Body == nullptr)
+	{
+		// Normaal in de basis-hub of vóór het bezetten van een pawn. Wel zeggen, op
+		// Verbose, zodat een LEGE hoek naderhand te scheiden is van een STILLE bus.
+		UE_LOG(LogEclipse, Verbose,
+			TEXT("HUD: bij montage is er nog geen spelerslichaam — de gezondheidshoek wacht op het eerste feit van de bus."));
+		return;
+	}
+	Body->RequestVitalsResend();
 }
 
 void UEclipseMissionHudWidget::BuildHitMarker()
@@ -1267,6 +1592,160 @@ void UEclipseMissionHudWidget::BuildAmmoReadout()
 	SetVisibilityIfChanged(ReloadBarFill, false);
 }
 
+void UEclipseMissionHudWidget::BuildVitalsReadout()
+{
+	// DE GEZONDHEIDSHOEK LINKSONDER — spiegelbeeld van de munitiehoek, met opzet.
+	//
+	// GEMETEN 01-08 op alle tien geopende HUD-frames: linksonder staat NIETS. De
+	// referentie (r36-37) wijst die hoek expliciet aan gezondheid toe, en r57 zet de
+	// volgorde: "eerst compleet, dan mooi".
+	//
+	// VAST KADER en geen AutoSize, om dezelfde reden als bij de munitiehoek (defect
+	// 4): een AutoSize-slot gebruikt één frame lang de GEWENSTE MAAT VAN DE VORIGE
+	// LAYOUT. Rechts uitgelijnd betekende dat de tekst het beeld uit schoof; hier
+	// links zou hij de plaat uit schuiven. Een vast kader kan dat per constructie niet.
+	VitalsBlock = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("VitalsBlock"));
+	if (UCanvasPanelSlot* BlockSlot = Canvas->AddChildToCanvas(VitalsBlock))
+	{
+		BlockSlot->SetAutoSize(false);
+		BlockSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+		BlockSlot->SetAlignment(FVector2D(0.0f, 1.0f));
+		BlockSlot->SetSize(FVector2D(VitalsBlockWidthPx, VitalsBlockHeightPx));
+		BlockSlot->SetPosition(FVector2D::ZeroVector); // per frame gezet, zie ApplySafeAreaLayout
+	}
+	VitalsBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	// PLAAT + INKTRAND, exact dezelfde waarden als de munitiehoek.
+	//
+	// Dat is geen kopieerwerk maar de reden dat dit werkt: die hoek is op een frame
+	// nagemeten op 18 : 1 tegen een ondergrond waar de kale tekst 1,39 : 1 haalde.
+	// Afwijken zou betekenen dat ik een tweede, ongemeten waarde introduceer.
+	//
+	// LET OP DE KLEURRUIMTE: Slate leest een FLinearColor als LINEAIR en zet hem naar
+	// sRGB voor het scherm, dus lineair 0,055 wordt 64 van de 255 en niet 14.
+	// FromSRGBColor rekent de goede kant op — dan staat in de code het getal dat je op
+	// het frame terugmeet. (Dezelfde fout is hier op 31-07 één keer gemaakt en gemeten.)
+	VitalsPanelInk = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("VitalsPanelInk"));
+	VitalsPanelInk->SetColorAndOpacity(FLinearColor::FromSRGBColor(FColor(5, 5, 7, 255)));
+	if (UCanvasPanelSlot* InkSlot = VitalsBlock->AddChildToCanvas(VitalsPanelInk))
+	{
+		InkSlot->SetAutoSize(false);
+		InkSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+		InkSlot->SetOffsets(FMargin(-3.0f, -3.0f, -3.0f, -3.0f));
+	}
+
+	VitalsPanelFill = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("VitalsPanelFill"));
+	VitalsPanelFill->SetColorAndOpacity(FLinearColor::FromSRGBColor(FColor(18, 19, 24, 209)));
+	if (UCanvasPanelSlot* FillSlot = VitalsBlock->AddChildToCanvas(VitalsPanelFill))
+	{
+		FillSlot->SetAutoSize(false);
+		FillSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+		FillSlot->SetOffsets(FMargin(0.0f));
+	}
+
+	// Alles binnen het blok LINKS uitgelijnd op dezelfde lijn — spiegelbeeld van de
+	// munitiehoek, waar alles rechts op één lijn eindigt.
+	auto AddToBlock = [this](UWidget* Child, float LeftPx, float BottomPx)
+	{
+		if (UCanvasPanelSlot* Slot = VitalsBlock->AddChildToCanvas(Child))
+		{
+			Slot->SetAutoSize(true);
+			Slot->SetAnchors(FAnchors(0.0f, 1.0f));
+			Slot->SetAlignment(FVector2D(0.0f, 1.0f));
+			Slot->SetPosition(FVector2D(LeftPx, -BottomPx));
+		}
+	};
+
+	// HET GETAL EN ZIJN MAXIMUM IN ÉÉN RIJ, en dat is hier de juiste oplossing waar
+	// het bij de munitiehoek niet kon: die is rechts uitgelijnd, dus daar moest elk
+	// veld zijn eigen vaste eindpunt krijgen. Links uitgelijnd groeit een rij naar
+	// rechts en blijft zijn linkerrand staan — dus mag "/ 100" gewoon achter het getal
+	// aan schuiven zonder dat er iets verspringt.
+	UHorizontalBox* HealthRow = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("HealthRow"));
+	AddToBlock(HealthRow, /*LeftPx*/ 0.0f, /*BottomPx*/ 0.0f);
+
+	HealthReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("HealthReadout"));
+	FSlateFontInfo HealthFont = HealthReadout->GetFont();
+	HealthFont.Size = 46;
+	HealthFont.TypefaceFontName = TEXT("Bold");
+	HealthReadout->SetFont(HealthFont);
+	ApplyLegibilityOutline(*HealthReadout, 2);
+	if (UHorizontalBoxSlot* NumberSlot = HealthRow->AddChildToHorizontalBox(HealthReadout))
+	{
+		NumberSlot->SetVerticalAlignment(VAlign_Bottom);
+	}
+
+	HealthCapacity = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("HealthCapacity"));
+	FSlateFontInfo HealthCapacityFont = HealthCapacity->GetFont();
+	HealthCapacityFont.Size = 20;
+	HealthCapacity->SetFont(HealthCapacityFont);
+	HealthCapacity->SetColorAndOpacity(FSlateColor(FLinearColor(0.72f, 0.72f, 0.74f)));
+	ApplyLegibilityOutline(*HealthCapacity);
+	if (UHorizontalBoxSlot* CapacitySlot = HealthRow->AddChildToHorizontalBox(HealthCapacity))
+	{
+		CapacitySlot->SetVerticalAlignment(VAlign_Bottom);
+		CapacitySlot->SetPadding(FMargin(6.0f, 0.0f, 0.0f, 6.0f));
+	}
+
+	// DE HOUDING ERBOVEN. Hij hoort hier en niet bij de munitie: hurken, sprinten en
+	// dekking zijn feiten over je LICHAAM, en het scherm hoort ze bij elkaar te zetten
+	// zodat je in één blik weet hoe je ervoor staat.
+	StanceReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("StanceReadout"));
+	FSlateFontInfo StanceFont = StanceReadout->GetFont();
+	StanceFont.Size = 18;
+	StanceReadout->SetFont(StanceFont);
+	StanceReadout->SetColorAndOpacity(FSlateColor(FLinearColor(0.88f, 0.88f, 0.90f)));
+	ApplyLegibilityOutline(*StanceReadout);
+	AddToBlock(StanceReadout, /*LeftPx*/ 0.0f, /*BottomPx*/ 54.0f);
+
+	// DOWN / STABILIZED — de twee toestanden die met een balk alleen niet te scheiden
+	// zijn. Eigen regel en eigen kleur, zie RefreshVitalsReadout.
+	VitalsStatusReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("VitalsStatusReadout"));
+	FSlateFontInfo StatusFont = VitalsStatusReadout->GetFont();
+	StatusFont.Size = 16;
+	StatusFont.TypefaceFontName = TEXT("Bold");
+	VitalsStatusReadout->SetFont(StatusFont);
+	ApplyLegibilityOutline(*VitalsStatusReadout);
+	AddToBlock(VitalsStatusReadout, /*LeftPx*/ 0.0f, /*BottomPx*/ 92.0f);
+
+	// DE BALK: een donkere goot met een vulling erin, en de vulling GROEIT NAAR RECHTS
+	// vanaf de linkerrand. Verankerd op links, zodat het leeglopen leest als "er gaat
+	// iets af" en niet als een balk die uit het niets opkomt.
+	HealthBarTrack = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("HealthBarTrack"));
+	HealthBarTrack->SetColorAndOpacity(FLinearColor(0.05f, 0.05f, 0.06f, 0.85f));
+	if (UCanvasPanelSlot* TrackSlot = VitalsBlock->AddChildToCanvas(HealthBarTrack))
+	{
+		TrackSlot->SetAutoSize(false);
+		TrackSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+		TrackSlot->SetAlignment(FVector2D(0.0f, 1.0f));
+		TrackSlot->SetSize(FVector2D(HealthBarWidthPx, 8.0f));
+		TrackSlot->SetPosition(FVector2D(0.0f, -84.0f));
+	}
+
+	HealthBarFill = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("HealthBarFill"));
+	HealthBarFill->SetColorAndOpacity(FLinearColor(0.95f, 0.95f, 0.95f, 1.0f));
+	if (UCanvasPanelSlot* FillSlot = VitalsBlock->AddChildToCanvas(HealthBarFill))
+	{
+		FillSlot->SetAutoSize(false);
+		FillSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+		FillSlot->SetAlignment(FVector2D(0.0f, 1.0f));
+		FillSlot->SetSize(FVector2D(0.0f, 8.0f));
+		FillSlot->SetPosition(FVector2D(0.0f, -84.0f));
+	}
+
+	// Verborgen tot het eerste feit. Zonder deze regel zou de hoek tussen de
+	// constructie en het eerste buspakket een lege plaat met een nul tonen — en dat is
+	// precies de leugen die ComposeVitalsReadout met bHasFact voorkomt.
+	SetVisibilityIfChanged(VitalsPanelInk, false);
+	SetVisibilityIfChanged(VitalsPanelFill, false);
+	SetVisibilityIfChanged(HealthCapacity, false);
+	SetVisibilityIfChanged(StanceReadout, false);
+	SetVisibilityIfChanged(VitalsStatusReadout, false);
+	SetVisibilityIfChanged(HealthBarTrack, false);
+	SetVisibilityIfChanged(HealthBarFill, false);
+	HealthReadout->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UEclipseMissionHudWidget::ApplySafeAreaLayout()
 {
 	// DE MARGE HOORT PER FRAME GEZET TE WORDEN EN NIET BIJ DE BOUW, en dat is een
@@ -1301,11 +1780,14 @@ void UEclipseMissionHudWidget::ApplySafeAreaLayout()
 	}
 	LastAppliedSafeMarginPx = Margin;
 
-	if (Root != nullptr)
+	// DE PLAAT en niet meer de lijst: sinds de plaat eronder ligt is InfoPanel het
+	// canvas-kind, en Root hangt in de overlay. Een marge op Root zou stil niets doen
+	// — zijn Slot is dan geen UCanvasPanelSlot meer en de Cast geeft null.
+	if (InfoPanel != nullptr)
 	{
-		if (UCanvasPanelSlot* RootSlot = Cast<UCanvasPanelSlot>(Root->Slot))
+		if (UCanvasPanelSlot* PanelSlot = Cast<UCanvasPanelSlot>(InfoPanel->Slot))
 		{
-			RootSlot->SetPosition(Margin);
+			PanelSlot->SetPosition(Margin);
 		}
 	}
 	if (AmmoBlock != nullptr)
@@ -1313,6 +1795,13 @@ void UEclipseMissionHudWidget::ApplySafeAreaLayout()
 		if (UCanvasPanelSlot* BlockSlot = Cast<UCanvasPanelSlot>(AmmoBlock->Slot))
 		{
 			BlockSlot->SetPosition(FVector2D(-Margin.X, -Margin.Y));
+		}
+	}
+	if (VitalsBlock != nullptr)
+	{
+		if (UCanvasPanelSlot* BlockSlot = Cast<UCanvasPanelSlot>(VitalsBlock->Slot))
+		{
+			BlockSlot->SetPosition(FVector2D(Margin.X, -Margin.Y));
 		}
 	}
 	UE_LOG(LogEclipse, Verbose, TEXT("HUD: titel-veilige marge gezet op %.1f slot-eenheden."), Margin.X);
@@ -1742,6 +2231,23 @@ void UEclipseMissionHudWidget::ApplyPanelVisibility()
 	Apply(ControlsPanel, bControlsVisible);
 	Apply(PlaytestPanel, bPlaytestVisible);
 	Apply(GuidePanel, IsGuidePanelVisible());
+
+	// EN DE PLAAT VOLGT WAT ERONDER LIGT. Een overlay zonder zichtbare inhoud houdt de
+	// borstelmaat van zijn eigen plaatafbeeldingen aan (32x32) en zou dus als een
+	// klein donker vierkant in de hoek blijven staan — een kader dat schermruimte
+	// claimt voor informatie die er niet is. Dezelfde regel als bij de munitiehoek:
+	// het paneel gaat mee als de cijfers weggaan.
+	if (InfoPanel != nullptr)
+	{
+		const bool bAnyRows = (LiveBox != nullptr && LiveBox->GetChildrenCount() > 0)
+			|| IsGauntletPanelVisible() || bControlsVisible || bPlaytestVisible || IsGuidePanelVisible();
+		const ESlateVisibility Desired = bAnyRows
+			? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed;
+		if (InfoPanel->GetVisibility() != Desired)
+		{
+			InfoPanel->SetVisibility(Desired);
+		}
+	}
 }
 
 void UEclipseMissionHudWidget::RefreshGauntletRows(bool bForce)

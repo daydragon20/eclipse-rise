@@ -450,4 +450,55 @@ bool FEclipseVitalsFeedWiredToBusTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// FALSIFICATIE 5 — kan een consument die TE LAAT aankomt de stand nog krijgen?
+//
+// Geen theorie: het is de volgorde waarin het spel werkelijk opstart. Het lichaam
+// zendt zijn eerste foto bij de bezetting, de missie-HUD monteert op
+// Event.Mission.Started, en de bus bewaart niets. Zonder een resend blijft de
+// gezondheidshoek leeg tot de speler zijn eerste klap oploopt.
+// ---------------------------------------------------------------------------
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseVitalsResendTest,
+	"Eclipse.Characters.VitalsFeed.ResendForLateConsumer",
+	EclipseVitalsFeedTest::TestFlags)
+
+bool FEclipseVitalsResendTest::RunTest(const FString& Parameters)
+{
+	using namespace EclipseVitalsFeed;
+
+	FEclipseVitalsTracker Tracker;
+	const FEclipseVitalsSnapshot Snapshot = EclipseVitalsFeedTest::Healthy();
+
+	TestTrue(TEXT("Het eerste monster gaat de deur uit"), Tracker.Submit(Snapshot).bShouldBroadcast);
+	// CONTROLEPROEF: zonder vergeten zwijgt hij, en dat IS het probleem waar
+	// ForgetLastBroadcast voor bestaat. Zonder deze regel zou de test hieronder
+	// evengoed slagen op een tracker die altijd uitzendt.
+	TestFalse(TEXT("CONTROLEPROEF: hetzelfde monster nogmaals levert niets op"),
+		Tracker.Submit(Snapshot).bShouldBroadcast);
+
+	Tracker.ForgetLastBroadcast();
+	const FEclipseVitalsDecision Resend = Tracker.Submit(Snapshot);
+	TestTrue(TEXT("Na ForgetLastBroadcast gaat dezelfde stand opnieuw de deur uit"), Resend.bShouldBroadcast);
+	TestTrue(TEXT("...als FOTO en niet als verandering, dus met bInitial"), Resend.Payload.bInitial);
+	TestFalse(TEXT("...en dus zonder gezondheids-verandervlag"), Resend.Payload.bHealthChanged);
+	TestFalse(TEXT("...en zonder houdings-verandervlag"), Resend.Payload.bStanceChanged);
+	TestEqual(TEXT("...met de stand erin"), Resend.Payload.Health, Snapshot.Health);
+	TestEqual(TEXT("...en het maximum, want de balk heeft een lengte nodig"),
+		Resend.Payload.MaxHealth, Snapshot.MaxHealth);
+
+	// EN DE UITZENDTELLER OVERLEEFT HET — het enige verschil met Reset(), en geen
+	// detail: die teller scheidt "de poort wees het lichaam af" van "de feed vond geen
+	// verandering" van "de bus leverde niet af". Een montage die het bewijsmateriaal
+	// uitgumt, breekt precies het onderzoek dat je daarna zou willen doen.
+	//
+	// Twee en niet drie: het tweede monster was identiek en ging dus NIET de deur uit
+	// (de controleproef hierboven).
+	TestEqual(TEXT("De uitzendteller telt door over het vergeten heen"), Tracker.GetBroadcastCount(), 2);
+	Tracker.Reset();
+	TestEqual(TEXT("Reset() wist hem WEL — dat is het verschil tussen de twee"),
+		Tracker.GetBroadcastCount(), 0);
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

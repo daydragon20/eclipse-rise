@@ -106,6 +106,30 @@ namespace EclipseVitalsFeed
 		/** Terug naar "nog nooit iets verstuurd"; het volgende monster is weer bInitial. */
 		void Reset();
 
+		/**
+		 * Vergeet WAT er het laatst uit ging, maar niet DAT er iets uit ging.
+		 *
+		 * Bestaat voor de ene situatie die een bus zonder geheugen structureel niet
+		 * dekt: een consument die LATER aankomt dan de producent. Het lichaam zendt
+		 * zijn eerste vitals uit bij de bezetting (NotifyControllerChanged) en bij
+		 * InitializeHealth; de missie-HUD wordt gemonteerd op Event.Mission.Started,
+		 * ruim daarna. Zonder een manier om het opnieuw te vragen zou de hoek
+		 * linksonder leeg blijven tot de speler zijn eerste klap oploopt — en een
+		 * gezondheidsbalk die pas verschijnt als je al geraakt bent, is precies het
+		 * gat waar deze laag voor bestaat.
+		 *
+		 * NIET Reset(), en dat verschil is het hele bestaansrecht van deze functie:
+		 * Reset zet ook BroadcastCount op nul, en dat is een MEETINSTRUMENT (het
+		 * scheidt "de poort wees het lichaam af" van "de feed vond geen verandering"
+		 * van "de bus leverde niet af" — zie de vier-ketenmeting in
+		 * EclipseVitalsFeedTests). Een HUD die bij zijn montage het bewijsmateriaal
+		 * uitgumt, breekt precies het onderzoek dat je daarna zou willen doen.
+		 *
+		 * Identiek van vorm aan EclipseWeaponStatusFeed::ForgetLastBroadcast, en dat
+		 * is geen toeval: het is dezelfde montagevolgorde en dus hetzelfde probleem.
+		 */
+		void ForgetLastBroadcast();
+
 		bool HasBroadcast() const { return bHasBroadcast; }
 		const FEclipseVitalsSnapshot& GetLastBroadcast() const { return LastBroadcast; }
 

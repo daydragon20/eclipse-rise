@@ -1977,6 +1977,16 @@ void AEclipseCharacter::PublishVitals()
 	}
 }
 
+void AEclipseCharacter::RequestVitalsResend()
+{
+	// ForgetLastBroadcast en niet Reset: het ijkpunt gaat weg, de uitzendteller niet.
+	// Die teller is het meetinstrument waarmee een stille HUD te bisecteren valt, en
+	// een montage die hem uitgumt breekt precies het onderzoek dat je daarna wilt doen
+	// (zie EclipseVitalsFeed.h).
+	VitalsTracker.ForgetLastBroadcast();
+	PublishVitals();
+}
+
 void AEclipseCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
 {
 	if (bDowned || Data.NewValue > 0.0f)

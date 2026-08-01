@@ -145,6 +145,37 @@ public:
 	/** Idem voor de wapennaam; leeg als het veld verborgen staat. */
 	FString GetWeaponTextOnScreen() const;
 
+	// ---------------------------------------------------------------------------
+	// MEETPUNTEN VAN DE GEZONDHEIDSHOEK — zelfde vorm als de munitiehoek hierboven,
+	// en met opzet zelfde vorm: het is dezelfde soort omzetting (feed bestond,
+	// consument niet), dus dezelfde falsificatie moet erop passen.
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Hoe vaak het TEKENPAD van de gezondheidshoek werkelijk gelopen heeft.
+	 *
+	 * Zestig frames zonder vitals-feit horen dit getal niet te bewegen. Zonder deze
+	 * teller is "de HUD polt niet" een bewering; met deze teller is het een nul die
+	 * rood kan worden — mits de controleproef ervóór bewijst dat hij kán bewegen.
+	 */
+	int32 GetVitalsDrawCount() const { return VitalsDrawCount; }
+
+	/** Hoeveel Event.Player.VitalsChanged deze HUD van de bus heeft aangenomen. */
+	int32 GetVitalsEventCount() const { return VitalsEventsReceived; }
+
+	/** Het gezondheidsgetal uit het WIDGET (niet uit de cache); leeg als het veld verborgen staat. */
+	FString GetHealthTextOnScreen() const;
+
+	/** De houding op het scherm ("STANDING"/"CROUCHED"/…); leeg terwijl het lichaam neer ligt. */
+	FString GetStanceTextOnScreen() const;
+
+	/**
+	 * "DOWN" / "STABILIZED" / leeg — het veld dat neergaan en gestabiliseerd worden
+	 * van elkaar scheidt. Publiek omdat juist dát onderscheid de eis is, en een eis
+	 * die alleen van binnenuit te controleren is, is niet gefalsificeerd.
+	 */
+	FString GetVitalsStatusOnScreen() const;
+
 private:
 	void OnHitLanded(FGameplayTag EventTag, const FInstancedStruct& Payload);
 	void OnAnyFact(FGameplayTag EventTag, const FInstancedStruct& Payload);
@@ -158,6 +189,15 @@ private:
 	 * een terugval naar het pollen (GDD 12.1/8.8: UI is consument).
 	 */
 	void OnWeaponStatusChanged(FGameplayTag EventTag, const FInstancedStruct& Payload);
+
+	/**
+	 * Event.Player.VitalsChanged: de ENIGE bron van de gezondheidshoek.
+	 *
+	 * Neemt het feit over in de cache en tekent meteen. Deze widget vraagt de pawn
+	 * niets — wie hier een GetHealth() ziet verschijnen, kijkt naar een terugval naar
+	 * het pollen (GDD 12.1/8.8: UI is consument).
+	 */
+	void OnVitalsChanged(FGameplayTag EventTag, const FInstancedStruct& Payload);
 
 	/** Rebuild the live sections only (objectives, orders, Command Mode state). */
 	void Rebuild();
@@ -226,6 +266,37 @@ private:
 	void BuildAmmoReadout();
 
 	/**
+	 * DE GEZONDHEIDSHOEK LINKSONDER (N-c).
+	 *
+	 * De plek is niet gekozen maar aangewezen: `REFERENTIE_HUD_BORDERLANDS.md` r36-37
+	 * zet gezondheid linksonder, waar Borderlands zijn schild/gezondheid heeft. Wij
+	 * hebben geen schild, dus die hoek is helemaal van de gezondheid.
+	 *
+	 * BEWUST GEEN MINIMAP ERNAAST. Die vraagt een tweede databron (object- en
+	 * vijandposities per perceptiemodel) en de owner heeft er nooit om gevraagd; hem
+	 * "er even bij" bouwen zou een halve minimap opleveren die vervolgens als
+	 * afgevinkt telt.
+	 *
+	 * Vier dingen horen bij elkaar, net als bij de munitiehoek: constructie,
+	 * ABONNEMENT (SubscribePlayerEvents), refresh (OnVitalsChanged) en opruiming
+	 * (NativeDestruct).
+	 */
+	void BuildVitalsReadout();
+
+	/** De gezondheidshoek tekenen uit de cache; nooit uit de pawn. */
+	void RefreshVitalsReadout();
+
+	/**
+	 * Het lichaam vragen zijn vitals opnieuw uit te zenden, één keer bij montage.
+	 *
+	 * Zelfde reden als RequestInitialWeaponStatus: de bus levert synchroon af en
+	 * bewaart niets, en deze widget monteert op Event.Mission.Started — ruim ná de
+	 * bezetting waar het lichaam zijn eerste foto verstuurde. Zonder dit verzoek zou
+	 * de hoek leeg blijven tot de speler zijn eerste klap oploopt.
+	 */
+	void RequestInitialVitals();
+
+	/**
 	 * De richtingsindicator uit Screen_Damage_Indicator.
 	 *
 	 * Stond tot 31-07 MIDDEN IN NativeTick, in de tak die het trefteken dooft: hij
@@ -285,6 +356,36 @@ private:
 
 	/** Read the five criteria out of the layers that own them. */
 	EclipseGauntletOverlay::FEclipseGauntletCriteria GatherCriteria() const;
+
+	/**
+	 * DE PLAAT ONDER DE TEKSTLIJST — en dit is geen stijlkeuze maar een ontbrekend
+	 * onderdeel.
+	 *
+	 * GEMETEN 01-08 op `HUD_3e_persoon_terug.png`: de statusregel is wit zonder rand,
+	 * zonder schaduw en zonder vlak, en waar hij op een felle wereldbalk valt is het
+	 * contrast **1,39 : 1** — de balk zit op luminantie 0,7065 met 53 % van zijn
+	 * pixels geclipt op 255. De munitieteller op datzelfde frame haalt **18 : 1**, en
+	 * die heeft als enige element wél een eigen donker paneel. Eén element met plaat
+	 * is leesbaar, de rest niet: dat is het bewijs dat de plaat het ontbrekende
+	 * onderdeel is en niet een smaakvraag.
+	 *
+	 * "Maak de tekst helderder" kan hier per constructie niet werken: tegen een
+	 * ondergrond die zelf 255 haalt is er geen helderder wit. Alleen een plaat of
+	 * contour maakt de leesbaarheid onafhankelijk van wat er toevallig achter staat.
+	 *
+	 * Een OVERLAY en geen canvas: de tekstlijst groeit en krimpt met het aantal
+	 * regels (objectives, orders, Command Mode), dus de plaat moet meegroeien. Een
+	 * overlay neemt de maat van zijn grootste kind — de plaatafbeeldingen staan op
+	 * Fill en volgen dus de lijst in plaats van andersom.
+	 */
+	UPROPERTY()
+	TObjectPtr<class UOverlay> InfoPanel;
+
+	UPROPERTY()
+	TObjectPtr<class UImage> InfoPanelInk;
+
+	UPROPERTY()
+	TObjectPtr<class UImage> InfoPanelFill;
 
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> Root;
@@ -380,6 +481,64 @@ private:
 	inline static constexpr float AmmoBlockWidthPx = 300.0f;
 	inline static constexpr float AmmoBlockHeightPx = 120.0f;
 	inline static constexpr float ReloadBarWidthPx = 150.0f;
+
+	// ---------------------------------------------------------------------------
+	// DE GEZONDHEIDSHOEK LINKSONDER
+	// ---------------------------------------------------------------------------
+
+	/** Vast kader, om dezelfde reden als AmmoBlock: geen tekst mag zijn eigen rand uit. */
+	UPROPERTY(Transient)
+	TObjectPtr<class UCanvasPanel> VitalsBlock;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> VitalsPanelInk;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> VitalsPanelFill;
+
+	/** Het grote getal ("62"). */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> HealthReadout;
+
+	/** Het maximum ("/ 100"): staat vast, dus kleiner en gedimd. */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> HealthCapacity;
+
+	/** De houding — STANDING / CROUCHED / SPRINTING / IN COVER. */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> StanceReadout;
+
+	/** DOWN / STABILIZED; het veld dat die twee toestanden scheidt. */
+	UPROPERTY(Transient)
+	TObjectPtr<class UTextBlock> VitalsStatusReadout;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> HealthBarTrack;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UImage> HealthBarFill;
+
+	inline static constexpr float VitalsBlockWidthPx = 300.0f;
+	inline static constexpr float VitalsBlockHeightPx = 120.0f;
+	inline static constexpr float HealthBarWidthPx = 190.0f;
+
+	/**
+	 * DE LAATSTE VITALS ZOALS DE BUS ZE AFLEVERDE — de enige bron van deze hoek.
+	 * Een KOPIE en geen pointer naar de pawn, om dezelfde reden als bij WeaponStatus:
+	 * zodra hier een verwijzing staat, kan de teken-functie er alsnog doorheen vragen
+	 * en is de laagscheiding weg.
+	 */
+	UPROPERTY(Transient)
+	FEclipsePlayerVitalsPayload Vitals;
+
+	/** Is er ooit een vitals-feit binnengekomen? Zonder feit hoort de hele hoek weg te blijven. */
+	bool bHasVitals = false;
+
+	int32 VitalsEventsReceived = 0;
+	int32 VitalsDrawCount = 0;
+
+	/** Eén keer melden dat een vitals-feit niet getekend kon worden; daarna zou het per feit spammen. */
+	bool bReportedSilentVitals = false;
 
 	/** Rijen waarover al geklaagd is dat hun DisplayName ontbreekt — één keer melden, niet per frame. */
 	TSet<FName> ReportedMissingDisplayNames;

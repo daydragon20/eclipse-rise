@@ -95,4 +95,14 @@ namespace EclipseVitalsFeed
 		bHasBroadcast = false;
 		BroadcastCount = 0;
 	}
+
+	void FEclipseVitalsTracker::ForgetLastBroadcast()
+	{
+		// Alleen het IJKPUNT weg, de teller blijft. Het volgende monster loopt daardoor
+		// door de bHasPrevious=false-tak van Decide en komt er als FOTO uit (bInitial,
+		// geen verander-vlaggen) — precies wat een late consument nodig heeft: de stand,
+		// niet een overgang die hij gemist heeft.
+		LastBroadcast = FEclipseVitalsSnapshot();
+		bHasBroadcast = false;
+	}
 }

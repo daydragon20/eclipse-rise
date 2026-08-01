@@ -2187,6 +2187,107 @@ void AEclipseGameMode::AdvancePlayShotRound()
 		break;
 	}
 	case 12:
+	{
+		// DE LEESBAARHEIDSPROEF: DE HUD MIDDEN IN EEN VUURGEVECHT, OP IETS FELS.
+		//
+		// `REFERENTIE_HUD_BORDERLANDS.md` r49 zet de eis en zegt er meteen bij hoe hij
+		// getoetst moet worden: "je moet je munitie binnen een halve seconde kunnen
+		// aflezen MIDDEN IN EEN GEVECHT. Toets dat op een screenshot tijdens gevecht,
+		// niet in een stilstaand menu." Die opname bestond in deze ronde niet: elke
+		// CaptureHudFrame viel op een stilstaand, niet-vurend personage, en de enige
+		// frames tijdens het vuren (PLAYSHOT 3) zijn HighResShots — die tekenen alleen
+		// de 3D-scene en dragen de HUD per constructie niet.
+		//
+		// Een leesbaarheidsoordeel op een leeg scherm bewijst niets, dus twee dingen
+		// tegelijk: er wordt GEVUURD (muzzle flash, terugslag, kruis open) én er staat
+		// iets FELS in beeld (dezelfde Deco_Sign/Deco_Decal-doelen als de
+		// kruis-controleproef, luminantie tot 0,19 gemeten op de frames van 01-08).
+		//
+		// ZETTEN EN OPNEMEN ZIJN TWEE STAPPEN, de vaste les van dit draaiboek: de
+		// opname valt op een eigen timer, ruim na het aanzetten, zodat het frame de
+		// TOESTAND vastlegt en niet de overgang.
+		{
+			APawn* Eye = Controller->GetPawn();
+			AActor* Bright = nullptr;
+			double BestDistSq = TNumericLimits<double>::Max();
+			if (Eye != nullptr)
+			{
+				for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+				{
+					AActor* Candidate = *It;
+					if (Candidate == nullptr
+						|| !(Candidate->Tags.Contains(TEXT("Deco_Sign")) || Candidate->Tags.Contains(TEXT("Deco_Decal"))))
+					{
+						continue;
+					}
+					const double DistSq = FVector::DistSquared(Candidate->GetActorLocation(), Eye->GetActorLocation());
+					if (DistSq < BestDistSq)
+					{
+						BestDistSq = DistSq;
+						Bright = Candidate;
+					}
+				}
+			}
+			if (Bright == nullptr)
+			{
+				// Luid, want dan toetst deze opname de eis niet en ziet het frame er
+				// desondanks normaal uit (14.3.5).
+				UE_LOG(LogEclipse, Warning,
+					TEXT("[GEVECHTSFRAME] GEEN licht doel gevonden — deze opname kan de leesbaarheidseis van r49 niet toetsen."));
+			}
+			else
+			{
+				FVector EyeLocation;
+				FRotator EyeRotation;
+				Controller->GetPlayerViewPoint(EyeLocation, EyeRotation);
+				Controller->SetControlRotation((Bright->GetActorLocation() - EyeLocation).Rotation());
+				UE_LOG(LogEclipse, Display,
+					TEXT("[GEVECHTSFRAME] gericht op '%s' op %.0f cm — en nu vuren."),
+					*Bright->GetName(), FMath::Sqrt(BestDistSq));
+			}
+			bPlayShotWalking = true;
+			bPlayShotFiring = true;
+
+			// EN DE SPELER LOOPT SCHADE OP, want anders bewijst dit frame de helft niet.
+			//
+			// Zonder deze regel staat de gezondheidshoek op ELK frame van de ronde op
+			// "100 / 100" met een volle balk — en dan is een werkende uitlezing niet te
+			// onderscheiden van een vast plaatje met "100" erop. Twee verklaringen die
+			// een frame niet scheidt, zijn geen meting.
+			//
+			// 40 van de 100 en niet meer: de balk staat dan zichtbaar op 60 %, het getal
+			// is duidelijk veranderd, en het personage gaat niet neer — een casualty zou
+			// de missiestaat van deze ronde veranderen en dat hoort een opnameronde niet
+			// te doen. De schade gaat door ApplyDamage, dus door hetzelfde pad als een
+			// echte kogel: geen testachterdeur die iets anders meet dan het spel doet.
+			if (AEclipseCharacter* Hurt = Cast<AEclipseCharacter>(Controller->GetPawn()))
+			{
+				const float Before = Hurt->GetHealth();
+				Hurt->ApplyDamage(40.0f, nullptr, FName(TEXT("PlayShotLeesbaarheid")));
+				UE_LOG(LogEclipse, Display,
+					TEXT("[GEVECHTSFRAME] speler %0.f -> %.0f hp van %.0f — de gezondheidshoek hoort mee te bewegen."),
+					Before, Hurt->GetHealth(), Hurt->GetMaxHealth());
+			}
+
+			// 0,9 s: ruim vijf schoten op een cadans van 0,15 s, dus het kruis staat
+			// open, het magazijn is zichtbaar gedaald en er hangt rook/flits in beeld.
+			FTimerHandle Gevecht;
+			GetWorldTimerManager().SetTimer(Gevecht, FTimerDelegate::CreateWeakLambda(this, [this]()
+			{
+				CaptureHudFrame(TEXT("gevecht_op_fel_doel"));
+				UE_LOG(LogEclipse, Display,
+					TEXT("[GEVECHTSFRAME] opgenomen tijdens het vuren — dit is het frame waarop r49 getoetst hoort te worden."));
+			}), 0.9f, /*bLoop*/ false);
+		}
+		break;
+	}
+	case 13:
+		// Vuren uit vóór de wapenproef: die vergelijkt zichtbaarheidstoestanden van
+		// meshes en wil een stilstaand, niet-schietend personage. Een terugslag tussen
+		// twee proefframes maakt "A min B" onberekenbaar — dezelfde reden als het
+		// stilzetten in stap 0 van de wapenproef zelf.
+		bPlayShotFiring = false;
+		bPlayShotWalking = false;
 		// DE WAPENPROEF (O-5 "volledig", 31-07) — hier en niet in een eigen ronde.
 		//
 		// Op dit punt is de speler het ENIGE zichtbare lichaam (opname 4 verborg de

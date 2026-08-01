@@ -83,6 +83,59 @@ FEclipseAmmoReadout ComposeAmmoReadout(const FEclipseWeaponReadoutFacts& Facts)
 	return Out;
 }
 
+FText StanceLabel(EEclipseStance Stance)
+{
+	switch (Stance)
+	{
+	case EEclipseStance::Crouched:  return NSLOCTEXT("EclipseHud", "StanceCrouched", "CROUCHED");
+	case EEclipseStance::Sprinting: return NSLOCTEXT("EclipseHud", "StanceSprinting", "SPRINTING");
+	case EEclipseStance::InCover:   return NSLOCTEXT("EclipseHud", "StanceInCover", "IN COVER");
+	default:                        return NSLOCTEXT("EclipseHud", "StanceStanding", "STANDING");
+	}
+}
+
+FEclipseVitalsReadout ComposeVitalsReadout(const FEclipseVitalsReadoutFacts& Facts)
+{
+	FEclipseVitalsReadout Out;
+
+	// NOG GEEN FEIT IS GEEN NUL. Zie de toelichting bij bHasFact: een uitlezing die
+	// bij montage alvast "0 / 0" toont, meldt de dood van een lichaam waarover nog
+	// niets bekend is. Hetzelfde bezwaar als bij de munitieteller ("0 / 0" liegt).
+	if (!Facts.bHasFact || Facts.MaxHealth <= 0.0f)
+	{
+		Out.bHidden = true;
+		return Out;
+	}
+
+	const float Clamped = FMath::Clamp(Facts.Health, 0.0f, Facts.MaxHealth);
+	Out.HealthFraction = Clamped / Facts.MaxHealth;
+
+	// Naar boven, behalve op echte nul; zie de header voor waarom die richting.
+	const int32 Shown = Clamped <= 0.0f ? 0 : FMath::Max(1, FMath::CeilToInt(Clamped));
+	Out.HealthText = FString::Printf(TEXT("%d"), Shown);
+	Out.CapacityText = FString::Printf(TEXT("/ %d"), FMath::CeilToInt(Facts.MaxHealth));
+
+	Out.bLow = Out.HealthFraction <= LowHealthFraction;
+	Out.bDowned = Facts.bDowned;
+	Out.bStabilized = Facts.bDownedChanged && !Facts.bDowned;
+
+	if (Facts.bDowned)
+	{
+		// GEEN HOUDING TERWIJL JE LIGT. De bewegingslaag staat uit (DisableMovement in
+		// HandleHealthChanged), dus "STANDING · DOWN" zou het scherm zichzelf laten
+		// tegenspreken. Eén regel, één waarheid.
+		Out.StatusText = NSLOCTEXT("EclipseHud", "VitalsDown", "DOWN");
+		return Out;
+	}
+
+	Out.StanceText = StanceLabel(Facts.Stance);
+	if (Out.bStabilized)
+	{
+		Out.StatusText = NSLOCTEXT("EclipseHud", "VitalsStabilized", "STABILIZED");
+	}
+	return Out;
+}
+
 float SpreadDegreesToGapPx(float SpreadDegrees, float ViewportHeightPx, float VerticalFovDegrees)
 {
 	// Beschermen tegen onzin-invoer VÓÓR de tangens: een FOV van 0 of 180 laat de

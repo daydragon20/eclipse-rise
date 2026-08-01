@@ -292,6 +292,18 @@ public:
 	 */
 	int32 GetVitalsBroadcastCount() const { return VitalsTracker.GetBroadcastCount(); }
 
+	/**
+	 * Stuur de huidige vitals opnieuw de bus op, ook als er niets veranderd is.
+	 *
+	 * Voor een consument die LATER aankomt dan dit lichaam — de missie-HUD hangt aan
+	 * Event.Mission.Started en dat is ruim na de bezetting, en de bus bewaart niets.
+	 * Het is een VERZOEK en geen uitlezing: de HUD vraagt om een uitzending en leest
+	 * hier geen waarde uit, zodat er maar één pad naar het scherm bestaat.
+	 *
+	 * Spiegelbeeld van UEclipseHitscanWeaponComponent::RequestStatusResend.
+	 */
+	void RequestVitalsResend();
+
 	/** Campaign identity for roster soldiers (invalid for enemies/player in Phase 1). */
 	FGuid GetSoldierId() const { return SoldierId; }
 	void SetSoldierId(const FGuid& InSoldierId) { SoldierId = InSoldierId; }

@@ -270,4 +270,135 @@ bool FEclipseHudCrosshairTest::RunTest(const FString&)
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// N-c — DE GEZONDHEIDSUITLEZING, de pure helft.
+//
+// De nulmeting: op alle tien geopende HUD-frames van 01-08 staat linksonder NIETS.
+// `REFERENTIE_HUD_BORDERLANDS.md` r36-37 wijst die hoek aan gezondheid toe. Wat
+// hieronder staat is elke BESLISSING over wat daar komt — het getal, het woord, de
+// toestand — zodat ze te toetsen zijn zonder een game te starten.
+// ---------------------------------------------------------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FEclipseHudVitalsReadoutTest,
+	"Eclipse.UI.HudReadout.VitalsSaysWhatTheBodyIsDoing",
+	EclipseHudReadoutTest::TestFlags)
+
+bool FEclipseHudVitalsReadoutTest::RunTest(const FString&)
+{
+	using namespace EclipseHudReadout;
+
+	// ---- CONTROLEPROEF EERST: nog geen feit is iets ANDERS dan nul ----------
+	//
+	// Zonder deze proef zou "de hoek is leeg" niet te onderscheiden zijn van "de hoek
+	// staat op nul", en dat zijn twee heel verschillende schermen: het eerste zegt
+	// niets, het tweede meldt je dood.
+	FEclipseVitalsReadoutFacts Leeg;
+	Leeg.bHasFact = false;
+	const FEclipseVitalsReadout Niets = ComposeVitalsReadout(Leeg);
+	TestTrue(TEXT("CONTROLEPROEF: zonder feit staat er niets"), Niets.bHidden);
+	TestTrue(TEXT("...en er is geen getal om per ongeluk te tonen"), Niets.HealthText.IsEmpty());
+
+	FEclipseVitalsReadoutFacts Vol;
+	Vol.bHasFact = true;
+	Vol.Health = 100.0f;
+	Vol.MaxHealth = 100.0f;
+	Vol.PreviousHealth = 100.0f;
+	const FEclipseVitalsReadout Gezond = ComposeVitalsReadout(Vol);
+	TestFalse(TEXT("CONTROLEPROEF: mét feit staat er wél iets"), Gezond.bHidden);
+	TestEqual(TEXT("het getal is de gezondheid"), Gezond.HealthText, FString(TEXT("100")));
+	TestEqual(TEXT("het maximum staat er apart naast"), Gezond.CapacityText, FString(TEXT("/ 100")));
+	TestEqual(TEXT("de balk staat vol"), Gezond.HealthFraction, 1.0f);
+	TestFalse(TEXT("vol leven kleurt niet"), Gezond.bLow);
+
+	// ---- 100 -> 60: het getal volgt, en de balk volgt hetzelfde getal -------
+	FEclipseVitalsReadoutFacts Geraakt = Vol;
+	Geraakt.Health = 60.0f;
+	Geraakt.PreviousHealth = 100.0f;
+	const FEclipseVitalsReadout Gewond = ComposeVitalsReadout(Geraakt);
+	TestEqual(TEXT("60 van de 100 leest als 60"), Gewond.HealthText, FString(TEXT("60")));
+	TestEqual(TEXT("...en de balk staat op 0,6 — één bron voor getal en balk"), Gewond.HealthFraction, 0.6f);
+	TestFalse(TEXT("60 % is nog niet 'laag'"), Gewond.bLow);
+
+	FEclipseVitalsReadoutFacts Kritiek = Vol;
+	Kritiek.Health = 30.0f;
+	TestTrue(TEXT("onder een derde kleurt hij — zelfde grens als het magazijn"),
+		ComposeVitalsReadout(Kritiek).bLow);
+
+	// ---- afronden naar boven, en dat is geen kosmetiek ----------------------
+	//
+	// Bij 0,4 hp zou rekenkundig afronden "0" tonen terwijl je nog leeft. Dat is een
+	// leugen in precies de richting waar hij het duurst is.
+	FEclipseVitalsReadoutFacts Sliver = Vol;
+	Sliver.Health = 0.4f;
+	const FEclipseVitalsReadout Rest = ComposeVitalsReadout(Sliver);
+	AddInfo(FString::Printf(TEXT("GEMETEN 0,4 hp op het scherm: '%s'"), *Rest.HealthText));
+	TestEqual(TEXT("0,4 hp is niet nul — je leeft nog"), Rest.HealthText, FString(TEXT("1")));
+
+	FEclipseVitalsReadoutFacts Nul = Vol;
+	Nul.Health = 0.0f;
+	TestEqual(TEXT("echt nul is wél nul"), ComposeVitalsReadout(Nul).HealthText, FString(TEXT("0")));
+
+	// ---- DE HOUDING, in de brontaal Engels ---------------------------------
+	//
+	// Er heeft ooit NSLOCTEXT("Eclipse","Reloading","HERLADEN") in de schermlaag
+	// gestaan; deze vier regels zijn de reden dat dat hier niet stil kan terugkomen.
+	FEclipseVitalsReadoutFacts Houding = Vol;
+	Houding.Stance = EEclipseStance::Standing;
+	TestEqual(TEXT("staand"), ComposeVitalsReadout(Houding).StanceText.ToString(), FString(TEXT("STANDING")));
+	Houding.Stance = EEclipseStance::Crouched;
+	TestEqual(TEXT("hurken"), ComposeVitalsReadout(Houding).StanceText.ToString(), FString(TEXT("CROUCHED")));
+	Houding.Stance = EEclipseStance::Sprinting;
+	TestEqual(TEXT("sprint"), ComposeVitalsReadout(Houding).StanceText.ToString(), FString(TEXT("SPRINTING")));
+	Houding.Stance = EEclipseStance::InCover;
+	TestEqual(TEXT("dekking"), ComposeVitalsReadout(Houding).StanceText.ToString(), FString(TEXT("IN COVER")));
+
+	// ---- NEER EN GESTABILISEERD ZIJN TWEE TOESTANDEN, geen één "gewond" -----
+	//
+	// Dit is de scherpste eis van N-c. Allebei gaan ze gepaard met een lage
+	// gezondheid, dus met een balk alleen zijn ze niet te scheiden — terwijl "lig ik
+	// of sta ik weer" het enige is waar je op dat moment naar handelt.
+	FEclipseVitalsReadoutFacts Neer = Vol;
+	Neer.Health = 0.0f;
+	Neer.PreviousHealth = 12.0f;
+	Neer.bDowned = true;
+	Neer.bDownedChanged = true;
+	const FEclipseVitalsReadout Liggend = ComposeVitalsReadout(Neer);
+
+	FEclipseVitalsReadoutFacts Terug = Vol;
+	Terug.Health = 100.0f;
+	Terug.PreviousHealth = 0.0f;
+	Terug.bDowned = false;
+	Terug.bDownedChanged = true;
+	const FEclipseVitalsReadout Overeind = ComposeVitalsReadout(Terug);
+
+	AddInfo(FString::Printf(TEXT("GEMETEN toestanden: neer='%s' · gestabiliseerd='%s'"),
+		*Liggend.StatusText.ToString(), *Overeind.StatusText.ToString()));
+	TestEqual(TEXT("neergaan heet DOWN"), Liggend.StatusText.ToString(), FString(TEXT("DOWN")));
+	TestEqual(TEXT("gestabiliseerd worden heet STABILIZED"), Overeind.StatusText.ToString(), FString(TEXT("STABILIZED")));
+	TestNotEqual(TEXT("en de twee zijn op het scherm ONDERSCHEIDBAAR"),
+		Liggend.StatusText.ToString(), Overeind.StatusText.ToString());
+	TestTrue(TEXT("neer zegt ook los van de tekst dat hij neer is"), Liggend.bDowned);
+	TestTrue(TEXT("gestabiliseerd is een eigen vlag, niet 'niet neer'"), Overeind.bStabilized);
+	TestFalse(TEXT("...en gestabiliseerd is dus niet neer"), Overeind.bDowned);
+
+	// Terwijl je ligt is er geen houding: de bewegingslaag staat uit, dus
+	// "STANDING · DOWN" zou het scherm zichzelf laten tegenspreken.
+	TestTrue(TEXT("terwijl je ligt staat er geen houding"), Liggend.StanceText.IsEmpty());
+	TestFalse(TEXT("...en zodra je weer staat wel"), Overeind.StanceText.IsEmpty());
+
+	// EN DE DERDE TOESTAND: gewoon gewond. Zonder deze regel zou "twee
+	// onderscheidbare toestanden" ook waar zijn voor een uitlezing die ALTIJD iets
+	// roept — en dan staat er permanent een melding waar niets aan de hand is.
+	TestTrue(TEXT("gewoon gewond zijn is geen meldingswaardige toestand"), Gewond.StatusText.IsEmpty());
+
+	// ---- een lichaam zonder maximum toont niets ----------------------------
+	FEclipseVitalsReadoutFacts ZonderMax;
+	ZonderMax.bHasFact = true;
+	ZonderMax.MaxHealth = 0.0f;
+	TestTrue(TEXT("zonder maximum valt er niets af te zetten, dus staat er niets"),
+		ComposeVitalsReadout(ZonderMax).bHidden);
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
