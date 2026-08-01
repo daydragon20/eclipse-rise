@@ -22,7 +22,7 @@ Meer dan **12 nieuwe beelden per ronde** doe je niet. Nieuwste eerst. De rest ko
 ## Waar je op let
 
 **1. Foutdialogen** — deze hebben altijd voorrang.
-Lees de tekst letterlijk over. Titelbalk, boodschap, knoppen. Een pad in een foutmelding is bijna altijd de diagnose: bij `C:/Users/.../Programs/Git/Game/Maps/...` weet je meteen dat Git Bash het argument heeft verminkt (`DEBUG_DISCIPLINE.md` §4.4). Zoek voor je concludeert.
+Lees de tekst letterlijk over. Titelbalk, boodschap, knoppen. Een pad in een foutmelding is bijna altijd de diagnose: bij `C:/Users/.../Programs/Git/Game/Maps/...` weet je meteen dat Git Bash het argument heeft verminkt (`phase0/DEBUG_DISCIPLINE.md` §4.4). Zoek voor je concludeert.
 
 **2. Het personage en zijn wapen**
 - Wordt het wapen **de goede kant op** vastgehouden? Loopt de loop naar voren?
