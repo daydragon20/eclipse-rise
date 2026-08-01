@@ -37,7 +37,20 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 CORPUS = os.path.join(REPO, "Eclipse", "Content", "Script")
 
 # Sleutels die naar meer dan een stem oplossen. SCRIPT_FORMAT §4 regel 196.
-MULTIPLIERS = {"voss": 2}
+# O-14 BESLIST 02-08: EEN Voss-stem, niet twee. De multiplier stond op 2 omdat
+# Voss een keer geschreven wordt en per spelersgeslacht ingesproken zou worden.
+# Nathan heeft gekozen voor een enkele stem; een tweede komt er alleen als
+# phase0/VOSS_TWEEDE_STEM_AANVRAAG.json bestaat.
+#
+# GEMETEN BESPARING: 23.507 credits (483 regels, 23.507 tekens). Nathans
+# opdracht noemt 20.570 -- dat verschil is geen fout maar ouderdom: het
+# corpus is sindsdien gegroeid, en dat is precies waarom een bedrag in een
+# document veroudert en een teller niet.
+import os
+_TWEEDE_STEM = os.path.exists(os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "phase0", "VOSS_TWEEDE_STEM_AANVRAAG.json"))
+MULTIPLIERS = {"voss": 2 if _TWEEDE_STEM else 1}
 
 RE_VOICE = re.compile(r"^\s{4}voice:\s*(\S+)\s*$")
 RE_TEXT = re.compile(r'^\s{4}text:\s*(.*)$')
@@ -234,14 +247,35 @@ def zelftest():
         if pv["voss"]["varianten"] != 2:
             fouten.append("variantteller klopt niet: %d" % pv["voss"]["varianten"])
 
-    # 2. de voss-verdubbeling MOET het bedrag veranderen
+    # 2. de voss-multiplier MOET het bedrag veranderen -- BEIDE KANTEN.
+    #    Sinds O-14 (02-08) staat hij op 1 tenzij de owner een tweede stem
+    #    aanvraagt. Deze test toetst daarom niet EEN uitkomst maar het VERSCHIL:
+    #    anders bewijst hij alleen de stand van vandaag en niet dat de teller de
+    #    verdubbeling nog kan.
     with tempfile.TemporaryDirectory() as tmp:
         maak(tmp, met_var)
-        pv, pm, _, _, _, _ = tel(tmp)
-        verwacht = 5 * 1 + 9 * 2
+        _pv, pm, _, _, _, _ = tel(tmp)
         gekregen = sum(m["credits"] for m in pm.values())
+        # LET OP: geen `import count_generation_cost` hier. Als script draait deze
+        # module als `__main__`, dus die import maakt een TWEEDE modulekopie met
+        # zijn eigen MULTIPLIERS -- en dan muteer je een tabel die `tel()` niet
+        # leest. Deze zelftest vond dat zelf, en het is de dubbele-opslag-fout in
+        # het klein: twee kopieen van een waarheid, en de meting hangt aan de
+        # verkeerde.
+        factor = MULTIPLIERS.get("voss", 1)
+        verwacht = 5 * 1 + 9 * factor
         if gekregen != verwacht:
-            fouten.append("voss-verdubbeling: %d credits, verwacht %d" % (gekregen, verwacht))
+            fouten.append("voss-multiplier %d: %d credits, verwacht %d"
+                          % (factor, gekregen, verwacht))
+        _oud = MULTIPLIERS.get("voss", 1)
+        try:
+            MULTIPLIERS["voss"] = 3 if _oud != 3 else 2
+            _pv2, pm2, _, _, _, _ = tel(tmp)
+            anders = sum(m["credits"] for m in pm2.values())
+            if anders == gekregen:
+                fouten.append("de multiplier doet niets: zelfde bedrag bij een andere factor")
+        finally:
+            MULTIPLIERS["voss"] = _oud
 
     # 3. een vorm die de parser NIET kent moet MELDEN, niet stil 0 tellen
     blok = basis + (
