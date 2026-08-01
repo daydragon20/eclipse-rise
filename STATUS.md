@@ -40,19 +40,19 @@ herhaalbaar en **drukt altijd zijn eigen dekking af**. Saldo 125.612 — act 1 a
 dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 
 > **Spoor A staat verder dan spoor B. ACT 1 IS COMPLEET GESCHREVEN** — acht missies, de
-> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.628 regels, 97.659 credits**
+> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.630 regels. 97.963 credits**
 > (gemeten, `Tools/count_generation_cost.py`; deze drie getallen worden sinds 01-08 door
 > `Tools/check_owner_docs.py` tegen die teller bewaakt). Saldo 125.612, dus **act 1 alleen
 > is 78% van alles wat er nog is** — barks, muziek, SFX en de acts 2 t/m 4 komen daar nog
 > bij. Dat is de vraag op **O-14**.
 >
 > **Maar dat is niet wat je vandaag zou uitgeven.** `Tools/check_generation_ready.py`
-> splitst het: **35 scènes / 49.663 credits staan KLAAR** (poort groen én stem gecast),
-> 26 scènes / 30.309 zijn door de kwaliteitspoort gehouden en 10 scènes / 17.687 wachten
+> splitst het: **42 scènes / 59.082 credits staan KLAAR** (poort groen én stem gecast),
+> 18 scènes / 19.920 zijn door de kwaliteitspoort gehouden en 11 scènes / 18.961 wachten
 > op casting. Het grote getal is wat act 1 *zou* kosten; dit is wat er *kan*.
 >
 > **DE IJKMISSIE IS DOOR DE POORT.** M1.1 staat op **7 van 7 GO** na drie critic-rondes.
-> Corpus: **45 GO, 13 NO-GO, 11 gehouden op de hub-reeks, 2 nog te beoordelen**.
+> Corpus: **HET HELE CORPUS IS GEPOORT** — 71 van 71, in acht rondes. **53 GO, 7 NO-GO, 11 gehouden op de hub-reeks, nul onbeoordeeld**.
 > De elf hub-scènes halen §18.9 apart maar de REEKS zakt — negen van twaalf delen
 > dezelfde motor en elf van twaalf sluiten identiek af. Ze dragen daarom geen kaal
 > `GO`: dat veld is een vergunning om te genereren.
