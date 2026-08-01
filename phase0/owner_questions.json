@@ -272,6 +272,35 @@
    ],
    "advies": "Optie 3. Je verliest het getal niet en de kaart belooft niets wat hij niet kan waarmaken. Dat is dezelfde vorm die vannacht bij tien andere notities werkte: niet de telling opschrijven maar wáár je gekeken hebt.",
    "vrijtekst": true
+  },
+  {
+   "id": "O-19",
+   "prio": "nu",
+   "vraag": "Heb JIJ vanochtend castingkeuzes gewijzigd? Ik heb het niet gedaan en ik raak het niet aan.",
+   "waarom": "phase0/CASTING_KEUZE.json is vanochtend om 09:03 gewijzigd. Ik heb dat niet gedaan en geen enkele agent had er opdracht toe — daarom vraag ik het in plaats van erop door te bouwen.\n\nWAT ER VERANDERD IS:\n  • iron_chorus_emissary toegevoegd: kandidaten 2 en 3 (Cain, Steve)\n  • petra toegevoegd: kandidaten 1 en 5 (Empress, Mother)\n  • kaine GEWIJZIGD van [2] naar [5, 8]\n\nDe eerste twee vullen precies de gaten die ik als ongecast meldde, dus dit zóú je antwoord op O-16 kunnen zijn. Maar het staat NIET in OWNER_ANSWERS.md en O-16 is nergens als beantwoord gemarkeerd, dus ik weet het niet.\n\nWAAROM IK NIET GEWOON DOORGA: casting is permanent. Twee personages op één stem-id zijn niet gelijkend maar identiek — zelfde id, zelfde model, zelfde cachesleutel — en na generatie kost het verplaatsen van één van beide elke regel opnieuw. Voor Mara zijn dat er 332.\n\nEn de derde regel is het punt: kaine had al een keuze en die is VERANDERD. Toevoegen is een gat vullen; wijzigen is iets anders.\n\nVier van de nieuwe kandidaten komen uit de Voice Library en hebben een LICENTIECONTROLE nodig voor er iets mee gegenereerd wordt.",
+   "stappen": "1. Zeg of jij dit gedaan hebt.\n2. Zo ja: dan verwerk ik het als je O-16-antwoord en doe ik de licentiecontrole eerst.\n3. Zo nee: dan zoek ik uit wat het geschreven heeft voordat er één credit uitgaat.",
+   "opties": [
+    {
+     "label": "Ja, dat was ik — verwerk het",
+     "waarde": "owner_deed_dit",
+     "toelichting": "Ik behandel het als je O-16-antwoord.",
+     "gevolg": "Ik doe eerst de licentiecontrole op de vier bibliotheekstemmen, verwerk daarna de keuzes, en meld wat er dan vrijkomt. Er gaat geen credit uit voor je dat gezien hebt."
+    },
+    {
+     "label": "Nee, dat was ik niet",
+     "waarde": "niet_de_owner",
+     "toelichting": "Dan is er iets anders dat naar dit bestand schrijft.",
+     "gevolg": "Ik raak de casting niet aan en zoek eerst uit wat het geschreven heeft. Generatie blijft stil tot dat duidelijk is."
+    },
+    {
+     "label": "Ik weet het niet meer — draai het terug",
+     "waarde": "terugdraaien",
+     "toelichting": "Terug naar de stand van gisteravond.",
+     "gevolg": "kaine gaat terug naar zijn oude keuze en de twee nieuwe rollen worden weer leeg. O-16 blijft dan gewoon open staan en er is niets verloren."
+    }
+   ],
+   "advies": "Als jij het was: mooi, dan is de grootste blokkade weg en doe ik de licentiecontrole meteen. Als je het niet meer weet, is terugdraaien gratis — er is nog geen credit uitgegeven, dus er gaat niets verloren. Wat ik NIET doe is gokken, want dit is de enige beslissing in het project die na uitvoering niet meer te herstellen is zonder alles opnieuw te betalen.",
+   "vrijtekst": true
   }
  ]
 }
