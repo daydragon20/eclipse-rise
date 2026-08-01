@@ -14,7 +14,7 @@ turn:         "Mara names it as the third time this has happened, decides it is 
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        206
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----

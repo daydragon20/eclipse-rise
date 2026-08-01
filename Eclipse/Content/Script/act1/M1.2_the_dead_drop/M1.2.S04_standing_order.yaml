@@ -14,7 +14,7 @@ turn:         "Recovery of a stolen custodian key-token outranks cell suppressio
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .220-.250 bestaat ook als M1.7.S03.250 (zelfde document, zelfde beat, hier onvoorwaardelijk en groter); geen condition op een blok dat de beat-sheet optioneel noemt; Story.Clue.CustodianKey heeft twee gedeclareerde zetters; .240 zakt op 18.9 C2 en .120 op C3"
 words:        211
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----

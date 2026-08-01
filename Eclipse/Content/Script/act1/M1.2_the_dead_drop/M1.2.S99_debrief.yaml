@@ -14,7 +14,7 @@ turn:         "Voss proposes a target that is neither of theirs, and it is the o
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: flags-in noemt Story.Clue.CustodianKey die deze scene in nul condities leest, en .280 claimt een zetter die van S04 is. De tekst zelf is af; het zit uitsluitend in vier regels commentaar die onwaar zijn over hun eigen bestand"
 words:        354
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
