@@ -211,6 +211,22 @@ if ($LASTEXITCODE -ne 0) { $Failures += "documentcontrole kan niet meer rood wor
 python "$Root\Tools\check_owner_docs.py"
 if ($LASTEXITCODE -ne 0) { $Failures += "STATUS.md claimt een getal dat niet meer klopt" }
 
+# En de PREMISSEN onder de rulings. Op 01-08 bleek dat L1-R14 en L1-R21 allebei
+# redeneerden met "M1.5 is GO" terwijl alle zes bestanden `critic: null` droegen.
+# Voor L1-R21 gaf dat niets -- hij had nog twee andere gronden. Voor L1-R14 wel:
+# die had er EEN, en de uitzondering die erop stond hield "eleven days" als
+# verhoorduur in stand terwijl vijftien andere bestanden op dat getal geveegd
+# zijn -- waarvan een (M1.6.S03) zijn EIGEN getal inleverde om die regel te
+# beschermen. De fout is dus niet duur omdat een document ernaast zit, maar omdat
+# een ANDERE missie ervoor betaalt en niemand dat kan zien.
+#
+# Het is een keer met de hand nagelopen. Dat is precies wat veroudert: M1.5 is
+# sinds 01-08 geen `null` meer, en er komen rulings bij.
+python "$Root\Tools\check_ruling_premises.py" --zelftest
+if ($LASTEXITCODE -ne 0) { $Failures += "premissecontrole kan niet meer rood worden" }
+python "$Root\Tools\check_ruling_premises.py"
+if ($LASTEXITCODE -ne 0) { $Failures += "een ruling redeneert vanuit een poortstatus die de bestanden niet dragen" }
+
 # ---------------------------------------------------------- 4. de opnameronde
 if (-not $SkipShots) {
     Write-Step "OPNAMERONDE"
