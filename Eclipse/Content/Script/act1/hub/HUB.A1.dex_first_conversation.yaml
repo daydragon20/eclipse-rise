@@ -14,7 +14,7 @@ turn:         "The rifle turns out to be fine, which leaves them nothing to look
 
 # ---- state ----
 status:          draft
-critic:          "GO op 18.9 (scene) -- GEHOUDEN op de reeks. REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
+critic:          GO
 words:           124
 words_heard:     124
 words_generated: 167

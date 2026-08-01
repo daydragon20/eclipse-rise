@@ -14,11 +14,10 @@ turn:         "She makes him choose, then tells him what the Dominion's version 
 
 # ---- state ----
 status:          draft
-critic:          "GO op 18.9 (scene) -- GEHOUDEN op de reeks. REEKS NO-GO: negen van twaalf delen dezelfde motor (Voss benadert, personage buigt af), elf van twaalf sluiten op een taak over een voorwerp met de spreker terug aan het werk, en de drie voorgeschreven uitbrekers uit BEATS_HUB_A1 7.1 zijn geen van drieen gebouwd"
-words:           228
-words_heard:     170
-words_generated: 269
-
+critic:          GO
+words:           234
+words_heard:     176
+words_generated: 275
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      REYES, VOSS
 # condition: story.beat_m14_quartermaster == true
