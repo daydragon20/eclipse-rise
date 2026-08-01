@@ -15,9 +15,9 @@ turn:         "Somebody uses a name that was not a name an hour ago, it goes aro
 # ---- state ----
 status:          draft
 critic:          GO
-words:           224
-words_heard:     182
-words_generated: 252
+words:           228
+words_heard:     186
+words_generated: 256
 
 # ---- declared silence — RULING L1-R41 (02-08, story-architect) ----
 # The writer proposed this block, checked it against the checker's four conditions, and did
@@ -117,6 +117,14 @@ silence:
 # goes unanswered, and NOTHING here resolves P3-d. Cost is zero - nothing in this scene has
 # been generated. WRITER ACTION: rewrite .090 flat. L1 does not write the line.
 #
+# *** DONE 02-08 BY dialogue-writer. ONE LINE, .090. NOTHING ELSE IN THIS FILE MOVED. ***
+# The tail is gone and the claim is now a single past-tense accusation about one transaction
+# instead of a rule about the Veil. The two halves of the swapped slot sit in the same
+# register at last: .100 has a shift boss in a kitchen, .090 has somebody eating on the money,
+# and neither of them would survive being lifted out of this room. .110 stays the only
+# quotable one. Counts move by four spoken words: words 224 -> 228, words_heard 182 -> 186
+# (the default branch is the one words_heard counts), words_generated 252 -> 256.
+#
 # writer:    ANYONE WHO LETS ONE EXPLANATION WIN IN BEAT 4 DESTROYS TWIST 3.
 #            Half Voss variant set. He should speak less here than in any other debrief.
 
@@ -133,7 +141,7 @@ silence:
 # *** P3-d, AND WHY NOTHING WINS. ***
 # Three explanations reach the room and none of them is answered:
 #   .080  the intake        - Dex, who ran the ledger, cut off mid-sentence
-#   .090  the Veil's nets   - a fighter, eight flat words           [default branch]
+#   .090  the Veil's nets   - a fighter, twelve words, flat as of L1-R43 [default branch]
 #   .100  the man we let run - same slot, WARNED BRANCH ONLY         [swap, not addition]
 #   .110  luck              - a freed conscript, and it deflates the room
 # .120 is Reyes asking which one they act on, and NOBODY ANSWERS HER. The shot moves the
@@ -277,8 +285,8 @@ lines:
     voice:      eclipse_fighter_a
     condition:  'story.m15_shiftboss != "warned"'
     interrupts: true
-    text:       "The Veil buys people. That's the whole job."
-    note:       "EXPLANATION TWO, default branch. Replaced - not joined - by .100 in the warned branch. *** L1-R43: THIS LINE GOES FLAT, WRITER ACTION. *** `That's the whole job` is a generalising tail, so this slot reads as a maxim in the default branch and as plain speech in the warned branch (.100), which is the same slot. Keep the beat exactly: from the crowd, interrupting, unanswered. Take the polish off. The one quotable explanation the scene is allowed is .110, because there the epigram IS the deflation."
+    text:       "Somebody's eating this week on what the Veil paid for those names."
+    note:       "EXPLANATION TWO, default branch. Replaced - not joined - by .100 in the warned branch. *** L1-R43 DONE 02-08: THE LINE IS FLAT. *** The beat has not moved a step - same speaker, same interrupt, same slot, nobody answers it - and the figure is gone. Old text was a statement plus a generalising tail (`That's the whole job`), which is the shape L1-R17 is about; this is one sentence about one transaction, in the tense of a thing that happened. Measured against .100, which fills this slot in the warned branch: both are now a single specific claim with a concrete image in it (a kitchen there, a full stomach here), 13 words against 12. 18.9 C2 inverts as it should - there is no last sentence to delete, because the explanation IS the sentence, and deleting it takes the theory out of the room. It would look like nothing on a poster. The one quotable explanation the scene is allowed is still .110, where the epigram IS the deflation."
 
   - id:         M1.8.S99.100
     speaker:    FIGHTER_A

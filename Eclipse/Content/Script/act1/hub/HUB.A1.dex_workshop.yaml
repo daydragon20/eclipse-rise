@@ -16,9 +16,9 @@ turn:         "He finishes showing it to the man who is still standing there, an
 # ---- state ----
 status:          draft
 critic:          GO
-words:           172
-words_heard:     172
-words_generated: 196
+words:           173
+words_heard:     173
+words_generated: 197
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      DEX, MARA, VOSS
@@ -102,11 +102,19 @@ words_generated: 196
 # pronoun. WRITER ACTION - I do not write the word, and `words:` moves by one.
 # UNTIL IT IS DONE: `dialogue-critic` holds .070, not the file. Nothing else in this scene is
 # in question and the twelve-scene verdict does not turn on it.
+#
+# *** DONE 02-08 BY dialogue-writer. THE WORD IS `Medic's`, IN FRONT OF `room`. ***
+# Placed a clause before the pronoun rather than beside it: by the time `she` is spoken the
+# only person in the sentence is the one who has a room coming. A bare role noun with the
+# article dropped, which is his form at .040, .060 and .110, so it reads as Dex and not as a
+# repair. NO NAME, NO REASON, NO REACTION, NO SECOND PRONOUN, and no other text, shot or note
+# in the file changed. `words:` 172 -> 173, `words_heard` 172 -> 173, `words_generated`
+# 196 -> 197 (Dex is not doubled for gender; only Voss's four lines are).
 
 # ---- dialogue-writer notes (L2) — REBUILT 2026-08-01 AGAINST THE FORM A CONTRACT ----
-# band:      hub (12-35) as a ceiling (L1-R1). Longest 19 w (.010). Register reached at .010
-#            (19), .012 (14), .030 (12), .060 (12), .070 (18), .100 (17). Spread 1 w (.130
-#            "Seven.") to 19 w = 19x. Ceiling clear by sixteen words.
+# band:      hub (12-35) as a ceiling (L1-R1). Longest 19 w (.010 and, since L1-R54, .070).
+#            Register reached at .010 (19), .012 (14), .030 (12), .060 (12), .070 (19), .100
+#            (17). Spread 1 w (.130 "Seven.") to 19 w = 19x. Ceiling clear by sixteen words.
 # ids:       .012 .014 .016 .018 ARE INSERTIONS, not a renumber. Every pre-existing id keeps
 #            its speaker and its job (.020 Voss's first line, .050 his mechanism question,
 #            .080/.090 the interrupt pair, .120 the player beat, .130 the number). The row
@@ -265,9 +273,9 @@ lines:
   - id:      HUB.A1.dex_workshop.070
     speaker: DEX
     voice:   dex
-    text:    "Bench comes off first. Room goes there with a door, and she stops treating people on the floor."
+    text:    "Bench comes off first. Medic's room goes there with a door, and she stops treating people on the floor."
     shot:    "Third card down. His hands stop on the bench and stay there for the whole line. He is looking at Voss."
-    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private. *** L1-R54, WRITER ACTION, ONE WORD: the referent of `she` must be unambiguous the moment it is heard. Form A put Mara on stage six lines up and she is the freshest female referent in the room, which she was not when this line was written. Insert one word before `she` - a bare role noun sits inside Dex's article-dropping fingerprint - and change nothing else. NO NAME, NO REASON, NO REACTION. The line already identifies her by function; what it withholds is why, and that stays withheld."
+    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private. *** L1-R54 DONE 02-08, ONE WORD: `Medic's`, in front of `room`. *** It stands a clause BEFORE the pronoun instead of repairing it after, so the referent is already set while he is still talking about the room and `she` has nowhere else to go. Bare role noun, article dropped - his own form at .040, .060 and .110 - and it names nobody. The line always identified her by function; what it withholds is WHY, and that is untouched. No reason, no reaction, no second pronoun, and nothing else in this file moved."
 
   - id:      HUB.A1.dex_workshop.080
     speaker: VOSS
