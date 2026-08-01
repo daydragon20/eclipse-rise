@@ -23,12 +23,21 @@ EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 >    op Display gelogd en overgeslagen. **Owner-actie (O-3), bewust géén fallback** —
 >    terugvallen op stem A maakt de bar groen terwijl die acht regels nog steeds geen
 >    gekozen stem hebben.
-> 2. **`validate_script.py`** (nieuw, 01-08) — **5** bevindingen, waarvan twee de hele
->    tool waard zijn: `M1.1.S99` vertakt op drie uitkomsten en handelt er **twee** af
->    (`left` ontbreekt), `M1.6.S05` mist `split`. Plus vijf condities die door niemand
->    gezet worden. Die bevindingen bestonden allemaal al; er kon alleen niets naar
->    kijken. Zijn **zelftest draait ervóór** in de bar: zakt het bewijs dat de controles
->    rood kúnnen worden, dan is het oordeel over het script waardeloos.
+> 2. **`validate_script.py`** — **4** bevindingen, allemaal `REGISTER`. Dat is voor het
+>    eerst onder de vijf, en de twee die de tool zijn bestaan waard maakten zijn **weg**:
+>    `M1.1.S99` handelde twee van drie uitkomsten af, `M1.6.S05` miste `split`. De laatste
+>    vertakkingsfout — `M1.8.S99`, de slotscène — is op 02-08 gesloten met een **verklaarde
+>    stilte** in plaats van een geschreven tak, want de speler die geen pact sloot hóórt
+>    ook niets: dat is wat een geweigerde bondgenoot aan het eind van act 1 is. Er staan
+>    nu **twee bewust stille takken** zichtbaar in het rapport — doorgelaten, niet verdwenen.
+>
+>    De vier die overblijven zijn cutscenes die de ondergrens van hun band met één tot drie
+>    woorden missen. Drie ervan zijn onderzocht en **terecht rood**: hun verdedigende blokken
+>    zijn nagerekend en elke toetsbare claim erin klopt. Er naar 20 woorden toe schrijven is
+>    opvullen om een meter te halen.
+>
+>    Zijn **zelftest draait ervóór** in de bar: zakt het bewijs dat de controles rood kúnnen
+>    worden, dan is het oordeel over het script waardeloos.
 >
 > De vier `Eclipse.Base.Vault*`-tests die hier eerder als derde punt stonden zijn **groen**:
 > dat was in-flight werk en het is geland (`f3e5c0b`).
