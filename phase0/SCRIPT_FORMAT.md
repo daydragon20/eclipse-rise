@@ -214,8 +214,14 @@ Three namespaces were in circulation: this document's `mara_sovann`, the live ca
 |---|---|
 | Named characters | `mara` `dex` `reyes` `brick` `sela` `torren` `kaya` `whisper` `threx` `aegis` `vex` `kaine` `callis` |
 | Voss | **`voss`** — a logical key, resolved to `voss_m` / `voss_f` per player gender at build |
-| Role pools | `eclipse_fighter_a`…`_d` · `dominion_conscript_a`…`_c` · `veil_operative_a` `_b` |
+| Role pools | `eclipse_fighter_a` `_b` · **`iron_chorus_fighter_a` `_b`** · `dominion_conscript_a`…`_c` · `veil_operative_a` `_b` |
 | Not yet cast | `petra` · `iron_chorus_emissary` · `dominion_officer` · `civilian_kessara_a` `_b` — **owner questions Q-3/Q-4/Q-5, blocking for Tier 2** |
+
+#### Role pools are per FACTION, not per job — RULING L1-R30
+
+`eclipse_fighter_c` and `_d` are **retired**. All eight of their lines were Iron Chorus people and they now carry `iron_chorus_fighter_a` / `_b`. §18.5 rule 5 makes faction identity a property of the *voice*, and the rival cell that M1.5 exists to make audible was drawing from Ember's pool.
+
+**A pool key names the faction that fields the speaker, never the job he is doing.** Two factions with the same job description — a fighter — are two pools. If you need a rifle-carrier for a group that has no pool, that is an owner question (a casting row), not a key you borrow from the nearest pool that resolves. Borrowing resolves cleanly and generates the wrong voice, which is the one failure mode nothing downstream can see.
 
 **Renaming a `voice` key costs nothing, and this was measured, not assumed.** `EclipseGenerateVoicesCommandlet.cpp:325` builds the cache key from `Voice->ElevenLabsVoiceId`, not from the script-side key:
 
@@ -228,13 +234,17 @@ The indirection this document promised is real. The actual risk is not cache inv
 
 ### `speaker` — role speakers — RULING L1-R6
 
-A pure glossary check can never pass, because `ACT1_OVERVIEW.md` AR-1 and AR-10 deliberately keep Ember's rank and file nameless. Speaker is valid if it is a glossary name, **or** matches `^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER)_[A-Z]$`, **or** is a named-role token from this list:
+A pure glossary check can never pass, because `ACT1_OVERVIEW.md` AR-1 and AR-10 deliberately keep Ember's rank and file nameless. Speaker is valid if it is a glossary name, **or** matches `^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER|CHORUS)_[A-Z]$`, **or** is a named-role token from this list:
 
 | Role token | Who |
 |---|---|
 | `EMISSARY` | the Iron Chorus emissary (§18.4 row; owner question Q-4 may still give him a proper name) |
 
 **Amended 2026-07-31 (L1-R6b), on a correct escalation from the M1.5 writer.** The original pattern justified itself on AR-1/AR-10, which are about Ember's *rank and file* — that reasoning never covered the second lead of a dialogue mission. Burying him in `FIGHTER_C` would have made sixty lines unreadable for the strip test, which is the one test that scene exists to pass. A named unnamed character is not a contradiction: he has a role, and his refusal to give names is his §18.4 "never".
+
+**Amended 2026-08-01 (L1-R30). `CHORUS_A` `CHORUS_B` are the Iron Chorus's two fighters.** Read the alternation as what it already was: `VEIL` is a faction, `CONSCRIPT` is a faction's rank, `CIVILIAN` and `PRISONER` are nobody's. **`FIGHTER` was the only token that meant one faction without saying so** — it meant Ember — and the first mission to put a second cell's riflemen on screen had nowhere else to put them. "The Chorus" is how the script already refers to them out loud (`M1.8.S99.040`); this is not a new name.
+
+A token that cannot say which side is speaking is not a label, it is a coin-flip the critic has to resolve from context. Where a scene fields two factions doing the same job, the token says which — as it does for `VEIL_A` today.
 
 Anything else fails — including a near-miss on a canon name, which is the failure the check exists to catch.
 
@@ -436,9 +446,11 @@ variants:
     text:  "They got {name}. Push up, push up!"
 
   - id:    BARK.SQ.MD.030
-    voice: eclipse_fighter_c
+    voice: eclipse_fighter_a
     text:  "{name}! Talk to me!"
 ```
+
+> **Why the third variant repeats register A.** Ember's pool is two registers, not four: L1-R30 retired `eclipse_fighter_c` / `_d` to the Iron Chorus, following the casting the voice-director actually made. A 6–12 variant set therefore reuses A and B, which is legal — §18.5 rule 1 counts *variants*, not voices. **It is also thin**, and whether Ember's rank and file deserve a third and fourth voice is a casting question (more slots, more owner picks), not a writing one. Flagged in L1-R30; do not solve it by borrowing another faction's pool.
 
 **Rules:**
 - `trigger` must be a real event from `Eclipse/Docs/EventCatalog.md`. A bark set pointing at a non-existent event fails the critic. If the event does not exist yet, that is a systems task, not a writing task — escalate, do not invent.

@@ -58,6 +58,13 @@ words:        613
 # goes the other way: EMISSARY -> FIGHTER_C, and shift the two fighters to _D and _E.
 # Generation is NOT at risk either way - `voice: iron_chorus_emissary` resolves today.
 #
+# CLOSED 2026-07-31 by L1-R6b: EMISSARY is in the alternation, the writer was right, and his
+# fingerprint went into 18.4 verbatim. Q-4 (a proper name) stays open and stays optional.
+# THE PATTERN QUOTED ABOVE IS STALE - it is what L1-R6 said on 31-07. Current, per L1-R30:
+# ^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER|CHORUS)_[A-Z]$, or EMISSARY.
+# THE FALLBACK IN THE LINE ABOVE IS NOW FORBIDDEN, not merely unused: putting the emissary on
+# FIGHTER_C would re-file the rival cell under Ember's token, which is the whole of L1-R30.
+#
 # *** ESCALATION 2 - IRON CHORUS FIGHTER VOICES. ***
 # L1-R5's table has no iron_chorus_fighter_* key, so the two fighters carry
 # eclipse_fighter_c / _d, which resolve. That is the CHEAP answer the beat sheet section 10
@@ -65,6 +72,13 @@ words:        613
 # (.220, .480) and four across the mission are doing faction-differentiation work, and .220
 # in particular is the line that stops the emissary's boast being a boast. Reported, not
 # quietly settled.
+#
+# CLOSED 2026-08-01 by L1-R30, and the escalation was right on every point. The voice-director
+# took the BETTER answer of beat sheet section 10, not the cheap one: these two are cast as the
+# rival's people (owner card O-16, slot C "she belongs to the Iron Chorus, not to you"). So the
+# keys moved with the casting - `iron_chorus_fighter_a` / `_b`, and `speaker: CHORUS_A` / `_B`.
+# Ember's `eclipse_fighter_c` / `_d` are retired, not aliased. Cost: zero, nothing generated.
+# Still open and NOT blocked by this: those two slots have no bound voice until O-16.
 #
 # band:      hub (12-35), ceiling respected (max 20 w). Register reached repeatedly.
 # spread:    1 w (.190 "Nobody.") to 20 w (.210 / .460) = 20x.
@@ -217,10 +231,10 @@ lines:
     text:    "We hold a man three months before he carries anything heavier than a message. Three months. We still lost two."
 
   - id:      M1.5.S02.220
-    speaker: FIGHTER_C
-    voice:   eclipse_fighter_c
+    speaker: CHORUS_A
+    voice:   iron_chorus_fighter_a
     text:    "Three."
-    note:    "His own fighter corrects the count upward. It stops the boast being a boast and turns it into a bill - what three months of discipline still costs. See L2 escalation 2 on the voice key."
+    note:    "His own fighter corrects the count upward. It stops the boast being a boast and turns it into a bill - what three months of discipline still costs. Speaker and voice keys are the rival cell's own (L1-R30); escalation 2 is closed."
 
   - id:      M1.5.S02.230
     speaker: EMISSARY

@@ -11,7 +11,15 @@
   "",
   "`slot` picks which voice inside a multi-voice role (bark registers A/B/C/D).",
   "`variants` means one script key ships in several cast voices -- Voss is written",
-  "once and voiced per player gender, so those lines cost double."
+  "once and voiced per player gender, so those lines cost double.",
+  "",
+  "RULING L1-R30: `eclipse_fighter_c` and `_d` are RETIRED, not aliased. Their",
+  "eight lines were all Iron Chorus and now carry `iron_chorus_fighter_a` / `_b`.",
+  "They are not re-added as aliases, and that is the point: an alias is two keys",
+  "on one ROLE (dex / dex_callum are one man), but these are two keys on one",
+  "role+SLOT -- and the collision check groups by `role:slot`, so it would never",
+  "see two factions sharing one voice. A silent share is the exact defect this",
+  "file exists to prevent."
  ],
  "map": {
   "mara_sovann": {
@@ -64,6 +72,16 @@
   "iron_chorus_emissary": {
    "role": "iron_chorus_emissary"
   },
+  "iron_chorus_fighter_a": {
+   "role": "eclipse_fighter",
+   "slot": "C",
+   "note": "The rival cell's two people, not Ember's (RULING L1-R30). The ROLE stays `eclipse_fighter` on purpose while O-16 is open: the owner's proposal offers slot C (Beth) and slot D (Arric) under that role id, and resolve_casting_choice.py derives slots_needed from THIS file. Retargeting the role now would leave the owner's button pointing at nothing. Splitting the role is the second half of L1-R30 and it is an owner file."
+  },
+  "iron_chorus_fighter_b": {
+   "role": "eclipse_fighter",
+   "slot": "D",
+   "note": "See iron_chorus_fighter_a."
+  },
   "voss": {
    "variants": [
     "voss_m",
@@ -77,14 +95,6 @@
   "eclipse_fighter_b": {
    "role": "eclipse_fighter",
    "slot": "B"
-  },
-  "eclipse_fighter_c": {
-   "role": "eclipse_fighter",
-   "slot": "C"
-  },
-  "eclipse_fighter_d": {
-   "role": "eclipse_fighter",
-   "slot": "D"
   },
   "dominion_conscript_a": {
    "role": "dominion_conscript",

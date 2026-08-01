@@ -205,15 +205,16 @@ lines:
     note:      "He is right a fourth time. Deferring keeps everybody alive tonight and it is also the option he can take apart."
 
   - id:        M1.5.S04.170
-    speaker:   FIGHTER_C
-    voice:     eclipse_fighter_c
+    speaker:   CHORUS_A
+    voice:     iron_chorus_fighter_a
     condition: 'story.m15_shiftboss != "killed"'
     text:      "Tuesday."
     shot:      "She says it on her way past the shift boss, and not to him."
+    note:      "L1-R30: the rival cell's own keys. The `shot` fixes her as a woman and she is the same person as S02.220 and S05.050/.100 - one Iron Chorus fighter across four scenes, not a pool draw."
 
   - id:      M1.5.S04.180
-    speaker: FIGHTER_D
-    voice:   eclipse_fighter_d
+    speaker: CHORUS_B
+    voice:   iron_chorus_fighter_b
     text:    "Lights on the row. Both ends."
 
   - id:      M1.5.S04.190

@@ -76,6 +76,31 @@ De ledger sluit op de cent.
 hij uit cache had moeten komen, betekent dat tekst of een audio-tag is veranderd —
 zoek uit wát vóór je opnieuw draait.*
 
+### 2026-08-01 — Twee stemsleutels hernoemd, nul credits (L1-R30) + één datataak die pas ná O-16 kan
+
+**Delta 0, en niet omdat het gemeten is maar omdat er niets te meten valt:** er is nog geen
+seconde audio. `eclipse_fighter_c` / `_d` droegen acht regels, alle acht Iron Chorus, alle acht
+in M1.5. Ze heten nu `iron_chorus_fighter_a` / `_b` (`speaker: CHORUS_A` / `_B`). Ook ná
+generatie zou dit gratis zijn geweest — de cachesleutel hasht de ElevenLabs-ID, niet de
+scriptsleutel (L1-R5) — maar dat argument is hier niet nodig.
+
+**Wat er voor jou verandert: niets aan de knop.** De twee sleutels wijzen nog steeds naar
+`eclipse_fighter` slot **C** en **D**, precies waar O-16's voorstel Beth en Arric aanbiedt, en
+`resolve_casting_choice.py` leidt `slots_needed` uit `VoiceKeyMap.json` af. `check_voice_resolves`
+blijft dus rood op dezelfde twee onbezette slots, nu onder de nieuwe namen.
+
+> **DATATAAK, pas uitvoerbaar ná O-16, en hij mag niet zoekraken.** De *rol* heet nog
+> `eclipse_fighter` terwijl slot C en D de rivaal zijn — het label in `CASTING_RESOLVED.json`
+> is `"Eclipse-fighter A/B/C/D"`. Zodra de owner O-16 heeft beantwoord: splits die twee slots
+> af naar een eigen rol `iron_chorus_fighter` (A/B) en zet de sleutels erop. Gratis, om dezelfde
+> reden als hierboven. **Gebeurt dit niet, dan draagt de castingtabel voor de rest van het
+> project de naam van de verkeerde factie.**
+>
+> **En één gevolg dat niemand gekozen heeft:** met C en D bij de Chorus houdt Ember **twee**
+> barkregisters over in plaats van vier. §18.5 vraagt 6–12 varianten per trigger en verbiedt
+> redundantie. Of Ember een derde en vierde stem krijgt, is een castingvraag — geen schrijfvraag,
+> en zeker geen reden om weer uit de pool van een andere factie te lenen.
+
 ### 2026-08-01 — M1.1 stond klaar om ingesproken te worden en is NIET gegenereerd
 
 **Gemeten saldo vóór: 125.612. Gemeten saldo ná: 125.612. Delta 0.**

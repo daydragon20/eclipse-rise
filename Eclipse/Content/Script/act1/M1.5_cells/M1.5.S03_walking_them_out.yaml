@@ -36,8 +36,10 @@ words:        226
 #            version of himself that would have liked Ember.
 
 # ---- dialogue-writer notes (L2) ----
-# format:    L1-R1 / L1-R5 / L1-R6 applied. Speaker EMISSARY is escalated in S02's L2 notes;
-#            the Iron Chorus fighter carries eclipse_fighter_d, same escalation.
+# format:    L1-R1 / L1-R5 / L1-R6 applied. Speaker EMISSARY was escalated in S02's L2 notes
+#            and closed by L1-R6b. The Iron Chorus fighter was the second half of that
+#            escalation and is closed by L1-R30: CHORUS_B / iron_chorus_fighter_b, the rival
+#            cell's own keys. He is the same man as S04.180 and S05.070/.160.
 # band:      walk-and-talk (10-25). Ceiling respected (max 20 w), register reached at .030.
 # spread:    1 w (.010 / .210) to 20 w (.140) = 20x.
 # mara:      one word (.010), then gone. She is forty metres back and hears none of this.
@@ -122,8 +124,8 @@ lines:
     text:    "Then somebody else stands where I'm standing."
 
   - id:      M1.5.S03.110
-    speaker: FIGHTER_D
-    voice:   eclipse_fighter_d
+    speaker: CHORUS_B
+    voice:   iron_chorus_fighter_b
     tags:    [quietly]
     text:    "Light on the corner. Wardens."
     shot:    "The whole column steps into a doorway without anybody giving an order. Ember is half a beat slower."

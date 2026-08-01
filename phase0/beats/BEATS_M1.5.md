@@ -166,4 +166,6 @@ Dat is meteen de belangrijkste schrijfopdracht van deze missie: **de Iron Chorus
 ## 10. Barks
 
 **Nieuw: Veil-vocabulaire** (kalm, klinisch, doelgericht) en **Iron Chorus-vocabulaire.** Voor de Iron Chorus is de goedkope oplossing hergebruik van de Eclipse-fighterstem met andere regels; de betere oplossing is een eigen registerkeuze. Dat is een `voice-director`-afweging binnen tier 1 en hij hoort hier gemeld te worden, niet stil opgelost.
+
+> **BESLIST 01-08 — de betere oplossing, en de sleutels zijn meegegaan (L1-R30).** De `voice-director` heeft de twee Iron Chorus-vechters gecast als mensen van de emissaris (owner-kaart **O-16**, slot C: *"zij hoort bij de Iron Chorus, niet bij jou"*), niet als Ember. De acht regels dragen nu `iron_chorus_fighter_a` / `_b` en `speaker: CHORUS_A` / `CHORUS_B`; `eclipse_fighter_c` / `_d` zijn ingetrokken. Kosten: nul — er is niets gegenereerd. **Wat de melding hier waard was:** de schrijver heeft dit als escalatie 2 in `M1.5.S02` gemeld in plaats van het stil te laten staan, en zonder die melding was de enige scène die twee cellen hoorbaar uit elkaar moet houden (S05) in vier identieke stemmen verscheept.
 </content>

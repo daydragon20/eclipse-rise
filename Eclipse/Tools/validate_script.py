@@ -569,7 +569,12 @@ CHOICE_REQUIRED = ("group", "set")
 CHOICE_OPTIONAL = ("label", "__line__")
 AXES = ("pragmatist", "idealist", "personal", "strategic")
 
-ROLE_SPEAKER = re.compile(r"^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER)_[A-Z]$")
+# CHORUS added by L1-R30. The alternation was already a faction vocabulary
+# everywhere except FIGHTER, which silently meant Ember -- so the first scene
+# with a second cell's riflemen in it had nowhere to put them and took Ember's
+# token and Ember's voice pool with it.
+ROLE_SPEAKER = re.compile(
+    r"^(FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|PRISONER|CHORUS)_[A-Z]$")
 NAMED_ROLE = {"EMISSARY"}          # L1-R6b
 COND_GRAMMAR = re.compile(r'^(story|run)\.[a-z0-9_]+\s*(==|!=)\s*(".*?"|true|false)$')
 SET_GRAMMAR = re.compile(r'^(story|run)\.[a-z0-9_]+\s*=\s*(".*?"|true|false)$')
@@ -739,8 +744,8 @@ class Validator:
                     or speaker in NAMED_ROLE):
                 self.add("SPEAKER", at,
                          f"{lid}: speaker `{speaker}` is not a canon name and not a role "
-                         "speaker (L1-R6: FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|"
-                         "PRISONER + _A..Z, or EMISSARY)")
+                         "speaker (L1-R6/R30: FIGHTER|CONSCRIPT|VEIL|CIVILIAN|OFFICER|"
+                         "PRISONER|CHORUS + _A..Z, or EMISSARY)")
 
         tags = it.get("tags") or []
         if isinstance(tags, str):

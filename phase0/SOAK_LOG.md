@@ -213,3 +213,5 @@ Zonder de rode nachten is `drie nachten achtereen` niet te bewijzen.
 | 2026-08-01 00:54 | `be0a7af` | **ROOD** | 237 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
 | 2026-08-01 01:29 | `9b87943` | **ROOD** | 244 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
 | 2026-08-01 01:34 | `f90c4c8` | **ROOD** | 244 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 02:11 | `30ff4bb` | **ROOD** | 247 tests / 0 gefaald / 0 niet gedraaid | 0 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen |
+| 2026-08-01 02:22 | `cd516a0` | **ROOD** | 247 tests / 0 gefaald / 0 niet gedraaid | 26 | scriptstem komt nergens op uit; scriptvalidatie meldt bevindingen; een owner-kaart vraagt iets dat niet kan; STATUS.md claimt een getal dat niet meer klopt [beeld: 2 beeld(en) VERANDERD -> stap 4, stap 7] |

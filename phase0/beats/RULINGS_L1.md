@@ -693,9 +693,76 @@ Twee dingen die hij niet kon zien en die ik erbij zet:
 
 ---
 
-## Wat deze ronde niet heeft opgelost, expliciet
+## Wat ronde 5 niet heeft opgelost, expliciet
 
-- **Ik heb `validate_script.py` niet kunnen draaien** in deze sessie (geen shell). Elke wijziging die ik in een scènebestand heb gemaakt is daarom beperkt tot commentaarblokken en één scalaire `turn:`-string, en ik heb de parser gelezen om te bevestigen dat beide categorieën door de bestaande tak lopen. **Wie hierna het eerst een shell heeft, draait `python Eclipse/Tools/validate_script.py --no-voice` en meldt het resultaat** — dat is een controle die ik verschuldigd ben, niet een formaliteit.
+- **Ik heb `validate_script.py` niet kunnen draaien** in die sessie (geen shell). Elke wijziging die ik in een scènebestand heb gemaakt is daarom beperkt tot commentaarblokken en één scalaire `turn:`-string, en ik heb de parser gelezen om te bevestigen dat beide categorieën door de bestaande tak lopen. **Wie hierna het eerst een shell heeft, draait `python Eclipse/Tools/validate_script.py --no-voice` en meldt het resultaat** — dat is een controle die ik verschuldigd ben, niet een formaliteit.
 - **L1-R28 is gespecificeerd, niet actief.** De toolwijziging gaat vóór de adoptie.
 - **`M1.5.S99.050`/`.060` in de `none`-tak** — gemeld in L1-R24, niet beslist, op de act-1-continuïteitsdoorloop.
 - **`M1.4.S99`'s registerdrempel** (langste 19 tegen 20) — gemeld in L1-R22, niet beslist; scènevraag.
+
+---
+
+## Ronde 6 — 2026-08-01, een naamleugen in de stemsleutels
+
+### L1-R30 — De Iron Chorus krijgt eigen stemsleutels. Een rolpool noemt een **factie**, geen beroep
+
+**Gemeten, niet aangenomen, en de meting is de hele ruling.** `eclipse_fighter_c` en `eclipse_fighter_d` dragen in het hele corpus **acht regels, en alle acht staan in M1.5** — in de mond van mensen van de rivaal:
+
+| Sleutel | Regels | Waar |
+|---|---|---|
+| `eclipse_fighter_c` | 4 | `M1.5.S02.220` · `S04.170` · `S05.050` · `S05.100` |
+| `eclipse_fighter_d` | 4 | `M1.5.S03.110` · `S04.180` · `S05.070` · `S05.160` |
+
+Geen enkele Ember-vechter gebruikt ze. **De bestanden zeggen het zelf**, en dat is wat dit van een smaakkwestie tot een fout maakt:
+
+> `M1.5.S03` r. 40 — *"the Iron Chorus fighter carries `eclipse_fighter_d`"*
+> `M1.5.S02` bij `.220` — *"**His own** fighter corrects the count upward"*, waarbij die *"his"* de emissaris is
+> `M1.5.S05` L2-blok — *"IRON CHORUS numbers, never names. EMBER names. That is the audible difference between two cells fighting in one street."*
+
+**Het onderscheid stond in de wóórden en werd door de sleutels ongedaan gemaakt.** S05 is de enige scène in act 1 die twee cellen in één straat laat vechten; hij is er letterlijk voor gebouwd. Met vier stemmen uit Embers pool zou `.050` (*"Two, screen. Three, door."*) tegenover `.060` (*"Brick, left side!"*) — vier woorden uit elkaar, de wending van de scène — in **dezelfde stem** hebben geklonken. §18.5 regel 5 hangt factie-identiteit expliciet aan de stem: *"Same trigger, three vocabularies."* Er zijn er hier vier, en de vierde had er geen.
+
+**Dit is geen cosmetica en het is geen hernoeming om de netheid.** Het is het enige onderscheid dat de speler in S05 kan hóren.
+
+**De beslissing zelf was niet van mij, en dat is de juiste volgorde geweest.** De M1.5-schrijver meldde het als escalatie 2 en noemde het een `voice-director`-beslissing; `BEATS_M1.5` §10 noemde precies deze afweging (*"de goedkope oplossing is hergebruik van de Eclipse-fighterstem; de betere is een eigen registerkeuze"*). De `voice-director` heeft de **betere** gekozen en het staat op owner-kaart **O-16**, met de reden erbij: slot C is *"een vrouw... en zij hoort bij de Iron Chorus, niet bij jou"*, slot D is *"hoorbaar iemand anders dan C en dan de emissaris"*. De voorstelbestanden heten al `02_Iron-Chorus-vechter_C_VOORSTEL_...`. **De casting was dus al eerlijk; alleen de sleutels logen nog.** Data hoort achter een genomen besluit aan te lopen, anders spreekt de kaart het script tegen.
+
+**Ruling, in vier delen.**
+
+**1. Twee nieuwe sleutels: `iron_chorus_fighter_a` en `_b`.** Doorgevoerd in `SCRIPT_FORMAT` §4 en in `VoiceKeyMap.json`. De acht regels zijn omgezet (C→A, D→B; de letter blijft gelijklopen met de sprekertoken, zoals hij nu ook doet).
+
+**2. De sprekertokens gaan mee: `CHORUS_A` / `CHORUS_B`.** Dit was de vraag die aan mij gesteld werd, en het antwoord is ja, om twee redenen.
+
+De eerste is dat de alternatie van L1-R6 **al een factievocabulaire was**, overal behalve op één plek. Nageteld: `VEIL` is een factie, `CONSCRIPT` is een rang binnen een factie, `CIVILIAN` en `PRISONER` zijn van niemand. **`FIGHTER` was het enige token dat één factie betekende zonder het te zeggen** — het betekende Ember — en de eerste missie met de geweerdragers van een tweede cel erin had daardoor geen plek om ze te zetten. Ze namen Embers token, en met het token namen ze Embers stempool. Dat is niet een schrijver die slordig was; dat is een vocabulaire met een gat erin.
+
+De tweede reden is dwingender en hij gaat over wat er gebeurt als je het hálf doet. Alleen `voice:` omzetten laat dit staan:
+
+```yaml
+speaker: FIGHTER_C
+voice:   iron_chorus_fighter_a
+```
+
+Acht keer, op aangrenzende regels, en het leest als een bug. Iemand repareert dat — en hij repareert het de verkeerde kant op, terug naar `eclipse_fighter_c`, omdat `FIGHTER_C` er gezaghebbender uitziet dan een sleutel die hij niet kent. **Een halve rename is geen halve verbetering maar een uitnodiging tot terugdraaien.**
+
+*"De Chorus"* is geen verzonnen naam: `M1.8.S99.040` zegt het hardop — *"Three cells and one door out. The Chorus sleeps somewhere else."*
+
+**Toolwijziging vóór adoptie, zoals L1-R28 het voorschrijft:** `CHORUS` is toegevoegd aan `ROLE_SPEAKER` in `validate_script.py` (die alternatie staat **hardcoded** in de tool, niet in het document — dat heb ik nagekeken, niet aangenomen) en aan de tekst in `SCRIPT_FORMAT` §4. Zonder die twee regels zakken de acht regels op SPEAKER.
+
+**3. Géén aliaspaar, en de reden is machinaal.** De vraag was of `eclipse_fighter_c` als alias moest blijven staan zoals `dex` / `dex_callum`. Nee — en `alias_of` is daarbij een rode haring: **dat veld wordt door geen enkele tool gelezen.** Wat een alias een alias maakt, is dat twee sleutels dezelfde **rol** dragen. Voor `dex` / `dex_callum` is dat veilig: het is één man. Hier zouden twee sleutels dezelfde **rol + slot** dragen, en de botsingscontrole in `check_voice_resolves.py` groepeert op `role:slot` — twee facties op één stem zouden er dus **niet** uitkomen. Een alias die precies het defect verbergt waarvoor de controle herbouwd is, is geen vriendelijkheid. **De twee oude sleutels zijn ingetrokken, met de reden in het bestand.**
+
+**4. De rol blijft `eclipse_fighter`, slot C en D — en dat is bewust half.** De sleutel is van mij; de rol staat in `CASTING_RESOLVED.json` en dat is de owner-knop. Belangrijker: **`resolve_casting_choice.py` leidt `slots_needed` af uit `VoiceKeyMap.json`**, en O-16's voorstel biedt Beth en Arric aan ónder `eclipse_fighter:C` en `:D`. Had ik hier een verse rol `iron_chorus_fighter` neergezet, dan wees de knop die de owner straks indrukt nergens meer heen en bleven de acht regels na O-16 nog steeds stil. **Een opruimactie die de openstaande owner-actie breekt, is duurder dan de rommel.** Het rolsplitsing-deel hoort bij O-16 en is daarna alsnog gratis (de cachesleutel hangt aan de stem-ID, L1-R5).
+
+**Kosten: nul, en dat is gemeten en niet aangenomen.** Er is geen seconde audio; O-16 blokkeert alle generatie. Ná generatie zou het óók gratis zijn — `EclipseGenerateVoicesCommandlet.cpp:325` hasht de opgeloste ElevenLabs-ID, niet de scriptsleutel — maar dat argument heb ik niet nodig.
+
+**Wat dit openlegt en wat ik niet zelf beslis: Embers barkpool is nu twee registers, geen vier.** Dat is geen gevolg van deze ruling maar van de casting die eronder ligt — O-16 geeft C en D aan de Chorus. §18.5 vraagt 6–12 varianten per trigger en regel 4 verbiedt redundantie; twee stemmen voor Embers hele gelederen is dun. **Of Ember een derde en vierde stem verdient, is een castingvraag (meer slots, meer owner-keuzes), geen schrijfvraag.** Gemeld, niet opgelost, en in `SCRIPT_FORMAT` §5 gezet waar een barkschrijver hem tegenkomt — met de uitdrukkelijke regel dat je hem **niet** oplost door de pool van een andere factie te lenen. Dat is namelijk precies hoe deze fout ontstond.
+
+**Escalatie 1 in `M1.5.S02` heb ik in dezelfde beurt afgesloten.** Hij was op 31-07 beslist door L1-R6b en stond nog open in het bestand — inclusief een *"zero-cost fallback"* die de emissaris naar `FIGHTER_C` zou verhuizen. Die uitweg is nu verboden in plaats van ongebruikt: hij zou de rivaal opnieuw onder Embers token schuiven. **Een afgehandelde escalatie die open blijft staan, is een instructie aan de volgende schrijver.**
+
+---
+
+## Wat ronde 6 niet heeft opgelost, expliciet
+
+- **Ik heb de twee controles opnieuw niet kunnen draaien** (geen shell, tweede keer op rij). Ik heb in plaats daarvan `validate_script.py`, `check_voice_resolves.py` en `resolve_casting_choice.py` gelézen en de uitkomst daaruit afgeleid; dat is een afleiding en geen meting, en zo staat het ook in mijn rapport. **De eerstvolgende met een shell draait beide en meldt het.** Wat ik verwacht: `validate_script.py --no-voice` blijft op **5 bevindingen** (4 REGISTER, 1 BRANCH — geen enkele check die ik heb aangeraakt telt mee), en `check_voice_resolves.py` blijft **rood** met de nieuwe sleutelnamen in de melding (`iron_chorus_fighter_a/_b → eclipse_fighter slot C/D, unbound`) plus de drie botsingen. **Wijkt dat af, dan is deze ruling het probleem en niet de tool.**
+- **De rolsplitsing hoort bij O-16 en is niet gedaan.** `eclipse_fighter:C/D` heten nog Ember terwijl ze de Chorus zijn. Bewust: het is een owner-bestand en de knop staat op scherp. Daarna gratis.
+- **Embers barkpool is twee registers.** Gemeld in deel 4 hierboven, castingvraag, niet beslist.
+- **`M1.5` staat in dit log twee keer als GO** (L1-R14, L1-R21: *"M1.5 is GO en wordt niet heropend"*), maar gemeten dragen alle zes de scènebestanden `status: draft` / `critic: null`. Twee eerdere rulings hebben dus op een toestand geleund die de bestanden niet dragen. **Niet door mij op te lossen** — een verdict zetten is het veld van `dialogue-critic`. Gemeld, en het staat op de act-1-continuïteitsdoorloop.
+- **Q-4 (een eigen naam voor de emissaris) blijft open** en blijft optioneel; L1-R6b maakte hem al minder dringend en L1-R30 verandert daar niets aan.
+- **Nog open uit ronde 5:** L1-R28 (gespecificeerd, niet actief), `M1.5.S99.050`/`.060` in de `none`-tak, en `M1.4.S99`'s registerdrempel.
