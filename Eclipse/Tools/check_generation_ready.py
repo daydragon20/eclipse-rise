@@ -5,9 +5,13 @@
 WAAROM DIT BESTAAT
 ------------------
 `count_generation_cost.py` telt het hele corpus. Dat is het juiste antwoord op
-"wat kost act 1", en het is 97.275 credits. Maar het wordt gelezen als "wat sta
-ik op het punt uit te geven", en dat is een ander getal -- want een deel van die
-regels staat achter een dichte poort of achter een ongecaste stem.
+"wat kost act 1". Maar het wordt gelezen als "wat sta ik op het punt uit te
+geven", en dat is een ander getal -- want een deel van die regels staat achter
+een dichte poort of achter een ongecaste stem.
+
+(Hier stond het bedrag zelf, en het was binnen een nacht drie keer verlopen: elke
+scenereparatie verplaatst het. Dat is precies waar deze tool over gaat, dus het
+getal hoort er niet in. Draai hem.)
 
 Dat is precies het patroon dat dit project al vaker geld had kunnen kosten: een
 instrument dat iets anders meet dan waarvoor het gelezen wordt. Deze tool bouwt
