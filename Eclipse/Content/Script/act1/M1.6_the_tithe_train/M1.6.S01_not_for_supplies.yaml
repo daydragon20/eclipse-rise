@@ -14,7 +14,7 @@ turn:         "Brick speaks first, for the only time in the act, and after that 
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        229
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----

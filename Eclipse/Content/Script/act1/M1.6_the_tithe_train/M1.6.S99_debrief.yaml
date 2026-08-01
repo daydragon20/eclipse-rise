@@ -14,7 +14,7 @@ turn:         "Voss picks the smallest of her three words, and it sticks."
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        275
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----

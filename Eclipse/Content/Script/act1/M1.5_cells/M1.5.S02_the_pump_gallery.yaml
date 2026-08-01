@@ -14,7 +14,7 @@ turn:         "He offers an alliance on one condition, and the condition is a na
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        613
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----

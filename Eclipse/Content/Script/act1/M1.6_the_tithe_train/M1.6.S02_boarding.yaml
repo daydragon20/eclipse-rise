@@ -14,7 +14,7 @@ turn:         "The guards defend the empty cars, which tells Ember exactly where
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        134
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----

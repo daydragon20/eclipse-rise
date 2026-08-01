@@ -14,7 +14,7 @@ turn:         "He tells Voss something about Mara's earlier refusals that Mara d
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       "NO-GO: .230/.240/.250 zetten elf naast .150 als verhoorduur; de M1.5-uitzondering van L1-R14 steunt alleen op GO en die staat er niet. Herbevestigt L1 hem op andere grond, dan is dit ongewijzigd GO"
 words:        226
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----

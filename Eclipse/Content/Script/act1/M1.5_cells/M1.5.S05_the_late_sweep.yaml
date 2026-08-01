@@ -14,7 +14,7 @@ turn:         "The Iron Chorus fights the way they have survived — and Ember s
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        132
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----

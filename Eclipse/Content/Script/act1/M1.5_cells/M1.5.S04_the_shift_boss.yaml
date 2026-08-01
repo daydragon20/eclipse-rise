@@ -14,7 +14,7 @@ turn:         "Voss decides, and whichever way he decides, one of the two cells 
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        291
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----

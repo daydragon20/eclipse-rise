@@ -14,7 +14,7 @@ turn:         "She admits the third invitation was not hers — it was theirs, a
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        259
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----

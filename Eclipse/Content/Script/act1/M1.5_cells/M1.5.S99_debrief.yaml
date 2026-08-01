@@ -14,7 +14,7 @@ turn:         "She ratifies his decision without endorsing it, and tells the roo
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        344
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.5.md ----

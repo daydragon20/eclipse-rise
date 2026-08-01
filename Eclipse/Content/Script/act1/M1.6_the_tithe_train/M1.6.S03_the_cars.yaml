@@ -14,7 +14,7 @@ turn:         "Sela stops arguing with Voss and starts arguing with them, and wi
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        256
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----

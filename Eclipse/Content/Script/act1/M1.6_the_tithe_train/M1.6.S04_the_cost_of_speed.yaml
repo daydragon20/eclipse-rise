@@ -14,7 +14,7 @@ turn:         "He chooses, and Sela prices the choice before he has finished mak
 
 # ---- state ----
 status:       draft
-critic:       null
+critic:       GO
 words:        318
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.6.md ----
