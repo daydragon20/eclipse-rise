@@ -25,7 +25,7 @@ van 01 op 02-08 kozen VIER agents onafhankelijk "het enige vrije getal
 onder de twintig"; elk had gelijk op het moment van meten en alle vier
 de metingen waren de volgende ochtend onwaar.
 
-    Eclipse\Toolserify.ps1 -SkipShots      de bar (build, tests, alle poorten)
+    Eclipse\Tools\verify.ps1 -SkipShots      de bar (build, tests, alle poorten)
 
     check_generation_ready.py    welke scenes NU gegenereerd mogen worden,
                                  gesplitst in klaar / poort / casting. Het
