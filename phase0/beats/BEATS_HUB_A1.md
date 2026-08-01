@@ -135,7 +135,8 @@ condition:    'story.beat_m14_quartermaster == true'
 
 - **Brick IS meegenomen.** `M1.6.S03.220` (*"Krad-9. Seventeen days."*), `M1.6.S01` en `M1.8.S02` zeggen het alle drie. Niets in deze scène mag suggereren dat iemand anders in zijn plaats ging. **Zie §8.4.**
 - **De tic wordt niet gebruikt en niet uitgegeven.** Hij noemt geen dode. De M1.8-schrijver geeft het middel voorgoed uit in `M1.8.S90.050`; deze scène raakt dat niet, want er valt hier geen naam.
-- **De betaling is zijn eigen regel.** `M1.6.S01.140` — *"They water them at the yard. Not before."* Het enige dat hij ooit ongevraagd zei. Nu liggen er eenenveertig mensen uit zo'n wagon op de vloer van dit gewelf en draagt hij water rond, en heeft dat de hele nacht gedaan. **Niemand legt het verband. Niemand zegt het woord Tithe.** De speler heeft de zin vier scènes geleden gehoord en herkent hem of niet.
+- **De betaling is zijn eigen regel.** `M1.6.S01.140` — *"They water them at the yard. Not before."* Het enige dat hij ooit ongevraagd zei. Nu liggen de mensen die uit die wagons kwamen op de vloer van dit gewelf en draagt hij water rond, en heeft dat de hele nacht gedaan. **Niemand legt het verband. Niemand zegt het woord Tithe.** De speler heeft de zin vier scènes geleden gehoord en herkent hem of niet.
+- **Geen hoofdentelling, ook niet in een `shot:`.** Het instroomgetal ligt onder een lopende ruling elders; deze scène heeft het niet nodig en mag er geen afhankelijkheid van krijgen. `sela_intake.010` bezit dat getal.
 - **Vier regels, niet vijf.** Brick krijgt er twee en geen van beide is een antwoord. Er komt geen tweede beat na de weigering.
 - **De sluiting bevat geen van beide sprekers** — zie §8.2.
 - **AR-11 is hier niet meer aan de orde.** Die is in M1.6 twee keer volledig betaald (`S01.140` eerste betaling, `S03.220` landing). Deze scène was in het oude beat-sheet als derde betaling ingeboekt en had daarom niets te doen; dat is de oorzaak van de hele fout.
@@ -300,7 +301,7 @@ Twee regels, allebei volledig in `shot:` en dus **nul credits**.
 | **`dex_workshop`** | Het plan wordt **bedekt**. Er loopt iemand door de werkplaats naar de bunks — een naamloze schutter, **geen regel** — en Dex veegt de zeven kaarten zijn kit in. Hij heeft dit aan één persoon laten zien | één `shot:`-zin, nul woorden, nul stemmen |
 | **`petra_return`** | De camera blijft bij **Voss**, niet bij de pot. Zij is met de kommen weg vóór de laatste beat; vasthouden op hem bij de brander, met opgerolde mouwen | één `shot:`-zin, nul woorden |
 
-En **`brick_the_tithe`** wijkt door constructie: het laatste beeld bevat **geen van beide sprekers**. Het bevat het water en de eenenveertig.
+En **`brick_the_tithe`** wijkt door constructie: het laatste beeld bevat **geen van beide sprekers**. Het bevat het water en de mensen die het krijgen.
 
 **"Geen afscheid" blijft** — dat is §18.7 en het is goed. Maar geen afscheid is niet hetzelfde als geen einde: na (i) en (ii) eindigen vier van de twaalf met iemand die het beeld verlaat, en het is niet elke keer Voss.
 
@@ -382,7 +383,7 @@ Nageteld tegen alle twaalf: **één faalt**, en dat is deze. De andere elf houde
 
 #### De herbouw
 
-Zie §4.7 voor de volledige stub. Kern: **de weigering is de scène**, het middel (een dode naam) wordt niet uitgegeven, en de betaling is **Bricks eigen regel** uit `M1.6.S01.140` — *"They water them at the yard. Not before."* — die hij nu uitvoert in plaats van uitspreekt, voor de eenenveertig die op de vloer van dit gewelf liggen. Nul nieuwe canon, nul nieuwe eigennamen, vier regels in plaats van vijf, en goedkoper dan de huidige versie.
+Zie §4.7 voor de volledige stub. Kern: **de weigering is de scène**, het middel (een dode naam) wordt niet uitgegeven, en de betaling is **Bricks eigen regel** uit `M1.6.S01.140` — *"They water them at the yard. Not before."* — die hij nu uitvoert in plaats van uitspreekt, voor de mensen die op de vloer van dit gewelf liggen. Nul nieuwe canon, nul nieuwe eigennamen, geen getal, vier regels in plaats van vijf, en goedkoper dan de huidige versie.
 
 **Titel wijzigt mee:** `"In My Place"` → `"Not Before"`.
 
@@ -440,6 +441,19 @@ Zelfde klasse als (a): het commentaar liegt terwijl de regels kloppen. Beide ver
 
 Zie de blokcitaat-noot in §4.6. De schrijver handelde juist en meldde het; het besluit staat nu op papier zodat het niet opnieuw afgeleid hoeft te worden, en de vraag naar een tweede in latere acts is expliciet een **owner-vraag**.
 
+#### (f) NIEUW — Bricks tijdlijn klopt niet, en het staat buiten de hub
+
+Gevonden tijdens het natrekken van §8.4, niet gezocht. **Ik heb het niet gerepareerd, want het staat in `M1.7`, buiten mijn opdracht van deze ronde.**
+
+| Bron | Wat er staat | Soort |
+|---|---|---|
+| `M1.4.S99.150` | REYES: *"Three months in a holding block. What was there to do with the time?"* | **gesproken** |
+| `M1.7.S05` r. 58 | *"He knows nobody on that screen — **he has been on Kessara six weeks** — and that is precisely why it is not his list to read out loud."* | schrijversnoot |
+
+M1.4 ligt drie missies vóór M1.7. Brick zit dus vóór M1.4 al drie maanden vast op Kessara; zes weken kan niet. **De gesproken regel wint** — de noot is fout, niet de scène.
+
+**Waarom dit gemeld wordt en niet weggepoetst:** de noot kost vandaag nul credits, maar hij is een *premisse*. `M1.7.S05`'s hele argument voor Bricks stilte bij de manifest-lijst hangt eraan (*"restraint, not absence of material"*), en dat argument blijft overeind op de juiste tijdlijn — sterker zelfs: een man die drie maanden vastzat kent nóg minder mensen op een lijst uit een blacksite. **Alleen het getal moet weg.** Een volgende schrijver die deze noot leest en er een regel op bouwt, maakt er een gesproken tegenspraak van, en dat is precies de klasse-3-fout uit §8.6.
+
 ---
 
 ### 8.6 Vier defectklassen, nul rode regels — wat is mechanisch te vangen?
@@ -477,4 +491,25 @@ De twaalf kosten samen **10.780 credits** van een act van 97.275 tegen een saldo
 > **Dat cijfer is van mij en niet van een tool.** `Eclipse/Tools/count_generation_cost.py` telt dit exact uit de tekst; **de definitieve cijfers komen daarvandaan, ná de herschrijving, niet uit deze tabel.** Ik had geen shell in deze ronde (zie het rapport) en heb dus niets gemeten.
 
 **`mara_letters` houdt absolute voorrang** bij schrijven én genereren (§4.9). Als er één hubscène overleeft, is het die.
+
+---
+
+### 8.8 Wat er nog **serieel** moet landen — niet door mij
+
+Er liep in deze ronde een tweede `story-architect` in `RULINGS_L1.md`. Ik heb dat bestand niet aangeraakt. Alles hieronder is uitgesproken en in de bestanden uitgevoerd; alleen de rulingtekst ontbreekt nog, en die moet één voor één landen zodat de nummering niet botst.
+
+| # | Wat | Waar het al staat |
+|---|---|---|
+| 1 | **Erratum op L1-R29:** "L2-notitie" → **"L1-blok, r. 25"** in `HUB.A1.reyes_first_conversation` | §4.2, §8.5 (a); bestand gecorrigeerd |
+| 2 | **`brick_the_tithe`: Brick is zelf meegenomen.** Canon-uitspraak, plus de intrekking van deze scène als AR-11-drager | §4.7, §8.4; stub herschreven |
+| 3 | **Poortregel voor alle 42 missies:** een hubscène gepoort op beat X mag niet willen wat beat X geleverd heeft, en de toets is de hoorbaarheid voor het personage dat het wil | §8.4 |
+| 4 | **De drie vormen zijn toegewezen, niet gevraagd.** A → `dex_workshop`, B → `petra_return`, C → `brick_the_tithe` | §8.1; drie stubs herschreven |
+| 5 | **Vrijstelling:** een scène met één sprekende partij is vrijgesteld van §18.7's onderbrekingseis en krijgt in ruil een verplichte bewegingsbeat | §8.1 vorm B; `petra_return` |
+| 6 | **Rantsoen op de stilstand:** "does not look up" op de zwaarste regel in ten hoogste vijf van de twaalf, met naam en toenaam | §8.2 (i); notitie in alle twaalf bestanden |
+| 7 | **Voss-toets:** een hubregel die zonder verlies "Go on" kan zijn, is geen Voss-regel | §8.3 |
+| 8 | **§18.9 A:** `reyes_triage.170` is act 1's enige klinische Reyes-benoeming; een tweede in act 1 is NO-GO, een plafond voor acts 2–4 is een **owner-vraag** | §4.6, §8.5 (e) |
+| 9 | **`sets_on_complete:`** — scalair kopveld, gespecificeerd en **nog niet aangezet**, landt in dezelfde toolwijziging als L1-R28 en nooit ervoor. Plus de generatievolgorde-instructie voor `M1.8.S91.157/.164` | §8.5 (b); `SCRIPT_FORMAT.md` §4 moet de rij nog krijgen |
+| 10 | **Erratum M1.7.S05:** "six weeks" tegen de gesproken "three months" van `M1.4.S99.150`. Buiten mijn opdracht, niet gerepareerd | §8.5 (f) |
+
+**Twee daarvan zijn owner-beslissingen en geen van beide is door mij genomen:** het §18.9 A-plafond voor acts 2–4 (nr. 8), en of `sets_on_complete:` er komt of dat aanwezigheidsdraden anders opgelost worden (nr. 9).
 </content>

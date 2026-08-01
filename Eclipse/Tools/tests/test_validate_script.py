@@ -198,6 +198,26 @@ class TheControl(unittest.TestCase):
         self.assertIn("BEWUST STILLE TAK", out,
                       "een doorgelaten stilte moet zichtbaar blijven, niet verdwijnen")
 
+    def test_a_register_trusted_fact_stays_visible(self):
+        """Een DOORLAAT is geen bevinding, maar hij mag niet stil zijn.
+
+        `story.thread_mara_letters_open` heeft een eenbladige registerrij en
+        nergens een `set:`. CONDITION laat dat bewust door -- eenbladige
+        vlaggen worden vaak legitiem door een systeem gezet, en daarop vuren
+        maakt de check ruis. Maar op 01-08 bleek er een doorheen te lopen die
+        TWEE BETAALDE REGELS aanstuurt terwijl de zetter die het register
+        noemt een zin proza in een `shot:` is.
+
+        Deze test bewaakt de ZICHTBAARHEID, niet de bevinding. Zakt hij, dan
+        is de doorlaat weer stil -- en een stille doorlaat leest als gedekt.
+        """
+        rc, out = run("register_trusted")
+        self.assertEqual(rc, 0, "een doorgelaten feit mag geen bevinding zijn:\n" + out)
+        self.assertIn("OP HET REGISTER VERTROUWD", out,
+                      "een doorgelaten feit moet zichtbaar blijven, niet verdwijnen")
+        self.assertIn("controleert het niet", out,
+                      "de doorlaat moet zeggen WAT hij niet controleert")
+
     def test_clean_fixture_produces_nothing(self):
         rc, out = run("clean")
         self.assertEqual(rc, 0, f"the control fixture must be clean:\n{out}")

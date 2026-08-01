@@ -29,6 +29,14 @@ words_generated: 130
 #            often a single noun, never speaks first.
 #            He does not explain why he wants the names. Voss does not ask.
 #            The variance rule survives because Voss's lines are long and Brick's are not.
+#
+# *** SERIES PASS 2026-08-01 (BEATS_HUB_A1 8): NOTHING IN THIS FILE CHANGES. ***
+# This is the model, not the problem. The inversion at .040 is real - he ASKS for names
+# instead of handing one over, different verb, and the .070 shot buys M1.8.S90.020 for zero
+# words. It is also one of the FIVE scenes permitted to keep "does not look up" on its
+# heaviest line (8.2 (i)), because that is his fingerprint and the shot is doing paid work.
+# .050 "Before you got here?" survives the 8.3 test as well: four words, and the content of
+# the first half of this scene is that Voss talks too much. DO NOT REBUILD IT.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      `hub` (12-35) as a ceiling. Longest 23 w (.030). Register reached at .010 and

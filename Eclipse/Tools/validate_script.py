@@ -605,6 +605,11 @@ class Validator:
         # scene -> {vlagwaarde: reden}. Een BEWUST stille tak, opgeschreven.
         self.silences: dict[str, dict] = {}
         self.silence_used: set = set()
+        # Feiten die op EEN registerrij worden vertrouwd in plaats van op een
+        # `set:`. Dat is een bewuste doorlaat (zie CONDITION RESOLVES), maar hij
+        # was STIL -- en op 01-08 bleek dat er een van doorheen liep die twee
+        # betaalde regels aanstuurt zonder dat iets hem ooit zet.
+        self.register_trusted: set = set()
 
     def add(self, code: str, where: str, msg: str) -> None:
         self.findings.append(Finding(code, where, msg))
@@ -937,6 +942,17 @@ class Validator:
                          "options are still marked with `note:` only (pre-L1-R2), or reader "
                          "and setter have drifted apart (the L1-R12 shape).")
 
+            elif f.readers and not f.setters and row and not row.leaves and not declared:
+                # EEN BLAD, GEEN ZETTER, WEL EEN REGISTERRIJ. Bewust geen
+                # bevinding: veel eenbladige vlaggen worden legitiem door een
+                # scene-commit of door een systeem gezet, en daarop vuren maakt
+                # deze check ruis -- en ruis is hoe een bar ophoudt gelezen te
+                # worden. Maar de doorlaat was STIL, en dat is iets anders dan
+                # verantwoord. Hij wordt nu getoond met de zetter die het
+                # register CLAIMT, zodat een mens kan zien of die zetter bestaat.
+                self.register_trusted.add(
+                    (f.readers[0][0], name, len(f.readers), row.set_by or "(geen zetter genoemd)"))
+
             # --- CHOICE INTEGRITY: a set nobody reads ---------------------
             if f.setters and not f.readers:
                 self.add("CHOICE", f.setters[0][0],
@@ -1165,6 +1181,15 @@ def main(argv=None) -> int:
             print(f"  {scene}: `{name} == \"{val}\"` speelt niets af, met opgeschreven reden")
         if not blank_before:
             print()
+
+    if v.register_trusted:
+        print(f"{len(v.register_trusted)} FEIT(EN) OP HET REGISTER VERTROUWD -- doorgelaten, "
+              "niet verdwenen:")
+        for scene, name, n_readers, set_by in sorted(v.register_trusted):
+            print(f"  {scene}: `{name}` wordt door {n_readers} regel(s) gelezen en door GEEN "
+                  f"`set:` gezet. Het register noemt {set_by!r} als zetter -- deze check "
+                  "gelooft dat, en controleert het niet.")
+        print()
 
     by_code: dict[str, list[Finding]] = defaultdict(list)
     for f in v.findings:

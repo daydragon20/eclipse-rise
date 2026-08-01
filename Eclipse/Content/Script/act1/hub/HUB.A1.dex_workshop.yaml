@@ -8,9 +8,10 @@ type:         hub
 credit_tier:  4
 
 # ---- the three-sentence contract (18.7) ----
-want:         "Dex wants to show Voss what the vault could be if anyone gave him a week and some steel."
-obstacle:     "Nobody has a week and there is no steel."
-turn:         "He shows him anyway, and the plan is far too big, and it is the first blueprint of Hollow Point as the player will eventually know it."
+# REWRITTEN BY L1 2026-08-01 — FORM A. VONNIS: phase0/beats/BEATS_HUB_A1.md 8.1 and 4.4.
+want:         "Dex wants Mara to look at the whole plan before she rules on one piece of it."
+obstacle:     "Mara will not plan past tomorrow. She says so, and she leaves."
+turn:         "He finishes showing it to the man who is still standing there, and the plan is far too big, and it is the first blueprint of Hollow Point as the player will eventually know it."
 
 # ---- state ----
 status:          draft
@@ -20,7 +21,7 @@ words_heard:     164
 words_generated: 182
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
-# cast:      DEX, VOSS
+# cast:      DEX, MARA, VOSS
 # condition: story.beat_m13_signalfire == true
 # flags-out: none
 # purpose:   SYSTEM-TEACHER SCENE. 05_base_building: you learn base building from the
@@ -31,6 +32,47 @@ words_generated: 182
 #            never be allowed to build.
 #            No line here may function as a tutorial. If a line only conveys a mechanic,
 #            delete it and let the UI do its job.
+#
+# *** FORM A, ASSIGNED BY L1 2026-08-01: THIS SCENE OPENS IN THE MIDDLE OF A ROW. ***
+# The old obstacle was "Nobody has a week and there is no steel" - A SHORTAGE, NOT AN
+# OPPONENT. A shortage cannot answer back, which is why this scene ended up with the same
+# engine as the other eleven: Voss walks in, Dex talks, Voss asks. 18.9 D asks for somebody
+# who is wrong in an uninteresting way, and that person already exists in the canon.
+#
+# the row:   IT IS NOT INVENTED AND IT COSTS NOTHING. mara_map_table.110 - "The mast is not
+#            down yet." - she will not plan past tomorrow, and that refusal is the floor her
+#            reversal in M1.7 stands on. Dex has a seven-card plan that takes four acts.
+#            Two people who are both right, and it has never been played.
+# mara:      THREE LINES MAXIMUM and she does not win by being right. SHE WINS BY LEAVING.
+#            AR-5/AR-5b hold without exception: zero "you", zero "your", zero "I" about the
+#            cause. She talks about the card, never about him. `mara` is cast and is named
+#            in the 19.2 hub billing, so this adds no voice and no casting question.
+#            SHE IS NOT UNKIND AND SHE IS NOT DISMISSIVE. She is a woman who has been asked
+#            to spend attention she has already allocated.
+# scope:     THE ROW IS ABOUT ONE CARD, NEVER ABOUT THE PLAN. Dex does not put his plan to
+#            a vote - that is precisely the thing he never does. He asks her to look at one
+#            thing, and she refuses the stack.
+# open:      THE SCENE OPENS ON THE SECOND HALF OF A SENTENCE. Not on a question, not on a
+#            greeting, and not on "Stand where the lamp is."
+# the system stays: the four complaints and two wishes, the seven ration cards, ENERGY /
+#            SLOTS / OCCUPANCY / MEDBAY / HANGAR / BUILD COST - all unchanged. Only the
+#            motive underneath changes: he is finishing what he started for the woman who
+#            walked out, in front of the man who stayed. That is a better reason to talk
+#            than an audience.
+# voss:      .020 "What am I looking at?" IS REBUILT. It is a line that could be replaced by
+#            "Go on" without loss, which is the test in BEATS_HUB_A1 8.3. Replace it with a
+#            measurement of the thing in front of him - he counts or sizes a ration card -
+#            in the same breath count. .050 "What's on the four now?" stays: that is already
+#            a mechanism question.
+#            NO VARIANTS - section 7.6 restricts axis variants to scenes 2, 6, 8 and 11.
+# closing:   THE PLAN GETS COVERED. Somebody crosses the workshop towards the bunks - a
+#            nameless fighter, NO LINE, no voice, no credit - and Dex sweeps the seven cards
+#            into his kit. He has shown this to one person. One of the three deviant
+#            closings (BEATS_HUB_A1 8.2 (ii)); it also makes .070's medbay wish private,
+#            which is the strongest thing that can happen to that line.
+#            The heaviest line in this scene may NOT carry "does not look up" - this file is
+#            not one of the five permitted (8.2 (i)).
+# budget:    WORD-NEUTRAL. What Mara gets, Dex gives up.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      hub (12-35) as a ceiling (L1-R1). Longest 25 w (.030 and .070), ceiling clear.

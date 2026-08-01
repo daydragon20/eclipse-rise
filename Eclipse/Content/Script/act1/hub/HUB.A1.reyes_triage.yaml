@@ -31,6 +31,30 @@ words_generated: 257
 #            contains exactly one such line, it belongs in this scene. Mark it and justify
 #            it in a note:.
 #            Voss variants on all four axes - the order he signs is a character statement.
+#
+# *** 18.9 A, SETTLED BY L1 2026-08-01 SO IT IS NEVER DERIVED AGAIN. ***
+# The line is .170. The writer read 18.9 A correctly: the exemption is TWO exemptions joined
+# by "or" - the standing Reyes-clinical one, and AR-12's rationed direct_beat - and he used
+# the first. `direct_beat: true` would either hand act 1 a second ration or force
+# M1.8.S90.050 back open, and both are wrong. HE HANDLED IT CORRECTLY AND ESCALATED IT
+# CORRECTLY; the boolean stays off.
+# THIS IS ACT 1'S ONLY CLINICAL EMOTION-NAMING BY REYES. A second one in act 1 is a NO-GO
+# I will write myself. Whether acts 2-4 get a per-act cap is an OWNER QUESTION, not mine and
+# not a writer's: 18.9 A's exemption is standing and unrationed, and the moment there are
+# two of them it stops being an exemption and becomes a register.
+#
+# *** TWO CHANGES FROM THE SERIES PASS (BEATS_HUB_A1 8.2, 8.3). NO OTHER LINE MOVES. ***
+# .020 "What order?" IS REBUILT. It is a line that could be replaced by "Go on" without
+#      loss, which is the test in 8.3. Voss names the plate instead of the question - there
+#      is a rectangle of bunk plate propped against a crate with nothing on it and he is the
+#      man who sees mechanisms (18.4). Word-neutral to +6.
+# .190 THE CLOSING CHANGES. SHE DOES NOT GO BACK TO THE KIT. She has given the punch away
+#      and has nothing to do with her hands - the first time in act 1 the player sees this
+#      woman idle. Going back to the kit undoes the transfer the whole scene is about.
+#      One `shot:` sentence, zero words, and it is one of the three deviant closings.
+# .170 must NOT be delivered with her eyes down: this file is not one of the five permitted
+#      to put "does not look up" on its heaviest line (8.2 (i)). The camera is on the plate
+#      at .160; at .170 she says it to his face. Nothing else in the file changes.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      `hub` (12-35) as a ceiling. Longest 22 w (.010). Register reached at .010,

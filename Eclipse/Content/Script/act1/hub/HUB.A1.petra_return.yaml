@@ -8,9 +8,10 @@ type:         hub
 credit_tier:  4
 
 # ---- the three-sentence contract (18.7) ----
-want:         "Voss wants his aunt to rest."
-obstacle:     "She has already found the kitchen, the water line, and three people who are not being fed."
-turn:         "She gives him a job, he takes it, and that is how they both survive the week."
+# REWRITTEN BY L1 2026-08-01 — FORM B. VONNIS: phase0/beats/BEATS_HUB_A1.md 8.1 and 4.10.
+want:         "Voss wants his aunt to rest, and he does not manage to say it."
+obstacle:     "She has already found the kitchen, the water line and three people who are not being fed, and she does not need an answer from anybody."
+turn:         "He picks up the spoon, nobody says anything about it, and that is how they both survive the week."
 
 # ---- state ----
 status:          draft
@@ -39,6 +40,42 @@ words_generated: 145
 # writer:    she does not thank anyone and she does not complain. She never mentions K-77.
 #            NO SCENE IN THE GAME MAY HAVE HER DESCRIBE WHAT WAS DONE TO HER.
 #            Aftermath: zero comic beats (18.6).
+#
+# *** FORM B, ASSIGNED BY L1 2026-08-01: THIS IS THE SCENE IN WHICH VOSS SAYS NOTHING. ***
+# BEATS_HUB_A1 7.1 required one of the twelve to run without a Voss line and none of the
+# twelve did. This is the only one where the silence is CHARACTER and not a missing line:
+# he has nothing to say to her, and that is the scene. Petra is also the one person in the
+# cast who structurally does not need an answer (18.4: never "you", never accepts thanks,
+# answers with a task).
+#
+# voss:      ZERO `text:` LINES IN THIS FILE. He is on screen for the whole scene.
+#            The five existing Voss lines (.020 .040 .060 .080 .100) are DELETED. Their IDs
+#            are retired, not reused - nothing is generated, so nothing is at risk, and a
+#            retired id is cheaper to read than a recycled one.
+#            EVERY PETRA LINE IS ANSWERED BY A MOVEMENT, AND THE MOVEMENT LIVES IN `shot:`.
+#            Seven turns, six of them physical. `shot:` costs nothing. The scene must not
+#            read as a woman talking to herself; it must read as two people working.
+# .110:      "Until it stops smelling like water." now answers a question HE NEVER ASKS.
+#            That is the fingerprint at full strength and it is the only place in act 1
+#            where somebody knows this man without making him speak. Keep the line.
+# 18.7:      THE INTERRUPTION REQUIREMENT LAPSES HERE, AND ONLY HERE. An interruption needs
+#            two speaking parts. The old .060/.070 pair dies with the Voss lines and its
+#            job - she gives his hands something instead of letting him finish - is now
+#            carried by staging: he starts to reach for her and she puts the salt in his
+#            hand. Ruled by L1; do not treat the absence as a defect.
+# 18.7 in:   THE PLAYER BEAT IS MANDATORY AND IT IS THE SPOON. Mark it `PLAYER BEAT (18.7)`
+#            on the line where he takes it. This file was the only one of the twelve with no
+#            marked player input at all; the spoon was already a movement and was simply
+#            never written as one.
+# closing:   HOLD ON VOSS, NOT ON THE POT. She is out of frame with the bowls before the
+#            last beat. Last image is him at the burner with his sleeves rolled, alone.
+#            This is one of the three deviant closings (BEATS_HUB_A1 8.2 (ii)) and it is the
+#            only shot in the twelve that is allowed to stay with the player character.
+# band:      REGISTER still applies (>=6 lines, hub floor 12). Keep at least one Petra line
+#            of 12+ words after the trim.
+# budget:    THIS IS A REFUND. Voss lines are the only ones doubled for player gender, so
+#            removing five of them is worth more than their word count. Petra may take back
+#            up to 20 words; the scene still ends cheaper than it started.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      `hub` (12-35) as a ceiling. Longest 16 w (.030). Register reached at .010, .030,

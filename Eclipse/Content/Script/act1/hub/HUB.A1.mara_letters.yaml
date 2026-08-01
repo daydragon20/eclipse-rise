@@ -63,9 +63,11 @@ words_generated: 128
 # she is making of the future on that console, four hours earlier and out loud, and the
 # player who was in this room hears it twice. It costs no canon, no new prop and no line
 # of explanation, and it is why she asks for something instead of answering him.
-# The second half of the turn is .090 - four words, unexplained, and the only crack in
+# The second half of the turn is .080 - four words, unexplained, and the only crack in
 # the scene. She has just refused to say whether the raid is survivable and then asks him
 # not to shut the door behind him.
+# [L1 2026-08-01: said .090 twice in this block; the file ends at .080. Corrected in both
+#  places. Same class as the L1-R29 defect - the lines were right and the comment lied.]
 #
 # *** THE LAMP IS OFF, AND THAT IS CANON I AM SERVING, NOT SETTING. ***
 # M1.8.S91.140 (already written) has Voss say "She did them at this table. With the lamp
@@ -88,9 +90,28 @@ words_generated: 128
 #            NO VARIANTS - BEATS_HUB_A1 section 7.6 gives Voss axis variants in scenes
 #            2, 6, 8 and 11 only, and this scene branches on nothing. That is also the
 #            reason it costs what it costs.
-# flag:      Story.Thread.MaraLetters_Open commits on the closing shot of .090, the same
+# flag:      Story.Thread.MaraLetters_Open commits on the closing shot of .080, the same
 #            shape M1.8.S90 and M1.8.S91 use for a scene commit. No `choice:` block: there
 #            is no option here, and a set with no option is not a choice.
+#            [L1 2026-08-01: THE WRITER'S REASONING IS UPHELD IN FULL. There is no `set:`
+#             outside `choice:`, and a one-option `choice:` fails choice-integrity, so a
+#             prose commit was the only thing the format could express. THE FORMAT IS THE
+#             DEFECT, NOT THE FILE. Counted across the corpus: this flag has TWO machine-
+#             readable readers (M1.8.S91.157/.164), ZERO machine-readable setters, and TWO
+#             setters in prose (here, and M1.8.S91.160's shot).
+#             Two consequences, and the second is the expensive one:
+#               1. THE THREAD IS NOT ORPHANED IF THE HUB IS CUT. M1.8.S91.160 opens it for
+#                  everybody, so acts 2-4 keep their thread. Recorded here so nobody derives
+#                  it again.
+#               2. But M1.8.S91.157/.164 would then be permanently dead lines that had
+#                  already been paid for. INSTRUCTION TO voice-director: those two lines are
+#                  NOT generated before HUB.A1.mara_letters is generated.
+#             SPECIFIED, NOT YET ENABLED (the L1-R28 shape): a scene-header scalar
+#             `sets_on_complete: 'story.thread_mara_letters_open'`, committing on the last
+#             line of the scene, same grammar and same place as `condition:`, and it MUST
+#             count as a writer in the fact table or it is decoration. Lands in the same
+#             tool change as L1-R28, never before it. See BEATS_HUB_A1 8.5 (b).
+#             DO NOT ADD THE FIELD TO THIS FILE YET - it fails SCHEMA today.]
 # omitted:   an answer, a reassurance, the word "letter", the word "if", any line where
 #            she says what the recordings are for, and any acknowledgement from either of
 #            them that she is planning around not being here. See report.

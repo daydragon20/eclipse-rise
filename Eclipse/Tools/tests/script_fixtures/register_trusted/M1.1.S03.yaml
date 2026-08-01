@@ -1,0 +1,34 @@
+# GEEN BEVINDING -- een ZICHTBARE DOORLAAT, en die moet zichtbaar blijven.
+#
+# `story.thread_mara_letters_open` heeft een EENBLADIGE rij in het
+# vlaggenregister (ACT1_OVERVIEW section 6) die HUB.A1.mara_letters als zetter
+# noemt. Er is nergens in het corpus een `set:` voor. De CONDITION-check laat
+# dat bewust door: veel eenbladige vlaggen worden legitiem door een
+# scene-commit of door een systeem gezet, en daarop vuren maakt de check ruis.
+#
+# Maar die doorlaat was STIL, en op 01-08 bleek er een doorheen te lopen die
+# TWEE BETAALDE REGELS in M1.8.S91 aanstuurt terwijl de "zetter" die het
+# register noemt een zin proza in een `shot:` is. Niets controleert dat.
+#
+# Deze fixture bewaakt de zichtbaarheid, niet de bevinding. Zakt hij, dan is
+# de doorlaat weer stil geworden -- en een stille doorlaat leest als "gedekt".
+scene:        M1.1.S03
+mission:      M1.1
+title:        "Fixture"
+act:          1
+location:     "Kessara / Foundry District / Overpass"
+type:         in-mission-radio
+credit_tier:  2
+want:         "A want."
+obstacle:     "An obstacle."
+turn:         "A turn."
+status:       draft
+critic:       null
+words:        20
+
+lines:
+  - id:      M1.1.S03.010
+    speaker: MARA
+    voice:   mara
+    condition: 'story.thread_mara_letters_open == true'
+    text:    "A perfectly ordinary line of dialogue here."

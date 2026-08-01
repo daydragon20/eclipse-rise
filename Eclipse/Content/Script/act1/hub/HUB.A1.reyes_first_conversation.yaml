@@ -22,8 +22,18 @@ words_generated: 277
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_HUB_A1.md ----
 # cast:      REYES, VOSS
 # condition: story.beat_m11_thirteenbullets == true
-# branches:  three, on story.choice_m11_conscriptspared (killed / left / bound and left).
+# branches:  three, on story.m11_conscript_choice, leaves `finished` / `left` / `bound`.
 #            NONE of the three is a judgement. She records; she does not score.
+#            *** CORRECTED BY L1 2026-08-01. This line used to name
+#            story.choice_m11_conscriptspared with leaves (killed / left / bound and left) -
+#            a tag WITHDRAWN BY MY OWN L1-R3, and a leaf called `killed` that nothing sets.
+#            The writer caught it, refused to fix it silently, and read the three leaves
+#            M1.1.S05.170/.180/.190 actually set. He was right; this block was wrong.
+#            NOTE FOR THE RECORD: ruling L1-R29 describes this as a correction in the
+#            writer's L2 note. It was not - the dead tag lived HERE, in the L1 block, so a
+#            writer following the ruling literally looks in the wrong place and finds
+#            nothing. The ruling text needs one word changed (L2 -> L1); see
+#            phase0/beats/BEATS_HUB_A1.md 8.5 (a). Exactly the defect L1-R29 is about. ***
 # purpose:   first time the game shows the player that somebody is counting
 #            (2.5 - "holds the player accountable for casualty-heavy tactics")
 # writer:    18.4 - complete clinical sentences; asks a question instead of accusing;

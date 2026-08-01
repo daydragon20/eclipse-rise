@@ -30,6 +30,17 @@ words_generated: 141
 #            anywhere.
 #            The second number being SMALL is the whole scene. Do not have anyone react
 #            to it out loud.
+#
+# *** SERIES PASS 2026-08-01 (BEATS_HUB_A1 8): NOTHING IN THIS FILE CHANGES. ***
+# .020 "That's not what I asked." STAYS AND HAS PRIORITY. It appears twice in the corpus of
+# 71 files - here and in brick_the_tithe.030 - and nowhere else. This one comes first and it
+# is earned: it is the third attempt after two deflections. The other instance dies with
+# that scene's rebuild (8.4), so no duplicate whitelist is needed.
+# .080 "Who was it?" stays: four words, and it buys a real refusal.
+# .070 KEEPS ITS STILLNESS. This is one of the five scenes permitted to hold the heaviest
+# line still (8.2 (i)) - the second number is ONE and the stub forbids anybody reacting out
+# loud. The stillness here sits on VOSS'S side and it is already written ("Voss does not
+# move"). Do not move it to her and do not add a look.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      hub (12-35) as a ceiling (L1-R1). Longest 21 w (.010), ceiling clear.

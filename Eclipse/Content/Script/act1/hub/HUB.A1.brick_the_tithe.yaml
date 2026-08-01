@@ -1,16 +1,18 @@
 # ---- header ----
 scene:        HUB.A1.brick_the_tithe
 mission:      HUB.A1
-title:        "In My Place"
+title:        "Not Before"
 act:          1
 location:     "Kessara / Underworks / Hollow Point — Bunk Row"
 type:         hub
 credit_tier:  4
 
 # ---- the three-sentence contract (18.7) ----
-want:         "Voss wants to know why Brick spoke first at the briefing."
-obstacle:     "Brick does not explain things."
-turn:         "He says the name of the man who was taken off Krad-9 in his place, and that is the answer."
+# REWRITTEN BY L1 2026-08-01. The old contract was wrong twice over and both errors were
+# mine, not the writer's. VONNIS EN REDENERING: phase0/beats/BEATS_HUB_A1.md 8.4.
+want:         "Voss wants Brick to say what the seventeen days were."
+obstacle:     "Brick will not say, and he will not deflect either. He simply does not answer, twice."
+turn:         "Voss stops asking, and on his way out he sees what Brick has been doing for the people off the train all night, and it is the sentence Brick said at the map table, done instead of said."
 
 # ---- state ----
 status:          draft
@@ -23,15 +25,66 @@ words_generated: 72
 # cast:      BRICK, VOSS
 # condition: story.beat_m16_tithetrain == true
 # flags-out: none
-# canon:     AR-11 pays in full here. Brick is an ex-pit miner from Krad-9 (2.5) who is on
-#            Kessara because the Tithe of Hands moves labour between worlds (2.3). Only
-#            existing canon; nothing invented.
-# writer:    FIVE LINES. Not one of them explains what the Tithe is (18.8).
-#            His tic - answering a hard question by naming a dead soldier - is not a tic
-#            in this scene. It is the literal answer, and the player has heard it enough
-#            times by now to feel the difference.
+#
+# *** REBUILT BY L1 2026-08-01. THE WHOLE `lines:` BLOCK BELOW IS TO BE REPLACED. ***
+# The L2 block and the five lines under it answer the OLD contract and are kept only so the
+# writer can see what is being replaced and why. Nothing here is generated (tier 4, status
+# draft), so the ID block .010-.050 is reused freely and no cache is at risk. Four lines now,
+# not five. VONNIS: phase0/beats/BEATS_HUB_A1.md 8.4 and section 4 entry 7.
+#
+# *** THE CANON RULING. BRICK WAS TAKEN. NOBODY WENT IN HIS PLACE. ***
+# M1.6.S03.220 (spoken, and the player has heard it before this gate opens): "Krad-9.
+# Seventeen days." - seventeen days in a car. M1.6.S01 r.31 and M1.8.S02 r.48 say the same
+# thing in prose. `.040`'s "Tam went in my place" contradicts all three, and the source of
+# that line is my own `turn:` field, not the writer. He executed it loyally, invented no
+# name, and could not see the collision because it lives in three other files.
+# THE REPAIR IS NOT A DIFFERENT NAME. THE REPAIR IS NO NAME.
+#
+# tam:       fixed and closed, so nobody has to look it up again. Tam is dead
+#            (M1.7.S01.210). Somebody stayed with him (M1.7.S01.210); who, is never said and
+#            never will be. He is one of the three names Brick counted through three months
+#            in a holding block (M1.4.S99.150-.180). NONE OF THAT IS SPOKEN IN THIS SCENE.
+# ar-11:     ALREADY PAID, TWICE, IN M1.6 - S01.140 (first payment) and S03.220 (the
+#            landing). This scene was booked as a third payment and therefore had nothing
+#            to do, which is what produced the error. It is not an AR-11 carrier any more.
+# the tic:   NOT USED AND NOT SPENT. He names no dead soldier. The M1.8 writer spends the
+#            device for good in M1.8.S90.050 and nothing here touches it, because no name
+#            falls. This would have been its sixth outing.
+# want:      the new want is DOWNSTREAM of the gate. The old one was answered in Voss's own
+#            hearing before the scene could play (M1.6.S03.220's note: "The player now knows
+#            why he spoke first in S01"). General rule, all 42 missions: a hub scene gated on
+#            beat X may not want what beat X delivered, and the test is whether it was
+#            answered IN THE HEARING OF the character who wants it.
+# writer:    FOUR LINES. Voss two, Brick two, and neither of Brick's is an answer.
+#            He does not deflect - a deflection is a different subject offered in good
+#            faith, and that is what the old .020 was. He does not offer one. The refusal
+#            is the content and there is no second beat after it.
+#            NOT ONE LINE EXPLAINS WHAT THE TITHE IS (18.8).
+#            Voss asks twice and the second attempt is a measurement, not a repeat -
+#            BEATS_HUB_A1 8.3. He does not get an answer and he does not get angry.
+# payoff:    BRICK'S OWN LINE, M1.6.S01.140: "They water them at the yard. Not before." The
+#            one thing he ever volunteered unasked. The people who came off those cars are
+#            on the floor of this vault now, and he has been carrying water to them all
+#            night, and has not said why to anybody. NOBODY CONNECTS IT OUT LOUD. Nobody
+#            says the word Tithe. The player heard the sentence four scenes ago and either
+#            recognises it or does not.
+#            DO NOT SPEAK A HEAD COUNT AND DO NOT WRITE ONE INTO A SHOT. The intake number
+#            is under an open ruling elsewhere; this scene does not need it and must not
+#            acquire a dependency on it. sela_intake.010 owns that number.
+#            It costs no new canon, no new prop and no new proper noun, and it is the exact
+#            opposite move from "he says a name".
+# closing:   THE LAST IMAGE CONTAINS NEITHER SPEAKER. It contains the water and the
+#            forty-one. See BEATS_HUB_A1 8.2 (ii).
+#            This scene keeps "does not look up" on its heaviest line - it is one of the
+#            five permitted (8.2 (i)), because here the refusal and the image are the same
+#            thing.
+# omitted:   Tam, any name at all, what the Tithe is, what the seventeen days were, an
+#            apology, a reaction, and any line in which either man says the word water.
 
-# ---- dialogue-writer notes (L2) ----
+# ---- dialogue-writer notes (L2) — SUPERSEDED 2026-08-01, DO NOT FOLLOW ----
+# Everything below answers the withdrawn contract. It is kept unedited (L1 does not rewrite
+# a writer's block) so the next writer can see the reasoning that was correct and the one
+# premise that was not: the stub told him a man went in Brick's place, and no man did.
 # band:      `hub` (12-35) as a ceiling. Longest 17 w (.010). FIVE LINES, so the scene is
 #            exempt from register and spread (L1-R1) - and compression is the point of it.
 #
