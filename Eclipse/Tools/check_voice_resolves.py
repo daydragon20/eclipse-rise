@@ -147,7 +147,8 @@ def main() -> int:
                   f"{', '.join(need) or '?'})")
         print("\n  A bark register is not one character: the scripts address these "
               "as\n  separate people, and §18.5 wants them to sound like separate "
-              "people.\n  Fix: the owner picks one more voice per unbound slot.")
+              "people.\n  Fix: the owner picks one more voice per unbound slot "
+              "(owner question O-16).")
 
     if unmapped:
         print(f"\nFAIL - {len(unmapped)} speaker(s) resolve to NOTHING. These would "
@@ -175,8 +176,8 @@ def main() -> int:
               "  identical - same id, same model, same cache key. Casting is\n"
               "  permanent (19.1 point 2), so fixing this after generation\n"
               "  re-costs every line of whichever character moves.\n"
-              "  Fix: the owner assigns the reserve voice to one of each pair\n"
-              "  (owner question O-13), then re-run.")
+              "  Fix: the owner assigns a fresh voice to one of each pair\n"
+              "  (owner question O-16, which replaced O-3 and O-13), then re-run.")
 
     if unmapped or unbound or collisions:
         return 1

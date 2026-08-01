@@ -7,22 +7,23 @@
 
 ## Het overzicht
 
-*Bijgewerkt 01-08 middag. **O-13 is geen los puntje meer**: er bleken zes stembotsingen in
-plaats van drie, en twee ervan zitten in de ijkmissie. Samen met O-3 is dat nu één blokkade,
-en het is de enige die iets tegenhoudt.*
+*Bijgewerkt 01-08 laat. **O-3 en O-13 bestaan niet meer als losse kaarten**: ze zijn samen
+één kaart geworden, **O-16**, met één voorstel en één knop. Wat elf losse keuzes waren, is nu
+één akkoord — met de mogelijkheid er twee uit te pikken en de rest te laten lopen.*
 
 | Wanneer | Wat | Hoe lang | Blokkeert |
 |---|---|---|---|
-| **NU — dit is de enige echte rem** | **O-3 + O-13 samen**: zes stemmen staan op twee rollen, en twee `eclipse_fighter`-slots zijn leeg | 15 min | **alle audio.** Er wordt geen seconde ingesproken tot dit weg is |
+| **NU — dit is de enige echte rem** | **O-16**: tien stemmen liggen als voorstel klaar, met een fragment per stem en één regel waarom | 5 min | **alle audio.** Er wordt geen seconde ingesproken tot dit weg is |
 | **Nu — het gaat over geld** | **O-14** Act 1 kost ~97.000 van je 125.612 credits | 10 min | hoe act 1 klinkt |
 | **Nu** | **O-12** 2.475 credits gingen naar het verkeerde model — opnieuw of niet? | 5 min | niets, maar het loopt op |
 | **Als je zin hebt** | **O-15** Kijk naar de vier vault-kamers: is dit Hollow Point? | 5 min | niets |
 | **Wacht op mij** | **O-4** IJkmissie beluisteren | — | — |
 
-**Er komt een voorstel aan waar je in één keer ja op kunt zeggen.** Zoals het er nu staat
-zou je elf losse keuzes moeten maken; dat is drie kwartier. Een agent zoekt nu per botsing
-een verse stem uit, met één regel waarom, zodat het één akkoord wordt met de mogelijkheid
-er twee uit te pikken.
+**Dat voorstel ligt er nu.** Tien open slots, tien stemmen, negentien fragmenten om af te
+spelen (tien voorstellen plus negen alternatieven), en één regel waarom per keuze. Het staat
+op je dashboard als **O-16** en op
+`progress_media/casting/CASTING.html` onder *Het voorstel van 01-08*. **Nul credits:** het
+saldo stond voor én na deze ronde op 125.612, in beide richtingen gemeten.
 
 **Niets hiervan houdt het bouwen tegen** — de schermlaag, de kaartlaag en het schrijfwerk
 lopen door terwijl jij dit doet.
@@ -42,7 +43,7 @@ dashboard.
 
 ---
 
-## O-3 + O-13 · de castingblokkade *(15 minuten, en het houdt alles tegen)*
+## O-16 · de castingblokkade, nu als één voorstel *(5 minuten, en het houdt alles tegen)*
 
 **Wat er mis is.** Drie stem-ID's staan op **twee rollen tegelijk**, en dat is niet
 "lijkt op elkaar" — het is dezelfde ID, dus dezelfde cachesleutel, dus **letterlijk
@@ -68,10 +69,17 @@ mijn opdracht om te generen was fout.
 **Dit had ik moeten zien.** Ik meldde "alle acht stemmen resolven" en dat wás waar. Maar
 *resolven* is niet *uniek* resolven, en die controle bestond niet. Hij bestaat nu wel.
 
-**Wat jij doet:** één voorstel goedkeuren. Het advies dat eronder ligt is om bij elke
-botsing het **personage** te laten staan en de **bark-rol** een verse stem te geven — dat is
-de kant met 52, 9 en 8 regels tegen 328, 267 en 28, en dus veruit de goedkoopste kant om
-later nog te kunnen bewegen.
+**Wat jij doet:** één voorstel goedkeuren. Bij elke botsing blijft het **personage** staan en
+krijgt de **kant met de minste regels** een verse stem — 52, 9 en 8 regels tegen 328, 267 en
+28, en bij de andere drie 0 tegen 325, 0 tegen 92 en 0 tegen 4. Dat is veruit de goedkoopste
+kant om later nog te kunnen bewegen.
+
+**Twee dingen die ik onderweg gemeten heb en die het voorstel veranderd hebben.** Eclipse-
+vechter B is in het script een **man** (*"It is the man who said On the new one, right"*),
+terwijl er nu een vrouwenstem aan hangt — die stond dus los van de botsing al verkeerd. En
+vechter **C en D zijn geen mensen van jou**: al hun acht regels staan in M1.5 en het script
+noteert bij hun regels *"Iron Chorus: numbers, never names"* tegenover *"Ember: names"*. Ze
+zijn daarom gecast als de mensen van de rivaal, niet als jouw squad.
 
 ---
 

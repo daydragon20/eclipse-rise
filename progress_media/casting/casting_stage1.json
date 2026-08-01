@@ -2508,5 +2508,432 @@
    "Inquisiteur Dahl Threx (41)",
    "Hoog-Arbiter Malachar Vex (68)"
   ]
+ },
+ "voorstel": {
+  "datum": "2026-08-01",
+  "credits": 0,
+  "hoort_bij": "owner-kaart O-16 (vervangt O-3 en O-13)",
+  "wat": "Een voorstel, geen vastlegging. Per open slot een stem, plus waar zinvol een alternatief. Pas na akkoord van de owner gaat dit naar phase0/CASTING_RESOLVED.json en naar de castingtabel in 19_voice_production.md.",
+  "poorten": "category=professional, opzegtermijn >= 365 dagen, gebruik >= 250.000 tekens per jaar, >= 100 klonen, en machinaal gecontroleerd tegen ALLE reeds gecaste en op een shortlist staande stem-ids.",
+  "keuzes": [
+   {
+    "rol": "eclipse_fighter",
+    "slot": "B",
+    "voice_id": "iPYqcpY8j8Ap4jUf28I3",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/01_Eclipse-vechter_B_VOORSTEL_Michael-gruff.mp3",
+    "reden": "Roger (slot A) is glad en laid-back; B is de man die kribbig wordt en tóch meedoet, en die over zijn moeder achter een gieterijmuur praat. Gruff en schor is de enige as die hem losmaakt van de drie andere Amerikaanse mannen van middelbare leeftijd die in diezelfde scenes staan (Voss, Roger, Brick).",
+    "stem": "Michael - Gruff and Serious",
+    "eigenschappen": "male / middle_aged / american / raspy / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=iPYqcpY8j8Ap4jUf28I3",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 19954711,
+      "klonen": 12753
+     }
+    }
+   },
+   {
+    "rol": "eclipse_fighter",
+    "slot": "B",
+    "voice_id": "dag0x2dW9i5XIWwJ5KlD",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/01b_Eclipse-vechter_B_alternatief_Chxpo-gritty.mp3",
+    "reden": "Zelfde hoek, maar stiller: 'quiet dominance, slight grit under pressure'. Kies deze als Michael je te zwaar is.",
+    "stem": "Chxpo - Gritty & Grimy",
+    "eigenschappen": "male / middle_aged / american / calm / characters_animation",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=dag0x2dW9i5XIWwJ5KlD",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 2018417,
+      "klonen": 1077
+     }
+    }
+   },
+   {
+    "rol": "eclipse_fighter",
+    "slot": "C",
+    "voice_id": "y3UNfL9XC5Bb5htg8B0q",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/02_Iron-Chorus-vechter_C_VOORSTEL_Beth-bold.mp3",
+    "reden": "C is een vrouw (staat in het script: 'She says it on her way past the shift boss') en zij hoort bij de Iron Chorus, niet bij jou. Bold, rokerig en zonder een greintje warmte - dat is de vrouw die burgers de steeg in duwt en het een positie noemt.",
+    "stem": "Beth - Bold and Smooth Narrator",
+    "eigenschappen": "female / young / american / mature / characters_animation",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=y3UNfL9XC5Bb5htg8B0q",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 125861614,
+      "klonen": 17611
+     }
+    }
+   },
+   {
+    "rol": "eclipse_fighter",
+    "slot": "C",
+    "voice_id": "O4NKp88bb2JkAnrCbwQt",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/02b_Iron-Chorus-vechter_C_alternatief_Lauren-serious.mp3",
+    "reden": "Serieuzer en beheerster, minder hard. Kies deze als Beth je te veel reclame-energie heeft.",
+    "stem": "Lauren - Mystery Storytelling Voice",
+    "eigenschappen": "female / middle_aged / american / serious / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=O4NKp88bb2JkAnrCbwQt",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 57286895,
+      "klonen": 19631
+     }
+    }
+   },
+   {
+    "rol": "eclipse_fighter",
+    "slot": "D",
+    "voice_id": "AOLUVLMs1jzrUpQeAea8",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/03_Iron-Chorus-vechter_D_VOORSTEL_Arric-deadpan.mp3",
+    "reden": "D roept 'Wall. Go.' en 'Not that door. Leave it.' Deadpan en jong: hij telt waar Ember namen roept, en hij is hoorbaar iemand anders dan C en dan de emissaris.",
+    "stem": "Arric - Steady and Deadpan",
+    "eigenschappen": "male / young / american / calm / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=AOLUVLMs1jzrUpQeAea8",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 4281969,
+      "klonen": 2289
+     }
+    }
+   },
+   {
+    "rol": "eclipse_fighter",
+    "slot": "D",
+    "voice_id": "NZCHiZl9ydU4j5Gm7s63",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/03b_Iron-Chorus-vechter_D_alternatief_Sebastian-monotoon.mp3",
+    "reden": "Van nature monotoon en lager. Kies deze als je de Iron Chorus zwaarder wilt dan jonger.",
+    "stem": "Sebastian Everheart - Deep and Monotone",
+    "eigenschappen": "male / young / american / chill / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=NZCHiZl9ydU4j5Gm7s63",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 2233954,
+      "klonen": 1907
+     }
+    }
+   },
+   {
+    "rol": "dominion_conscript",
+    "slot": "B",
+    "voice_id": "6UZ6Y6OSl14UA2aOxuMM",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/04_Dominion-conscript_B_VOORSTEL_Miguel-clear.mp3",
+    "reden": "Harry (slot A) is de ruwe; B is de nette. 'Jong, welbespraakt, helder, professioneel' is het procedurele register van 18.5 regel 5 - en het staat een wereld af van Dex, die nu dezelfde stem heeft.",
+    "stem": "Miguel - American English - Clear and Youthful",
+    "eigenschappen": "male / young / american / calm / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=6UZ6Y6OSl14UA2aOxuMM",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 3602851,
+      "klonen": 2864
+     }
+    }
+   },
+   {
+    "rol": "dominion_conscript",
+    "slot": "B",
+    "voice_id": "mWRBtRP92mUXZzi4RZ0Y",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/04b_Dominion-conscript_B_alternatief_Blake-zacht.mp3",
+    "reden": "Zachter, eind twintig, 'speaks softly but with authority'. Kies deze als Miguel je te veel omroeper is.",
+    "stem": "Blake",
+    "eigenschappen": "male / young / american / confident / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=mWRBtRP92mUXZzi4RZ0Y",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 1427509,
+      "klonen": 1239
+     }
+    }
+   },
+   {
+    "rol": "veil_operative",
+    "slot": "B",
+    "voice_id": "FyrYFW3P9GUxA348YGWu",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/05_Veil-operative_B_VOORSTEL_MadisonRay-nieuwslezer.mp3",
+    "reden": "De Veil MELDT waar de conscript schreeuwt (18.5 regel 5). Een nieuwslezersregister is dat in een woord, het snijdt door geweervuur heen, en het is hoorbaar iemand anders dan River (slot A) zonder het register te verlaten.",
+    "stem": "Madison Ray - Sharp News Anchor",
+    "eigenschappen": "female / middle_aged / american / pleasant / entertainment_tv",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=FyrYFW3P9GUxA348YGWu",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 18342548,
+      "klonen": 30698
+     }
+    }
+   },
+   {
+    "rol": "veil_operative",
+    "slot": "B",
+    "voice_id": "6eEQXEFYsrOsaQlOdxlJ",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/05b_Veil-operative_B_alternatief_GroundedWoman-vlak.mp3",
+    "reden": "Vlakker en droger: 'steady, factual delivery, never bright, upbeat, or robotic'. Kies deze als je de Veil kouder wilt dan gladder.",
+    "stem": "Grounded Woman - Neurodivergent Narrator",
+    "eigenschappen": "female / middle_aged / american / neutral / informative_educational",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=6eEQXEFYsrOsaQlOdxlJ",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "gebruik_1j": 1593462,
+      "klonen": 548
+     }
+    }
+   },
+   {
+    "rol": "kaya",
+    "slot": null,
+    "voice_id": "ejl43bbp2vjkAFGSmAMa",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/06_Kaya_VOORSTEL_Veronica-sassy.mp3",
+    "reden": "Kaya verhuist, niet Voss: Voss heeft 325 regels in act 1 en Kaya nul. Dit is hetzelfde register als Laura - jong, Amerikaans, brutaal - met wat schorheid erbij, en zij praat sneller dan ze denkt.",
+    "stem": "Veronica - Sassy and Energetic",
+    "eigenschappen": "female / young / american / sassy / characters_animation",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=ejl43bbp2vjkAFGSmAMa",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": false,
+      "rate": 3.0,
+      "gebruik_1j": 1844733,
+      "klonen": 1914
+     }
+    }
+   },
+   {
+    "rol": "kaya",
+    "slot": null,
+    "voice_id": "TPPp5Y7VlA8wm6T8DFrK",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/06b_Kaya_alternatief_Sloane-droog.mp3",
+    "reden": "Droger dan uitbundig, scherpe timing, subtiel sarcasme. Kies deze als je Kaya's humor liever koel dan luid hebt.",
+    "stem": "Sloane Madison - Gen Z, Edgy & Playful",
+    "eigenschappen": "female / young / american / chill / social_media",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=TPPp5Y7VlA8wm6T8DFrK",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "gebruik_1j": 2376014,
+      "klonen": 950
+     }
+    }
+   },
+   {
+    "rol": "kaine",
+    "slot": null,
+    "voice_id": "wa4sQVgbDDzUDEzJwch3",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/07_Kaine_VOORSTEL_Eryn-commandant.mp3",
+    "reden": "Reyes houdt Alice: 92 regels tegen nul voor Kaine. En de stemkaart van Eryn zegt letterlijk 'strong female military commander, tactical roles, video games' - dat is de Grootmaarschalk.",
+    "stem": "Eryn – Strong Female Military Commander",
+    "eigenschappen": "female / middle_aged / american / serious / entertainment_tv",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=wa4sQVgbDDzUDEzJwch3",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 2989028,
+      "klonen": 4767
+     }
+    }
+   },
+   {
+    "rol": "kaine",
+    "slot": null,
+    "voice_id": "Qbw4VpyUrHEG7NigKzty",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/07b_Kaine_alternatief_Kristen-koud.mp3",
+    "reden": "Kouder en vorstelijker. Let op: Kaine is geen schurk maar een eerlijke tegenstander met een erecode; dit duwt haar richting schurk.",
+    "stem": "Kristen – Cold Evil Queen Villain",
+    "eigenschappen": "female / middle_aged / american / intense / characters_animation",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=Qbw4VpyUrHEG7NigKzty",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 9167103,
+      "klonen": 11401
+     }
+    }
+   },
+   {
+    "rol": "torren",
+    "slot": null,
+    "voice_id": "An7r4HL8TAw73K5uSMpy",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/08_Torren_VOORSTEL_Onyx-jouw-eigen-tweede-keus.mp3",
+    "reden": "Torren verhuist naar zijn EIGEN tweede keus, dus dit is geen nieuwe stem maar er een die je al gekozen had. AEGIS houdt Daniel - een machine mag formeel en Brits klinken, een overgelopen kolonel hoeft dat niet.",
+    "stem": "Onyx – Calm & Friendly Podcast Narrator",
+    "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=An7r4HL8TAw73K5uSMpy",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 1895292,
+      "klonen": 1164
+     }
+    }
+   },
+   {
+    "rol": "petra",
+    "slot": null,
+    "voice_id": "YGWwh1G8pUwWmJyCCpma",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/09_Petra_VOORSTEL_Blue-low-calm-grit.mp3",
+    "reden": "Laag, kalm en met grit - precies de drie samen. Kalm zonder grit is een machine, grit zonder kalm is boosheid, en haar vlakheid is schade, geen karakter.",
+    "stem": "Blue - Low, Calm with Grit ",
+    "eigenschappen": "female / old / canadian / confident / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=YGWwh1G8pUwWmJyCCpma",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "gebruik_1j": 3789103,
+      "klonen": 4042
+     }
+    }
+   },
+   {
+    "rol": "petra",
+    "slot": null,
+    "voice_id": "MHPwHxLx0nmGIb5Jnbly",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/09b_Petra_alternatief_Empress-smoky.mp3",
+    "reden": "Ouder en rokeriger. Risico: 'breathy', en haar regels zijn vier woorden lang.",
+    "stem": "Empress - Smoky, Breathy, and Neutral",
+    "eigenschappen": "female / old / american / deep / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=MHPwHxLx0nmGIb5Jnbly",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 18008371,
+      "klonen": 9169
+     }
+    }
+   },
+   {
+    "rol": "iron_chorus_emissary",
+    "slot": null,
+    "voice_id": "S75jVZ0i3J6Xa5BbK8CE",
+    "rang": 1,
+    "bestand": "progress_media/casting/voorstel/10_Emissaris_VOORSTEL_Spartan-restrained.mp3",
+    "reden": "'Measured pacing, clear diction, restrained emotional weight' is woordelijk de opdracht: vlak zijn zonder dood te klinken. En hij is de enige kandidaat voor deze rol die ALLE poorten haalt - de zeven van de bestaande shortlist niet.",
+    "stem": "Spartan - Deep Narration & Storytelling",
+    "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=S75jVZ0i3J6Xa5BbK8CE",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": true,
+      "rate": 1.0,
+      "gebruik_1j": 4258205,
+      "klonen": 5268
+     }
+    }
+   },
+   {
+    "rol": "iron_chorus_emissary",
+    "slot": null,
+    "voice_id": "3H55HGnNE1XjYxigHSAS",
+    "rang": 2,
+    "bestand": "progress_media/casting/voorstel/10b_Emissaris_alternatief_MarcusK-documentaire.mp3",
+    "reden": "De beste van je bestaande zeven: documentaire-voordracht, feiten zonder kleur. Mist de gebruiksdrempel op een haar (95 klonen tegen 100).",
+    "stem": "Marcus K - Calm Documentary Narrator",
+    "eigenschappen": "male / middle_aged / american / calm / narrative_story",
+    "licentie": {
+     "status": "NIET_GEVERIFIEERD",
+     "kaart_url": "https://elevenlabs.io/app/voice-library?voiceId=3H55HGnNE1XjYxigHSAS",
+     "gemeten_velden": {
+      "category": "professional",
+      "notice_period_dagen": 730,
+      "free_users_allowed": false,
+      "rate": 1.0,
+      "gebruik_1j": 276973,
+      "klonen": 95
+     }
+    }
+   }
+  ]
  }
 }
