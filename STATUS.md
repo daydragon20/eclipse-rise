@@ -182,6 +182,10 @@ bark-varianten, geen zes. Volledig in `21_quality_mandate.md` — kort, lees het
     aanhalingsteken.
   - Een regex met `re.S` en een niet-verankerde `.+?` matcht over het **hele bestand**.
     `check_owner_questions.py` klapte daarmee tot één regel samen.
+  - **Lezen met `utf-8-sig` en schrijven met `utf-8` haalt de BOM eraf.** Zonder BOM leest
+    PowerShell 5.1 een `.ps1` als ANSI, en dan breekt de eerste em-dash de parse — op een
+    regel die je niet hebt aangeraakt. `verify.ps1` viel daarop om. Schrijf een `.ps1` of
+    `.bat` terug met **`utf-8-sig`**, en parse hem daarna.
 
   Moet het toch met een script: **assert dat het anker precies één keer voorkomt vóór je
   schrijft**, laat het script **atomair falen** (bouw de hele nieuwe tekst op en schrijf pas
