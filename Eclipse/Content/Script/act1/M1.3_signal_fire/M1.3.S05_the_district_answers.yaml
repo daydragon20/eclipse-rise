@@ -14,7 +14,7 @@ turn:         "Voss recognises a shoulder plate in the response line and keeps m
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .150 zegt Nine one seven terwijl L1-R36 het kenteken op two six one heeft vastgelegd; de L2-notitie op r.50 gaat mee. Alles verder schoon"
+critic:       GO
 words:        130
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.3.md ----
@@ -181,7 +181,7 @@ lines:
   - id:      M1.3.S05.150
     speaker: VOSS
     voice:   voss
-    text:    "Nine one seven."
+    text:    "Two six one."
     shot:    "A response line forming across the avenue, sodium light on their backs. Voss is half a step slow for the length of one man's shoulder plate."
     note:    "THE BADGE. He is not named, he does not speak, and he does not die - 02.11 holds this thread to the end of the campaign."
 

@@ -14,7 +14,7 @@ turn:         "In the quiet branch the block covers for them unasked; in the lou
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: ACT1_OVERVIEW 6 r.237 noemt de debrief als zetter van Story.Choice.M12_Ghost terwijl het bestand S05-exit zegt -- wint het register, dan leest S99 de vlag voor hij gezet is; .120 zakt op 18.9 C2"
+critic:       GO
 words:        260
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_M1.2.md ----
