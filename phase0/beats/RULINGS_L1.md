@@ -766,3 +766,5 @@ Acht keer, op aangrenzende regels, en het leest als een bug. Iemand repareert da
 - **`M1.5` staat in dit log twee keer als GO** (L1-R14, L1-R21: *"M1.5 is GO en wordt niet heropend"*), maar gemeten dragen alle zes de scènebestanden `status: draft` / `critic: null`. Twee eerdere rulings hebben dus op een toestand geleund die de bestanden niet dragen. **Niet door mij op te lossen** — een verdict zetten is het veld van `dialogue-critic`. Gemeld, en het staat op de act-1-continuïteitsdoorloop.
 - **Q-4 (een eigen naam voor de emissaris) blijft open** en blijft optioneel; L1-R6b maakte hem al minder dringend en L1-R30 verandert daar niets aan.
 - **Nog open uit ronde 5:** L1-R28 (gespecificeerd, niet actief), `M1.5.S99.050`/`.060` in de `none`-tak, en `M1.4.S99`'s registerdrempel.
+
+> **En de rest is nagelopen, zodat niemand dat opnieuw doet.** Elke claim in dit document van de vorm *"M1.x is GO / draft / NO-GO"* is machinaal tegen de scènebestanden gehouden (01-08). **M1.5 is de enige die niet klopt** — drie voorkomens, alle drie tegenover zes bestanden op `critic: null`. De klas is dus begrensd en dit is de enige instantie, geen steekproef.
