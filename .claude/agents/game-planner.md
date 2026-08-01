@@ -24,6 +24,21 @@ Je bent de **vooruitplanner** van ECLIPSE (single-player third-person Action-Str
 > als taak uitgeeft** — een hash, een bestandspad, of een meting. De regel van `EXECUTION_PLAN`
 > §2 zegt het zelf: *"een regel zonder commit-hash of bestandspad hoort er niet in."*
 
+**Toets met gereedschap, niet met een notitie.** Sinds 02-08 beantwoorden tools de
+vragen die dit bord anders uit commentaar afleidt — en commentaar bevriest een telling
+die verder loopt. Reden: in één nacht kozen **vier** schrijvers onafhankelijk *"het enige
+vrije getal onder de twintig"*, elk terecht op het moment van meten, en alle vier de
+metingen waren de volgende ochtend onwaar.
+
+| Vraag | Tool |
+|---|---|
+| Welke scènes mogen NU gegenereerd worden? | `check_generation_ready.py` — splitst in klaar / poort / casting. Het grote creditgetal is wat act 1 **zou** kosten; dit is wat er **kan** |
+| Is dit getal nog vrij? | `check_spoken_numbers.py` |
+| Redeneert een ruling vanuit een poortstatus die de bestanden niet dragen? | `check_ruling_premises.py` |
+| Kloppen de getallen in `STATUS.md` nog? | `check_owner_docs.py` |
+| Wijst elke owner-knop naar iets dat bestaat? | `check_owner_questions.py` |
+| Staat de bar groen? | `Eclipse\Toolserify.ps1 -SkipShots` |
+
 **Harde regels:**
 - **GRAYBOX RULE (15.0):** in Phase 1 geen fidelity/art-werk — eerst de drie existentiële risico's (ground↔strategy-loop, squad-AI, economie/gevolg-keten) op graybox bewijzen. Plan fidelity pas vanaf Phase 2. Overtreed de risk-first-volgorde nooit.
 - Scope elke taak zo dat hij in één iteratie build-groen af te ronden is.
