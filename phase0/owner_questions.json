@@ -276,30 +276,30 @@
   {
    "id": "O-19",
    "prio": "nu",
-   "vraag": "Heb JIJ vanochtend castingkeuzes gewijzigd? Ik heb het niet gedaan en ik raak het niet aan.",
-   "waarom": "phase0/CASTING_KEUZE.json is vanochtend om 09:03 gewijzigd. Ik heb dat niet gedaan en geen enkele agent had er opdracht toe — daarom vraag ik het in plaats van erop door te bouwen.\n\nWAT ER VERANDERD IS:\n  • iron_chorus_emissary toegevoegd: kandidaten 2 en 3 (Cain, Steve)\n  • petra toegevoegd: kandidaten 1 en 5 (Empress, Mother)\n  • kaine GEWIJZIGD van [2] naar [5, 8]\n\nDe eerste twee vullen precies de gaten die ik als ongecast meldde, dus dit zóú je antwoord op O-16 kunnen zijn. Maar het staat NIET in OWNER_ANSWERS.md en O-16 is nergens als beantwoord gemarkeerd, dus ik weet het niet.\n\nWAAROM IK NIET GEWOON DOORGA: casting is permanent. Twee personages op één stem-id zijn niet gelijkend maar identiek — zelfde id, zelfde model, zelfde cachesleutel — en na generatie kost het verplaatsen van één van beide elke regel opnieuw. Voor Mara zijn dat er 332.\n\nEn de derde regel is het punt: kaine had al een keuze en die is VERANDERD. Toevoegen is een gat vullen; wijzigen is iets anders.\n\nVier van de nieuwe kandidaten komen uit de Voice Library en hebben een LICENTIECONTROLE nodig voor er iets mee gegenereerd wordt.",
-   "stappen": "1. Zeg of jij dit gedaan hebt.\n2. Zo ja: dan verwerk ik het als je O-16-antwoord en doe ik de licentiecontrole eerst.\n3. Zo nee: dan zoek ik uit wat het geschreven heeft voordat er één credit uitgaat.",
+   "vraag": "Je hebt vanochtend gecast. Ik heb het gezien, ik doe er nog niets mee, en ik heb één vraag.",
+   "waarom": "Ik meldde dit eerst als ‘er is iets in je castingbestand geschreven en ik weet niet wat’. Dat was te voorzichtig en ik heb het uitgezocht: het dashboard SCHRIJFT dat bestand, achter een klik op de castingpagina (Tools/eclipse_dashboard.py r. 1272). De wijziging van 09:03 komt dus van jou.\n\nWAT ER NU STAAT:\n  • iron_chorus_emissary: kandidaat 2 en 3 (Cain, Steve)\n  • petra: kandidaat 1 en 5 (Empress, Mother)\n  • kaine: van [2] naar [5, 8]\n\nDe eerste twee vullen precies de twee gaten die de stemcontrole al dagen meldt. Dat is goed nieuws.\n\nMIJN VRAAG GAAT OVER ÉÉN REGEL: kaine had al een keuze en die is nu een andere. Toevoegen is een gat vullen; wijzigen is iets anders, en ik wil niet dat een misklik permanent wordt. Casting is namelijk onomkeerbaar — twee personages op één stem-id zijn niet gelijkend maar identiek, en na generatie kost het verplaatsen van één van beide elke regel opnieuw.\n\nEN ER MOET IETS VÓÓR DE GENERATIE: vier van de gekozen stemmen komen uit de Voice Library en hebben een LICENTIECONTROLE nodig. Dat is een owner-handeling, geen tool.\n\nDit lost O-16 overigens nog niet helemaal op: de drie stem-id’s die op TWEE rollen staan (Mara met een schutter, Dex met een dienstplichtige, Threx met een Veil-operative) staan er nog, en dat zijn 696 van de 704 geblokkeerde regels.",
+   "stappen": "1. Bevestig dat kaine bewust is gewijzigd (of zeg dat het een misklik was).\n2. Doe de licentiecontrole op de vier bibliotheekstemmen.\n3. Klik daarna de drie botsingen van O-16 weg — die zijn de echte rem.",
    "opties": [
     {
-     "label": "Ja, dat was ik — verwerk het",
-     "waarde": "owner_deed_dit",
-     "toelichting": "Ik behandel het als je O-16-antwoord.",
-     "gevolg": "Ik doe eerst de licentiecontrole op de vier bibliotheekstemmen, verwerk daarna de keuzes, en meld wat er dan vrijkomt. Er gaat geen credit uit voor je dat gezien hebt."
+     "label": "Klopt allemaal — ga door",
+     "waarde": "bevestigd",
+     "toelichting": "Inclusief de wijziging op kaine.",
+     "gevolg": "Ik verwerk de keuzes en meld wat er vrijkomt. Er gaat geen credit uit tot de licentiecontrole gedaan is — dat blijft jouw handeling."
     },
     {
-     "label": "Nee, dat was ik niet",
-     "waarde": "niet_de_owner",
-     "toelichting": "Dan is er iets anders dat naar dit bestand schrijft.",
-     "gevolg": "Ik raak de casting niet aan en zoek eerst uit wat het geschreven heeft. Generatie blijft stil tot dat duidelijk is."
+     "label": "Kaine was een misklik, de rest klopt",
+     "waarde": "kaine_terug",
+     "toelichting": "Alleen die één regel terug.",
+     "gevolg": "Ik zet kaine terug op zijn oude keuze en laat de emissary en petra staan. Kost niets — er is nog geen credit uitgegeven."
     },
     {
-     "label": "Ik weet het niet meer — draai het terug",
-     "waarde": "terugdraaien",
-     "toelichting": "Terug naar de stand van gisteravond.",
-     "gevolg": "kaine gaat terug naar zijn oude keuze en de twee nieuwe rollen worden weer leeg. O-16 blijft dan gewoon open staan en er is niets verloren."
+     "label": "Ik wil het eerst zelf terugzien",
+     "waarde": "eerst_zien",
+     "toelichting": "Geen wijziging tot je gekeken hebt.",
+     "gevolg": "Ik laat het bestand precies zoals het is en doe niets met casting. De rest van het werk loopt gewoon door."
     }
    ],
-   "advies": "Als jij het was: mooi, dan is de grootste blokkade weg en doe ik de licentiecontrole meteen. Als je het niet meer weet, is terugdraaien gratis — er is nog geen credit uitgegeven, dus er gaat niets verloren. Wat ik NIET doe is gokken, want dit is de enige beslissing in het project die na uitvoering niet meer te herstellen is zonder alles opnieuw te betalen.",
+   "advies": "Als kaine bewust is: bevestig en doe de licentiecontrole, dan is dit de grootste stap van de week. Maar de echte rem zit nog in O-16 — drie stemmen die op twee rollen staan, samen 696 regels, waaronder 332 van Mara en 267 van Dex. Die twee delen op dit moment een stem met een figurant.",
    "vrijtekst": true
   }
  ]
