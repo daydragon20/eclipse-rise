@@ -28,6 +28,17 @@ Hij leest geen escalaties en geen openstaande rulings. Een scene die hier KLAAR
 heet, kan nog steeds op een architect-beslissing wachten die alleen in proza
 bestaat. Hij zegt: de poort is groen en de stemmen bestaan. Niet meer.
 
+Die onzekerheid is op 02-08 EEN KEER MET DE HAND GEMETEN: van de 44 scenes in de
+klaar-bak droeg er geen enkele een escalatie die als open leest. Dat is geen
+check en het is geen belofte -- het is een momentopname met een grove regex, en
+hij staat hier zodat de volgende lezer hem niet opnieuw hoeft af te leiden.
+
+Er is bewust GEEN check van gemaakt. De vorm van een escalatie is proza; een
+regex die "OPEN" naast "escalatie" zoekt, meldt straks een scene die het woord
+toevallig in een citaat draagt, en een poort die ruis maakt houdt op gelezen te
+worden. Wie dit mechanisch wil, heeft eerst een VELD nodig -- en dat is een
+formaatwijziging en dus L1-werk.
+
 Draai:  python Eclipse/Tools/check_generation_ready.py
         python Eclipse/Tools/check_generation_ready.py --zelftest
 """
