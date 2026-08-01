@@ -10,7 +10,7 @@ ze bezit, hier staat alleen wat een verse sessie moet weten om te beginnen.*
 
 **Fase 2 — Vertical Slice "Thirteen Bullets"** is de actieve milestone.
 
-Bar (zelf nagedraaid 01-08 ~12:45): build groen `-NoUba` · **244 tests, 0 gefaald, 0
+Bar (zelf nagedraaid 01-08 ~16:30): build groen `-NoUba` · **247 tests, 0 gefaald, 0
 niet gedraaid** · `EclipseValidateData` 7 validators / 9 assets / **0 fouten** ·
 EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 
