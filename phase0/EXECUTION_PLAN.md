@@ -203,7 +203,17 @@ DoD-basis (14.4): *spec gerefereerd + code + data + tests + EventCatalog/docs bi
 
 **Eén build-slot.** Schrijven mag parallel, **landen is serieel**. Spoor A raakt de build niet en loopt dus altijd door.
 
-### 2a-quater. GESCOPET EN KLAAR OM TE STARTEN — N-c: gezondheid op het scherm
+### 2a-quater. ~~N-c: gezondheid op het scherm~~ — GELAND 01-08, `d766712`
+
+> **Af, en op frames geverifieerd.** Gezondheid staat linksonder met houding en balk; het
+> gevechtsframe toont 60/100 met 59% vulling. Het contrast op de statusregel ging van
+> 1,00 naar 10,77 : 1 — maar het getal is niet het punt: **vóór** liep het van 1,00 tot
+> 4,52 afhankelijk van wat er toevallig achter stond, **ná** is het 10,77 op alle acht
+> frames. De controleproef gaf dezelfde handtekening als bij de munitie: met het pollen
+> tijdelijk terug werden 8 feiten 16 tekenbeurten — pollen en luisteren telden óp in
+> plaats van elkaar te vervangen. Zonder die proef was een half-geslaagde ombouw als
+> geslaagd gemeld. *Hieronder staat de oorspronkelijke scoping; laat hem staan als
+> nulmeting.*
 
 *Gemeten 01-08 ~11:30, en het is kleiner dan het klinkt.*
 
@@ -238,7 +248,14 @@ staat in `phase0/REFERENTIE_HUD_BORDERLANDS.md` r36-37 expliciet linksonder, met
 **Wacht op het build-slot** (N-b heeft het). Twee C++-agents tegelijk is de fout die op
 31-07 drie keer de werkboom brak.
 
-### 2a-quinquies. N-d — van lijst met topologie naar GRAAF
+### 2a-quinquies. ~~N-d — van lijst met topologie naar GRAAF~~ — GELAND 02-08, `cdef03f`
+
+> **Af, met plaat en opname.** Bordregels van 1,21 naar 13,54 : 1 en de **spreiding van
+> de ondergrond op 0,0000**; aanbodknoppen van 1,36 naar 16,90. Zes knopen op geauthorde
+> posities, zeven lijnen, en **twee onafhankelijke poorten**: de asymmetriepoort slaat het
+> bord blank bij een datafout, de layoutpoort sluit alleen de tekenlaag en laat de lijst
+> staan. Het frame vond wat geen test kon zien: de graaf duwde de aanbodknoppen van het
+> scherm. *Hieronder staat de oorspronkelijke scoping; laat hem staan als nulmeting.*
 
 *Gescopet 01-08 na N-b. De element-builder noemde dit een owner-beslissing; ik denk dat
 de staande opdracht hem al beantwoordt, en leg hieronder uit waarom — omkeerbaar als
