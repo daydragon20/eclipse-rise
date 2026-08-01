@@ -49,7 +49,7 @@ herhaalbaar en **drukt altijd zijn eigen dekking af**. Saldo 125.612 — act 1 a
 dus ~vier vijfde van alles wat er nog is, en O-14 is daarmee een andere vraag.
 
 > **Spoor A staat verder dan spoor B. ACT 1 IS COMPLEET GESCHREVEN** — acht missies, de
-> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.630 regels, 97.963 credits**
+> proloog en de twaalf hub-gesprekken. **71 bestanden, 1.630 regels, 98.035 credits**
 > (gemeten, `Tools/count_generation_cost.py`; deze drie getallen worden sinds 01-08 door
 > `Tools/check_owner_docs.py` tegen die teller bewaakt). Saldo 125.612, dus **act 1 alleen
 > is 78% van alles wat er nog is** — barks, muziek, SFX en de acts 2 t/m 4 komen daar nog
