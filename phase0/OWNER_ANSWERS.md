@@ -36,3 +36,6 @@
 | 2026-08-01 10:05 | O-12 | 51 |  |
 | 2026-08-01 10:06 | O-15 | sfeer |  |
 | 2026-08-01 10:09 | O-20 | alle_tien_ok |  |
+| 2026-08-01 10:19 | OBS-8 | gebruik-de-animatietools | OWNER-INSTRUCTIE 01-08: STOP MET HET LICHAAM UIT TE REKKEN OM BEWEGING TE MAKEN - dat is onrealistisch. Er staan twee animatietools klaar, gebruik die om de personages te laten bewegen EN voor gezichtsanimatie. GEMETEN WAT ER IS: (1) Animotiva / Kimodo Exporter - marketplace-plugin Animotiva7ec6e436aeaV2, categorie Animation, van Animotive. Exporteert Sequencer-animaties als SOMA-JSON voor Kimodo motion generation. Geinstalleerd maar nog NERGENS in het project gebruikt: geen enkel bestand met kimodo/animotive/soma in de naam. (2) MetaHuman Animator plus MetaHuman Animation Tools - engine-plugi |
+| 2026-08-01 10:20 | T-8 | gedaan |  |
+| 2026-08-01 10:20 | O-21 | vier_assen |  |

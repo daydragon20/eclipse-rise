@@ -1392,6 +1392,19 @@ def zet_casting_keuze(rol: str, nr: int) -> dict:
     return {"ok": True, "rol": rol, "gekozen": huidig}
 
 
+def scan_assets() -> dict:
+    """De asset-inventaris. Gegenereerd door Tools/dump_asset_inventaris.py —
+    deze server leest alleen, want een grep over 18 GB hoort niet in een lus
+    die elke vijf seconden draait."""
+    p = REPO / "phase0" / "asset_inventaris.json"
+    if not p.is_file():
+        return {"packs": [], "gemeten": "", "leeg": True}
+    try:
+        return json.loads(p.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {"packs": [], "gemeten": "", "leeg": True}
+
+
 def disk_info() -> dict:
     def size_of(p: Path) -> float:
         total = 0
@@ -1452,6 +1465,7 @@ def scanner_loop() -> None:
             fresh["vragen"] = scan_questions()
             fresh["bevindingen"] = scan_findings()
             fresh["casting"] = scan_casting()
+            fresh["assets"] = scan_assets()
             fresh["voorstel"] = scan_voorstel()
             fresh["audio"] = scan_audio()
             fresh["voss"] = scan_voss()

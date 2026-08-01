@@ -205,6 +205,11 @@ h3{font-size:17px;margin:0 0 8px}
 .kies.aan{background:var(--ok);border-color:var(--ok);color:#0b0e14}
 .kies:disabled{opacity:.5;cursor:wait}
 
+/* assets */
+.pack{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:13px 15px;margin-bottom:9px}
+.pack.ongebruikt{border-color:#f5a52444}
+.pack .oordeel{font-size:12.5px;color:var(--dim);margin:9px 0 0;display:grid;gap:5px;line-height:1.5}
+
 /* campagne-boom */
 .boomrij{display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer;border-bottom:1px solid var(--line);font-size:13.5px}
 .boomrij:hover{color:var(--acc2)}
@@ -258,6 +263,7 @@ h3{font-size:17px;margin:0 0 8px}
     <button data-v="schrijf">Schrijflaag</button>
     <button data-v="geluid">Geluidslaag</button>
     <button data-v="beeld">Beeld</button>
+    <button data-v="assets">Assets</button>
     <button data-v="docs">Documenten</button>
     <button data-v="historie">Historie</button>
   </nav>
@@ -271,6 +277,7 @@ h3{font-size:17px;margin:0 0 8px}
   <section class="view" id="v-schrijf"></section>
   <section class="view" id="v-geluid"></section>
   <section class="view" id="v-beeld"></section>
+  <section class="view" id="v-assets"></section>
   <section class="view" id="v-docs"></section>
   <section class="view" id="v-historie"></section>
 </main>
@@ -828,7 +835,45 @@ function vGeluid(){
 }
 
 
-const VIEWS={nu:vNu,voortgang:vVoortgang,agents:vAgents,taken:vTaken,schrijf:vSchrijf,geluid:vGeluid,beeld:vBeeld,docs:vDocs,historie:vHistorie};
+function vAssets(){
+  const a=S.assets||{}, packs=a.packs||[];
+  if(!packs.length)return '<h2>Assets</h2><div class="card"><div class="empty">Nog niet geïnventariseerd. Draai <code>python Tools/dump_asset_inventaris.py</code>.</div></div>';
+  const ong=packs.filter(p=>!p.gebruikt), gebr=packs.filter(p=>p.gebruikt);
+  const kaart=p=>`
+    <div class="pack ${p.gebruikt?"":"ongebruikt"}">
+      <div class="ow-h">
+        <span class="tag ${p.gebruikt?"ok":"warn"}">${p.gebruikt?"in gebruik":"ongebruikt"}</span>
+        <strong>${esc(p.naam)}</strong>
+        <span class="m" style="margin-left:auto">${p.assets} assets · ${p.mb} MB</span>
+      </div>
+      ${(p.oordeel&&p.oordeel.length)?`<div class="oordeel">${p.oordeel.map(o=>"<div>"+esc(o.replace(/\s+—\s+\*.*\*$/,""))+"</div>").join("")}</div>`:""}
+      ${p.gebruikt?`<div class="note">genoemd in ${p.refs.length} bestand(en): <code>${esc((p.refs||[]).slice(0,2).join(", "))}</code></div>`:""}
+    </div>`;
+  return `
+  <h2>Assets — ${packs.length} packs · ${(a.totaal_assets||0).toLocaleString("nl")} assets · ${((a.totaal_mb||0)/1024).toFixed(1)} GB</h2>
+  <div class="card"><div class="note" style="margin:0">
+    Alles hier is al binnengehaald en al betaald. <strong>Kijk hier voor je iets met de hand bouwt</strong> — een gang, een muzzle flash, een auto, een planeet aan de hemel: de kans is groot dat het er ligt.<br><br>
+    "In gebruik" betekent dat <code>/Game/&lt;pack&gt;</code> in de code voorkomt. Dat is een <strong>ondergrens</strong>: een pack dat alleen vanuit een level of DataTable gebruikt wordt, staat hier ten onrechte als ongebruikt. Gemeten ${esc(a.gemeten||"—")}.
+  </div></div>
+
+  ${ong.length?`<h2>Ligt er, wordt niet aangeroepen <span class="tag warn">${ong.length}</span></h2>
+  <div class="card"><div class="note" style="margin:0 0 12px">Geen verwijt — een lijst met kansen.</div>
+  ${ong.map(kaart).join("")}</div>`:""}
+
+  <h2>In gebruik <span class="tag ok">${gebr.length}</span></h2>
+  <div class="card">${gebr.map(kaart).join("")}</div>
+
+  ${(a.afgewezen||[]).length?`<h2>Bewust afgewezen</h2>
+  <div class="card"><div class="note" style="margin:0 0 10px">Staat in <code>Eclipse/Saved/RejectedAssets</code>. Niets verwijderd; terugzetten is één verplaatsing. Reden per pack in <code>WAAROM_AFGEWEZEN.md</code>.</div>
+  ${(a.afgewezen||[]).map(x=>`<div class="row"><span class="t">${esc(x.naam)}</span><span class="m">${x.assets} assets</span></div>`).join("")}</div>`:""}
+
+  ${(a.eigen||[]).length?`<h2>Eigen werk</h2><div class="card">
+  ${(a.eigen||[]).map(x=>`<div class="row"><span class="t">${esc(x.naam)}</span><span class="m">${x.assets} assets · ${x.mb} MB</span></div>`).join("")}</div>`:""}
+
+  <div class="card"><div class="note" style="margin:0">De stijlwet geldt onverkort: niets rendert rauw, alles door de toon-master (§15.5). En een pack-asset met aardse semiotiek — verkeersborden, moderne meubels, Latijnse tekst — wordt <strong>vervangen, niet geplaatst</strong> (§20.2).</div></div>`;
+}
+
+const VIEWS={nu:vNu,assets:vAssets,voortgang:vVoortgang,agents:vAgents,taken:vTaken,schrijf:vSchrijf,geluid:vGeluid,beeld:vBeeld,docs:vDocs,historie:vHistorie};
 
 // Waarom dit bestaat: de pagina bouwde zichzelf elke 5 s opnieuw op, en gooide
 // daarmee een spelende <audio> weg. Owner 31-07: "als je de audio luistert

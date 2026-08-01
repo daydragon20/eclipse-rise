@@ -1,0 +1,356 @@
+{
+ "gemeten": "2026-08-01 10:23",
+ "packs": [
+  {
+   "naam": "Fab",
+   "assets": 977,
+   "mb": 6077,
+   "refs": [
+    "Eclipse/Source/Eclipse/Core/EclipseGrayboxBuilder.cpp",
+    "Eclipse/Tools/inventory_curation_pass.py",
+    "Eclipse/Tools/inventory_metahumans_wave2.py",
+    "Eclipse/Tools/__pycache__/inventory_curation_pass.cpython-312.pyc",
+    "Eclipse/Tools/__pycache__/inventory_metahumans_wave2.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Restyle contract for every accept: dynamic instance of /Game/Art/M_EclipseToon with the tint pair below, AlbedoTex + AlbedoGain as listed, AlbedoMix 0.4–0.9, LightDir synced to the builder sun. Fab packs are machine-local (gitignored): reference with graceful fallback (missing pack = flat cel, log l  — *phase0/ASSET_CURATION.md*",
+    "Pack removed from disk 2026-07-23 (cleanup pass, ASSET_CLEANUP.md D1) — re-download from the Fab library if ever needed.  — *phase0/ASSET_CURATION.md*",
+    "Rejected (3): _3 (near-blank cream — no read at any distance), _4 (candy-colored honeycomb — reads as fabric/toy, not industrial), _8 (sparse wire squiggles — reads as scribble beyond 3 m).  — *phase0/ASSET_CURATION.md*"
+   ]
+  },
+  {
+   "naam": "Uniblocks",
+   "assets": 3803,
+   "mb": 3777,
+   "refs": [
+    "Eclipse/Tools/inventory_envpacks_2026_07_25.py",
+    "Eclipse/Tools/__pycache__/inventory_envpacks_2026_07_25.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Uniblocks  3777 MB  3803  ~3200  ~204  ~293  25  12  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "- Uniblocks is de kit-kandidaat voor P2-08. 3200 meshes met 12 demo-maps is het  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "Uniblocks  3200  3179  13  8  2506 (78%)  203 (121)  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*"
+   ]
+  },
+  {
+   "naam": "ParagonLtBelica",
+   "assets": 1840,
+   "mb": 1964,
+   "refs": [
+    "Eclipse/Source/Eclipse/Characters/EclipseCharacter.cpp",
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp",
+    "Eclipse/Tools/inventory_curation_pass.py",
+    "Eclipse/Tools/link_compatible_skeletons.py",
+    "Eclipse/Tools/migrate_curation_accepts.py",
+    "Eclipse/Tools/__pycache__/inventory_curation_pass.cpython-312.pyc",
+    "Eclipse/Tools/__pycache__/migrate_curation_accepts.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "1. /Game/ParagonLtBelica — 80 static meshes → 1 accepted, 79 rejected  — *phase0/ASSET_CURATION.md*",
+    "A1  /Game/ParagonLtBelica/Characters/Maps/BackGroundAssets/SM_AssetPlatform  2×2 m industrial plinth: loading-dock step / vendor-stand base in the warehouse yard (4096 tri, clean quad disc)  graphite; AlbedoTex T_4k_SciFi10_1_BaseColor, gain 4.96, world-aligned (UVMode 0), TexWorldScale ~200  — *phase0/ASSET_CURATION.md*",
+    "Content/ParagonLtBelica  1,964.5 MB  Player body: DT_BodyDefs row Player (mesh + idle/walk/shoot/death anims) — binary-confirmed in DT_BodyDefs.uasset; plus accept A1 (SM_AssetPlatform). Whole pack kept: Paragon anims carry notifies into pack audio/FX (internal cross-refs), subdirectory surgery is n  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "Factory_Pack_V1",
+   "assets": 408,
+   "mb": 1897,
+   "refs": [
+    "Eclipse/Tools/inspect_kit_candidates.py",
+    "Eclipse/Tools/inventory_envpacks_2026_07_25.py",
+    "Eclipse/Tools/migrate_kit_accepts.py",
+    "Eclipse/Tools/__pycache__/inspect_kit_candidates.cpython-312.pyc",
+    "Eclipse/Tools/__pycache__/inventory_envpacks_2026_07_25.cpython-312.pyc",
+    "Eclipse/Tools/__pycache__/migrate_kit_accepts.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Factory_Pack_V1  2130 MB  408  ~151  ~138  ~115  3  2  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "- Factory_Pack_V1 is een props-/industrieel pack (151 meshes, 115 materials) —  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "Factory_Pack_V1  151  146  5  0  35 (23%)  139 (110)  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*"
+   ]
+  },
+  {
+   "naam": "Planet_Project",
+   "assets": 33,
+   "mb": 1011,
+   "refs": [],
+   "gebruikt": false,
+   "oordeel": [
+    "- [FREE] Planet Project (Arghanion's Puzzlebox, 5.6–5.7, ~1 GB) —  — *ASSETS_IN_WACHT.md*"
+   ]
+  },
+  {
+   "naam": "SciFiCharacterPack",
+   "assets": 226,
+   "mb": 327,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp",
+    "Eclipse/Tools/inspect_body_skeletons.py",
+    "Eclipse/Tools/setup_character_data.py"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "SciFiCharacter",
+   "assets": 105,
+   "mb": 316,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp",
+    "Eclipse/Tools/inspect_body_skeletons.py",
+    "Eclipse/Tools/setup_character_data.py"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "Sci_fi_hallway",
+   "assets": 108,
+   "mb": 252,
+   "refs": [
+    "Eclipse/Tools/inventory_envpacks_2026_07_25.py",
+    "Eclipse/Tools/__pycache__/inventory_envpacks_2026_07_25.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Sci_fi_hallway  252 MB  108  ~35  ~47  ~17  3  2  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "- Sci_fi_hallway is interieur. Relevant voor de walkable vault (die net  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "Sci-Fi Hallway  aanwezig (Sci_fi_hallway)  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*"
+   ]
+  },
+  {
+   "naam": "SciFiWarrior02",
+   "assets": 42,
+   "mb": 195,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "MuzzleFlash",
+   "assets": 95,
+   "mb": 187,
+   "refs": [],
+   "gebruikt": false,
+   "oordeel": []
+  },
+  {
+   "naam": "SciFiSoldier03",
+   "assets": 45,
+   "mb": 168,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "SciFiWarrior",
+   "assets": 40,
+   "mb": 135,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp",
+    "Eclipse/Tools/setup_character_data.py"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "SciFiSoldier02",
+   "assets": 45,
+   "mb": 124,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "SciFiGirl",
+   "assets": 48,
+   "mb": 105,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "SciFiSoldier",
+   "assets": 14,
+   "mb": 72,
+   "refs": [
+    "Eclipse/Source/Eclipse/Tests/EclipseFeelHarnessTests.cpp",
+    "Eclipse/Tools/inspect_body_skeletons.py",
+    "Eclipse/Tools/setup_character_data.py"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Content/SciFiSoldier, SciFiSoldier02, SciFiSoldier03, SciFiCharacter, SciFiCharacterPack, SciFiGirl, SciFiWarrior, SciFiWarrior02  1,441.5 MB (8 packs)  Every RAISOR pack is a DT_BodyDefs source (binary-confirmed): meshes for Rebel_A/B/C, Enforcer, Trooper, Shock, Veil, RadiantGuard; SciFiCharacterP  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "RustyCarsFree",
+   "assets": 56,
+   "mb": 68,
+   "refs": [
+    "Eclipse/Source/Eclipse/Core/EclipseGrayboxBuilder.cpp",
+    "Eclipse/Tools/inventory_curation_pass.py",
+    "Eclipse/Tools/__pycache__/inventory_curation_pass.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "4. /Game/RustyCarsFree — 17 static meshes → 5 accepted (in use), 12 rejected  — *phase0/ASSET_CURATION.md*",
+    "A4–A8  /Game/RustyCarsFree/Geometries/SM_asset_00 … SM_asset_04  The five artery wrecks — already dressed by the builder (checkpoint choke dressing)  rust; each slot's own base texture as AlbedoTex, gain 3.2, mix 0.9, UVMode 1 (authored UVs) — banked, keep  — *phase0/ASSET_CURATION.md*",
+    "Content/RustyCarsFree  68.1 MB  5 wrecks (SM_asset_00..04) hard-referenced in EclipseGrayboxBuilder.cpp:743-747, dressed.  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "IBuilding_49",
+   "assets": 7,
+   "mb": 66,
+   "refs": [
+    "Eclipse/Tools/inventory_envpacks_2026_07_25.py",
+    "Eclipse/Tools/__pycache__/inventory_envpacks_2026_07_25.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "IBuilding_49  66 MB  7  1 (in /Mesh)  5  2  0  1  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "- IBuilding_49 is één gebouw met een volledige PBR-set (AO/BaseColor/Metallic/  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "IBuilding_49  1  0  0  1  1  5 (5)  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*"
+   ]
+  },
+  {
+   "naam": "Sci_Fi_Light",
+   "assets": 106,
+   "mb": 63,
+   "refs": [
+    "Eclipse/Source/Eclipse/Core/EclipseGrayboxBuilder.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Sci_Fi_Light  26-07  17 emissieve armaturen — wand, plafond, laag, baken, props  — *ASSETS_IN_WACHT.md*"
+   ]
+  },
+  {
+   "naam": "muzzle_flash",
+   "assets": 25,
+   "mb": 8,
+   "refs": [],
+   "gebruikt": false,
+   "oordeel": [
+    "All FX helpers (muzzle flashes, water-impact cylinders, smoke planes, spline ribbons, jets) plus joke props (SM_Cool_Sunglasses) and TwinBlast_Hair/TwinBlast_Grenade (character extras). SM_AssetPlatform here is a duplicate of A1 — use the Belica copy. Nothing reads industrial.  — *phase0/ASSET_CURATION.md*",
+    "Free Muzzle Flash  niet gezien  — *phase0/CURATIE_ENVPACKS_2026-07-25.md*",
+    "- Muzzle Flash (Niagara System) — mondingsvlam. Hoort bij de feedback-laag,  — *ASSETS_IN_WACHT.md*"
+   ]
+  },
+  {
+   "naam": "Footsteps_Volume_02",
+   "assets": 206,
+   "mb": 5,
+   "refs": [
+    "Eclipse/Source/Eclipse/Audio/EclipseAudioSubsystem.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "Footsteps_Volume_02 is al binnen en dekt Metal/Mud/Sand/Grass/Wood. Alleen  — *ASSETS_IN_WACHT.md*",
+    "Footsteps_Volume_02  26-07  Oppervlak-gebaseerd: Metal, Mud, Sand, Grass, Wood  — *ASSETS_IN_WACHT.md*"
+   ]
+  },
+  {
+   "naam": "FreeWeaponSounds",
+   "assets": 80,
+   "mb": 4,
+   "refs": [
+    "Eclipse/Source/Eclipse/Audio/EclipseAudioSubsystem.cpp"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "FreeWeaponSounds  26-07  3 schoten + 3 gedempt + tails + volledige herlaadketen  — *ASSETS_IN_WACHT.md*"
+   ]
+  },
+  {
+   "naam": "Locodrome",
+   "assets": 9,
+   "mb": 3,
+   "refs": [],
+   "gebruikt": false,
+   "oordeel": [
+    "- Binary scan, 631 files, 0 hits: __ExternalActors__ (160), __ExternalObjects__ (6), Maps (1), Art incl. Art/Imported (132), Data (21), Audio (10), MetaHumans (232), Locodrome (9), Atira_LODSettings (1), RustyCarsFree (57), Screen_Damage_Indicator (2), Collections/Developers (0). The district is run  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "Atira_LODSettings",
+   "assets": 1,
+   "mb": 0,
+   "refs": [],
+   "gebruikt": false,
+   "oordeel": [
+    "- Binary scan, 631 files, 0 hits: __ExternalActors__ (160), __ExternalObjects__ (6), Maps (1), Art incl. Art/Imported (132), Data (21), Audio (10), MetaHumans (232), Locodrome (9), Atira_LODSettings (1), RustyCarsFree (57), Screen_Damage_Indicator (2), Collections/Developers (0). The district is run  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  },
+  {
+   "naam": "Screen_Damage_Indicator",
+   "assets": 2,
+   "mb": 0,
+   "refs": [
+    "Eclipse/Source/Eclipse/UI/EclipseMissionHudWidget.cpp",
+    "Eclipse/Tools/inventory_curation_pass.py",
+    "Eclipse/Tools/__pycache__/inventory_curation_pass.cpython-312.pyc"
+   ],
+   "gebruikt": true,
+   "oordeel": [
+    "7. /Game/Screen_Damage_Indicator — 5 static meshes → 0 accepted; 2 assets flagged for the HUD lane  — *phase0/ASSET_CURATION.md*",
+    "The 5 LevelPrototyping meshes are UE-template primitives (the graybox already owns that job) — rejected, as are the mannequin materials (162 of 167 assets are template filler). The pack's actual payload — /Game/Screen_Damage_Indicator/UI/WBP_DamageIndicator + /Game/Screen_Damage_Indicator/Texture/T_  — *phase0/ASSET_CURATION.md*",
+    "Content/Screen_Damage_Indicator/UI + /Texture  0.3 MB  The pack's actual payload (WBP_DamageIndicator, T_BloodOverlay) — flagged for the HUD lane (GDD 08). Binary ref-check: self-contained (WBP references only the texture and itself).  — *phase0/ASSET_CLEANUP.md*"
+   ]
+  }
+ ],
+ "eigen": [
+  {
+   "naam": "Art",
+   "assets": 463,
+   "mb": 385
+  },
+  {
+   "naam": "CharacterAssemblies",
+   "assets": 232,
+   "mb": 908
+  }
+ ],
+ "afgewezen": [
+  {
+   "naam": "LPCharacters_FREE",
+   "assets": 25
+  }
+ ],
+ "totaal_mb": 16824,
+ "totaal_assets": 8321,
+ "ongebruikt": [
+  "Atira_LODSettings",
+  "Locodrome",
+  "muzzle_flash",
+  "MuzzleFlash",
+  "Planet_Project"
+ ]
+}

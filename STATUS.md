@@ -237,6 +237,26 @@ Live, ververst elke 5 s. **Werk na elke iteratie `progress_data.js` bij**: `bijg
 Houd deze drie vers, het dashboard kleurt ze rood als ze verlopen: `STATUS.md` (elke
 sessie), `JOUW_ACTIES.md` (bij elke owner-wijziging), `BESTURING.md` (7 d).
 
+> **KIJK IN `phase0/ASSET_INVENTARIS.md` VÓÓR JE IETS MET DE HAND BOUWT.** Er staat
+> **16,4 GB aan packs op schijf — 24 stuks, 8.321 assets** — en dat overzicht bestond niet,
+> waardoor niemand wist wat er lag. Een gang, een mondingsvlam, een auto, een planeet aan de
+> hemel: de kans is groot dat het er al ligt en al betaald is. Vijf packs worden **nergens
+> aangeroepen**: `Planet_Project` (1 GB), `MuzzleFlash`, `muzzle_flash`, `Locodrome`,
+> `Atira_LODSettings`. Genereren met `Tools/dump_asset_inventaris.py`; ook zichtbaar als tab
+> **Assets** op het dashboard. *"In gebruik" is een ondergrens* — het meet of `/Game/<pack>`
+> in de code voorkomt, dus een pack dat alleen vanuit een level of DataTable geladen wordt,
+> staat er ten onrechte als ongebruikt.
+>
+> **TWEE ANIMATIETOOLS STAAN KLAAR — gebruik die in plaats van het lichaam uit te rekken.**
+> Owner-instructie 01-08: schaal- en stretch-trucs op de skeletal mesh zijn onrealistisch en
+> stoppen hier. **(1) Animotiva / Kimodo Exporter** (marketplace, categorie Animation):
+> exporteert Sequencer-animaties als SOMA-JSON voor Kimodo motion generation — geïnstalleerd,
+> nog nergens gebruikt. **(2) MetaHuman Animator + MetaHuman Animation Tools** (engine) voor
+> gezichtsanimatie — **die staan UIT**: `Eclipse.uproject` heeft alleen `MetaHumanCharacter`
+> en `MetaHumanSDK` aan. Aanzetten is een vinkje, geen installatie, dus dat mag zonder
+> owner-consent. Leg in `17_cinematic_animation_system.md` vast welke van de twee waarvoor is
+> vóór er iemand opnieuw gaat rekken.
+>
 > **De castingtab is 01-08 verwijderd** — alle keuzes liggen vast en de poort bewaakt ze,
 > dus een tab die niets meer doet is ruis op zijn scherm. **Er is niets verloren.** De
 > keuzes staan leesbaar in **`phase0/CASTING_DEFINITIEF.md`** (10 O-16-slots, 20 rollen,
