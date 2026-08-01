@@ -13,8 +13,8 @@
 
 | Wanneer | Wat | Hoe lang | Blokkeert |
 |---|---|---|---|
-| **NU — dit is de enige echte rem** | **O-16**: tien stemmen liggen als voorstel klaar, met een fragment per stem en één regel waarom | 5 min | **alle audio.** Er wordt geen seconde ingesproken tot dit weg is |
-| **Nu — het gaat over geld** | **O-14** Act 1 kost ~97.000 van je 125.612 credits | 10 min | hoe act 1 klinkt |
+| **NU — dit is de enige echte rem** | **O-16**: tien stemmen liggen als voorstel klaar, met een fragment per stem en één regel waarom. **Er staan nu 39 scènes / 55.729 credits aan tekst klaar die alleen hierop wacht** — vannacht was dat 26 scènes | 5 min | **alle audio.** Er wordt geen seconde ingesproken tot dit weg is |
+| **Nu — het gaat over geld** | **O-14** Act 1 zou 97.659 van je 125.612 kosten — maar je beslist vandaag over **55.729** (wat door de poort is). En de helft van act 1 is één man: Voss kost 41.140 doordat hij in twee stemmen spreekt | 10 min | hoe act 1 klinkt |
 | **Nu** | **O-12** 2.475 credits gingen naar het verkeerde model — opnieuw of niet? | 5 min | niets, maar het loopt op |
 | **Als je zin hebt** | **O-15** Kijk naar de vier vault-kamers: is dit Hollow Point? | 5 min | niets |
 | **Wacht op mij** | **O-4** IJkmissie beluisteren | — | — |
