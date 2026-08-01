@@ -129,6 +129,21 @@ M1.1  beats → dialoog → critic → stem → import → in PIE gehoord
 > | **Tier 0 casting** | fase 1 klaar (104 kandidaten, 0 credits) + een voorstel van tien stemmen met 19 previews. Wacht op één knop. |
 > | **Begroting** | act 1 kost **97.659** gemeten (was 97.275 — elke scenereparatie schuift dit, en `check_owner_docs.py` bewaakt het sinds 01-08). Saldo 125.612. **Maar dat is niet het bedrag waarover besloten wordt:** `check_generation_ready.py` splitst het in **39 scenes / 55.729 credits KLAAR** (poort groen én stem gecast), 30.309 gehouden door de poort en 17.687 door de casting. |
 >
+> **DE VOLGENDE POORT VAN SPOOR A IS ACT 2, EN HIJ IS LEEG.** Gemeten 02-08: `phase0/beats/`
+> draagt elf act-1-documenten (acht missies, de proloog, de hub en het overzicht) en **nul** voor
+> act 2. Schrijvers kunnen dus niet beginnen — een `dialogue-writer` schrijft tegen een stub, en
+> die stubs bestaan niet.
+>
+> Dat is **architect-werk en het staat op de kritieke lijn**: schrijven kost geen credits en raakt
+> de build niet, dus zodra de stubs er zijn kan spoor A weer doorlopen terwijl de casting nog
+> wacht. Precies zoals act 1 vooruit kwam terwijl het build-slot bezet was.
+>
+> **Wat act 1 opleverde en wat act 2 dus meekrijgt:** 44 rulings (L1-R1 t/m L1-R44), een
+> nummerregister, een T4-aanrakingstabel, een vlaggenregister met de *gelezen door*-kolom, en
+> acht poorten met zelftests. De duurste lessen zaten niet in de zinnen maar in de **boekhouding**
+> — een notitie die iets beweert dat het bestand tegenspreekt, tien keer gevonden in één nacht.
+> Act 2 begint dus niet op nul.
+>
 > **Dagen tot de werkdeadline (19-08): 18.** Spoor A loopt daarmee **vóór** op deze kalender
 > voor het schrijven en **achter** op de stem — en die achterstand is één owner-klik groot.
 >
