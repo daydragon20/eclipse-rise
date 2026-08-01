@@ -24,7 +24,7 @@ EventCatalog **40/40** · creditmeter- en kaartpoort groen.
 >    op Display gelogd en overgeslagen. **Owner-actie (O-3), bewust géén fallback** —
 >    terugvallen op stem A maakt de bar groen terwijl die acht regels nog steeds geen
 >    gekozen stem hebben.
-> 2. **`validate_script.py`** — **4** bevindingen, allemaal `REGISTER`. Dat is voor het
+> 2. **`validate_script.py`** — **3** bevindingen, allemaal `REGISTER`, en alle drie onderzocht en TERECHT rood (hun verdedigende blokken zijn nagerekend en elke toetsbare claim klopt). Dat is voor het
 >    eerst onder de vijf, en de twee die de tool zijn bestaan waard maakten zijn **weg**:
 >    `M1.1.S99` handelde twee van drie uitkomsten af, `M1.6.S05` miste `split`. De laatste
 >    vertakkingsfout — `M1.8.S99`, de slotscène — is op 02-08 gesloten met een **verklaarde
