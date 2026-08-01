@@ -169,6 +169,35 @@ gegenereerd. Bewaakt door `Eclipse/Tools/test_credit_meter.py` (7 tests), die in
 `Eclipse/Tools/verify.ps1` als gate draait. Controleproef gedaan: die test wordt
 **rood** tegen de oude code, dus hij kan echt falen.
 
+### ⚠ De cache-manifest zegt NIET wat hem gemaakt heeft (01-08)
+
+`Eclipse/Content/Audio/Generated/VoiceCacheManifest.json` heeft **16 entries**, en er staan
+16 `.wav`-bestanden naast. De manifest is een kale afbeelding van hash naar bestandsnaam:
+
+```json
+"6858d5ebd3bc32364f2ab39db3e0c741": "6858d5ebd3bc32364f2ab39db3e0c741.wav"
+```
+
+**Geen stem-ID, geen model, geen tekst, geen datum.** De cachesleutel is
+`hash(voiceId + text + emotion + modelId)` en is dus per constructie onomkeerbaar.
+
+**Waarom dat vandaag een concreet probleem is.** `DialogueSeed.json` draagt
+`eleven_multilingual_v2` terwijl §19.4's audiotags op `eleven_v3` leunen. Het model omzetten
+lijkt een correctie van één veld — maar **het model zit in de cachesleutel**, dus elke
+bestaande entry wordt er wees van. Ik wilde vaststellen hoeveel van die 16 dat zouden zijn,
+en **dat kan niet**: de manifest weet niet welke stem of welk model een bestand gemaakt
+heeft.
+
+> **Dus niet gewijzigd.** Het is geen configuratieveld maar een uitgavebesluit, en het is
+> dezelfde vraag als **O-12** (de 51 auditieclips op het verkeerde model). Het hoort daar
+> bij, niet in een stille commit.
+
+**De reparatie aan de manifest zelf is klein en hoort vóór de eerste grote generatie.** Zet
+per entry neer wat hem gemaakt heeft — stem-ID, model, tekst-hash, datum, credits. Dan is
+"wat kost een modelwissel" een query in plaats van een gok, en dan kan de ledger na een run
+tegen de cache gecontroleerd worden in plaats van tegen een teller die achterloopt. **Zolang
+dat er niet is, is elke uitspraak over wat er in de cache zit een aanname.**
+
 ### ⚠ Act 1 past niet in tier 2 — gemeten, niet geschat (31-07)
 
 Ik heb de scriptbestanden geteld in plaats van aangenomen: elke `text:` plus elke
