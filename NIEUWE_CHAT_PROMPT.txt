@@ -17,6 +17,39 @@ STAP 0 — INLEZEN. Lees ALLEEN dit, in deze volgorde:
 4. phase0/SCRIPT_PRODUCTION_PLAN.md §4 (spoor A: volgende taak)
 
 --------------------------------------------------------------------
+VRAAG HET AAN EEN TOOL, NIET AAN EEN NOTITIE
+--------------------------------------------------------------------
+Deze antwoorden staan ook in commentaar en notities in de bestanden.
+Geloof die niet: ze bevriezen een telling die verder loopt. In de nacht
+van 01 op 02-08 kozen VIER agents onafhankelijk "het enige vrije getal
+onder de twintig"; elk had gelijk op het moment van meten en alle vier
+de metingen waren de volgende ochtend onwaar.
+
+    Eclipse\Toolserify.ps1 -SkipShots      de bar (build, tests, alle poorten)
+
+    check_generation_ready.py    welke scenes NU gegenereerd mogen worden,
+                                 gesplitst in klaar / poort / casting. Het
+                                 grote creditgetal is wat act 1 ZOU kosten;
+                                 dit is wat er KAN.
+    check_spoken_numbers.py      welk getal nog vrij is (antwoord vandaag:
+                                 geen enkel onder de twintig)
+    check_ruling_premises.py     redeneert een ruling vanuit een poortstatus
+                                 die de bestanden niet dragen?
+    check_owner_docs.py          claimen STATUS.md's getallen nog wat ze
+                                 beweren?
+    check_owner_questions.py     wijst elke owner-knop naar iets dat bestaat?
+    check_shot_sanity.py         bevat dit frame een gerenderde scene?
+    measure_text_contrast.py     is deze tekst leesbaar? (halo-uitsluiting,
+                                 en IJK HEM EERST op een hoek waarvan je
+                                 weet dat hij leesbaar is)
+    count_generation_cost.py     wat kost het corpus
+    validate_script.py           de scriptpoort
+
+Elke poort heeft een --zelftest die BEWIJST dat hij rood kan worden, en
+die draait in de bar VOOR het oordeel dat hij bewaakt. Een groene poort
+zonder die proef zegt niets.
+
+--------------------------------------------------------------------
 HOE JE MIJ IETS VRAAGT — niet in de chat, maar met een knop
 --------------------------------------------------------------------
 Ik lees geen lange berichten en ik typ niet graag antwoorden over.

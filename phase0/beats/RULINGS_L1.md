@@ -489,7 +489,7 @@ Een scène waarin ze tien regels lang gelijkmatig contraheert, is een nullijn en
 
 **Dit is ook de generalisatie die L1-R19 had moeten hebben:** een *"when X"*-vingerafdruk heeft een ingesproken niet-X nodig, **en het beste ingesproken niet-X bevat één X.** Anders is het geen nullijn maar een ander personage. Geldt bij act 2 ook voor Torren en Kaya.
 
-**Kosten: nul.** `M1.4.S99` staat op `draft`, `critic: null`. Er is niets gegenereerd en niets te herbetalen.
+**Kosten: nul, en de grond daarvoor is dat er niets gegenereerd is** — niet de poortstatus. Dat onderscheid is op 02-08 aangebracht nadat `check_ruling_premises.py` meldde dat de oude formulering (*"staat op `draft`, `critic: null`"*) verlopen was: M1.4 is inmiddels beoordeeld en `S99` draagt een NO-GO. De **conclusie** stond nooit op die status maar op de generatie, en `check_generation_ready.py` bevestigt dat M1.4.S99 nog steeds niets heeft gekost. Zo hoort een ruling te steunen: op het feit dat hij bedoelt, niet op een toestand die ernaast ligt en verder loopt.
 
 **Wat er nu moet gebeuren, vóór tier 2:** `dialogue-writer` M1.4 contraheert `.070` `.130` `.140` en corrigeert zijn eigen L2-notitie op r. 86 — die notitie is de instructie die de volgende schrijver ook fout zou zetten. Ik heb het L1-blok in dat bestand uitgebreid met de `.190`-uitzondering, want die was nieuw en stond er niet. `voice-director`: dit is een tier-2-blokkade, niet een netheidskwestie. **Losstaand en niet hier beslist:** `M1.4.S99` mist de registerdrempel met één woord (langste 19 tegen 20) — dat staat al in `SCRIPT_FORMAT` §4 als een van de drie bekende gevallen, en het is de goedkoopste beurt om er meteen naar te kijken nu het bestand toch open is. Het is een scènevraag, geen ruling.
 
