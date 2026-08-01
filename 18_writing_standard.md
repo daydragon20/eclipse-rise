@@ -244,6 +244,19 @@ Never ship a line containing:
 
 It exists because the Act 1 touch inventory measured *plants* and nobody measured *touches* — a table that counts one thing and is used to check another is not a measurement (`phase0/beats/RULINGS_L1.md`, L1-R21). **Not yet swept across the existing corpus**: apply it to new work, and measure before gating an already-written scene on it.
 
+**A maxim is not "rhetoric", and for one character in this cast that difference is the whole part (ruling L1-R56, 02-08).** §18.4 gives **Sela** *"rhetorical structure even in private"* — she is the only voice with that in her fingerprint — so on her, the Maxims row and the fingerprint row appear to point in opposite directions, and a sweep that does not say this out loud will flatten precisely the character whose voice is the figure.
+
+They are not in conflict, because they measure different objects:
+
+| | |
+|---|---|
+| **Structure** — §18.4, unlimited for Sela | the *shape* of the sentence: antithesis, parallelism, negation-then-imperative, question handed back to the room, second person plural |
+| **Maxim** — §18.9 B, capped for everybody | a **general truth**, lifted clean out of the room, shaped to be repeated |
+
+A character can be relentlessly rhetorical and never once state a general truth — by being rhetorical **about the thing in front of her**. That is not a theory: it is Sela's strongest line in Act 1. `M1.6.S03.190` — *"No. So say it out loud if you're staying, and the rest of us can stop counting on you."* — is negation, imperative and consequence, addressed to a wagon in the second person plural, and it contains **no general truth whatsoever**. It is entirely about these people, in this car, tonight. Her fingerprint is at full strength and the Maxims row does not fire.
+
+**So the cap holds for her, and the sweep asks the narrower question:** not *how many rhetorical lines does she have* (unlimited, and it is the character), but *how many lines state something that would survive being lifted out of the room* (one per scene, like everybody). Where a scene of hers is over — `HUB.A1.sela_intake` is the first candidate and carries three from one mouth — **the repair is to point the figure at the specific instead of the general, which costs her nothing and sharpens what she is doing**: an organiser whose power is that she names *your* situation, not the human condition.
+
 ### C. The three tests
 
 1. **The strip test.** Remove all speaker names from the scene. Give it to a reader who knows the cast. If they cannot reassign at least 80% of lines correctly, the voices are mush. **Rewrite.**
@@ -260,6 +273,11 @@ Watch for these; they are the tells:
 - Conflict resolves inside the scene it starts in.
 - Characters have no verbal habits, only opinions.
 - Everyone agrees on what the scene is about.
+- **The same rhetorical construction carries three consecutive beats.**
+
+**The last bullet, added 2026-08-01 by `story-architect` (ruling L1-R51).** It is the one failure in this list that no single line commits, which is why it needed writing down. The prologue found it: three cards in a row gloss a proper noun with the identical move — *"The Tithe of Hands — a labor lottery nobody wins."*, *"Hollow Point — a dead geothermal vault the Dominion forgot."*, *"Ember Cell: eleven people who still say no."* **Every one of those lines does two jobs at once and every one survives the Explaining row on its own.** The pattern is the tell, not the line, and a writer checking his scene line by line cannot see it — the same blind spot §18.9 B's Triads and Maxims rows exist for, one level up.
+
+**It is a scene- and sequence-level check, and it is not a ban.** A construction repeated deliberately is a refrain and it is one of the oldest things writing does. What this catches is the *undeliberate* version: three beats running on one shape because the shape was working. **Three in a row is the line; two is nothing.** And a recap or a codex entry may be granted the exception explicitly, in writing, in the file — a form whose whole job is to gloss proper nouns quickly has an argument, and the prologue's is on record in `P0.S01_recap.yaml`.
 
 ---
 

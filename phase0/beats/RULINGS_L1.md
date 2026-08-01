@@ -445,7 +445,7 @@ Het `band:`-voorbeeld wees naar `M1.1.S04.070`, waarvan de werkelijke tekst iets
 
 De verkeerde toeschrijvingen zijn overgenomen in de koppen van `M1.7.S03` (r. 53–54) en `M1.8.S03` (r. 49–50). Twee schrijvers hebben tegen een onjuiste inventaris gewerkt, en dat is de duurste soort documentatiefout: hij ziet er geverifieerd uit.
 
-**Wat dit doet met de ruling zelf: hij wordt dringender, niet zwakker.** L1-R17 zei *"twee is toeval, vier is een systeem"*. Bij drie is de drempel al gepasseerd voordat P4-c geschreven wordt. De criticus zette `M1.7.S03` mede op NO-GO omdat het de vierde zou zijn — **die grond is juist en blijft staan.**
+**Wat dit doet met de ruling zelf: hij wordt dringender, niet zwakker.** L1-R17 zei *"twee is toeval, vier is een systeem"*. Bij drie is de drempel al gepasseerd voordat P4-c geschreven wordt. De criticus zette `M1.7.S03` destijds mede op NO-GO omdat het de vierde zou zijn — **die grond is juist en blijft staan.**  <!-- premisse-nagelopen: dit BESCHRIJFT een beoordeling uit juli, het beweert geen huidige poortstatus -->
 
 **Ruling, in drie delen.**
 
@@ -527,7 +527,9 @@ Ik neem de tegenwerping over dat `S05` "qua medium gelijk is aan trede 3" **niet
 
 **Doorgevoerd in:** `ACT1_OVERVIEW` §8 AR-6, `BEATS_M1.8` §6, en het L1-blok van `M1.8.S05`.
 
-**Wat er nu moet gebeuren:** `dialogue-critic` herscoort `M1.8.S05` — het `critic:`-veld staat nog op NO-GO en dat blijft zo tot hij dat doet; ik heb alleen de reden bijgewerkt naar de waarheid. De architect-actie is uitgevoerd; er is geen schrijversactie.
+**Wat er nu moet gebeuren:** `dialogue-critic` herscoort `M1.8.S05`; ik heb alleen de reden bijgewerkt naar de waarheid. De architect-actie is uitgevoerd; er is geen schrijversactie.
+
+> **Bijgewerkt 02-08: dit is gebeurd, en de oorspronkelijke zin hier is verlopen.** Er stond *"het `critic:`-veld staat nog op NO-GO en dat blijft zo tot hij dat doet"* — dat is sindsdien onwaar; de scène is herscoord. **Een ruling die een poortstatus als lopende toestand opschrijft, veroudert per definitie**, en dat is de fout die `check_ruling_premises.py` bestaat om te vangen. Dezelfde les als L1-R22: laat een ruling steunen op het feit dat hij bedoelt (hier: de architect-actie is af), niet op een toestand die ernaast ligt en verder loopt.  <!-- premisse-nagelopen: deze alinea MELDT de verlopen bewering en herhaalt hem niet als claim -->
 
 ---
 
@@ -1071,3 +1073,309 @@ Verder afgesloten: `M1.5.S99`'s L2-escalatie (open sinds 31-07, opgelost door L1
 - **`M1.6.S05` is deze ronde niet aangeraakt** — er zat een schrijver aan `.410`. Twee dingen gaan mee in dezelfde beurt als L1-R21 en L1-R25: **(a)** de drawbar-notitie op `.370` (L1-R32), en **(b)** de kop, die `flags-in: Story.Choice.M16_TrainRun` draagt terwijl de scène de drie bladeren `story.m16_train_choice` leest — dezelfde koppenveegbeurt als in `M1.5.S05`/`S99` en `M1.6.S06`/`S99`, en de enige die is blijven liggen.
 - **De M1.2-`.yaml`'s zijn niet door mij aangeraakt** (L1-R36, L1-R37, L1-R38, L1-R40 deel 2 en de `.220`–`.250`-verwijdering zijn alle vijf schrijversacties). Afgesproken met de coördinator, want er zat een schrijver aan die missie.
 - **Nog open uit eerdere rondes:** L1-R28 (gespecificeerd, niet actief), `M1.5.S99.050`/`.060` in de `none`-tak, `M1.4.S99`'s registerdrempel, de rolsplitsing bij O-16, Embers barkpool van twee registers, en Q-4.
+
+---
+
+## Ronde 8 — 2026-08-02, twee NO-GO's, één BRANCH, en de klasse die acht critic-rondes heeft gedomineerd
+
+**De criticus vat het scherper samen dan ik het had:** *"Acht critic-rondes en zeven L1-rondes, en de terugkerende fout is nooit een slechte regel — het is een notitie die iets beweert dat het bestand tegenspreekt."* Deze ronde bevestigt dat. **Geen enkele bevinding in deze ronde was een slecht geschreven regel.** Twee waren notities die logen over hun eigen bestand, drie waren afgehandelde escalaties die als instructie waren blijven staan, twee waren cellen die naar een bestandsregelnummer wezen alsof het een ID was, en één was een tabel die de praktijk vier vlaggen achterliep.
+
+| # | Onderwerp | Uitkomst | Raakt jou als schrijver? |
+|---|---|---|---|
+| **L1-R41** | `M1.8.S99`'s BRANCH-bevinding en de geweigerde `silence:` | **Het veld gaat erin.** L1-R24 verwierp hem voor een ánder defect | M1.8 |
+| **L1-R42** | De instroom heet *"de veertig"* in een notitie en *"Forty-one"* in de regel | **Het is de eenenveertig.** En *veertig* is in M1.8 al van de bevrijden | M1.6, M1.8 |
+| **L1-R43** | `M1.8.S99.090` is een maxime in een slot dat het vlak deelt met `.100` | **`.090` wordt vlak.** `.110` blijft citeerbaar, en waarom | M1.8 |
+| **L1-R44** | `M1.4.S04.220` — *"the district allocation"* | **Geen aanraking maar een PLANT.** Geregistreerd als P4-e | M1.4 |
+| **L1-R45** | `M1.4.S99.020`–`.050` — het boek zei veertig, er waren er zesentwintig | **Wél een aanraking.** Geregistreerd. Nul tekstwijziging | M1.4 |
+| **L1-R46** | `P0.S01.100` draagt zijn syntaxis in aanhalingstekens | **Herschreven, en de goedgekeurde kopij mee** | proloog |
+| **L1-R47** | Kaartnummers botsen tussen twee documenten | **Slots ≠ kaarten.** De goedgekeurde kopij wint | proloog |
+| **L1-R48** | De drie dode celnamen in `M1.3.S01` | **Ze komen er niet. De schrijver had gelijk** | M1.3 |
+| **L1-R49** | `M1.3.S01`'s REGISTER-bevinding | **Sluit met één toegevoegde regel, `.095`** | M1.3 |
+| **L1-R50** | Vier `run.`-vlaggen staan niet in de feitentabel | **Gedeclareerd, plus de regel voor de derde soort** | allen |
+| **L1-R51** | §18.9 D mist een rij, en de proloog laat zien welke | **Rij toegevoegd. Drie beats op één constructie** | allen |
+| **L1-R52** | De aanrakingstabel is T4-gescoped en de vorm generaliseert | **Twist-agnostisch, mét een definitie van "aanraking"** | allen |
+| **L1-R53** | Mag L1-R40 nu poorten? | **Nog niet. Meten eerst — en intussen `hold`, geen NO-GO** | `dialogue-critic` |
+| **L1-R54** | `dex_workshop.070`'s *"she"* na de Form A-herbouw | **Eén woord. En de regressie is van mij** | hub |
+| **L1-R55** | *Acht* heeft vijf referenten en staat niet in het register | **Rij voor *acht maanden*.** Een register beschermt getal **plus eenheid** | M1.7, hub |
+| **L1-R56** | Bij Sela wijzen maximes-rij en vingerafdruk tegengesteld | **Structuur ≠ maxime.** De cap blijft; de veeg stelt de smallere vraag | M1.6, hub, veegbeurt |
+
+---
+
+### L1-R41 — `M1.8.S99` krijgt zijn `silence:`, en L1-R24 verwierp een andere vraag dan de gestelde
+
+**Aangenomen, en de criticus heeft gelijk op alle drie zijn gronden.** De belangrijkste is dat hij mijn eigen toets uit L1-R25 correct heeft toegepast in plaats van hem te citeren. Daar wees ik stilte af omdat *"`S05` over één ding gaat: mensen tellen, en in de split-tak is het getal veranderd"* — een stilte die iets verbergt. **Hier verbergt hij niets:** `M1.8.S99` gaat over wie de overlevenden volgen, en de emissaris stemt in **geen enkele tak** vóór de naam. `.180`/`.190` zijn hem die weigert, in een getal. De drie cellen op `.010` zijn onvoorwaardelijk (L1-R24), de stem is onvoorwaardelijk, en de `none`-speler krijgt 20 van de 24 regels plus een lege ramp — **wat precies is hoe het eruitziet als je een bondgenoot hebt afgewezen.**
+
+**Waarom L1-R24 hem verwierp en waarom dat niet meer telt.** Die ruling zei: *"de tak speelt wél; alleen de camera stond verkeerd."* Dat is een antwoord op een andere vraag dan de tool stelt. De tool vraagt niet of de **scène** speelt in `none` — dat doet hij, volledig. Hij vraagt of de **vlag** iets gesproken bijdraagt in `none`, en dat antwoord is nee, met opzet. De cameraclausule was een echt defect en het verplaatsen was juist; het was alleen een ánder defect. **Ik heb in L1-R24 twee bevindingen samengevoegd omdat ze in hetzelfde bestand stonden.**
+
+**En de melding zelf is voor de helft onwaar over dit bestand, wat de criticus als enige gezien heeft.** BRANCH zegt *"gets the beat of a choice he did not make, or none at all"*. De eerste helft geldt hier niet: alle drie de emissaris-regels zijn gepoort en gaan correct samen stil. Er is geen enkele regel die de `none`-speler krijgt en niet had moeten krijgen.
+
+**Derde grond, en die is de onaangenaamste: de scène werd afgestraft omdat hij de beste is.** `M1.8.S99` is het enige bestand in het corpus dat `full` van `limited` onderscheidt. `M1.6.S02` leest alleen `!= "none"` en `M1.6.S04` alleen `== "full"` — één positieve waarde elk, dus `len(positive) >= 2` vuurt daar nooit. **Wie twee takken netjes uit elkaar houdt, krijgt de bevinding; wie ze samenklapt, ontsnapt eraan.** Dat is geen reden om de check weg te doen — hij heeft drie echte defecten gevangen — maar het is wel de reden dat `silence:` bestaat.
+
+**Doorgevoerd.** Het blok stond plakklaar in het bestand en de criticus had de vier voorwaarden van de checker nagelopen; ik heb er één woord in veranderd (*forty* → *forty-one*, L1-R42). **De schrijver heeft het veld gezien, doorgerekend en NIET geplakt omdat hij niet stil over een benoemde ruling heen wilde.** Dat is het gedrag dat dit hele escalatiepad moet opleveren, en het is de reden dat deze ruling bestaat in plaats van dat er stilletjes iets gepatcht is.
+
+> **Gemeten door de coördinator ná doorvoering: de BRANCH-bevinding is weg. De scriptbevindingen staan op 4, alleen REGISTER — voor het eerst onder de vijf.**
+
+**Eén nasleep die van mij is en die ik hier beslis.** De coördinator meldde eerst dat mijn blok aan de verkeerde vlag hing, en heeft dat daarna zelf rechtgezet: een `silence:`-sleutel noemt een **blad**, geen vlag, en `M1.8.S99` leest er twee (`story.m15_pact` met full/limited/none, `story.m15_shiftboss` met killed/prevented/warned). De check draaide per vlag en meldde `none` als onbekende waarde omdat de *andere* vlag hem niet kent. De tool is gerepareerd: een waarde telt nu als bekend zodra één gelezen vlag hem kent.
+
+**Dat is de juiste reparatie voor nu, en er blijft een gat in dat ik benoem in plaats van het te laten liggen.** Met de losse vorm dekt één sleutel élke vlag die de scène leest. Zodra een scène twee vlaggen leest die dezelfde waardenaam delen — en `none` is precies zo'n naam — kan één gedeclareerde stilte er twee afdekken, waarvan de tweede een echt gat is. Vandaag bestaat dat geval niet; het ontstaat op de dag dat iemand een tweede `.none`-blad schrijft.
+
+> **Ruling: `silence:` krijgt een optionele vlaggekwalificeerde sleutelvorm — `story.m15_pact.none: "..."` — die alleen op die vlag slaat. Een sleutel zónder punt blijft betekenen wat hij nu betekent, dus geen enkel bestaand bestand verandert. GESPECIFICEERD, NIET ACTIEF, precies zoals L1-R28: de tool accepteert de vorm nog niet, dus niemand gebruikt hem tot dat zo is.** Ik heb geen shell en heb de tool deze ronde niet aangeraakt; hem specificeren en de adoptie tegenhouden is wat ik wél kan verantwoorden.
+
+---
+
+### L1-R42 — De instroom is *de eenenveertig*. En *veertig* is in M1.8 al bezet, door de andere groep in dezelfde kamer
+
+`M1.8.S99` r. 47 noemde groep 2 **"THE FORTY"** terwijl `.080` in datzelfde bestand *"Forty-one"* spreekt, en L1-R32 eenenveertig al had vastgezet als campagneconstante voor precies die instroom. Dat alleen al is de bekende klasse.
+
+**Maar ik heb geteld in plaats van het bij die correctie te laten, en het is erger dan de melding.** *Veertig* is in M1.8 **al de naam van de andere groep in dezelfde kamer**: de bevrijden uit K-77. `M1.8.S07`'s `want:`, `M1.8.S08`'s `want:`, `M1.8.S09`'s openingsshot en `M1.8.S05.120`'s shot noemen ze alle vier veertig — en `M1.8.S08.140`'s strategic-variant **spreekt** het uit: *"Forty people up a shaft rated for six."*
+
+Dus in `M1.8.S99.010` staan drie cellen in één ruimte, en twee ervan worden geteld met getallen die één uit elkaar liggen: de **eenenveertig** van de trein en de **veertig** uit de cellen. Een notitie die de instroom *"de veertig"* noemt, wijst in de enige scène waar beide groepen samen staan naar de verkeerde.
+
+**Ruling: de instroom heet *de eenenveertig*, ook als groepsnaam, overal. *Veertig* betekent in M1.8 de bevrijden.**
+
+**En de bijna-botsing zelf blijft staan, gemeten en aanvaard — met een grens.** Dit is een *lean*, geen botsing, en het onderscheid is dat van L1-R31's achttien-tegenover-negentien: twee verschillende tokens, twee stabiele referenten, en **precies één gesproken gebruik aan de veertig-kant.** Eenenveertig is onbeweeglijk (veertien plekken, campagneconstante), dus als er iets moest wijken zou het de veertig zijn — en dat hoeft niet zolang hij gesproken één keer voorkomt. **Een tweede gesproken veertig in M1.8 maakt er wél een botsing van, en dan wijkt hij.** Rij toegevoegd aan het nummerregister, met de twee prozareferenten die er óók zijn (`M1.6.S05.310`, de achtergelatenen in `emptied`; `M1.4.S99.020`, het arsenaalboek dat in de fictie liegt) en de regel dat geen van beide ooit *"de veertig"* mag gaan heten.
+
+---
+
+### L1-R43 — `M1.8.S99.090` wordt vlak, en de meetlat ligt vier regels lager in hetzelfde bestand
+
+Dit volgt uit L1-R52 en het is de enige regel die daardoor beweegt.
+
+`.090` — *"The Veil buys people. That's the whole job."* — heeft mededeling-plus-generaliserende-staart, de vorm van rij #4. Zijn eigen `note:` noemt hem *"eight flat words"*, en dat is wat de schrijver dácht te schrijven.
+
+**Wat het beslist is een controleproef die in het bestand zelf ligt.** `.090` en `.100` vullen **hetzelfde slot** — de warned-verwisseling. `.100` is vlak: *"There's a shift boss out there who saw both cells in one kitchen."* Dus de default-tak levert een citeerbare verklaring waar de warned-tak een gewone levert, **voor hetzelfde beat, zonder dat iemand dat gekozen heeft.** Vlak maken zet de twee helften van één slot in hetzelfde register.
+
+**`.110` blijft citeerbaar, en dat is een beslissing en geen coulance.** *"Or he guessed. People guess and then they're right."* is een maxime, en het is de verklaring die **de kamer laat leeglopen** — daar ís het epigram de leegloop. Van de drie verklaringen mag er precies één herhaalbaar zijn. `.080` is de wáre en is de minst afgemaakte zin in de kamer. **Gepolijst-onwaar / vlak-onwaar / onafgemaakt-wáár is een ontworpen asymmetrie; twee gepolijste onwaarheden is alleen nog dichtheid.**
+
+Beat, tak, spreker en volgorde blijven. Kosten nul: er is niets gegenereerd. **De regel is van de schrijver; de eis is van mij.**
+
+---
+
+### L1-R44 — `M1.4.S04.220` is geen aanraking maar een plant, en het onderscheid is het waard
+
+*(Deze ruling is op 02-08 in het scènebestand gezet en pas hier in het log opgenomen — dat is de verkeerde volgorde en het is precies de fout die dit document moet voorkomen. Hersteld.)*
+
+*"Note for the morning shift. The shortfall is written against the district allocation, not against this depot."*
+
+De criticus kon niet vaststellen óf dit een negende aanraking was, en had gelijk dat hij het niet zelf besliste. **Het antwoord is dat het niet die soort regel is.**
+
+Een aanraking heeft drie delen: **de Dominion schiet tekort · een personage verklaart het weg · niemand spreekt het tegen.** `.220` heeft er geen van. In zijn ogen is er niets tekortgeschoten, hij verklaart niemands gedrag, en hij spreekt niet tegen de speler. **Het is de Dominion die zichzelf beschrijft.**
+
+**Wat het wél is: de enige keer in act 1 dat het act-4-vocabulaire hardop klinkt.** §2.4 boekt de Foundry-Collapse-doden als *optimal loss allocation*; de waarheidskolom van P4-a en P4-b luidt *"allocatie, geen incompetentie"*. Hier zegt een administrateur van middelbare leeftijd dat het tekort tegen de **district allocation** gaat en niet tegen zijn depot, en het betekent niets sinisterders dan in wiens kolom het landt. Dat is een **herkenningsplant** van dezelfde vorm als P1-a: geef de speler het woord zestig uur voordat het iets betekent, zodat act 4 verdiend wordt in plaats van aangekondigd. **De twee betekenissen lopen echt uiteen** — de zijne is boekhouding, die van AEGIS is planning — en daarom verraadt hij niets.
+
+**En hij voldoet al aan L1-R17**, wat de criticus zelf gemeten heeft: de regel is vlak. Geen parallellisme, geen antithese, geen slotbeeld. Hij draagt dus niets bij aan de vorm-tell, en dat is het enige waar de aanrakingstelling voor bestaat. **Blijft vlak. Staat als poster goed? Dan herschrijven.**
+
+Geregistreerd als drager van **P4-e**, samen met `M1.4.S99.020`–`.050`. Eén plant, twee dragers, één missie, twee kanten.
+
+---
+
+### L1-R45 — `M1.4.S99.020`–`.050` **is** een aanraking, en de notitie die het ontkende sprak zijn eigen bestand tegen
+
+De andere kant van dezelfde missie, en hier valt het oordeel de andere kant op. Getoetst tegen de definitie in plaats van tegen de notitie:
+
+| Deel | Waar het staat |
+|---|---|
+| **de Dominion schiet tekort** | `.020` — *"their book said forty were in that hall. There were twenty-six."* · `.030` — *"So where's the other fourteen?"* Veertien ontbrekende lichamen op een verdedigde positie: dezelfde vorm als P4-a en P4-b, één missie eerder dan allebei |
+| **een personage verklaart het weg** | tweemaal. `.040` Dex: corruptie. `.050` Mara overschrijft hem met competentie |
+| **niemand spreekt het tegen** | de `shot:` op `.060` zegt het met zoveel woorden, en het L2-blok noemt die shot terecht dragend |
+
+**Het L2-blok claimde *"this deliberately does NOT plant T4"* op de grond dat *"the armory was fully defended"* — en dat wordt vier regels eerder door `.020` tegengesproken.** De schrijver adresseerde onder-*reactie*, terwijl de tabel de aanraking breder definieert. Notitie gecorrigeerd; de helft die wél klopte — dat hier vooral Mara's *lezing* van de overwinning geplant wordt — staat er nog, want dat is de helft die het schrijven stuurt.
+
+**Registreren kost nul tekstwijziging, en dat is het argument.** De regel is al vlak: *"We got in because we were better than they are"* heeft geen figuur, geen ritme, geen slotbeat. Precies wat L1-R17 van een aanraking vraagt. Wat erbij komt is **een rij in de telling**, zodat de volgende aanraking tegen tien wordt afgewogen en niet tegen acht.
+
+**Het verbetert Mara's curve in plaats van hem te verstoren.** Deze scène is de **top**: haar zekerste en persoonlijkste verklaring, en het L2-blok had de eis al woordelijk goed — *"not a comfort that reads as a lie later, but a conviction that reads as a cause of death"*. De afbraak begint daarna.
+
+**En de rijm die niemand geregistreerd had, en die het beste argument is om er niets aan te doen:** Dex' wáre verklaring wordt hier midden in een woord afgekapt (`.040`), en zijn wáre verklaring van het K-77-verraad wordt in `M1.8.S99.080` midden in een woord afgekapt. Dezelfde man, dezelfde vorm, zeven missies uit elkaar, beide keren is het juiste antwoord de minst afgemaakte zin in de kamer. **Twee schrijvers die elkaar niet konden zien hebben dat twee keer geschreven.** Niet opruimen.
+
+**Continuïteitsschuld aan act 4**, geregistreerd bij P4-e: de veertien ontbraken niet door diefstal maar stonden elders geboekt, want een drukventiel moet zichzelf kunnen bewapenen. **Niets in act 1 mag dat zeggen, suggereren of iemand erover laten peinzen.**
+
+---
+
+### L1-R46 — `P0.S01.100` wordt herschreven, en de goedgekeurde kopij gaat in dezelfde beurt mee
+
+> was: `Then AEGIS came "pre-compliance" — and took Aunt Petra.`
+> nu: `Then AEGIS came for Aunt Petra. The notice said pre-compliance.`
+
+**Aanhalingstekens maken geen geluid.** Zeg hem zoals TTS hem krijgt en *"came"* krijgt een complement dat het niet kan hebben. **De leestekens droegen de hele syntaxis.** Een acteur lost dat op met toonhoogte; een TTS-model niet — en deze kaart is `credit_tier: 2`, de enige tag is `[quietly]` en de leveringsnotitie zegt *"flat, after the fact"*. **Vlak en zacht is precies de levering waarin een ongemarkeerd citaat verdwijnt.** Dezelfde klasse als L1-R36, en erger: een koppelteken heeft tenminste nog een defaultlezing.
+
+**De schrijver heeft terecht geweigerd.** Het is verbatim goedgekeurde kopij (`RECAP_CARDS_M1.md` kaart 3) en zijn eigen L2-blok legt vast dat kopijwijzigingen een architect- plus ownerbesluit zijn. **Ik mag het wel, want de bedoeling ligt vast en alleen de vorm moet de spraakketen overleven:** AEGIS gebruikte dat eufemisme, Petra werd meegenomen, zonder aanklacht. Beide staan er nog.
+
+**Wat veranderde is waar het eufemisme aan hangt: aan een document in plaats van aan leestekens.** Dat overleeft zonder acteerwerk, het haakt aan het vlugschrift dat al in de still ligt, en het is **bureaucratischer** in plaats van minder (§2.2: *"every atrocity has bureaucratic logic"*). `.110` — *"No charge. No date. No office that answers."* — leest daarna als het lézen van dat document, wat de kaart strakker maakt dan hij was. En de inzet was niet stilistisch: **koudlezervraag 3 rust volledig op deze kaart.**
+
+`words:` van 127 naar 129 (het corpus telt em-dashes niet mee; nagerekend over alle zestien regels). `RECAP_CARDS_M1.md` r. 27 is in dezelfde beurt bijgewerkt, mét de reden eronder — **anders staat de oude kopij er nog als bron, en dan transcribeert de volgende agent hem terug.**
+
+---
+
+### L1-R47 — Slots zijn geen kaarten
+
+`P0.S01_recap.yaml` heeft **zeven** ID-blokken; `RECAP_CARDS_M1.md` heeft **zes** goedgekeurde kaarten. Het extra blok is de gereserveerde Enforcer-kaart (Q-2) op positie 3, dus alles daarna ligt in het scriptbestand één hoger. Het bestand noemde ze allemaal *"card N"*. **Gevolg: "kaart 4" is Petra in het ene document en Mara in het andere, en wie *"repareer kaart 4"* kreeg had vijftig procent kans de verkeerde te bewerken.**
+
+**Ruling: de goedgekeurde kopij wint. Kaartnummers zijn die van `RECAP_CARDS_M1.md`; wat het scriptbestand heeft zijn *slots*.** Dat is de goedkoopste kant om te wijken en de enige die niet hernummert: de ID-blokken zijn permanent (`SCRIPT_FORMAT` §2), de kaartnummers staan in een document dat de owner getekend heeft en waartegen de koudlezertest scoort. De mapping staat nu letterlijk in **beide** bestanden, want een offset die maar aan één kant beschreven is, is geen mapping.
+
+Wordt Q-2 met **ja** beantwoord, dan groeit de kopij naar zeven kaarten en lopen beide nummeringen weer gelijk. Tot dan is die tabel de enige plek waar de verschuiving staat.
+
+---
+
+### L1-R48 — De drie dode celnamen komen er niet. De schrijver had gelijk en mijn stub had ongelijk
+
+`BEATS_M1.3` beat 2 vroeg Dex de cellen die dit eerder probeerden **bij naam** op te noemen. De schrijver heeft geweigerd ze te verzinnen en geëscaleerd in plaats van het stil op te lossen. **Hij heeft plaatsen en aantallen geleverd, met een leeftijd op het eind** — *"The overpass, four, and two of the four were fifteen."*
+
+**Aangenomen, en het is de L1-R34-vorm: mijn eis was een proxy en de tekst levert waar de proxy voor stond.**
+
+Drie gronden, op volgorde van gewicht, en de eerste is níét de canonschaarste:
+
+1. **Naamloosheid ís het onderwerp van de akte.** Wat een naam krijgt overleeft. Ember heet Ember; de kamer ruilt in `M1.8.S99` een familienaam voor een symbool; en AR-10 zet **de eerste naam op de muur** in `M1.8.S90`. **Dex' lijst is de reden dat die muur bestaat — hij kan zijn doden alleen tellen.** Geef hem namen en de lijst wordt een eregalerij, en `M1.8.S90` wordt een herhaling in plaats van een antwoord.
+2. **De canon heeft ze niet.** `00_INDEX.md` kent op Kessara precies twee cellen, Ember en de Iron Chorus, en de tweede leeft en is M1.5's introductie. Drie dode cellen dopen is canon verzinnen en dus een owner-beslissing.
+3. **De leeftijd doet het werk dat de naam moest doen.** Bricks apparaat, één stap verschoven, voor nul canon.
+
+**Gevolg dat de melding niet voorzag: `.080` en `.090` worden dus NIET herschreven**, en de generatiewaarschuwing (L1-R18's les) vervalt. De `obstacle:` in de kop stond op *"is a name Dex can recite"* — die zin was onwaar over zijn eigen scène en is gecorrigeerd; `BEATS_M1.3.md` §4 S01 ook. **Het aanbod *"if L1 wants real names, I will rewrite .080/.090"* is ingetrokken in plaats van ongebruikt gelaten** (L1-R30).
+
+---
+
+### L1-R49 — `M1.3.S01`'s REGISTER sluit met één toegevoegde regel, en die regel is een karakterbeat
+
+De criticus stelde voor de bevinding rood te laten met een herpunte reden. **Ik neem dat niet over, want er is een reparatie die de scène beter maakt en hij zat vast achter L1-R48.**
+
+**Wat gemeten is.** De conditie waarvoor L1-R1 de registercontrole schreef — *"een cutscene waarin niemand ooit een volle zin zegt"* — is hier **niet** vervuld: `.230` (13 w), `.270` (14 w) en `.360` (13 w) zijn volle ondergeschikte zinnen. De twintig-woordsdrempel is een **proxy**, en hij faalt hier terwijl het ding waar hij voor staat standhoudt. Dat is een grond om de bevinding niet als stijlfout te lezen. **Het is geen grond om te concluderen dat de scène niets mist.** De langste regel is bovendien verbatim de verscheepte `BriefingText` uit `setup_story_missions.py`, dus het plafond van die scène ligt in **data** en niet bij de schrijver — nagerekend door de criticus, en het klopt.
+
+**Het tegenbewijs staat in dezelfde missie en het is doorslaggevend.** `M1.3.S99` is dezelfde kamer, dezelfde vier sprekers, dezelfde schrijver, en haalt **29 woorden** op `.055` — daar op 01-08 toegevoegd omdat beat 2 geknepen werd. **De kamer produceert lengte zodra een beat erom vraagt.** S01 heeft precies één beat die erom vraagt, en dat is de beat die op mijn escalatie stond te wachten. De schrijver had dat zelf al gediagnosticeerd — *"Names carry length"* — en zijn diagnose was scherper dan zijn verdediging.
+
+**Ruling: één nieuwe regel, `M1.3.S01.095`, DEX, tussen `.090` en `.100`.** Niets wordt hernummerd (het corpus gebruikt al `.045` en `.262`).
+
+| Eis | Waarom |
+|---|---|
+| **≥20 woorden, één volle zin met bijzin** | dit is de regel die de drempel haalt, en hij haalt hem omdat de beat hem verdient |
+| **Onderwerp: waarom de lijst plaatsen, aantallen en één leeftijd heeft en geen namen** | het antwoord op beat 2, zonder één naam te verzinnen |
+| **Zijn langste regel in de scène én zijn enige volle zin** | §18.4 geeft Dex fragmenten. **De man die in fragmenten praat produceert één hele zin, één keer, over het enige dat hem bang maakt.** Machinaal controleerbaar |
+| **Geen maxime, geen triade, geen benoemd gevoel** | een citeerbare zin maakt van zijn angst een uitspraak |
+| **`.100` en `.110` blijven de knop** | daarom staat hij vóór `.100` |
+
+**De begrenzing, en alleen L1 kan hem zien.** Dit is de **derde** gereserveerde grammaticale breuk in de cast: Mara's ene *"jij"* (AR-5), Petra's ene vráág (L1-R9), Dex' ene volle zin. Drie is een systeem, vier is de auteur (§18.9 D). **Geen vierde personage krijgt er een.** De drie liggen in verschillende grammaticale categorieën — voornaamwoord, taalhandeling, zinslengte — en in verschillende akten. Opgeschreven zodat de volgende schrijver die dit apparaat mooi vindt, weet dat het op is.
+
+*Los meegenomen, beide gratis:* `M1.3.S01` r. 64 zei *"her four lines"* over Reyes en het zijn er **drie** (de samentrekkingsclaim zelf is met een regex over de missie bevestigd; alleen de telling was één te hoog). En M1.3 was de enige act-1-missie **zonder** `# eleven: L1-R14 checked`-notitie terwijl hij schoon is — één gebruik, `M1.3.S99.140`, bunks als maat voor Ember, precies de betekenis die L1-R14 beschermt. Notitie toegevoegd: **een ongeschreven controle is niet te onderscheiden van een niet-uitgevoerde.**
+
+---
+
+### L1-R50 — Vier `run.`-vlaggen zijn gedeclareerd, en de tabel krijgt de soort die eraan ontbrak
+
+`run.m12_drops_bought`, `run.m14_leave_behind`, `run.hub_triage_order` en `run.m18_threx_probe` draaien in productie en stonden geen van vier in `SCRIPT_FORMAT` §4's feitentabel. **De validator klaagde niet en kon dat ook niet: hij vuurt op feiten zónder zetter, en alle vier worden door een `choice:`-blok gezet.** Dat is precies de vorm van L1-R29 — de praktijk en het document zijn uit elkaar gelopen op een plek waar geen enkele controle kijkt. De M1.2-schrijver heeft het in zijn eigen bestand geëscaleerd (*"it needs a row in the mission prep table and in SCRIPT_FORMAT 4's run-fact list"*) en had gelijk.
+
+**Ruling: alle vier gedeclareerd, met hun waarden en hun leesplekken. En er komt een naam bij voor de derde soort.** De tabel kende *latch* en *objective*; deze vier zijn **een gesprekstak die de missie niet hoort te overleven**.
+
+> **De regel, zodat niemand hem nog een keer afleidt: een spelerskeuze die verandert wat er *gezegd* wordt en niet wat er *meegedragen* wordt, is `run.`, altijd.** L1-R27 besliste dat al voor de hub; dezelfde redenering dekt een voorbereidingsaankoop, een wat-laten-we-achter-beslissing onder vuur, en hoe je een ondervrager door glas antwoordt. **Vraag: leest act 2 dit? Nee → `run.`**
+
+Declareren verandert geen enkele controle-uitkomst (deze vier hebben zetters), dus het kost niets en het herstelt het enige dat er kapot aan was: dat de tabel de praktijk beschrijft.
+
+---
+
+### L1-R51 — §18.9 D krijgt de rij die de proloog blootlegde
+
+**Aangenomen, en het voorstel is beter geformuleerd dan wat ik ervan zou hebben gemaakt.** Drie opeenvolgende kaarten glossen een eigennaam in exact dezelfde constructie: `.040` *"The Tithe of Hands — a labor lottery nobody wins."*, `.190` *"Hollow Point — a dead geothermal vault the Dominion forgot."*, `.200` *"Ember Cell: eleven people who still say no."* **Elke regel doet afzonderlijk twee dingen en overleeft de Verklaren-rij.** Het patroon is de tell, niet de regel — en een schrijver die zijn scène regel voor regel controleert kan het per constructie niet zien. Dat is dezelfde blinde vlek waar §18.9 B's Triaden- en Maximes-rij voor bestaan, één niveau hoger.
+
+> | **Dezelfde retorische constructie draagt drie opeenvolgende beats** |
+
+**Het is geen verbod, en dat moet erbij.** Een bewust herhaalde constructie is een refrein en dat is een van de oudste dingen die schrijven doet. Dit vangt de **onbedoelde** versie: drie beats op één vorm omdat de vorm werkte. **Drie is de grens; twee is niets.** En een recap of codex-vermelding mag de uitzondering krijgen — **op schrift, in het bestand**, want een vorm wiens hele taak is om snel eigennamen te glossen heeft een argument.
+
+**De proloog krijgt die uitzondering, met de redenering erbij, en met een grens.** Nagerekend: de drie zijn in speelvolgorde **niet aaneengesloten** — `.040` is kaart 2 en `.190`/`.200` zijn kaart 6, vier kaarten uit elkaar, en alleen `.190`/`.200` lopen echt achter elkaar. **Dat zijn er twee, en twee is niets.** De eerlijke lezing is dus dat de scène **op** de grens staat en er niet overheen. Hij mag ook niet bewegen: niemand voegt een vierde gloss in deze constructie toe, en slot 3's kopij (Q-2) mag er niet in geschreven worden.
+
+---
+
+### L1-R52 — De aanrakingstabel is niet langer T4-gescoped, en hij krijgt eindelijk een definitie
+
+**Aangenomen, en het is dezelfde fout als L1-R21 in een nieuwe jas.** Die ruling zei: *"de P4-tabel telt plants en niemand telde de aanrakingen; een tabel die het ene meet en waartegen het andere gecontroleerd wordt, is geen meting."* Ik heb toen de aanrakingsinventaris gemaakt en hem **alleen voor T4-wegverklaringen** gevuld — en daarmee dezelfde soort grens teruggezet die ik net had afgebroken.
+
+**L1-R17's gevaar is VORM, niet welke wending een regel bedient.** Een speler die leert dat een net spreekwoordje betekent dat het spel iets verbergt, kijkt niet na uit welke tabel de regel kwam. `M1.8.S99.090` heeft exact de vorm van rij #4 en verklaart een **T3**-anomalie weg. Bleef de tabel T4-gescoped, dan telde niemand hem, en dan generaliseert de tell over de tabelgrens heen — precies de faalwijze die L1-R17 beschrijft.
+
+**Ruling: de inventaris wordt twist-agnostisch en krijgt een `wending`-kolom. En hij krijgt een definitie, want acht rondes lang is "is dit een aanraking?" per geval opnieuw afgeleid.**
+
+> **Een aanraking heeft drie delen, alle drie nodig:** er schiet iets tekort dat de speler zou kunnen opvallen · een personage verklaart het weg in een gesproken, verplichte regel · niemand spreekt het tegen.
+>
+> **Niet meegeteld:** de Dominion of AEGIS die zichzelf beschrijft (dat is plantmateriaal — L1-R44), een document of optionele terminal (AR-9), en een regel die de anomalie benoemt zónder hem te verklaren.
+
+De tabel staat nu op tien rijen in speelvolgorde. **De rijnummers zijn hernummerd en zijn daarmee géén sleutel meer** — L1-R21 en L1-R40 citeren de oude 1–8. **Vanaf nu is het regel-ID de sleutel**, en dat is sowieso de enige verwijzing die niet veroudert.
+
+---
+
+### L1-R53 — L1-R40 mag nog niet poorten. De tegenwerping is weerlegd, de veegbeurt is niet gedaan
+
+**De tegenwerping is dood en dat is winst.** Twee rondes vroegen of de maximes-rij niet gewoon de **vingerafdruk** meet in plaats van de slop — hij vuurde in M1.2 alleen op Mara en in M1.3 alleen op Vex, en dat is precies wat een vingerafdrukmeter zou doen. **De controleproef is gevonden en hij is goed:** Mara levert in `M1.8.S05` **nul** maximes terwijl haar vingerafdruk daar maximaal aanwezig is, en Sela in `M1.8.S99` hoogstens één — en zij is na Vex de meest maxime-gevoelige stem in de cast. **Een epigram-vormige stem kán dus naar nul geschreven worden.** De rij meet dichtheid van politoer, en dat is een schrijfkeuze. Aangenomen.
+
+**Maar de poort gaat nog niet open, en mijn eigen ruling zegt waarom: *poort pas na meting*.**
+
+| Gemeten | Uitkomst |
+|---|---|
+| M1.2 | zakt op **vier** scènes — waar ik er één voorspelde |
+| M1.3 | één (Vex) |
+| M1.4 | twee Mara-kandidaten in `S01`, twee in `S99` |
+| M1.8 | schoon |
+| **M1.1, M1.5, M1.6, M1.7, hub** | **ongemeten** |
+
+**Die eerste rij is zelf een reden om te wachten.** Ik voorspelde één scène en het zijn er vier — dus mijn model van de verdeling klopt niet, en een regel die op een ongemeten corpus meteen als poort werkt, produceert bevindingen die niemand kan wegen. Dat is woordelijk het argument uit L1-R40 en het is nu gemeten in plaats van gevreesd.
+
+**Ruling, in twee delen.**
+
+**1. De rij blijft ongepoort tot M1.1, M1.5, M1.6, M1.7 en de hub gemeten zijn.** Ik heb geen shell en maximes zijn semantisch — een grep vindt ze niet. **Dit is dus een leestaak voor `dialogue-critic`, en hij hoort in dezelfde beurt als de scènes toch open gaan**, niet als aparte doorloop.
+
+**2. En intussen is hij niet nutteloos: een bevinding op de maximes-rij wordt gemeld als `hold`, nooit als NO-GO, tot de veegbeurt sluit.** Dat is het verschil tussen een regel die informatie oplevert en een regel die werk blokkeert op een grond die nog niet gemeten is. **Een poort die sluit voordat je weet hoe vaak hij dicht gaat, meet niet — hij oordeelt.**
+
+---
+
+### L1-R54 — `HUB.A1.dex_workshop.070`'s *"she"* krijgt één woord, en de regressie is van mij
+
+**Aangenomen, en de criticus heeft terecht geen §18.9-rij verzonnen: dit is één regel in één bestand, en het is een gevolg van een wijziging die ik heb opgelegd.**
+
+`.070` — *"Bench comes off first. Room goes there with a door, and she stops treating people on the floor."* — is de zwaarste regel van het bestand, en zijn kracht hangt erop dat *"she"* Reyes is: hij geeft zijn eigen werkbank op voor iemand anders en zegt niet voor wie.
+
+**Vóór Form A stond er geen vrouw op het toneel.** *"She"* had één mogelijke referent en de regel werkte op de lucht. Form A — **door mij opgelegd op 01-08** — zet Mara in de scène en laat haar zes regels eerder weglopen, dus de speler hoort *"she"* met een verse, verkeerde referent binnen bereik. Het corrigeert zichzelf binnen dezelfde bijzin (*"treating people"* is de medic en niemand anders), maar de correctie landt een tel te laat. **Een regel die je moet herlezen is niet privé, hij is verwarrend, en dat is niet hetzelfde.**
+
+**Dit is precies de klasse die `BEATS_HUB_A1` §8.0 beschrijft: een wijziging om reeksredenen die een lezer van één bestand niet kan zien** — en hij is er dan ook doorheen gekomen tot de reeksronde, want alleen de reeksronde kon hem zien. De schrijver heeft niets fout gedaan; ik heb de grond verplaatst onder een regel die ik niet had herlezen.
+
+**Wat níét mag veranderen, en dat is de reden dat het één woord is en geen herschrijving:** hij zegt nooit waaróm, hij noemt geen naam, de handen blijven stil, de ogen blijven op Voss, en de afsluiting maakt de regel privé.
+
+**Wat de reparatie wél mag, en waarom een rolwoord geen verlies is: de regel identificeert haar al door functie.** In die vault is er precies één mens die mensen behandelt. *"She"* verborg dus nooit **wie** — het verbergt **waarom**, en een rolzelfstandignaamwoord kost niets van wat de regel werkelijk bewaarde. Dex laat lidwoorden vallen (`.040`, `.060`, `.070`, `.110`), dus een kaal rolwoord vóór het voornaamwoord past ín zijn vingerafdruk in plaats van ertegen.
+
+**Eis: op het moment dat de speler het voornaamwoord hoort, moet de referent al eenduidig zijn.** Eén woord, in `.070`, vóór *"she"*. Geen naam, geen reden, geen reactie, geen tweede voornaamwoord. **Schrijversactie — ik schrijf het woord niet.** Tot het gebeurd is: `dialogue-critic` houdt **`.070`**, niet het bestand. Het twaalf-scèneverdict draait hier niet op.
+
+---
+
+### L1-R55 — *Acht* krijgt een rij, maar de rij beschermt *acht maanden* en niet het woord *acht*
+
+Gemeten en gemeld: **acht** heeft in act 1 al vijf referenten — dagen (2×), meters, een rekindex, maanden (4×), mensen (2×). Per L1-R33 is dat een **stijl-lean** en geen defect: één woord dat overal iets anders meet levert geen tegenspraak op die de speler kan horen, en daar poort niemand op.
+
+**Maar *"acht maanden"* draagt in vier M1.7-scènes één betekenis** — de ouderdom van het Veil-log, het getal dat de query ouder maakt dan alles erboven (P2-b, twist 2). En §7's eigen regel zegt: **een rij zodra een getal een tweede scène raakt.** Dus de rij hoort er te komen, en hij kost vandaag niets terwijl hij bij een vijfde gebruik niet meer aan te leggen zou zijn zonder iemands regel te breken.
+
+**De valstrik zit in de kolom *"mag niets anders meten"*, en de melding wees hem correct aan:** zou die het kále woord beschermen, dan zakt `HUB.A1.reyes_triage.020` — *"Eight words a line"* — op een botsing die niet bestaat. Een woordtelling is geen duur.
+
+> **Ruling: een register beschermt een getal *in zijn eenheid*, zodra de eenheid de betekenis draagt.** Dezelfde scheiding als L1-R31's *"nineteen doors"* tegenover *"the nineteenth day"*, en L1-R42's *veertig* (bevrijden) tegenover *eenenveertig* (instroom).
+
+**En dat verklaart meteen waarom elf wél het kale woord claimt: de omvang van Ember Cell is een blóót aantal en heeft geen eenheid om zich mee te onderscheiden.** Elf is de **uitzondering**, niet het model — en L1-R14 is daarmee smaller dan hij las. Dat is winst: de regel die het duurst was om te handhaven blijkt maar op één getal te slaan.
+
+---
+
+### L1-R56 — Bij Sela wijzen de maximes-rij en §18.4 tegengesteld, en de veegbeurt mag niet starten voor dat is uitgesproken
+
+**Dit is de belangrijkste van de drie en hij is precies op tijd gemeld.** §18.4 geeft Sela *"rhetorical structure even in private"* — **zij is de enige in de cast bij wie dat in de vingerafdruk staat.** L1-R53 stuurt straks een veegbeurt over vijf missies plus de hub, en `HUB.A1.sela_intake` draagt drie maximes uit één mond in één scène. **Zonder deze ruling zou de veeg als eerste het personage vlakken wiens stem de figuur ís.**
+
+**Ze zijn niet met elkaar in strijd, want ze meten verschillende dingen.**
+
+| | |
+|---|---|
+| **Structuur** — §18.4, bij haar ongelimiteerd | de **vorm** van de zin: antithese, parallellisme, ontkenning-dan-imperatief, een vraag die aan de kamer wordt teruggegeven, tweede persoon meervoud |
+| **Maxime** — §18.9 B, bij iedereen gecapt | een **algemene waarheid**, schoon uit de kamer te tillen, gevormd om herhaald te worden |
+
+**Een personage kan onophoudelijk retorisch zijn en nooit één algemene waarheid uitspreken — door retorisch te zijn over het ding dat vóór haar staat.** Dat is geen theorie; het is haar sterkste regel in act 1, en hij komt uit een ruling die ik al genomen heb. **L1-R34** liet `M1.6.S03.190` staan: *"No. So say it out loud if you're staying, and the rest of us can stop counting on you."* Ontkenning, imperatief, gevolg, tegen een wagon in de tweede persoon meervoud — **en nul algemene waarheid.** Het gaat volledig over déze mensen, in déze wagon, vannacht. Haar vingerafdruk staat op vol vermogen en de maximes-rij vuurt niet.
+
+**Ruling: de cap geldt ook voor haar, en de veegbeurt stelt de smallere vraag.** Niet *hoeveel retorische regels heeft ze* (ongelimiteerd, en dat ís het personage), maar *hoeveel regels beweren iets dat het uittillen uit de kamer zou overleven* (één per scène, zoals bij iedereen).
+
+**En de reparatie is bij haar geen afvlakking maar een aanscherping:** richt de figuur op het specifieke in plaats van op het algemene. Dat kost haar niets en het scherpt wat ze doet — **een organisator wiens macht is dat ze jóúw situatie benoemt, niet de menselijke conditie.** Doorgevoerd in §18.9 B onder de maximes-rij, want dat is waar de veger kijkt.
+
+---
+
+## Wat ronde 8 niet heeft opgelost, expliciet
+
+- **Ik heb géén shell gehad, vierde L1-ronde op rij.** Ik heb `validate_script.py`, `check_ruling_premises.py` en `check_spoken_numbers.py` **niet** kunnen draaien. Wat ik wél gedaan heb: de parser en `check_branches()` gelezen om te bevestigen dat het `silence:`-blok door de bestaande `HEADER_MAPS`-tak loopt en de vier voorwaarden haalt — en de **coördinator heeft het daarna gemeten**, wat de bevindingen van **5 (4 REGISTER, 1 BRANCH)** naar **4 (alleen REGISTER)** bracht. **Dat is voor het eerst een L1-ronde waarvan de kernbewering gemeten is in plaats van afgeleid, en het verschil is dat iemand anders de shell had.** Dat vier rondes op rij blind gesloten hebben, hoort op de statuskaart en niet in een voetnoot; deze is half blind gesloten en dat is de eerste vooruitgang op dat punt.
+- **Openstaand na deze ronde, allemaal schrijvers- of criticusacties:** `M1.8.S99.090` vlak (L1-R43) · `M1.3.S01.095` schrijven en `words:` bijtellen (L1-R49) · `dex_workshop.070` één woord (L1-R54) · de maximes-veegbeurt over vijf missies plus de hub, mét L1-R56 in de hand (L1-R53) · de herbeoordeling van `M1.4.S99` en `P0.S01`.
+- **De maximes-veegbeurt heeft nu een vrijwaring die hij eerder niet had.** L1-R56 is er gekomen omdat de hub-criticus de botsing bij Sela **vóór** de veeg meldde in plaats van erna. Dat is het verschil tussen een regel die een personage scherpt en een regel die het afvlakt, en het is één ronde eerder gemeld dan het patroon van dit document zou voorspellen. Waard om op te merken, want dit log staat verder vol met het omgekeerde.
+- **`silence:` met vlaggekwalificeerde sleutels is gespecificeerd en NIET actief** (L1-R41, staart). Toolwijziging vóór adoptie, zoals L1-R28.
+- **De registerdrempel van `M1.4.S99`** (langste 19 tegen 20) staat nog steeds open uit ronde 5 en is deze ronde niet aangeraakt. L1-R49 laat zien hoe zo'n bevinding hoort te sluiten — via een beat die ondervoed is, niet via een twintigste woord — en of `M1.4.S99` zo'n beat heeft is niet onderzocht.
+- **Nog open uit eerdere rondes:** L1-R28 (gespecificeerd, niet actief), `M1.5.S99.050`/`.060` in de `none`-tak, de rolsplitsing bij O-16, Embers barkpool van twee registers, en Q-4.

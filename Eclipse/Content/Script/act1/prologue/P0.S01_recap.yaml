@@ -14,32 +14,64 @@ turn:         "The last card stops describing a life and states a debt — eleve
 
 # ---- state ----
 status:       draft
-critic:       "NO-GO: .100 draagt zijn syntaxis in aanhalingstekens die TTS niet uitspreekt -- came 'pre-compliance' wordt zonder die tekens geen Engelse zin. GEEN SCHRIJVERSACTIE: verbatim goedgekeurde kopij (RECAP_CARDS_M1.md r.27), dus owner + architect"
-words:        127
+critic:       "NO-GO: .100 draagt zijn syntaxis in aanhalingstekens die TTS niet uitspreekt -- came 'pre-compliance' wordt zonder die tekens geen Engelse zin. GEEN SCHRIJVERSACTIE: verbatim goedgekeurde kopij (RECAP_CARDS_M1.md r.27), dus owner + architect  ||  ARCHITECT-ACTIE UITGEVOERD 02-08, RULING L1-R46: .100 herschreven en RECAP_CARDS_M1.md kaart 3 in dezelfde beurt bijgewerkt. Ter herbeoordeling."
+words:        129
 
 # ---- story-architect notes (L1) — see phase0/beats/BEATS_P0_prologue.md ----
 # THIS IS THE RECAP OPENING, not a playable prologue (SPEC-P2-04 decision 1, ACCEPTED).
-# Approved copy for cards 1,2,4,5,6,7 lives in phase0/RECAP_CARDS_M1.md and is NOT
-# rewritten - it is transcribed here. Card 3 is a story-architect PROPOSAL pending
-# owner question Q-2 and repairs the orphaned Enforcer thread (finding C-2).
+#
+# *** SLOTS ARE NOT CARDS. RULING L1-R47 (02-08), AND IT IS THE FIX FOR A REAL AMBIGUITY. ***
+# This file has SEVEN id blocks; phase0/RECAP_CARDS_M1.md has SIX approved cards. The extra
+# block is the reserved Enforcer card (Q-2), and it sits at position 3, so every card after it
+# is one higher here than in the approved copy. This file used to call them all "card N",
+# which meant "card 4" was Petra in one document and Mara in the other. Anybody handed
+# "repair card 4" had a coin-flip chance of editing the wrong one.
+# THE APPROVED-COPY NUMBERS WIN, because that document is what the owner signed and what the
+# cold-reader test scores. What this file has are SLOTS: permanent id blocks, never
+# renumbered, never mistaken for a card number again.
+#
+#   SLOT  ids            what it holds                       approved card
+#   ----  -------------  ----------------------------------  -------------
+#     1   010 020 030    The city                            card 1
+#     2   040 050 060    The Tithe                           card 2
+#     3   070 080 090    The Enforcer line - Q-2, EMPTY      none yet (proposal)
+#     4   100 110 120    Petra                               card 3
+#     5   130 140 150    Mara                                card 4
+#     6   160 170 180    The container                       card 5
+#     7   190 200 210    Ember Cell                          card 6
+#
+# Approved copy for slots 1,2,4,5,6,7 lives in phase0/RECAP_CARDS_M1.md. Slot 3 is a
+# story-architect PROPOSAL pending owner question Q-2 and repairs the orphaned Enforcer
+# thread (finding C-2). If Q-2 is answered yes, the approved copy grows to seven cards and
+# slot number and card number line up again - and until then this table is the only place
+# the offset is written down.
 #
 # voice:     open. Owner question Q-1: are the cards narrated at all? Recommendation is
 #            yes, in Voss's voice, both genders, ~2,200 credits. If the answer is no,
 #            this file stays as the text source and voice-director skips it.
 #
-# ID BLOCKS - three ids reserved per card, never renumbered:
-#   card 1  The city          010 020 030
-#   card 2  The Tithe         040 050 060
-#   card 3  The line (Q-2)    070 080 090   <- leave EMPTY and reserved if Q-2 is refused
-#   card 4  Petra             100 110 120
-#   card 5  Mara              130 140 150
-#   card 6  The container     160 170 180
-#   card 7  Ember Cell        190 200 210
+# ID BLOCKS - three ids reserved per slot, never renumbered. See the slot table above for
+# which approved card each slot holds. Slot 3 stays EMPTY and reserved if Q-2 is refused.
 #
 # flags-in:  none
 # flags-out: Story.Thread.Enforcer_BadgeHeld  (card 3 only - NEW TAG, systems task)
 # plants:    T4 groundwork - AEGIS is introduced as an arresting machine, not a predictor.
 #            Keep that impression flat and hard. Act 4 inverts it; act 1 must not hedge it.
+# *** 18.9 D, THE THREE-CONSECUTIVE-BEATS ROW: THIS SCENE HAS THE EXCEPTION, IN WRITING. ***
+# Ruling L1-R51 (02-08) added a row to 18.9 D - "the same rhetorical construction carries
+# three consecutive beats" - and THIS FILE IS WHERE IT WAS FOUND. Three lines gloss a proper
+# noun with the identical move: .040 "The Tithe of Hands - a labor lottery nobody wins.",
+# .190 "Hollow Point - a dead geothermal vault the Dominion forgot.", .200 "Ember Cell:
+# eleven people who still say no." Each does two jobs and each survives the Explaining row
+# alone; the PATTERN is the tell, and no line-by-line check can see it.
+# THE EXCEPTION IS GRANTED AND HERE IS THE ARGUMENT, because the new row requires it to be
+# written down rather than assumed. A recap has ninety seconds and seven still frames to hand
+# the player four proper nouns he has never heard, and gloss-on-first-use is the form's whole
+# job - 18.8's relaxation for exactly this case. Note also that the three are NOT adjacent in
+# play: .040 is card 2 and .190/.200 are card 6, four cards apart, and only .190/.200 actually
+# run consecutively. TWO IS NOTHING. So the honest reading is that this scene is at the line
+# and not over it - and it may not move: nobody adds a fourth gloss in this construction, and
+# slot 3's copy (Q-2) must NOT be written in it.
 # writer:    second person, past tense - the ONLY place in the game where that is allowed.
 #            Max three lines per card. No card names an emotion (18.9 A); the existing
 #            line "That was the day keeping your head down stopped working" names a
@@ -52,6 +84,12 @@ words:        127
 #   cold-reader action. What this pass authored is line granularity, stills-as-shot,
 #   tags, bands, and the reserved gaps. If a reviewer wants copy changes, that is a
 #   RECAP_CARDS_M1.md change and therefore a story-architect + owner decision, not mine.
+#   *** ONE EXCEPTION SINCE 02-08, AND IT WENT THE ROUTE THIS PARAGRAPH DESCRIBES. ***
+#   .100 (approved card 3, Petra) was amended by story-architect under ruling L1-R46 because
+#   its syntax was carried by quotation marks that TTS does not pronounce, and
+#   RECAP_CARDS_M1.md was updated in the same pass so there is still exactly one source. The
+#   writer was right to refuse this rewrite and right to escalate it. Every other line in
+#   this file is still verbatim, and the rule above still stands for everybody.
 #
 # CARD 3 IS NOT WRITTEN. Block 070-090 is left empty and reserved exactly as the stub
 #   instructs. Q-2 is unanswered, the Enforcer badge is a live canon conflict (C-2), and
@@ -92,7 +130,7 @@ words:        127
 #   that ban should survive into generation.
 
 lines:
-  # ================= CARD 1 — THE CITY =================
+  # ============ SLOT 1 — THE CITY — approved card 1 ============
   - id:      P0.S01.010
     speaker: VOSS
     voice:   voss
@@ -113,15 +151,21 @@ lines:
 
   # 030 reserved, unused. Card 1 is two lines of approved copy.
 
-  # ================= CARD 2 — THE TITHE =================
+  # ============ SLOT 2 — THE TITHE — approved card 2 ============
   - id:      P0.S01.040
     speaker: VOSS
     voice:   voss
     band:    ambient
     text:    "The Tithe of Hands — a labor lottery nobody wins."
     shot:    "STILL. The Tithe of Hands lottery board; one name lit; nobody meets anyone's eyes."
-    note:    "18.8 in one line: the Tithe is used correctly and never defined. It stays
-              undefined until Sela in M1.6 and until Brick in HUB.A1.brick_the_tithe."
+    note:    "CORRECTED 02-08 (L1 documentation sweep). This note used to say the Tithe is
+              `used correctly and never defined`, and the line it is attached to defines it:
+              `a labor lottery nobody wins` is a definition, in six words. WHAT IS ACTUALLY
+              TRUE, and it is the thing 18.8 asks for: the Tithe is GLOSSED and never
+              EXPLAINED. Nobody says who runs it, how a name is drawn, what happens to the
+              drawn, or why anybody complies. Sela supplies the politics in M1.6 and Brick
+              supplies the body in HUB.A1.brick_the_tithe - and Brick is on Kessara because
+              of it (AR-11), which the player is never told here."
 
   - id:      P0.S01.050
     speaker: VOSS
@@ -138,7 +182,7 @@ lines:
               deletion test (18.9 C2) was run on this card and it fails backwards: cut
               this and the Tithe is an institution instead of a person. Kept."
 
-  # ================= CARD 3 — THE LINE — NOT WRITTEN, Q-2 =================
+  # ============ SLOT 3 — THE ENFORCER LINE — NO APPROVED CARD, NOT WRITTEN, Q-2 ============
   # IDS 070, 080, 090 ARE RESERVED AND DELIBERATELY EMPTY.
   #
   # This is the Enforcer badge card. It is a story-architect PROPOSAL (BEATS_P0_prologue.md
@@ -157,16 +201,31 @@ lines:
   #   the Enforcer thread, because M1.2.S01 currently pays off a plant that does not exist.
   # Either way: DO NOT RENUMBER. That is how a script loses its audio.
 
-  # ================= CARD 4 — PETRA =================
+  # ============ SLOT 4 — PETRA — approved card 3 ============
   - id:      P0.S01.100
     speaker: VOSS
     voice:   voss
     band:    ambient
     tags:    [quietly]
-    text:    'Then AEGIS came "pre-compliance" — and took Aunt Petra.'
+    text:    "Then AEGIS came for Aunt Petra. The notice said pre-compliance."
     shot:    "STILL. A forced door, an overturned chair, an AEGIS notice on the table."
     note:    "T4 groundwork. AEGIS enters as an arresting machine, flat and hard. No hedge,
-              no ambiguity - act 4 pays for this first impression by inverting it."
+              no ambiguity - act 4 pays for this first impression by inverting it.
+              *** COPY AMENDED 02-08 BY RULING L1-R46. STORY-ARCHITECT + APPROVED-COPY
+              CHANGE, NOT A WRITER'S CALL. *** It read: Then AEGIS came 'pre-compliance' and
+              took Aunt Petra, with the euphemism in quotation marks. Quotation marks make no
+              sound. Say it as TTS gets it and 'came' takes a complement it cannot take, so
+              the punctuation was carrying the entire syntax on a card at credit_tier 2 whose
+              only tag is [quietly] and whose delivery note says flat, after the fact - the
+              exact delivery in which an unmarked quotation disappears. Same class as L1-R36,
+              and worse, because a hyphen at least has a default reading. The intent is
+              unchanged and it is the intent that was approved: AEGIS used that euphemism and
+              Petra was taken. What changed is that the euphemism is now attributed to a
+              DOCUMENT instead of to punctuation, which needs no performance to survive, ties
+              the line to the notice already in the shot, and is more bureaucratic rather than
+              less (02_story_bible 2.2). Cold-reader question 3 rests on this card and it is
+              answered harder than before. phase0/RECAP_CARDS_M1.md card 3 updated in the same
+              pass; do not re-transcribe the old wording from a stale copy."
 
   - id:      P0.S01.110
     speaker: VOSS
@@ -185,7 +244,7 @@ lines:
     note:    "The ceiling line for 18.9 A in this whole scene. It names a BEHAVIOUR, never
               a feeling, and no other line in the prologue may go further than this one."
 
-  # ================= CARD 5 — MARA =================
+  # ============ SLOT 5 — MARA — approved card 4 ============
   - id:      P0.S01.130
     speaker: VOSS
     voice:   voss
@@ -211,7 +270,7 @@ lines:
               ninety seconds. He claims no credit for it (18.4, Voss fixed trait): she
               found him, she slipped it, he took it."
 
-  # ================= CARD 6 — THE CONTAINER =================
+  # ============ SLOT 6 — THE CONTAINER — approved card 5 ============
   - id:      P0.S01.160
     speaker: VOSS
     voice:   voss
@@ -229,7 +288,7 @@ lines:
 
   # 180 reserved, unused. Card 6 is two lines of approved copy.
 
-  # ================= CARD 7 — EMBER CELL =================
+  # ============ SLOT 7 — EMBER CELL — approved card 6 ============
   - id:      P0.S01.190
     speaker: VOSS
     voice:   voss

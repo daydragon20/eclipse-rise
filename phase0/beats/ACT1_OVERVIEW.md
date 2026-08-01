@@ -144,6 +144,15 @@ Dit is de moeilijkste, want hij moet **retroactief kloppen met wat de speler in 
 | P4-b | De sweep bij de Iron Chorus-ontmoeting komt laat en met te weinig mensen | M1.5.S05 | **verplicht** (Iron Chorus merkt het spottend op) | "de Veil is politie, geen leger" | idem |
 | P4-c | Threx' aanvraag voor een interdictiepakket is **afgewezen** — gestempeld als toewijzingsbesluit, niet als commandobesluit | M1.7.S03 | optioneel document, **maar** Dex noemt de afwijzing hardop | "iemand boven hem is zuinig" | AEGIS wees de middelen af |
 | P4-d | K-77's cellenblok is onderbezet voor wat Threx wist. Hij krijgt Mara en verliest de rest | M1.8.S03 + S09 | **verplicht** (Voss zegt het hardop; Mara wil het niet horen) | "we hadden geluk" | een gecontroleerde opstand mag bloeden, niet sterven |
+| **P4-e** | Het arsenaalboek zei veertig man in die hal en er waren er zesentwintig — **en twee scènes eerder boekt de magazijnofficier tekorten tegen de *district allocation*** | **M1.4.S99.020–.050** + **M1.4.S04.220** | **verplicht ×2** (beide gesproken, beide onvoorwaardelijk) | "verduisterd, of in een kolom geschreven die niemand nakeek" — en Mara overschrijft het met *"we waren beter dan zij"* | **allocatie, geen incompetentie.** De veertien ontbraken niet door diefstal; ze stonden elders geboekt. Een drukventiel moet zichzelf kunnen bewapenen |
+
+> **P4-e toegevoegd 02-08, ruling L1-R44 + L1-R45.** Twee critici konden niet vaststellen of deze twee plekken T4-aanrakingen waren, en dat is terecht: alleen L1 mag een rij in de aanrakingstabel zetten. **Het antwoord is dat het één *plant* is met twee dragers, en dat maar één van de twee een aanraking is.**
+>
+> `M1.4.S99.020`–`.050` **is** een aanraking en staat nu in de inventaris: de Dominion schiet tekort (veertien man ontbreken), twee personages verklaren het (Dex: corruptie; Mara: *"we got in because we were better than they are"*), en de `shot:` op `.060` zegt uitdrukkelijk dat **niemand haar tegenspreekt**. Het L2-blok claimde *"this deliberately does NOT plant T4"* op de grond dat *"the armory was fully defended"* — en dat wordt vier regels eerder door `.020` tegengesproken. **Nooit een slechte regel; altijd een notitie die iets beweert dat het bestand ontkent.**
+>
+> `M1.4.S04.220` is **geen** aanraking. Een aanraking is *een personage dat een tekortschieten van de Dominion wegverklaart terwijl de speler de verklaring aanneemt*. Daar valt niets van samen met een klerk die aan het eind van zijn dienst een materieelverlies boekt: er is in zijn ogen niets tekortgeschoten, hij verklaart niemands gedrag, en hij spreekt niet tegen de speler. **Het is de Dominion die zichzelf beschrijft** — en het is de enige keer in act 1 dat het act-4-vocabulaire hardop klinkt (§2.4 boekt de Foundry-Collapse-doden als *optimal loss allocation*). Dat is een **herkenningsplant** van precies de vorm die P1-a al gebruikt: geef de speler het woord zestig uur voordat het iets betekent. De twee betekenissen lopen echt uiteen — die van hem is boekhouding, die van AEGIS is planning — en daarom verraadt hij de wending niet.
+>
+> **Continuïteitsschuld aan act 4, en die is hier geregistreerd zodat hij niet zoekraakt:** wie de twist-4-betaling schrijft, moet naar M1.4 terug kunnen wijzen. Doet act 4 dat niet, dan wijzigt deze rij en niet de act-4-scène — dezelfde afspraak als bij P3-c.
 
 **Deze groep is het fundament van twist 4 en hij mag niet verwateren.** P4-d is bovendien het antwoord op een ontwerpprobleem dat anders in M1.8 zou bijten: waarom overleeft iemand een val die de hele cel had moeten kosten? Omdat hij daarvoor bedoeld was.
 
@@ -153,22 +162,43 @@ Dit is de moeilijkste, want hij moet **retroactief kloppen met wat de speler in 
 >
 > Gevonden door de criticus over twee missies heen. Dit is precies het soort fout dat één schrijver nooit ziet, want in zijn eigen missie is het gewoon een goede regel.
 
-#### De T4-AANRAKINGEN in speelvolgorde — geteld 01-08, ruling L1-R21
+#### De WEGVERKLARINGEN in speelvolgorde — de aanrakingsinventaris
+
+> **DEZE TABEL IS SINDS 02-08 NIET MEER T4-GESCOPED — ruling L1-R52.** Hij heette *"de T4-aanrakingen"* en dat was een fout van dezelfde familie als L1-R21: **L1-R17's gevaar is VORM, niet welke wending een regel bedient.** Een speler die leert dat een net spreekwoordje betekent dat het spel iets verbergt, kijkt niet na uit welke tabel de regel kwam. `M1.8.S99.090` — *"The Veil buys people. That's the whole job."* — heeft exact de vorm van rij #4 (mededeling plus generaliserende staart) en verklaart een **T3**-anomalie weg. Bleef de tabel T4-gescoped, dan telde niemand hem, en dan generaliseert de tell over de tabelgrens heen. Gemeld door de criticus; overgenomen.
+>
+> **WAT TELT ALS AANRAKING — de definitie, zodat dit niet elke ronde opnieuw beslist wordt.** Drie delen, alle drie nodig:
+> 1. **er schiet iets tekort** dat de speler zou kunnen opvallen (de Dominion reageert dun, of een raadsel blijft staan);
+> 2. **een personage verklaart het weg** in een gesproken, verplichte regel;
+> 3. **niemand spreekt het tegen** — de speler neemt de verklaring aan.
+>
+> **Wat NIET telt:** de Dominion of AEGIS die zichzelf beschrijft (dat is plantmateriaal — zie P4-e en L1-R44), een document of optionele terminal (AR-9: die dragen nooit alleen), en een regel die de anomalie *benoemt zonder hem te verklaren*.
+>
+> **Speelvolgorde, en de rijnummers zijn GEEN sleutel.** Ze zijn op 02-08 hernummerd van acht naar tien; L1-R21 en L1-R40 citeren de oude 1–8. **De regel-ID is de sleutel.** Wie hiernaar verwijst, verwijst naar het ID.
 
 **De eerste versie van L1-R17 citeerde twee regels en zette ze allebei in de verkeerde missie**, en telde de derde niet mee omdat die in geen enkele P4-rij staat. Die fout is doorgelekt naar de koppen van `M1.7.S03` en `M1.8.S03`. De oorzaak is structureel: **de tabel hierboven telt *plants*, en L1-R17 gaat over *aanrakingen*.** Een aforisme dat niemand als plant boekt, is nog steeds een aforisme. Daarom staat de tweede telling er nu naast — een tabel die het ene meet en waartegen het andere gecontroleerd wordt, is geen meting.
 
-| # | Regel | ID | Plant | Vorm | Status |
-|---|---|---|---|---|---|
-| 1 | MARA *"They mark everything. They come back for what is worth the night."* | `M1.2.S03.150` | P4-a | parallellisme + slotbeeld | **blijft gepolijst** — het is competentie, en de curve heeft een top nodig |
-| 2 | MARA *"A marked block is a block nobody looks at twice."* | `M1.2.S03.200` | *geen rij* | maxime | **WORDT VLAK (L1-R40)** — vier regels na #1, zelfde mond, zelfde raadsel |
-| 3 | DEX *"They're police, not an army. Police always come afterwards."* | `M1.5.S05.200` | P4-b | antithese + maxime | **blijft** — één gepolijste per mond per missie, en dit is de zijne |
-| 4 | MARA *"It's a freight yard. Freight yards get freight guards."* | `M1.6.S05.410` | *geen rij* | anadiplose | **WORDT VLAK (L1-R21)** — de eerste barst |
-| 5 | P4-c, de afgewezen aanvraag | `M1.7.S03` | P4-c | — | vlak by spec, staat op NO-GO |
-| 6 | MARA, haar eigen zin uit #1, woordelijk herhaald, onderwerp dichtgeslagen | `M1.7.S06.160` | P4-d opzet | herhaling | goed zoals hij is |
-| 7 | MARA, twee redenen en geen van beide af | `M1.8.S03.130` | P4-d | — | vlak by spec |
-| 8 | DEX, vier vlakke woorden op een lege radio | `M1.8.S09.130` | P4-d slot | — | vlak by spec |
+| # | Regel | ID | Wending | Plant | Vorm | Status |
+|---|---|---|---|---|---|---|
+| 1 | MARA *"They mark everything. They come back for what is worth the night."* | `M1.2.S03.150` | T4 | P4-a | parallellisme + slotbeeld | **blijft gepolijst** — het is competentie, en de curve heeft een top nodig |
+| 2 | MARA *"A marked block is a block nobody looks at twice."* | `M1.2.S03.200` | T4 | *geen rij* | maxime | **WORDT VLAK (L1-R40)** — vier regels na #1, zelfde mond, zelfde raadsel |
+| **3** | **DEX *"Sold, or written into a column nobody checked."* → MARA *"We got in because we were better than they are."*** | **`M1.4.S99.020`–`.050`** | **T4** | **P4-e** | **vlak — plain declaratief, geen figuur** | **NIEUW 02-08 (L1-R45). Blijft woordelijk staan.** De top van Mara's curve: haar zekerste en persoonlijkste verklaring. Dex' wáre verklaring wordt hier midden in een woord afgekapt — precies zoals in #10 |
+| 4 | DEX *"They're police, not an army. Police always come afterwards."* | `M1.5.S05.200` | T4 | P4-b | antithese + maxime | **blijft** — één gepolijste per mond per missie, en dit is de zijne |
+| 5 | MARA *"It's a freight yard. Freight yards get freight guards."* | `M1.6.S05.410` | T4 | *geen rij* | anadiplose | **WORDT VLAK (L1-R21)** — de eerste barst |
+| 6 | P4-c, de afgewezen aanvraag | `M1.7.S03` | T4 | P4-c | — | vlak by spec |
+| 7 | MARA, haar eigen zin uit #1, woordelijk herhaald, onderwerp dichtgeslagen | `M1.7.S06.160` | T4 | P4-d opzet | herhaling | goed zoals hij is |
+| 8 | MARA, twee redenen en geen van beide af | `M1.8.S03.130` | T4 | P4-d | — | vlak by spec |
+| 9 | DEX, vier vlakke woorden op een lege radio | `M1.8.S09.130` | T4 | P4-d slot | — | vlak by spec |
+| **10a** | **FIGHTER_A *"The Veil buys people. That's the whole job."*** | **`M1.8.S99.090`** | **T3** | **P3-d** | **mededeling + generaliserende staart** | **WORDT VLAK (L1-R43).** Zijn eigen `note:` noemt hem *"eight flat words"* — dat is hij niet. Hij deelt zijn slot met `.100`, die wél vlak is |
+| **10b** | **FIGHTER_A *"There's a shift boss out there who saw both cells in one kitchen."*** | **`M1.8.S99.100`** | **T3** | **P3-d** | **vlak** | **blijft.** De warned-verwisseling, en de meetlat waartegen 10a zakt: hetzelfde slot, twee registers |
+| **11** | **CIVILIAN_B *"Or he guessed. People guess and then they're right."*** | **`M1.8.S99.110`** | **T3** | **P3-d** | **maxime** | **BLIJFT CITEERBAAR, en dat is een keuze.** Precies één van de drie verklaringen mag herhaalbaar zijn, en dit is degene die de kamer laat leeglopen — het epigram *ís* de leegloop. `.080` is de wáre en is de minst afgemaakte zin in de kamer |
 
-**Wat vlak maken oplevert is beter dan wat L1-R17 oorspronkelijk vroeg.** De reeks wordt een **afbraakcurve** — gepolijst, dan de eerste barst, dan een letterlijke herhaling, dan twee onafgemaakte redenen, dan vier woorden op een lege radio. De vlakheid wordt daarmee een **karakterfeit over Mara**, een vrouw wier verklaringen opraken, in plaats van een auteursregel. **Wie een negende aanraking schrijft, zet hem in deze tabel of schrijft hem niet.**
+**De asymmetrie in `M1.8.S99` is ontworpen en moet zo blijven: gepolijst-onwaar / vlak-onwaar / onafgemaakt-wáár.** Twee gepolijste onwaarheden naast elkaar is geen asymmetrie meer maar dichtheid, en dat is waarom 10a wijkt en 11 blijft.
+
+**Wat vlak maken oplevert is beter dan wat L1-R17 oorspronkelijk vroeg.** De reeks wordt een **afbraakcurve** — gepolijst, dan de top van haar zelfvertrouwen, dan de eerste barst, dan een letterlijke herhaling, dan twee onafgemaakte redenen, dan vier woorden op een lege radio. De vlakheid wordt daarmee een **karakterfeit over Mara**, een vrouw wier verklaringen opraken, in plaats van een auteursregel. **Wie een nieuwe aanraking schrijft, zet hem in deze tabel of schrijft hem niet.**
+
+> **Mara's curve, na de toevoeging van #3 (02-08).** `M1.2.S03.150` competentie → **`M1.4.S99.050` zelfvertrouwen, en dit is de top** → `M1.6.S05.410` de eerste barst → `M1.7.S06.160` haar eigen zin herhaald → `M1.8.S03.130` twee redenen, geen van beide af → stilte. #3 is bewust géén barst: het is de zekerste en persoonlijkste verklaring die ze ooit geeft, vlak geschreven, en het L2-blok van dat bestand had de eis al precies goed — *"not a comfort that reads as a lie later, but a conviction that reads as a cause of death"*.
+>
+> **En de rijm die niemand had geregistreerd:** Dex' wáre verklaring wordt in `M1.4.S99.040` midden in een woord afgekapt, en zijn wáre verklaring van het K-77-verraad wordt in `M1.8.S99.080` midden in een woord afgekapt. Dezelfde man, dezelfde vorm, zeven missies uit elkaar, en beide keren is het juiste antwoord de minst afgemaakte zin in de kamer. **Twee schrijvers die elkaar niet konden zien hebben dat twee keer geschreven.** Niet opruimen.
 
 > **#2 toegevoegd 01-08, ruling L1-R40, en de rij die eronder hoort staat nu in §18.9 B.** Hij stond in geen enkele tabel omdat hij **geen wegverklaring is maar de exploitatie van de anomalie** — Mara draait hem om in een voordeel, en dat is dezelfde blinde vlek die haar K-77 in draagt. Dat maakt hem zwaarder, niet lichter. Twee gepolijste zinnen over hetzelfde raadsel binnen vier regels leren de speler de **vorm** in plaats van het feit, en dat is precies de faalwijze die L1-R17 beschrijft. **Rij #3's status droeg tot 01-08 de motivering *"M1.5 is GO en wordt hier niet voor heropend"*; die grond is gemeten onwaar (alle zes M1.5-bestanden staan op `draft`) en is vervangen door de grond die wél houdt.**
 
@@ -340,18 +370,26 @@ De regionamen komen uit de gebouwde Phase-1-graaf (`Eclipse/Tools/create_phase1_
 
 | Getal | Betekent | Zetters/dragers | Mag niets anders meten |
 |---|---|---|---|
-| **elf** | de omvang van Ember Cell (AR-1), inclusief het aantal bunks | `P0.S01` · `M1.5.S01.090` · `M1.5.S03.150` · `M1.6.S06.020`/`.110` · `M1.4.S01.159` · `M1.3.S99.182` · de elf opnames in `M1.8.S91` | **L1-R14.** Geen minuten, meters, geweren, patrouille-, verhoor- of transportdagen |
-| **eenenveertig** | de instroom van de Tithe-trein: het aantal mensen dat in Hollow Point aankomt, **in alle drie de takken** | `M1.6.S06.010` (de enige telling die iemand doet) · 13 verdere gebruiken in M1.6, M1.7, M1.8 en de hub | **L1-R32.** Het is geen wagontelling en geen treintotaal. De trein is nooit geteld (`M1.6.S01.110`/`.120`) en dat is de these van de missie |
+| **elf** | de omvang van Ember Cell (AR-1), inclusief het aantal bunks | `P0.S01.200` · `M1.5.S01.090` · `M1.5.S03.150` · `M1.6.S06.020`/`.110` · `M1.4.S01.140` · `M1.3.S99.140` · de elf opnames in `M1.8.S91` | **L1-R14.** Geen minuten, meters, geweren, patrouille-, verhoor- of transportdagen |
+| **eenenveertig** | de instroom van de Tithe-trein: het aantal mensen dat in Hollow Point aankomt, **in alle drie de takken**. Ook de **groepsnaam**: *"de eenenveertig"*, nooit *"de veertig"* | `M1.6.S06.010` (de enige telling die iemand doet) · 13 verdere gebruiken in M1.6, M1.7, M1.8 en de hub | **L1-R32 + L1-R42.** Het is geen wagontelling en geen treintotaal. De trein is nooit geteld (`M1.6.S01.110`/`.120`) en dat is de these van de missie |
+| **veertig** | in M1.8: **de bevrijden uit K-77**, de derde cel — een ándere groep dan de instroom | gesproken: `M1.8.S08.140` (strategic-variant). Verder alleen in `want:`/`shot:`-proza: `M1.8.S07`, `M1.8.S09`, `M1.8.S05.120` | **L1-R42.** Twee groepen in één kamer, één getal uit elkaar. **Eén gesproken gebruik is een lean; een tweede is een botsing** — wie in M1.8 een nieuwe veertig wil uitspreken, wijkt. Twee prozareferenten liggen bovendien elders: `M1.6.S05.310` (de achtergelatenen in `emptied`) en `M1.4.S99.020` (het arsenaalboek, dat in de fictie liegt). Geen van beide mag ooit *"de veertig"* gaan heten |
 | **veertien** | de burgers in het portiek, M1.5 | `M1.5.S99.100`/`.110` | — |
 | **dertien** | M1.1's munitie | `M1.1` (6×), titel van de missie | — |
 | **zeventien** | Bricks dagen in de wagon van Krad-9 | `M1.6.S03.220` | staat sinds L1-R14 vast; **niet terugdraaien naar elf** — de hoofdregel veroordeelde dat gebruik los van de M1.5-botsing |
 | **achttien / negentien** | hoe lang een man het verhoor volhield, en de dag waarop de Chorus eruit kwam | `M1.5.S03.230`/`.240`/`.250` — **te schrijven, L1-R31** | negentien telt in M1.8 K-77's deuren; ordinaal tegenover cardinaal, drie missies apart, aanvaard |
+| **acht maanden** | de ouderdom van het Veil-log in M1.7 — het getal dat de query ouder maakt dan alles erboven (P2-b, T2) | vier M1.7-scènes | **L1-R55. De eenheid hoort bij het getal**: beschermd is *"acht maanden"* als duur, niet het kale woord *acht*. Geen tweede duur van acht maanden in act 1 |
 | **negen · zes** | verzadigd (30× resp. 29× gesproken in act 1) | overal | **niet als nieuw dragend getal gebruiken** |
 | **`two six one`** | het Enforcer-kenteken (§2.11-draad *The Enforcer*, loopt tot het eind van de campagne) | `M1.2.S01` (6×) · `M1.3.S05.150` — **te corrigeren, L1-R36** | er is precies één Enforcer en precies één nummer |
 
 **Cijferconventie (L1-R36).** Cijfers die één voor één worden uitgesproken, worden als **losse woorden zonder koppeltekens** geschreven: *"Two six one."*, *"Four six two."*, *"Nine one seven."* Een koppelteken is een TTS-gok — een model kan het als samenstelling lezen — en het corpus schrijft ze overal los behalve op één plek. Getallen die als gétal klinken blijven één woord: *"Forty-one"*, *"Seventeen"*.
 
 **Wanneer je hier een rij bij zet:** zodra een getal een tweede scène raakt. Niet als het een keer valt.
+
+> **GETAL + EENHEID, NIET HET KALE CIJFERWOORD — ruling L1-R55 (02-08).** *Acht* heeft in act 1 al **vijf** referenten (dagen 2×, meters, een rekindex, maanden 4×, mensen 2×). Per L1-R33 is dat een stijl-lean en geen defect — één constructie die overal iets anders meet is nog geen tegenspraak die de speler kan horen. **Maar *"acht maanden"* draagt in vier M1.7-scènes één betekenis**, en de regel onder deze tabel zegt: een rij zodra een getal een tweede scène raakt. Zou die rij het kále woord beschermen, dan zakt `HUB.A1.reyes_triage.020` (*"Eight words a line"*) op een botsing die niet bestaat — een woordtelling is geen duur.
+>
+> **Dus: wat een register beschermt is het getal *in zijn eenheid*, zodra de eenheid de betekenis draagt.** Dat is dezelfde scheiding als L1-R31's *"nineteen doors"* tegenover *"the nineteenth day"*, en het verklaart meteen waarom **elf** wél het kale woord claimt: de omvang van Ember is een bloot aantal en heeft geen eenheid om zich mee te onderscheiden. **Elf is de uitzondering, niet het model.** Nu kost deze rij niets; bij een vijfde acht-gebruik zou hij niet meer aan te leggen zijn zonder iemands regel te breken.
+
+> **EEN CEL IN DIT REGISTER BEVAT EEN REGEL-ID, NOOIT EEN BESTANDSREGELNUMMER (02-08).** De elf-rij droeg tot 02-08 `M1.4.S01.159` en `M1.3.S99.182`. **Die ID's bestaan niet.** Het zijn de regelnummers waarop die tekst in het `.yaml`-bestand staat; de ID's zijn `M1.4.S01.140` en `M1.3.S99.140` en beide luiden *"eleven bunks"*. Twee cellen, in het register dat er juist is om verwijzingen betrouwbaar te maken. Wie *"repareer `.159`"* kreeg, zocht naar een regel die er niet is — en bestandsregelnummers verschuiven bij elke bewerking terwijl ID's permanent zijn (`SCRIPT_FORMAT` §2). Dit geldt voor élke tabel in dit document.
 
 ---
 

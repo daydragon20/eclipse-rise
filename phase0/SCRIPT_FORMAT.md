@@ -282,6 +282,14 @@ There are two kinds, and the second kind is **a category, not a list**:
 | `run.alarm_raised` | `FEclipseMissionOutcome::bAlarmRaised` | latch |
 | `run.ghost` | never went loud and was never seen | latch |
 | **`run.m17_record`** | **`CompletedObjectiveIds` contains M1.7's optional record objective** | **objective** |
+| **`run.m12_drops_bought`** | **M1.2.S01 prep purchase — set at `.250`/`.260`, read at `.262`/`.264`** | **choice** |
+| **`run.m14_leave_behind`** | **`"rounds"` \| `"rifles"` — M1.4.S05 `.020`/`.030`, read at `.040`/`.045`** | **choice** |
+| **`run.hub_triage_order`** | **`"worst"` \| `"saved"` \| `"ours"` \| `"watch"` — `HUB.A1.reyes_triage`** | **choice** |
+| **`run.m18_threx_probe`** | **`"trade"` \| `"refuse"` \| `"petra"` \| `"board"` — M1.8.S06** | **choice** |
+
+**The last four were added 02-08 (ruling L1-R50) and they had been in production for days.** They are the third kind and the table did not have a name for it: **a conversational branch that must not survive the mission.** All four are set by a `choice:` block and read inside the same scene or mission, so `CONDITION` — which only fires on a fact nothing sets — was always going to stay quiet about them. **A table that is silent because the check is silent is not a table, it is a coincidence.** The M1.2 writer escalated exactly this in his own file (*"it needs a row in the mission prep table and in SCRIPT_FORMAT 4's run-fact list"*) and he was right.
+
+> **The rule for the third kind, so nobody has to ask again: a player choice that changes what is *said* and not what is *carried forward* is `run.`, always.** L1-R27 already settled it for the hub (*hub branches are `run.`; the hub sets zero `story.` flags*), and the same reasoning covers a prep purchase, a what-to-abandon call under fire, and how you answer an interrogator through glass: the campaign does not need to remember any of them, and persisting them grows the save with dead branches for forty-two missions. **Ask "does act 2 read this?" — if no, it is `run.`** Adding a row here costs nothing and changes no check; leaving one out means the practice and the document have drifted, which is the L1-R29 failure in its cheapest form.
 
 **`CompletedObjectiveIds` already exists** (`EclipseMissionTypes.h:165`) and it is generic. So **any `run.` fact of the form "did the player complete this optional objective" needs no new state — only access**, exactly as L1-R4 said of `run.zero_casualty`. Every mission in the game has optionals, so a debrief line about one is always free of persisted state. **A `story.` flag for an optional objective is always wrong.**
 
@@ -395,6 +403,30 @@ version only printed on the findings path.
 
 The scene header is otherwise flat, so `silence` is the one mapping the parser accepts there
 (`HEADER_MAPS`). Keep that list short — every name in it changes how a block is read.
+
+#### A key names a **value**, not a flag — and a scene may read two flags (02-08, RULING L1-R41)
+
+`M1.8.S99` is the first scene to declare a silence while branching on **two** flags:
+`story.m15_pact` (full/limited/none) and `story.m15_shiftboss` (killed/prevented/warned).
+`silence: none` means *"the `none` branch of the pact plays nothing"* — but the checker walks
+flags one at a time, so it also asked whether `none` is a value of `m15_shiftboss`, which it is
+not, and reported an unknown value. **The block was right; the field was ambiguous.** Fixed: a
+value now counts as known as soon as **one** flag the scene reads has it.
+
+> **SPECIFIED, NOT YET ENABLED — the flag-qualified key.** The loose form means one key covers
+> **every** flag the scene reads. That is fine today and it has a hole with a date on it: the
+> moment two flags in one scene share a value name — and `none` is exactly that kind of name —
+> one declared silence can cover two branches, and the second one is a real gap.
+>
+> ```yaml
+> silence:
+>   story.m15_pact.none: "..."   # this flag only. A key without a dot behaves as it does now.
+> ```
+>
+> **Tool change first, adoption second** (the L1-R28 rule): `validate_script.py` does not
+> accept the dotted form yet, so nobody writes it until it does. Backwards compatible by
+> construction — no existing file contains a dot in a silence key, so nothing changes when the
+> form lands.
 
 ### `choice` — player options — RULING L1-R2
 

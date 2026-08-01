@@ -54,10 +54,44 @@ Dat is geen toeval maar de opzet: op het moment dat de cel de Dominion het zwijg
 **Aanwezig:** Mara, Voss, Dex, Reyes, de cel
 
 - **want** — Mara wants the district's ears shut for one night, and she wants everyone in this room to know it is not a robbery.
-- **obstacle** — Every previous cell that made a noise this loud on Kessara is a name Dex can recite.
+- **obstacle** — Every previous cell that made a noise this loud on Kessara is a place and a count Dex can recite, and not one of them is a name he can give.
 - **turn** — Dex volunteers to set the charge himself, which is the first thing he has ever asked to do.
 
-**Beats:** (1) Wat een jammer-mast doet, verteld door wat hij de cel kost (nooit uitgelegd — §18.8). (2) Dex' lijst met cellen die dit probeerden. Hij noemt ze bij naam, wat een Brick-achtige beat is en daarom precies één keer mag. (3) De insertie-keuze: plein of tunnel — de **speler** kiest. (4) Reyes vraagt wat er gebeurt met de gewonden als de extractie onder vuur ligt. Mara antwoordt eerlijk. (5) **Dex meldt zich.**
+**Beats:** (1) Wat een jammer-mast doet, verteld door wat hij de cel kost (nooit uitgelegd — §18.8). (2) **Dex' lijst met cellen die dit probeerden — plaatsen, aantallen en één leeftijd, géén namen.** Het is een Brick-achtige beat en mag daarom precies één keer. (3) De insertie-keuze: plein of tunnel — de **speler** kiest. (4) Reyes vraagt wat er gebeurt met de gewonden als de extractie onder vuur ligt. Mara antwoordt eerlijk. (5) **Dex meldt zich.**
+
+> **RULING L1-R48 — de drie celnamen komen er niet, en de schrijver had gelijk. `.080`/`.090` blijven zoals ze staan.**
+>
+> Beat 2 vroeg om namen. De schrijver heeft geweigerd ze te verzinnen, geëscaleerd in plaats van stil op te lossen, en plaatsen-plus-aantallen geleverd met een leeftijd op het eind (*"The overpass, four, and two of the four were fifteen."*). **Dat is beter dan wat ik vroeg, en het is dezelfde vorm als L1-R34: mijn eis was een proxy en de tekst levert waar de proxy voor stond.**
+>
+> Drie gronden, op volgorde van gewicht:
+> 1. **De canon heeft ze niet.** `00_INDEX.md` kent op Kessara precies twee cellen: Ember en de Iron Chorus, en die tweede leeft en is M1.5's introductie. Drie dode cellen dopen is canon verzinnen, en dat is een owner-beslissing die ik niet neem en die niets oplevert dat de scène nodig heeft.
+> 2. **Naamloosheid ís het onderwerp van de akte.** Wat een naam krijgt overleeft: Ember heet Ember, de cel ruilt in M1.8.S99 een familienaam voor een symbool, en AR-10 zet **de eerste naam op de muur** in M1.8.S90. Dex' lijst is de reden dat die muur bestaat — hij kan zijn doden alleen tellen. Namen in `.080`/`.090` maken van die lijst een eregalerij en van M1.8.S90 een herhaling in plaats van een antwoord.
+> 3. **De leeftijd op het eind doet het werk dat de naam moest doen.** *"two of the four were fifteen"* is Bricks apparaat één stap verschoven, en het kost nul canon.
+>
+> **Gevolg dat de melding niet voorzag: `.080` en `.090` worden dus NIET herschreven.** De generatiewaarschuwing (L1-R18's les) vervalt daarmee — er staat niets in deze scène op het punt te veranderen behalve één toegevoegde regel.
+
+> **RULING L1-R49 — de REGISTER-bevinding sluit met één toegevoegde regel, `.095`, en die regel is een karakterbeat en geen vulling.**
+>
+> De criticus stelde voor de bevinding rood te laten met een herpunte reden. **Ik neem dat niet over, want er is een reparatie die de scène beter maakt, en hij zat vast aan dezelfde escalatie.**
+>
+> **Wat gemeten is en wat het betekent.** De conditie waarvoor L1-R1 de registercontrole schreef — *"een cutscene waarin niemand ooit een volle zin zegt"* — is hier **niet** vervuld: `.230` (13 w), `.270` (14 w) en `.360` (13 w) zijn volle ondergeschikte zinnen. De twintig-woordsdrempel is een **proxy**, en hij faalt hier terwijl het ding waar hij voor staat standhoudt. Dat is een argument om de bevinding niet als stijlfout te lezen — het is **geen** argument dat de scène niets mist.
+>
+> **Het tegenbewijs staat in dezelfde missie en het is doorslaggevend.** `M1.3.S99` is dezelfde kamer, dezelfde vier sprekers, dezelfde schrijver, en haalt **29 woorden** op `.055` — toegevoegd omdat beat 2 daar geknepen werd. De kamer produceert dus lengte zodra een beat erom vraagt. **S01 heeft precies één beat die erom vraagt, en dat is de beat die op deze escalatie stond te wachten.**
+>
+> **`.095` — nieuwe regel, DEX, tussen `.090` en `.100`.** ID-ruimte bestaat (het corpus gebruikt al `.045` en `.262`); niets wordt hernummerd.
+>
+> | Eis | Waarom |
+> |---|---|
+> | **≥20 woorden, één volle zin met een bijzin** | dit is de regel die de registerdrempel haalt, en hij haalt hem omdat de beat hem verdient — niet andersom |
+> | **Onderwerp: waarom de lijst plaatsen, aantallen en één leeftijd heeft en geen namen** | het antwoord op beat 2, zonder één naam te verzinnen |
+> | **Zijn langste regel in de scène, en zijn enige volle zin** | §18.4 geeft Dex fragmenten. **De man die in fragmenten praat produceert één hele zin, één keer, over het enige dat hem bang maakt.** Dat is de beat, en hij is machinaal te controleren |
+> | **Geen maxime (L1-R40), geen triade (§18.9 B), geen benoemd gevoel (§18.9 A)** | een citeerbare zin hier maakt van zijn angst een uitspraak |
+> | **Geen celnaam, geen persoonsnaam, geen plaats buiten het locatieregister** | L1-R48 |
+> | **`.100` *"There's more. I can keep going."* en `.110` *"Don't."* blijven de knop** | daarom staat de regel vóór `.100` en niet erna |
+>
+> **De begrenzing, en die is van mij omdat alleen ik hem kan zien.** Dit is de **derde** gereserveerde grammaticale breuk in de cast: Mara's ene *"jij"* (AR-5), Petra's ene vráág (L1-R9), en nu Dex' ene volle zin. Drie is een systeem; vier is de auteur (§18.9 D). **Geen vierde personage krijgt een gereserveerde breuk**, en de drie die er zijn liggen in verschillende grammaticale categorieën (voornaamwoord, taalhandeling, zinslengte) en in verschillende akten. Dat staat hier zodat de volgende schrijver die dit apparaat mooi vindt, weet dat het op is.
+>
+> **Kosten: nul.** Niets van M1.3 is gegenereerd, geen bestaande regel verandert, en `words:` gaat met de nieuwe regel mee omhoog — de schrijver telt bij.
 **Waarom Dex mee moet:** dit is de missie waarin de ingenieur ophoudt de stem in het oor te zijn. Hij loopt mee, hij is bang, hij is de beste. Vanaf M1.4 blijft hij weer thuis, en dan mist de speler hem — precies zoals het hoort.
 
 ### S02 — *The Anniversary* · de nadering

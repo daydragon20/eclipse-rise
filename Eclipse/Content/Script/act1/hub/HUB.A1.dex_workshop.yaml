@@ -73,6 +73,35 @@ words_generated: 196
 #            The heaviest line in this scene may NOT carry "does not look up" - this file is
 #            not one of the five permitted (8.2 (i)).
 # budget:    WORD-NEUTRAL. What Mara gets, Dex gives up.
+#
+# *** .070's "SHE" NEEDS ONE WORD - RULING L1-R54 (02-08). AND IT IS MY REGRESSION. ***
+# Form A put Mara on stage. Before Form A there was NO WOMAN IN THIS SCENE, so "she" at .070
+# had exactly one possible referent and the line worked on air. Now Mara speaks at .012/.016/
+# .018 and leaves, and the player hears "she" with a fresh wrong referent within reach. It
+# corrects itself inside the same clause - "treating people" is the medic and nobody else -
+# but the correction lands a beat late, and this is the heaviest line in the file. A line that
+# has to be re-parsed is not private, it is confusing, and those are not the same thing.
+# THIS IS THE CLASS BEATS_HUB_A1 8.0 DESCRIBES: a change made for series reasons that a reader
+# of one file cannot see. It reached the series round because only the series round could see
+# it. The writer did nothing wrong; I moved the ground under a line I had not re-read.
+#
+# WHAT MAY NOT CHANGE, and this is the whole reason it is one word and not a rewrite:
+#   - HE NEVER SAYS WHY. The beat is a man giving up his own bench for somebody else without
+#     one word about it, and nobody in the room remarking on it. That is untouchable.
+#   - NO NAME. He does not say Reyes, here or anywhere in this file.
+#   - The hands stay still, the eyes stay on Voss, and the closing still makes it private.
+#
+# WHAT THE FIX MAY DO, and the reason a role word is not the loss it looks like: THE LINE
+# ALREADY IDENTIFIES HER BY FUNCTION. Everyone in this vault knows exactly one person who
+# treats people. So "she" was never hiding WHO - it hides WHY, and a role noun costs nothing
+# the line was actually keeping. Dex drops articles (.040, .060, .070, .110), so a bare role
+# noun in front of the pronoun sits inside his fingerprint rather than against it.
+#
+# REQUIREMENT: at the moment the player hears the pronoun, its referent must already be
+# unambiguous. One word, in .070, before "she". No name, no reason, no reaction, no second
+# pronoun. WRITER ACTION - I do not write the word, and `words:` moves by one.
+# UNTIL IT IS DONE: `dialogue-critic` holds .070, not the file. Nothing else in this scene is
+# in question and the twelve-scene verdict does not turn on it.
 
 # ---- dialogue-writer notes (L2) — REBUILT 2026-08-01 AGAINST THE FORM A CONTRACT ----
 # band:      hub (12-35) as a ceiling (L1-R1). Longest 19 w (.010). Register reached at .010
@@ -238,7 +267,7 @@ lines:
     voice:   dex
     text:    "Bench comes off first. Room goes there with a door, and she stops treating people on the floor."
     shot:    "Third card down. His hands stop on the bench and stay there for the whole line. He is looking at Voss."
-    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private."
+    note:    "MEDBAY, out of his own slot, for somebody else, without one word about why. He names no feeling and does not name her. HEAVIEST LINE IN THE FILE - delivered with the hands still and the eyes on Voss (8.2 (i)); this file is not permitted the stillness of the eyes. The closing makes this line private. *** L1-R54, WRITER ACTION, ONE WORD: the referent of `she` must be unambiguous the moment it is heard. Form A put Mara on stage six lines up and she is the freshest female referent in the room, which she was not when this line was written. Insert one word before `she` - a bare role noun sits inside Dex's article-dropping fingerprint - and change nothing else. NO NAME, NO REASON, NO REACTION. The line already identifies her by function; what it withholds is why, and that stays withheld."
 
   - id:      HUB.A1.dex_workshop.080
     speaker: VOSS

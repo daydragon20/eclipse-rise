@@ -1,9 +1,26 @@
 {
  "bron": "phase0/CASTING_KEUZE.json",
  "toelichting": "Index = positie op progress_media/casting/CASTING.html (premade eerst, daarna Voice Library). Controleer ordering_fingerprint als de shortlist opnieuw is gebouwd.",
- "rollen_gekozen": 17,
- "finalisten_totaal": 33,
- "library_finalisten_zonder_licentiecheck": [],
+ "rollen_gekozen": 19,
+ "finalisten_totaal": 38,
+ "library_finalisten_zonder_licentiecheck": [
+  [
+   "iron_chorus_emissary",
+   "Cain - Calm & Grounded"
+  ],
+  [
+   "iron_chorus_emissary",
+   "Steve - Deep & Authoritative"
+  ],
+  [
+   "petra",
+   "Empress - Smoky, Breathy, and Neutral"
+  ],
+  [
+   "petra",
+   "Mother - Strong, Warm  & Calm"
+  ]
+ ],
  "conflicten_eerste_keuze": {
   "FGY2WhTYpPnrIDTdsKH5": [
    [
@@ -14,18 +31,6 @@
    [
     "Kaya Renn (27)",
     "Laura",
-    1
-   ]
-  ],
-  "Xb7hH8MSUJpSbSDYk0k2": [
-   [
-    "Dr. Elin Reyes (38)",
-    "Alice",
-    1
-   ],
-   [
-    "Grootmaarschalk Sera Kaine (49)",
-    "Alice",
     1
    ]
   ],
@@ -135,11 +140,6 @@
     "AEGIS",
     "Alice",
     2
-   ],
-   [
-    "Grootmaarschalk Sera Kaine (49)",
-    "Alice",
-    1
    ]
   ],
   "hpp4J3VqNfWAUOO0d1Us": [
@@ -658,13 +658,76 @@
    "ordering_fingerprint": "1bb2a282fa7cd741",
    "finalisten": [
     {
-     "stem": "Alice",
-     "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
-     "bron": "premade",
-     "bestand": "progress_media/casting/kaine/kaine_kandidaat2_Alice.mp3",
-     "eigenschappen": "female / middle_aged / british / professional",
+     "stem": "Adalina - Professional & Friendly",
+     "voice_id": "i2SoWWnAm3qCyr53Jenw",
+     "bron": "professional",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_i2SoWWnA.mp3",
+     "eigenschappen": "female / middle_aged / american / confident",
+     "keuze_index": 5,
+     "rang": 1
+    },
+    {
+     "stem": "Glinda - Confident, Sly, Sultry",
+     "voice_id": "o9yXv9EFSasRrRM3x6xK",
+     "bron": "professional",
+     "bestand": "progress_media/casting/stemmen_library/kaine_lib_o9yXv9EF.mp3",
+     "eigenschappen": "female / middle_aged / american / serious",
+     "keuze_index": 8,
+     "rang": 2
+    }
+   ]
+  },
+  "iron_chorus_emissary": {
+   "label": "Iron Chorus-emissaris (M1.5)",
+   "prio": 2,
+   "tier": "Tier 2 - blokkeert M1.5",
+   "aantal_kandidaten": 7,
+   "ordering_fingerprint": "bc3d2a0210a966f5",
+   "finalisten": [
+    {
+     "stem": "Cain - Calm & Grounded",
+     "voice_id": "tX9AxXOGVaX1mDbRjN0f",
+     "bron": "voice_library",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat2_tX9AxXOG.mp3",
+     "eigenschappen": "male / middle_aged / american / calm / narrative_story",
      "keuze_index": 2,
      "rang": 1
+    },
+    {
+     "stem": "Steve - Deep & Authoritative",
+     "voice_id": "lPVHDJjq0RhPU2UxBOD3",
+     "bron": "voice_library",
+     "bestand": "progress_media/casting/iron_chorus_emissary/iron_chorus_emissary_kandidaat3_lPVHDJjq.mp3",
+     "eigenschappen": "male / middle_aged / american / professional / narrative_story",
+     "keuze_index": 3,
+     "rang": 2
+    }
+   ]
+  },
+  "petra": {
+   "label": "Petra Voss (55)",
+   "prio": 2,
+   "tier": "Tier 2 - blokkeert M1.8",
+   "aantal_kandidaten": 8,
+   "ordering_fingerprint": "8defc8dad54e9611",
+   "finalisten": [
+    {
+     "stem": "Empress - Smoky, Breathy, and Neutral",
+     "voice_id": "MHPwHxLx0nmGIb5Jnbly",
+     "bron": "voice_library",
+     "bestand": "progress_media/casting/petra/petra_kandidaat1_MHPwHxLx.mp3",
+     "eigenschappen": "female / old / american / deep / narrative_story",
+     "keuze_index": 1,
+     "rang": 1
+    },
+    {
+     "stem": "Mother - Strong, Warm  & Calm",
+     "voice_id": "TLeBnGDqmcwGf936zZyW",
+     "bron": "voice_library",
+     "bestand": "progress_media/casting/petra/petra_kandidaat5_TLeBnGDq.mp3",
+     "eigenschappen": "female / middle_aged / us midwest / calm / narrative_story",
+     "keuze_index": 5,
+     "rang": 2
     }
    ]
   }

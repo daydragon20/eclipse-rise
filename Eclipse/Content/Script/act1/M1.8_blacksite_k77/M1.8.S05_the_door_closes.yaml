@@ -62,7 +62,13 @@ words_generated: 190
 #            Register reached at .030 (20 w) and .090 (22 w).
 #            Spread 2 w (.070 "And Voss.") to 23 w = 11.5x.
 #
-# *** ESCALATION TO STORY-ARCHITECT - THE FIRST NAME. NOT SOLVED SILENTLY. ***
+# *** ESCALATION - THE FIRST NAME. CLOSED 31-07 BY RULING L1-R23. NO ACTION OUTSTANDING. ***
+# Marked closed 02-08. The ruling is executed: the `turn:` field in this header is the new
+# one, AR-6 rung 4 has two movements, and the ladder tops out in S06.040. The paragraph below
+# is kept because it is the reasoning that produced the right answer - read it as history,
+# not as an open question, and read the LAST sentence of it as withdrawn (see the note under
+# it). L1-R30: an escalation that has been decided and is left standing is an instruction to
+# the next writer.
 # This stub's turn says "Threx uses Voss's FIRST name". Ruling L1-R10 (same night, same
 # document set - BEATS_M1.8.md section 2b, point 4) says the protagonist's first name is
 # player-chosen and therefore CAN NEVER BE VOICED: "everyone says 'Voss', and from M1.8
@@ -74,6 +80,11 @@ words_generated: 190
 # apprenticeship note, not as a syllable. That is stronger than a first name would have
 # been, because a first name only proves he read a file; .080 proves he read it and liked it.
 # If the architect wants the literal reading instead, the fix is one line and no restructure.
+#   ^ WITHDRAWN 02-08. The architect does NOT want the literal reading and cannot have it:
+#     L1-R10 point 4 makes the first name permanently unvoiceable, so AR-6 rung 4 as
+#     originally written was unbuildable, and that was my error and not the writer's. The
+#     offer above is the only live instruction left in this paragraph and it is hereby off
+#     the table. Nobody tries to deliver a first name here again.
 #
 # *** THE THREE NAMES, AND WHY NONE OF THEM IS INVENTED. ***
 # The stub asks for one prisoner, one Ember fighter and Voss.

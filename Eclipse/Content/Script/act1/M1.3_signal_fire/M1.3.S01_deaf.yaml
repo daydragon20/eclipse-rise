@@ -9,7 +9,7 @@ credit_tier:  2
 
 # ---- the three-sentence contract (18.7) ----
 want:         "Mara wants the district's ears shut for one night, and wants everyone in the room to know this is not a robbery."
-obstacle:     "Every cell on Kessara that ever made a noise this loud is a name Dex can recite."
+obstacle:     "Every cell on Kessara that ever made a noise this loud is a place and a count Dex can recite, and not one of them is a name he can give."
 turn:         "Dex volunteers to set the charge himself, which is the first thing he has ever asked to do."
 
 # ---- state ----
@@ -23,8 +23,10 @@ words:        325
 # flags-out: none
 # beats:     1) what a jammer mast does, told through what it costs the cell (never
 #               explained - 18.8)
-#            2) Dex's list of cells that tried this. He names them. That is a Brick beat
-#               and it is allowed exactly once in the act, here, because it is his fear
+#            2) Dex's list of cells that tried this - PLACES, COUNTS AND ONE AGE, NO NAMES
+#               (ruling L1-R48, 02-08; this beat used to read "he names them"). That is a
+#               Brick beat and it is allowed exactly once in the act, here, because it is
+#               his fear
 #            3) the insertion choice - plaza or service tunnel. THE PLAYER CHOOSES
 #            4) Reyes asks what happens to the wounded if extraction is contested;
 #               Mara answers honestly
@@ -32,6 +34,53 @@ words:        325
 # writer:    this is the mission where the engineer stops being the voice in your ear and
 #            walks out with you. From M1.4 he stays home again, and the player misses him.
 #            That absence is the point; do not undercut it by making him casual here.
+#
+# *** ESCALATION 1 ANSWERED - RULING L1-R48 (02-08). NO NAMES. .080/.090 DO NOT CHANGE. ***
+# The writer refused to invent three dead cell names and escalated instead of solving it
+# quietly. That was right, and the refusal is now the ruling. 00_INDEX.md knows exactly two
+# cells on Kessara - Ember and the Iron Chorus - and the second is alive and is M1.5's
+# introduction. But the canon shortage is the weaker half of the reason. THE STRONGER HALF:
+# namelessness is the subject of the act. What gets named survives. Ember is named; the room
+# trades a surname for a symbol in M1.8.S99; and AR-10 puts THE FIRST NAME ON THE WALL in
+# M1.8.S90. Dex's list is the reason that wall exists - he can only count his dead. Give him
+# names here and the list becomes a roll of honour and M1.8.S90 becomes a repeat instead of
+# an answer. The age at the end of .090 does the work the name was supposed to do.
+# The obstacle line in the header has been corrected to say what the scene actually contains.
+#
+# *** REGISTER CLOSES WITH ONE NEW LINE, .095 - RULING L1-R49 (02-08). WRITER ACTION. ***
+# The critic proposed leaving the finding red with a re-pointed reason. I am not taking that,
+# because there is a repair that makes the scene better and it was stuck behind the same
+# escalation. THE MEASUREMENT: the condition L1-R1 wrote this check for - "a cutscene in which
+# nobody ever says a full sentence" - is NOT met here; .230, .270 and .360 are full
+# subordinate sentences at 13-14 words. The 20-word floor is a PROXY and it fails here while
+# the thing it stands for holds. That is a reason not to read the finding as a style fault. It
+# is NOT a reason to conclude the scene is missing nothing.
+# AND THE COUNTER-EVIDENCE IS IN THIS MISSION: M1.3.S99 is the same room, the same four
+# speakers, the same writer, and reaches 29 words at .055 - added because beat 2 was being
+# clipped there. This room produces length the moment a beat asks for it, and S01 has exactly
+# one beat that asks, which is the one that was waiting on me.
+#
+# .095  DEX, new line, between .090 and .100. Nothing is renumbered (the corpus already uses
+#       .045 and .262). Requirements, and they are mine; the line is the writer's:
+#         - AT LEAST 20 WORDS, one full sentence with a subordinate clause. This is the line
+#           that reaches the floor, and it reaches it because the beat earns it.
+#         - SUBJECT: why the list is places, counts and one age instead of names. Not one
+#           invented cell name, person or place outside the act-1 location register.
+#         - HIS LONGEST LINE IN THE SCENE AND HIS ONLY FULL SENTENCE. 18.4 gives Dex
+#           fragments. The man who speaks in fragments produces one whole sentence, once, about
+#           the only thing that frightens him. That is the beat, and a critic can check it.
+#         - NO maxim (L1-R40), NO triad (18.9 B), NO named feeling (18.9 A). A quotable line
+#           here turns his fear into a statement.
+#         - .100 "There's more. I can keep going." and .110 "Don't." STAY THE BUTTON. That is
+#           why the line goes before .100 and not after .110.
+#       Then update `words:` and re-ask REGISTER. Do not write a twentieth word anywhere else.
+#
+# BOUNDARY, AND ONLY L1 CAN SEE IT: this is the THIRD reserved grammatical break in the cast -
+# Mara's single "you" (AR-5), Petra's single question (L1-R9), and now Dex's single full
+# sentence. Three is a system; four is the author (18.9 D). NO FOURTH CHARACTER GETS ONE. The
+# three that exist are in different grammatical categories - pronoun, speech act, sentence
+# length - and in different acts. This is written down so the next writer who likes the device
+# knows it is spent.
 
 # ---- dialogue-writer notes (L2) ----
 # band:      type is `cutscene` (20-60 per 18.3). MOST LINES SIT FAR BELOW 20, and the
@@ -54,24 +103,41 @@ words:        325
 # and the turn at .310-.320 works BECAUSE he cannot say why.
 # THERE IS ONE REAL HOLE AND IT IS ALREADY L1'S: escalation 1 above. Beat 2 asks Dex to
 # recite the dead cells BY NAME and there are no canon cell names, so he recites places
-# and counts instead. Names carry length. If L1 grants three names, .080/.090 get
-# rewritten on the same ids and THIS FINDING SHOULD BE RE-ASKED THEN - it may answer
-# itself. Until then the scene is short because of who is in the room, which is not a
-# defect, and I am not writing a twentieth word to close a gap that belongs to a different
-# ticket.
+# and counts instead. Names carry length.
+#
+# *** THAT DIAGNOSIS WAS RIGHT AND IT IS THE ONE THAT GOT ACTED ON. ANSWERED 02-08. ***
+# L1-R48 refuses the names, so .080/.090 do NOT get rewritten - and L1-R49 closes REGISTER
+# with ONE ADDED LINE, .095, which is Dex saying why the list has no names in it. The hole and
+# the finding were the same defect, exactly as this paragraph said; they are answered
+# together. See the L1 block above for the requirements on .095, and note the two things this
+# changes about the refusal to write a twentieth word: it was the right refusal (a word added
+# to close a bar is padding), and the line that now reaches the floor is not that word - it is
+# a beat that was underfed because the canon it wanted did not exist.
 # ar-5:      Mara spends ZERO of her "you" allowance here and says "I" never. Checked line
 #            by line. Her only second-person constructions are bare imperatives.
-# reyes:     no contraction anywhere in her four lines. She is stressed and it shows in
-#            grammar, not in adjectives (18.4).
+# reyes:     no contraction anywhere in her THREE lines (the count read "four" until 02-08;
+#            the contraction claim itself was regex-checked across the mission and holds -
+#            only the tally was one high). She is stressed and it shows in grammar, not in
+#            adjectives (18.4).
+# eleven:    L1-R14 checked, 02-08, for the whole of M1.3. ONE use in the mission -
+#            M1.3.S99.140, eleven bunks as the measure of Ember - which is the meaning the
+#            ruling protects. Nothing here. M1.3 was the only act-1 mission without this
+#            note, and it was clean the whole time; an unwritten check is indistinguishable
+#            from an unmade one.
 #
-# *** ESCALATION 1 - Dex's list (beat 2). ***
-# The beat asks him to recite the cells that tried this BY NAME. There are no canon cell
+# *** ESCALATION 1 - Dex's list (beat 2). CLOSED 02-08 BY RULING L1-R48: NO NAMES. ***
+# The beat asked him to recite the cells that tried this BY NAME. There are no canon cell
 # names on Kessara except Ember and Iron Chorus, and Iron Chorus is alive and is M1.5's
 # introduction. Inventing three dead cell names is exactly the quiet canon drift the brief
 # forbids, so I did NOT invent them. He recites PLACES from the act-1 location register
 # and COUNTS instead, and the last count carries an age instead of a name (.090). That is
-# Brick's device transposed one step and it costs no canon. If story-architect wants real
-# names, they come from L1 and I will rewrite .080/.090 on the same ids.
+# Brick's device transposed one step and it costs no canon.
+# L1'S ANSWER: the text was right and the stub was wrong, same shape as L1-R34. .080 and .090
+# STAY AS WRITTEN - no rewrite, no new ids, and the "if L1 wants real names" offer that used
+# to close this paragraph is WITHDRAWN so that nobody reads it as a standing invitation. The
+# beat sheet and the L1 block above now say places-counts-and-one-age. The full reasoning,
+# including why namelessness is the subject of the act and what it pays into M1.8.S90, is in
+# BEATS_M1.3.md section 4 S01.
 #
 # NOTE FOR M1.5's WRITER: .080 puts a dead cell of six in the Worker Housing pump gallery,
 # two winters before M1.3. M1.5 plays there. That is free weight; it is not a conflict.

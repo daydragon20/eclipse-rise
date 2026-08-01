@@ -79,6 +79,56 @@ words:        300
 # to Torren's silences and Kaya's undercutting in act 2 as well.
 # COST: zero. status is draft, critic is null. Nothing is generated and nothing is re-paid.
 #
+# *** .020-.050 IS A T4 TOUCH, AND THE SECOND CARRIER OF PLANT P4-e. RULING L1-R45 (02-08).
+#     NOT ONE WORD OF DIALOGUE CHANGES. READ THIS BEFORE YOU "FIX" ANYTHING HERE. ***
+# The critic could not decide this and was right not to: only L1 may put a row in the touch
+# inventory, and the inventory says "write a ninth one into this table or do not write it".
+# I have measured it against the definition instead of against the L2 note, and it is a touch.
+# THE DEFINITION HAS THREE PARTS AND THIS BEAT HAS ALL THREE:
+#   1  THE DOMINION FALLS SHORT.   .020 - the book said forty were in that hall and there
+#      were twenty-six. .030 asks where the other fourteen are. That is fourteen missing
+#      bodies off a defended position, which is the same SHAPE as P4-a (a block the Veil
+#      marked and never swept) and P4-b (a sweep that came late and thin).
+#   2  A PERSON ACCOUNTS FOR IT.   Twice. Dex says corruption (.040, "sold, or written into
+#      a column nobody checked"); Mara overrides him with competence (.050, "we got in
+#      because we were better than they are").
+#   3  NOBODY ARGUES.              The shot on .060 says so in as many words, and the L2 note
+#      correctly calls that shot load-bearing.
+# SO THE L2 CLAIM "this deliberately does NOT plant T4" WAS UNTRUE ABOUT ITS OWN FILE, and
+# its stated ground - "the armory was fully defended" - is contradicted four lines earlier by
+# .020. It is corrected below. This is the recurring failure of eight critic rounds: never a
+# bad line, always a note that asserts something the file denies.
+#
+# WHAT IT COSTS TO REGISTER IT: nothing, and that is the point. The line is already flat.
+# "We got in because we were better than they are" has no parallelism, no antithesis and no
+# closing image - it is a plain declarative, which is exactly what L1-R17 asks of a touch.
+# It does not add to the form-tell. What it adds is a ROW IN THE COUNT, so that the ninth
+# touch is measured against nine and not against eight.
+#
+# IT IMPROVES MARA'S CURVE INSTEAD OF DISTURBING IT. Play order now reads: competence
+# (M1.2.S03.150) -> self-belief, HERE -> consensus from another mouth (M1.5.S05.200) -> the
+# first crack (M1.6.S05.410) -> her own sentence repeated (M1.7.S06.160) -> two unfinished
+# reasons (M1.8.S03.130) -> four words on a dead radio (M1.8.S09.130). This scene is the TOP
+# of that curve, not a crack in it: it is the most confident and the most personal version she
+# ever gives, and the L2 note already had the requirement exactly right - "not a comfort that
+# reads as a lie later, but a conviction that reads as a cause of death".
+#
+# AND THE RHYME NOBODY HAD REGISTERED, WHICH IS THE BEST ARGUMENT FOR LEAVING IT ALONE:
+# Dex's TRUE explanation is cut off mid-word here (.040), and Dex's TRUE explanation of the
+# K-77 betrayal is cut off mid-word in M1.8.S99.080. Same man, same shape, seven missions
+# apart, and both times the correct answer is the least finished sentence in the room. That
+# was written twice by two writers who could not see each other. Do not tidy either one.
+#
+# P4-e: this beat shares one plant row with M1.4.S04.220, which is the same fact from the
+# Dominion's side - a clerk booking a shortfall against the DISTRICT ALLOCATION. The cell
+# explains the missing fourteen as theft; the building's own officer files losses by
+# allocation, two scenes apart, in one mission. Act 4 turns both over at once. AR-9 is
+# satisfied twice: both carriers are mandatory, spoken and unconditional.
+# CONTINUITY DEBT TO ACT 4, and it is registered in ACT1_OVERVIEW section 4 so it cannot be
+# forgotten: whoever writes the twist-4 payoff must be able to point back here. The fourteen
+# were not embezzled - they were allocated elsewhere, because a pressure valve has to be able
+# to arm itself. Nothing in act 1 may say that, hint at it, or let anybody wonder about it.
+#
 # writer:    Reyes's arc is "from penance to purpose" (2.5). This is the first stone: she
 #            treats a man she would once have been ordered to triage by loyalty score.
 #            The scene knows it. She does not say it.
@@ -136,9 +186,14 @@ words:        300
 # comfort that reads as a lie later, but a conviction that reads as a cause of death.
 # The shot on .060 is load-bearing: NOBODY DISAGREES WITH HER. Dex shrugs. If Dex looks
 # doubtful, the twist is flagged sixty hours early and the scene is worthless.
-# NOTE: this deliberately does NOT plant T4. Nobody says the Dominion under-reacted -
-# the armory was fully defended and the beat sheet reserves T4 for elsewhere. What is
-# planted here is Mara's READING of the win, which is a character fact, not an enemy fact.
+# NOTE - CORRECTED 02-08 BY RULING L1-R45. The sentence that stood here said "this
+# deliberately does NOT plant T4", on the ground that "the armory was fully defended". That
+# ground is contradicted by .020 four lines above it: the book said forty and there were
+# twenty-six. IT IS A T4 TOUCH AND IT IS NOW REGISTERED - see the L1 block for the full
+# reasoning, and do not put the old sentence back.
+# WHAT THE NOTE HAD RIGHT, AND IT IS THE HALF THAT MATTERS TO THE WRITING: what is planted
+# here is Mara's READING of the win. It is a character fact first and an enemy fact second,
+# and it is written flat on purpose. Nothing changes in these five lines.
 #
 # reyes:     her biggest scene of the act and she never says where she learned any of it.
 #            .100 is the whole thing: she knows where the cuff sits in a Dominion holding
@@ -182,6 +237,7 @@ lines:
     speaker: DEX
     voice:   dex
     text:    "And their book said forty were in that hall. There were twenty-six."
+    note:    "*** T4 TOUCH OPENS - L1-R45 (02-08). *** Fourteen missing bodies off a defended position: the same shape as P4-a and P4-b, one mission earlier than either. In act 1 this is a paperwork fact about a corrupt garrison and it must never read as stranger than that. FORTY here is the Dominion's OWN BOOK and it is a lie in the fiction - it is not the forty-one of M1.6's intake (L1-R32) and not the freed of M1.8. Nobody counts it twice and nobody comes back to it."
 
   - id:      M1.4.S99.030
     speaker: FIGHTER_B
@@ -198,6 +254,7 @@ lines:
     voice:   mara
     interrupts: true
     text:    "We got in because we were better than they are."
+    note:    "*** T4 TOUCH, REGISTERED - L1-R45. THE LINE DOES NOT CHANGE. *** It is already flat: no parallelism, no antithesis, no closing image. That is what L1-R17 asks of a touch and it is why registering it costs nothing. This is the TOP of Mara's curve, not a crack in it - the most confident and most personal explanation she ever gives - and the curve breaks down from M1.6.S05.410 onward. If anybody ever polishes this into something quotable, the whole breakdown curve inverts. Dex's true explanation is cut off mid-word by it, exactly as it is again in M1.8.S99.080."
 
   - id:      M1.4.S99.060
     speaker: DEX

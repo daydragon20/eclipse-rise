@@ -9,6 +9,24 @@ voltooid is. De 2.9-prologue (2 u) comprimeert naar deze 6 kaarten (spec staat 5
 + 2–3 regels. Stills zijn Phase-2-graybox-waardig: een gestileerd stilstaand beeld uit de
 bestaande district-assets/palet volstaat (15.5); geen nieuwe art-dependency.*
 
+> **KAARTNUMMER ≠ SLOTNUMMER — ruling L1-R47 (02-08).** Dit document heeft **zes** kaarten.
+> Het scriptbestand `Eclipse/Content/Script/act1/prologue/P0.S01_recap.yaml` heeft **zeven**
+> ID-blokken, want blok 3 is de gereserveerde Enforcer-kaart die op owner-vraag **Q-2** wacht.
+> Alles ná die reservering ligt daar dus één hoger. **Dit document wint**: kaartnummers zijn
+> die van hieronder, en wat het scriptbestand heeft zijn **slots**.
+>
+> | kaart (hier) | slot (script) | | kaart (hier) | slot (script) |
+> |---|---|---|---|---|
+> | 1 De stad | 1 | | 4 Mara | 5 |
+> | 2 De Tithe | 2 | | 5 De container | 6 |
+> | 3 Petra | **4** | | 6 Ember Cell | 7 |
+> | *(nog geen kaart — Q-2)* | *3, leeg* | | | |
+>
+> Waarom dit een bevinding was en geen muggenzifterij: het scriptbestand noemde zijn blokken
+> tot 02-08 óók *"card N"*, en dan is *"repareer kaart 4"* Petra in het ene document en Mara
+> in het andere. Wordt Q-2 met **ja** beantwoord, dan groeit dit document naar zeven kaarten
+> en lopen beide nummeringen weer gelijk.
+
 ---
 
 ## Kaart 1 — De stad
@@ -24,9 +42,25 @@ bestaande district-assets/palet volstaat (15.5); geen nieuwe art-dependency.*
 
 ## Kaart 3 — Petra
 **Still:** een opengebroken deur, een omgevallen stoel, een AEGIS-vlugschrift op tafel.
-> Then AEGIS came "pre-compliance" — and took Aunt Petra.
+> Then AEGIS came for Aunt Petra. The notice said pre-compliance.
 > No charge. No date. No office that answers.
 > That was the day keeping your head down stopped working.
+
+> **Regel 1 gewijzigd 02-08 door `story-architect`, ruling L1-R46. Dit is de enige wijziging
+> in de goedgekeurde kopij en de bedoeling is onveranderd.** Er stond: *Then AEGIS came
+> "pre-compliance" — and took Aunt Petra.* **Aanhalingstekens maken geen geluid.** Zeg de
+> regel zoals TTS hem krijgt en *"came"* krijgt een complement dat het niet kan hebben; de
+> leestekens droegen de hele syntaxis. Deze kaart is `credit_tier: 2`, de enige tag is
+> `[quietly]` en de leveringsnotitie zegt *"flat, after the fact"* — vlak en zacht is precies
+> de levering waarin een ongemarkeerd citaat verdwijnt. Zelfde klasse als L1-R36, en erger,
+> want een koppelteken heeft tenminste nog een defaultlezing.
+>
+> **Wat behouden is, want dát is wat de owner goedkeurde:** AEGIS gebruikte dat eufemisme, en
+> Petra werd meegenomen, zonder aanklacht. **Wat veranderde:** het eufemisme hangt nu aan een
+> **document** in plaats van aan leestekens. Dat overleeft de spraakketen zonder acteerwerk,
+> het haakt aan het vlugschrift dat al in de still ligt, en het is bureaucratischer in plaats
+> van minder (`02_story_bible.md` §2.2). Koudlezervraag 3 rust volledig op deze kaart en wordt
+> harder beantwoord dan eerst. Doorgevoerd in `P0.S01.100` in dezelfde beurt.
 
 ## Kaart 4 — Mara
 **Still:** een handschoen schuift een gevouwen routekaart over een tafel; gezicht buiten beeld.
