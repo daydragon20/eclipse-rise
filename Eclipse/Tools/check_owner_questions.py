@@ -1,5 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+OPENSTAANDE UITBREIDING, gemeten op 02-08.
+------------------------------------------
+Deze tool controleert dat elk repo-pad in een OWNER-KAART bestaat. Hetzelfde
+risico geldt voor `NIEUWE_CHAT_PROMPT.txt` -- het document dat een verse sessie
+als EERSTE leest -- en dat is niet gedekt. Vandaag stond daar een gereedschaps-
+tabel met `Eclipse\Toolserify.ps1` in: een verkeerd ontsnapte backslash in een
+commando dat niet bestaat. Wie het intikt concludeert dat de bar stuk is.
+
+Met de hand nagelopen: 32 paden genoemd, na die ene reparatie 0 ontbrekend.
+Let op bij het bouwen: mijn eerste handcontrole meldde er ZES omdat de regex bij
+een letter begon en `01_game_vision.md` als `_game_vision.md` las. Een padcheck
+die leidende cijfers laat vallen, meldt vijf bestanden die er wel zijn.
 """Controleert of een owner-vraag ook echt UITVOERBAAR is.
 
 WAAROM DIT BESTAAT. Op 01-08 stonden er twee kaarten op het dashboard die Nathan
