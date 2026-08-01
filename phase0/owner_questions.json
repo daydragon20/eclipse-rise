@@ -22,35 +22,6 @@
  ],
  "vragen": [
   {
-   "id": "O-20",
-   "prio": "nu",
-   "vraag": "Licentiecontrole op tien stemmen — dit is het enige dat nog tussen jou en audio staat",
-   "waarom": "De poort staat GROEN (exitcode 0) en 63 scènes / 85.354 credits staan klaar. Er is nog één ding, en het is owner-werk omdat ik het niet kan: 19_voice_production.md eist dat de COMMERCIËLE LICENTIE met de hand op de stemkaart wordt gelezen voor er iets mee gegenereerd wordt.\n\nIk genereer geen seconde audio voor jij dit hebt afgevinkt. Niet uit voorzichtigheid maar omdat casting onomkeerbaar is: blijkt één stem achteraf niet commercieel bruikbaar, dan is elke regel die eronder gegenereerd is verloren geld — en voor Mara alleen zijn dat er 332.\n\nDE TIEN LINKS, klaar om te openen:\n\n  dominion_conscript:B       Miguel - American English - Clear and Yout https://elevenlabs.io/app/voice-library?voiceId=6UZ6Y6OSl14UA2aOxuMM\n  eclipse_fighter:B          Michael - Gruff and Serious                https://elevenlabs.io/app/voice-library?voiceId=iPYqcpY8j8Ap4jUf28I3\n  eclipse_fighter:C          Beth - Bold and Smooth Narrator            https://elevenlabs.io/app/voice-library?voiceId=y3UNfL9XC5Bb5htg8B0q\n  eclipse_fighter:D          Arric - Steady and Deadpan                 https://elevenlabs.io/app/voice-library?voiceId=AOLUVLMs1jzrUpQeAea8\n  iron_chorus_emissary:-     Marcus K - Calm Documentary Narrator       https://elevenlabs.io/app/voice-library?voiceId=3H55HGnNE1XjYxigHSAS\n  kaine:-                    Eryn – Strong Female Military Commander    https://elevenlabs.io/app/voice-library?voiceId=wa4sQVgbDDzUDEzJwch3\n  kaya:-                     Veronica - Sassy and Energetic             https://elevenlabs.io/app/voice-library?voiceId=ejl43bbp2vjkAFGSmAMa\n  petra:-                    Blue - Low, Calm with Grit                 https://elevenlabs.io/app/voice-library?voiceId=YGWwh1G8pUwWmJyCCpma\n  torren:-                   Onyx – Calm & Friendly Podcast Narrator    https://elevenlabs.io/app/voice-library?voiceId=An7r4HL8TAw73K5uSMpy\n  veil_operative:B           Madison Ray - Sharp News Anchor            https://elevenlabs.io/app/voice-library?voiceId=FyrYFW3P9GUxA348YGWu\n\nKijk per stem naar 'commercial use' of 'licensing' op de kaart. Duurt ongeveer een minuut per stem.",
-   "stappen": "1. Open de tien links hierboven.\n2. Lees per stem de licentie op de stemkaart.\n3. Zeg hieronder of ze allemaal mogen, of welke niet.",
-   "opties": [
-    {
-     "label": "Alle tien mogen commercieel",
-     "waarde": "alle_tien_ok",
-     "toelichting": "Ik begin meteen met genereren.",
-     "gevolg": "Tier 1 barks en daarna act 1. Eerste batch is M1.1 zodat je de ijkmissie kunt horen."
-    },
-    {
-     "label": "Eén of meer mogen niet — ik zeg welke",
-     "waarde": "gedeeltelijk",
-     "toelichting": "Vertel welke, dan zoeken we vervangers voor die rol.",
-     "gevolg": "Ik genereer alleen wat wel mag, en zet een kaart klaar voor de rollen die een nieuwe stem nodig hebben."
-    },
-    {
-     "label": "Ik wil dat jij het eerst uitzoekt",
-     "waarde": "uitzoeken",
-     "toelichting": "Ik kan de kaarten niet openen zonder browsertoegang.",
-     "gevolg": "Dat kost een owner-actie (browsertoegang) en is dus langzamer dan zelf tien links openen. Generatie blijft tot dan stil."
-    }
-   ],
-   "advies": "Dit is een minuut of tien werk en het is het enige dat nog tussen jou en de eerste ingesproken regel staat. Negen van de tien komen uit de Voice Library, en dat is precies de categorie waar de licentie per stem verschilt.",
-   "vrijtekst": true
-  },
-  {
    "id": "T-8",
    "vraag": "MetaHuman-downloads afronden?",
    "waarom": "De basis staat er (SentinelC + Common, 908 MB). Voor de resterende MetaHuman-onderdelen is per stuk één Download-klik nodig. Daarna kan de curatie van de named-character-slots verder.",
@@ -102,6 +73,35 @@
     }
    ],
    "advies": "Halveren. Je hebt met één stem al 23.507 bespaard en zit op 57% van je saldo in plaats van 75% — de druk is eraf. De 4.778 die halveren oplevert is minder waard dan het risico dat je Voss vlak maakt, maar het is wel het enige voorstel dat geld bespaart zónder een regel te verliezen die iemand hoort.",
+   "vrijtekst": true
+  },
+  {
+   "id": "O-22",
+   "prio": "als je zin hebt",
+   "vraag": "Er staat 1 GB aan nieuwe assets ongetrackt — houden of weg?",
+   "waarom": "Twee mappen staan in de werkboom zonder dat ze in git zitten en zonder dat .gitignore ze uitsluit:\n\n  Eclipse/Content/Planet_Project   1.012 MB\n  Eclipse/Content/muzzle_flash         8 MB\n  samen 60 bestanden\n\nIk leg dat niet uit mezelf vast. Een gigabyte binaries in één commit is een keuze over hoe zwaar je repo wordt, en die is van jou.\n\nHET IS NIET URGENT: ze staan veilig op schijf en blokkeren niets. Maar zolang ze ongetrackt zijn, verschijnen ze bij elke statuscontrole én zijn ze weg bij een opruimbeurt of een verkeerde checkout — hetzelfde risico waardoor je tien castingkeuzes vanmiddag bijna verloren gingen.",
+   "stappen": "Kies hieronder. Er hoeft niets gedownload of geïnstalleerd te worden.",
+   "opties": [
+    {
+     "label": "Houden — leg ze vast in git",
+     "waarde": "vastleggen",
+     "toelichting": "Ze horen bij het project.",
+     "gevolg": "De repo wordt ongeveer een gigabyte zwaarder en klonen duurt langer. Daarna zijn ze veilig en verdwijnen ze uit je statuslijst."
+    },
+    {
+     "label": "Weg — ik gebruik ze niet",
+     "waarde": "verwijderen",
+     "toelichting": "Ik verwijder de twee mappen.",
+     "gevolg": "Een gigabyte schijfruimte terug. Als je ze later toch nodig hebt moeten ze opnieuw verworven worden."
+    },
+    {
+     "label": "Laten staan, niet vastleggen",
+     "waarde": "laten_staan",
+     "toelichting": "Alleen uit de statuslijst halen via .gitignore.",
+     "gevolg": "Repo blijft licht en je statuslijst wordt schoon. Risico: bij een opruimbeurt zijn ze weg zonder waarschuwing."
+    }
+   ],
+   "advies": "Optie 1 als ze bij het project horen, optie 3 als je het nog niet weet. Wat ik afraad is ze laten staan zónder keuze — dan blijven ze in elke statuscontrole opduiken en verdwijnen ze een keer stil.",
    "vrijtekst": true
   }
  ]
